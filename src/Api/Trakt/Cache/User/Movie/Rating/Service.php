@@ -15,7 +15,7 @@ class Service
         $this->repository = $repository;
     }
 
-    public function findRatingByTraktId(TraktId $traktId) : ?Entity
+    public function findRatingByTraktId(TraktId $traktId) : ?int
     {
         return $this->repository->findByTraktId($traktId);
     }

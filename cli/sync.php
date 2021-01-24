@@ -9,6 +9,13 @@ $api = $container->get(Movary\Api\Trakt\Api::class);
 $movieCreateService = $container->get(Movary\Application\Movie\Service\Create::class);
 /** @var Movary\Application\Movie\Service\Select $movieSelectService */
 $movieSelectService = $container->get(Movary\Application\Movie\Service\Select::class);
+/** @var Movary\Application\Movie\Service\Update $movieUpdateService */
+$movieUpdateService = $container->get(Movary\Application\Movie\Service\Update::class);
+
+/** @var Movary\Application\Movie\History\Service\Create $movieHistoryCreateService */
+$movieHistoryCreateService = $container->get(Movary\Application\Movie\History\Service\Create::class);
+/** @var Movary\Application\Movie\History\Service\Delete $movieHistoryDeleteService */
+$movieHistoryDeleteService = $container->get(Movary\Application\Movie\History\Service\Delete::class);
 
 /** @var Movary\Api\Trakt\Cache\User\Movie\Rating\Service $cacheUserMovieRatingService */
 $cacheUserMovieRatingService = $container->get(Movary\Api\Trakt\Cache\User\Movie\Rating\Service::class);
@@ -36,24 +43,26 @@ foreach ($watchedMovies as $watchedMovie) {
         $movie = $movieCreateService->create(
             $watchedMovie->getMovie()->getTitle(),
             $watchedMovie->getMovie()->getYear(),
-            $rating === null ? null : $rating->getRating(),
+            $rating,
             $watchedMovie->getMovie()->getTraktId(),
             $watchedMovie->getMovie()->getImdbId(),
             $watchedMovie->getMovie()->getTmdbId(),
         );
 
         echo 'Added movie: ' . $movie->getTitle() . "\n";
-    } else {
-        //TODO Update rating for existing movie
+    } elseif ($movie->getRating() !== $rating) {
+        $movie = $movieUpdateService->updateRating($movie->getId(), $rating);
 
         echo 'Updated rating for movie: ' . $movie->getTitle() . "\n";
     }
 
+    $movieHistoryDeleteService->deleteByMovieId($movie->getId());
+
     /** @var Movary\Api\Trakt\ValueObject\User\Movie\History\Dto $movieHistoryEntry */
     foreach ($api->getUserMovieHistoryByMovieId('leepe', $watchedMovie->getMovie()->getTraktId()) as $movieHistoryEntry) {
-        //TODO Delete all existing history entries and create them new
+        $movieHistoryCreateService->create($movie->getId(), $movieHistoryEntry->getWatchedAt());
 
-        echo 'Added movie "' . $movieHistoryEntry->getMovie()->getTitle() . '" watch date: ' . $movieHistoryEntry->getWatchedAt() . "\n";
+        echo 'Added watch date for "' . $movieHistoryEntry->getMovie()->getTitle() . '": ' . $movieHistoryEntry->getWatchedAt() . "\n";
     }
 }
 

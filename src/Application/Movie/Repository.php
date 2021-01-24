@@ -28,7 +28,22 @@ class Repository
                 'tmdb_id' => $tmdbId,
             ]
         );
+
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
+    }
+
+    public function findByTraktId(TraktId $traktId) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE trakt_id = ?', [$traktId->asInt()]);
+
+        return $data === false ? null : Entity::createFromArray($data);
+    }
+
+    public function updateRating(int $id, int $rating) : Entity
+    {
+        $this->dbConnection->update('movie', ['rating' => $rating], ['id' => $id]);
+
+        return $this->fetchById($id);
     }
 
     private function fetchById(int $id) : Entity
@@ -40,12 +55,5 @@ class Repository
         }
 
         return Entity::createFromArray($data);
-    }
-
-    public function findByTraktId(TraktId $traktId) : ?Entity
-    {
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE trakt_id = ?', [$traktId->asInt()]);
-
-        return $data === false ? null : Entity::createFromArray($data);
     }
 }

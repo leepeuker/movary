@@ -26,6 +26,11 @@ class DateTime implements \JsonSerializable
         return new self(new \DateTime($dateString, new \DateTimeZone('UTC')));
     }
 
+    public static function createFromStringAndTimeZone(string $dateString, string $timeZone) : self
+    {
+        return new self(new \DateTime($dateString, new \DateTimeZone($timeZone)));
+    }
+
     public function __toString() : string
     {
         return (string)$this->dateTime->format('Y-m-d H:i:s');

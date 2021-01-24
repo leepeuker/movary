@@ -28,8 +28,8 @@ class Dto
         return new self(
             Movie\Dto::createFromArray($data['movie']),
             $data['plays'],
-            DateTime::createFromString($data['last_watched_at']),
-            DateTime::createFromString($data['last_updated_at']),
+            DateTime::createFromStringAndTimeZone($data['last_watched_at'], 'GMT'),
+            DateTime::createFromStringAndTimeZone($data['last_watched_at'], 'GMT'),
         );
     }
 
@@ -38,8 +38,18 @@ class Dto
         return $this->lastUpdated;
     }
 
+    public function getLastWatched() : DateTime
+    {
+        return $this->lastWatched;
+    }
+
     public function getMovie() : Movie\Dto
     {
         return $this->movie;
+    }
+
+    public function getPlays() : int
+    {
+        return $this->plays;
     }
 }

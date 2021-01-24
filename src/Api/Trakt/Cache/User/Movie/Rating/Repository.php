@@ -32,10 +32,10 @@ class Repository
         );
     }
 
-    public function findByTraktId(TraktId $traktId) : ?Entity
+    public function findByTraktId(TraktId $traktId) : ?int
     {
-        $data = $this->dbConnection->fetchOne('SELECT * FROM `cache_trakt_user_movie_rating` WHERE trakt_id = ?', [$traktId->asInt()]);
+        $data = $this->dbConnection->fetchOne('SELECT rating FROM `cache_trakt_user_movie_rating` WHERE trakt_id = ?', [$traktId->asInt()]);
 
-        return $data === false ? null : Entity::createFromArray($data);
+        return $data === false ? null : (int)$data;
     }
 }
