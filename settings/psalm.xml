@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<psalm
+    resolveFromConfigFile="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config ../vendor/vimeo/psalm/config.xsd"
+    cacheDirectory="../tmp/cache/psalm"
+>
+    <projectFiles>
+        <directory name="src" />
+        <file name="bootstrap.php"/>
+    </projectFiles>
+
+    <issueHandlers>
+        <DeprecatedMethod errorLevel="info"/>
+        <DeprecatedProperty errorLevel="info"/>
+        <DeprecatedClass errorLevel="info"/>
+        <DeprecatedConstant errorLevel="info"/>
+        <DeprecatedFunction errorLevel="info"/>
+        <DeprecatedInterface errorLevel="info"/>
+        <DeprecatedTrait errorLevel="info"/>
+
+        <RedundantConditionGivenDocblockType errorLevel="info"/>
+        <PropertyNotSetInConstructor errorLevel="info"/>
+        <MixedArrayAccess errorLevel="info"/>
+        <MixedAssignment errorLevel="info"/>
+        <ImplicitToStringCast errorLevel="suppress"/>
+    </issueHandlers>
+</psalm>

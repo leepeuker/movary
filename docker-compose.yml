@@ -1,0 +1,25 @@
+version: "3.5"
+
+services:
+  movary-php:
+    build: ./build/php
+    container_name: movary-php
+    restart: unless-stopped
+    working_dir: /app
+    user: "${USER_ID}"
+    volumes:
+      - ./:/app
+      - ./build/php/php.ini:/usr/local/etc/php/php.ini
+
+  movary-mysql:
+    image: mysql:5.7
+    container_name: movary-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./tmp/db/:/var/lib/mysql
+    ports:
+      - "${MYSQL_PORT}:3306"
