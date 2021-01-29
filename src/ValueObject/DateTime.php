@@ -18,7 +18,13 @@ class DateTime implements \JsonSerializable
 
     public static function createFromFormat(string $format, string $dateString) : self
     {
-        return new self(\DateTime::createFromFormat($format, $dateString, new \DateTimeZone('UTC')));
+        $dateTime = \DateTime::createFromFormat($format, $dateString, new \DateTimeZone('UTC'));
+
+        if ($dateTime === false) {
+            throw new \RuntimeException("Could not use format '$format' on: $dateString");
+        }
+
+        return new self($dateTime);
     }
 
     public static function createFromString(string $dateString) : self

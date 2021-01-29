@@ -9,6 +9,7 @@
   ],
   "require": {
     "php": "^7.4",
+    "ext-json": "*",
     "doctrine/dbal": "^3.0",
     "guzzlehttp/guzzle": "^7.2",
     "monolog/monolog": "^2.2",

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Application\Movie\Service;
+namespace Movary\Application\Movie\History\Service;
 
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie\Entity;

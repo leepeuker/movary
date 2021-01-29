@@ -1,5 +1,4 @@
-includes:
-    - ../vendor/phpstan/phpstan-phpunit/extension.neon
 parameters:
     checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
     tmpDir: ../tmp/cache/phpstan

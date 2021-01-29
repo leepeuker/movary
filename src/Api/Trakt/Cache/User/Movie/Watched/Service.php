@@ -24,7 +24,7 @@ class Service
     {
         $this->repository->clearCache();
 
-        /** @var Dto $rating */
+        /** @var Dto $movieWatched */
         foreach ($moviesWatched as $movieWatched) {
             $this->repository->create($movieWatched->getMovie()->getTraktId(), $movieWatched->getLastUpdated());
         }
