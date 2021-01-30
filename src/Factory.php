@@ -4,6 +4,7 @@ namespace Movary;
 
 use Doctrine\DBAL;
 use GuzzleHttp;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Trakt\Client;
@@ -23,8 +24,14 @@ class Factory
 
     public static function createFileLogger(Config $config) : LoggerInterface
     {
+        $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
+        $formatter->includeStacktraces(true);
+
+        $handler = new StreamHandler(__DIR__ . '/../' . $config->getAsString('logger.file'), $config->getAsString('logger.logLevel'));
+        $handler->setFormatter($formatter);
+
         $logger = new Logger('file');
-        $logger->pushHandler(new StreamHandler(__DIR__ . '/../' . $config->getAsString('logger.file'), $config->getAsString('logger.logLevel')));
+        $logger->pushHandler($handler);
 
         return $logger;
     }
