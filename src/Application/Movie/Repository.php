@@ -32,6 +32,13 @@ class Repository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
+    public function fetchAll() : EntityList
+    {
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie`');
+
+        return EntityList::createFromArray($data);
+    }
+
     public function findByTraktId(TraktId $traktId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE trakt_id = ?', [$traktId->asInt()]);
@@ -39,7 +46,7 @@ class Repository
         return $data === false ? null : Entity::createFromArray($data);
     }
 
-    public function updateRating(int $id, int $rating) : Entity
+    public function updateRating(int $id, ?int $rating) : Entity
     {
         $this->dbConnection->update('movie', ['rating' => $rating], ['id' => $id]);
 

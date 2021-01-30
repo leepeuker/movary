@@ -2,6 +2,7 @@
 
 namespace Movary\Api\Trakt\Cache\User\Movie\Watched;
 
+use Cassandra\Date;
 use Doctrine\DBAL\Connection;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\DateTime;
@@ -36,6 +37,18 @@ class Repository
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `cache_trakt_user_movie_watched` WHERE trakt_id = ?', [$traktId->asInt()]);
 
         return $data === false ? null : Entity::createFromArray($data);
+    }
+
+    public function findLastUpdatedByTraktId(TraktId $traktId) : ?DateTime
+    {
+        $data = $this->dbConnection->fetchOne(
+            'SELECT last_updated_at
+            FROM cache_trakt_user_movie_watched
+            WHERE trakt_id = ?',
+            [$traktId->asInt()]
+        );
+
+        return $data === false ? null : DateTime::createFromString($data);
     }
 
     public function findLatestLastUpdatedAt() : ?DateTime

@@ -25,4 +25,9 @@ class TraktId
     {
         return $this->id;
     }
+
+    public function isEqual(TraktId $traktId) : bool
+    {
+        return $this->id === $traktId->asInt();
+    }
 }

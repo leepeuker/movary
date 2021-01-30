@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Application\Movie\History;
+namespace Movary\Application\Movie;
 
 use Movary\AbstractList;
 

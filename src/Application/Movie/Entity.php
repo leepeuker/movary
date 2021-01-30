@@ -38,7 +38,7 @@ class Entity
             (int)$data['id'],
             $data['title'],
             Year::createFromString($data['year']),
-            (int)$data['rating'],
+            $data['rating'] === null ? null : (int)$data['rating'],
             TraktId::createFromString($data['trakt_id']),
             $data['imdb_id'],
             (int)$data['tmdb_id'],

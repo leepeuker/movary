@@ -3,9 +3,11 @@
 namespace Movary\Api\Trakt\ValueObject\User\Movie\Watched;
 
 use Movary\AbstractList;
+use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\DateTime;
 
 /**
+ * @method Dto[] getIterator()
  * @psalm-suppress ImplementedReturnTypeMismatch
  */
 class DtoList extends AbstractList
@@ -24,6 +26,17 @@ class DtoList extends AbstractList
         }
 
         return $list;
+    }
+
+    public function containsTraktId(TraktId $traktId) : bool
+    {
+        foreach ($this as $watchedMovie) {
+            if ($watchedMovie->getMovie()->getTraktId()->isEqual($traktId) === true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getLatestLastUpdated() : ?DateTime

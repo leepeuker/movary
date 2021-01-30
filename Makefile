@@ -48,7 +48,7 @@ db_import:
 	docker exec movary-mysql bash -c 'rm /tmp/dump.sql'
 
 db_export:
-	docker exec movary-mysql bash -c 'mysqldump --databases --add-drop-database -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME) > /tmp/dump.sql'
+	docker exec movary-mysql bash -c 'mysqldump --databases --no-tablespaces --add-drop-database -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME) > /tmp/dump.sql'
 	docker cp movary-mysql:/tmp/dump.sql tmp/movary-`date +%Y-%m-%d-%H-%M-%S`.sql
 	docker exec movary-mysql bash -c 'rm /tmp/dump.sql'
 

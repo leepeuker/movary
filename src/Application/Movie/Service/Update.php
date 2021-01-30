@@ -14,7 +14,7 @@ class Update
         $this->repository = $repository;
     }
 
-    public function updateRating(int $id, int $rating) : Entity
+    public function updateRating(int $id, ?int $rating) : Entity
     {
         return $this->repository->updateRating($id, $rating);
     }
