@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Command\Trakt;
+namespace Movary\Application\Service\Trakt;
 
 use Movary\Api;
 use Movary\Application;
@@ -35,7 +35,7 @@ class SyncWatchedMovies
         $this->traktApiCacheUserMovieWatchedService = $traktApiCacheUserMovieWatchedService;
     }
 
-    public function run() : void
+    public function execute() : void
     {
         $watchedMovies = $this->traktApi->getUserMoviesWatched('leepe');
 

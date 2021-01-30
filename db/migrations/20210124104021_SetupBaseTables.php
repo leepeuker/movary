@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class Migration extends AbstractMigration
+class SetupBaseTables extends AbstractMigration
 {
     public function down() : void
     {

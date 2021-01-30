@@ -5,7 +5,7 @@ clientSecret =
 
 [database]
 driver = "pdo_mysql"
-host = "127.0.0.1"
+host = "movary-mysql"
 name = "movary"
 username = "movary"
 password = "movary"

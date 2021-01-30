@@ -15,7 +15,8 @@
     "monolog/monolog": "^2.2",
     "php-di/php-di": "^6.3",
     "psr/http-client": "^1.0",
-    "robmorgan/phinx": "^0.11"
+    "robmorgan/phinx": "^0.11",
+    "symfony/console": "^5.2"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",

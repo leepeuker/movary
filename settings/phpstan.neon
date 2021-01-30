@@ -2,3 +2,7 @@ parameters:
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
     tmpDir: ../tmp/cache/phpstan
+    ignoreErrors:
+        -
+            message: '#PHPDoc tag @var for property Movary\\Command\\SyncTrakt::\$defaultName#'
+            path: ../src/Command/SyncTrakt.php

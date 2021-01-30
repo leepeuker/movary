@@ -60,6 +60,12 @@ composer_install:
 composer_update:
 	docker exec movary-php bash -c "composer update"
 
+# Commands
+##########
+sync_trakt:
+	make run_cmd_php CMD="php bin/console.php app:sync-trakt"
+
+
 # Tests
 #######
 test: test_psalm test_phpstan

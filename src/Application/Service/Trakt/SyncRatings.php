@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Command\Trakt;
+namespace Movary\Application\Service\Trakt;
 
 use Movary\Api;
 use Movary\Application;
@@ -27,7 +27,7 @@ class SyncRatings
         $this->traktApiCacheUserMovieRatingService = $traktApiCacheUserMovieRatingService;
     }
 
-    public function run() : void
+    public function execute() : void
     {
         $this->traktApiCacheUserMovieRatingService->set($this->traktApi->getUserMoviesRatings('leepe'));
 
