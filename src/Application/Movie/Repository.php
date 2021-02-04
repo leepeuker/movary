@@ -5,7 +5,6 @@ namespace Movary\Application\Movie;
 use Doctrine\DBAL\Connection;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\Year;
 use RuntimeException;
 
 class Repository
@@ -17,13 +16,12 @@ class Repository
         $this->dbConnection = $dbConnection;
     }
 
-    public function create(string $title, Year $year, ?int $rating, TraktId $traktId, string $imdbId, int $tmdbId) : Entity
+    public function create(string $title, ?int $rating, TraktId $traktId, string $imdbId, int $tmdbId) : Entity
     {
         $this->dbConnection->insert(
             'movie',
             [
                 'title' => $title,
-                'year' => $year->asInt(),
                 'rating' => $rating,
                 'trakt_id' => $traktId->asInt(),
                 'imdb_id' => $imdbId,

@@ -45,7 +45,6 @@ class SyncWatchedMovies
             if ($movie === null) {
                 $movie = $this->movieCreateService->create(
                     $watchedMovie->getMovie()->getTitle(),
-                    $watchedMovie->getMovie()->getYear(),
                     null,
                     $watchedMovie->getMovie()->getTraktId(),
                     $watchedMovie->getMovie()->getImdbId(),

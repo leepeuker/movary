@@ -34,10 +34,8 @@ class SyncTmdb extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $this->syncMovieDetails->execute();
-
-
         try {
+            $this->syncMovieDetails->execute();
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
 

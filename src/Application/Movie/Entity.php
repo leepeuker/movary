@@ -4,7 +4,6 @@ namespace Movary\Application\Movie;
 
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\Year;
 
 class Entity
 {
@@ -34,12 +33,9 @@ class Entity
 
     private ?DateTime $updatedAtTmdb;
 
-    private Year $year;
-
     private function __construct(
         int $id,
         string $title,
-        Year $year,
         ?int $rating,
         TraktId $traktId,
         string $imdbId,
@@ -54,7 +50,6 @@ class Entity
     ) {
         $this->id = $id;
         $this->title = $title;
-        $this->year = $year;
         $this->rating = $rating;
         $this->traktId = $traktId;
         $this->imdbId = $imdbId;
@@ -73,7 +68,6 @@ class Entity
         return new self(
             (int)$data['id'],
             $data['title'],
-            Year::createFromString($data['year']),
             $data['rating'] === null ? null : (int)$data['rating'],
             TraktId::createFromString($data['trakt_id']),
             $data['imdb_id'],
@@ -151,10 +145,5 @@ class Entity
     public function getUpdatedAtTmdb() : ?DateTime
     {
         return $this->updatedAtTmdb;
-    }
-
-    public function getYear() : Year
-    {
-        return $this->year;
     }
 }

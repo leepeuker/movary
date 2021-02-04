@@ -68,7 +68,6 @@ sync_trakt:
 sync_tmdb:
 	make run_cmd_php CMD="php bin/console.php app:sync-tmdb"
 
-
 # Tests
 #######
 test: test_psalm test_phpstan
