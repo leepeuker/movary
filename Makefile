@@ -65,6 +65,9 @@ composer_update:
 sync_trakt:
 	make run_cmd_php CMD="php bin/console.php app:sync-trakt"
 
+sync_tmdb:
+	make run_cmd_php CMD="php bin/console.php app:sync-tmdb"
+
 
 # Tests
 #######

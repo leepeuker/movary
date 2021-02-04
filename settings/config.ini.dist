@@ -3,9 +3,16 @@ username =
 clientId =
 clientSecret =
 
+[tmdb]
+apiKey =
+
 [database]
 driver = "pdo_mysql"
 host = "movary-mysql"
 name = "movary"
 username = "movary"
 password = "movary"
+
+[logger]
+file = "tmp/app.log"
+logLevel = "debug"

@@ -9,6 +9,7 @@ $builder->addDefinitions(
     [
         \Movary\ValueObject\Config::class => DI\factory([Factory::class, 'createConfig']),
         \Movary\Api\Trakt\Client::class => DI\factory([Factory::class, 'createTraktApiClient']),
+        \Movary\Api\Tmdb\Client::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Psr\Http\Client\ClientInterface::class => DI\factory([Factory::class, 'createHttpClient']),
         \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createFileLogger']),
         \Doctrine\DBAL\Connection::class => DI\factory([Factory::class, 'createDbConnection']),

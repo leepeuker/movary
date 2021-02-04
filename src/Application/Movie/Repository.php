@@ -4,7 +4,9 @@ namespace Movary\Application\Movie;
 
 use Doctrine\DBAL\Connection;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Year;
+use RuntimeException;
 
 class Repository
 {
@@ -46,6 +48,32 @@ class Repository
         return $data === false ? null : Entity::createFromArray($data);
     }
 
+    public function updateDetails(
+        int $id,
+        ?string $overview,
+        ?string $originalLanguage,
+        ?DateTime $releaseDate,
+        ?int $runtime,
+        ?float $tmdbVoteAverage,
+        ?int $tmdbVoteCount
+    ) : Entity {
+        $this->dbConnection->update(
+            'movie',
+            [
+                'overview' => $overview,
+                'original_language' => $originalLanguage,
+                'release_date' => $releaseDate === null ? null : $releaseDate->format('Y-m-d'),
+                'runtime' => $runtime,
+                'tmdb_vote_average' => $tmdbVoteAverage,
+                'tmdb_vote_count' => $tmdbVoteCount,
+                'updated_at_tmdb' => DateTime::create()->format('Y-m-d H:i:s'),
+            ],
+            ['id' => $id]
+        );
+
+        return $this->fetchById($id);
+    }
+
     public function updateRating(int $id, ?int $rating) : Entity
     {
         $this->dbConnection->update('movie', ['rating' => $rating], ['id' => $id]);
@@ -58,7 +86,7 @@ class Repository
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE id = ?', [$id]);
 
         if ($data === false) {
-            throw new \RuntimeException('No movie found by id: ' . $id);
+            throw new RuntimeException('No movie found by id: ' . $id);
         }
 
         return Entity::createFromArray($data);

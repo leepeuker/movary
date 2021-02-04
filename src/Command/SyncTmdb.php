@@ -2,32 +2,28 @@
 
 namespace Movary\Command;
 
-use Movary\Application\Service\Trakt\SyncRatings;
-use Movary\Application\Service\Trakt\SyncWatchedMovies;
+use Movary\Application\Service\Tmdb\SyncMovieDetails;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SyncTrakt extends Command
+class SyncTmdb extends Command
 {
     /**
      * @var string|null
      */
-    protected static $defaultName = 'app:sync-trakt';
+    protected static $defaultName = 'app:sync-tmdb';
 
     private LoggerInterface $logger;
 
-    private SyncRatings $syncRatings;
+    private SyncMovieDetails $syncMovieDetails;
 
-    private SyncWatchedMovies $syncWatchedMovies;
-
-    public function __construct(SyncRatings $syncRatings, SyncWatchedMovies $syncWatchedMovies, LoggerInterface $logger)
+    public function __construct(SyncMovieDetails $syncMovieDetails, LoggerInterface $logger)
     {
         parent::__construct();
 
-        $this->syncRatings = $syncRatings;
-        $this->syncWatchedMovies = $syncWatchedMovies;
+        $this->syncMovieDetails = $syncMovieDetails;
         $this->logger = $logger;
     }
 
@@ -38,11 +34,12 @@ class SyncTrakt extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
+        $this->syncMovieDetails->execute();
+
+
         try {
-            $this->syncWatchedMovies->execute();
-            $this->syncRatings->execute();
         } catch (\Throwable $t) {
-            $this->logger->error('Could not complete trakt sync.', ['exception' => $t]);
+            $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
 
             return Command::FAILURE;
         }

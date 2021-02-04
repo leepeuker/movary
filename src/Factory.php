@@ -7,7 +7,8 @@ use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Movary\Api\Trakt\Client;
+use Movary\Api\Tmdb;
+use Movary\Api\Trakt;
 use Movary\ValueObject\Config;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -15,11 +16,22 @@ use Psr\Log\LoggerInterface;
 
 class Factory
 {
-    private ?DBAL\Connection $dbConnection = null;
-
     public static function createConfig() : Config
     {
         return Config::createFromFile(__DIR__ . '/../settings/config.ini');
+    }
+
+    public static function createDbConnection(Config $config) : DBAL\Connection
+    {
+        return DBAL\DriverManager::getConnection(
+            [
+                'dbname' => $config->getAsString('database.name'),
+                'user' => $config->getAsString('database.username'),
+                'password' => $config->getAsString('database.password'),
+                'host' => $config->getAsString('database.host'),
+                'driver' => $config->getAsString('database.driver'),
+            ]
+        );
     }
 
     public static function createFileLogger(Config $config) : LoggerInterface
@@ -41,28 +53,19 @@ class Factory
         return new GuzzleHttp\Client();
     }
 
-    public static function createTraktApiClient(ContainerInterface $container, Config $config) : Client
+    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\Client
     {
-        return new Client(
+        return new Tmdb\Client(
             $container->get(ClientInterface::class),
-            $config->getAsString('trakt.clientId')
+            $config->getAsString('tmdb.apiKey')
         );
     }
 
-    public function createDbConnection(Config $config) : DBAL\Connection
+    public static function createTraktApiClient(ContainerInterface $container, Config $config) : Trakt\Client
     {
-        if ($this->dbConnection === null) {
-            $this->dbConnection = DBAL\DriverManager::getConnection(
-                [
-                    'dbname' => $config->getAsString('database.name'),
-                    'user' => $config->getAsString('database.username'),
-                    'password' => $config->getAsString('database.password'),
-                    'host' => $config->getAsString('database.host'),
-                    'driver' => $config->getAsString('database.driver'),
-                ]
-            );
-        }
-
-        return $this->dbConnection;
+        return new Trakt\Client(
+            $container->get(ClientInterface::class),
+            $config->getAsString('trakt.clientId')
+        );
     }
 }

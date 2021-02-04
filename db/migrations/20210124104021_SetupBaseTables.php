@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
@@ -30,7 +30,7 @@ class SetupBaseTables extends AbstractMigration
                 UNIQUE (`trakt_id`),
                 UNIQUE (`imdb_id`),
                 UNIQUE (`tmdb_id`)
-            ) COLLATE="utf8mb4_general_ci" ENGINE=InnoDB
+            ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
             SQL
         );
 
@@ -40,7 +40,7 @@ class SetupBaseTables extends AbstractMigration
                 `movie_id` INT(10) UNSIGNED NOT NULL,
                 `watched_at` DATETIME NOT NULL,
                 FOREIGN KEY (`movie_id`) REFERENCES `movie`(`id`)
-            ) COLLATE="utf8mb4_general_ci" ENGINE=InnoDB
+            ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
             SQL
         );
 
@@ -51,7 +51,7 @@ class SetupBaseTables extends AbstractMigration
                 `rating` TINYINT UNSIGNED,
                 `rated_at` TIMESTAMP NOT NULL,
                 PRIMARY KEY (`trakt_id`)
-            ) COLLATE="utf8mb4_general_ci" ENGINE=InnoDB
+            ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
             SQL
         );
 
@@ -61,7 +61,7 @@ class SetupBaseTables extends AbstractMigration
                 `trakt_id` INT(10) UNSIGNED NOT NULL,
                 `last_updated_at` DATETIME NOT NULL,
                 PRIMARY KEY (`trakt_id`)
-            ) COLLATE="utf8mb4_general_ci" ENGINE=InnoDB
+            ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
             SQL
         );
     }
