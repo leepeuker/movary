@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Application\Movie;
+namespace Movary\Application\Movie\Genre;
 
 use Movary\AbstractList;
 
@@ -19,15 +19,15 @@ class EntityList extends AbstractList
     {
         $list = new self();
 
-        foreach ($data as $movie) {
-            $list->add(Entity::createFromArray($movie));
+        foreach ($data as $historyEntry) {
+            $list->add(Entity::createFromArray($historyEntry));
         }
 
         return $list;
     }
 
-    private function add(Entity $movie) : void
+    private function add(Entity $dto) : void
     {
-        $this->data[] = $movie;
+        $this->data[] = $dto;
     }
 }
