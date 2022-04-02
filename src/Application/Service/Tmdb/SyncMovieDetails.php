@@ -2,10 +2,12 @@
 
 namespace Movary\Application\Service\Tmdb;
 
+use Doctrine\DBAL;
 use Movary\Api\Tmdb;
 use Movary\Application\Genre;
 use Movary\Application\Movie;
 use Movary\ValueObject\DateTime;
+use Psr\Log\LoggerInterface;
 
 class SyncMovieDetails
 {
@@ -13,9 +15,13 @@ class SyncMovieDetails
 
     private Tmdb\Api $api;
 
+    private DBAL\Connection $dbConnection;
+
     private Genre\Service\Create $genreCreateService;
 
     private Genre\Service\Select $genreSelectService;
+
+    private LoggerInterface $logger;
 
     private Movie\Service\Select $movieSelectService;
 
@@ -26,13 +32,17 @@ class SyncMovieDetails
         Movie\Service\Select $movieSelectService,
         Movie\Service\Update $movieUpdateService,
         Genre\Service\Select $genreSelectService,
-        Genre\Service\Create $genreCreateService
+        Genre\Service\Create $genreCreateService,
+        DBAL\Connection $dbConnection,
+        LoggerInterface $logger
     ) {
         $this->api = $api;
         $this->movieSelectService = $movieSelectService;
         $this->movieUpdateService = $movieUpdateService;
         $this->genreSelectService = $genreSelectService;
         $this->genreCreateService = $genreCreateService;
+        $this->dbConnection = $dbConnection;
+        $this->logger = $logger;
     }
 
     public function execute() : void
@@ -45,8 +55,17 @@ class SyncMovieDetails
                 continue;
             }
 
-            $this->updateDetails($movie);
-            $this->updateCredits($movie);
+            $this->dbConnection->beginTransaction();
+
+            try {
+                // TODO sync credits less often than details
+                $this->updateDetails($movie);
+                $this->updateCredits($movie);
+                $this->dbConnection->commit();
+            } catch (\Throwable $t) {
+                $this->dbConnection->rollBack();
+                $this->logger->error('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+            }
         }
     }
 
@@ -94,6 +113,6 @@ class SyncMovieDetails
 
     private function syncExpired(DateTime $updatedAtTmdb) : bool
     {
-        return $updatedAtTmdb->diff(DateTime::create())->getDays() > self::SYNC_VALIDITY_TIME_IN_DAYS;
+        return DateTime::create()->diff($updatedAtTmdb)->getDays() > self::SYNC_VALIDITY_TIME_IN_DAYS;
     }
 }

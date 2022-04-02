@@ -19,7 +19,7 @@ final class AddPerson extends AbstractMigration
                 `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `name` VARCHAR(256) NOT NULL,
                 `gender` ENUM('0', '1', '2', '3') NOT NULL,
-                `known_for_department` VARCHAR(256),
+                `known_for_department` VARCHAR(256) DEFAULT NULL,
                 `tmdb_id` INT(10) UNSIGNED DEFAULT NULL,
                 `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
                 `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE NOW(),
@@ -34,7 +34,7 @@ final class AddPerson extends AbstractMigration
             CREATE TABLE `movie_cast` (
                 `person_id` INT(10) UNSIGNED NOT NULL,
                 `movie_id` INT(10) UNSIGNED NOT NULL,
-                `character_name` VARCHAR(256) NOT NULL,
+                `character_name` TEXT NOT NULL,
                 `position` SMALLINT UNSIGNED,
                 FOREIGN KEY (`person_id`) REFERENCES person (`id`),
                 FOREIGN KEY (`movie_id`) REFERENCES movie (`id`),

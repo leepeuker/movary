@@ -10,7 +10,7 @@ class Entity
 
     private int $id;
 
-    private string $knownForDepartment;
+    private ?string $knownForDepartment;
 
     private string $name;
 
@@ -20,7 +20,7 @@ class Entity
         int $id,
         string $name,
         Gender $gender,
-        string $knownForDepartment,
+        ?string $knownForDepartment,
         int $tmdbId,
     ) {
         $this->id = $id;
@@ -51,7 +51,7 @@ class Entity
         return $this->id;
     }
 
-    public function getKnownForDepartment() : string
+    public function getKnownForDepartment() : ?string
     {
         return $this->knownForDepartment;
     }

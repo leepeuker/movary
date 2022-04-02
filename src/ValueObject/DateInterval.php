@@ -18,6 +18,6 @@ class DateInterval
 
     public function getDays() : int
     {
-        return $this->dateInterval->d;
+        return $this->dateInterval->days;
     }
 }

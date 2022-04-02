@@ -10,7 +10,7 @@ class Person
 
     private Gender $gender;
 
-    private string $knownForDepartment;
+    private ?string $knownForDepartment;
 
     private string $name;
 
@@ -28,7 +28,7 @@ class Person
         string $originalName,
         Gender $gender,
         float $popularity,
-        string $knownForDepartment,
+        ?string $knownForDepartment,
         ?string $profilePath,
         string $creditId
     ) {
@@ -66,7 +66,7 @@ class Person
         return $this->gender;
     }
 
-    public function getKnownForDepartment() : string
+    public function getKnownForDepartment() : ?string
     {
         return $this->knownForDepartment;
     }
