@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Application\Movie\Cast;
+namespace Movary\Application\Movie\Crew;
 
 use Movary\AbstractList;
 

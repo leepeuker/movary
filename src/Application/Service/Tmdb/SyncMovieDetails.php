@@ -45,19 +45,8 @@ class SyncMovieDetails
                 continue;
             }
 
-            $movieDetails = $this->api->getMovieDetails($movie->getTmdbId());
-
-            $this->movieUpdateService->updateDetails(
-                $movie->getId(),
-                $movieDetails->getOverview(),
-                $movieDetails->getOriginalLanguage(),
-                $movieDetails->getReleaseDate(),
-                $movieDetails->getRuntime(),
-                $movieDetails->getVoteAverage(),
-                $movieDetails->getVoteCount(),
-            );
-
-            $this->movieUpdateService->updateGenres($movie->getId(), $this->getGenres($movieDetails));
+            $this->updateDetails($movie);
+            $this->updateCredits($movie);
         }
     }
 
@@ -76,6 +65,31 @@ class SyncMovieDetails
         }
 
         return $genres;
+    }
+
+    public function updateCredits(Movie\Entity $movie) : void
+    {
+        $credits = $this->api->getMovieCredits($movie->getTmdbId());
+
+        $this->movieUpdateService->updateCast($movie->getId(), $credits->getCast());
+        $this->movieUpdateService->updateCrew($movie->getId(), $credits->getCrew());
+    }
+
+    public function updateDetails(Movie\Entity $movie) : void
+    {
+        $movieDetails = $this->api->getMovieDetails($movie->getTmdbId());
+
+        $this->movieUpdateService->updateDetails(
+            $movie->getId(),
+            $movieDetails->getOverview(),
+            $movieDetails->getOriginalLanguage(),
+            $movieDetails->getReleaseDate(),
+            $movieDetails->getRuntime(),
+            $movieDetails->getVoteAverage(),
+            $movieDetails->getVoteCount(),
+        );
+
+        $this->movieUpdateService->updateGenres($movie->getId(), $this->getGenres($movieDetails));
     }
 
     private function syncExpired(DateTime $updatedAtTmdb) : bool
