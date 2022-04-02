@@ -8,9 +8,11 @@ class Gender
 
     private const GENDER_MALE = 2;
 
+    private const GENDER_NON_BINARY = 3;
+
     private const GENDER_UNKNOWN = 0;
 
-    private const VALID_GENDERS = [self::GENDER_FEMALE, self::GENDER_MALE, self::GENDER_UNKNOWN];
+    private const VALID_GENDERS = [self::GENDER_FEMALE, self::GENDER_MALE, self::GENDER_NON_BINARY, self::GENDER_UNKNOWN];
 
     private int $gender;
 
