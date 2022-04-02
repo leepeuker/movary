@@ -14,22 +14,18 @@ class Entity
 
     private string $name;
 
-    private float $popularity;
-
     private int $tmdbId;
 
     private function __construct(
         int $id,
         string $name,
         Gender $gender,
-        float $popularity,
         string $knownForDepartment,
         int $tmdbId,
     ) {
         $this->id = $id;
         $this->name = $name;
         $this->gender = $gender;
-        $this->popularity = $popularity;
         $this->knownForDepartment = $knownForDepartment;
         $this->tmdbId = $tmdbId;
     }
@@ -40,7 +36,6 @@ class Entity
             $data['id'],
             $data['name'],
             Gender::createFromInt((int)$data['gender']),
-            $data['popularity'],
             $data['known_for_department'],
             $data['tmdb_id'],
         );
@@ -64,11 +59,6 @@ class Entity
     public function getName() : string
     {
         return $this->name;
-    }
-
-    public function getPopularity() : float
-    {
-        return $this->popularity;
     }
 
     public function getTmdbId() : int

@@ -19,7 +19,6 @@ final class AddPerson extends AbstractMigration
                 `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `name` VARCHAR(256) NOT NULL,
                 `gender` ENUM('0', '1', '2', '3') NOT NULL,
-                `popularity` FLOAT (6,3),
                 `known_for_department` VARCHAR(256),
                 `tmdb_id` INT(10) UNSIGNED DEFAULT NULL,
                 `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),

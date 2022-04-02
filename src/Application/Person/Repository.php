@@ -15,14 +15,13 @@ class Repository
         $this->dbConnection = $dbConnection;
     }
 
-    public function create(string $name, Gender $gender, ?float $popularity, ?string $knownForDepartment, int $tmdbId) : Entity
+    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId) : Entity
     {
         $this->dbConnection->insert(
             'person',
             [
                 'name' => $name,
                 'gender' => $gender->asInt(),
-                'popularity' => $popularity,
                 'known_for_department' => $knownForDepartment,
                 'tmdb_id' => $tmdbId,
             ]

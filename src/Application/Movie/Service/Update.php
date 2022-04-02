@@ -64,7 +64,6 @@ class Update
                 $person = $this->personCreateService->create(
                     $castMember->getPerson()->getName(),
                     $castMember->getPerson()->getGender(),
-                    $castMember->getPerson()->getPopularity(),
                     $castMember->getPerson()->getKnownForDepartment(),
                     $castMember->getPerson()->getTmdbId(),
                 );
@@ -85,7 +84,6 @@ class Update
                 $person = $this->personCreateService->create(
                     $crewMember->getPerson()->getName(),
                     $crewMember->getPerson()->getGender(),
-                    $crewMember->getPerson()->getPopularity(),
                     $crewMember->getPerson()->getKnownForDepartment(),
                     $crewMember->getPerson()->getTmdbId(),
                 );

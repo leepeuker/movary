@@ -15,8 +15,8 @@ class Create
         $this->repository = $repository;
     }
 
-    public function create(string $name, Gender $gender, ?float $popularity, ?string $knownForDepartment, int $tmdbId) : Entity
+    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId) : Entity
     {
-        return $this->repository->create($name, $gender, $popularity, $knownForDepartment, $tmdbId);
+        return $this->repository->create($name, $gender, $knownForDepartment, $tmdbId);
     }
 }
