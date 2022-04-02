@@ -7,29 +7,21 @@ use Movary\ValueObject\DateTime;
 
 class Dto
 {
-    private string $action;
-
-    private int $id;
-
     private Movie\Dto $movie;
 
     private DateTime $watchedAt;
 
-    private function __construct(int $id, Movie\Dto $movie, DateTime $watchedAt, string $action)
+    private function __construct(Movie\Dto $movie, DateTime $watchedAt)
     {
-        $this->id = $id;
         $this->movie = $movie;
         $this->watchedAt = $watchedAt;
-        $this->action = $action;
     }
 
     public static function createFromArray(array $data) : self
     {
         return new self(
-            $data['id'],
             Movie\Dto::createFromArray($data['movie']),
             DateTime::createFromStringAndTimeZone($data['watched_at'], 'GMT'),
-            $data['action'],
         );
     }
 

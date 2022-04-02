@@ -3,3 +3,6 @@ parameters:
     checkGenericClassInNonGenericObjectType: false
     tmpDir: ../tmp/cache/phpstan
     ignoreErrors:
+        -
+            message: '#Parameter \#2 \$level of class Monolog\\Handler\\StreamHandler#'
+            path: ../src/Factory.php

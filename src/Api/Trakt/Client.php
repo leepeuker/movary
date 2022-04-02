@@ -10,6 +10,8 @@ class Client
 {
     private const BASE_URL = 'https://api.trakt.tv';
 
+    private const TRAKT_API_VERSION = '2';
+
     private string $clientId;
 
     private ClientInterface $httpClient;
@@ -27,7 +29,7 @@ class Client
             self::BASE_URL . $relativeUrl,
             [
                 'Content-Type' => 'application/json',
-                'trakt-api-version' => 2,
+                'trakt-api-version' => self::TRAKT_API_VERSION,
                 'trakt-api-key' => $this->clientId,
             ]
         );

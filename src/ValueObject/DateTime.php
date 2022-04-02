@@ -39,7 +39,7 @@ class DateTime implements \JsonSerializable
 
     public function __toString() : string
     {
-        return (string)$this->dateTime->format('Y-m-d H:i:s');
+        return $this->dateTime->format('Y-m-d H:i:s');
     }
 
     public function diff(DateTime $dateTime) : DateInterval

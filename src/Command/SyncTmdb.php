@@ -10,9 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncTmdb extends Command
 {
-    /**
-     * @var string|null
-     */
     protected static $defaultName = 'app:sync-tmdb';
 
     private LoggerInterface $logger;
@@ -32,6 +29,7 @@ class SyncTmdb extends Command
         $this->setDescription('Sync trakt.tv movie history and rating with local database');
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         try {

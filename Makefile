@@ -72,10 +72,13 @@ sync_tmdb:
 
 # Tests
 #######
-test: test_psalm test_phpstan
+test: test_phpcs test_psalm test_phpstan
+
+test_phpcs:
+	make run_cmd_php CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml ./src"
 
 test_phpstan:
-	make run_cmd_php CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level max"
+	make run_cmd_php CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8"
 
 test_psalm:
 	make run_cmd_php CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"

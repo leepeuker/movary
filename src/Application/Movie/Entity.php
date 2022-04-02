@@ -69,7 +69,7 @@ class Entity
             (int)$data['id'],
             $data['title'],
             $data['rating'] === null ? null : (int)$data['rating'],
-            TraktId::createFromString($data['trakt_id']),
+            TraktId::createFromString((string)$data['trakt_id']),
             $data['imdb_id'],
             (int)$data['tmdb_id'],
             $data['overview'],

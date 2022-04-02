@@ -11,9 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncTrakt extends Command
 {
-    /**
-     * @var string|null
-     */
     protected static $defaultName = 'app:sync-trakt';
 
     private LoggerInterface $logger;
@@ -36,6 +33,7 @@ class SyncTrakt extends Command
         $this->setDescription('Sync trakt.tv movie history and rating with local database');
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         try {

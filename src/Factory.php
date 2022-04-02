@@ -39,7 +39,10 @@ class Factory
         $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
         $formatter->includeStacktraces(true);
 
-        $handler = new StreamHandler(__DIR__ . '/../' . $config->getAsString('logger.file'), $config->getAsString('logger.logLevel'));
+        $handler = new StreamHandler(
+            __DIR__ . '/../' . $config->getAsString('logger.file'),
+            $config->getAsString('logger.logLevel')
+        );
         $handler->setFormatter($formatter);
 
         $logger = new Logger('file');

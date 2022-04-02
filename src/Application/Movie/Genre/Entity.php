@@ -25,4 +25,19 @@ class Entity
             (int)$data['position'],
         );
     }
+
+    public function getGenreId() : int
+    {
+        return $this->genreId;
+    }
+
+    public function getMovieId() : int
+    {
+        return $this->movieId;
+    }
+
+    public function getPosition() : int
+    {
+        return $this->position;
+    }
 }

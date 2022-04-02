@@ -52,7 +52,9 @@ class SyncWatchedMovies
                 );
 
                 echo 'Added movie: ' . $movie->getTitle() . "\n";
-            } elseif ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
+            }
+
+            if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
                 continue;
             }
 

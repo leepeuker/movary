@@ -35,4 +35,9 @@ class Entity
     {
         return $this->name;
     }
+
+    public function getTmdbId() : int
+    {
+        return $this->tmdbId;
+    }
 }

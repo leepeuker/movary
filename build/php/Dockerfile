@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/php
-FROM php:7.4.13-fpm-alpine3.12
+FROM php:8.1.4-fpm-alpine3.15
 
 ARG USER_ID
 
@@ -19,12 +19,10 @@ RUN apk add --no-cache git                  \
 
 
 # Install php dependencies
-RUN pecl install xdebug-beta
-RUN docker-php-ext-enable xdebug
 RUN docker-php-ext-install mysqli pdo pdo_mysql zip
 
 # Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.3.3
 
 # Create user
 RUN addgroup --gid "$USER_ID" "movary" \
