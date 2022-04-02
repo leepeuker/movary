@@ -1,45 +1,37 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Api\Tmdb\ValueObject;
+namespace Movary\Application\Person;
 
 use Movary\ValueObject\Gender;
 
-class Person
+class Entity
 {
-    private string $creditId;
-
     private Gender $gender;
+
+    private int $id;
 
     private string $knownForDepartment;
 
     private string $name;
 
-    private string $originalName;
-
     private float $popularity;
-
-    private ?string $profilePath;
 
     private int $tmdbId;
 
     private function __construct(
-        int $tmdbId,
+        int $id,
         string $name,
-        string $originalName,
         Gender $gender,
         float $popularity,
         string $knownForDepartment,
-        ?string $profilePath,
-        string $creditId
+        int $tmdbId,
     ) {
-        $this->tmdbId = $tmdbId;
+        $this->id = $id;
         $this->name = $name;
-        $this->originalName = $originalName;
         $this->gender = $gender;
         $this->popularity = $popularity;
         $this->knownForDepartment = $knownForDepartment;
-        $this->profilePath = $profilePath;
-        $this->creditId = $creditId;
+        $this->tmdbId = $tmdbId;
     }
 
     public static function createFromArray(array $data) : self
@@ -47,23 +39,21 @@ class Person
         return new self(
             $data['id'],
             $data['name'],
-            $data['original_name'],
-            Gender::createFromInt($data['gender']),
+            Gender::createFromInt((int)$data['gender']),
             $data['popularity'],
             $data['known_for_department'],
-            $data['profile_path'],
-            $data['credit_id'],
+            $data['tmdb_id'],
         );
-    }
-
-    public function getCreditId() : string
-    {
-        return $this->creditId;
     }
 
     public function getGender() : Gender
     {
         return $this->gender;
+    }
+
+    public function getId() : int
+    {
+        return $this->id;
     }
 
     public function getKnownForDepartment() : string
@@ -76,19 +66,9 @@ class Person
         return $this->name;
     }
 
-    public function getOriginalName() : string
-    {
-        return $this->originalName;
-    }
-
     public function getPopularity() : float
     {
         return $this->popularity;
-    }
-
-    public function getProfilePath() : ?string
-    {
-        return $this->profilePath;
     }
 
     public function getTmdbId() : int
