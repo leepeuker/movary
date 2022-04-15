@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Api\Tmdb\ValueObject;
+namespace Movary\Api\Tmdb\Dto;
 
 class Genre
 {

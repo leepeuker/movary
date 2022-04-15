@@ -30,6 +30,7 @@ class Factory
                 'password' => $config->getAsString('database.password'),
                 'host' => $config->getAsString('database.host'),
                 'driver' => $config->getAsString('database.driver'),
+                'charset' => $config->getAsString('database.charset'),
             ]
         );
     }

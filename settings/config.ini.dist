@@ -12,6 +12,7 @@ host = "movary-mysql"
 name = "movary"
 username = "movary"
 password = "movary"
+charset = "utf8"
 
 [logger]
 file = "tmp/app.log"

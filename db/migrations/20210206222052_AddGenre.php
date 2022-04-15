@@ -33,6 +33,8 @@ class AddGenre extends AbstractMigration
                 `genre_id` INT(10) UNSIGNED NOT NULL,
                 `movie_id` INT(10) UNSIGNED NOT NULL,
                 `position` SMALLINT UNSIGNED,
+                FOREIGN KEY (`genre_id`) REFERENCES genre (`id`),
+                FOREIGN KEY (`movie_id`) REFERENCES movie (`id`),
                 UNIQUE (`genre_id`, `movie_id`),
                 UNIQUE (`movie_id`, `position`)
             ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
