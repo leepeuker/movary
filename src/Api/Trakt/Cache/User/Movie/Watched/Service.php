@@ -3,7 +3,6 @@
 namespace Movary\Api\Trakt\Cache\User\Movie\Watched;
 
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
-use Movary\Api\Trakt\ValueObject\User\Movie\Watched\Dto;
 use Movary\Api\Trakt\ValueObject\User\Movie\Watched\DtoList;
 use Movary\ValueObject\DateTime;
 
@@ -26,12 +25,17 @@ class Service
         return $this->repository->findLatestLastUpdatedAt();
     }
 
-    public function set(DtoList $moviesWatched) : void
+    public function removeMissingMoviesFromCache(DtoList $watchedMovies) : void
     {
-        $this->repository->clearCache();
-
-        foreach ($moviesWatched as $movieWatched) {
-            $this->repository->create($movieWatched->getMovie()->getTraktId(), $movieWatched->getLastUpdated());
+        foreach ($this->repository->fetchAllUniqueTraktIds() as $traktId) {
+            if ($watchedMovies->containsTraktId($traktId) === false) {
+                $this->repository->removeAllWithTraktId($traktId);
+            }
         }
+    }
+
+    public function setOne(TraktId $traktId, DateTime $lastUpdated) : void
+    {
+        $this->repository->create($traktId, $lastUpdated);
     }
 }

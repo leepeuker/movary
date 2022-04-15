@@ -59,11 +59,13 @@ class SyncWatchedMovies
             }
 
             $this->syncMovieHistory($movie);
+
+            $this->traktApiCacheUserMovieWatchedService->setOne($movie->getTraktId(), $watchedMovie->getLastUpdated());
         }
 
         $this->removeMovieHistoryFromNotWatchedMovies($watchedMovies);
 
-        $this->traktApiCacheUserMovieWatchedService->set($watchedMovies);
+        $this->traktApiCacheUserMovieWatchedService->removeMissingMoviesFromCache($watchedMovies);
     }
 
     private function isWatchedCacheUpToDate(Api\Trakt\ValueObject\User\Movie\Watched\Dto $watchedMovie) : bool
