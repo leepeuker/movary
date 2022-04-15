@@ -1,0 +1,12 @@
+on: pull_request
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build docker image
+        run: docker build -t php ./build/
+      - name: Install composer dependencies
+        run: docker exec php composer --no-plugins --no-interaction --prefer-dist --no-progress --no-suggest install
