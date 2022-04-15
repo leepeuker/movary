@@ -1,12 +1,16 @@
-on: pull_request
-
+on: [pull_request]
 jobs:
   testing:
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
+
       - name: Build docker image
         run: docker build -t php ./build/
+
+      - name: Run docker image
+        run: docker run --rm -d -v /home/runner/work/movary/movary:/app --name php php
+
       - name: Install composer dependencies
-        run: docker exec php composer --no-plugins --no-interaction --prefer-dist --no-progress --no-suggest install
+        run: docker exec php composer --no-plugins --no-interaction --prefer-dist --no-progress --no-suggest instal
