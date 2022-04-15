@@ -1,7 +1,8 @@
-.PHONY: build
-
 include .env
-include Makefile.database.mk
+
+ifeq ($(ENV), development)
+    include Makefile.database.mk
+endif
 
 # Docker
 ########
