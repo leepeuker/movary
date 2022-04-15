@@ -8,7 +8,7 @@ return [
         'default_migration_table' => 'phinxlog',
         'development' => [
             'adapter' => 'mysql',
-            'host' => 'movary-mysql',
+            'host' => '127.0.0.1',
             'name' => 'movary',
             'user' => 'movary',
             'pass' => 'movary',

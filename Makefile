@@ -1,67 +1,37 @@
-.PHONY: build
-
 include .env
+
+ifeq ($(ENV), development)
+    include Makefile.database.mk
+endif
 
 # Docker
 ########
+PHP_CONTAINER_NAME = movary-php
+PHP_DOCKER_OPTIONS = --rm \
+	             --network=host \
+                 --user $(USER_ID):$(USER_ID) \
+                 -v ${PWD}:/app
+PHP_DOCKER_RUN = docker run $(PHP_DOCKER_OPTIONS) $(PHP_CONTAINER_NAME)
+
+# Setup
+#######
 build:
-	docker-compose build --no-cache --build-arg USER_ID=${USER_ID}
+	docker build -t $(PHP_CONTAINER_NAME) ./build/php/
+	$(MAKE) composer_install
 
-up:
-	docker-compose up -d
-
-down:
-	docker-compose down
-
-reup: down up
-
-connect_php_bash:
-	docker exec -it movary-php bash
+run_php_bash:
+	docker run -it $(PHP_DOCKER_OPTIONS) $(PHP_CONTAINER_NAME) bash
 
 run_php_cmd:
-	docker exec -i movary-php bash -c "${CMD}"
-
-run_mysql_cmd:
-	docker exec -i movary-mysql bash -c "${CMD}"
-
-run_mysql_query:
-	make run_mysql_cmd CMD="mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e \\\"$(QUERY)\\\""
-
-# Database
-##########
-db_create_database:
-	make run_mysql_query QUERY="DROP DATABASE IF EXISTS $(DB_NAME)"
-	make run_mysql_query QUERY="CREATE DATABASE $(DB_NAME)"
-	make run_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DB_NAME).* TO $(MYSQL_USER)@'%'"
-	make run_mysql_query QUERY="FLUSH PRIVILEGES;"
-	make db_migration_migrate
-
-db_migration_migrate:
-	make run_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php -e $(ENV)"
-
-db_migration_rollback:
-	make run_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php -e $(ENV)"
-
-db_migration_create:
-	make run_php_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
-
-db_import:
-	docker cp $(FILE) movary-mysql:/tmp/dump.sql
-	make run_mysql_cmd CMD="mysql -uroot -p${MYSQL_ROOT_PASSWORD} < /tmp/dump.sql"
-	make run_mysql_cmd CMD="rm /tmp/dump.sql"
-
-db_export:
-	make run_mysql_cmd CMD="mysqldump --databases --no-tablespaces --add-drop-database -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME) > /tmp/dump.sql"
-	docker cp movary-mysql:/tmp/dump.sql tmp/movary-`date +%Y-%m-%d-%H-%M-%S`.sql
-	make run_mysql_cmd CMD="rm /tmp/dump.sql"
+	$(PHP_DOCKER_RUN) bash -c "${CMD}"
 
 # Composer
 ##########
 composer_install:
-	make run_php_cmd CMD="composer install"
+	$(PHP_DOCKER_RUN) composer install
 
 composer_update:
-	make run_php_cmd CMD="composer update"
+	$(PHP_DOCKER_RUN) composer update
 
 # Commands
 ##########
