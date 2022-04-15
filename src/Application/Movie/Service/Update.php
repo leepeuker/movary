@@ -2,8 +2,8 @@
 
 namespace Movary\Application\Movie\Service;
 
-use Movary\Api\Tmdb\ValueObject\Cast;
-use Movary\Api\Tmdb\ValueObject\Crew;
+use Movary\Api\Tmdb\Dto\Cast;
+use Movary\Api\Tmdb\Dto\Crew;
 use Movary\Application\Genre;
 use Movary\Application\Movie;
 use Movary\Application\Movie\Entity;

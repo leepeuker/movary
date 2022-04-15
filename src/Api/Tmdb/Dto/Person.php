@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Api\Tmdb\ValueObject;
+namespace Movary\Api\Tmdb\Dto;
 
 use Movary\ValueObject\Gender;
 
@@ -50,7 +50,7 @@ class Person
             $data['original_name'],
             Gender::createFromInt($data['gender']),
             $data['popularity'],
-            $data['known_for_department'],
+            empty($data['known_for_department']) === true ? null : $data['known_for_department'],
             $data['profile_path'],
             $data['credit_id'],
         );

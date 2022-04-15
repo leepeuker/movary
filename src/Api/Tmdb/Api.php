@@ -2,8 +2,8 @@
 
 namespace Movary\Api\Tmdb;
 
-use Movary\Api\Tmdb\ValueObject\Credits;
-use Movary\Api\Tmdb\ValueObject\Movie;
+use Movary\Api\Tmdb\Dto\Credits;
+use Movary\Api\Tmdb\Dto\Movie;
 
 class Api
 {

@@ -69,7 +69,7 @@ class SyncMovieDetails
         }
     }
 
-    public function getGenres(Tmdb\ValueObject\Movie $movieDetails) : Genre\EntityList
+    public function getGenres(Tmdb\Dto\Movie $movieDetails) : Genre\EntityList
     {
         $genres = Genre\EntityList::create();
 
