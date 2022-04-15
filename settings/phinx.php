@@ -11,7 +11,8 @@ return [
     ],
     'environments' => [
         'default_migration_table' => 'phinxlog',
-        $config->getAsString('environment.system') => [
+        'default_environment' => 'dynamic',
+        'dynamic' => [
             'adapter' => $config->getAsString('database.driver') === 'pdo_mysql' ? 'mysql' : $config->getAsString('database.driver'),
             'host' => $config->getAsString('database.host'),
             'name' => $config->getAsString('database.name'),

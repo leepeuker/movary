@@ -1,6 +1,3 @@
-[environment]
-system = development
-
 [trakt]
 username =
 clientId =

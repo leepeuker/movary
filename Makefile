@@ -61,10 +61,10 @@ test_psalm:
 # Database
 ##########
 db_migration_migrate:
-	make run_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php -e $(ENV)"
+	make run_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php"
 
 db_migration_rollback:
-	make run_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php -e $(ENV)"
+	make run_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php"
 
 db_migration_create:
 	make run_php_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
