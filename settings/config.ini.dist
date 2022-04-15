@@ -8,7 +8,7 @@ apiKey =
 
 [database]
 driver = "pdo_mysql"
-host = "movary-mysql"
+host = "movary-db"
 name = "movary"
 username = "movary"
 password = "movary"
