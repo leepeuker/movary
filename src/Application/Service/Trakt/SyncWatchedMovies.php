@@ -35,9 +35,9 @@ class SyncWatchedMovies
         $this->traktApiCacheUserMovieWatchedService = $traktApiCacheUserMovieWatchedService;
     }
 
-    public function execute() : void
+    public function execute(string $username) : void
     {
-        $watchedMovies = $this->traktApi->getUserMoviesWatched('leepe');
+        $watchedMovies = $this->traktApi->getUserMoviesWatched($username);
 
         foreach ($watchedMovies as $watchedMovie) {
             $movie = $this->movieSelectService->findByTraktId($watchedMovie->getMovie()->getTraktId());
@@ -51,7 +51,7 @@ class SyncWatchedMovies
                     $watchedMovie->getMovie()->getTmdbId(),
                 );
 
-                echo 'Added movie: ' . $movie->getTitle() . "\n";
+                echo 'Added movie: ' . $movie->getTitle() . PHP_EOL;
             }
 
             if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
@@ -81,7 +81,7 @@ class SyncWatchedMovies
             if ($watchedMovies->containsTraktId($movie->getTraktId()) === false) {
                 $this->movieHistoryDeleteService->deleteByMovieId($movie->getId());
 
-                echo 'Removed watch dates for movie: ' . $movie->getTitle() . "\n";
+                echo 'Removed watch dates for movie: ' . $movie->getTitle() . PHP_EOL;
             }
         }
     }
@@ -93,7 +93,7 @@ class SyncWatchedMovies
         foreach ($this->traktApi->getUserMovieHistoryByMovieId('leepe', $movie->getTraktId()) as $movieHistoryEntry) {
             $this->movieHistoryCreateService->create($movie->getId(), $movieHistoryEntry->getWatchedAt());
 
-            echo 'Added watch date for "' . $movieHistoryEntry->getMovie()->getTitle() . '": ' . $movieHistoryEntry->getWatchedAt() . "\n";
+            echo 'Added watch date for "' . $movieHistoryEntry->getMovie()->getTitle() . '": ' . $movieHistoryEntry->getWatchedAt() . PHP_EOL;
         }
     }
 }
