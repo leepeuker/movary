@@ -35,15 +35,6 @@ db_create_database:
 	make run_mysql_query QUERY="FLUSH PRIVILEGES;"
 	make db_migration_migrate
 
-db_migration_migrate:
-	make run_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php -e $(ENV)"
-
-db_migration_rollback:
-	make run_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php -e $(ENV)"
-
-db_migration_create:
-	make run_php_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
-
 db_import:
 	docker cp $(FILE) $(DB_CONTAINER_NAME):/tmp/dump.sql
 	make run_mysql_cmd CMD="mysql -uroot -p${MYSQL_ROOT_PASSWORD} < /tmp/dump.sql"
