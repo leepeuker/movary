@@ -7,7 +7,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build docker image
-        run: docker build -t php ./build/
+        run: docker build -t php ./build/php/
 
       - name: Run docker image
         run: docker run --rm -d -v /home/runner/work/movary/movary:/app --name php php
