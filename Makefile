@@ -1,3 +1,5 @@
+.PHONY:build
+
 include .env
 
 ifeq ($(ENV), development)
