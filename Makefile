@@ -18,67 +18,70 @@ reup: down up
 connect_php_bash:
 	docker exec -it movary-php bash
 
-run_cmd_php:
+run_php_cmd:
 	docker exec -i movary-php bash -c "${CMD}"
 
-run_cmd_mysql:
-	docker exec -it movary-mysql bash -c "mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e \"$(QUERY)\""
+run_mysql_cmd:
+	docker exec -i movary-mysql bash -c "${CMD}"
+
+run_mysql_query:
+	make run_mysql_cmd CMD="mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e \\\"$(QUERY)\\\""
 
 # Database
 ##########
 db_create_database:
-	make run_cmd_mysql QUERY="DROP DATABASE IF EXISTS $(DB_NAME)"
-	make run_cmd_mysql QUERY="CREATE DATABASE $(DB_NAME)"
-	make run_cmd_mysql QUERY="GRANT ALL PRIVILEGES ON $(DB_NAME).* TO $(MYSQL_USER)@'%'"
-	make run_cmd_mysql QUERY="FLUSH PRIVILEGES;"
+	make run_mysql_query QUERY="DROP DATABASE IF EXISTS $(DB_NAME)"
+	make run_mysql_query QUERY="CREATE DATABASE $(DB_NAME)"
+	make run_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DB_NAME).* TO $(MYSQL_USER)@'%'"
+	make run_mysql_query QUERY="FLUSH PRIVILEGES;"
 	make db_migration_migrate
 
 db_migration_migrate:
-	make run_cmd_php CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php -e $(ENV)"
+	make run_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php -e $(ENV)"
 
 db_migration_rollback:
-	make run_cmd_php CMD="vendor/bin/phinx rollback -c ./settings/phinx.php -e $(ENV)"
+	make run_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php -e $(ENV)"
 
 db_migration_create:
-	make run_cmd_php CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
+	make run_php_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
 
 db_import:
 	docker cp $(FILE) movary-mysql:/tmp/dump.sql
-	docker exec movary-mysql bash -c 'mysql -uroot -p${MYSQL_ROOT_PASSWORD} < /tmp/dump.sql'
-	docker exec movary-mysql bash -c 'rm /tmp/dump.sql'
+	make run_mysql_cmd CMD="mysql -uroot -p${MYSQL_ROOT_PASSWORD} < /tmp/dump.sql"
+	make run_mysql_cmd CMD="rm /tmp/dump.sql"
 
 db_export:
-	docker exec movary-mysql bash -c 'mysqldump --databases --no-tablespaces --add-drop-database -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME) > /tmp/dump.sql'
+	make run_mysql_cmd CMD="mysqldump --databases --no-tablespaces --add-drop-database -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME) > /tmp/dump.sql"
 	docker cp movary-mysql:/tmp/dump.sql tmp/movary-`date +%Y-%m-%d-%H-%M-%S`.sql
-	docker exec movary-mysql bash -c 'rm /tmp/dump.sql'
+	make run_mysql_cmd CMD="rm /tmp/dump.sql"
 
 # Composer
 ##########
 composer_install:
-	docker exec movary-php bash -c "composer install"
+	make run_php_cmd CMD="composer install"
 
 composer_update:
-	docker exec movary-php bash -c "composer update"
+	make run_php_cmd CMD="composer update"
 
 # Commands
 ##########
 sync: sync_trakt sync_tmdb
 
 sync_trakt:
-	make run_cmd_php CMD="php bin/console.php app:sync-trakt"
+	make run_php_cmd CMD="php bin/console.php app:sync-trakt"
 
 sync_tmdb:
-	make run_cmd_php CMD="php bin/console.php app:sync-tmdb"
+	make run_php_cmd CMD="php bin/console.php app:sync-tmdb"
 
 # Tests
 #######
 test: test_phpcs test_psalm test_phpstan
 
 test_phpcs:
-	make run_cmd_php CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml ./src"
+	make run_php_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml ./src"
 
 test_phpstan:
-	make run_cmd_php CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8"
+	make run_php_cmd CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8"
 
 test_psalm:
-	make run_cmd_php CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
+	make run_php_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
