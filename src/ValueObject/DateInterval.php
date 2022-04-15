@@ -18,6 +18,12 @@ class DateInterval
 
     public function getDays() : int
     {
-        return $this->dateInterval->days;
+        $days = $this->dateInterval->days;
+
+        if ($days === false) {
+            throw new \RuntimeException('Could not get days');
+        }
+
+        return $days;
     }
 }

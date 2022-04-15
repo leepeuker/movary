@@ -58,7 +58,6 @@ class SyncMovieDetails
             $this->dbConnection->beginTransaction();
 
             try {
-                // TODO sync credits less often than details
                 $this->updateDetails($movie);
                 $this->updateCredits($movie);
                 $this->dbConnection->commit();
