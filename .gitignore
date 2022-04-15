@@ -2,7 +2,6 @@
 tmp/*
 !tmp/.gitkeep
 settings/config.ini
-settings/phinx.php
 
 .idea/
 vendor/
