@@ -65,6 +65,14 @@ class Factory
         );
     }
 
+    public static function createTraktApi(ContainerInterface $container, Config $config) : Trakt\Api
+    {
+        return new Trakt\Api(
+            $container->get(Trakt\Client::class),
+            $config->getAsString('trakt.username')
+        );
+    }
+
     public static function createTraktApiClient(ContainerInterface $container, Config $config) : Trakt\Client
     {
         return new Trakt\Client(

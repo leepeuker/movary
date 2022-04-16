@@ -9,28 +9,31 @@ class Api
 {
     private Client $client;
 
-    public function __construct(Client $client)
+    private string $username;
+
+    public function __construct(Client $client, string $username)
     {
         $this->client = $client;
+        $this->username = $username;
     }
 
-    public function getUserMovieHistoryByMovieId(string $username, TraktId $traktId) : User\Movie\History\DtoList
+    public function getUserMovieHistoryByMovieId(TraktId $traktId) : User\Movie\History\DtoList
     {
-        $responseData = $this->client->get(sprintf('/users/%s/history/movies/%d', $username, $traktId->asInt()));
+        $responseData = $this->client->get(sprintf('/users/%s/history/movies/%d', $this->username, $traktId->asInt()));
 
         return User\Movie\History\DtoList::createFromArray($responseData);
     }
 
-    public function getUserMoviesRatings(string $username) : User\Movie\Rating\DtoList
+    public function getUserMoviesRatings() : User\Movie\Rating\DtoList
     {
-        $responseData = $this->client->get(sprintf('/users/%s/ratings/movies', $username));
+        $responseData = $this->client->get(sprintf('/users/%s/ratings/movies', $this->username));
 
         return User\Movie\Rating\DtoList::createFromArray($responseData);
     }
 
-    public function getUserMoviesWatched(string $username) : User\Movie\Watched\DtoList
+    public function getUserMoviesWatched() : User\Movie\Watched\DtoList
     {
-        $responseData = $this->client->get(sprintf('/users/%s/watched/movies', $username));
+        $responseData = $this->client->get(sprintf('/users/%s/watched/movies', $this->username));
 
         return User\Movie\Watched\DtoList::createFromArray($responseData);
     }

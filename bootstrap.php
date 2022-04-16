@@ -8,6 +8,7 @@ $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(
     [
         \Movary\ValueObject\Config::class => DI\factory([Factory::class, 'createConfig']),
+        \Movary\Api\Trakt\Api::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Api\Trakt\Client::class => DI\factory([Factory::class, 'createTraktApiClient']),
         \Movary\Api\Tmdb\Client::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Psr\Http\Client\ClientInterface::class => DI\factory([Factory::class, 'createHttpClient']),

@@ -29,7 +29,7 @@ class SyncRatings
 
     public function execute() : void
     {
-        $this->traktApiCacheUserMovieRatingService->set($this->traktApi->getUserMoviesRatings('leepe'));
+        $this->traktApiCacheUserMovieRatingService->set($this->traktApi->getUserMoviesRatings());
 
         foreach ($this->movieSelectService->fetchAll() as $movie) {
             $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($movie->getTraktId());

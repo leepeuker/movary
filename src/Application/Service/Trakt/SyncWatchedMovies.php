@@ -35,9 +35,9 @@ class SyncWatchedMovies
         $this->traktApiCacheUserMovieWatchedService = $traktApiCacheUserMovieWatchedService;
     }
 
-    public function execute(string $username) : void
+    public function execute() : void
     {
-        $watchedMovies = $this->traktApi->getUserMoviesWatched($username);
+        $watchedMovies = $this->traktApi->getUserMoviesWatched();
 
         foreach ($watchedMovies as $watchedMovie) {
             $movie = $this->movieSelectService->findByTraktId($watchedMovie->getMovie()->getTraktId());
@@ -90,7 +90,7 @@ class SyncWatchedMovies
     {
         $this->movieHistoryDeleteService->deleteByMovieId($movie->getId());
 
-        foreach ($this->traktApi->getUserMovieHistoryByMovieId('leepe', $movie->getTraktId()) as $movieHistoryEntry) {
+        foreach ($this->traktApi->getUserMovieHistoryByMovieId($movie->getTraktId()) as $movieHistoryEntry) {
             $this->movieHistoryCreateService->create($movie->getId(), $movieHistoryEntry->getWatchedAt());
 
             echo 'Added watch date for "' . $movieHistoryEntry->getMovie()->getTitle() . '": ' . $movieHistoryEntry->getWatchedAt() . PHP_EOL;

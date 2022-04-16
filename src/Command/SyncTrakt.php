@@ -36,10 +36,8 @@ class SyncTrakt extends Command
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $username = 'leepe';
-
         try {
-            $this->syncWatchedMovies->execute($username);
+            $this->syncWatchedMovies->execute();
             $this->syncRatings->execute();
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete trakt sync.', ['exception' => $t]);
