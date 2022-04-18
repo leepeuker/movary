@@ -4,6 +4,6 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/',
-        [\Movary\Endpoint\DummyController::class, 'helloWorld']
+        [\Movary\HttpController\MovieHistoryController::class, 'fetchHistory']
     );
 };
