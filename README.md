@@ -5,11 +5,12 @@
 ### Prerequisite
 - trakt account and api credentials (https://trakt.tv/oauth/applications) 
 - tmdb api key (https://www.themoviedb.org/settings/api)
+- mysql 5.7 or higher
 - Docker (20.10.14) OR php 8.1 + composer installed
 
 ### Install with docker
-- `cp settings/config.ini.dist settings/config.ini`
-- `cp .env.dist .env`
+- `cp .env.example .env`
+- set config values in .env
 - `make build`
 
 ## Commands
