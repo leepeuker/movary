@@ -4,6 +4,7 @@ namespace Movary\Application\Movie\Service;
 
 use Movary\Api\Tmdb\Dto\Cast;
 use Movary\Api\Tmdb\Dto\Crew;
+use Movary\Application\Company;
 use Movary\Application\Genre;
 use Movary\Application\Movie;
 use Movary\Application\Movie\Entity;
@@ -25,6 +26,10 @@ class Update
 
     private Movie\Genre\Service\Delete $movieGenreDeleteService;
 
+    private Movie\ProductionCompany\Service\Create $movieProductionCompanyCreateService;
+
+    private Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService;
+
     private Person\Service\Create $personCreateService;
 
     private Person\Service\Select $personSelectService;
@@ -35,6 +40,8 @@ class Update
         Repository $repository,
         Movie\Genre\Service\Create $movieGenreCreateService,
         Movie\Genre\Service\Delete $movieGenreDeleteService,
+        Movie\ProductionCompany\Service\Create $movieProductionCompanyCreateService,
+        Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService,
         Person\Service\Select $personSelectService,
         Person\Service\Create $personCreateService,
         Movie\Cast\Service\Create $movieCastCreateService,
@@ -45,6 +52,8 @@ class Update
         $this->repository = $repository;
         $this->movieGenreCreateService = $movieGenreCreateService;
         $this->movieGenreDeleteService = $movieGenreDeleteService;
+        $this->movieProductionCompanyCreateService = $movieProductionCompanyCreateService;
+        $this->movieProductionCompanyDeleteService = $movieProductionCompanyDeleteService;
         $this->personSelectService = $personSelectService;
         $this->personCreateService = $personCreateService;
         $this->movieCastCreateService = $movieCastCreateService;
@@ -111,6 +120,15 @@ class Update
 
         foreach ($genres as $position => $genre) {
             $this->movieGenreCreateService->create($movieId, $genre->getId(), (int)$position);
+        }
+    }
+
+    public function updateProductionCompanies(int $movieId, Company\EntityList $genres) : void
+    {
+        $this->movieProductionCompanyDeleteService->deleteByMovieId($movieId);
+
+        foreach ($genres as $position => $genre) {
+            $this->movieProductionCompanyCreateService->create($movieId, $genre->getId(), (int)$position);
         }
     }
 

@@ -6,13 +6,15 @@ use Movary\ValueObject\DateTime;
 
 class Movie
 {
-    private GenreList $genreList;
+    private GenreList $genres;
 
     private int $id;
 
     private string $originalLanguage;
 
     private string $overview;
+
+    private ProductionCompanyList $productionCompanies;
 
     private DateTime $releaseDate;
 
@@ -30,7 +32,8 @@ class Movie
         int $runtime,
         float $voteAverage,
         int $voteCount,
-        GenreList $genreList
+        GenreList $genres,
+        ProductionCompanyList $productionCompanies
     ) {
         $this->id = $id;
         $this->originalLanguage = $originalLanguage;
@@ -39,7 +42,8 @@ class Movie
         $this->runtime = $runtime;
         $this->voteAverage = $voteAverage;
         $this->voteCount = $voteCount;
-        $this->genreList = $genreList;
+        $this->genres = $genres;
+        $this->productionCompanies = $productionCompanies;
     }
 
     public static function createFromArray(array $data) : self
@@ -53,12 +57,13 @@ class Movie
             $data['vote_average'],
             $data['vote_count'],
             GenreList::createFromArray($data['genres']),
+            ProductionCompanyList::createFromArray($data['production_companies']),
         );
     }
 
     public function getGenres() : GenreList
     {
-        return $this->genreList;
+        return $this->genres;
     }
 
     public function getId() : int
@@ -74,6 +79,11 @@ class Movie
     public function getOverview() : string
     {
         return $this->overview;
+    }
+
+    public function getProductionCompanies() : ProductionCompanyList
+    {
+        return $this->productionCompanies;
     }
 
     public function getReleaseDate() : DateTime

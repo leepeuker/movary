@@ -4,6 +4,7 @@ namespace Movary\Application\Service\Tmdb;
 
 use Doctrine\DBAL;
 use Movary\Api\Tmdb;
+use Movary\Application\Company;
 use Movary\Application\Genre;
 use Movary\Application\Movie;
 use Movary\ValueObject\DateTime;
@@ -14,6 +15,10 @@ class SyncMovieDetails
     private const SYNC_VALIDITY_TIME_IN_DAYS = 7;
 
     private Tmdb\Api $api;
+
+    private Company\Service\Create $companyCreateService;
+
+    private Company\Service\Select $companySelectService;
 
     private DBAL\Connection $dbConnection;
 
@@ -33,6 +38,8 @@ class SyncMovieDetails
         Movie\Service\Update $movieUpdateService,
         Genre\Service\Select $genreSelectService,
         Genre\Service\Create $genreCreateService,
+        Company\Service\Select $companySelectService,
+        Company\Service\Create $companyCreateService,
         DBAL\Connection $dbConnection,
         LoggerInterface $logger
     ) {
@@ -41,17 +48,19 @@ class SyncMovieDetails
         $this->movieUpdateService = $movieUpdateService;
         $this->genreSelectService = $genreSelectService;
         $this->genreCreateService = $genreCreateService;
+        $this->companySelectService = $companySelectService;
+        $this->companyCreateService = $companyCreateService;
         $this->dbConnection = $dbConnection;
         $this->logger = $logger;
     }
 
-    public function execute() : void
+    public function execute(bool $forceSync = false) : void
     {
         $movies = $this->movieSelectService->fetchAll();
 
         foreach ($movies as $movie) {
             $updatedAtTmdb = $movie->getUpdatedAtTmdb();
-            if ($updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb) === false) {
+            if ($forceSync === false && $updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb) === false) {
                 continue;
             }
 
@@ -85,6 +94,23 @@ class SyncMovieDetails
         return $genres;
     }
 
+    public function getProductionCompanies(Tmdb\Dto\Movie $movieDetails) : Company\EntityList
+    {
+        $productionCompany = Company\EntityList::create();
+
+        foreach ($movieDetails->getProductionCompanies() as $tmdbCompany) {
+            $company = $this->companySelectService->findByTmdbId($tmdbCompany->getId());
+
+            if ($company === null) {
+                $company = $this->companyCreateService->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
+            }
+
+            $productionCompany->add($company);
+        }
+
+        return $productionCompany;
+    }
+
     public function updateCredits(Movie\Entity $movie) : void
     {
         $credits = $this->api->getMovieCredits($movie->getTmdbId());
@@ -108,6 +134,7 @@ class SyncMovieDetails
         );
 
         $this->movieUpdateService->updateGenres($movie->getId(), $this->getGenres($movieDetails));
+        $this->movieUpdateService->updateProductionCompanies($movie->getId(), $this->getProductionCompanies($movieDetails));
     }
 
     private function syncExpired(DateTime $updatedAtTmdb) : bool
