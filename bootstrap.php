@@ -11,6 +11,7 @@ $builder->addDefinitions(
         \Movary\Api\Trakt\Api::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Api\Trakt\Client::class => DI\factory([Factory::class, 'createTraktApiClient']),
         \Movary\Api\Tmdb\Client::class => DI\factory([Factory::class, 'createTmdbApiClient']),
+        \Movary\ValueObject\HttpRequest::class => DI\factory([Factory::class, 'createHttpRequest']),
         \Psr\Http\Client\ClientInterface::class => DI\factory([Factory::class, 'createHttpClient']),
         \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createFileLogger']),
         \Doctrine\DBAL\Connection::class => DI\factory([Factory::class, 'createDbConnection']),

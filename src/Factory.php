@@ -10,6 +10,7 @@ use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
 use Movary\ValueObject\Config;
+use Movary\ValueObject\HttpRequest;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -59,6 +60,11 @@ class Factory
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client();
+    }
+
+    public static function createHttpRequest() : HttpRequest
+    {
+        return HttpRequest::createFromGlobals();
     }
 
     public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\Client
