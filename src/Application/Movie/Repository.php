@@ -48,6 +48,7 @@ class Repository
 
     public function updateDetails(
         int $id,
+        ?string $tagline,
         ?string $overview,
         ?string $originalLanguage,
         ?DateTime $releaseDate,
@@ -58,6 +59,7 @@ class Repository
         $this->dbConnection->update(
             'movie',
             [
+                'tagline' => $tagline,
                 'overview' => $overview,
                 'original_language' => $originalLanguage,
                 'release_date' => $releaseDate === null ? null : $releaseDate->format('Y-m-d'),

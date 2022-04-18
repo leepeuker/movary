@@ -104,6 +104,7 @@ class Update
 
     public function updateDetails(
         int $id,
+        ?string $tagline,
         ?string $overview,
         ?string $originalLanguage,
         ?DateTime $releaseDate,
@@ -111,7 +112,7 @@ class Update
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount
     ) : Entity {
-        return $this->repository->updateDetails($id, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount);
+        return $this->repository->updateDetails($id, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount);
     }
 
     public function updateGenres(int $movieId, Genre\EntityList $genres) : void

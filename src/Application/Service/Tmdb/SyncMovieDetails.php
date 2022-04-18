@@ -125,6 +125,7 @@ class SyncMovieDetails
 
         $this->movieUpdateService->updateDetails(
             $movie->getId(),
+            $movieDetails->getTagline(),
             $movieDetails->getOverview(),
             $movieDetails->getOriginalLanguage(),
             $movieDetails->getReleaseDate(),

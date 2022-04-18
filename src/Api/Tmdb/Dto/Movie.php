@@ -12,13 +12,15 @@ class Movie
 
     private string $originalLanguage;
 
-    private string $overview;
+    private ?string $overview;
 
     private ProductionCompanyList $productionCompanies;
 
     private DateTime $releaseDate;
 
     private int $runtime;
+
+    private ?string $tagline;
 
     private float $voteAverage;
 
@@ -27,7 +29,8 @@ class Movie
     private function __construct(
         int $id,
         string $originalLanguage,
-        string $overview,
+        ?string $tagline,
+        ?string $overview,
         DateTime $releaseDate,
         int $runtime,
         float $voteAverage,
@@ -37,6 +40,7 @@ class Movie
     ) {
         $this->id = $id;
         $this->originalLanguage = $originalLanguage;
+        $this->tagline = $tagline;
         $this->overview = $overview;
         $this->releaseDate = $releaseDate;
         $this->runtime = $runtime;
@@ -51,7 +55,8 @@ class Movie
         return new self(
             $data['id'],
             $data['original_language'],
-            $data['overview'],
+            empty($data['tagline']) === true ? null : $data['tagline'],
+            empty($data['overview']) === true ? null : $data['overview'],
             DateTime::createFromString($data['release_date']),
             $data['runtime'],
             $data['vote_average'],
@@ -76,7 +81,7 @@ class Movie
         return $this->originalLanguage;
     }
 
-    public function getOverview() : string
+    public function getOverview() : ?string
     {
         return $this->overview;
     }
@@ -94,6 +99,11 @@ class Movie
     public function getRuntime() : int
     {
         return $this->runtime;
+    }
+
+    public function getTagline() : ?string
+    {
+        return $this->tagline;
     }
 
     public function getVoteAverage() : float
