@@ -22,7 +22,7 @@ final class AddProductionCompanies extends AbstractMigration
                 `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
                 `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE NOW(),
                 PRIMARY KEY (`id`),
-                UNIQUE (`name`),
+                UNIQUE (`name`, `origin_country`),
                 UNIQUE (`tmdb_id`)
             ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
             SQL
