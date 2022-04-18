@@ -14,7 +14,7 @@ services:
         container_name: movary-web
         working_dir: /var/www/
         ports:
-            - "${NGINX_PORT}:80"
+            - "${WEB_PORT}:80"
         volumes:
             - ./build/nginx/conf.d/:/etc/nginx/conf.d/
             - ./build/nginx/nginx.conf:/etc/nginx/nginx.conf

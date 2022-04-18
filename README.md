@@ -9,8 +9,8 @@ Additionally it enriches the synced movies with data provided by tmdb (e.g. movi
 ### Prerequisite
 - trakt account and api credentials (https://trakt.tv/oauth/applications) 
 - tmdb api key (https://www.themoviedb.org/settings/api)
-- mysql 5.7 or higher
-- Docker (20.10.14) OR php 8.1 + composer installed
+- Docker (20.10.14) [for php and web server]
+- mysql 8.0 [only included in docker in development setup]
 
 ### Install with docker
 - `cp .env.example .env`
