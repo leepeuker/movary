@@ -1,5 +1,9 @@
 # Movary
 
+This is a tool I have written to sync my movie watch history and ratings from trakt.tv to my personal server.
+
+Additionally it enriches the synced movies with data provided by tmdb (e.g. movie metadata, credits, production companies).
+
 ## Install
 
 ### Prerequisite
@@ -32,6 +36,7 @@ This sync includes:
 - movie details 
 - movie cast
 - movie crew
+- movie production company
 
 ## Useful links:
 - Trakt API docs: https://trakt.docs.apiary.io/
