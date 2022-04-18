@@ -21,6 +21,7 @@ reup: down up
 
 build: down init
 	docker-compose build --no-cache --build-arg USER_ID=${USER_ID}
+	make composer_install
 
 # Container interaction
 #######################
