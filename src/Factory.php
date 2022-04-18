@@ -29,6 +29,7 @@ class Factory
         return DBAL\DriverManager::getConnection(
             [
                 'dbname' => $config->getAsString('DATABASE_NAME'),
+                'port' => $config->getAsInt('DATABASE_PORT'),
                 'user' => $config->getAsString('DATABASE_USER'),
                 'password' => $config->getAsString('DATABASE_PASSWORD'),
                 'host' => $config->getAsString('DATABASE_HOST'),

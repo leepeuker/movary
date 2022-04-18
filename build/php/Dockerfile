@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/php
-FROM php:8.1.4-alpine3.15
+FROM php:8.1.4-fpm-alpine3.15
 
 # System update
 RUN apk update && apk upgrade
@@ -22,4 +22,4 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql zip
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.3.3
 
-WORKDIR /app
+WORKDIR /var/www
