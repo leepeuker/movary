@@ -18,19 +18,22 @@ class Factory
 {
     public static function createConfig() : Config
     {
-        return Config::createFromFile(__DIR__ . '/../settings/config.ini');
+        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+        $dotenv->load();
+
+        return Config::createFromEnv();
     }
 
     public static function createDbConnection(Config $config) : DBAL\Connection
     {
         return DBAL\DriverManager::getConnection(
             [
-                'dbname' => $config->getAsString('database.name'),
-                'user' => $config->getAsString('database.username'),
-                'password' => $config->getAsString('database.password'),
-                'host' => $config->getAsString('database.host'),
-                'driver' => $config->getAsString('database.driver'),
-                'charset' => $config->getAsString('database.charset'),
+                'dbname' => $config->getAsString('DATABASE_NAME'),
+                'user' => $config->getAsString('DATABASE_USER'),
+                'password' => $config->getAsString('DATABASE_PASSWORD'),
+                'host' => $config->getAsString('DATABASE_HOST'),
+                'driver' => $config->getAsString('DATABASE_DRIVER'),
+                'charset' => $config->getAsString('DATABASE_CHARSET'),
             ]
         );
     }
@@ -41,8 +44,8 @@ class Factory
         $formatter->includeStacktraces(true);
 
         $handler = new StreamHandler(
-            __DIR__ . '/../' . $config->getAsString('logger.file'),
-            $config->getAsString('logger.logLevel')
+            __DIR__ . '/../' . $config->getAsString('LOG_FILE'),
+            $config->getAsString('LOG_LEVEL')
         );
         $handler->setFormatter($formatter);
 
@@ -61,7 +64,7 @@ class Factory
     {
         return new Tmdb\Client(
             $container->get(ClientInterface::class),
-            $config->getAsString('tmdb.apiKey')
+            $config->getAsString('TMDB_API_KEY')
         );
     }
 
@@ -69,7 +72,7 @@ class Factory
     {
         return new Trakt\Api(
             $container->get(Trakt\Client::class),
-            $config->getAsString('trakt.username')
+            $config->getAsString('TRAKT_USERNAME')
         );
     }
 
@@ -77,7 +80,7 @@ class Factory
     {
         return new Trakt\Client(
             $container->get(ClientInterface::class),
-            $config->getAsString('trakt.clientId')
+            $config->getAsString('TRAKT_CLIENT_ID')
         );
     }
 }

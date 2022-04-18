@@ -6,26 +6,14 @@ class Config
 {
     private array $data;
 
-    public function __construct(string $configFile)
+    public function __construct(array $config)
     {
-        self::ensureFileIsReadable($configFile);
-
-        $this->data = (array)parse_ini_file($configFile, true);
+        $this->data = $config;
     }
 
-    public static function createFromFile(string $configDir) : self
+    public static function createFromEnv() : self
     {
-        return new self($configDir);
-    }
-
-    /**
-     * @throws \RuntimeException
-     */
-    private static function ensureFileIsReadable(string $file) : void
-    {
-        if (is_readable($file) === false) {
-            throw new \RuntimeException('File is not readable: ' . $file);
-        }
+        return new self($_ENV);
     }
 
     public function getAsArray(string $parameter) : array
@@ -53,40 +41,17 @@ class Config
         return (string)$this->get($parameter);
     }
 
-    private function ensureKeyExists(string $section, string $key) : void
+    private function ensureKeyExists(string $key) : void
     {
-        if (isset($this->data[$section][$key]) === false) {
-            throw new \OutOfBoundsException('Key does not exist: ' . $section . '.' . $key);
+        if (isset($this->data[$key]) === false) {
+            throw new \OutOfBoundsException('Key does not exist: ' . $key);
         }
     }
 
-    private function ensureSectionExists(string $section) : void
+    private function get(string $key) : mixed
     {
-        if (isset($this->data[$section]) === false || is_array($this->data[$section]) === false) {
-            throw new \OutOfBoundsException('Section does not exist: ' . $section);
-        }
-    }
+        $this->ensureKeyExists($key);
 
-    private function explode(string $parameter) : array
-    {
-        $pos = (int)strpos($parameter, '.');
-        $section = substr($parameter, 0, $pos);
-
-        $key = substr($parameter, $pos + 1);
-
-        return [$section, $key];
-    }
-
-    /**
-     * @return mixed
-     */
-    private function get(string $parameter)
-    {
-        [$section, $key] = $this->explode($parameter);
-
-        $this->ensureSectionExists($section);
-        $this->ensureKeyExists($section, $key);
-
-        return $this->data[$section][$key];
+        return $this->data[$key];
     }
 }

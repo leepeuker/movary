@@ -16,7 +16,8 @@
     "php-di/php-di": "^6.3",
     "psr/http-client": "^1.0",
     "robmorgan/phinx": "^0.12",
-    "symfony/console": "^6.0"
+    "symfony/console": "^6.0",
+    "vlucas/phpdotenv": "^5.4"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",
