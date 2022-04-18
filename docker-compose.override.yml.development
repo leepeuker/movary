@@ -5,10 +5,10 @@ services:
         image: mysql:8.0
         container_name: movary-db
         environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
             MYSQL_USER: ${DATABASE_USER}
             MYSQL_PASSWORD: ${DATABASE_PASSWORD}
         volumes:
             - ./tmp/db/:/var/lib/mysql
         ports:
-            - "${DATABASE_PORT}:3306"
+            - "${DATABASE_PORT_HOST}:3306"
