@@ -3,68 +3,47 @@
 include .env
 
 ifeq ($(ENV), development)
-    include Makefile.database.mk
+    include Makefile.development.mk
+else ifneq ($(ENV), development)
+	include Makefile.production.mk
 endif
 
-# Docker
-########
-PHP_CONTAINER_NAME = movary-php
-PHP_DOCKER_OPTIONS = --rm \
-	             --network=host \
-                 --user $(USER_ID):$(USER_ID) \
-                 -v ${PWD}:/app
-PHP_DOCKER_RUN = docker run $(PHP_DOCKER_OPTIONS) $(PHP_CONTAINER_NAME)
+# Container management
+######################
+up:
+	mkdir -p tmp/db
+	docker-compose up -d
 
-# Setup
-#######
-build:
-	docker build -t $(PHP_CONTAINER_NAME) ./build/php/
-	$(MAKE) composer_install
+down:
+	docker-compose down
 
-run_php_bash:
-	docker run -it $(PHP_DOCKER_OPTIONS) $(PHP_CONTAINER_NAME) bash
+reup: down up
 
-run_php_cmd:
-	$(PHP_DOCKER_RUN) bash -c "${CMD}"
+build: down init
+	docker-compose build --no-cache --build-arg USER_ID=${USER_ID}
 
-# Composer
-##########
-composer_install:
-	$(PHP_DOCKER_RUN) composer install
+# Container interaction
+#######################
+exec_php_bash:
+	docker exec -it movary-php bash -c "bash"
 
-composer_update:
-	$(PHP_DOCKER_RUN) composer update
+exec_php_cmd:
+	docker exec -i movary-php bash -c "${CMD}"
 
 # Commands
 ##########
 app_sync_all: app_sync_trakt app_sync_tmdb
 
 app_sync_trakt:
-	make run_php_cmd CMD="php bin/console.php app:sync-trakt"
+	make exec_php_cmd CMD="php bin/console.php app:sync-trakt"
 
 app_sync_tmdb:
-	make run_php_cmd CMD="php bin/console.php app:sync-tmdb"
-
-# Tests
-#######
-test: test_phpcs test_psalm test_phpstan
-
-test_phpcs:
-	make run_php_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml ./src"
-
-test_phpstan:
-	make run_php_cmd CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8"
-
-test_psalm:
-	make run_php_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
+	make exec_php_cmd CMD="php bin/console.php app:sync-tmdb"
 
 # Database
 ##########
 db_migration_migrate:
-	make run_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php"
+	make exec_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php"
 
 db_migration_rollback:
-	make run_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php"
-
-db_migration_create:
-	make run_php_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
+	make exec_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php"

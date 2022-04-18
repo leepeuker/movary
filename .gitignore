@@ -1,6 +1,7 @@
 .env
 tmp/*
 !tmp/.gitkeep
+docker-compose.override.yml
 
 .idea/
 vendor/
