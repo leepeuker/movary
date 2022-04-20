@@ -15,7 +15,9 @@ class Entity
 
     private ?string $overview;
 
-    private ?int $rating;
+    private ?int $rating10;
+
+    private ?int $rating5;
 
     private ?DateTime $releaseDate;
 
@@ -36,7 +38,8 @@ class Entity
     private function __construct(
         int $id,
         string $title,
-        ?int $rating,
+        ?int $rating10,
+        ?int $rating5,
         TraktId $traktId,
         string $imdbId,
         int $tmdbId,
@@ -50,7 +53,7 @@ class Entity
     ) {
         $this->id = $id;
         $this->title = $title;
-        $this->rating = $rating;
+        $this->rating10 = $rating10;
         $this->traktId = $traktId;
         $this->imdbId = $imdbId;
         $this->tmdbId = $tmdbId;
@@ -61,6 +64,7 @@ class Entity
         $this->tmdbVoteAverage = $tmdbVoteAverage;
         $this->tmdbVoteCount = $tmdbVoteCount;
         $this->updatedAtTmdb = $updatedAtTmdb;
+        $this->rating5 = $rating5;
     }
 
     public static function createFromArray(array $data) : self
@@ -68,7 +72,8 @@ class Entity
         return new self(
             (int)$data['id'],
             $data['title'],
-            $data['rating'] === null ? null : (int)$data['rating'],
+            $data['rating_10'] === null ? null : (int)$data['rating_10'],
+            $data['rating_5'] === null ? null : (int)$data['rating_5'],
             TraktId::createFromString((string)$data['trakt_id']),
             $data['imdb_id'],
             (int)$data['tmdb_id'],
@@ -102,9 +107,14 @@ class Entity
         return $this->overview;
     }
 
-    public function getRating() : ?int
+    public function getRating10() : ?int
     {
-        return $this->rating;
+        return $this->rating10;
+    }
+
+    public function getRating5() : ?int
+    {
+        return $this->rating5;
     }
 
     public function getReleaseDate() : ?DateTime

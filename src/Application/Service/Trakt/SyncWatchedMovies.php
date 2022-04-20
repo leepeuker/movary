@@ -46,6 +46,7 @@ class SyncWatchedMovies
                 $movie = $this->movieCreateService->create(
                     $watchedMovie->getMovie()->getTitle(),
                     null,
+                    null,
                     $watchedMovie->getMovie()->getTraktId(),
                     $watchedMovie->getMovie()->getImdbId(),
                     $watchedMovie->getMovie()->getTmdbId(),
