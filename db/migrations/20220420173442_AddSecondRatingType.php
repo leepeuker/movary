@@ -19,7 +19,7 @@ final class AddSecondRatingType extends AbstractMigration
         $this->execute(
             <<<SQL
             ALTER TABLE movie RENAME COLUMN rating TO rating_10;
-            ALTER TABLE movie ADD COLUMN rating_5 TINYINT DEFAULT NULL AFTER title;
+            ALTER TABLE movie ADD COLUMN rating_5 TINYINT DEFAULT NULL AFTER rating_10;
             SQL
         );
     }
