@@ -9,6 +9,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
+use Movary\Application\Movie;
+use Movary\Application\Service\Letterboxd;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\HttpRequest;
 use Psr\Container\ContainerInterface;
@@ -65,6 +67,17 @@ class Factory
     public static function createHttpRequest() : HttpRequest
     {
         return HttpRequest::createFromGlobals();
+    }
+
+    public static function createLetterboxRatingSyncService(ContainerInterface $container, Config $config) : Letterboxd\SyncRatings
+    {
+        return new Letterboxd\SyncRatings(
+            $container->get(Movie\Service\Update::class),
+            $container->get(Movie\Service\Select::class),
+            __DIR__ . '/../' . $config->getAsString('LETTERBOXD_RATINGS_CSV_PATH'),
+            $container->get(Letterboxd\WebScrapper::class),
+            $container->get(LoggerInterface::class),
+        );
     }
 
     public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\Client

@@ -50,6 +50,20 @@ class Repository
         );
     }
 
+    public function findByLetterboxdId(string $letterboxdId) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE letterboxd_id = ?', [$letterboxdId]);
+
+        return $data === false ? null : Entity::createFromArray($data);
+    }
+
+    public function findByTmdbId(int $tmdbId) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE tmdb_id = ?', [$tmdbId]);
+
+        return $data === false ? null : Entity::createFromArray($data);
+    }
+
     public function findByTraktId(TraktId $traktId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE trakt_id = ?', [$traktId->asInt()]);
@@ -85,11 +99,19 @@ class Repository
         return $this->fetchById($id);
     }
 
-    public function updateRating10(int $id, ?int $rating10) : Entity
+    public function updateLetterboxdId(int $id, string $letterboxdId) : void
+    {
+        $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId], ['id' => $id]);
+    }
+
+    public function updateRating10(int $id, ?int $rating10) : void
     {
         $this->dbConnection->update('movie', ['rating_10' => $rating10], ['id' => $id]);
+    }
 
-        return $this->fetchById($id);
+    public function updateRating5(int $id, ?int $rating5) : void
+    {
+        $this->dbConnection->update('movie', ['rating_5' => $rating5], ['id' => $id]);
     }
 
     private function fetchById(int $id) : Entity

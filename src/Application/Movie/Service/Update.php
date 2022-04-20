@@ -124,6 +124,11 @@ class Update
         }
     }
 
+    public function updateLetterboxdId(int $movieId, string $letterboxdId) : void
+    {
+        $this->repository->updateLetterboxdId($movieId, $letterboxdId);
+    }
+
     public function updateProductionCompanies(int $movieId, Company\EntityList $genres) : void
     {
         $this->movieProductionCompanyDeleteService->deleteByMovieId($movieId);
@@ -133,8 +138,13 @@ class Update
         }
     }
 
-    public function updateRating10(int $id, ?int $rating10) : Entity
+    public function updateRating10(int $id, ?int $rating10) : void
     {
-        return $this->repository->updateRating10($id, $rating10);
+        $this->repository->updateRating10($id, $rating10);
+    }
+
+    public function updateRating5(int $id, ?int $rating5) : void
+    {
+        $this->repository->updateRating5($id, $rating5);
     }
 }

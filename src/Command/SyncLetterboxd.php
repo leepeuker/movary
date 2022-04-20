@@ -2,8 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\Service\Trakt\SyncRatings;
-use Movary\Application\Service\Trakt\SyncWatchedMovies;
+use Movary\Application\Service\Letterboxd\SyncRatings;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,20 +10,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncLetterboxd extends Command
 {
-    protected static $defaultName = 'app:sync-letterboxed';
+    protected static $defaultName = 'app:sync-letterboxd';
 
     private LoggerInterface $logger;
 
     private SyncRatings $syncRatings;
 
-    private SyncWatchedMovies $syncWatchedMovies;
-
-    public function __construct(SyncRatings $syncRatings, SyncWatchedMovies $syncWatchedMovies, LoggerInterface $logger)
+    public function __construct(SyncRatings $syncRatings, LoggerInterface $logger)
     {
         parent::__construct();
 
         $this->syncRatings = $syncRatings;
-        $this->syncWatchedMovies = $syncWatchedMovies;
         $this->logger = $logger;
     }
 
@@ -37,10 +33,9 @@ class SyncLetterboxd extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         try {
-            $this->syncWatchedMovies->execute();
             $this->syncRatings->execute();
         } catch (\Throwable $t) {
-            $this->logger->error('Could not complete trakt sync.', ['exception' => $t]);
+            $this->logger->error('Could not complete letterboxd sync.', ['exception' => $t]);
 
             return Command::FAILURE;
         }

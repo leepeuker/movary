@@ -21,6 +21,16 @@ class Select
         return $this->repository->fetchAll();
     }
 
+    public function findByLetterboxdId(string $letterboxdId): ?Entity
+    {
+        return $this->repository->findByLetterboxdId($letterboxdId);
+    }
+
+    public function findByTmdbId(int $tmdbId) : ?Entity
+    {
+        return $this->repository->findByTmdbId($tmdbId);
+    }
+
     public function findByTraktId(TraktId $traktId) : ?Entity
     {
         return $this->repository->findByTraktId($traktId);
