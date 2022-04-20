@@ -19,4 +19,9 @@ class Select
     {
         return $this->repository->findByTraktId($traktId);
     }
+
+    public function fetchHistoryOrderedByWatchedAtDesc() : array
+    {
+        return $this->repository->fetchHistoryOrderedByWatchedAtDesc();
+    }
 }
