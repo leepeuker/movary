@@ -54,13 +54,13 @@ class SyncRatings
         }
     }
 
-    public function findMovieByLetterboxdUri(string $letterboxdURI) : ?Application\Movie\Entity
+    public function findMovieByLetterboxdUri(string $letterboxdUri) : ?Application\Movie\Entity
     {
-        $letterboxdId = basename($letterboxdURI);
+        $letterboxdId = basename($letterboxdUri);
         $movie = $this->movieSelectService->findByLetterboxdId($letterboxdId);
 
         if ($movie === null) {
-            $tmdbId = $this->webScrapper->getProviderTmdbId($letterboxdURI);
+            $tmdbId = $this->webScrapper->getProviderTmdbId($letterboxdUri);
 
             $movie = $this->movieSelectService->findByTmdbId($tmdbId);
             if ($movie === null) {

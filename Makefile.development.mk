@@ -27,7 +27,7 @@ db_create_database:
 	make db_migration_migrate
 
 db_import:
-	docker cp tmp/dump.sql movary-db:/tmp/dump.sql
+	docker cp $(FILE) movary-db:/tmp/dump.sql
 	docker exec movary-db bash -c 'mysql -uroot -p${DATABASE_ROOT_PASSWORD} < /tmp/dump.sql'
 	docker exec movary-db bash -c 'rm /tmp/dump.sql'
 
