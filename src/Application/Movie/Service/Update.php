@@ -133,8 +133,8 @@ class Update
         }
     }
 
-    public function updateRating(int $id, ?int $rating) : Entity
+    public function updateRating10(int $id, ?int $rating10) : Entity
     {
-        return $this->repository->updateRating($id, $rating);
+        return $this->repository->updateRating10($id, $rating10);
     }
 }

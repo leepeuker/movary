@@ -34,7 +34,7 @@ class SyncRatings
         foreach ($this->movieSelectService->fetchAll() as $movie) {
             $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($movie->getTraktId());
 
-            $this->movieUpdateService->updateRating($movie->getId(), $rating);
+            $this->movieUpdateService->updateRating10($movie->getId(), $rating);
         }
     }
 }

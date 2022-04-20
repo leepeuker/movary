@@ -16,13 +16,14 @@ class Repository
         $this->dbConnection = $dbConnection;
     }
 
-    public function create(string $title, ?int $rating, TraktId $traktId, string $imdbId, int $tmdbId) : Entity
+    public function create(string $title, ?int $rating10, ?int $rating5, TraktId $traktId, string $imdbId, int $tmdbId) : Entity
     {
         $this->dbConnection->insert(
             'movie',
             [
                 'title' => $title,
-                'rating' => $rating,
+                'rating_10' => $rating10,
+                'rating_5' => $rating5,
                 'trakt_id' => $traktId->asInt(),
                 'imdb_id' => $imdbId,
                 'tmdb_id' => $tmdbId,
@@ -37,6 +38,16 @@ class Repository
         $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie`');
 
         return EntityList::createFromArray($data);
+    }
+
+    public function fetchHistoryOrderedByWatchedAtDesc() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT m.title, m.rating_10, m.rating_5, mh.watched_at
+            FROM movie_history mh
+            JOIN movie m on mh.movie_id = m.id
+            ORDER BY watched_at DESC'
+        );
     }
 
     public function findByTraktId(TraktId $traktId) : ?Entity
@@ -74,9 +85,9 @@ class Repository
         return $this->fetchById($id);
     }
 
-    public function updateRating(int $id, ?int $rating) : Entity
+    public function updateRating10(int $id, ?int $rating10) : Entity
     {
-        $this->dbConnection->update('movie', ['rating' => $rating], ['id' => $id]);
+        $this->dbConnection->update('movie', ['rating_10' => $rating10], ['id' => $id]);
 
         return $this->fetchById($id);
     }
