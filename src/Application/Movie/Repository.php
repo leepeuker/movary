@@ -102,14 +102,4 @@ class Repository
 
         return Entity::createFromArray($data);
     }
-
-    public function fetchHistoryOrderedByWatchedAtDesc() : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.title, m.rating, mh.watched_at
-            FROM movie_history mh
-            JOIN movie m on mh.movie_id = m.id
-            ORDER BY watched_at DESC'
-        );
-    }
 }

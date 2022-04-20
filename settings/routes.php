@@ -3,7 +3,7 @@
 return static function(FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
-        '/',
+        '/history',
         [\Movary\HttpController\MovieHistoryController::class, 'fetchHistory']
     );
 };
