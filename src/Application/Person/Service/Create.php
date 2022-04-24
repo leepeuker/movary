@@ -8,11 +8,8 @@ use Movary\ValueObject\Gender;
 
 class Create
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId) : Entity

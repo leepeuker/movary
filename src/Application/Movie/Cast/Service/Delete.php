@@ -6,11 +6,8 @@ use Movary\Application\Movie\Cast\Repository;
 
 class Delete
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function deleteByMovieId(int $movieId) : void

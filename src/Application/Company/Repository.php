@@ -7,11 +7,8 @@ use RuntimeException;
 
 class Repository
 {
-    private Connection $dbConnection;
-
-    public function __construct(Connection $dbConnection)
+    public function __construct(private readonly Connection $dbConnection)
     {
-        $this->dbConnection = $dbConnection;
     }
 
     public function create(string $name, ?string $originCountry, int $tmdbId) : Entity

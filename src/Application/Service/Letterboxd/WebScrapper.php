@@ -6,11 +6,8 @@ use GuzzleHttp\Client;
 
 class WebScrapper
 {
-    private Client $httpClient;
-
-    public function __construct(Client $httpClient)
+    public function __construct(private readonly Client $httpClient)
     {
-        $this->httpClient = $httpClient;
     }
 
     public function getProviderTmdbId(string $letterboxedMovieUri) : int

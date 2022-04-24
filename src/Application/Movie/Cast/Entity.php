@@ -4,20 +4,12 @@ namespace Movary\Application\Movie\Cast;
 
 class Entity
 {
-    private string $character;
-
-    private int $movieId;
-
-    private int $personId;
-
-    private int $position;
-
-    private function __construct(int $movieId, int $personId, string $character, int $position)
-    {
-        $this->movieId = $movieId;
-        $this->personId = $personId;
-        $this->character = $character;
-        $this->position = $position;
+    private function __construct(
+        private readonly int $movieId,
+        private readonly int $personId,
+        private readonly string $character,
+        private readonly int $position
+    ) {
     }
 
     public static function createFromArray(array $data) : self

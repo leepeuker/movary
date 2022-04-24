@@ -6,23 +6,13 @@ use Movary\ValueObject\Year;
 
 class Dto
 {
-    private string $imdbId;
-
-    private string $title;
-
-    private int $tmdbId;
-
-    private TraktId $traktId;
-
-    private Year $year;
-
-    private function __construct(string $title, Year $year, TraktId $traktId, string $imdbId, int $tmdbId)
-    {
-        $this->title = $title;
-        $this->year = $year;
-        $this->traktId = $traktId;
-        $this->imdbId = $imdbId;
-        $this->tmdbId = $tmdbId;
+    private function __construct(
+        private readonly string $title,
+        private readonly Year $year,
+        private readonly TraktId $traktId,
+        private readonly string $imdbId,
+        private readonly int $tmdbId
+    ) {
     }
 
     public static function createFromArray(array $data) : self

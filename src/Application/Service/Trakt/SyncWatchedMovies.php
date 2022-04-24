@@ -8,32 +8,14 @@ use Movary\ValueObject\Date;
 
 class SyncWatchedMovies
 {
-    private Application\Movie\Service\Create $movieCreateService;
-
-    private Application\Movie\History\Service\Create $movieHistoryCreateService;
-
-    private Application\Movie\History\Service\Delete $movieHistoryDeleteService;
-
-    private Application\Movie\Service\Select $movieSelectService;
-
-    private Api\Trakt\Api $traktApi;
-
-    private Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService;
-
     public function __construct(
-        Application\Movie\Service\Create $movieCreateService,
-        Application\Movie\Service\Select $movieSelectService,
-        Application\Movie\History\Service\Create $movieHistoryCreateService,
-        Application\Movie\History\Service\Delete $movieHistoryDeleteService,
-        Api\Trakt\Api $traktApi,
-        Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService
+        private readonly Application\Movie\Service\Create $movieCreateService,
+        private readonly Application\Movie\Service\Select $movieSelectService,
+        private readonly Application\Movie\History\Service\Create $movieHistoryCreateService,
+        private readonly Application\Movie\History\Service\Delete $movieHistoryDeleteService,
+        private readonly Api\Trakt\Api $traktApi,
+        private readonly Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService
     ) {
-        $this->movieCreateService = $movieCreateService;
-        $this->movieSelectService = $movieSelectService;
-        $this->movieHistoryCreateService = $movieHistoryCreateService;
-        $this->movieHistoryDeleteService = $movieHistoryDeleteService;
-        $this->traktApi = $traktApi;
-        $this->traktApiCacheUserMovieWatchedService = $traktApiCacheUserMovieWatchedService;
     }
 
     public function execute() : void

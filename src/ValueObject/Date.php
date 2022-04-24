@@ -6,7 +6,7 @@ class Date implements \JsonSerializable
 {
     private const FORMAT = 'Y-m-d';
 
-    private function __construct(public string $date)
+    private function __construct(public readonly string $date)
     {
     }
 

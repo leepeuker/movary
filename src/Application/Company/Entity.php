@@ -4,24 +4,12 @@ namespace Movary\Application\Company;
 
 class Entity
 {
-    private int $id;
-
-    private string $name;
-
-    private ?string $originCountry;
-
-    private int $tmdbId;
-
     private function __construct(
-        int $id,
-        string $name,
-        string $originCountry,
-        int $tmdbId
+        private readonly int $id,
+        private readonly string $name,
+        private readonly string $originCountry,
+        private readonly int $tmdbId
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->originCountry = $originCountry;
-        $this->tmdbId = $tmdbId;
     }
 
     public static function createFromArray(array $data) : self

@@ -13,19 +13,12 @@ class SyncTrakt extends Command
 {
     protected static $defaultName = 'app:sync-trakt';
 
-    private LoggerInterface $logger;
-
-    private SyncRatings $syncRatings;
-
-    private SyncWatchedMovies $syncWatchedMovies;
-
-    public function __construct(SyncRatings $syncRatings, SyncWatchedMovies $syncWatchedMovies, LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly SyncRatings $syncRatings,
+        private readonly SyncWatchedMovies $syncWatchedMovies,
+        private readonly LoggerInterface $logger
+    ) {
         parent::__construct();
-
-        $this->syncRatings = $syncRatings;
-        $this->syncWatchedMovies = $syncWatchedMovies;
-        $this->logger = $logger;
     }
 
     protected function configure() : void

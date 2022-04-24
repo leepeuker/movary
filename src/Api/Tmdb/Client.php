@@ -10,14 +10,10 @@ class Client
 {
     private const BASE_URL = 'https://api.themoviedb.org/3';
 
-    private string $apiKey;
-
-    private ClientInterface $httpClient;
-
-    public function __construct(ClientInterface $httpClient, string $apiKey)
-    {
-        $this->httpClient = $httpClient;
-        $this->apiKey = $apiKey;
+    public function __construct(
+        private readonly ClientInterface $httpClient,
+        private readonly string $apiKey
+    ) {
     }
 
     public function get(string $relativeUrl) : array

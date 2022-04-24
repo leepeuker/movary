@@ -6,14 +6,10 @@ use Movary\ValueObject\Date;
 
 class Entity
 {
-    private int $id;
-
-    private Date $watchedAt;
-
-    private function __construct(int $id, Date $watchedAt)
-    {
-        $this->id = $id;
-        $this->watchedAt = $watchedAt;
+    private function __construct(
+        private readonly int $id,
+        private readonly Date $watchedAt
+    ) {
     }
 
     public static function createFromArray(array $data) : self

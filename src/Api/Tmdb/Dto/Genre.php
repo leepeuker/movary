@@ -4,14 +4,10 @@ namespace Movary\Api\Tmdb\Dto;
 
 class Genre
 {
-    private int $id;
-
-    private string $name;
-
-    private function __construct(int $id, string $name)
-    {
-        $this->id = $id;
-        $this->name = $name;
+    private function __construct(
+        private readonly int $id,
+        private readonly string $name
+    ) {
     }
 
     public static function createFromArray(array $data) : self

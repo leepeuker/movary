@@ -14,52 +14,19 @@ use Movary\ValueObject\DateTime;
 
 class Update
 {
-    private Movie\Cast\Service\Create $movieCastCreateService;
-
-    private Movie\Cast\Service\Delete $movieCasteDeleteService;
-
-    private Movie\Crew\Service\Create $movieCrewCreateService;
-
-    private Movie\Crew\Service\Delete $movieCrewDeleteService;
-
-    private Movie\Genre\Service\Create $movieGenreCreateService;
-
-    private Movie\Genre\Service\Delete $movieGenreDeleteService;
-
-    private Movie\ProductionCompany\Service\Create $movieProductionCompanyCreateService;
-
-    private Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService;
-
-    private Person\Service\Create $personCreateService;
-
-    private Person\Service\Select $personSelectService;
-
-    private Repository $repository;
-
     public function __construct(
-        Repository $repository,
-        Movie\Genre\Service\Create $movieGenreCreateService,
-        Movie\Genre\Service\Delete $movieGenreDeleteService,
-        Movie\ProductionCompany\Service\Create $movieProductionCompanyCreateService,
-        Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService,
-        Person\Service\Select $personSelectService,
-        Person\Service\Create $personCreateService,
-        Movie\Cast\Service\Create $movieCastCreateService,
-        Movie\Cast\Service\Delete $movieCasteDeleteService,
-        Movie\Crew\Service\Create $movieCrewCreateService,
-        Movie\Crew\Service\Delete $movieCrewDeleteService,
+        private readonly Repository $repository,
+        private readonly Movie\Genre\Service\Create $movieGenreCreateService,
+        private readonly Movie\Genre\Service\Delete $movieGenreDeleteService,
+        private readonly Movie\ProductionCompany\Service\Create $movieProductionCompanyCreateService,
+        private readonly Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService,
+        private readonly Person\Service\Select $personSelectService,
+        private readonly Person\Service\Create $personCreateService,
+        private readonly Movie\Cast\Service\Create $movieCastCreateService,
+        private readonly Movie\Cast\Service\Delete $movieCasteDeleteService,
+        private readonly Movie\Crew\Service\Create $movieCrewCreateService,
+        private readonly Movie\Crew\Service\Delete $movieCrewDeleteService,
     ) {
-        $this->repository = $repository;
-        $this->movieGenreCreateService = $movieGenreCreateService;
-        $this->movieGenreDeleteService = $movieGenreDeleteService;
-        $this->movieProductionCompanyCreateService = $movieProductionCompanyCreateService;
-        $this->movieProductionCompanyDeleteService = $movieProductionCompanyDeleteService;
-        $this->personSelectService = $personSelectService;
-        $this->personCreateService = $personCreateService;
-        $this->movieCastCreateService = $movieCastCreateService;
-        $this->movieCasteDeleteService = $movieCasteDeleteService;
-        $this->movieCrewCreateService = $movieCrewCreateService;
-        $this->movieCrewDeleteService = $movieCrewDeleteService;
     }
 
     public function updateCast(int $movieId, Cast $tmdbCast) : void

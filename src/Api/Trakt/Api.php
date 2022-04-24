@@ -7,14 +7,10 @@ use Movary\Api\Trakt\ValueObject\User;
 
 class Api
 {
-    private Client $client;
-
-    private string $username;
-
-    public function __construct(Client $client, string $username)
-    {
-        $this->client = $client;
-        $this->username = $username;
+    public function __construct(
+        private readonly Client $client,
+        private readonly string $username
+    ) {
     }
 
     public function getUserMovieHistoryByMovieId(TraktId $traktId) : User\Movie\History\DtoList

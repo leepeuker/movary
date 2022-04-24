@@ -20,11 +20,8 @@ class Create
         'Music Director',
     ];
 
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function create(int $movieId, int $personId, string $job, string $department, int $position) : void

@@ -7,14 +7,10 @@ use Movary\ValueObject\DateTime;
 
 class Dto
 {
-    private Movie\Dto $movie;
-
-    private DateTime $watchedAt;
-
-    private function __construct(Movie\Dto $movie, DateTime $watchedAt)
-    {
-        $this->movie = $movie;
-        $this->watchedAt = $watchedAt;
+    private function __construct(
+        private readonly Movie\Dto $movie,
+        private readonly DateTime $watchedAt
+    ) {
     }
 
     public static function createFromArray(array $data) : self

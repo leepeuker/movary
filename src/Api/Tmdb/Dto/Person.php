@@ -6,40 +6,16 @@ use Movary\ValueObject\Gender;
 
 class Person
 {
-    private string $creditId;
-
-    private Gender $gender;
-
-    private ?string $knownForDepartment;
-
-    private string $name;
-
-    private string $originalName;
-
-    private float $popularity;
-
-    private ?string $profilePath;
-
-    private int $tmdbId;
-
     private function __construct(
-        int $tmdbId,
-        string $name,
-        string $originalName,
-        Gender $gender,
-        float $popularity,
-        ?string $knownForDepartment,
-        ?string $profilePath,
-        string $creditId
+        private readonly int $tmdbId,
+        private readonly string $name,
+        private readonly string $originalName,
+        private readonly Gender $gender,
+        private readonly float $popularity,
+        private readonly ?string $knownForDepartment,
+        private readonly ?string $profilePath,
+        private readonly string $creditId
     ) {
-        $this->tmdbId = $tmdbId;
-        $this->name = $name;
-        $this->originalName = $originalName;
-        $this->gender = $gender;
-        $this->popularity = $popularity;
-        $this->knownForDepartment = $knownForDepartment;
-        $this->profilePath = $profilePath;
-        $this->creditId = $creditId;
     }
 
     public static function createFromArray(array $data) : self

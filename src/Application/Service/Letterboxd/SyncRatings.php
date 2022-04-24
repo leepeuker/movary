@@ -9,29 +9,13 @@ use Psr\Log\LoggerInterface;
 
 class SyncRatings
 {
-    private LoggerInterface $logger;
-
-    private Application\Movie\Service\Select $movieSelectService;
-
-    private Application\Movie\Service\Update $movieUpdateService;
-
-    private string $ratingsCsvPath;
-
-    private WebScrapper $webScrapper;
-
     public function __construct(
-        Application\Movie\Service\Update $movieUpdateService,
-        Application\Movie\Service\Select $movieSelectService,
-        string $ratingCsvPath,
-        WebScrapper $webScrapper,
-        LoggerInterface $logger
-
+        private readonly Application\Movie\Service\Update $movieUpdateService,
+        private readonly Application\Movie\Service\Select $movieSelectService,
+        private readonly string $ratingsCsvPath,
+        private readonly WebScrapper $webScrapper,
+        private readonly LoggerInterface $logger
     ) {
-        $this->movieUpdateService = $movieUpdateService;
-        $this->movieSelectService = $movieSelectService;
-        $this->ratingsCsvPath = $ratingCsvPath;
-        $this->webScrapper = $webScrapper;
-        $this->logger = $logger;
     }
 
     public function execute() : void

@@ -8,7 +8,7 @@ class DateTime implements \JsonSerializable
 
     private const FORMAT = 'Y-m-d H:i:s';
 
-    private function __construct(public string $dateTime)
+    private function __construct(public readonly string $dateTime)
     {
     }
 

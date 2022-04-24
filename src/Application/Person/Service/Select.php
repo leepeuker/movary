@@ -7,11 +7,8 @@ use Movary\Application\Person\Repository;
 
 class Select
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function findByTmdbId(int $tmdbId) : ?Entity

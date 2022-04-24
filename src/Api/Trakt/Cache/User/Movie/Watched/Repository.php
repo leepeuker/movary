@@ -8,11 +8,8 @@ use Movary\ValueObject\DateTime;
 
 class Repository
 {
-    private Connection $dbConnection;
-
-    public function __construct(Connection $dbConnection)
+    public function __construct(private readonly Connection $dbConnection)
     {
-        $this->dbConnection = $dbConnection;
     }
 
     public function create(TraktId $traktId, DateTime $lastUpdatedAt) : void
@@ -42,13 +39,6 @@ class Repository
         return $traktIds;
     }
 
-    public function findByTraktId(TraktId $traktId) : ?Entity
-    {
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `cache_trakt_user_movie_watched` WHERE trakt_id = ?', [$traktId->asInt()]);
-
-        return $data === false ? null : Entity::createFromArray($data);
-    }
-
     public function findLastUpdatedByTraktId(TraktId $traktId) : ?DateTime
     {
         $data = $this->dbConnection->fetchOne(
@@ -56,18 +46,6 @@ class Repository
             FROM cache_trakt_user_movie_watched
             WHERE trakt_id = ?',
             [$traktId->asInt()]
-        );
-
-        return $data === false ? null : DateTime::createFromString($data);
-    }
-
-    public function findLatestLastUpdatedAt() : ?DateTime
-    {
-        $data = $this->dbConnection->fetchOne(
-            'SELECT last_updated_at
-            FROM cache_trakt_user_movie_watched
-            ORDER BY last_updated_at DESC
-            LIMIT 1'
         );
 
         return $data === false ? null : DateTime::createFromString($data);

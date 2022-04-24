@@ -4,16 +4,13 @@ namespace Movary\ValueObject;
 
 class Year implements \JsonSerializable
 {
-    private const MIN_YEAR_ALLOWED = 1901;
-
     private const MAX_YEAR_ALLOWED = 2155;
 
-    private int $year;
+    private const MIN_YEAR_ALLOWED = 1901;
 
-    private function __construct(int $year)
+    private function __construct(private readonly int $year)
     {
         $this->ensureValidRange($year);
-        $this->year = $year;
     }
 
     public static function createFromInt(int $year) : self
