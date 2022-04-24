@@ -2,9 +2,8 @@
 
 namespace Movary\Application\Movie\History\Service;
 
-use Movary\Application\Movie\Entity;
 use Movary\Application\Movie\History\Repository;
-use Movary\ValueObject\DateTime;
+use Movary\ValueObject\Date;
 
 class Create
 {
@@ -15,7 +14,7 @@ class Create
         $this->repository = $repository;
     }
 
-    public function create(int $movieId, DateTime $watchedAt) : void
+    public function create(int $movieId, Date $watchedAt) : void
     {
         $this->repository->create($movieId, $watchedAt);
     }

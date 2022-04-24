@@ -21,7 +21,7 @@ class Dto
     {
         return new self(
             Movie\Dto::createFromArray($data['movie']),
-            DateTime::createFromStringAndTimeZone($data['watched_at'], 'GMT'),
+            DateTime::createFromString($data['watched_at']),
         );
     }
 

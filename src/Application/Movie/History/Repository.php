@@ -3,7 +3,7 @@
 namespace Movary\Application\Movie\History;
 
 use Doctrine\DBAL\Connection;
-use Movary\ValueObject\DateTime;
+use Movary\ValueObject\Date;
 
 class Repository
 {
@@ -14,13 +14,13 @@ class Repository
         $this->dbConnection = $dbConnection;
     }
 
-    public function create(int $movieId, DateTime $watchedAt) : void
+    public function create(int $movieId, Date $watchedAt) : void
     {
         $this->dbConnection->insert(
             'movie_history',
             [
                 'movie_id' => $movieId,
-                'watched_at' => (string)$watchedAt
+                'watched_at' => (string)$watchedAt,
             ]
         );
     }

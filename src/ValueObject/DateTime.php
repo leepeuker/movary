@@ -4,11 +4,12 @@ namespace Movary\ValueObject;
 
 class DateTime implements \JsonSerializable
 {
-    private \DateTime $dateTime;
+    private const DEFAULT_TIME_ZONE = 'UTC';
 
-    private function __construct(\DateTime $dateTime)
+    private const FORMAT = 'Y-m-d H:i:s';
+
+    private function __construct(public string $dateTime)
     {
-        $this->dateTime = $dateTime;
     }
 
     public static function create() : self
@@ -16,42 +17,26 @@ class DateTime implements \JsonSerializable
         return self::createFromString('now');
     }
 
-    public static function createFromFormat(string $format, string $dateString) : self
+    public static function createFromString(string $dateTimeString) : self
     {
-        $dateTime = \DateTime::createFromFormat($format, $dateString, new \DateTimeZone('UTC'));
-
-        if ($dateTime === false) {
-            throw new \RuntimeException("Could not use format '$format' on: $dateString");
-        }
-
-        return new self($dateTime);
+        return new self((new \DateTime($dateTimeString, new \DateTimeZone(self::DEFAULT_TIME_ZONE)))->format(self::FORMAT));
     }
 
-    public static function createFromString(string $dateString) : self
+    public static function createFromStringAndTimeZone(string $dateTimeString, string $timeZone) : self
     {
-        return new self(new \DateTime($dateString, new \DateTimeZone('UTC')));
-    }
-
-    public static function createFromStringAndTimeZone(string $dateString, string $timeZone) : self
-    {
-        return new self(new \DateTime($dateString, new \DateTimeZone($timeZone)));
+        return new self((new \DateTime($dateTimeString, new \DateTimeZone($timeZone)))->format(self::FORMAT));
     }
 
     public function __toString() : string
     {
-        return $this->dateTime->format('Y-m-d H:i:s');
+        return $this->dateTime;
     }
 
     public function diff(DateTime $dateTime) : DateInterval
     {
-         $dateInterval = $this->dateTime->diff(new \DateTime((string)$dateTime));
+        $dateInterval = (new \DateTime($this->dateTime))->diff(new \DateTime((string)$dateTime));
 
         return DateInterval::createByDateInterval($dateInterval);
-    }
-
-    public function format(string $format) : string
-    {
-        return $this->dateTime->format($format);
     }
 
     public function isEqual(DateTime $lastUpdated) : bool
@@ -61,6 +46,6 @@ class DateTime implements \JsonSerializable
 
     public function jsonSerialize() : string
     {
-        return $this->dateTime->format('Y-m-d H:i:s');
+        return $this->dateTime;
     }
 }

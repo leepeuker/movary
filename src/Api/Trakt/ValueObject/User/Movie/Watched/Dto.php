@@ -28,8 +28,8 @@ class Dto
         return new self(
             Movie\Dto::createFromArray($data['movie']),
             $data['plays'],
-            DateTime::createFromStringAndTimeZone($data['last_watched_at'], 'GMT'),
-            DateTime::createFromStringAndTimeZone($data['last_watched_at'], 'GMT'),
+            DateTime::createFromString($data['last_watched_at']),
+            DateTime::createFromString($data['last_watched_at']),
         );
     }
 

@@ -2,15 +2,15 @@
 
 namespace Movary\Application\Movie\History;
 
-use Movary\ValueObject\DateTime;
+use Movary\ValueObject\Date;
 
 class Entity
 {
     private int $id;
 
-    private DateTime $watchedAt;
+    private Date $watchedAt;
 
-    private function __construct(int $id, DateTime $watchedAt)
+    private function __construct(int $id, Date $watchedAt)
     {
         $this->id = $id;
         $this->watchedAt = $watchedAt;
@@ -20,7 +20,7 @@ class Entity
     {
         return new self(
             (int)$data['id'],
-            DateTime::createFromString($data['watched_at'])
+            Date::createFromString($data['watched_at'])
         );
     }
 
@@ -29,7 +29,7 @@ class Entity
         return $this->id;
     }
 
-    public function getWatchedAt() : DateTime
+    public function getWatchedAt() : Date
     {
         return $this->watchedAt;
     }

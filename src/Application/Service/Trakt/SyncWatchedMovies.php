@@ -4,6 +4,7 @@ namespace Movary\Application\Service\Trakt;
 
 use Movary\Api;
 use Movary\Application;
+use Movary\ValueObject\Date;
 
 class SyncWatchedMovies
 {
@@ -92,7 +93,7 @@ class SyncWatchedMovies
         $this->movieHistoryDeleteService->deleteByMovieId($movie->getId());
 
         foreach ($this->traktApi->getUserMovieHistoryByMovieId($movie->getTraktId()) as $movieHistoryEntry) {
-            $this->movieHistoryCreateService->create($movie->getId(), $movieHistoryEntry->getWatchedAt());
+            $this->movieHistoryCreateService->create($movie->getId(), Date::createFromDateTime($movieHistoryEntry->getWatchedAt()));
 
             echo 'Added watch date for "' . $movieHistoryEntry->getMovie()->getTitle() . '": ' . $movieHistoryEntry->getWatchedAt() . PHP_EOL;
         }
