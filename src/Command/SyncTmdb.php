@@ -11,20 +11,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncTmdb extends Command
 {
-    const OPTION_NAME_FORCE_SYNC = 'forceSync';
+    private const OPTION_NAME_FORCE_SYNC = 'forceSync';
 
     protected static $defaultName = 'app:sync-tmdb';
 
-    private LoggerInterface $logger;
-
-    private SyncMovieDetails $syncMovieDetails;
-
-    public function __construct(SyncMovieDetails $syncMovieDetails, LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly SyncMovieDetails $syncMovieDetails,
+        private readonly LoggerInterface $logger
+    ) {
         parent::__construct();
-
-        $this->syncMovieDetails = $syncMovieDetails;
-        $this->logger = $logger;
     }
 
     protected function configure() : void

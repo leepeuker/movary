@@ -4,11 +4,8 @@ namespace Movary\ValueObject;
 
 class Config
 {
-    private array $data;
-
-    public function __construct(array $config)
+    public function __construct(private readonly array $config)
     {
-        $this->data = $config;
     }
 
     public static function createFromEnv() : self
@@ -43,7 +40,7 @@ class Config
 
     private function ensureKeyExists(string $key) : void
     {
-        if (isset($this->data[$key]) === false) {
+        if (isset($this->config[$key]) === false) {
             throw new \OutOfBoundsException('Key does not exist: ' . $key);
         }
     }
@@ -52,6 +49,6 @@ class Config
     {
         $this->ensureKeyExists($key);
 
-        return $this->data[$key];
+        return $this->config[$key];
     }
 }

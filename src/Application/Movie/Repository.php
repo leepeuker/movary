@@ -4,16 +4,14 @@ namespace Movary\Application\Movie;
 
 use Doctrine\DBAL\Connection;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
+use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use RuntimeException;
 
 class Repository
 {
-    private Connection $dbConnection;
-
-    public function __construct(Connection $dbConnection)
+    public function __construct(private readonly Connection $dbConnection)
     {
-        $this->dbConnection = $dbConnection;
     }
 
     public function create(string $title, ?int $rating10, ?int $rating5, TraktId $traktId, string $imdbId, int $tmdbId) : Entity
@@ -87,11 +85,11 @@ class Repository
                 'tagline' => $tagline,
                 'overview' => $overview,
                 'original_language' => $originalLanguage,
-                'release_date' => $releaseDate === null ? null : $releaseDate->format('Y-m-d'),
+                'release_date' => $releaseDate === null ? null : Date::createFromDateTime($releaseDate),
                 'runtime' => $runtime,
                 'tmdb_vote_average' => $tmdbVoteAverage,
                 'tmdb_vote_count' => $tmdbVoteCount,
-                'updated_at_tmdb' => DateTime::create()->format('Y-m-d H:i:s'),
+                'updated_at_tmdb' => (string)DateTime::create(),
             ],
             ['id' => $id]
         );

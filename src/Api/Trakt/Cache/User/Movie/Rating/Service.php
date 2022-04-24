@@ -8,11 +8,8 @@ use Movary\Api\Trakt\ValueObject\User\Movie\Rating\DtoList;
 
 class Service
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function findRatingByTraktId(TraktId $traktId) : ?int

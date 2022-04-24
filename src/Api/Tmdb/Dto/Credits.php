@@ -4,14 +4,10 @@ namespace Movary\Api\Tmdb\Dto;
 
 class Credits
 {
-    private Cast $cast;
-
-    private Crew $crew;
-
-    private function __construct(Cast $cast, Crew $crew)
-    {
-        $this->cast = $cast;
-        $this->crew = $crew;
+    private function __construct(
+        private readonly Cast $cast,
+        private readonly Crew $crew
+    ) {
     }
 
     public static function createFromArray(array $data) : self

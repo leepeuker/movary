@@ -7,11 +7,8 @@ use Movary\Api\Tmdb\Dto\Movie;
 
 class Api
 {
-    private Client $client;
-
-    public function __construct(Client $client)
+    public function __construct(private readonly Client $client)
     {
-        $this->client = $client;
     }
 
     public function getMovieCredits(int $movieId) : Credits

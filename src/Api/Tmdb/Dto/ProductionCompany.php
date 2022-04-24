@@ -4,17 +4,11 @@ namespace Movary\Api\Tmdb\Dto;
 
 class ProductionCompany
 {
-    private int $id;
-
-    private string $name;
-
-    private ?string $originCountry;
-
-    private function __construct(int $id, string $name, ?string $originCountry)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->originCountry = $originCountry;
+    private function __construct(
+        private readonly int $id,
+        private readonly string $name,
+        private readonly ?string $originCountry
+    ) {
     }
 
     public static function createFromArray(array $data) : self

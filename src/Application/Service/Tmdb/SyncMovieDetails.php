@@ -14,44 +14,17 @@ class SyncMovieDetails
 {
     private const SYNC_VALIDITY_TIME_IN_DAYS = 7;
 
-    private Tmdb\Api $api;
-
-    private Company\Service\Create $companyCreateService;
-
-    private Company\Service\Select $companySelectService;
-
-    private DBAL\Connection $dbConnection;
-
-    private Genre\Service\Create $genreCreateService;
-
-    private Genre\Service\Select $genreSelectService;
-
-    private LoggerInterface $logger;
-
-    private Movie\Service\Select $movieSelectService;
-
-    private Movie\Service\Update $movieUpdateService;
-
     public function __construct(
-        Tmdb\Api $api,
-        Movie\Service\Select $movieSelectService,
-        Movie\Service\Update $movieUpdateService,
-        Genre\Service\Select $genreSelectService,
-        Genre\Service\Create $genreCreateService,
-        Company\Service\Select $companySelectService,
-        Company\Service\Create $companyCreateService,
-        DBAL\Connection $dbConnection,
-        LoggerInterface $logger
+        private readonly Tmdb\Api $api,
+        private readonly Movie\Service\Select $movieSelectService,
+        private readonly Movie\Service\Update $movieUpdateService,
+        private readonly Genre\Service\Select $genreSelectService,
+        private readonly Genre\Service\Create $genreCreateService,
+        private readonly Company\Service\Select $companySelectService,
+        private readonly Company\Service\Create $companyCreateService,
+        private readonly DBAL\Connection $dbConnection,
+        private readonly LoggerInterface $logger
     ) {
-        $this->api = $api;
-        $this->movieSelectService = $movieSelectService;
-        $this->movieUpdateService = $movieUpdateService;
-        $this->genreSelectService = $genreSelectService;
-        $this->genreCreateService = $genreCreateService;
-        $this->companySelectService = $companySelectService;
-        $this->companyCreateService = $companyCreateService;
-        $this->dbConnection = $dbConnection;
-        $this->logger = $logger;
     }
 
     public function execute(bool $forceSync = false) : void

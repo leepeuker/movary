@@ -8,11 +8,8 @@ use Movary\ValueObject\DateTime;
 
 class Repository
 {
-    private Connection $dbConnection;
-
-    public function __construct(Connection $dbConnection)
+    public function __construct(private readonly Connection $dbConnection)
     {
-        $this->dbConnection = $dbConnection;
     }
 
     public function clearCache() : void

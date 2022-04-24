@@ -12,14 +12,10 @@ class Client
 
     private const TRAKT_API_VERSION = '2';
 
-    private string $clientId;
-
-    private ClientInterface $httpClient;
-
-    public function __construct(ClientInterface $httpClient, string $clientId)
-    {
-        $this->httpClient = $httpClient;
-        $this->clientId = $clientId;
+    public function __construct(
+        private readonly ClientInterface $httpClient,
+        private readonly string $clientId
+    ) {
     }
 
     public function get(string $relativeUrl) : array

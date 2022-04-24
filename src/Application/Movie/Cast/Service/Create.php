@@ -6,11 +6,8 @@ use Movary\Application\Movie\Cast\Repository;
 
 class Create
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function create(int $movieId, int $personId, string $character, int $position) : void

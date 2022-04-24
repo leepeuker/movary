@@ -4,17 +4,11 @@ namespace Movary\Api\Tmdb\Dto;
 
 class CrewMember
 {
-    private string $department;
-
-    private string $job;
-
-    private Person $person;
-
-    private function __construct(Person $person, string $department, string $job)
-    {
-        $this->person = $person;
-        $this->department = $department;
-        $this->job = $job;
+    private function __construct(
+        private readonly Person $person,
+        private readonly string $department,
+        private readonly string $job
+    ) {
     }
 
     public static function createFromArray(array $data) : self

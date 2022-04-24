@@ -2,13 +2,13 @@
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddLetterboxdId extends AbstractMigration
+final class RemoveTimeFromWatchDate extends AbstractMigration
 {
     public function down() : void
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE movie DROP COLUMN letterboxd_id;
+            ALTER TABLE movie_history MODIFY COLUMN watched_at DATETIME NOT NULL;
             SQL
         );
     }
@@ -17,7 +17,7 @@ final class AddLetterboxdId extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE movie ADD COLUMN letterboxd_id CHAR(4) DEFAULT NULL AFTER tmdb_id;
+            ALTER TABLE movie_history MODIFY COLUMN watched_at DATE NOT NULL;
             SQL
         );
     }

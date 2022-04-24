@@ -6,28 +6,13 @@ use Movary\ValueObject\Gender;
 
 class Entity
 {
-    private Gender $gender;
-
-    private int $id;
-
-    private ?string $knownForDepartment;
-
-    private string $name;
-
-    private int $tmdbId;
-
     private function __construct(
-        int $id,
-        string $name,
-        Gender $gender,
-        ?string $knownForDepartment,
-        int $tmdbId,
+        private readonly int $id,
+        private readonly string $name,
+        private readonly Gender $gender,
+        private readonly ?string $knownForDepartment,
+        private readonly int $tmdbId,
     ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->gender = $gender;
-        $this->knownForDepartment = $knownForDepartment;
-        $this->tmdbId = $tmdbId;
     }
 
     public static function createFromArray(array $data) : self

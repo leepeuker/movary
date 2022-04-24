@@ -4,22 +4,13 @@ namespace Movary\ValueObject;
 
 class HttpRequest
 {
-    private string $body;
-
-    private array $getParameters;
-
-    private array $postParameters;
-
     private array $routeParameters = [];
 
     private function __construct(
-        array $getParameters,
-        array $postParameters,
-        string $body
+        private readonly array $getParameters,
+        private readonly array $postParameters,
+        private readonly string $body,
     ) {
-        $this->getParameters = $getParameters;
-        $this->postParameters = $postParameters;
-        $this->body = $body;
     }
 
     public static function createFromGlobals() : self

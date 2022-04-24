@@ -8,21 +8,13 @@ use Movary\ValueObject\DateTime;
 
 class Service
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function findLastUpdatedByTraktId(TraktId $traktId) : ?DateTime
     {
         return $this->repository->findLastUpdatedByTraktId($traktId);
-    }
-
-    public function findLatestLastUpdatedAt() : ?DateTime
-    {
-        return $this->repository->findLatestLastUpdatedAt();
     }
 
     public function removeMissingMoviesFromCache(DtoList $watchedMovies) : void

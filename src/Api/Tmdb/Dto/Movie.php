@@ -6,48 +6,18 @@ use Movary\ValueObject\DateTime;
 
 class Movie
 {
-    private GenreList $genres;
-
-    private int $id;
-
-    private string $originalLanguage;
-
-    private ?string $overview;
-
-    private ProductionCompanyList $productionCompanies;
-
-    private DateTime $releaseDate;
-
-    private int $runtime;
-
-    private ?string $tagline;
-
-    private float $voteAverage;
-
-    private int $voteCount;
-
     private function __construct(
-        int $id,
-        string $originalLanguage,
-        ?string $tagline,
-        ?string $overview,
-        DateTime $releaseDate,
-        int $runtime,
-        float $voteAverage,
-        int $voteCount,
-        GenreList $genres,
-        ProductionCompanyList $productionCompanies
+        private readonly int $id,
+        private readonly string $originalLanguage,
+        private readonly ?string $tagline,
+        private readonly ?string $overview,
+        private readonly DateTime $releaseDate,
+        private readonly int $runtime,
+        private readonly float $voteAverage,
+        private readonly int $voteCount,
+        private readonly GenreList $genres,
+        private readonly ProductionCompanyList $productionCompanies
     ) {
-        $this->id = $id;
-        $this->originalLanguage = $originalLanguage;
-        $this->tagline = $tagline;
-        $this->overview = $overview;
-        $this->releaseDate = $releaseDate;
-        $this->runtime = $runtime;
-        $this->voteAverage = $voteAverage;
-        $this->voteCount = $voteCount;
-        $this->genres = $genres;
-        $this->productionCompanies = $productionCompanies;
     }
 
     public static function createFromArray(array $data) : self

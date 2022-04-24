@@ -7,64 +7,22 @@ use Movary\ValueObject\DateTime;
 
 class Entity
 {
-    private int $id;
-
-    private string $imdbId;
-
-    private ?string $originalLanguage;
-
-    private ?string $overview;
-
-    private ?int $rating10;
-
-    private ?int $rating5;
-
-    private ?DateTime $releaseDate;
-
-    private ?int $runtime;
-
-    private string $title;
-
-    private int $tmdbId;
-
-    private ?float $tmdbVoteAverage;
-
-    private ?int $tmdbVoteCount;
-
-    private TraktId $traktId;
-
-    private ?DateTime $updatedAtTmdb;
-
     private function __construct(
-        int $id,
-        string $title,
-        ?int $rating10,
-        ?int $rating5,
-        TraktId $traktId,
-        string $imdbId,
-        int $tmdbId,
-        ?string $overview,
-        ?string $originalLanguage,
-        ?int $runtime,
-        ?DateTime $releaseDate,
-        ?float $tmdbVoteAverage,
-        ?int $tmdbVoteCount,
-        ?DateTime $updatedAtTmdb
+        private readonly int $id,
+        private readonly string $title,
+        private readonly ?int $rating10,
+        private readonly ?int $rating5,
+        private readonly TraktId $traktId,
+        private readonly string $imdbId,
+        private readonly int $tmdbId,
+        private readonly ?string $overview,
+        private readonly ?string $originalLanguage,
+        private readonly ?int $runtime,
+        private readonly ?DateTime $releaseDate,
+        private readonly ?float $tmdbVoteAverage,
+        private readonly ?int $tmdbVoteCount,
+        private readonly ?DateTime $updatedAtTmdb
     ) {
-        $this->id = $id;
-        $this->title = $title;
-        $this->rating10 = $rating10;
-        $this->traktId = $traktId;
-        $this->imdbId = $imdbId;
-        $this->tmdbId = $tmdbId;
-        $this->overview = $overview;
-        $this->originalLanguage = $originalLanguage;
-        $this->runtime = $runtime;
-        $this->releaseDate = $releaseDate;
-        $this->tmdbVoteAverage = $tmdbVoteAverage;
-        $this->tmdbVoteCount = $tmdbVoteCount;
-        $this->updatedAtTmdb = $updatedAtTmdb;
-        $this->rating5 = $rating5;
     }
 
     public static function createFromArray(array $data) : self

@@ -12,16 +12,11 @@ class SyncLetterboxd extends Command
 {
     protected static $defaultName = 'app:sync-letterboxd';
 
-    private LoggerInterface $logger;
-
-    private SyncRatings $syncRatings;
-
-    public function __construct(SyncRatings $syncRatings, LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly SyncRatings $syncRatings,
+        private readonly LoggerInterface $logger
+    ) {
         parent::__construct();
-
-        $this->syncRatings = $syncRatings;
-        $this->logger = $logger;
     }
 
     protected function configure() : void

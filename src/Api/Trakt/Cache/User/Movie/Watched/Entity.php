@@ -7,14 +7,10 @@ use Movary\ValueObject\DateTime;
 
 class Entity
 {
-    private DateTime $lastUpdatedAt;
-
-    private TraktId $traktId;
-
-    private function __construct(TraktId $traktId, DateTime $lastUpdatedAt)
-    {
-        $this->traktId = $traktId;
-        $this->lastUpdatedAt = $lastUpdatedAt;
+    private function __construct(
+        private readonly TraktId $traktId,
+        private readonly DateTime $lastUpdatedAt
+    ) {
     }
 
     public static function createFromArray(array $data) : self

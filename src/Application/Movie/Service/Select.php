@@ -9,11 +9,8 @@ use Movary\Application\Movie\Repository;
 
 class Select
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
+    public function __construct(private readonly Repository $repository)
     {
-        $this->repository = $repository;
     }
 
     public function fetchAll() : EntityList
@@ -21,7 +18,7 @@ class Select
         return $this->repository->fetchAll();
     }
 
-    public function findByLetterboxdId(string $letterboxdId): ?Entity
+    public function findByLetterboxdId(string $letterboxdId) : ?Entity
     {
         return $this->repository->findByLetterboxdId($letterboxdId);
     }

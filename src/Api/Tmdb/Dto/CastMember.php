@@ -4,20 +4,12 @@ namespace Movary\Api\Tmdb\Dto;
 
 class CastMember
 {
-    private int $castId;
-
-    private string $character;
-
-    private int $order;
-
-    private Person $person;
-
-    private function __construct(int $castId, Person $person, string $character, int $order)
-    {
-        $this->castId = $castId;
-        $this->person = $person;
-        $this->character = $character;
-        $this->order = $order;
+    private function __construct(
+        private readonly int $castId,
+        private readonly Person $person,
+        private readonly string $character,
+        private readonly int $order
+    ) {
     }
 
     public static function createFromArray(array $data) : self

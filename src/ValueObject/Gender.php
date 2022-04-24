@@ -14,13 +14,9 @@ class Gender
 
     private const VALID_GENDERS = [self::GENDER_FEMALE, self::GENDER_MALE, self::GENDER_NON_BINARY, self::GENDER_UNKNOWN];
 
-    private int $gender;
-
-    private function __construct(int $gender)
+    private function __construct(private readonly int $gender)
     {
         self::ensureValidGender($gender);
-
-        $this->gender = $gender;
     }
 
     public static function createFromInt(int $gender) : self
@@ -36,11 +32,6 @@ class Gender
     }
 
     public function asInt() : int
-    {
-        return $this->gender;
-    }
-
-    public function getGender() : int
     {
         return $this->gender;
     }
