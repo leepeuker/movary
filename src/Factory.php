@@ -9,8 +9,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
-use Movary\Application\Movie;
 use Movary\Application\Service\Letterboxd;
+use Movary\Command\SyncLetterboxd;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\HttpRequest;
 use Psr\Container\ContainerInterface;
@@ -70,14 +70,12 @@ class Factory
         return new GuzzleHttp\Client();
     }
 
-    public static function createLetterboxRatingSyncService(ContainerInterface $container, Config $config) : Letterboxd\SyncRatings
+    public static function createLetterboxRatingSyncCommand(ContainerInterface $container, Config $config) : SyncLetterboxd
     {
-        return new Letterboxd\SyncRatings(
-            $container->get(Movie\Service\Update::class),
-            $container->get(Movie\Service\Select::class),
-            __DIR__ . '/../' . $config->getAsString('LETTERBOXD_RATINGS_CSV_PATH'),
-            $container->get(Letterboxd\WebScrapper::class),
+        return new SyncLetterboxd(
+            $container->get(Letterboxd\SyncRatings::class),
             $container->get(LoggerInterface::class),
+            __DIR__ . '/../' . $config->getAsString('LETTERBOXD_RATINGS_CSV_PATH'),
         );
     }
 

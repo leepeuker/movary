@@ -14,7 +14,8 @@ class SyncLetterboxd extends Command
 
     public function __construct(
         private readonly SyncRatings $syncRatings,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly string $ratingsCsvPath,
     ) {
         parent::__construct();
     }
@@ -28,7 +29,7 @@ class SyncLetterboxd extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         try {
-            $this->syncRatings->execute();
+            $this->syncRatings->execute($this->ratingsCsvPath);
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete letterboxd sync.', ['exception' => $t]);
 

@@ -12,18 +12,13 @@ class SyncRatings
     public function __construct(
         private readonly Application\Movie\Service\Update $movieUpdateService,
         private readonly Application\Movie\Service\Select $movieSelectService,
-        private readonly string $ratingsCsvPath,
         private readonly WebScrapper $webScrapper,
         private readonly LoggerInterface $logger
     ) {
     }
 
-    public function execute(string $csvPath = null) : void
+    public function execute(string $csvPath) : void
     {
-        if ($csvPath === null) {
-            $csvPath = $this->ratingsCsvPath;
-        }
-
         $ratings = Reader::createFromPath($csvPath);
         $ratings->setHeaderOffset(0);
 
