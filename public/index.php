@@ -1,32 +1,53 @@
 <?php declare(strict_types=1);
 
 /** @var DI\Container $container */
+
+use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
+
 $container = require(__DIR__ . '/../bootstrap.php');
-$httpRequest = $container->get(\Movary\ValueObject\HttpRequest::class);
+$httpRequest = $container->get(\Movary\ValueObject\Http\Request::class);
 
-$dispatcher = FastRoute\simpleDispatcher(
-    require(__DIR__ . '/../settings/routes.php')
-);
+try {
+    $dispatcher = FastRoute\simpleDispatcher(
+        require(__DIR__ . '/../settings/routes.php')
+    );
 
-$uri = $_SERVER['REQUEST_URI'];
+    $uri = $_SERVER['REQUEST_URI'];
 
-// Strip query string (?foo=bar) and decode URI
-if (false !== $pos = strpos($uri, '?')) {
-    $uri = substr($uri, 0, $pos);
+    // Strip query string (?foo=bar) and decode URI
+    if (false !== $pos = strpos($uri, '?')) {
+        $uri = substr($uri, 0, $pos);
+    }
+    $uri = rawurldecode($uri);
+
+    $routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $uri);
+    switch ($routeInfo[0]) {
+        case FastRoute\Dispatcher::NOT_FOUND:
+            $response = Response::create(StatusCode::createNotFound());
+            break;
+        case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+            $response = Response::create(StatusCode::createMethodNotAllowed());
+            break;
+        case FastRoute\Dispatcher::FOUND:
+            $handler = $routeInfo[1];
+            $httpRequest->addRouteParameters($routeInfo[2]);
+
+            $response = $container->call($handler, [$httpRequest]);
+            break;
+        default:
+            throw new \LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
+    }
+
+    header((string)$response->getStatusCode());
+    foreach ($response->getHeaders() as $name => $value) {
+        header($name . ':' . $value);
+    }
+
+    echo $response->getBody();
+} catch (\Throwable $t) {
+    $container->get(\Psr\Log\LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
+
+    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
 }
-$uri = rawurldecode($uri);
-
-$routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $uri);
-switch ($routeInfo[0]) {
-    case FastRoute\Dispatcher::NOT_FOUND:
-        header("HTTP/1.0 404 Not Found");
-        break;
-    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-        header("HTTP/1.0 405 Method Not Allowed");
-        break;
-    case FastRoute\Dispatcher::FOUND:
-        $handler = $routeInfo[1];
-        $httpRequest->addRouteParameters($routeInfo[2]);
-        $response = $container->call($handler, [$httpRequest]);
-        break;
-}
+exit(0);

@@ -4,6 +4,8 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Util\Json;
+use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 
 class MovieHistoryController
 {
@@ -11,10 +13,14 @@ class MovieHistoryController
     {
     }
 
-    public function fetchHistory() : void
+    public function fetchHistory() : Response
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        echo Json::encode($this->movieHistorySelectService->fetchHistoryOrderedByWatchedAtDesc());
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode($this->movieHistorySelectService->fetchHistoryOrderedByWatchedAtDesc()),
+            ['Content-Type' => 'application/json; charset=utf-8']
+        );
     }
 }

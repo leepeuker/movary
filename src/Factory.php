@@ -9,10 +9,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
-use Movary\Application\Service\Letterboxd;
-use Movary\Command\SyncLetterboxd;
 use Movary\ValueObject\Config;
-use Movary\ValueObject\HttpRequest;
+use Movary\ValueObject\Http\Request;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -28,9 +26,9 @@ class Factory
         return Config::createFromEnv();
     }
 
-    public static function createCurrentHttpRequest() : HttpRequest
+    public static function createCurrentHttpRequest() : Request
     {
-        return HttpRequest::createFromGlobals();
+        return Request::createFromGlobals();
     }
 
     public static function createDbConnection(Config $config) : DBAL\Connection

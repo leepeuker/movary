@@ -2,6 +2,8 @@
 
 namespace Movary\HttpController;
 
+use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
 
 class DashboardController
@@ -13,8 +15,11 @@ class DashboardController
         $this->twig = $twig;
     }
 
-    public function render() : void
+    public function render() : Response
     {
-        echo $this->twig->render('dashboard.html.twig');
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('dashboard.html.twig'),
+        );
     }
 }

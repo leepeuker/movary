@@ -4,6 +4,8 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Util\Json;
+use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 
 class MostWatchedController
 {
@@ -11,10 +13,14 @@ class MostWatchedController
     {
     }
 
-    public function fetchMostWatched() : void
+    public function fetchMostWatched() : Response
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        echo Json::encode($this->movieHistorySelectService->fetchMoviesOrderedByMostWatchedDesc());
+        return Response::create(
+            StatusCode::createOk(),
+            Json::encode($this->movieHistorySelectService->fetchMoviesOrderedByMostWatchedDesc()),
+            ['Content-Type' => 'application/json; charset=utf-8']
+        );
     }
 }

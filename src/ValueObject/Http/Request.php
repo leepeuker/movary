@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Movary\ValueObject;
+namespace Movary\ValueObject\Http;
 
-class HttpRequest
+class Request
 {
     private array $routeParameters = [];
 

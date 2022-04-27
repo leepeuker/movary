@@ -3,7 +3,9 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Service\Letterboxd\SyncRatings;
-use Movary\ValueObject\HttpRequest;
+use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 use Psr\Log\LoggerInterface;
 
 class Letterboxd
@@ -14,7 +16,7 @@ class Letterboxd
     ) {
     }
 
-    public function uploadRatingCsv(HttpRequest $httpRequest) : void
+    public function uploadRatingCsv(Request $httpRequest) : Response
     {
         $files = $httpRequest->getFileParameters();
 
@@ -28,6 +30,10 @@ class Letterboxd
             $this->logger->error('Could not complete letterboxd sync.', ['exception' => $t]);
         }
 
-        header('Location: ' . $_SERVER['HTTP_REFERER'] . '?');
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            ['Location' => $_SERVER['HTTP_REFERER']]
+        );
     }
 }
