@@ -17,7 +17,7 @@ class SyncRatings
     ) {
     }
 
-    public function execute(string $ratingsCsvPath) : void
+    public function execute(string $ratingsCsvPath, bool $verbose = false) : void
     {
         $ratings = Reader::createFromPath($ratingsCsvPath);
         $ratings->setHeaderOffset(0);
@@ -33,7 +33,9 @@ class SyncRatings
                 continue;
             }
 
-            echo "Updating {$movie->getTitle()} with rating: " . $rating['Rating'] . PHP_EOL;
+            if ($verbose === true) {
+                echo "Updating {$movie->getTitle()} with rating: " . $rating['Rating'] . PHP_EOL;
+            }
 
             $this->movieUpdateService->updateRating5($movie->getId(), (int)$rating['Rating']);
         }

@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncLetterboxd extends Command
 {
-    protected static $defaultName = 'app:sync-letterboxd';
+    protected static $defaultName = 'app:sync-letterboxd-ratings';
 
     public function __construct(
         private readonly SyncRatings $syncRatings,
@@ -23,7 +23,7 @@ class SyncLetterboxd extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Sync letterboxd.com movie history and rating with local database')
+            ->setDescription('Sync letterboxd.com movie ratings with local database')
             ->addArgument('ratingsCsvName', InputArgument::REQUIRED, 'Letterboxed rating csv file name (must be put into the tmp directory)');
     }
 
@@ -31,14 +31,16 @@ class SyncLetterboxd extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $ratingsCsvPath = __DIR__ . '/../../tmp/' . $input->getArgument('ratingsCsvName');
+        $verbose = $input->getOption('verbose');
 
         if (is_dir($ratingsCsvPath) === true || is_readable($ratingsCsvPath) === false) {
             $output->writeln('Csv file at the given path cannot be read: ' . $ratingsCsvPath);
+
             return Command::FAILURE;
         }
 
         try {
-            $this->syncRatings->execute($ratingsCsvPath);
+            $this->syncRatings->execute($ratingsCsvPath, $verbose);
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete letterboxd sync.', ['exception' => $t]);
 

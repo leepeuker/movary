@@ -18,10 +18,14 @@ class Letterboxd
     {
         $files = $httpRequest->getFileParameters();
 
+        if ($files['letterboxedRating']['tmp_name'] === false) {
+            throw new \RuntimeException('Uploaded csv missing in request.');
+        }
+
         try {
             $this->syncRatings->execute($files['letterboxedRating']['tmp_name']);
         } catch (\Throwable $t) {
-            $this->logger->error('Could not process csv.', ['exception' => $t]);
+            $this->logger->error('Could not complete letterboxd sync.', ['exception' => $t]);
         }
 
         header('Location: ' . $_SERVER['HTTP_REFERER'] . '?');
