@@ -17,9 +17,9 @@ class SyncRatings
     ) {
     }
 
-    public function execute(string $csvPath) : void
+    public function execute(string $ratingsCsvPath) : void
     {
-        $ratings = Reader::createFromPath($csvPath);
+        $ratings = Reader::createFromPath($ratingsCsvPath);
         $ratings->setHeaderOffset(0);
 
         foreach ($ratings->getRecords() as $rating) {

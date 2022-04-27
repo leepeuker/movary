@@ -70,15 +70,6 @@ class Factory
         return new GuzzleHttp\Client();
     }
 
-    public static function createLetterboxRatingSyncCommand(ContainerInterface $container, Config $config) : SyncLetterboxd
-    {
-        return new SyncLetterboxd(
-            $container->get(Letterboxd\SyncRatings::class),
-            $container->get(LoggerInterface::class),
-            __DIR__ . '/../' . $config->getAsString('LETTERBOXD_RATINGS_CSV_PATH'),
-        );
-    }
-
     public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\Client
     {
         return new Tmdb\Client(

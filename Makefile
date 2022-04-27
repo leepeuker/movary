@@ -41,7 +41,7 @@ app_sync_tmdb:
 	make exec_php_cmd CMD="php bin/console.php app:sync-tmdb"
 
 app_sync_letterboxd:
-	make exec_php_cmd CMD="php bin/console.php app:sync-letterboxd"
+	make exec_php_cmd CMD="php bin/console.php app:sync-letterboxd $(CSV_PATH)"
 
 # Database
 ##########
