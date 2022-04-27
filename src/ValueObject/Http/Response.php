@@ -5,7 +5,7 @@ namespace Movary\ValueObject\Http;
 class Response
 {
     /**
-     * @param array<string, string> $headers
+     * @param array<Header> $headers
      */
     private function __construct(
         private readonly StatusCode $statusCode,

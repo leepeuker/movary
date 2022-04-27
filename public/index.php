@@ -40,8 +40,8 @@ try {
     }
 
     header((string)$response->getStatusCode());
-    foreach ($response->getHeaders() as $name => $value) {
-        header($name . ':' . $value);
+    foreach ($response->getHeaders() as $header) {
+        header((string)$header);
     }
 
     echo $response->getBody();

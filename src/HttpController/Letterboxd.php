@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Service\Letterboxd\SyncRatings;
+use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -33,7 +34,7 @@ class Letterboxd
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            ['Location' => $_SERVER['HTTP_REFERER']]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
         );
     }
 }
