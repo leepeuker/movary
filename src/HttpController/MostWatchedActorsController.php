@@ -8,17 +8,17 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 
-class MovieHistoryController
+class MostWatchedActorsController
 {
     public function __construct(private readonly Select $movieHistorySelectService)
     {
     }
 
-    public function fetchHistory() : Response
+    public function fetchMostWatchedActors() : Response
     {
         return Response::create(
             StatusCode::createOk(),
-            Json::encode($this->movieHistorySelectService->fetchHistoryOrderedByWatchedAtDesc()),
+            Json::encode($this->movieHistorySelectService->fetchMostWatchedActors()),
             [Header::createContentTypeJson()]
         );
     }

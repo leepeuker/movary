@@ -8,16 +8,14 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 
-class MostWatchedController
+class MostWatchedMoviesController
 {
     public function __construct(private readonly Select $movieHistorySelectService)
     {
     }
 
-    public function fetchMostWatched() : Response
+    public function fetchMostWatchedMovies() : Response
     {
-        header('Content-Type: application/json; charset=utf-8');
-
         return Response::create(
             StatusCode::createOk(),
             Json::encode($this->movieHistorySelectService->fetchMoviesOrderedByMostWatchedDesc()),

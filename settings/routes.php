@@ -13,8 +13,13 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/mostWatched',
-        [\Movary\HttpController\MostWatchedController::class, 'fetchMostWatched']
+        '/mostWatchedMovies',
+        [\Movary\HttpController\MostWatchedMoviesController::class, 'fetchMostWatchedMovies']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/mostWatchedActors',
+        [\Movary\HttpController\MostWatchedActorsController::class, 'fetchMostWatchedActors']
     );
     $routeCollector->addRoute(
         'POST',

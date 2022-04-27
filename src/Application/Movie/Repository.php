@@ -59,6 +59,20 @@ class Repository
         );
     }
 
+    public function fetchMostWatchedActors() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT p.name, COUNT(*) as count, p.gender
+            FROM movie m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            JOIN person p ON mc.person_id = p.id
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee"
+            GROUP BY mc.person_id
+            ORDER BY COUNT(*) DESC, p.name
+            LIMIT 1000'
+        );
+    }
+
     public function findByLetterboxdId(string $letterboxdId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE letterboxd_id = ?', [$letterboxdId]);

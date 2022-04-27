@@ -4,6 +4,13 @@ namespace Movary\ValueObject;
 
 class Gender
 {
+    private const GENDER_ABBREVIATION = [
+        self::GENDER_FEMALE => 'f',
+        self::GENDER_MALE => 'm',
+        self::GENDER_NON_BINARY => 'nb',
+        self::GENDER_UNKNOWN => null,
+    ];
+
     private const GENDER_FEMALE = 1;
 
     private const GENDER_MALE = 2;
@@ -34,5 +41,10 @@ class Gender
     public function asInt() : int
     {
         return $this->gender;
+    }
+
+    public function getAbbreviation() : ?string
+    {
+        return self::GENDER_ABBREVIATION[$this->asInt()];
     }
 }
