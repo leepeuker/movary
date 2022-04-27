@@ -19,6 +19,7 @@
     "psr/http-client": "^1.0",
     "robmorgan/phinx": "^0.12",
     "symfony/console": "^6.0",
+    "twig/twig": "^3.3",
     "vlucas/phpdotenv": "^5.4"
   },
   "require-dev": {

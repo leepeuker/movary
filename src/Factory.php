@@ -16,6 +16,7 @@ use Movary\ValueObject\HttpRequest;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Twig;
 
 class Factory
 {
@@ -25,6 +26,11 @@ class Factory
         $dotenv->load();
 
         return Config::createFromEnv();
+    }
+
+    public static function createCurrentHttpRequest() : HttpRequest
+    {
+        return HttpRequest::createFromGlobals();
     }
 
     public static function createDbConnection(Config $config) : DBAL\Connection
@@ -64,11 +70,6 @@ class Factory
         return new GuzzleHttp\Client();
     }
 
-    public static function createHttpRequest() : HttpRequest
-    {
-        return HttpRequest::createFromGlobals();
-    }
-
     public static function createLetterboxRatingSyncService(ContainerInterface $container, Config $config) : Letterboxd\SyncRatings
     {
         return new Letterboxd\SyncRatings(
@@ -102,5 +103,10 @@ class Factory
             $container->get(ClientInterface::class),
             $config->getAsString('TRAKT_CLIENT_ID')
         );
+    }
+
+    public static function createTwigFilesystemLoader() : Twig\Loader\FilesystemLoader
+    {
+        return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
     }
 }

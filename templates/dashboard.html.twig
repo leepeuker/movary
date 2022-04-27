@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container" style="padding-top: 1rem">
+        <ul>
+            <li><a href="/history">History</a></li>
+        </ul>
+
+        <hr>
+        <form action="/letterboxd-rating" method="post" enctype="multipart/form-data">
+            <p>Letterboxed rating upload:</p>
+            <input type="file" id="letterboxedRating" name="letterboxedRating" accept=".csv" required> <br><br>
+            <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Upload</button>
+        </form>
+        <hr>
+    </main>
+{% endblock %}

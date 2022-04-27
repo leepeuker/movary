@@ -18,12 +18,18 @@ class SyncRatings
     ) {
     }
 
-    public function execute() : void
+    public function execute(string $csvPath = null) : void
     {
-        $ratings = Reader::createFromPath($this->ratingsCsvPath);
+        if ($csvPath === null) {
+            $csvPath = $this->ratingsCsvPath;
+        }
+
+        $ratings = Reader::createFromPath($csvPath);
         $ratings->setHeaderOffset(0);
 
         foreach ($ratings->getRecords() as $rating) {
+            $this->ensureValidCsvRow($rating);
+
             $movie = $this->findMovieByLetterboxdUri($rating['Letterboxd URI']);
 
             if ($movie === null) {
@@ -55,5 +61,12 @@ class SyncRatings
         }
 
         return $movie;
+    }
+
+    private function ensureValidCsvRow(array $rating) : void
+    {
+        if (empty($rating['Letterboxd URI']) === true || empty($rating['Rating']) === true) {
+            throw new \RuntimeException('Invalid csv row in letterboxed rating csv.');
+        }
     }
 }

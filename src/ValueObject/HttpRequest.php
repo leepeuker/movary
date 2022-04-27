@@ -10,6 +10,7 @@ class HttpRequest
         private readonly array $getParameters,
         private readonly array $postParameters,
         private readonly string $body,
+        private readonly array $filesParameters,
     ) {
     }
 
@@ -17,10 +18,17 @@ class HttpRequest
     {
         $getParameterList = self::extractGetParameter();
         $postParameterList = self::extractPostParameter();
+        $filesParameterList = self::extractFilesParameter();
 
         $body = (string)file_get_contents('php://input');
 
-        return new self($getParameterList, $postParameterList, $body);
+        return new self($getParameterList, $postParameterList, $body, $filesParameterList);
+    }
+
+    private static function extractFilesParameter() : array
+    {
+        // phpcs:ignore MySource.PHP.GetRequestData
+        return $_FILES;
     }
 
     private static function extractGetParameter() : array
@@ -53,6 +61,11 @@ class HttpRequest
     public function getBody() : string
     {
         return $this->body;
+    }
+
+    public function getFileParameters() : array
+    {
+        return $this->filesParameters;
     }
 
     public function getGetParameters() : array
