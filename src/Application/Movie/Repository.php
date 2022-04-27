@@ -48,6 +48,17 @@ class Repository
         );
     }
 
+    public function fetchMoviesOrderedByMostWatchedDesc() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT m.title, COUNT(*) AS views
+            FROM movie_history mh
+            JOIN movie m on mh.movie_id = m.id
+            GROUP BY m.title
+            ORDER BY COUNT(*) DESC, m.title'
+        );
+    }
+
     public function findByLetterboxdId(string $letterboxdId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE letterboxd_id = ?', [$letterboxdId]);

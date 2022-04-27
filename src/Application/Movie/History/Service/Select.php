@@ -15,6 +15,11 @@ class Select
         $this->repository = $repository;
     }
 
+    public function fetchMoviesOrderedByMostWatchedDesc() : array
+    {
+        return $this->repository->fetchMoviesOrderedByMostWatchedDesc();
+    }
+
     public function findByTraktId(TraktId $traktId) : ?Entity
     {
         return $this->repository->findByTraktId($traktId);

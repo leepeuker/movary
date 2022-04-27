@@ -12,6 +12,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\MovieHistoryController::class, 'fetchHistory']
     );
     $routeCollector->addRoute(
+        'GET',
+        '/mostWatched',
+        [\Movary\HttpController\MostWatchedController::class, 'fetchMostWatched']
+    );
+    $routeCollector->addRoute(
         'POST',
         '/letterboxd-rating',
         [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']
