@@ -22,6 +22,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\MostWatchedActorsController::class, 'fetchMostWatchedActors']
     );
     $routeCollector->addRoute(
+        'GET',
+        '/mostWatchedProductionCompanies',
+        [\Movary\HttpController\MostWatchedProductionCompaniesController::class, 'fetchMostWatchedProductionCompanies']
+    );
+    $routeCollector->addRoute(
         'POST',
         '/letterboxd-rating',
         [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']

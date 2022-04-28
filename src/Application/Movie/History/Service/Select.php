@@ -16,6 +16,22 @@ class Select
         $this->repository = $repository;
     }
 
+    public function fetchMostWatchedProductionCompanies() : array
+    {
+        $mostWatchedProductionCompanies = $this->repository->fetchMostWatchedProductionCompany();
+
+        foreach ($mostWatchedProductionCompanies as $index => $productionCompany) {
+            $moviesByProductionCompany = $this->repository->fetchMoviesByProductionCompany($productionCompany['id']);
+            unset($mostWatchedProductionCompanies[$index]['id']);
+
+            foreach ($moviesByProductionCompany as $movieByProductionCompany) {
+                $mostWatchedProductionCompanies[$index]['movies'][] = $movieByProductionCompany['title'];
+            }
+        }
+
+        return $mostWatchedProductionCompanies;
+    }
+
     public function fetchMoviesOrderedByMostWatchedDesc() : array
     {
         return $this->repository->fetchMoviesOrderedByMostWatchedDesc();
