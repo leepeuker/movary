@@ -7,28 +7,33 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\DashboardController::class, 'render']
     );
     $routeCollector->addRoute(
+        'POST',
+        '/letterboxd-rating',
+        [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']
+    );
+    $routeCollector->addRoute(
         'GET',
-        '/history',
+        '/api/ahistory',
         [\Movary\HttpController\MovieHistoryController::class, 'fetchHistory']
     );
     $routeCollector->addRoute(
         'GET',
-        '/mostWatchedMovies',
+        '/api/mostWatchedMovies',
         [\Movary\HttpController\MostWatchedMoviesController::class, 'fetchMostWatchedMovies']
     );
     $routeCollector->addRoute(
         'GET',
-        '/mostWatchedActors',
+        '/api/mostWatchedActors',
         [\Movary\HttpController\MostWatchedActorsController::class, 'fetchMostWatchedActors']
     );
     $routeCollector->addRoute(
         'GET',
-        '/mostWatchedProductionCompanies',
-        [\Movary\HttpController\MostWatchedProductionCompaniesController::class, 'fetchMostWatchedProductionCompanies']
+        '/api/mostWatchedGenres',
+        [\Movary\HttpController\MostWatchedGenresController::class, 'fetchMostWatchedGenres']
     );
     $routeCollector->addRoute(
-        'POST',
-        '/letterboxd-rating',
-        [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']
+        'GET',
+        '/api/mostWatchedProductionCompanies',
+        [\Movary\HttpController\MostWatchedProductionCompaniesController::class, 'fetchMostWatchedProductionCompanies']
     );
 };

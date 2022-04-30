@@ -48,6 +48,19 @@ class Repository
         );
     }
 
+    public function fetchMostWatchedGenres() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT g.name, COUNT(*) as count
+            FROM movie m
+            JOIN movie_genre mg ON m.id = mg.movie_id
+            JOIN genre g ON mg.genre_id = g.id
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            GROUP BY g.name
+            ORDER BY COUNT(*) DESC, g.name'
+        );
+    }
+
     public function fetchMostWatchedProductionCompany() : array
     {
         return $this->dbConnection->fetchAllAssociative(

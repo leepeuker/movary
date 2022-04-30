@@ -16,6 +16,11 @@ class Select
         $this->repository = $repository;
     }
 
+    public function fetchMostWatchedGenres() : array
+    {
+        return $this->repository->fetchMostWatchedGenres();
+    }
+
     public function fetchMostWatchedProductionCompanies() : array
     {
         $mostWatchedProductionCompanies = $this->repository->fetchMostWatchedProductionCompany();
