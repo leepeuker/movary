@@ -38,6 +38,22 @@ class Repository
         return EntityList::createFromArray($data);
     }
 
+    public function fetchFirstHistoryWatchDate() : Date
+    {
+        $data = $this->dbConnection->fetchFirstColumn(
+            'SELECT watched_at FROM movie_history ORDER BY watched_at ASC'
+        );
+
+        return Date::createFromString($data[0]);
+    }
+
+    public function fetchHistoryCount() : int
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT COUNT(*) FROM movie_history'
+        )[0];
+    }
+
     public function fetchHistoryOrderedByWatchedAtDesc() : array
     {
         return $this->dbConnection->fetchAllAssociative(
@@ -45,6 +61,20 @@ class Repository
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC'
+        );
+    }
+
+    public function fetchMostWatchedActors() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT p.name, COUNT(*) as count, p.gender
+            FROM movie m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            JOIN person p ON mc.person_id = p.id
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee"
+            GROUP BY mc.person_id
+            ORDER BY COUNT(*) DESC, p.name
+            LIMIT 1000'
         );
     }
 
@@ -76,7 +106,6 @@ class Repository
 
     public function fetchMoviesByProductionCompany(int $id) : array
     {
-
         return $this->dbConnection->fetchAllAssociative(
             'SELECT m.title 
             FROM movie m
@@ -97,18 +126,11 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedActors() : array
+    public function fetchUniqueMovieInHistoryCount() : int
     {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT p.name, COUNT(*) as count, p.gender
-            FROM movie m
-            JOIN movie_cast mc ON m.id = mc.movie_id
-            JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee"
-            GROUP BY mc.person_id
-            ORDER BY COUNT(*) DESC, p.name
-            LIMIT 1000'
-        );
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT COUNT(DISTINCT movie_id) FROM movie_history'
+        )[0];
     }
 
     public function findByLetterboxdId(string $letterboxdId) : ?Entity

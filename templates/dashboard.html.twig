@@ -6,6 +6,13 @@
 
 {% block body %}
     <main role="main" class="container" style="padding-top: 1rem">
+        Diary entries watched: {{ watchedMoviesCount }}
+        <br>
+        Unique movies:  {{ uniqueWatchedMoviesCount }}
+        <br>
+        First diary entry:   {{ firstDiaryEntry }}
+        <hr>
+
         <ul>
             <li><a href="/api/history">History</a></li>
             <li><a href="/api/mostWatchedMovies">Most watched movies</a></li>
@@ -15,6 +22,7 @@
         </ul>
 
         <hr>
+
         <form action="/letterboxd-rating" method="post" enctype="multipart/form-data">
             <p>Letterboxed rating upload:</p>
             <input type="file" id="letterboxedRating" name="letterboxedRating" accept=".csv" required> <br><br>
