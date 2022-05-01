@@ -38,6 +38,24 @@ class Repository
         return EntityList::createFromArray($data);
     }
 
+    public function fetchAverage10Rating() : float
+    {
+        return (float)$this->dbConnection->fetchFirstColumn(
+            'SELECT AVG(rating_10)
+            FROM movie
+            WHERE id IN (SELECT DISTINCT movie_id FROM movie_history mh)'
+        )[0];
+    }
+
+    public function fetchAverageRuntime() : float
+    {
+        return (float)$this->dbConnection->fetchFirstColumn(
+            'SELECT AVG(runtime)
+            FROM movie
+            WHERE id IN (SELECT DISTINCT movie_id FROM movie_history mh)'
+        )[0];
+    }
+
     public function fetchFirstHistoryWatchDate() : Date
     {
         $data = $this->dbConnection->fetchFirstColumn(
@@ -124,6 +142,15 @@ class Repository
             GROUP BY m.title
             ORDER BY COUNT(*) DESC, m.title'
         );
+    }
+
+    public function fetchTotalMinutesWatched() : int
+    {
+        return (int)$this->dbConnection->fetchFirstColumn(
+            'SELECT SUM(m.runtime)
+            FROM movie_history mh
+            JOIN movie m ON mh.movie_id = m.id'
+        )[0];
     }
 
     public function fetchUniqueMovieInHistoryCount() : int

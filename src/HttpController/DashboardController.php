@@ -20,8 +20,12 @@ class DashboardController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('dashboard.html.twig', [
-                'watchedMoviesCount' => $this->movieHistorySelectService->fetchHistoryCount(),
-                'uniqueWatchedMoviesCount' => $this->movieHistorySelectService->fetchUniqueMovieInHistoryCount(),
+                'totalPlayCount' => $this->movieHistorySelectService->fetchHistoryCount(),
+                'uniqueMoviesCount' => $this->movieHistorySelectService->fetchUniqueMovieInHistoryCount(),
+                'totalHoursWatched' => $this->movieHistorySelectService->fetchTotalHoursWatched(),
+                'average10Rating' => $this->movieHistorySelectService->fetchAverage10Rating(),
+                'averagePlaysPerDay' => $this->movieHistorySelectService->fetchAveragePlaysPerDay(),
+                'averageRuntime' => $this->movieHistorySelectService->fetchAverageRuntime(),
                 'firstDiaryEntry' => $this->movieHistorySelectService->fetchFirstHistoryWatchDate(),
             ]),
         );

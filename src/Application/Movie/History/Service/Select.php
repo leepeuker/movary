@@ -17,6 +17,26 @@ class Select
         $this->repository = $repository;
     }
 
+    public function fetchAverage10Rating() : float
+    {
+        return round($this->repository->fetchAverage10Rating(), 1);
+    }
+
+    public function fetchAveragePlaysPerDay() : float
+    {
+        $totalPlayCount = $this->repository->fetchHistoryCount();
+        $firstPlayDate = $this->repository->fetchFirstHistoryWatchDate();
+
+        $totalNumberOfDays = $firstPlayDate->getNumberOfDaysSince(Date::create());
+
+        return round($totalPlayCount / $totalNumberOfDays, 1);
+    }
+
+    public function fetchAverageRuntime() : int
+    {
+        return (int)round($this->repository->fetchAverageRuntime());
+    }
+
     public function fetchFirstHistoryWatchDate() : Date
     {
         return $this->repository->fetchFirstHistoryWatchDate();
@@ -67,6 +87,13 @@ class Select
     public function fetchMoviesOrderedByMostWatchedDesc() : array
     {
         return $this->repository->fetchMoviesOrderedByMostWatchedDesc();
+    }
+
+    public function fetchTotalHoursWatched() : int
+    {
+        $minutes = $this->repository->fetchTotalMinutesWatched();
+
+        return (int)round($minutes / 60);
     }
 
     public function fetchUniqueMovieInHistoryCount() : int

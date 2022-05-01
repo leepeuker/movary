@@ -4,13 +4,43 @@
     Dashboard
 {% endblock %}
 
+{% block stylesheets %}
+    <link href="/css/style.css" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container" style="padding-top: 1rem">
-        Diary entries watched: {{ watchedMoviesCount }}
-        <br>
-        Unique movies:  {{ uniqueWatchedMoviesCount }}
-        <br>
-        First diary entry:   {{ firstDiaryEntry }}
+        <div style="text-align: center">
+
+            <h1>Overview</h1>
+            <br>
+            <div class="row justify-content-md-center">
+                <div class="col ">
+                    <span class="stat-value">{{ totalPlayCount }}</span><br><span class="stat-description">TOTAL PLAYS</span>
+                </div>
+                <div class="col ">
+                    <span class="stat-value">{{ uniqueMoviesCount }}</span><br><span class="stat-description">UNIQUE MOVIES</span>
+                </div>
+                <div class="col">
+                    <span class="stat-value">{{ totalHoursWatched }}</span><br><span class="stat-description font-weight-light">HOURS WATCHED</span>
+                </div>
+            </div>
+            <br>
+            <div class="row justify-content-md-center">
+                <div class="col ">
+                    <span class="stat-value">{{ averagePlaysPerDay }}</span><br><span class="stat-description">PLAYS PER DAY</span>
+                </div>
+                <div class="col ">
+                    <span class="stat-value">{{ averageRuntime }}</span><br><span class="stat-description">AVERAGE RUNTIME</span>
+                </div>
+                <div class="col ">
+                        <span class="stat-value">{{ average10Rating }}</span><br><span class="stat-description">AVERAGE RATING</span>
+                </div>
+            </div>
+            <br>
+        </div>
+        <hr>
+        First play: {{ firstDiaryEntry }}
         <hr>
 
         <ul>
