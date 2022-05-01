@@ -52,6 +52,11 @@ class Select
         return $this->repository->fetchHistoryOrderedByWatchedAtDesc();
     }
 
+    public function fetchLastPlays() : array
+    {
+        return $this->repository->fetchLastPlays();
+    }
+
     public function fetchMostWatchedActors() : array
     {
         $mostWatchedActors = $this->repository->fetchMostWatchedActors();

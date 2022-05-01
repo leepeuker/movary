@@ -27,6 +27,7 @@ class DashboardController
                 'averagePlaysPerDay' => $this->movieHistorySelectService->fetchAveragePlaysPerDay(),
                 'averageRuntime' => $this->movieHistorySelectService->fetchAverageRuntime(),
                 'firstDiaryEntry' => $this->movieHistorySelectService->fetchFirstHistoryWatchDate(),
+                'lastPlays' => $this->movieHistorySelectService->fetchLastPlays(),
             ]),
         );
     }

@@ -82,6 +82,17 @@ class Repository
         );
     }
 
+    public function fetchLastPlays() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at
+            FROM movie_history mh
+            JOIN movie m on mh.movie_id = m.id
+            ORDER BY watched_at DESC
+            LIMIT 5'
+        );
+    }
+
     public function fetchMostWatchedActors() : array
     {
         return $this->dbConnection->fetchAllAssociative(

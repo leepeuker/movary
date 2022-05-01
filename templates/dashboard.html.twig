@@ -11,9 +11,7 @@
 {% block body %}
     <main role="main" class="container" style="padding-top: 1rem">
         <div style="text-align: center">
-
-            <h1>Overview</h1>
-            <br>
+            <h2 style="padding-bottom: 0.5rem">Overview</h2>
             <div class="row justify-content-md-center">
                 <div class="col ">
                     <span class="stat-value">{{ totalPlayCount }}</span><br><span class="stat-description">TOTAL PLAYS</span>
@@ -34,13 +32,22 @@
                     <span class="stat-value">{{ averageRuntime }}</span><br><span class="stat-description">AVERAGE RUNTIME</span>
                 </div>
                 <div class="col ">
-                        <span class="stat-value">{{ average10Rating }}</span><br><span class="stat-description">AVERAGE RATING</span>
+                    <span class="stat-value">{{ average10Rating }}</span><br><span class="stat-description">AVERAGE RATING</span>
                 </div>
             </div>
-            <br>
+            <hr>
+            <h3>Last Plays</h3>
+            <ul class="list-group list-group-flush">
+                {% for lastPlay in lastPlays %}
+                    <li class="list-group-item d-flex">
+                        <div class="me-auto">
+                            <span class="last-plays-value">{{ lastPlay.title|e }} ({{ lastPlay.year }})</span> [{{ lastPlay.rating_10 }}]
+                        </div>
+                        <span class="stat-description">{{ lastPlay.watched_at|date("d-m-y") }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
-        <hr>
-        First play: {{ firstDiaryEntry }}
         <hr>
 
         <ul>
