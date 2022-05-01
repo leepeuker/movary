@@ -3,7 +3,7 @@ var assets = [
   '/',
   '/index.php',
   '/css/app.css',
-  '/js/app.js'
+  '/js/style.js'
 ];
 
 self.addEventListener("install", installEvent => {
