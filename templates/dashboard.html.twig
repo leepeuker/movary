@@ -36,35 +36,41 @@
                 </div>
             </div>
             <hr>
-            <h3>Last Plays</h3>
-            <ul class="list-group list-group-flush">
+            <h3 style="padding-bottom: 0.6rem">Last Plays</h3>
+
+
+            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for lastPlay in lastPlays %}
-                    <li class="list-group-item d-flex">
-                        <div class="me-auto">
-                            <span class="last-plays-value">{{ lastPlay.title|e }} ({{ lastPlay.year }})</span> [{{ lastPlay.rating_10 }}]
+                    <div class="col" style="padding-bottom: 1rem">
+                        <div class="card h-100  position-relative">
+                            <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="...">
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 0.8rem">{{ lastPlay.watched_at|date("d.m.y") }}</small>
+                            </div>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                {{ lastPlay.rating_10 }}
+                            </span>
                         </div>
-                        <span class="stat-description">{{ lastPlay.watched_at|date("d-m-y") }}</span>
-                    </li>
+                    </div>
                 {% endfor %}
+            </div>
+            <hr>
+
+            <ul>
+                <li><a href="/api/history">History</a></li>
+                <li><a href="/api/mostWatchedMovies">Most watched movies</a></li>
+                <li><a href="/api/mostWatchedActors">Most watched actors</a></li>
+                <li><a href="/api/mostWatchedGenres">Most watched genres</a></li>
+                <li><a href="/api/mostWatchedProductionCompanies">Most watched production companies</a></li>
             </ul>
-        </div>
-        <hr>
 
-        <ul>
-            <li><a href="/api/history">History</a></li>
-            <li><a href="/api/mostWatchedMovies">Most watched movies</a></li>
-            <li><a href="/api/mostWatchedActors">Most watched actors</a></li>
-            <li><a href="/api/mostWatchedGenres">Most watched genres</a></li>
-            <li><a href="/api/mostWatchedProductionCompanies">Most watched production companies</a></li>
-        </ul>
+            <hr>
 
-        <hr>
-
-        <form action="/letterboxd-rating" method="post" enctype="multipart/form-data">
-            <p>Letterboxed rating upload:</p>
-            <input type="file" id="letterboxedRating" name="letterboxedRating" accept=".csv" required> <br><br>
-            <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Upload</button>
-        </form>
-        <hr>
+            <form action="/letterboxd-rating" method="post" enctype="multipart/form-data">
+                <p>Letterboxed rating upload:</p>
+                <input type="file" id="letterboxedRating" name="letterboxedRating" accept=".csv" required> <br><br>
+                <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Upload</button>
+            </form>
+            <hr>
     </main>
 {% endblock %}

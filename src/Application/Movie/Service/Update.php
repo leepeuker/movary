@@ -77,9 +77,10 @@ class Update
         ?DateTime $releaseDate,
         ?int $runtime,
         ?float $tmdbVoteAverage,
-        ?int $tmdbVoteCount
+        ?int $tmdbVoteCount,
+        ?string $posterPath,
     ) : Entity {
-        return $this->repository->updateDetails($id, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount);
+        return $this->repository->updateDetails($id, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount, $posterPath);
     }
 
     public function updateGenres(int $movieId, Genre\EntityList $genres) : void

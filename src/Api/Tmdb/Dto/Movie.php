@@ -16,7 +16,8 @@ class Movie
         private readonly float $voteAverage,
         private readonly int $voteCount,
         private readonly GenreList $genres,
-        private readonly ProductionCompanyList $productionCompanies
+        private readonly ProductionCompanyList $productionCompanies,
+        private readonly string $posterPath
     ) {
     }
 
@@ -33,6 +34,7 @@ class Movie
             $data['vote_count'],
             GenreList::createFromArray($data['genres']),
             ProductionCompanyList::createFromArray($data['production_companies']),
+            $data['poster_path'],
         );
     }
 
@@ -54,6 +56,11 @@ class Movie
     public function getOverview() : ?string
     {
         return $this->overview;
+    }
+
+    public function getPosterPath() : string
+    {
+        return $this->posterPath;
     }
 
     public function getProductionCompanies() : ProductionCompanyList

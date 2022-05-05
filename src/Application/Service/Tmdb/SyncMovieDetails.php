@@ -105,6 +105,7 @@ class SyncMovieDetails
             $movieDetails->getRuntime(),
             $movieDetails->getVoteAverage(),
             $movieDetails->getVoteCount(),
+            $movieDetails->getPosterPath(),
         );
 
         $this->movieUpdateService->updateGenres($movie->getId(), $this->getGenres($movieDetails));

@@ -85,11 +85,11 @@ class Repository
     public function fetchLastPlays() : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at
+            'SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC
-            LIMIT 5'
+            LIMIT 6'
         );
     }
 
@@ -200,7 +200,8 @@ class Repository
         ?DateTime $releaseDate,
         ?int $runtime,
         ?float $tmdbVoteAverage,
-        ?int $tmdbVoteCount
+        ?int $tmdbVoteCount,
+        ?string $posterPath,
     ) : Entity {
         $this->dbConnection->update(
             'movie',
@@ -212,6 +213,7 @@ class Repository
                 'runtime' => $runtime,
                 'tmdb_vote_average' => $tmdbVoteAverage,
                 'tmdb_vote_count' => $tmdbVoteCount,
+                'poster_path' => $posterPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
             ],
             ['id' => $id]
