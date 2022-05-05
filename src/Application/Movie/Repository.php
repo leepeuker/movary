@@ -56,11 +56,15 @@ class Repository
         )[0];
     }
 
-    public function fetchFirstHistoryWatchDate() : Date
+    public function fetchFirstHistoryWatchDate() : ?Date
     {
         $data = $this->dbConnection->fetchFirstColumn(
             'SELECT watched_at FROM movie_history ORDER BY watched_at ASC'
         );
+
+        if (empty($data[0]) === true) {
+            return null;
+        }
 
         return Date::createFromString($data[0]);
     }

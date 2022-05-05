@@ -35,7 +35,7 @@ class SyncWatchedMovies
                     $watchedMovie->getMovie()->getTmdbId(),
                 );
 
-                echo 'Added movie: ' . $movie->getTitle() . PHP_EOL;
+                // echo 'Added movie: ' . $movie->getTitle() . PHP_EOL;
             }
 
             if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
@@ -65,7 +65,7 @@ class SyncWatchedMovies
             if ($watchedMovies->containsTraktId($movie->getTraktId()) === false) {
                 $this->movieHistoryDeleteService->deleteByMovieId($movie->getId());
 
-                echo 'Removed watch dates for movie: ' . $movie->getTitle() . PHP_EOL;
+                // echo 'Removed watch dates for movie: ' . $movie->getTitle() . PHP_EOL;
             }
         }
     }
@@ -77,7 +77,7 @@ class SyncWatchedMovies
         foreach ($this->traktApi->getUserMovieHistoryByMovieId($movie->getTraktId()) as $movieHistoryEntry) {
             $this->movieHistoryCreateService->create($movie->getId(), Date::createFromDateTime($movieHistoryEntry->getWatchedAt()));
 
-            echo 'Added watch date for "' . $movieHistoryEntry->getMovie()->getTitle() . '": ' . $movieHistoryEntry->getWatchedAt() . PHP_EOL;
+            // echo 'Added watch date for "' . $movieHistoryEntry->getMovie()->getTitle() . '": ' . $movieHistoryEntry->getWatchedAt() . PHP_EOL;
         }
     }
 }

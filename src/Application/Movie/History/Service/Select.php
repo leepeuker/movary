@@ -27,6 +27,10 @@ class Select
         $totalPlayCount = $this->repository->fetchHistoryCount();
         $firstPlayDate = $this->repository->fetchFirstHistoryWatchDate();
 
+        if ($firstPlayDate === null) {
+            return 0.0;
+        }
+
         $totalNumberOfDays = $firstPlayDate->getNumberOfDaysSince(Date::create());
 
         return round($totalPlayCount / $totalNumberOfDays, 1);
@@ -37,7 +41,7 @@ class Select
         return (int)round($this->repository->fetchAverageRuntime());
     }
 
-    public function fetchFirstHistoryWatchDate() : Date
+    public function fetchFirstHistoryWatchDate() : ?Date
     {
         return $this->repository->fetchFirstHistoryWatchDate();
     }

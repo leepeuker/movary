@@ -47,7 +47,7 @@
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.8rem">{{ lastPlay.watched_at|date("d.m.y") }}</small>
                             </div>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.9rem">
                                 {{ lastPlay.rating_10 }}
                             </span>
                         </div>
@@ -55,6 +55,23 @@
                 {% endfor %}
             </div>
             <hr>
+            <div>
+                Trakt.tv | Last refresh: -<br>
+                <form action="/refresh-trakt" method="POST">
+                    <button type="submit" class="btn btn-primary">Refresh</button>
+                </form>
+            </div>
+            <br>
+            <div>
+                themoviedb.org | Last refresh: -<br>
+                <form action="/refresh-tmdb" method="POST">
+                    <button type="submit" class="btn btn-primary">Refresh</button>
+                </form>
+            </div>
+
+
+            <hr>
+
 
             <ul>
                 <li><a href="/api/history">History</a></li>

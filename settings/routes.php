@@ -12,6 +12,16 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']
     );
     $routeCollector->addRoute(
+        'POST',
+        '/refresh-trakt',
+        [\Movary\HttpController\SyncTrakt::class, 'execute']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/refresh-tmdb',
+        [\Movary\HttpController\SyncTmdb::class, 'execute']
+    );
+    $routeCollector->addRoute(
         'GET',
         '/api/history',
         [\Movary\HttpController\MovieHistoryController::class, 'fetchHistory']
