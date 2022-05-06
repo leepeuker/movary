@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/app.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('navbar.html.twig') }}
+        <div style="text-align: center;padding-top: 1rem">
+            <div>
+                Trakt.tv | Last refresh: {{ lastSyncTrakt }}<br>
+                <form action="/refresh-trakt" method="POST">
+                    <button type="submit" class="btn btn-primary" style="margin-top: 0.4rem">Refresh</button>
+                </form>
+            </div>
+
+            <hr>
+
+            <div>
+                themoviedb.org | Last refresh: {{ lastSyncTmdb }}<br>
+                <form action="/refresh-tmdb" method="POST">
+                    <button type="submit" class="btn btn-primary" style="margin-top: 0.4rem">Refresh</button>
+                </form>
+            </div>
+
+            <hr>
+
+            <form action="/letterboxd-rating" method="post" enctype="multipart/form-data">
+                <p>letterboxd.com | Last refresh: {{ lastSyncLetterboxd }}<br></p>
+                <input type="file" id="letterboxedRating" name="letterboxedRating" accept=".csv" required style="padding-bottom: 1rem;padding-left:6rem"> <br>
+                <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Refresh</button>
+            </form>
+        </div>
+    </main>
+{% endblock %}

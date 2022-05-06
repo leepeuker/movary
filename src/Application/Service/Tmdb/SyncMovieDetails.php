@@ -7,6 +7,7 @@ use Movary\Api\Tmdb;
 use Movary\Application\Company;
 use Movary\Application\Genre;
 use Movary\Application\Movie;
+use Movary\Application\SyncLog\Repository;
 use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
 
@@ -23,7 +24,8 @@ class SyncMovieDetails
         private readonly Company\Service\Select $companySelectService,
         private readonly Company\Service\Create $companyCreateService,
         private readonly DBAL\Connection $dbConnection,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly Repository $scanLogRepository
     ) {
     }
 
@@ -48,6 +50,8 @@ class SyncMovieDetails
                 $this->logger->error('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
         }
+
+        $this->scanLogRepository->insertLogForTmdbSync();
     }
 
     public function getGenres(Tmdb\Dto\Movie $movieDetails) : Genre\EntityList

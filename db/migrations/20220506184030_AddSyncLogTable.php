@@ -1,0 +1,23 @@
+<?php declare(strict_types=1);
+
+use Phinx\Migration\AbstractMigration;
+
+final class AddSyncLogTable extends AbstractMigration
+{
+    public function down() : void
+    {
+        $this->execute('DROP TABLE `sync_log`');
+    }
+
+    public function up() : void
+    {
+        $this->execute(
+            <<<SQL
+            CREATE TABLE `sync_log` (
+                `type` VARCHAR(255) NOT NULL,
+                `created_at` TIMESTAMP NOT NULL DEFAULT NOW()
+            ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
+            SQL
+        );
+    }
+}

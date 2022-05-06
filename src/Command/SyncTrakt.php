@@ -2,8 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\Service\Trakt\SyncRatings;
-use Movary\Application\Service\Trakt\SyncWatchedMovies;
+use Movary\Application\Service\Trakt\Sync;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,8 +13,7 @@ class SyncTrakt extends Command
     protected static $defaultName = 'app:sync-trakt';
 
     public function __construct(
-        private readonly SyncRatings $syncRatings,
-        private readonly SyncWatchedMovies $syncWatchedMovies,
+        private readonly Sync $syncService,
         private readonly LoggerInterface $logger
     ) {
         parent::__construct();
@@ -30,8 +28,7 @@ class SyncTrakt extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         try {
-            $this->syncWatchedMovies->execute();
-            $this->syncRatings->execute();
+            $this->syncService->syncAll();
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete trakt sync.', ['exception' => $t]);
 

@@ -7,6 +7,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\DashboardController::class, 'render']
     );
     $routeCollector->addRoute(
+        'GET',
+        '/settings',
+        [\Movary\HttpController\SettingsController::class, 'render']
+    );
+    $routeCollector->addRoute(
         'POST',
         '/letterboxd-rating',
         [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']

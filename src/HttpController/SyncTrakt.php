@@ -2,8 +2,7 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Service\Trakt\SyncRatings;
-use Movary\Application\Service\Trakt\SyncWatchedMovies;
+use Movary\Application\Service\Trakt\Sync;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -11,16 +10,14 @@ use Movary\ValueObject\Http\StatusCode;
 class SyncTrakt
 {
     public function __construct(
-        private readonly SyncRatings $syncRatings,
-        private readonly SyncWatchedMovies $syncWatchedMovies,
+        private readonly Sync $syncService
     ) {
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function execute() : Response
     {
-        $this->syncWatchedMovies->execute();
-        $this->syncRatings->execute();
+        $this->syncService->syncAll();
 
         return Response::create(
             StatusCode::createSeeOther(),

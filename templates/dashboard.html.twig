@@ -6,11 +6,13 @@
 
 {% block stylesheets %}
     <link href="/css/app.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 {% endblock %}
 
 {% block body %}
-    <main role="main" class="container" style="padding-top: 1rem">
-        <div style="text-align: center">
+    <main role="main" class="container">
+        {{ include('navbar.html.twig') }}
+        <div style="text-align: center;padding-top: 1rem">
             <h2 style="padding-bottom: 0.5rem">Overview</h2>
             <div class="row justify-content-md-center">
                 <div class="col ">
@@ -35,8 +37,10 @@
                     <span class="stat-value">{{ average10Rating }}</span><br><span class="stat-description">AVERAGE RATING</span>
                 </div>
             </div>
-            <hr>
-            <h3 style="padding-bottom: 0.6rem">Last Plays</h3>
+
+            <hr style="margin-top: 1.1rem">
+
+            <h3 style="padding-bottom: 0.8rem">Last Plays</h3>
 
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -54,40 +58,6 @@
                     </div>
                 {% endfor %}
             </div>
-            <hr>
-            <div>
-                Trakt.tv | Last refresh: -<br>
-                <form action="/refresh-trakt" method="POST">
-                    <button type="submit" class="btn btn-primary">Refresh</button>
-                </form>
-            </div>
-            <br>
-            <div>
-                themoviedb.org | Last refresh: -<br>
-                <form action="/refresh-tmdb" method="POST">
-                    <button type="submit" class="btn btn-primary">Refresh</button>
-                </form>
-            </div>
-
-
-            <hr>
-
-
-            <ul>
-                <li><a href="/api/history">History</a></li>
-                <li><a href="/api/mostWatchedMovies">Most watched movies</a></li>
-                <li><a href="/api/mostWatchedActors">Most watched actors</a></li>
-                <li><a href="/api/mostWatchedGenres">Most watched genres</a></li>
-                <li><a href="/api/mostWatchedProductionCompanies">Most watched production companies</a></li>
-            </ul>
-
-            <hr>
-
-            <form action="/letterboxd-rating" method="post" enctype="multipart/form-data">
-                <p>Letterboxed rating upload:</p>
-                <input type="file" id="letterboxedRating" name="letterboxedRating" accept=".csv" required> <br><br>
-                <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Upload</button>
-            </form>
-            <hr>
+        </div>
     </main>
 {% endblock %}

@@ -17,7 +17,10 @@ class WebScrapper
 
         preg_match('/data-tmdb-id=\"(\d+)\"/', $responseBodyContent, $tmdbIdMatches);
         if (empty($tmdbIdMatches[1]) === true) {
-            throw new \RuntimeException('Could not find tmdb id on page: ' . $letterboxedMovieUri);
+            preg_match('/film_id=\"(\d+)\"/', $responseBodyContent, $tmdbIdMatches);
+            if (empty($tmdbIdMatches[1]) === true) {
+                throw new \RuntimeException('Could not find tmdb id on page: ' . $letterboxedMovieUri);
+            }
         }
 
         return (int)$tmdbIdMatches[1];

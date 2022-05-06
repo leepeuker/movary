@@ -13,7 +13,8 @@ class SyncRatings
         private readonly Application\Movie\Service\Update $movieUpdateService,
         private readonly Application\Movie\Service\Select $movieSelectService,
         private readonly WebScrapper $webScrapper,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly Application\SyncLog\Repository $scanLogRepository
     ) {
     }
 
@@ -39,6 +40,8 @@ class SyncRatings
 
             $this->movieUpdateService->updateRating5($movie->getId(), (int)$rating['Rating']);
         }
+
+        $this->scanLogRepository->insertLogForLetterboxdSync();
     }
 
     public function findMovieByLetterboxdUri(string $letterboxdUri) : ?Application\Movie\Entity
