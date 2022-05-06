@@ -9,15 +9,15 @@ use Movary\ValueObject\Http\StatusCode;
 
 class SyncTrakt
 {
-    public function __construct(
-        private readonly Sync $syncService
-    ) {
-    }
-
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function execute() : Response
     {
-        $this->syncService->syncAll();
+        exec(
+            sprintf(
+                "%s 2>&1",
+                'cd ' . __DIR__ . '/../../ && php bin/console.php app:sync-trakt',
+            )
+        );
 
         return Response::create(
             StatusCode::createSeeOther(),

@@ -2,22 +2,21 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Service\Tmdb\SyncMovieDetails;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 
 class SyncTmdb
 {
-    public function __construct(
-        private readonly SyncMovieDetails $syncMovieDetails,
-    ) {
-    }
-
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function execute() : Response
     {
-        $this->syncMovieDetails->execute();
+        exec(
+            sprintf(
+                "%s 2>&1",
+                'cd ' . __DIR__ . '/../../ && php bin/console.php app:sync-tmdb',
+            )
+        );
 
         return Response::create(
             StatusCode::createSeeOther(),
