@@ -10,7 +10,15 @@
                 <li><a class="dropdown-item" href="/api/mostWatchedActors">Top Actors</a></li>
                 <li><a class="dropdown-item" href="/api/mostWatchedGenres">Top Genres</a></li>
                 <li><a class="dropdown-item" href="/api/mostWatchedProductionCompanies">Top Production Companies</a></li>
-                <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                {% if loggedIn == true %}
+                    <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                {% else %}
+                    <li><a class="dropdown-item" href="/login">Login</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

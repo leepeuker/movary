@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+session_start();
+
 /** @var DI\Container $container */
 
 use Movary\ValueObject\Http\Response;

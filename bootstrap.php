@@ -16,6 +16,7 @@ $builder->addDefinitions(
         \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createFileLogger']),
         \Doctrine\DBAL\Connection::class => DI\factory([Factory::class, 'createDbConnection']),
         \Twig\Loader\LoaderInterface::class => DI\factory([Factory::class, 'createTwigFilesystemLoader']),
+        \Twig\Environment::class => DI\factory([Factory::class, 'createTwigEnvironment']),
     ]
 );
 

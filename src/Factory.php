@@ -9,6 +9,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
+use Movary\Application\SessionService;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Http\Request;
 use Psr\Container\ContainerInterface;
@@ -90,6 +91,16 @@ class Factory
             $container->get(ClientInterface::class),
             $config->getAsString('TRAKT_CLIENT_ID')
         );
+    }
+
+    public static function createTwigEnvironment(ContainerInterface $container) : Twig\Environment
+    {
+        $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
+
+        $twig->addGlobal('loggedIn', $container->get(SessionService::class)->isCurrentUserLoggedIn());
+        $twig->addExtension(new \Twig\Extension\DebugExtension());
+
+        return $twig;
     }
 
     public static function createTwigFilesystemLoader() : Twig\Loader\FilesystemLoader

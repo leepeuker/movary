@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Application\SessionService;
 use Movary\Application\SyncLog\Repository;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -11,12 +12,17 @@ class SettingsController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Repository $syncLogRepository
+        private readonly Repository $syncLogRepository,
+        private readonly SessionService $sessionService
     ) {
     }
 
     public function render() : Response
     {
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('settings.html.twig', [

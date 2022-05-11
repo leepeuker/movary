@@ -19,6 +19,11 @@ class Response
         return new self($statusCode, $body, $headers);
     }
 
+    public static function createFoundRedirect(string $targetUrl) : self
+    {
+        return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
+    }
+
     public function getBody() : ?string
     {
         return $this->body;

@@ -10,6 +10,11 @@ class StatusCode
     ) {
     }
 
+    public static function createFound() : self
+    {
+        return new self(302, 'Found');
+    }
+
     public static function createMethodNotAllowed() : self
     {
         return new self(405, 'Method Not Allowed');

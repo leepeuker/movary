@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('navbar.html.twig') }}
+
+        <div style="text-align: center;padding-top: 1rem">
+            {% if failedLogin == true %}
+                <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
+                    Invalid password
+                </div>
+            {% endif %}
+
+            <form action="/login" method="post" enctype="multipart/form-data">
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+                <br>
+                <button class="btn btn-primary" type="submit">Login</button>
+            </form>
+        </div>
+    </main>
+{% endblock %}

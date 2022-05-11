@@ -1,17 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Dashboard
-{% endblock %}
-
-{% block stylesheets %}
-    <link href="/css/app.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    Settings
 {% endblock %}
 
 {% block body %}
     <main role="main" class="container">
         {{ include('navbar.html.twig') }}
+
         <div style="text-align: center;padding-top: 1rem">
             <div>
                 Trakt.tv | Last refresh: {{ lastSyncTrakt }}<br>

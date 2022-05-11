@@ -19,12 +19,27 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/refresh-trakt',
-        [\Movary\HttpController\SyncTrakt::class, 'execute']
+        [\Movary\HttpController\SyncTraktController::class, 'execute']
     );
     $routeCollector->addRoute(
         'POST',
         '/refresh-tmdb',
-        [\Movary\HttpController\SyncTmdb::class, 'execute']
+        [\Movary\HttpController\SyncTmdbController::class, 'execute']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/login',
+        [\Movary\HttpController\AuthenticationController::class, 'login']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/login',
+        [\Movary\HttpController\AuthenticationController::class, 'renderLoginPage']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/logout',
+        [\Movary\HttpController\AuthenticationController::class, 'logout']
     );
     $routeCollector->addRoute(
         'GET',
