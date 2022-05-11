@@ -98,7 +98,6 @@ class Factory
         $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
 
         $twig->addGlobal('loggedIn', $container->get(SessionService::class)->isCurrentUserLoggedIn());
-        $twig->addExtension(new \Twig\Extension\DebugExtension());
 
         return $twig;
     }
