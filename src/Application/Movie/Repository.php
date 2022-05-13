@@ -69,8 +69,19 @@ class Repository
         return Date::createFromString($data[0]);
     }
 
-    public function fetchHistoryCount() : int
+    public function fetchHistoryCount(?string $searchTerm) : int
     {
+        if ($searchTerm !== null) {
+            return $this->dbConnection->fetchFirstColumn(
+                <<<SQL
+                SELECT COUNT(*)
+                FROM movie_history mh
+                JOIN movie m on mh.movie_id = m.id
+                WHERE m.title LIKE "%$searchTerm%"
+                SQL
+            )[0];
+        }
+
         return $this->dbConnection->fetchFirstColumn(
             'SELECT COUNT(*) FROM movie_history'
         )[0];
@@ -83,6 +94,34 @@ class Repository
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC'
+        );
+    }
+
+    public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm) : array
+    {
+        $offset = ($limit * $page) - $limit;
+
+        if ($searchTerm !== null) {
+            return $this->dbConnection->fetchAllAssociative(
+                <<<SQL
+                SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+                FROM movie_history mh
+                JOIN movie m on mh.movie_id = m.id
+                WHERE m.title LIKE "%$searchTerm%"
+                ORDER BY watched_at DESC
+                LIMIT $offset, $limit
+                SQL
+            );
+        }
+
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+            FROM movie_history mh
+            JOIN movie m on mh.movie_id = m.id
+            ORDER BY watched_at DESC
+            LIMIT $offset, $limit
+            SQL
         );
     }
 

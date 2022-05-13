@@ -12,6 +12,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'render']
     );
     $routeCollector->addRoute(
+        'GET',
+        '/history',
+        [\Movary\HttpController\HistoryController::class, 'render']
+    );
+    $routeCollector->addRoute(
         'POST',
         '/letterboxd-rating',
         [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']

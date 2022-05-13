@@ -46,14 +46,19 @@ class Select
         return $this->repository->fetchFirstHistoryWatchDate();
     }
 
-    public function fetchHistoryCount() : int
+    public function fetchHistoryCount(?string $searchTerm) : int
     {
-        return $this->repository->fetchHistoryCount();
+        return $this->repository->fetchHistoryCount($searchTerm);
     }
 
     public function fetchHistoryOrderedByWatchedAtDesc() : array
     {
         return $this->repository->fetchHistoryOrderedByWatchedAtDesc();
+    }
+
+    public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm) : array
+    {
+        return $this->repository->fetchHistoryPaginated($limit, $page, $searchTerm);
     }
 
     public function fetchLastPlays() : array
