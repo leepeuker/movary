@@ -46,7 +46,7 @@ class Select
         return $this->repository->fetchFirstHistoryWatchDate();
     }
 
-    public function fetchHistoryCount(?string $searchTerm) : int
+    public function fetchHistoryCount(?string $searchTerm = null) : int
     {
         return $this->repository->fetchHistoryCount($searchTerm);
     }
