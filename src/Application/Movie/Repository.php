@@ -69,7 +69,7 @@ class Repository
         return Date::createFromString($data[0]);
     }
 
-    public function fetchHistoryCount(?string $searchTerm) : int
+    public function fetchHistoryCount(?string $searchTerm = null) : int
     {
         if ($searchTerm !== null) {
             return $this->dbConnection->fetchFirstColumn(

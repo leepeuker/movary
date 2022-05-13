@@ -56,7 +56,7 @@ class Select
         return $this->repository->fetchHistoryOrderedByWatchedAtDesc();
     }
 
-    public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm) : array
+    public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm = null) : array
     {
         return $this->repository->fetchHistoryPaginated($limit, $page, $searchTerm);
     }
