@@ -18,6 +18,11 @@ class Select
         return $this->repository->fetchAll();
     }
 
+    public function fetchAllOrderedByLastUpdatedAtTmdbDesc() : EntityList
+    {
+        return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbDesc();
+    }
+
     public function findByLetterboxdId(string $letterboxdId) : ?Entity
     {
         return $this->repository->findByLetterboxdId($letterboxdId);

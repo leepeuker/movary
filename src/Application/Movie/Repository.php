@@ -38,6 +38,13 @@ class Repository
         return EntityList::createFromArray($data);
     }
 
+    public function fetchAllOrderedByLastUpdatedAtTmdbDesc() : EntityList
+    {
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie` ORDER BY updated_at_tmdb ASC');
+
+        return EntityList::createFromArray($data);
+    }
+
     public function fetchAverage10Rating() : float
     {
         return (float)$this->dbConnection->fetchFirstColumn(

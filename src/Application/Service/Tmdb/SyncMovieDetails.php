@@ -29,7 +29,7 @@ class SyncMovieDetails
 
     public function execute(?int $maxAgeInHours, ?int $movieCountSyncThreshold) : void
     {
-        $movies = $this->movieSelectService->fetchAll();
+        $movies = $this->movieSelectService->fetchAllOrderedByLastUpdatedAtTmdbDesc();
 
         $movieCountSynced = 0;
 
