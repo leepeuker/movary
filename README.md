@@ -21,7 +21,19 @@ Additionally it enriches the synced movies with data provided by tmdb (e.g. movi
 
 ## Commands
 
+### app:change-admin-password
+
+```
+php bin/console.php app:change-admin-password <password>
+```
+
+Change admin password to password provided by first argument.
+
 ### app:sync-trakt
+
+```
+php bin/console.php app:sync-trakt
+```
 
 Synchronize remote trakt watch history (plays) with local state.
 
@@ -45,6 +57,10 @@ You can only sync specific stuff by using flags (default behaviour syncs all of 
   Use if you want to completely overwrite the local state with the remote (trakt) state (deletes and overwrites local data)
 
 ### app:sync-tmdb
+
+```
+php bin/console.php app:sync-tmdb
+```
 
 Synchronize tmdb (meta-)data for existing movies.
 
