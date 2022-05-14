@@ -49,11 +49,11 @@ You can only sync specific stuff by using flags (default behaviour syncs all of 
 
 **Flags:**
 
-- `-- ratings`
+- `--ratings`
   Sync trakt ratings
-- `-- history`
+- `--history`
   Sync trakt watch history (plays)
-- `-- overwrite`
+- `--overwrite`
   Use if you want to completely overwrite the local state with the remote (trakt) state (deletes and overwrites local data)
 
 ### app:sync-tmdb
@@ -62,7 +62,7 @@ You can only sync specific stuff by using flags (default behaviour syncs all of 
 php bin/console.php app:sync-tmdb
 ```
 
-Synchronize tmdb (meta-)data for existing movies.
+Synchronize tmdb (meta-)data for existing movies. Without providing `--hours` flag, this will run the sync for all locally existing movies. 
 
 This sync includes:
 
@@ -70,6 +70,11 @@ This sync includes:
 - movie cast
 - movie crew
 - movie production company
+
+**Flags:**
+
+- `--hours`
+  Only movies which were not updated for at least this amount of hours will be synced again
 
 ## Useful links:
 

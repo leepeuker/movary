@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncTmdb extends Command
 {
-    private const OPTION_NAME_FORCE_SYNC = 'forceSync';
+    private const OPTION_NAME_FORCE_HOURS = 'hours';
 
     protected static $defaultName = 'app:sync-tmdb';
 
@@ -26,16 +26,17 @@ class SyncTmdb extends Command
     {
         $this
             ->setDescription('Sync trakt.tv movie history and rating with local database')
-            ->addOption(self::OPTION_NAME_FORCE_SYNC, 'f', InputOption::VALUE_NEGATABLE, 'Force the sync', false);
+            ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $forceSync = (bool)$input->getOption(self::OPTION_NAME_FORCE_SYNC);
+        $hoursOption = $input->getOption(self::OPTION_NAME_FORCE_HOURS);
+        $maxAgeInHours = $hoursOption !== null ? (int)$hoursOption : null;
 
         try {
-            $this->syncMovieDetails->execute($forceSync);
+            $this->syncMovieDetails->execute($maxAgeInHours);
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
 

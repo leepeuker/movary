@@ -13,8 +13,6 @@ use Psr\Log\LoggerInterface;
 
 class SyncMovieDetails
 {
-    private const SYNC_VALIDITY_TIME_IN_DAYS = 7;
-
     public function __construct(
         private readonly Tmdb\Api $api,
         private readonly Movie\Service\Select $movieSelectService,
@@ -29,13 +27,13 @@ class SyncMovieDetails
     ) {
     }
 
-    public function execute(bool $forceSync = false) : void
+    public function execute(?int $maxAgeInHours) : void
     {
         $movies = $this->movieSelectService->fetchAll();
 
         foreach ($movies as $movie) {
             $updatedAtTmdb = $movie->getUpdatedAtTmdb();
-            if ($forceSync === false && $updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb) === false) {
+            if ($maxAgeInHours !== null && $updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb, $maxAgeInHours) === false) {
                 continue;
             }
 
@@ -116,8 +114,8 @@ class SyncMovieDetails
         $this->movieUpdateService->updateProductionCompanies($movie->getId(), $this->getProductionCompanies($movieDetails));
     }
 
-    private function syncExpired(DateTime $updatedAtTmdb) : bool
+    private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays = null) : bool
     {
-        return DateTime::create()->diff($updatedAtTmdb)->getDays() > self::SYNC_VALIDITY_TIME_IN_DAYS;
+        return DateTime::create()->diff($updatedAtTmdb)->getHours() > $maxAgeInDays;
     }
 }

@@ -26,4 +26,9 @@ class DateInterval
 
         return $days;
     }
+
+    public function getHours() : int
+    {
+        return $this->dateInterval->h;
+    }
 }
