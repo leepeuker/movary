@@ -19,7 +19,7 @@ class SyncWatchedMovies
     ) {
     }
 
-    public function execute(bool $forceSync = false) : void
+    public function execute(bool $overwriteExistingData = false) : void
     {
         $watchedMovies = $this->traktApi->getUserMoviesWatched();
 
@@ -38,11 +38,11 @@ class SyncWatchedMovies
                 // echo 'Added movie: ' . $movie->getTitle() . PHP_EOL;
             }
 
-            // if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
-            //     continue;
-            // }
+            if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
+                continue;
+            }
 
-            $this->syncMovieHistory($movie, $forceSync);
+            $this->syncMovieHistory($movie, $overwriteExistingData);
 
             $this->traktApiCacheUserMovieWatchedService->setOne($movie->getTraktId(), $watchedMovie->getLastUpdated());
         }
@@ -69,9 +69,9 @@ class SyncWatchedMovies
         }
     }
 
-    private function syncMovieHistory(Application\Movie\Entity $movie, bool $forceSync) : void
+    private function syncMovieHistory(Application\Movie\Entity $movie, bool $overwriteExistingData) : void
     {
-        if ($forceSync === true) {
+        if ($overwriteExistingData === true) {
             $this->movieHistoryDeleteService->deleteByMovieId($movie->getId());
         }
 

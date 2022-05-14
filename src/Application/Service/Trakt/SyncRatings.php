@@ -15,14 +15,20 @@ class SyncRatings
     ) {
     }
 
-    public function execute() : void
+    public function execute(bool $overwriteExistingData = false) : void
     {
         $this->traktApiCacheUserMovieRatingService->set($this->traktApi->getUserMoviesRatings());
 
         foreach ($this->movieSelectService->fetchAll() as $movie) {
             $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($movie->getTraktId());
 
-            $this->movieUpdateService->updateRating10($movie->getId(), $rating);
+            if ($rating === null || $movie->getRating10() !== null) {
+                return;
+            }
+
+            if ($overwriteExistingData === true || $movie->getRating10() === null) {
+                $this->movieUpdateService->updateRating10($movie->getId(), $rating);
+            }
         }
     }
 }
