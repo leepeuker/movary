@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SyncTraktHistory extends Command
+class SyncTrakt extends Command
 {
     private const OPTION_NAME_HISTORY = 'history';
 
@@ -40,19 +40,20 @@ class SyncTraktHistory extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $overwriteExistingData = (bool)$input->getOption(self::OPTION_NAME_OVERWRITE);
+
         $syncRatings = (bool)$input->getOption(self::OPTION_NAME_RATINGS);
         $syncHistory = (bool)$input->getOption(self::OPTION_NAME_HISTORY);
 
         try {
             if ($syncRatings === false && $syncHistory === false) {
                 $this->syncWatchedMovies->execute($overwriteExistingData);
-                $this->syncWatchedMovies->execute($overwriteExistingData);
+                $this->syncRatings->execute($overwriteExistingData);
             } else {
-                if ($syncRatings === true) {
-                    $this->syncRatings->execute($overwriteExistingData);
-                }
                 if ($syncHistory === true) {
                     $this->syncWatchedMovies->execute($overwriteExistingData);
+                }
+                if ($syncRatings === true) {
+                    $this->syncRatings->execute($overwriteExistingData);
                 }
             }
         } catch (\Throwable $t) {
