@@ -13,7 +13,6 @@ class Repository
 
     public function createOrUpdatePlaysForDate(int $movieId, Date $watchedAt, int $plays) : void
     {
-        // TODO replace into
         $this->dbConnection->executeStatement(
             'REPLACE INTO movie_history (movie_id, watched_at, plays) VALUES (?, ?, ?)',
             [
