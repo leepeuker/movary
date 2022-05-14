@@ -103,6 +103,11 @@ class Select
         return $this->repository->fetchMoviesOrderedByMostWatchedDesc();
     }
 
+    public function fetchPlaysForMovieIdOnDate(int $movieId, Date $watchedAt) : int
+    {
+        return $this->repository->fetchPlaysForMovieIdAtDate($movieId, $watchedAt);
+    }
+
     public function fetchTotalHoursWatched() : int
     {
         $minutes = $this->repository->fetchTotalMinutesWatched();

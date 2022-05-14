@@ -13,10 +13,10 @@ class Sync
     ) {
     }
 
-    public function syncAll() : void
+    public function syncAll(bool $overwriteExistingData = false) : void
     {
-        $this->syncRatings->execute();
-        $this->syncWatchedMovies->execute();
+        $this->syncWatchedMovies->execute($overwriteExistingData);
+        $this->syncRatings->execute($overwriteExistingData);
 
         $this->scanLogRepository->insertLogForTraktSync();
     }

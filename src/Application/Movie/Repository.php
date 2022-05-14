@@ -198,6 +198,20 @@ class Repository
         );
     }
 
+    public function fetchPlaysForMovieIdAtDate(int $movieId, Date $watchedAt) : int
+    {
+        $result = $this->dbConnection->fetchOne(
+            'SELECT plays FROM movie_history WHERE movie_id = ? AND watched_at = ?',
+            [$movieId, $watchedAt]
+        );
+
+        if ($result === false) {
+            return 0;
+        }
+
+        return $result;
+    }
+
     public function fetchTotalMinutesWatched() : int
     {
         return (int)$this->dbConnection->fetchFirstColumn(

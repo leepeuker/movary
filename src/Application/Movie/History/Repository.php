@@ -11,13 +11,14 @@ class Repository
     {
     }
 
-    public function create(int $movieId, Date $watchedAt) : void
+    public function createOrUpdatePlaysForDate(int $movieId, Date $watchedAt, int $plays) : void
     {
-        $this->dbConnection->insert(
-            'movie_history',
+        $this->dbConnection->executeStatement(
+            'REPLACE INTO movie_history (movie_id, watched_at, plays) VALUES (?, ?, ?)',
             [
-                'movie_id' => $movieId,
-                'watched_at' => (string)$watchedAt,
+                $movieId,
+                (string)$watchedAt,
+                (string)$plays,
             ]
         );
     }

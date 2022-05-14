@@ -35,7 +35,7 @@ exec_php_cmd:
 app_sync_all: app_sync_trakt app_sync_tmdb
 
 app_sync_trakt:
-	make exec_php_cmd CMD="php bin/console.php app:sync-trakt"
+	make exec_php_cmd CMD="php bin/console.php app:sync-trakt --overwrite"
 
 app_sync_tmdb:
 	make exec_php_cmd CMD="php bin/console.php app:sync-tmdb"
