@@ -36,19 +36,17 @@
                     {% set lastDate = historyEntry.watched_at %}
                 {% endfor %}
             </div>
+
             <ul class="pagination justify-content-center">
-                {% if paginationElements.next < paginationElements.maxPage %}
+                {% if paginationElements.previous is null %}
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&laquo;</span></p></li>
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
+                {% else %}
                     <li class="page-item">
                         <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p=1">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                {% else %}
-                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&laquo;</span></p></li>
-                {% endif %}
-                {% if paginationElements.previous is null %}
-                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
-                {% else %}
                     <li class="page-item">
                         <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
                             <span aria-hidden="true">&lsaquo;</span>
@@ -60,23 +58,21 @@
                 </li>
                 {% if paginationElements.next is null %}
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&rsaquo;</span></p></li>
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
                         <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
-                {% endif %}
-                {% if paginationElements.next >= paginationElements.maxPage %}
                     <li class="page-item">
                         <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
-                {% else %}
-                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% endif %}
             </ul>
+
         </div>
     </main>
 {% endblock %}
