@@ -22,8 +22,8 @@ class SyncRatings
         foreach ($this->movieSelectService->fetchAll() as $movie) {
             $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($movie->getTraktId());
 
-            if ($rating === null || $movie->getRating10() !== null) {
-                return;
+            if ($rating === null) {
+                continue;
             }
 
             if ($overwriteExistingData === true || $movie->getRating10() === null) {

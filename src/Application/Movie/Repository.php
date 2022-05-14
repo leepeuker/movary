@@ -209,10 +209,7 @@ class Repository
             return 0;
         }
 
-        return $this->dbConnection->fetchOne(
-            'SELECT plays FROM movie_history WHERE movie_id = ? AND watched_at = ?',
-            [$movieId, $watchedAt]
-        );
+        return $result;
     }
 
     public function fetchTotalMinutesWatched() : int

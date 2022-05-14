@@ -38,9 +38,9 @@ class SyncWatchedMovies
                 // echo 'Added movie: ' . $movie->getTitle() . PHP_EOL;
             }
 
-            if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
-                continue;
-            }
+            // if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
+            //     continue;
+            // }
 
             $this->syncMovieHistory($movie, $overwriteExistingData);
 
@@ -78,7 +78,7 @@ class SyncWatchedMovies
         $playsPerDates = [];
 
         foreach ($this->traktApi->getUserMovieHistoryByMovieId($movie->getTraktId()) as $movieHistoryEntry) {
-            if (isset($playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())]) === false) {
+            if (empty($playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())]) === true) {
                 $playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())] = 1;
                 continue;
             }
