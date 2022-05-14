@@ -27,11 +27,17 @@ class SyncMovieDetails
     ) {
     }
 
-    public function execute(?int $maxAgeInHours) : void
+    public function execute(?int $maxAgeInHours, ?int $movieCountSyncThreshold) : void
     {
         $movies = $this->movieSelectService->fetchAll();
 
+        $movieCountSynced = 0;
+
         foreach ($movies as $movie) {
+            if ($movieCountSyncThreshold !== null && $movieCountSynced >= $movieCountSyncThreshold) {
+                continue;
+            }
+
             $updatedAtTmdb = $movie->getUpdatedAtTmdb();
             if ($maxAgeInHours !== null && $updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb, $maxAgeInHours) === false) {
                 continue;
@@ -39,6 +45,7 @@ class SyncMovieDetails
 
             $this->dbConnection->beginTransaction();
 
+            echo 1;
             try {
                 $this->updateDetails($movie);
                 $this->updateCredits($movie);
@@ -47,6 +54,8 @@ class SyncMovieDetails
                 $this->dbConnection->rollBack();
                 $this->logger->error('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
+
+            $movieCountSynced++;
         }
 
         $this->scanLogRepository->insertLogForTmdbSync();

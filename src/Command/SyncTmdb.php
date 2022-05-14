@@ -13,6 +13,8 @@ class SyncTmdb extends Command
 {
     private const OPTION_NAME_FORCE_HOURS = 'hours';
 
+    private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
+
     protected static $defaultName = 'app:sync-tmdb';
 
     public function __construct(
@@ -26,6 +28,7 @@ class SyncTmdb extends Command
     {
         $this
             ->setDescription('Sync trakt.tv movie history and rating with local database')
+            ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Max number of movies to sync.')
             ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.');
     }
 
@@ -35,8 +38,11 @@ class SyncTmdb extends Command
         $hoursOption = $input->getOption(self::OPTION_NAME_FORCE_HOURS);
         $maxAgeInHours = $hoursOption !== null ? (int)$hoursOption : null;
 
+        $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
+        $movieCountSyncThreshold = $thresholdOption !== null ? (int)$thresholdOption : null;
+
         try {
-            $this->syncMovieDetails->execute($maxAgeInHours);
+            $this->syncMovieDetails->execute($maxAgeInHours, $movieCountSyncThreshold);
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
 

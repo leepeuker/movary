@@ -75,6 +75,8 @@ This sync includes:
 
 - `--hours`
   Only movies which were not updated for at least this amount of hours will be synced again
+- `--threshold`
+  Maximum number of movies to sync for this run
 
 ## Useful links:
 
