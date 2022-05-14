@@ -13,10 +13,10 @@ class Sync
     ) {
     }
 
-    public function syncAll() : void
+    public function syncAll(bool $forceSync = false) : void
     {
         $this->syncRatings->execute();
-        $this->syncWatchedMovies->execute();
+        $this->syncWatchedMovies->execute($forceSync);
 
         $this->scanLogRepository->insertLogForTraktSync();
     }
