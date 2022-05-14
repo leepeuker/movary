@@ -45,7 +45,6 @@ class SyncMovieDetails
 
             $this->dbConnection->beginTransaction();
 
-            echo 1;
             try {
                 $this->updateDetails($movie);
                 $this->updateCredits($movie);
