@@ -47,7 +47,7 @@
                 {% for lastPlay in lastPlays %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100  position-relative">
-                            <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="...">
+                            <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip" data-bs-placement="top" title="{{ lastPlay.title }}">
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.8rem;font-weight: bold">{{ lastPlay.watched_at|date("d.m.y") }}</small>
                             </div>
