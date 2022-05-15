@@ -66,9 +66,9 @@ class Select
         return $this->repository->fetchLastPlays();
     }
 
-    public function fetchMostWatchedActors() : array
+    public function fetchMostWatchedActors(?int $limit = null, ?Gender $gender = null) : array
     {
-        $mostWatchedActors = $this->repository->fetchMostWatchedActors();
+        $mostWatchedActors = $this->repository->fetchMostWatchedActors($limit, $gender);
 
         foreach ($mostWatchedActors as $index => $mostWatchedActor) {
             $mostWatchedActors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedActor['gender'])->getAbbreviation();

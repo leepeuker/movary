@@ -26,9 +26,19 @@ class Gender
         self::ensureValidGender($gender);
     }
 
+    public static function createFemale() : self
+    {
+        return new self(self::GENDER_FEMALE);
+    }
+
     public static function createFromInt(int $gender) : self
     {
         return new self($gender);
+    }
+
+    public static function createMale() : self
+    {
+        return new self(self::GENDER_MALE);
     }
 
     private static function ensureValidGender(int $gender) : void
@@ -36,6 +46,11 @@ class Gender
         if (in_array($gender, self::VALID_GENDERS, true) === false) {
             throw new \RuntimeException('Invalid gender :' . $gender);
         }
+    }
+
+    public function __toString() : string
+    {
+        return (string)$this->gender;
     }
 
     public function asInt() : int

@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie\History\Service\Select;
+use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
@@ -28,6 +29,8 @@ class DashboardController
                 'averageRuntime' => $this->movieHistorySelectService->fetchAverageRuntime(),
                 'firstDiaryEntry' => $this->movieHistorySelectService->fetchFirstHistoryWatchDate(),
                 'lastPlays' => $this->movieHistorySelectService->fetchLastPlays(),
+                'topActors' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createMale()),
+                'topActresses' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createFemale()),
             ]),
         );
     }

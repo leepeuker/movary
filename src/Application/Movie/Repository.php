@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\Gender;
 use RuntimeException;
 
 class Repository
@@ -143,17 +144,31 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedActors() : array
+    public function fetchMostWatchedActors(?int $limit = null, ?Gender $gender = null) : array
     {
+        $limitQuery = '';
+        if ($limit !== null) {
+            $limitQuery = 'LIMIT ' . $limit;
+        }
+        $genderQuery = '';
+        if ($gender !== null) {
+            $genderQuery = 'AND p.gender = ?';
+        }
+
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT p.name, COUNT(*) as count, p.gender
+            <<<SQL
+            SELECT p.name, COUNT(*) as count, p.gender, p.poster_path
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee"
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee" {$genderQuery}
             GROUP BY mc.person_id
             ORDER BY COUNT(*) DESC, p.name
-            LIMIT 1000'
+            {$limitQuery}
+            SQL,
+            [
+                $gender,
+            ]
         );
     }
 
