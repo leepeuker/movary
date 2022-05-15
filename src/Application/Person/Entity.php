@@ -12,6 +12,7 @@ class Entity
         private readonly Gender $gender,
         private readonly ?string $knownForDepartment,
         private readonly int $tmdbId,
+        private readonly ?string $posterPath
     ) {
     }
 
@@ -23,6 +24,7 @@ class Entity
             Gender::createFromInt((int)$data['gender']),
             $data['known_for_department'],
             $data['tmdb_id'],
+            $data['poster_path'],
         );
     }
 
@@ -44,6 +46,11 @@ class Entity
     public function getName() : string
     {
         return $this->name;
+    }
+
+    public function getPosterPath() : ?string
+    {
+        return $this->posterPath;
     }
 
     public function getTmdbId() : int

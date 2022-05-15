@@ -14,7 +14,8 @@ class Person
         private readonly float $popularity,
         private readonly ?string $knownForDepartment,
         private readonly ?string $profilePath,
-        private readonly string $creditId
+        private readonly string $creditId,
+        private readonly ?string $posterPath
     ) {
     }
 
@@ -29,6 +30,7 @@ class Person
             empty($data['known_for_department']) === true ? null : $data['known_for_department'],
             $data['profile_path'],
             $data['credit_id'],
+            $data['profile_path'],
         );
     }
 
@@ -60,6 +62,11 @@ class Person
     public function getPopularity() : float
     {
         return $this->popularity;
+    }
+
+    public function getPosterPath() : ?string
+    {
+        return $this->posterPath;
     }
 
     public function getProfilePath() : ?string

@@ -11,6 +11,7 @@ use Movary\Application\Movie\Entity;
 use Movary\Application\Movie\Repository;
 use Movary\Application\Person;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\Gender;
 
 class Update
 {
@@ -22,6 +23,7 @@ class Update
         private readonly Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService,
         private readonly Person\Service\Select $personSelectService,
         private readonly Person\Service\Create $personCreateService,
+        private readonly Person\Service\Update $personUpdateService,
         private readonly Movie\Cast\Service\Create $movieCastCreateService,
         private readonly Movie\Cast\Service\Delete $movieCasteDeleteService,
         private readonly Movie\Crew\Service\Create $movieCrewCreateService,
@@ -34,16 +36,13 @@ class Update
         $this->movieCasteDeleteService->deleteByMovieId($movieId);
 
         foreach ($tmdbCast as $position => $castMember) {
-            $person = $this->personSelectService->findByTmdbId($castMember->getPerson()->getTmdbId());
-
-            if ($person === null) {
-                $person = $this->personCreateService->create(
-                    $castMember->getPerson()->getName(),
-                    $castMember->getPerson()->getGender(),
-                    $castMember->getPerson()->getKnownForDepartment(),
-                    $castMember->getPerson()->getTmdbId(),
-                );
-            }
+            $person = $this->createOrUpdatePersonByTmdbId(
+                $castMember->getPerson()->getTmdbId(),
+                $castMember->getPerson()->getName(),
+                $castMember->getPerson()->getGender(),
+                $castMember->getPerson()->getKnownForDepartment(),
+                $castMember->getPerson()->getPosterPath(),
+            );
 
             $this->movieCastCreateService->create($movieId, $person->getId(), $castMember->getCharacter(), $position);
         }
@@ -54,16 +53,13 @@ class Update
         $this->movieCrewDeleteService->deleteByMovieId($movieId);
 
         foreach ($tmdbCrew as $position => $crewMember) {
-            $person = $this->personSelectService->findByTmdbId($crewMember->getPerson()->getTmdbId());
-
-            if ($person === null) {
-                $person = $this->personCreateService->create(
-                    $crewMember->getPerson()->getName(),
-                    $crewMember->getPerson()->getGender(),
-                    $crewMember->getPerson()->getKnownForDepartment(),
-                    $crewMember->getPerson()->getTmdbId(),
-                );
-            }
+            $person = $this->createOrUpdatePersonByTmdbId(
+                $crewMember->getPerson()->getTmdbId(),
+                $crewMember->getPerson()->getName(),
+                $crewMember->getPerson()->getGender(),
+                $crewMember->getPerson()->getKnownForDepartment(),
+                $crewMember->getPerson()->getPosterPath(),
+            );
 
             $this->movieCrewCreateService->create($movieId, $person->getId(), $crewMember->getJob(), $crewMember->getDepartment(), $position);
         }
@@ -114,5 +110,28 @@ class Update
     public function updateRating5(int $id, ?int $rating5) : void
     {
         $this->repository->updateRating5($id, $rating5);
+    }
+
+    private function createOrUpdatePersonByTmdbId(int $tmdbId, string $name, Gender $gender, ?string $knownForDepartment, ?string $posterPath) : Person\Entity
+    {
+        $person = $this->personSelectService->findByTmdbId($tmdbId);
+
+        if ($person === null) {
+            $person = $this->personCreateService->create(
+                $name,
+                $gender,
+                $knownForDepartment,
+                $tmdbId,
+                $posterPath,
+            );
+        } elseif ($person->getName() !== $name ||
+                  $person->getGender() !== $gender ||
+                  $person->getKnownForDepartment() !== $knownForDepartment ||
+                  $person->getPosterPath() !== $posterPath
+        ) {
+            $this->personUpdateService->update($person->getId(), $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
+        }
+
+        return $person;
     }
 }
