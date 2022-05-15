@@ -5,7 +5,6 @@ namespace Movary\Command;
 use Movary\Application\Service\Trakt\SyncRatings;
 use Movary\Application\Service\Trakt\SyncWatchedMovies;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,7 +35,6 @@ class SyncTrakt extends Command
              ->addOption(self::OPTION_NAME_OVERWRITE, [], InputOption::VALUE_NONE, 'overwrite');
     }
 
-    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $overwriteExistingData = (bool)$input->getOption(self::OPTION_NAME_OVERWRITE);
@@ -46,14 +44,14 @@ class SyncTrakt extends Command
 
         try {
             if ($syncRatings === false && $syncHistory === false) {
-                $this->syncWatchedMovies->execute($overwriteExistingData);
-                $this->syncRatings->execute($overwriteExistingData);
+                $this->syncHistory($output, $overwriteExistingData);
+                $this->syncRatings($output, $overwriteExistingData);
             } else {
                 if ($syncHistory === true) {
-                    $this->syncWatchedMovies->execute($overwriteExistingData);
+                    $this->syncHistory($output, $overwriteExistingData);
                 }
                 if ($syncRatings === true) {
-                    $this->syncRatings->execute($overwriteExistingData);
+                    $this->syncRatings($output, $overwriteExistingData);
                 }
             }
         } catch (\Throwable $t) {
@@ -63,5 +61,23 @@ class SyncTrakt extends Command
         }
 
         return Command::SUCCESS;
+    }
+
+    private function syncHistory(OutputInterface $output, bool $overwriteExistingData) : void
+    {
+        $this->generateOutput($output, 'Syncing history...');
+
+        $this->syncWatchedMovies->execute($overwriteExistingData);
+
+        $this->generateOutput($output, 'Syncing history done.');
+    }
+
+    private function syncRatings(OutputInterface $output, bool $overwriteExistingData) : void
+    {
+        $this->generateOutput($output, 'Syncing ratings...');
+
+        $this->syncRatings->execute($overwriteExistingData);
+
+        $this->generateOutput($output, 'Syncing ratings ratings.');
     }
 }
