@@ -29,7 +29,7 @@ class DashboardController
                 'averageRuntime' => $this->movieHistorySelectService->fetchAverageRuntime(),
                 'firstDiaryEntry' => $this->movieHistorySelectService->fetchFirstHistoryWatchDate(),
                 'lastPlays' => $this->movieHistorySelectService->fetchLastPlays(),
-                'mostWatchedActor' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createMale()),
+                'mostWatchedActors' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createMale()),
                 'mostWatchedActresses' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createFemale()),
                 'mostWatchedDirectors' => $this->movieHistorySelectService->fetchMostWatchedDirectors(6),
             ]),
