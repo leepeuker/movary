@@ -62,16 +62,17 @@
 
             <hr style="margin-top: 1.1rem">
 
-            <h3 style="padding-bottom: 0.8rem">Top Actors</h3>
+            <h3 style="padding-bottom: 0.8rem">Most watched Actors</h3>
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                {% for topActor in topActors %}
+                {% for mostWatchedActor in mostWatchedActors %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100  position-relative">
-                            <img src="https://image.tmdb.org/t/p/w500{{ topActor.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip" data-bs-placement="top"
-                                 title="{{ topActor.name }}">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 title="{{ mostWatchedActor.name }}">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ topActor.count }}x</small>
+                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ mostWatchedActor.count }}x</small>
                             </div>
                         </div>
                     </div>
@@ -80,16 +81,35 @@
 
             <hr style="margin-top: 1.1rem">
 
-            <h3 style="padding-bottom: 0.8rem">Top Actresses</h3>
+            <h3 style="padding-bottom: 0.8rem">Most watched Actresses</h3>
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                {% for topActress in topActresses %}
+                {% for mostWatchedActress in mostWatchedActresses %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100  position-relative">
-                            <img src="https://image.tmdb.org/t/p/w500{{ topActress.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip" data-bs-placement="top"
-                                 title="{{ topActress.name }}">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActress.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 title="{{ mostWatchedActress.name }}">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ topActress.count }}x</small>
+                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ mostWatchedActress.count }}x</small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <hr style="margin-top: 1.1rem">
+
+            <h3 style="padding-bottom: 0.8rem">Most watched Directors</h3>
+
+            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+                {% for mostWatchedDirector in mostWatchedDirectors %}
+                    <div class="col" style="padding-bottom: 1rem;">
+                        <div class="card h-100  position-relative">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip" data-bs-placement="top"
+                                 title="{{ mostWatchedDirector.name }}">
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ mostWatchedDirector.count }}x</small>
                             </div>
                         </div>
                     </div>

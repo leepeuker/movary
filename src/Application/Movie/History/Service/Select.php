@@ -77,6 +77,17 @@ class Select
         return $mostWatchedActors;
     }
 
+    public function fetchMostWatchedDirectors(?int $limit = null) : array
+    {
+        $mostWatchedDirectors = $this->repository->fetchMostWatchedDirectors($limit);
+
+        foreach ($mostWatchedDirectors as $index => $mostWatchedDirector) {
+            $mostWatchedDirectors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedDirector['gender'])->getAbbreviation();
+        }
+
+        return $mostWatchedDirectors;
+    }
+
     public function fetchMostWatchedGenres() : array
     {
         return $this->repository->fetchMostWatchedGenres();

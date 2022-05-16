@@ -172,6 +172,27 @@ class Repository
         );
     }
 
+    public function fetchMostWatchedDirectors(?int $limit) : array
+    {
+        $limitQuery = '';
+        if ($limit !== null) {
+            $limitQuery = 'LIMIT ' . $limit;
+        }
+
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT p.name, COUNT(*) as count, p.gender, p.poster_path
+            FROM movie m
+            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
+            JOIN person p ON mc.person_id = p.id
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            GROUP BY mc.person_id
+            ORDER BY COUNT(*) DESC, p.name
+            {$limitQuery}
+            SQL
+        );
+    }
+
     public function fetchMostWatchedGenres() : array
     {
         return $this->dbConnection->fetchAllAssociative(
