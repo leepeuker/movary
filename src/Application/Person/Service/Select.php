@@ -15,4 +15,14 @@ class Select
     {
         return $this->repository->findByTmdbId($tmdbId);
     }
+
+    public function findWatchedMoviesActedBy(int $personId) : array
+    {
+        return $this->repository->findWatchedMoviesActedBy($personId);
+    }
+
+    public function findWatchedMoviesDirectedBy(int $personId) : array
+    {
+        return $this->repository->findWatchedMoviesDirectedBy($personId);
+    }
 }

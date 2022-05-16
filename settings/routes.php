@@ -71,4 +71,14 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/api/mostWatchedProductionCompanies',
         [\Movary\HttpController\MostWatchedProductionCompaniesController::class, 'fetchMostWatchedProductionCompanies']
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/api/person/{id:\d+}/director',
+        [\Movary\HttpController\PersonController::class, 'fetchWatchedMoviesDirectedBy']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/api/person/{id:\d+}/actor',
+        [\Movary\HttpController\PersonController::class, 'fetchWatchedMoviesActedBy']
+    );
 };

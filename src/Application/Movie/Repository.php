@@ -157,7 +157,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.name, COUNT(*) as count, p.gender, p.poster_path
+            SELECT p.id, p.name, COUNT(*) as count, p.gender, p.poster_path
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
@@ -181,7 +181,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.name, COUNT(*) as count, p.gender, p.poster_path
+            SELECT p.id, p.name, COUNT(*) as count, p.gender, p.poster_path
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
