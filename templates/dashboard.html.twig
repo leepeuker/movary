@@ -67,7 +67,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedActor in mostWatchedActors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}">
+                        <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}" style="cursor: pointer;">
                             <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
                             <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="...">
                             <div class="card-footer" style="padding: 0.1rem">
@@ -85,7 +85,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedActress in mostWatchedActresses %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActress.id }}">
+                        <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActress.id }}" style="cursor: pointer;">
                             <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
                             <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActress.poster_path }}" class="card-img-top" alt="...">
                             <div class="card-footer" style="padding: 0.1rem">
@@ -103,7 +103,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedDirector in mostWatchedDirectors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative" onclick="showDirectorModal(this.id)" id="{{ mostWatchedDirector.id }}">
+                        <div class="card h-100  position-relative" onclick="showDirectorModal(this.id)" id="{{ mostWatchedDirector.id }}" style="cursor: pointer;">
                             <input id="directorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
                             <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="...">
                             <div class="card-footer" style="padding: 0.1rem">
