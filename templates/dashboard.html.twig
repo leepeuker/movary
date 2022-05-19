@@ -46,15 +46,20 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for lastPlay in lastPlays %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative">
-                            <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip" data-bs-placement="top"
-                                 title="{{ lastPlay.title }}">
-                            <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.8rem;font-weight: bold">{{ lastPlay.watched_at|date("d.m.y") }}</small>
+                        <div class="card h-100 position-relative">
+                            <div class="card-header text-truncate" style="padding: 0.2rem">
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ lastPlay.title }}</small>
                             </div>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.9rem">
+                            <div class="position-relative">
+                                <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip" data-bs-placement="top"
+                                     title="{{ lastPlay.title }}" style="border-top-left-radius:0;border-top-right-radius:0;">
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.9rem">
                                 {{ lastPlay.rating_10 }}
                             </span>
+                            </div>
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 0.8rem">{{ lastPlay.watched_at|date("d.m.y") }}</small>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -68,10 +73,14 @@
                 {% for mostWatchedActor in mostWatchedActors %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}" style="cursor: pointer;">
+                            <div class="card-header text-truncate" style="padding: 0.2rem">
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
+                            </div>
                             <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="...">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="..."
+                                 style="border-top-left-radius:0;border-top-right-radius:0;">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ mostWatchedActor.count }}x</small>
+                                <small class="text-muted" style="font-size: 0.9rem">{{ mostWatchedActor.count }}x</small>
                             </div>
                         </div>
                     </div>
@@ -86,10 +95,14 @@
                 {% for mostWatchedActress in mostWatchedActresses %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActress.id }}" style="cursor: pointer;">
+                            <div class="card-header text-truncate" style="padding: 0.2rem">
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
+                            </div>
                             <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
-                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActress.poster_path }}" class="card-img-top" alt="...">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActress.poster_path }}" class="card-img-top" alt="..."
+                                 style="border-top-left-radius:0;border-top-right-radius:0;">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ mostWatchedActress.count }}x</small>
+                                <small class="text-muted" style="font-size: 0.9rem">{{ mostWatchedActress.count }}x</small>
                             </div>
                         </div>
                     </div>
@@ -104,10 +117,14 @@
                 {% for mostWatchedDirector in mostWatchedDirectors %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100  position-relative" onclick="showDirectorModal(this.id)" id="{{ mostWatchedDirector.id }}" style="cursor: pointer;">
+                            <div class="card-header text-truncate" style="padding: 0.2rem">
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
+                            </div>
                             <input id="directorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
-                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="...">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="..."
+                                 style="border-top-left-radius:0;border-top-right-radius:0;">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 1rem;font-weight: bold">{{ mostWatchedDirector.count }}x</small>
+                                <small class="text-muted" style="font-size: 0.9rem">{{ mostWatchedDirector.count }}x</small>
                             </div>
                         </div>
                     </div>
