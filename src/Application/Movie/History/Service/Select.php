@@ -120,6 +120,11 @@ class Select
         return $mostWatchedProductionCompanies;
     }
 
+    public function fetchMostWatchedReleaseYears() : array
+    {
+        return $this->repository->fetchMostWatchedReleaseYears();
+    }
+
     public function fetchMoviesOrderedByMostWatchedDesc() : array
     {
         return $this->repository->fetchMoviesOrderedByMostWatchedDesc();

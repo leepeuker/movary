@@ -238,6 +238,19 @@ class Repository
         );
     }
 
+    public function fetchMostWatchedReleaseYears() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT year(release_date) as name, COUNT(*) as count
+            FROM movie m
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            GROUP BY year(release_date)
+            ORDER BY COUNT(*) DESC, year(release_date)
+            SQL
+        );
+    }
+
     public function fetchMoviesByProductionCompany(int $id) : array
     {
         return $this->dbConnection->fetchAllAssociative(

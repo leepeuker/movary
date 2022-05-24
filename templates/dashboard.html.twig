@@ -145,7 +145,6 @@
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                     <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedGenre.name }}</small>
                                 </div>
-                                <input id="directorName_{{ mostWatchedGenre.id }}" value="{{ mostWatchedGenre.language }}" type="hidden">
                                 <div class="card-footer" style="padding: 0.1rem">
                                     <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedGenre.count }}x</small>
                                 </div>
@@ -167,7 +166,6 @@
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                     <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedLanguage.name }}</small>
                                 </div>
-                                <input id="directorName_{{ mostWatchedLanguage.id }}" value="{{ mostWatchedLanguage.language }}" type="hidden">
                                 <div class="card-footer" style="padding: 0.1rem">
                                     <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.count }}x</small>
                                 </div>
@@ -189,9 +187,29 @@
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                     <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedProductionCompany.name }}</small>
                                 </div>
-                                <input id="directorName_{{ mostWatchedProductionCompany.id }}" value="{{ mostWatchedProductionCompany.language }}" type="hidden">
                                 <div class="card-footer" style="padding: 0.1rem">
                                     <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedProductionCompany.count }}x</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <hr style="margin-top: 1.1rem">
+
+            <h3 style="padding-bottom: 0.8rem">Most watched Release Years</h3>
+
+            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+                {% for mostWatchedReleaseYear in mostWatchedReleaseYears %}
+                    {% if loop.index <= 12 %}
+                        <div class="col" style="padding-bottom: 1rem;">
+                            <div class="card h-100  position-relative">
+                                <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
+                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedReleaseYear.name }}</small>
+                                </div>
+                                <div class="card-footer" style="padding: 0.1rem">
+                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedReleaseYear.count }}x</small>
                                 </div>
                             </div>
                         </div>
