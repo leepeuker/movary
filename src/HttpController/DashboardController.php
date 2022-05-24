@@ -31,7 +31,8 @@ class DashboardController
                 'lastPlays' => $this->movieHistorySelectService->fetchLastPlays(),
                 'mostWatchedActors' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createMale()),
                 'mostWatchedActresses' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createFemale()),
-                'mostWatchedDirectors' => $this->movieHistorySelectService->fetchMostWatchedDirectors(6),
+                'mostWatchedLanguages' => $this->movieHistorySelectService->fetchMostWatchedLanguages(),
+                'mostWatchedGenres' => $this->movieHistorySelectService->fetchMostWatchedGenres(),
             ]),
         );
     }

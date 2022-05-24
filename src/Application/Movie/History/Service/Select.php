@@ -2,6 +2,7 @@
 
 namespace Movary\Application\Movie\History\Service;
 
+use Matriphe\ISO639\ISO639;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie\Entity;
 use Movary\Application\Movie\Repository;
@@ -10,11 +11,10 @@ use Movary\ValueObject\Gender;
 
 class Select
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
-    {
-        $this->repository = $repository;
+    public function __construct(
+        private readonly Repository $repository,
+        private readonly ISO639 $ISO639
+    ) {
     }
 
     public function fetchAverage10Rating() : float
@@ -91,6 +91,17 @@ class Select
     public function fetchMostWatchedGenres() : array
     {
         return $this->repository->fetchMostWatchedGenres();
+    }
+
+    public function fetchMostWatchedLanguages() : array
+    {
+        $mostWatchedLanguages = $this->repository->fetchMostWatchedLanguages();
+
+        foreach ($mostWatchedLanguages as $index => $mostWatchedLanguage) {
+            $mostWatchedLanguages[$index]['name'] = $this->ISO639->languageByCode1($mostWatchedLanguage['language']);
+        }
+
+        return $mostWatchedLanguages;
     }
 
     public function fetchMostWatchedProductionCompanies() : array

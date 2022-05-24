@@ -206,6 +206,17 @@ class Repository
         );
     }
 
+    public function fetchMostWatchedLanguages() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT DISTINCT original_language AS language, COUNT(*) AS count
+            FROM movie m
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            GROUP BY original_language
+            ORDER BY COUNT(*) DESC, original_language'
+        );
+    }
+
     public function fetchMostWatchedProductionCompany() : array
     {
         return $this->dbConnection->fetchAllAssociative(
