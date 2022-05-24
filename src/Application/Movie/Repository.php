@@ -217,16 +217,24 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedProductionCompany() : array
+    public function fetchMostWatchedProductionCompanies(?int $limit = null) : array
     {
+        $limitQuery = '';
+        if ($limit !== null) {
+            $limitQuery = 'LIMIT ' . $limit;
+        }
+
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT c.id, c.name, COUNT(*) as count, c.origin_country
+            <<<SQL
+            SELECT c.id, c.name, COUNT(*) as count, c.origin_country
             FROM movie m
                      JOIN movie_production_company mpc ON m.id = mpc.movie_id
                      JOIN company c ON mpc.company_id = c.id
             WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
             GROUP BY mpc.company_id
-            ORDER BY COUNT(*) DESC, c.name'
+            ORDER BY COUNT(*) DESC, c.name
+            {$limitQuery}
+            SQL
         );
     }
 

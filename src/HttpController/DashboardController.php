@@ -34,6 +34,7 @@ class DashboardController
                 'mostWatchedDirectors' => $this->movieHistorySelectService->fetchMostWatchedDirectors(6),
                 'mostWatchedLanguages' => $this->movieHistorySelectService->fetchMostWatchedLanguages(),
                 'mostWatchedGenres' => $this->movieHistorySelectService->fetchMostWatchedGenres(),
+                'mostWatchedProductionCompanies' => $this->movieHistorySelectService->fetchMostWatchedProductionCompanies(12),
             ]),
         );
     }

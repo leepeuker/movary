@@ -104,9 +104,9 @@ class Select
         return $mostWatchedLanguages;
     }
 
-    public function fetchMostWatchedProductionCompanies() : array
+    public function fetchMostWatchedProductionCompanies(?int $limit = null) : array
     {
-        $mostWatchedProductionCompanies = $this->repository->fetchMostWatchedProductionCompany();
+        $mostWatchedProductionCompanies = $this->repository->fetchMostWatchedProductionCompanies($limit);
 
         foreach ($mostWatchedProductionCompanies as $index => $productionCompany) {
             $moviesByProductionCompany = $this->repository->fetchMoviesByProductionCompany($productionCompany['id']);
