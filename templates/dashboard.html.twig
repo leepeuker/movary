@@ -161,7 +161,7 @@
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedLanguage in mostWatchedLanguages %}
-                    {% if loop.index <= 6 %}
+                    {% if loop.index <= 12 %}
                         <div class="col" style="padding-bottom: 1rem;">
                             <div class="card h-100  position-relative" onclick="showDirectorModal(this.id)" id="{{ mostWatchedLanguage.id }}" style="cursor: pointer;">
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
