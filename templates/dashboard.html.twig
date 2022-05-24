@@ -56,7 +56,7 @@
 
                             </div>
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.8rem;font-weight: bold">{{ lastPlay.watched_at|date("d.m.y") }}</small>
+                                <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date("d.m.y") }}</small>
                             </div>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.9rem">
                                 {{ lastPlay.rating_10 }}
@@ -81,7 +81,7 @@
                             <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="..."
                                  style="border-top-left-radius:0;border-top-right-radius:0;">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedActor.count }}x</small>
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.count }}x</small>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                             <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActress.poster_path }}" class="card-img-top" alt="..."
                                  style="border-top-left-radius:0;border-top-right-radius:0;">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedActress.count }}x</small>
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.count }}x</small>
                             </div>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
                             <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="..."
                                  style="border-top-left-radius:0;border-top-right-radius:0;">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedDirector.count }}x</small>
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.count }}x</small>
                             </div>
                         </div>
                     </div>
@@ -143,10 +143,10 @@
                         <div class="col" style="padding-bottom: 1rem;">
                             <div class="card h-100  position-relative">
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedGenre.name }}</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedGenre.name }}</small>
                                 </div>
                                 <div class="card-footer" style="padding: 0.1rem">
-                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedGenre.count }}x</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedGenre.count }}x</small>
                                 </div>
                             </div>
                         </div>
@@ -164,10 +164,10 @@
                         <div class="col" style="padding-bottom: 1rem;">
                             <div class="card h-100  position-relative">
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedLanguage.name }}</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.name }}</small>
                                 </div>
                                 <div class="card-footer" style="padding: 0.1rem">
-                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.count }}x</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedLanguage.count }}x</small>
                                 </div>
                             </div>
                         </div>
@@ -185,10 +185,10 @@
                         <div class="col" style="padding-bottom: 1rem;">
                             <div class="card h-100  position-relative">
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedProductionCompany.name }}</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedProductionCompany.name }}</small>
                                 </div>
                                 <div class="card-footer" style="padding: 0.1rem">
-                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedProductionCompany.count }}x</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedProductionCompany.count }}x</small>
                                 </div>
                             </div>
                         </div>
@@ -206,10 +206,10 @@
                         <div class="col" style="padding-bottom: 1rem;">
                             <div class="card h-100  position-relative">
                                 <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedReleaseYear.name }}</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold;">{{ mostWatchedReleaseYear.name }}</small>
                                 </div>
                                 <div class="card-footer" style="padding: 0.1rem">
-                                    <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedReleaseYear.count }}x</small>
+                                    <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedReleaseYear.count }}x</small>
                                 </div>
                             </div>
                         </div>
