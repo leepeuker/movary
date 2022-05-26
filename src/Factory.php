@@ -36,13 +36,13 @@ class Factory
     {
         return DBAL\DriverManager::getConnection(
             [
+                'charset' => $config->getAsString('DATABASE_CHARSET'),
                 'dbname' => $config->getAsString('DATABASE_NAME'),
                 'port' => $config->getAsInt('DATABASE_PORT'),
                 'user' => $config->getAsString('DATABASE_USER'),
                 'password' => $config->getAsString('DATABASE_PASSWORD'),
                 'host' => $config->getAsString('DATABASE_HOST'),
                 'driver' => $config->getAsString('DATABASE_DRIVER'),
-                'charset' => $config->getAsString('DATABASE_CHARSET'),
             ]
         );
     }

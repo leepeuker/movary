@@ -193,11 +193,12 @@ class Repository
         return (int)$count;
     }
 
-    public function fetchMostWatchedDirectors(?int $limit) : array
+    public function fetchMostWatchedDirectors(int $page = 1, ?int $limit = null) : array
     {
         $limitQuery = '';
         if ($limit !== null) {
-            $limitQuery = 'LIMIT ' . $limit;
+            $offset = ($limit * $page) - $limit;
+            $limitQuery = "LIMIT $offset, $limit";
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -212,6 +213,25 @@ class Repository
             {$limitQuery}
             SQL
         );
+    }
+
+    public function fetchMostWatchedDirectorsCount() : int
+    {
+        $count = $this->dbConnection->fetchOne(
+            <<<SQL
+            SELECT COUNT(DISTINCT p.id)
+            FROM movie m
+            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
+            JOIN person p ON mc.person_id = p.id
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            SQL,
+        );
+
+        if ($count === false) {
+            throw new \RuntimeException('Could not execute query.');
+        }
+
+        return (int)$count;
     }
 
     public function fetchMostWatchedGenres() : array

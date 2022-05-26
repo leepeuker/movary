@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Most Watched Actors
+    Most Watched Directors
 {% endblock %}
 
 {% block stylesheets %}
@@ -21,16 +21,16 @@
                 </div>
             </form>
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                {% for mostWatchedActor in mostWatchedActors %}
+                {% for mostWatchedDirector in mostWatchedDirectors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}" style="cursor: pointer;">
+                        <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedDirector.id }}" style="cursor: pointer;">
                             <div class="card-header text-truncate" style="padding: 0.2rem">
-                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
+                                <small class="text-muted" style="font-siz1e: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                             </div>
-                            <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="...">
+                            <input id="actorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="...">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.8rem">{{ mostWatchedActor.count }}</small>
+                                <small class="text-muted" style="font-size: 0.8rem">{{ mostWatchedDirector.count }}</small>
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
+                        <a class="page-link" href="/mostWatchedDirectors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
                             <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
@@ -61,12 +61,12 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
+                        <a class="page-link" href="/mostWatchedDirectors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
+                        <a class="page-link" href="/mostWatchedDirectors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

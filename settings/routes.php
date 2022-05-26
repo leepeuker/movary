@@ -52,6 +52,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/mostWatchedActors',
         [\Movary\HttpController\MostWatchedActorsController::class, 'renderPage']
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/mostWatchedDirectors',
+        [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage']
+    );
 
     ### Api
     $routeCollector->addRoute(
