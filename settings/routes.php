@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 return static function(FastRoute\RouteCollector $routeCollector) {
+    ### Frontend
     $routeCollector->addRoute(
         'GET',
         '/',
@@ -46,6 +47,13 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/logout',
         [\Movary\HttpController\AuthenticationController::class, 'logout']
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/mostWatchedActors',
+        [\Movary\HttpController\MostWatchedActorsController::class, 'renderPage']
+    );
+
+    ### Api
     $routeCollector->addRoute(
         'GET',
         '/api/history',

@@ -38,7 +38,7 @@ class HistoryController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('history.html.twig', [
+            $this->twig->render('page/history.html.twig', [
                 'historyEntries' => $historyPaginated,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $searchTerm,

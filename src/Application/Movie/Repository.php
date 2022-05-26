@@ -144,15 +144,19 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedActors(?int $limit = null, ?Gender $gender = null) : array
+    public function fetchMostWatchedActors(int $page = 1, ?int $limit = null, ?Gender $gender = null) : array
     {
+        $payload = [];
+
         $limitQuery = '';
         if ($limit !== null) {
-            $limitQuery = 'LIMIT ' . $limit;
+            $offset = ($limit * $page) - $limit;
+            $limitQuery = "LIMIT $offset, $limit";
         }
         $genderQuery = '';
         if ($gender !== null) {
             $genderQuery = 'AND p.gender = ?';
+            $payload[] = $gender;
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -166,10 +170,27 @@ class Repository
             ORDER BY COUNT(*) DESC, p.name
             {$limitQuery}
             SQL,
-            [
-                $gender,
-            ]
+            $payload
         );
+    }
+
+    public function fetchMostWatchedActorsCount() : int
+    {
+        $count = $this->dbConnection->fetchOne(
+            <<<SQL
+            SELECT COUNT(DISTINCT p.id)
+            FROM movie m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            JOIN person p ON mc.person_id = p.id
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee"
+            SQL,
+        );
+
+        if ($count === false) {
+            throw new \RuntimeException('Could not execute query.');
+        }
+
+        return (int)$count;
     }
 
     public function fetchMostWatchedDirectors(?int $limit) : array

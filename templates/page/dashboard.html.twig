@@ -11,7 +11,7 @@
 
 {% block body %}
     <main role="main" class="container">
-        {{ include('navbar.html.twig') }}
+        {{ include('component/navbar.html.twig') }}
         <div style="text-align: center;padding-top: 1rem">
             <h2 style="padding-bottom: 0.5rem">Overview</h2>
             <div class="row justify-content-md-center">
@@ -68,7 +68,7 @@
 
             <hr style="margin-top: 1.1rem">
 
-            <h3 style="padding-bottom: 0.8rem">Most watched Actors</h3>
+            <h3 style="padding-bottom: 0.8rem"><a href="/mostWatchedActors" style="color: black">Most watched Actors</a></h3>
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedActor in mostWatchedActors %}
@@ -90,7 +90,7 @@
 
             <hr style="margin-top: 1.1rem">
 
-            <h3 style="padding-bottom: 0.8rem">Most watched Actresses</h3>
+            <h3 style="padding-bottom: 0.8rem"><a href="/mostWatchedActors" style="color: black">Most watched Actresses</a></h3>
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedActress in mostWatchedActresses %}

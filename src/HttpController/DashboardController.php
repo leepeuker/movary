@@ -20,7 +20,7 @@ class DashboardController
     {
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('dashboard.html.twig', [
+            $this->twig->render('page/dashboard.html.twig', [
                 'totalPlayCount' => $this->movieHistorySelectService->fetchHistoryCount(),
                 'uniqueMoviesCount' => $this->movieHistorySelectService->fetchUniqueMovieInHistoryCount(),
                 'totalHoursWatched' => $this->movieHistorySelectService->fetchTotalHoursWatched(),
@@ -29,8 +29,8 @@ class DashboardController
                 'averageRuntime' => $this->movieHistorySelectService->fetchAverageRuntime(),
                 'firstDiaryEntry' => $this->movieHistorySelectService->fetchFirstHistoryWatchDate(),
                 'lastPlays' => $this->movieHistorySelectService->fetchLastPlays(),
-                'mostWatchedActors' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createMale()),
-                'mostWatchedActresses' => $this->movieHistorySelectService->fetchMostWatchedActors(6, Gender::createFemale()),
+                'mostWatchedActors' => $this->movieHistorySelectService->fetchMostWatchedActors(1, 6, Gender::createMale()),
+                'mostWatchedActresses' => $this->movieHistorySelectService->fetchMostWatchedActors(1, 6, Gender::createFemale()),
                 'mostWatchedDirectors' => $this->movieHistorySelectService->fetchMostWatchedDirectors(6),
                 'mostWatchedLanguages' => $this->movieHistorySelectService->fetchMostWatchedLanguages(),
                 'mostWatchedGenres' => $this->movieHistorySelectService->fetchMostWatchedGenres(),

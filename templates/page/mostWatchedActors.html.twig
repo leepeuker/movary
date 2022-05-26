@@ -11,7 +11,7 @@
 
 {% block body %}
     <main role="main" class="container">
-        {{ include('navbar.html.twig') }}
+        {{ include('component/navbar.html.twig') }}
 
         <div style="text-align: center;padding-top: 1rem">
             <form action="/history" method="GET">
@@ -21,19 +21,19 @@
                 </div>
             </form>
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                {% for historyEntry in historyEntries %}
+                {% for mostWatchedActor in mostWatchedActors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative">
-                            <img src="https://image.tmdb.org/t/p/w500{{ historyEntry.poster_path }}" class="card-img-top" alt="...">
-                            <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date("d.m.Y") }}</small>
+                        <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}" style="cursor: pointer;">
+                            <div class="card-header text-truncate" style="padding: 0.2rem">
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                             </div>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.9rem">
-                                {{ historyEntry.rating_10 }}
-                            </span>
+                            <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
+                            <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="...">
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 0.8rem">{{ mostWatchedActor.count }}</small>
+                            </div>
                         </div>
                     </div>
-                    {% set lastDate = historyEntry.watched_at %}
                 {% endfor %}
             </div>
 
@@ -48,7 +48,7 @@
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
+                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
                             <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
@@ -61,12 +61,12 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
+                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
+                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -75,4 +75,20 @@
 
         </div>
     </main>
+
+    <div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="personModalName">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Watched movies: </h6>
+                    <ul id="personModalMovies">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

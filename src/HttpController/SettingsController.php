@@ -25,7 +25,7 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('settings.html.twig', [
+            $this->twig->render('page/settings.html.twig', [
                 'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync(),
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync(),
                 'lastSyncLetterboxd' => $this->syncLogRepository->findLastLetterboxdSync(),

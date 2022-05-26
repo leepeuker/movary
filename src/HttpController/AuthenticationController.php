@@ -70,7 +70,7 @@ class AuthenticationController
             );
         }
 
-        $renderedTemplate = $this->twig->render('login.html.twig', ['failedLogin' => empty($_SESSION['failedLogin']) === false]);
+        $renderedTemplate = $this->twig->render('page/login.html.twig', ['failedLogin' => empty($_SESSION['failedLogin']) === false]);
 
         unset($_SESSION['failedLogin']);
 
