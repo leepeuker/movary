@@ -107,19 +107,13 @@ class Repository
 
     public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm) : array
     {
+        $payload = [];
         $offset = ($limit * $page) - $limit;
 
+        $whereQuery = '';
         if ($searchTerm !== null) {
-            return $this->dbConnection->fetchAllAssociative(
-                <<<SQL
-                SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
-                FROM movie_history mh
-                JOIN movie m on mh.movie_id = m.id
-                WHERE m.title LIKE "%$searchTerm%"
-                ORDER BY watched_at DESC
-                LIMIT $offset, $limit
-                SQL
-            );
+            $payload[] = "%$searchTerm%";
+            $whereQuery = 'WHERE m.title LIKE ?';
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -127,9 +121,11 @@ class Repository
             SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
+            $whereQuery
             ORDER BY watched_at DESC
             LIMIT $offset, $limit
-            SQL
+            SQL,
+            $payload
         );
     }
 
@@ -144,7 +140,7 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedActors(int $page = 1, ?int $limit = null, ?Gender $gender = null) : array
+    public function fetchMostWatchedActors(int $page = 1, ?int $limit = null, ?Gender $gender = null, ?string $searchTerm = null) : array
     {
         $payload = [];
 
@@ -158,6 +154,11 @@ class Repository
             $genderQuery = 'AND p.gender = ?';
             $payload[] = $gender;
         }
+        $searchTermQuery = '';
+        if ($searchTerm !== null) {
+            $searchTermQuery = 'AND p.name LIKE ?';
+            $payload[] = "%$searchTerm%";
+        }
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
@@ -165,7 +166,7 @@ class Repository
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee" {$genderQuery}
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee" {$genderQuery} {$searchTermQuery}
             GROUP BY mc.person_id
             ORDER BY COUNT(*) DESC, p.name
             {$limitQuery}
@@ -174,16 +175,24 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedActorsCount() : int
+    public function fetchMostWatchedActorsCount(?string $searchTerm) : int
     {
+        $payload = [];
+        $searchTermQuery = '';
+        if ($searchTerm !== null) {
+            $searchTermQuery = 'AND p.name LIKE ?';
+            $payload[] = "%$searchTerm%";
+        }
+
         $count = $this->dbConnection->fetchOne(
             <<<SQL
             SELECT COUNT(DISTINCT p.id)
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee"
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) AND p.name != "Stan Lee" {$searchTermQuery}
             SQL,
+            $payload
         );
 
         if ($count === false) {
@@ -193,12 +202,18 @@ class Repository
         return (int)$count;
     }
 
-    public function fetchMostWatchedDirectors(int $page = 1, ?int $limit = null) : array
+    public function fetchMostWatchedDirectors(int $page = 1, ?int $limit = null, ?string $searchTerm = null) : array
     {
         $limitQuery = '';
         if ($limit !== null) {
             $offset = ($limit * $page) - $limit;
             $limitQuery = "LIMIT $offset, $limit";
+        }
+        $payload = [];
+        $searchTermQuery = '';
+        if ($searchTerm !== null) {
+            $searchTermQuery = 'AND p.name LIKE ?';
+            $payload[] = "%$searchTerm%";
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -207,24 +222,33 @@ class Repository
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) {$searchTermQuery}
             GROUP BY mc.person_id
             ORDER BY COUNT(*) DESC, p.name
             {$limitQuery}
-            SQL
+            SQL,
+            $payload
         );
     }
 
-    public function fetchMostWatchedDirectorsCount() : int
+    public function fetchMostWatchedDirectorsCount(?string $searchTerm = null) : int
     {
+        $payload = [];
+        $searchTermQuery = '';
+        if ($searchTerm !== null) {
+            $searchTermQuery = 'AND p.name LIKE ?';
+            $payload[] = "%$searchTerm%";
+        }
+
         $count = $this->dbConnection->fetchOne(
             <<<SQL
             SELECT COUNT(DISTINCT p.id)
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_history mh) {$searchTermQuery}
             SQL,
+            $payload
         );
 
         if ($count === false) {

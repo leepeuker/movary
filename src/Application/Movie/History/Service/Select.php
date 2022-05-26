@@ -66,9 +66,9 @@ class Select
         return $this->repository->fetchLastPlays();
     }
 
-    public function fetchMostWatchedActors(int $page = 1, ?int $limit = null, ?Gender $gender = null) : array
+    public function fetchMostWatchedActors(int $page = 1, ?int $limit = null, ?Gender $gender = null, ?string $searchTerm = null) : array
     {
-        $mostWatchedActors = $this->repository->fetchMostWatchedActors($page, $limit, $gender);
+        $mostWatchedActors = $this->repository->fetchMostWatchedActors($page, $limit, $gender, $searchTerm);
 
         foreach ($mostWatchedActors as $index => $mostWatchedActor) {
             $mostWatchedActors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedActor['gender'])->getAbbreviation();
@@ -77,14 +77,14 @@ class Select
         return $mostWatchedActors;
     }
 
-    public function fetchMostWatchedActorsCount() : int
+    public function fetchMostWatchedActorsCount(?string $searchTerm = null) : int
     {
-        return $this->repository->fetchMostWatchedActorsCount();
+        return $this->repository->fetchMostWatchedActorsCount($searchTerm);
     }
 
-    public function fetchMostWatchedDirectors(int $page = 1, ?int $limit = null) : array
+    public function fetchMostWatchedDirectors(int $page = 1, ?int $limit = null, ?string $searchTerm = null) : array
     {
-        $mostWatchedDirectors = $this->repository->fetchMostWatchedDirectors($page, $limit);
+        $mostWatchedDirectors = $this->repository->fetchMostWatchedDirectors($page, $limit, $searchTerm);
 
         foreach ($mostWatchedDirectors as $index => $mostWatchedDirector) {
             $mostWatchedDirectors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedDirector['gender'])->getAbbreviation();
@@ -93,9 +93,9 @@ class Select
         return $mostWatchedDirectors;
     }
 
-    public function fetchMostWatchedDirectorsCount() : int
+    public function fetchMostWatchedDirectorsCount(?string $searchTerm = null) : int
     {
-        return $this->repository->fetchMostWatchedDirectorsCount();
+        return $this->repository->fetchMostWatchedDirectorsCount($searchTerm);
     }
 
     public function fetchMostWatchedGenres() : array

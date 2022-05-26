@@ -35,8 +35,8 @@ class MostWatchedActorsController
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors((int)$page, $limit);
-        $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount();
+        $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors((int)$page, $limit, null, $searchTerm);
+        $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount($searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
 

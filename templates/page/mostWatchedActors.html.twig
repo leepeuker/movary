@@ -14,7 +14,7 @@
         {{ include('component/navbar.html.twig') }}
 
         <div style="text-align: center;padding-top: 1rem">
-            <form action="/history" method="GET">
+            <form action="/mostWatchedActors" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="submit">Search</button>
