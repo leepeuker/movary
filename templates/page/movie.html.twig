@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Movie
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/app.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+
+        <p>Watches:</p>
+        <ul>
+            {% for watchDate in watchDates %}
+                <li>{{ watchDate.watched_at }}</li>
+            {% endfor %}
+        </ul>
+    </main>
+{% endblock %}

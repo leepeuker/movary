@@ -46,6 +46,11 @@ class Select
         return $this->repository->fetchFirstHistoryWatchDate();
     }
 
+    public function fetchHistoryByMovieId(int $movieId) : array
+    {
+        return $this->repository->fetchHistoryByMovieId($movieId);
+    }
+
     public function fetchHistoryCount(?string $searchTerm = null) : int
     {
         return $this->repository->fetchHistoryCount($searchTerm);

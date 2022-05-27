@@ -77,6 +77,14 @@ class Repository
         return Date::createFromString($data[0]);
     }
 
+    public function fetchHistoryByMovieId(int $movieId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM movie_history WHERE movie_id = ?',
+            [$movieId]
+        );
+    }
+
     public function fetchHistoryCount(?string $searchTerm = null) : int
     {
         if ($searchTerm !== null) {
@@ -132,7 +140,7 @@ class Repository
     public function fetchLastPlays() : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+            'SELECT m.id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC
