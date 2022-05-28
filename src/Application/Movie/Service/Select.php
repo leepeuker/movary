@@ -23,6 +23,11 @@ class Select
         return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbDesc();
     }
 
+    public function findById(int $movieId) : ?Entity
+    {
+        return $this->repository->findById($movieId);
+    }
+
     public function findByLetterboxdId(string $letterboxdId) : ?Entity
     {
         return $this->repository->findByLetterboxdId($letterboxdId);

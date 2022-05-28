@@ -3,6 +3,7 @@
 namespace Movary\Application\Movie\Genre;
 
 use Doctrine\DBAL\Connection;
+use RuntimeException;
 
 class Repository
 {
@@ -25,5 +26,12 @@ class Repository
     public function deleteByMovieId(int $movieId) : void
     {
         $this->dbConnection->delete('movie_genre', ['movie_id' => $movieId]);
+    }
+
+    public function findByMovieId(int $movieId) : EntityList
+    {
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie_genre` WHERE movie_id = ?', [$movieId]);
+
+        return EntityList::createFromArray($data);
     }
 }

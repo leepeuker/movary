@@ -13,11 +13,27 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
 
+        <h1 style="display: flex;padding-top: 0.8rem;">{{ movie.title }} ({{ movie.release_date|date("Y") }})</h1>
+        <div style="display: flex;padding-top: 0.3rem;">
+            <img src="https://image.tmdb.org/t/p/w500{{ movie.posterPath }}" width="200rem" style="align-self: start;">
 
+            <div style="padding-left: 1rem">
+
+                <p class="fw-bold" style="margin-bottom: 0.4rem">{{ movie.tagline }}</p>
+                <p style="margin-bottom: 0.4rem">{{ movie.overview }}</p>
+                <p>Genres:
+                {% for movieGenre in movieGenres %}
+                    <span class="fw-light">{{ movieGenre.name }}</span>{% if not loop.last %},{% endif %}
+                {% endfor %}
+                </p>
+            </div>
+        </div>
+
+        <br>
         <p>Watches:</p>
         <ul>
             {% for watchDate in watchDates %}
-                <li>{{ watchDate.watched_at }}</li>
+                <li>{{ watchDate.watched_at|date("d.m.Y") }}</li>
             {% endfor %}
         </ul>
     </main>

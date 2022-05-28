@@ -15,7 +15,9 @@ class Entity
         private readonly TraktId $traktId,
         private readonly string $imdbId,
         private readonly int $tmdbId,
+        private readonly ?string $posterPath,
         private readonly ?string $overview,
+        private readonly ?string $tagline,
         private readonly ?string $originalLanguage,
         private readonly ?int $runtime,
         private readonly ?DateTime $releaseDate,
@@ -35,7 +37,9 @@ class Entity
             TraktId::createFromString((string)$data['trakt_id']),
             $data['imdb_id'],
             (int)$data['tmdb_id'],
+            $data['poster_path'],
             $data['overview'],
+            $data['tagline'],
             $data['original_language'],
             $data['runtime'] === null ? null : (int)$data['runtime'],
             $data['release_date'] === null ? null : DateTime::createFromString($data['release_date']),
@@ -65,6 +69,11 @@ class Entity
         return $this->overview;
     }
 
+    public function getPosterPath() : ?string
+    {
+        return $this->posterPath;
+    }
+
     public function getRating10() : ?int
     {
         return $this->rating10;
@@ -83,6 +92,11 @@ class Entity
     public function getRuntime() : ?int
     {
         return $this->runtime;
+    }
+
+    public function getTagline() : ?string
+    {
+        return $this->tagline;
     }
 
     public function getTitle() : string

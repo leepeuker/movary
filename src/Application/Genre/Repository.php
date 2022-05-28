@@ -24,6 +24,17 @@ class Repository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
+    public function findById(int $id) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `genre` WHERE id = ?', [$id]);
+
+        if ($data === false) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
     public function findByTmdbId(int $tmdbId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `genre` WHERE tmdb_id = ?', [$tmdbId]);

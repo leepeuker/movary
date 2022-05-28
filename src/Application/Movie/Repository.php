@@ -376,6 +376,13 @@ class Repository
         )[0];
     }
 
+    public function findById(int $movieId) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE id = ?', [$movieId]);
+
+        return $data === false ? null : Entity::createFromArray($data);
+    }
+
     public function findByLetterboxdId(string $letterboxdId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE letterboxd_id = ?', [$letterboxdId]);

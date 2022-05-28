@@ -14,8 +14,8 @@ class Entity
     public static function createFromArray(array $data) : self
     {
         return new self(
-            (int)$data['genre_id'],
             (int)$data['movie_id'],
+            (int)$data['genre_id'],
             (int)$data['position'],
         );
     }
