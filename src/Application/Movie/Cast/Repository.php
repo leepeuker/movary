@@ -27,4 +27,11 @@ class Repository
     {
         $this->dbConnection->delete('movie_cast', ['movie_id' => $movieId]);
     }
+
+    public function findByMovieId(int $movieId) : EntityList
+    {
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie_cast` WHERE movie_id = ?', [$movieId]);
+
+        return EntityList::createFromArray($data);
+    }
 }

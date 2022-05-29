@@ -7,7 +7,7 @@ class Entity
     private function __construct(
         private readonly int $movieId,
         private readonly int $personId,
-        private readonly string $character,
+        private readonly ?string $character,
         private readonly int $position
     ) {
     }
@@ -17,12 +17,12 @@ class Entity
         return new self(
             (int)$data['movie_id'],
             (int)$data['person_id'],
-            $data['character'],
+            $data['character'] ?? null,
             (int)$data['position'],
         );
     }
 
-    public function getCharacter() : string
+    public function getCharacter() : ?string
     {
         return $this->character;
     }

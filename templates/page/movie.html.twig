@@ -14,26 +14,59 @@
         {{ include('component/navbar.html.twig') }}
 
         <h1 style="display: flex;padding-top: 0.8rem;">{{ movie.title }} ({{ movie.release_date|date("Y") }})</h1>
-        <div style="display: flex;padding-top: 0.3rem;">
-            <img src="https://image.tmdb.org/t/p/w500{{ movie.posterPath }}" width="200rem" style="align-self: start;">
+        <div style="display: flex;padding-top: 0.3rem">
+            <div style="text-align: center">
+                <img src="https://image.tmdb.org/t/p/w500{{ movie.posterPath }}" width="200rem" style="align-self: start;">
+                <p class="fw-bold" style="padding-top: 0.6rem;margin-bottom: 0.6rem;">{{ movie.rating10 ? movie.rating10 : '-' }}/10</p>
+            </div>
 
             <div style="padding-left: 1rem">
 
                 <p class="fw-bold" style="margin-bottom: 0.4rem">{{ movie.tagline }}</p>
                 <p style="margin-bottom: 0.4rem">{{ movie.overview }}</p>
-                <p>Genres:
-                {% for movieGenre in movieGenres %}
-                    <span class="fw-light">{{ movieGenre.name }}</span>{% if not loop.last %},{% endif %}
-                {% endfor %}
+                <p style="margin-bottom: 0.4rem">Genres:
+                    {% for movieGenre in movieGenres %}
+                        <span class="fw-light">{{ movieGenre.name }}</span>{% if not loop.last %},{% endif %}
+                    {% endfor %}
                 </p>
             </div>
         </div>
 
-        <br>
-        <p>Watches:</p>
+        <p style="margin-bottom: 0.5rem">
+            Director:
+            {% for director in directors %}
+                <span class="fw-light">{{ director.name }}</span>{% if not loop.last %},{% endif %}
+            {% endfor %}
+        </p>
+
+        <p style="margin-bottom: 0.5rem">
+            Cast:
+            {% for castMember in castMembers|slice(0, 25) %}
+                <span class="fw-light">{{ castMember.name }}</span>{% if not loop.last %},{% endif %}
+                {% if not loop.index >= 10 %},{% endif %}
+            {% endfor %}
+        </p>
+
+        <p style="margin-bottom: 0.5rem">Language: <span class="fw-light">{{ movie.originalLanguage }}</span></p>
+
+{#        <p>Cast:#}
+{#        <div class="d-flex flex-row flex-nowrap overflow-auto" style="border: 1px solid rgba(0,0,0,.125)">#}
+{#            {{ castMember.posterPath }}#}
+{#            {% for castMember in castMembers|slice(0, 25) %}#}
+{#                <div class="card" style="width: 18rem;min-width: 150px;margin: 0.4rem;">#}
+{#                    <div class="card-header" style="padding: 0.1rem;text-align: center">#}
+{#                        <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small>#}
+{#                    </div>#}
+{#                    <img src="https://image.tmdb.org/t/p/w500{{ castMember.posterPath }}" class="card-img-top" alt="...">#}
+{#                </div>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#        </p>#}
+
+        <p style="margin-block-end:0.2rem">Watched at:</p>
         <ul>
             {% for watchDate in watchDates %}
-                <li>{{ watchDate.watched_at|date("d.m.Y") }}</li>
+                <li class="fw-light">{{ watchDate.watched_at|date("d.m.Y") }}</li>
             {% endfor %}
         </ul>
     </main>

@@ -47,9 +47,6 @@
                 {% for lastPlay in lastPlays %}
                     <div class="col position-relative" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/movie/{{ lastPlay.id }}'">
                         <div class="card h-100 position-relative">
-                            <div class="card-header text-truncate" style="padding: 0.2rem">
-                                <small class="text-muted" style="font-size: 0.9rem;">{{ lastPlay.title }}</small>
-                            </div>
                             <div class="position-relative">
                                 <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip" data-bs-placement="top"
                                      title="{{ lastPlay.title }}" style="border-top-left-radius:0;border-top-right-radius:0;">

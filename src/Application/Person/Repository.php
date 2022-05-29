@@ -28,6 +28,17 @@ class Repository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
+    public function findByPersonId(int $personId) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `person` WHERE id = ?', [$personId]);
+
+        if ($data === false) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
     public function findByTmdbId(int $tmdbId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `person` WHERE tmdb_id = ?', [$tmdbId]);

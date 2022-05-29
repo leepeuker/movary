@@ -28,4 +28,11 @@ class Repository
     {
         $this->dbConnection->delete('movie_crew', ['movie_id' => $movieId]);
     }
+
+    public function findDirectorsByMovieId(int $movieId) : EntityList
+    {
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie_crew` WHERE movie_id = ? AND job = "director"', [$movieId]);
+
+        return EntityList::createFromArray($data);
+    }
 }

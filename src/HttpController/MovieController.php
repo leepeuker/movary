@@ -15,6 +15,8 @@ class MovieController
         private readonly History\Service\Select $movieHistorySelectService,
         private readonly Movie\Service\Select $movieSelectService,
         private readonly Movie\Genre\Service\Select $movieGenreSelectService,
+        private readonly Movie\Cast\Service\Select $movieCastSelectService,
+        private readonly Movie\Crew\Service\Select $movieCrewSelectService,
         private readonly Environment $twig
     ) {
     }
@@ -28,6 +30,8 @@ class MovieController
             $this->twig->render('page/movie.html.twig', [
                 'movie' => $this->movieSelectService->findById($movieId),
                 'movieGenres' => $this->movieGenreSelectService->findByMovieId($movieId),
+                'castMembers' => $this->movieCastSelectService->findByMovieId($movieId),
+                'directors' => $this->movieCrewSelectService->findDirectorsByMovieId($movieId),
                 'watchDates' => $this->movieHistorySelectService->fetchHistoryByMovieId($movieId),
             ]),
         );
