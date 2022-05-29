@@ -42,7 +42,7 @@
 
             <div class="list-group">
                 <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer;background-color: #e9ecef"> Last Plays</li>
-                <li class="list-group-item list-group-item-action" style="display: block;padding: 0.8rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action" style="display: block;padding: 0.9rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for lastPlay in lastPlays %}
                             <div class="col position-relative" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/movie/{{ lastPlay.id }}'">
@@ -56,7 +56,7 @@
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date("d.m.y") }}</small>
                                     </div>
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.9rem">
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
                                 {{ lastPlay.rating_10 }}
                             </span>
                                 </div>
