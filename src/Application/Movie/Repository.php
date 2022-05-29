@@ -126,7 +126,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+            SELECT m.id as id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             $whereQuery
