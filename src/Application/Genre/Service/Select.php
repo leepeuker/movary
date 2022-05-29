@@ -11,6 +11,11 @@ class Select
     {
     }
 
+    public function findById(int $genreId) : ?Entity
+    {
+        return $this->repository->findById($genreId);
+    }
+
     public function findByTmdbId(int $tmdbId) : ?Entity
     {
         return $this->repository->findByTmdbId($tmdbId);

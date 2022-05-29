@@ -77,6 +77,14 @@ class Repository
         return Date::createFromString($data[0]);
     }
 
+    public function fetchHistoryByMovieId(int $movieId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM movie_history WHERE movie_id = ?',
+            [$movieId]
+        );
+    }
+
     public function fetchHistoryCount(?string $searchTerm = null) : int
     {
         if ($searchTerm !== null) {
@@ -118,7 +126,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+            SELECT m.id as id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             $whereQuery
@@ -132,7 +140,7 @@ class Repository
     public function fetchLastPlays() : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+            'SELECT m.id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC
@@ -366,6 +374,13 @@ class Repository
         return $this->dbConnection->fetchFirstColumn(
             'SELECT COUNT(DISTINCT movie_id) FROM movie_history'
         )[0];
+    }
+
+    public function findById(int $movieId) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE id = ?', [$movieId]);
+
+        return $data === false ? null : Entity::createFromArray($data);
     }
 
     public function findByLetterboxdId(string $letterboxdId) : ?Entity

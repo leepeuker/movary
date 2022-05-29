@@ -57,6 +57,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/mostWatchedDirectors',
         [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage']
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/movie/{id:\d+}',
+        [\Movary\HttpController\MovieController::class, 'renderPage']
+    );
 
     ### Api
     $routeCollector->addRoute(
