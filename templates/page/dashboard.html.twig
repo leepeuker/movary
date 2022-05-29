@@ -48,9 +48,8 @@
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ lastPlay.id }}'">
                                     <div class="position-relative">
-                                        <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip"
-                                             data-bs-placement="top"
-                                             title="{{ lastPlay.title }}" style="border-top-left-radius:0;border-top-right-radius:0;">
+                                        <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="..."
+                                             style="border-top-left-radius:0;border-top-right-radius:0;" loading="lazy">
 
                                     </div>
                                     <div class="card-footer" style="padding: 0.1rem">
@@ -76,7 +75,7 @@
                                     </div>
                                     <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
                                     <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="..."
-                                         style="border-top-left-radius:0;border-top-right-radius:0;">
+                                         style="border-top-left-radius:0;border-top-right-radius:0;" loading="lazy">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.count }}x</small>
                                     </div>
@@ -98,7 +97,7 @@
                                     </div>
                                     <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
                                     <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedActress.poster_path }}" class="card-img-top" alt="..."
-                                         style="border-top-left-radius:0;border-top-right-radius:0;">
+                                         style="border-top-left-radius:0;border-top-right-radius:0;" loading="lazy">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.count }}x</small>
                                     </div>
@@ -119,7 +118,7 @@
                                     </div>
                                     <input id="directorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
                                     <img src="https://image.tmdb.org/t/p/w500{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="..."
-                                         style="border-top-left-radius:0;border-top-right-radius:0;">
+                                         style="border-top-left-radius:0;border-top-right-radius:0;" loading="lazy">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.count }}x</small>
                                     </div>
