@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Movie
+    Movie: {{ movie.title }} ({{ movie.release_date|date("Y") }})
 {% endblock %}
 
 {% block stylesheets %}
