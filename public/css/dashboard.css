@@ -1,0 +1,36 @@
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold
+}
+
+.stat-description {
+    font-size: 0.8rem;
+}
+
+.last-plays-value {
+    font-size: 1.2rem;
+}
+
+.activeItemButton {
+    cursor: pointer;
+    background-color: #e9ecef;
+}
+
+.inactiveItemButton {
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.activeItem {
+    cursor: default;
+    border-left: none;!important;
+    border-right: none;!important;
+    display: block;
+}
+
+.inactiveItem {
+    cursor: default;
+    border-left: none;!important;
+    border-right: none;!important;
+    display: none;
+}

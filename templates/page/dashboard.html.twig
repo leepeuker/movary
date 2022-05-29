@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="/css/app.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 {% endblock %}
 
@@ -41,12 +41,12 @@
             <hr>
 
             <div class="list-group">
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer;background-color: #e9ecef"> Last Plays</li>
-                <li class="list-group-item list-group-item-action" style="display: block;padding: 0.9rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none activeItemButton" onclick="toggleButton(this)"> Last Plays</li>
+                <li class="list-group-item activeItem" style="padding: 0.9rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for lastPlay in lastPlays %}
-                            <div class="col position-relative" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/movie/{{ lastPlay.id }}'">
-                                <div class="card h-100 position-relative">
+                            <div class="col position-relative" style="padding-bottom: 1rem;">
+                                <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ lastPlay.id }}'">
                                     <div class="position-relative">
                                         <img src="https://image.tmdb.org/t/p/w500{{ lastPlay.poster_path }}" class="card-img-top" alt="..." data-bs-toggle="tooltip"
                                              data-bs-placement="top"
@@ -65,12 +65,12 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer">Most watched Actors</li>
-                <li class="list-group-item list-group-item-action" style="display: none;padding: 1rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">Most watched Actors</li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActor in mostWatchedActors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                                     </div>
@@ -87,12 +87,12 @@
                 </li>
 
 
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer">Most watched Actresses</li>
-                <li class="list-group-item list-group-item-action" style="display: none;padding: 1rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">Most watched Actresses</li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActress in mostWatchedActresses %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100  position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActress.id }}" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActress.id }}" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
                                     </div>
@@ -108,12 +108,12 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer">Most watched Directors</li>
-                <li class="list-group-item list-group-item-action" style="display: none;padding: 1rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">Most watched Directors</li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedDirector in mostWatchedDirectors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100  position-relative" onclick="showDirectorModal(this.id)" id="{{ mostWatchedDirector.id }}" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="showDirectorModal(this.id)" id="{{ mostWatchedDirector.id }}" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                                     </div>
@@ -129,13 +129,13 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer">Most watched Genres</li>
-                <li class="list-group-item list-group-item-action" style="display: none;padding: 1rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">Most watched Genres</li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedGenre in mostWatchedGenres %}
                             {% if loop.index <= 12 %}
                                 <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100  position-relative">
+                                    <div class="card h-100 position-relative">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedGenre.name }}</small>
                                         </div>
@@ -149,13 +149,13 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer">Most watched Languages</li>
-                <li class="list-group-item list-group-item-action" style="display: none;padding: 1rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">Most watched Languages</li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedLanguage in mostWatchedLanguages %}
                             {% if loop.index <= 12 %}
                                 <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100  position-relative">
+                                    <div class="card h-100 position-relative">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.name }}</small>
                                         </div>
@@ -169,13 +169,13 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer">Most watched Production Companies</li>
-                <li class="list-group-item list-group-item-action" style="display: none;padding: 1rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">Most watched Production Companies</li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedProductionCompany in mostWatchedProductionCompanies %}
                             {% if loop.index <= 12 %}
                                 <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100  position-relative">
+                                    <div class="card h-100 position-relative">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedProductionCompany.name }}</small>
                                         </div>
@@ -189,13 +189,13 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none" onclick="toggleButton(this)" style="cursor: pointer">Most watched Release Years</li>
-                <li class="list-group-item list-group-item-action" style="display: none;padding: 1rem 0.4rem 0 0.4rem;border-left: none;border-right: none">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">Most watched Release Years</li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedReleaseYear in mostWatchedReleaseYears %}
                             {% if loop.index <= 12 %}
                                 <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100  position-relative">
+                                    <div class="card h-100 position-relative">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold;">{{ mostWatchedReleaseYear.name }}</small>
                                         </div>
