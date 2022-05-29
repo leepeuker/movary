@@ -22,7 +22,10 @@
 
             <div style="padding-left: 1rem">
 
-                <p class="fw-bold" style="margin-bottom: 0.4rem">{{ movie.tagline }}</p>
+                {% if movie.tagline is not null %}
+                    <p class="fw-bold" style="margin-bottom: 0.4rem">{{ movie.tagline }}</p>
+                {% endif %}
+
                 <p style="margin-bottom: 0.4rem">{{ movie.overview }}</p>
             </div>
         </div>
@@ -50,19 +53,19 @@
 
         <p style="margin-bottom: 0.5rem">Language: <span class="fw-light">{{ movie.originalLanguage }}</span></p>
 
-{#        <p>Cast:#}
-{#        <div class="d-flex flex-row flex-nowrap overflow-auto" style="border: 1px solid rgba(0,0,0,.125)">#}
-{#            {{ castMember.posterPath }}#}
-{#            {% for castMember in castMembers|slice(0, 25) %}#}
-{#                <div class="card" style="width: 18rem;min-width: 150px;margin: 0.4rem;">#}
-{#                    <div class="card-header" style="padding: 0.1rem;text-align: center">#}
-{#                        <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small>#}
-{#                    </div>#}
-{#                    <img src="https://image.tmdb.org/t/p/w500{{ castMember.posterPath }}" class="card-img-top" alt="...">#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#        </div>#}
-{#        </p>#}
+        {#        <p>Cast: #}
+        {#        <div class="d-flex flex-row flex-nowrap overflow-auto" style="border: 1px solid rgba(0,0,0,.125)"> #}
+        {#            {{ castMember.posterPath }} #}
+        {#            {% for castMember in castMembers|slice(0, 25) %} #}
+        {#                <div class="card" style="width: 18rem;min-width: 150px;margin: 0.4rem;"> #}
+        {#                    <div class="card-header" style="padding: 0.1rem;text-align: center"> #}
+        {#                        <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small> #}
+        {#                    </div> #}
+        {#                    <img src="https://image.tmdb.org/t/p/w500{{ castMember.posterPath }}" class="card-img-top" alt="..."> #}
+        {#                </div> #}
+        {#            {% endfor %} #}
+        {#        </div> #}
+        {#        </p> #}
 
         <p style="margin-block-end:0.2rem">Watched at:</p>
         <ul>
