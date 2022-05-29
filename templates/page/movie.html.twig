@@ -24,11 +24,6 @@
 
                 <p class="fw-bold" style="margin-bottom: 0.4rem">{{ movie.tagline }}</p>
                 <p style="margin-bottom: 0.4rem">{{ movie.overview }}</p>
-                <p style="margin-bottom: 0.4rem">Genres:
-                    {% for movieGenre in movieGenres %}
-                        <span class="fw-light">{{ movieGenre.name }}</span>{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                </p>
             </div>
         </div>
 
@@ -44,6 +39,12 @@
             {% for castMember in castMembers|slice(0, 25) %}
                 <span class="fw-light">{{ castMember.name }}</span>{% if not loop.last %},{% endif %}
                 {% if not loop.index >= 10 %},{% endif %}
+            {% endfor %}
+        </p>
+
+        <p style="margin-bottom: 0.5rem">Genres:
+            {% for movieGenre in movieGenres %}
+                <span class="fw-light">{{ movieGenre.name }}</span>{% if not loop.last %},{% endif %}
             {% endfor %}
         </p>
 
