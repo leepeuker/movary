@@ -65,7 +65,7 @@
 
         <p style="margin-block-end:0.2rem">Watched at:</p>
         <ul>
-            {% for watchDate in watchDates %}
+            {% for watchDate in watchDates|reverse %}
                 <li class="fw-light">{{ watchDate.watched_at|date("d.m.Y") }}</li>
             {% endfor %}
         </ul>
