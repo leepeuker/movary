@@ -59,8 +59,8 @@
                                         <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date("d.m.y") }}</small>
                                     </div>
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                {{ lastPlay.rating_10 }}
-                            </span>
+                                        {{ lastPlay.rating_10 }}
+                                    </span>
                                 </div>
                             </div>
                         {% endfor %}
@@ -76,7 +76,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActor in mostWatchedActors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActor.id }}" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/person/{{ mostWatchedActor.id }}'" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                                     </div>
@@ -102,7 +102,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActress in mostWatchedActresses %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="showActorModal(this.id)" id="{{ mostWatchedActress.id }}" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/person/{{ mostWatchedActress.id }}'" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
                                     </div>
@@ -127,7 +127,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedDirector in mostWatchedDirectors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="showDirectorModal(this.id)" id="{{ mostWatchedDirector.id }}" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/person/{{ mostWatchedDirector.id }}'" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                                     </div>
@@ -238,22 +238,6 @@
             </div>
         </div>
     </main>
-
-    <div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModal" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="personModalName">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h6>Watched movies: </h6>
-                    <ul id="personModalMovies">
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock %}
 
 

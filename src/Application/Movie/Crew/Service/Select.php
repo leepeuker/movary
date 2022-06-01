@@ -19,6 +19,7 @@ class Select
             $person = $this->personSelectService->findById($director->getPersonId());
 
             $directors[] = [
+                'id' => $person?->getId(),
                 'name' => $person?->getName(),
                 'posterPath' => $person?->getPosterPath(),
             ];

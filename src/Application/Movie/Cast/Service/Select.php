@@ -19,6 +19,7 @@ class Select
             $person = $this->personSelectService->findById($movieGenre->getPersonId());
 
             $castMembers[] = [
+                'id' => $person?->getId(),
                 'name' => $person?->getName(),
                 'posterPath' => $person?->getPosterPath(),
             ];

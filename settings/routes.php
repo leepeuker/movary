@@ -62,6 +62,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/movie/{id:\d+}',
         [\Movary\HttpController\MovieController::class, 'renderPage']
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/person/{id:\d+}',
+        [\Movary\HttpController\PersonController::class, 'renderPage']
+    );
 
     ### Api
     $routeCollector->addRoute(
