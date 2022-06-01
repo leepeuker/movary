@@ -1,0 +1,9 @@
+.carousel {
+    display: flex;
+    overflow: auto;
+    scroll-snap-type: x mandatory; /* <- the important piece */
+}
+.carousel .item {
+    flex-shrink: 0;
+    scroll-snap-align: start; /* <- the other important piece */
+}
