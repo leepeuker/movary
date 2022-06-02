@@ -18,6 +18,11 @@ class Api
         return Credits::createFromArray($data);
     }
 
+    public function getMovieCreditsByPersonId(int $personId) : array
+    {
+        return $this->client->get('/person/' . $personId . '/movie_credits')['cast'];
+    }
+
     public function getMovieDetails(int $movieId) : Movie
     {
         $data = $this->client->get('/movie/' . $movieId);

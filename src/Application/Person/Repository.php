@@ -54,7 +54,7 @@ class Repository
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.id, m.title, m.poster_path, rating_10, YEAR(m.release_date) AS year
+            SELECT m.id, m.tmdb_id, m.title, m.poster_path, rating_10, YEAR(m.release_date) AS year
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
