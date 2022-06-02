@@ -27,12 +27,12 @@
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsActor is empty %}disabled{% else %}active{% endif %}" id="home-tab" data-bs-toggle="tab" data-bs-target="#acting"
+                <button class="nav-link {% if person.knownForDepartment == 'Acting' %}active{% else %}disabled{% endif %}" id="home-tab" data-bs-toggle="tab" data-bs-target="#acting"
                         type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Acting
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsDirector is empty %}disabled{% elseif moviesAsActor is empty %}active{% endif %}" id="profile-tab" data-bs-toggle="tab" data-bs-target="#director" type="button"
+                <button class="nav-link {% if person.knownForDepartment == 'Directing' %}active{% else %}disabled{% endif %}" id="profile-tab" data-bs-toggle="tab" data-bs-target="#director" type="button"
                         role="tab" aria-controls="profile-tab-pane" aria-selected="false">Director
                 </button>
             </li>
