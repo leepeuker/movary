@@ -40,7 +40,7 @@
         </ul>
 
         <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show {% if moviesAsActor is not empty %}active{% endif %}" id="acting" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <div class="tab-pane fade show {% if person.knownForDepartment == 'Acting' %}active{% endif %}" id="acting" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                 {% if moviesAsActor is not empty %}
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                         {% for movieAsActor in moviesAsActor %}
@@ -63,7 +63,7 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="tab-pane fade show {% if moviesAsDirector is not empty and moviesAsActor is empty %}active{% endif %}" id="director" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' %}active{% endif %}" id="director" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                 <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative">
