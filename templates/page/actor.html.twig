@@ -11,52 +11,54 @@
         <h1 style="display: flex;padding-top: 0.8rem;">{{ person.name }}</h1>
         <img src="https://image.tmdb.org/t/p/w500{{ person.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
 
-        <br>
-        <hr>
+        {% if moviesAsActor is not empty %}
+            <hr style="margin-bottom: 0.7rem">
+            <h6 style="margin-bottom: 0.5rem">Actor</h6>
+            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;">
+                {% for movieAsActor in moviesAsActor %}
+                    <div class="col position-relative">
+                        <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsActor.id }}'">
+                            <div class="position-relative">
+                                <img src="https://image.tmdb.org/t/p/w500{{ movieAsActor.poster_path }}" class="card-img-top" alt="..."
+                                     style="border-top-left-radius:0;border-top-right-radius:0;">
 
-        <h5>Actor:</h5>
-        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;">
-            {% for movieAsActor in moviesAsActor %}
-                <div class="col position-relative" style="padding-bottom: 1rem;">
-                    <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsActor.id }}'">
-                        <div class="position-relative">
-                            <img src="https://image.tmdb.org/t/p/w500{{ movieAsActor.poster_path }}" class="card-img-top" alt="..."
-                                 style="border-top-left-radius:0;border-top-right-radius:0;">
-
-                        </div>
-                        <div class="card-footer" style="padding: 0.1rem">
-                            <small class="text-muted" style="font-size: 0.8rem;">{{ movieAsActor.watched_at|date("d.m.y") }}</small>
-                        </div>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                            </div>
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 0.8rem;">{{ movieAsActor.watched_at|date("d.m.y") }}</small>
+                            </div>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
                                 {{ movieAsActor.rating_10 }}
                             </span>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-        <hr>
+        {% if moviesAsDirector is not empty %}
+            <hr style="margin-bottom: 0.7rem">
+            <h6 style="margin-bottom: 0.5rem">Director</h6>
+            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;">
+                {% for movieAsDirector in moviesAsDirector %}
+                    <div class="col position-relative">
+                        <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsDirector.id }}'">
+                            <div class="position-relative">
+                                <img src="https://image.tmdb.org/t/p/w500{{ movieAsDirector.poster_path }}" class="card-img-top" alt="..."
+                                     style="border-top-left-radius:0;border-top-right-radius:0;">
 
-        <h5>Director:</h5>
-        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;">
-            {% for movieAsDirector in moviesAsDirector %}
-                <div class="col position-relative" style="padding-bottom: 1rem;">
-                    <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsDirector.id }}'">
-                        <div class="position-relative">
-                            <img src="https://image.tmdb.org/t/p/w500{{ movieAsDirector.poster_path }}" class="card-img-top" alt="..."
-                                 style="border-top-left-radius:0;border-top-right-radius:0;">
-
-                        </div>
-                        <div class="card-footer" style="padding: 0.1rem">
-                            <small class="text-muted" style="font-size: 0.8rem;">{{ movieAsDirector.watched_at|date("d.m.y") }}</small>
-                        </div>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                            </div>
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 0.8rem;">{{ movieAsDirector.watched_at|date("d.m.y") }}</small>
+                            </div>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
                                 {{ movieAsDirector.rating_10 }}
                             </span>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <br>
 
     </main>
 {% endblock %}

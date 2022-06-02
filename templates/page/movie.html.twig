@@ -30,42 +30,42 @@
             </div>
         </div>
 
-        <p style="margin-bottom: 0.5rem">
-            Cast:
+        <h6 style="margin-bottom: 0.5rem">Acting</h6>
         <div class="carousel">
             {% for castMember in castMembers|slice(0, 25) %}
                 <div class="card" onclick="window.location='/person/{{ castMember.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small>
                     </div>
-                    <img src="https://image.tmdb.org/t/p/w500{{ castMember.posterPath }}" class="card-img-top" alt="...">
+                    <img src="https://image.tmdb.org/t/p/w500{{ castMember.posterPath }}" class="card-img-top" alt="..." style="border-top-left-radius:0;border-top-right-radius:0;">
                 </div>
             {% endfor %}
         </div>
-        </p>
 
-        <p style="margin-bottom: 0.5rem">
-            Director:
+        <h6 style="margin-bottom: 0.5rem">Director</h6>
         <div class="carousel">
             {% for director in directors|slice(0, 25) %}
                 <div class="card" onclick="window.location='/person/{{ director.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
                     </div>
-                    <img src="https://image.tmdb.org/t/p/w500{{ director.posterPath }}" class="card-img-top" alt="...">
+                    <img src="https://image.tmdb.org/t/p/w500{{ director.posterPath }}" class="card-img-top" alt="..." style="border-top-left-radius:0;border-top-right-radius:0;">
                 </div>
             {% endfor %}
         </div>
-        </p>
 
-        <p style="margin-bottom: 0.5rem">Genres:
-            {% for movieGenre in movieGenres %}
-                <span class="fw-light">{{ movieGenre.name }}</span>{% if not loop.last %},{% endif %}
-            {% endfor %}
-        </p>
+        <h6 style="margin-bottom: 0.5rem">Genres</h6>
+        <div class="carousel">
+            <span class="fw-light">
+                {% for movieGenre in movieGenres %}{{ movieGenre.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </span>
+        </div>
 
-        <p style="margin-bottom: 0.5rem">Language: <span class="fw-light">{{ movie.originalLanguage }}</span></p>
-
+        <h6 style="margin-bottom: 0.5rem">Language</h6>
+        <div class="carousel">
+            <span class="fw-light">{{ movie.originalLanguage }}</span>
+        </div>
 
         <p style="margin-block-end:0.2rem">Watched at:</p>
         <ul>
