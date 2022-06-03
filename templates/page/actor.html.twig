@@ -54,9 +54,6 @@
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
 
                                     </div>
-                                    <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.8rem;">{{ movieAsActor.watched_at|date("d.m.y") }}</small>
-                                    </div>
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
                                 {{ movieAsActor.rating_10 }}
                             </span>
@@ -76,9 +73,6 @@
                                     <img src="https://image.tmdb.org/t/p/w500{{ movieAsDirector.poster_path }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
 
-                                </div>
-                                <div class="card-footer" style="padding: 0.1rem">
-                                    <small class="text-muted" style="font-size: 0.8rem;">{{ movieAsDirector.watched_at|date("d.m.y") }}</small>
                                 </div>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
                                 {{ movieAsDirector.rating_10 }}
