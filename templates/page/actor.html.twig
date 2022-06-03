@@ -52,11 +52,13 @@
                                     <div class="position-relative">
                                         <img src="https://image.tmdb.org/t/p/w500{{ movieAsActor.poster_path }}" class="card-img-top" alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
-
                                     </div>
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                {{ movieAsActor.rating_10 }}
-                            </span>
+
+                                    {% if movieAsActor.rating_10 is not null %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                            {{ movieAsActor.rating_10 }}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}
@@ -74,9 +76,12 @@
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
 
                                 </div>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                {{ movieAsDirector.rating_10 }}
-                            </span>
+
+                                {% if movieAsDirector.rating_10 is not null %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                        {{ movieAsDirector.rating_10 }}
+                                    </span>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}

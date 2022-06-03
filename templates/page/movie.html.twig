@@ -40,7 +40,11 @@
 
                 <h6 style="margin-bottom: 0.2rem">Rating</h6>
                 <div>
-                    <span class="fw-light">{{ movie.rating10 ? movie.rating10 : '-' }}/10</span>
+                    {% if movie.rating10 is null and movie.rating5 is not null %}
+                        <span class="fw-light">{{ movie.rating5 ? movie.rating5 : '-' }}/5</span>
+                    {% else %}
+                        <span class="fw-light">{{ movie.rating10 ? movie.rating10 : '-' }}/10</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
