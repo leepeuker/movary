@@ -2,7 +2,7 @@
     display: flex;
     overflow: auto;
     scroll-snap-type: x mandatory; /* <- the important piece */
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
 }
 .carousel .item {
     flex-shrink: 0;

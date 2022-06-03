@@ -8,7 +8,7 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
 
-        <h1 style="display: flex;padding-top: 0.8rem;">{{ person.name }}</h1>
+        <h2 style="display: flex;padding-top: 0.5rem;">{{ person.name }}</h2>
         <div style="display: flex;">
             <div style="text-align: center">
                 <img src="https://image.tmdb.org/t/p/w500{{ person.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
@@ -27,13 +27,17 @@
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' %}active{% endif %}" id="home-tab" data-bs-toggle="tab" data-bs-target="#acting"
-                        type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Acting
+                <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' %}active{% endif %}" id="home-tab"
+                        data-bs-toggle="tab" data-bs-target="#acting"
+                        type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
+                    Acting {% if moviesAsActor is not empty %}({{ moviesAsActor|length }}){% endif %}
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsDirector is empty %}disabled{% elseif person.knownForDepartment == 'Directing' %}active{% endif %}" id="profile-tab" data-bs-toggle="tab" data-bs-target="#director" type="button"
-                        role="tab" aria-controls="profile-tab-pane" aria-selected="false">Director
+                <button class="nav-link {% if moviesAsDirector is empty %}disabled{% elseif person.knownForDepartment == 'Directing' %}active{% endif %}" id="profile-tab"
+                        data-bs-toggle="tab" data-bs-target="#director" type="button"
+                        role="tab" aria-controls="profile-tab-pane" aria-selected="false">
+                    Director {% if moviesAsDirector is not empty %}({{ moviesAsDirector|length }}){% endif %}
                 </button>
             </li>
         </ul>
@@ -62,7 +66,8 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' %}active{% endif %}" id="director" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' %}active{% endif %}" id="director" role="tabpanel" aria-labelledby="profile-tab"
+                 tabindex="0">
                 <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative">

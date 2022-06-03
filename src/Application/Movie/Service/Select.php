@@ -32,6 +32,16 @@ class Select
             return null;
         }
 
+        $renderedRuntime = '';
+        $hours = floor($entity->getRuntime() / 60);
+        if ($hours > 0) {
+            $renderedRuntime .= $hours . 'h';
+        }
+        $minutes = $entity->getRuntime() % 60;
+        if ($minutes > 0) {
+            $renderedRuntime .= ' ' . $minutes . 'm';
+        }
+
         return [
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
@@ -40,6 +50,7 @@ class Select
             'rating10' => $entity->getRating10(),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
+            'runtime' => $renderedRuntime,
             'originalLanguage' => $this->ISO639->languageByCode1($entity->getOriginalLanguage()),
         ];
     }
