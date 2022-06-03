@@ -20,26 +20,26 @@
             </div>
 
             <div style="padding-left: 1rem">
-                <h6 style="margin-bottom: 0.4rem">Genres</h6>
-                <div class="carousel">
+                <h6 style="margin-bottom: 0.2rem">Genres</h6>
+                <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% for movieGenre in movieGenres %}{{ movieGenre.name }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </span>
                 </div>
 
-                <h6 style="margin-bottom: 0.4rem">Runtime</h6>
-                <div class="carousel">
+                <h6 style="margin-bottom: 0.2rem">Runtime</h6>
+                <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">{{ movie.runtime }}</span>
                 </div>
 
-                <h6 style="margin-bottom: 0.4rem">Language</h6>
-                <div class="carousel">
+                <h6 style="margin-bottom: 0.2rem">Language</h6>
+                <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">{{ movie.originalLanguage }}</span>
                 </div>
 
-                <h6>Rating</h6>
-                <div class="carousel">
+                <h6 style="margin-bottom: 0.2rem">Rating</h6>
+                <div>
                     <span class="fw-light">{{ movie.rating10 ? movie.rating10 : '-' }}/10</span>
                 </div>
             </div>
@@ -51,7 +51,7 @@
 
         <h6 style="margin-bottom: 0.5rem;{% if movie.tagline is null %}padding-top: 0.8em"{% endif %}">Description</h6>
         <div class="carousel">
-            <p style="margin-bottom: 0.4rem">{{ movie.overview }}</p>
+            <p style="margin-bottom: 0rem">{{ movie.overview }}</p>
         </div>
 
         <h6 style="margin-bottom: 0.5rem">Acting</h6>
