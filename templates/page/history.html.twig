@@ -28,9 +28,12 @@
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date("d.m.Y") }}</small>
                             </div>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.9rem">
-                                {{ historyEntry.rating_10 }}
-                            </span>
+
+                            {% if historyEntry.rating_10 is not null %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                    {{ historyEntry.rating_10 }}
+                                </span>
+                            {% endif %}
                         </div>
                     </div>
                     {% set lastDate = historyEntry.watched_at %}
