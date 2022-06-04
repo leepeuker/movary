@@ -2,6 +2,7 @@
 
 namespace Movary\Application\Movie;
 
+use Matriphe\ISO639\ISO639;
 use Movary\Api\Tmdb\Dto\Cast;
 use Movary\Api\Tmdb\Dto\Crew;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
@@ -23,6 +24,7 @@ class Api
         private readonly Movie\Genre\Service\Select $genreSelectService,
         private readonly Movie\Cast\Service\Select $castSelectService,
         private readonly Movie\Crew\Service\Select $crewSelectService,
+        private readonly ISO639 $ISO639
     ) {
     }
 
@@ -61,9 +63,45 @@ class Api
         return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc();
     }
 
+    public function fetchWithActor(int $personId) : EntityList
+    {
+        return $this->movieSelectService->fetchWithActor($personId);
+    }
+
+    public function fetchWithDirector(int $personId) : EntityList
+    {
+        return $this->movieSelectService->fetchWithDirector($personId);
+    }
+
     public function findById(int $movieId) : ?array
     {
-        return $this->movieSelectService->findById($movieId);
+        $entity = $this->movieSelectService->findById($movieId);
+
+        if ($entity === null) {
+            return null;
+        }
+
+        $renderedRuntime = '';
+        $hours = floor($entity->getRuntime() / 60);
+        if ($hours > 0) {
+            $renderedRuntime .= $hours . 'h';
+        }
+        $minutes = $entity->getRuntime() % 60;
+        if ($minutes > 0) {
+            $renderedRuntime .= ' ' . $minutes . 'm';
+        }
+
+        return [
+            'title' => $entity->getTitle(),
+            'releaseDate' => $entity->getReleaseDate(),
+            'posterPath' => $entity->getPosterPath(),
+            'rating5' => $entity->getRating5(),
+            'rating10' => $entity->getRating10(),
+            'tagline' => $entity->getTagline(),
+            'overview' => $entity->getOverview(),
+            'runtime' => $renderedRuntime,
+            'originalLanguage' => $this->ISO639->languageByCode1($entity->getOriginalLanguage()),
+        ];
     }
 
     public function findByLetterboxdId(string $letterboxdId) : ?Entity

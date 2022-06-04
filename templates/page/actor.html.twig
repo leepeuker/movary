@@ -7,7 +7,6 @@
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
-
         <h2 style="display: flex;padding-top: 0.5rem;">{{ person.name }}</h2>
         <div style="display: flex;">
             <div style="text-align: center">
@@ -50,13 +49,13 @@
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
-                                        <img src="https://image.tmdb.org/t/p/w500{{ movieAsActor.poster_path }}" class="card-img-top" alt="..."
+                                        <img src="https://image.tmdb.org/t/p/w500{{ movieAsActor.posterPath }}" class="card-img-top" alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
                                     </div>
 
-                                    {% if movieAsActor.rating_10 is not null %}
+                                    {% if movieAsActor.rating10 is not null %}
                                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                            {{ movieAsActor.rating_10 }}
+                                            {{ movieAsActor.rating10 }}
                                         </span>
                                     {% endif %}
                                 </div>
@@ -72,14 +71,14 @@
                         <div class="col position-relative">
                             <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
-                                    <img src="https://image.tmdb.org/t/p/w500{{ movieAsDirector.poster_path }}" class="card-img-top" alt="..."
+                                    <img src="https://image.tmdb.org/t/p/w500{{ movieAsDirector.posterPath }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
 
                                 </div>
 
-                                {% if movieAsDirector.rating_10 is not null %}
+                                {% if movieAsDirector.rating10 is not null %}
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                        {{ movieAsDirector.rating_10 }}
+                                        {{ movieAsDirector.rating10 }}
                                     </span>
                                 {% endif %}
                             </div>

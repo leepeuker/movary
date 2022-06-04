@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Application\Movie;
 use Movary\Application\Person;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -12,6 +13,7 @@ class PersonController
 {
     public function __construct(
         private readonly Person\Api $personApi,
+        private readonly Movie\Api $movieApi,
         private readonly Environment $twig,
     ) {
     }
@@ -24,8 +26,8 @@ class PersonController
             StatusCode::createOk(),
             $this->twig->render('page/actor.html.twig', [
                 'person' => $this->personApi->findById($personId),
-                'moviesAsActor' => $this->personApi->findWatchedMoviesActedBy($personId),
-                'moviesAsDirector' => $this->personApi->findWatchedMoviesDirectedBy($personId),
+                'moviesAsActor' => $this->movieApi->fetchWithActor($personId),
+                'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId),
             ]),
         );
     }

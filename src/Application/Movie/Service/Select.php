@@ -2,7 +2,6 @@
 
 namespace Movary\Application\Movie\Service;
 
-use Matriphe\ISO639\ISO639;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie\Entity;
 use Movary\Application\Movie\EntityList;
@@ -10,7 +9,7 @@ use Movary\Application\Movie\Repository;
 
 class Select
 {
-    public function __construct(private readonly Repository $repository, private readonly ISO639 $ISO639)
+    public function __construct(private readonly Repository $repository)
     {
     }
 
@@ -24,35 +23,19 @@ class Select
         return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbDesc();
     }
 
-    public function findById(int $movieId) : ?array
+    public function fetchWithActor(int $personId) : EntityList
     {
-        $entity = $this->repository->findById($movieId);
+        return EntityList::createFromArray($this->repository->fetchWithActor($personId));
+    }
 
-        if ($entity === null) {
-            return null;
-        }
+    public function fetchWithDirector(int $personId) : EntityList
+    {
+        return EntityList::createFromArray($this->repository->fetchWithDirector($personId));
+    }
 
-        $renderedRuntime = '';
-        $hours = floor($entity->getRuntime() / 60);
-        if ($hours > 0) {
-            $renderedRuntime .= $hours . 'h';
-        }
-        $minutes = $entity->getRuntime() % 60;
-        if ($minutes > 0) {
-            $renderedRuntime .= ' ' . $minutes . 'm';
-        }
-
-        return [
-            'title' => $entity->getTitle(),
-            'releaseDate' => $entity->getReleaseDate(),
-            'posterPath' => $entity->getPosterPath(),
-            'rating5' => $entity->getRating5(),
-            'rating10' => $entity->getRating10(),
-            'tagline' => $entity->getTagline(),
-            'overview' => $entity->getOverview(),
-            'runtime' => $renderedRuntime,
-            'originalLanguage' => $this->ISO639->languageByCode1($entity->getOriginalLanguage()),
-        ];
+    public function findById(int $movieId) : ?Entity
+    {
+        return $this->repository->findById($movieId);
     }
 
     public function findByLetterboxdId(string $letterboxdId) : ?Entity

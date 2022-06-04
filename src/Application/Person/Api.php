@@ -25,16 +25,6 @@ class Api
         return $this->repository->findByTmdbId($tmdbId);
     }
 
-    public function findWatchedMoviesActedBy(int $personId) : array
-    {
-        return $this->repository->findWatchedMoviesActedBy($personId);
-    }
-
-    public function findWatchedMoviesDirectedBy(int $personId) : array
-    {
-        return $this->repository->findWatchedMoviesDirectedBy($personId);
-    }
-
     public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $posterPath) : void
     {
         $this->repository->update($id, $name, $gender, $knownForDepartment, $tmdbId, $posterPath);

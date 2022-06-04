@@ -376,6 +376,36 @@ class Repository
         )[0];
     }
 
+    public function fetchWithActor(int $personId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT m.*
+            FROM movie m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            JOIN person p ON mc.person_id = p.id
+            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            ORDER BY m.title
+            SQL,
+            [$personId]
+        );
+    }
+
+    public function fetchWithDirector(int $personId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT m.*
+            FROM movie m
+            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
+            JOIN person p ON mc.person_id = p.id
+            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_history mh)
+            ORDER BY m.title
+            SQL,
+            [$personId]
+        );
+    }
+
     public function findById(int $movieId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE id = ?', [$movieId]);
