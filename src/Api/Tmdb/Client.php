@@ -16,11 +16,19 @@ class Client
     ) {
     }
 
-    public function get(string $relativeUrl) : array
+    public function get(string $relativeUrl, array $getParameters = []) : array
     {
+        $getParametersRendered = '?';
+
+        foreach ($getParameters as $name => $getParameter) {
+            $getParametersRendered .= $name . '=' . $getParameter . '&';
+        }
+
+        $getParametersRendered .= 'api_key=' . $this->apiKey;
+
         $request = new Request(
             'GET',
-            self::BASE_URL . $relativeUrl . '?api_key=' . $this->apiKey,
+            self::BASE_URL . $relativeUrl . $getParametersRendered,
         );
 
         $response = $this->httpClient->sendRequest($request);

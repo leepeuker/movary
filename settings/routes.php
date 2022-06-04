@@ -15,7 +15,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/history',
-        [\Movary\HttpController\HistoryController::class, 'render']
+        [\Movary\HttpController\HistoryController::class, 'renderHistory']
     );
     $routeCollector->addRoute(
         'POST',
@@ -56,6 +56,16 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/mostWatchedDirectors',
         [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/addMovie',
+        [\Movary\HttpController\HistoryController::class, 'renderAddMoviePage']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/addMovie',
+        [\Movary\HttpController\HistoryController::class, 'addMovie']
     );
     $routeCollector->addRoute(
         'GET',

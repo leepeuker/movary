@@ -8,6 +8,7 @@ class Movie
 {
     private function __construct(
         private readonly int $id,
+        private readonly string $title,
         private readonly string $originalLanguage,
         private readonly ?string $tagline,
         private readonly ?string $overview,
@@ -25,6 +26,7 @@ class Movie
     {
         return new self(
             $data['id'],
+            $data['title'],
             $data['original_language'],
             empty($data['tagline']) === true ? null : $data['tagline'],
             empty($data['overview']) === true ? null : $data['overview'],
@@ -81,6 +83,11 @@ class Movie
     public function getTagline() : ?string
     {
         return $this->tagline;
+    }
+
+    public function getTitle() : string
+    {
+        return $this->title;
     }
 
     public function getVoteAverage() : float

@@ -24,4 +24,11 @@ class Api
 
         return Movie::createFromArray($data);
     }
+
+    public function searchMovie(string $searchTerm) : array
+    {
+        $data = $this->client->get('/search/movie', ['query' => $searchTerm]);
+
+        return $data['results'];
+    }
 }

@@ -2,7 +2,10 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Tmdb;
+use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
+use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -14,11 +17,48 @@ class HistoryController
 
     public function __construct(
         private readonly Environment $twig,
-        private readonly Select $movieHistorySelectService
+        private readonly Select $movieHistorySelectService,
+        private readonly Tmdb\Api $tmdbApi,
+        private readonly Movie\Api $movieApi,
     ) {
     }
 
-    public function render(Request $request) : Response
+    public function addMovie(Request $request) : Response
+    {
+        $watchDate = $request->getPostParameters()['watchDate'];
+        $tmdbId = $request->getPostParameters()['tmdbId'];
+
+        $movie = $this->tmdbApi->getMovieDetails((int)$tmdbId);
+
+        var_dump($movie);
+        // $this->movieApi->create($movie->getTitle(), null, null, null, null, $tmdbId);
+        exit;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+        );
+    }
+
+    public function renderAddMoviePage(Request $request) : Response
+    {
+        $searchTerm = $request->getGetParameters()['s'] ?? null;
+
+        $movies = [];
+        if ($searchTerm !== null) {
+            $movies = $this->tmdbApi->searchMovie($searchTerm);
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/addMovie.html.twig', [
+                'movies' => $movies,
+            ]),
+        );
+    }
+
+    public function renderHistory(Request $request) : Response
     {
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
