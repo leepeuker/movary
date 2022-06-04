@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'makro/tmdb.html.twig' as tmdb %}
 
 {% block title %}
     Person: {{ person.name }}
@@ -10,7 +11,7 @@
         <h2 style="display: flex;padding-top: 0.5rem;">{{ person.name }}</h2>
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="https://image.tmdb.org/t/p/w342{{ person.tmdbPosterPath }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="{{ tmdb.generatePosterImageUrl(person.tmdbPosterPath) }}" width="200rem" style="width: 11rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -49,7 +50,7 @@
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
-                                        <img src="https://image.tmdb.org/t/p/w342{{ movieAsActor.tmdbPosterPath }}" class="card-img-top" alt="..."
+                                        <img src="{{ tmdb.generatePosterImageUrl(movieAsActor.tmdbPosterPath) }}" class="card-img-top" alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
                                     </div>
 
@@ -71,7 +72,7 @@
                         <div class="col position-relative">
                             <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
-                                    <img src="https://image.tmdb.org/t/p/w342{{ movieAsDirector.tmdbPosterPath }}" class="card-img-top" alt="..."
+                                    <img src="{{ tmdb.generatePosterImageUrl(movieAsDirector.tmdbPosterPath) }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
 
                                 </div>

@@ -28,7 +28,7 @@
                                 <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                             </div>
                             <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                            <img src="https://image.tmdb.org/t/p/w342{{ mostWatchedActor.tmdb_poster_path }}" class="card-img-top" alt="...">
+                            <img src="{{ tmdb.generatePosterImageUrl(mostWatchedActor.tmdb_poster_path) }}" class="card-img-top" alt="...">
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.8rem">{{ mostWatchedActor.count }}</small>
                             </div>
