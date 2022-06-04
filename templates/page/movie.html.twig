@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Movie: {{ movie.title }} ({{ movie.release_date|date("Y") }})
+    Movie: {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
 {% endblock %}
 
 {% block stylesheets %}
@@ -13,7 +13,7 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
 
-        <h2 style="display: flex;padding-top: 0.5rem;">{{ movie.title }} ({{ movie.release_date|date("Y") }})</h2>
+        <h2 style="display: flex;padding-top: 0.5rem;">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
         <div style="display: flex;padding-top: 0.3rem">
             <div style="text-align: center">
                 <img src="https://image.tmdb.org/t/p/w342{{ movie.tmdbPosterPath }}" width="200rem" style="width: 11rem;align-self: start;">

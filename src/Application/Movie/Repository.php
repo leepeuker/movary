@@ -106,7 +106,7 @@ class Repository
     public function fetchHistoryOrderedByWatchedAtDesc() : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.title, m.rating_10, m.rating_5, mh.watched_at
+            'SELECT m.*, mh.watched_at
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC'
@@ -126,7 +126,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.id as id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.tmdb_poster_path
+            SELECT m.*, mh.watched_at
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             $whereQuery
@@ -140,7 +140,7 @@ class Repository
     public function fetchLastPlays() : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.tmdb_poster_path
+            'SELECT m.*, mh.watched_at
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC
