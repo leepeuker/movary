@@ -7,7 +7,7 @@ use Movary\Application\Person;
 
 class Select
 {
-    public function __construct(private readonly Repository $repository, private readonly Person\Service\Select $personSelectService)
+    public function __construct(private readonly Repository $repository, private readonly Person\Api $personApi)
     {
     }
 
@@ -16,7 +16,7 @@ class Select
         $directors = [];
 
         foreach ($this->repository->findDirectorsByMovieId($movieId) as $director) {
-            $person = $this->personSelectService->findById($director->getPersonId());
+            $person = $this->personApi->findById($director->getPersonId());
 
             $directors[] = [
                 'id' => $person?->getId(),

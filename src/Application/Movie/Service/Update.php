@@ -21,9 +21,7 @@ class Update
         private readonly Movie\Genre\Service\Delete $movieGenreDeleteService,
         private readonly Movie\ProductionCompany\Service\Create $movieProductionCompanyCreateService,
         private readonly Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService,
-        private readonly Person\Service\Select $personSelectService,
-        private readonly Person\Service\Create $personCreateService,
-        private readonly Person\Service\Update $personUpdateService,
+        private readonly Person\Api $personApi,
         private readonly Movie\Cast\Service\Create $movieCastCreateService,
         private readonly Movie\Cast\Service\Delete $movieCasteDeleteService,
         private readonly Movie\Crew\Service\Create $movieCrewCreateService,
@@ -114,10 +112,10 @@ class Update
 
     private function createOrUpdatePersonByTmdbId(int $tmdbId, string $name, Gender $gender, ?string $knownForDepartment, ?string $posterPath) : Person\Entity
     {
-        $person = $this->personSelectService->findByTmdbId($tmdbId);
+        $person = $this->personApi->findByTmdbId($tmdbId);
 
         if ($person === null) {
-            $person = $this->personCreateService->create(
+            $person = $this->personApi->create(
                 $name,
                 $gender,
                 $knownForDepartment,
@@ -129,7 +127,7 @@ class Update
                   $person->getKnownForDepartment() !== $knownForDepartment ||
                   $person->getPosterPath() !== $posterPath
         ) {
-            $this->personUpdateService->update($person->getId(), $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
+            $this->personApi->update($person->getId(), $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
         }
 
         return $person;

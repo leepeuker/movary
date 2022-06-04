@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Application\Service\Letterboxd;
+namespace Movary\Api\Letterboxd;
 
 use GuzzleHttp\Client;
 

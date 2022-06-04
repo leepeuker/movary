@@ -1,14 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Application\Person\Service;
+namespace Movary\Application\Person;
 
-use Movary\Application\Person\Entity;
-use Movary\Application\Person\Repository;
+use Movary\ValueObject\Gender;
 
-class Select
+class Api
 {
     public function __construct(private readonly Repository $repository)
     {
+    }
+
+    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $posterPath) : Entity
+    {
+        return $this->repository->create($name, $gender, $knownForDepartment, $tmdbId, $posterPath);
     }
 
     public function findById(int $personId) : ?Entity
@@ -29,5 +33,10 @@ class Select
     public function findWatchedMoviesDirectedBy(int $personId) : array
     {
         return $this->repository->findWatchedMoviesDirectedBy($personId);
+    }
+
+    public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $posterPath) : void
+    {
+        $this->repository->update($id, $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
     }
 }

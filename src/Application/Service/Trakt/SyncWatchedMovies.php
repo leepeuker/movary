@@ -10,11 +10,8 @@ use Psr\Log\LoggerInterface;
 class SyncWatchedMovies
 {
     public function __construct(
-        private readonly Application\Movie\Service\Create $movieCreateService,
+        private readonly Application\Movie\Api $movieApi,
         private readonly Application\Movie\Service\Select $movieSelectService,
-        private readonly Application\Movie\History\Service\Create $movieHistoryCreateService,
-        private readonly Application\Movie\History\Service\Delete $movieHistoryDeleteService,
-        private readonly Application\Movie\History\Service\Select $movieHistorySelectService,
         private readonly Api\Trakt\Api $traktApi,
         private readonly Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService,
         private readonly LoggerInterface $logger
@@ -26,10 +23,10 @@ class SyncWatchedMovies
         $watchedMovies = $this->traktApi->getUserMoviesWatched();
 
         foreach ($watchedMovies as $watchedMovie) {
-            $movie = $this->movieSelectService->findByTraktId($watchedMovie->getMovie()->getTraktId());
+            $movie = $this->movieApi->findByTraktId($watchedMovie->getMovie()->getTraktId());
 
             if ($movie === null) {
-                $movie = $this->movieCreateService->create(
+                $movie = $this->movieApi->create(
                     $watchedMovie->getMovie()->getTitle(),
                     null,
                     null,
@@ -68,7 +65,7 @@ class SyncWatchedMovies
     {
         foreach ($this->movieSelectService->fetchAll() as $movie) {
             if ($watchedMovies->containsTraktId($movie->getTraktId()) === false) {
-                $this->movieHistoryDeleteService->deleteByMovieId($movie->getId());
+                $this->movieApi->deleteById($movie->getId());
 
                 $this->logger->info('Removed watch dates for movie: ' . $movie->getTitle());
             }
@@ -90,10 +87,10 @@ class SyncWatchedMovies
 
         foreach ($playsPerDates as $watchedAt => $playsPerDate) {
             $watchedAtObject = Date::createFromString($watchedAt);
-            $currentPlays = $this->movieHistorySelectService->fetchPlaysForMovieIdOnDate($movie->getId(), $watchedAtObject);
+            $currentPlays = $this->movieApi->fetchHistoryMoviePlaysOnDate($movie->getId(), $watchedAtObject);
 
             if ($currentPlays < $playsPerDate || ($currentPlays > $playsPerDate && $overwriteExistingData === true)) {
-                $this->movieHistoryCreateService->createOrUpdatePlaysForDate($movie->getId(), $watchedAtObject, $playsPerDate);
+                $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $watchedAtObject, $playsPerDate);
 
                 $this->logger->info('Updated plays for "' . $movie->getTitle() . '" at ' . $watchedAt . " from $currentPlays to $playsPerDate");
             }

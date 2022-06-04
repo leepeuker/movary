@@ -15,12 +15,9 @@ class SyncMovieDetails
 {
     public function __construct(
         private readonly Tmdb\Api $api,
-        private readonly Movie\Service\Select $movieSelectService,
-        private readonly Movie\Service\Update $movieUpdateService,
-        private readonly Genre\Service\Select $genreSelectService,
-        private readonly Genre\Service\Create $genreCreateService,
-        private readonly Company\Service\Select $companySelectService,
-        private readonly Company\Service\Create $companyCreateService,
+        private readonly Movie\Api $movieApi,
+        private readonly Genre\Api $genreApi,
+        private readonly Company\Api $companyApi,
         private readonly DBAL\Connection $dbConnection,
         private readonly LoggerInterface $logger,
         private readonly Repository $scanLogRepository
@@ -29,7 +26,7 @@ class SyncMovieDetails
 
     public function execute(?int $maxAgeInHours, ?int $movieCountSyncThreshold) : void
     {
-        $movies = $this->movieSelectService->fetchAllOrderedByLastUpdatedAtTmdbDesc();
+        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbDesc();
 
         $movieCountSynced = 0;
 
@@ -65,10 +62,10 @@ class SyncMovieDetails
         $genres = Genre\EntityList::create();
 
         foreach ($movieDetails->getGenres() as $tmdbGenre) {
-            $genre = $this->genreSelectService->findByTmdbId($tmdbGenre->getId());
+            $genre = $this->genreApi->findByTmdbId($tmdbGenre->getId());
 
             if ($genre === null) {
-                $genre = $this->genreCreateService->create($tmdbGenre->getName(), $tmdbGenre->getId());
+                $genre = $this->genreApi->create($tmdbGenre->getName(), $tmdbGenre->getId());
             }
 
             $genres->add($genre);
@@ -82,10 +79,10 @@ class SyncMovieDetails
         $productionCompany = Company\EntityList::create();
 
         foreach ($movieDetails->getProductionCompanies() as $tmdbCompany) {
-            $company = $this->companySelectService->findByTmdbId($tmdbCompany->getId());
+            $company = $this->companyApi->findByTmdbId($tmdbCompany->getId());
 
             if ($company === null) {
-                $company = $this->companyCreateService->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
+                $company = $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
             }
 
             $productionCompany->add($company);
@@ -98,15 +95,15 @@ class SyncMovieDetails
     {
         $credits = $this->api->getMovieCredits($movie->getTmdbId());
 
-        $this->movieUpdateService->updateCast($movie->getId(), $credits->getCast());
-        $this->movieUpdateService->updateCrew($movie->getId(), $credits->getCrew());
+        $this->movieApi->updateCast($movie->getId(), $credits->getCast());
+        $this->movieApi->updateCrew($movie->getId(), $credits->getCrew());
     }
 
     public function updateDetails(Movie\Entity $movie) : void
     {
         $movieDetails = $this->api->getMovieDetails($movie->getTmdbId());
 
-        $this->movieUpdateService->updateDetails(
+        $this->movieApi->updateDetails(
             $movie->getId(),
             $movieDetails->getTagline(),
             $movieDetails->getOverview(),
@@ -118,8 +115,8 @@ class SyncMovieDetails
             $movieDetails->getPosterPath(),
         );
 
-        $this->movieUpdateService->updateGenres($movie->getId(), $this->getGenres($movieDetails));
-        $this->movieUpdateService->updateProductionCompanies($movie->getId(), $this->getProductionCompanies($movieDetails));
+        $this->movieApi->updateGenres($movie->getId(), $this->getGenres($movieDetails));
+        $this->movieApi->updateProductionCompanies($movie->getId(), $this->getProductionCompanies($movieDetails));
     }
 
     private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays = null) : bool

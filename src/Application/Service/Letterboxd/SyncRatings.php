@@ -4,14 +4,14 @@ namespace Movary\Application\Service\Letterboxd;
 
 use League\Csv\Reader;
 use Movary\Api;
+use Movary\Api\Letterboxd\WebScrapper;
 use Movary\Application;
 use Psr\Log\LoggerInterface;
 
 class SyncRatings
 {
     public function __construct(
-        private readonly Application\Movie\Service\Update $movieUpdateService,
-        private readonly Application\Movie\Service\Select $movieSelectService,
+        private readonly Application\Movie\Api $movieApi,
         private readonly WebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
         private readonly Application\SyncLog\Repository $scanLogRepository
@@ -38,7 +38,7 @@ class SyncRatings
                 echo "Updating {$movie->getTitle()} with rating: " . $rating['Rating'] . PHP_EOL;
             }
 
-            $this->movieUpdateService->updateRating5($movie->getId(), (int)$rating['Rating']);
+            $this->movieApi->updateRating5($movie->getId(), (int)$rating['Rating']);
         }
 
         $this->scanLogRepository->insertLogForLetterboxdSync();
@@ -47,17 +47,17 @@ class SyncRatings
     public function findMovieByLetterboxdUri(string $letterboxdUri) : ?Application\Movie\Entity
     {
         $letterboxdId = basename($letterboxdUri);
-        $movie = $this->movieSelectService->findByLetterboxdId($letterboxdId);
+        $movie = $this->movieApi->findByLetterboxdId($letterboxdId);
 
         if ($movie === null) {
             $tmdbId = $this->webScrapper->getProviderTmdbId($letterboxdUri);
 
-            $movie = $this->movieSelectService->findByTmdbId($tmdbId);
+            $movie = $this->movieApi->findByTmdbId($tmdbId);
             if ($movie === null) {
                 return null;
             }
 
-            $this->movieUpdateService->updateLetterboxdId($movie->getId(), $letterboxdId);
+            $this->movieApi->updateLetterboxdId($movie->getId(), $letterboxdId);
         }
 
         return $movie;

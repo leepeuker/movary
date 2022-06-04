@@ -14,7 +14,7 @@ use Twig\Environment;
 class PersonController
 {
     public function __construct(
-        private readonly Person\Service\Select $personSelectService,
+        private readonly Person\Api $personApi,
         private readonly Environment $twig,
     ) {
     }
@@ -25,7 +25,7 @@ class PersonController
 
         return Response::create(
             StatusCode::createOk(),
-            Json::encode($this->personSelectService->findWatchedMoviesActedBy($personId)),
+            Json::encode($this->personApi->findWatchedMoviesActedBy($personId)),
             [Header::createContentTypeJson()]
         );
     }
@@ -36,7 +36,7 @@ class PersonController
 
         return Response::create(
             StatusCode::createOk(),
-            Json::encode($this->personSelectService->findWatchedMoviesDirectedBy($personId)),
+            Json::encode($this->personApi->findWatchedMoviesDirectedBy($personId)),
             [Header::createContentTypeJson()]
         );
     }
@@ -48,9 +48,9 @@ class PersonController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/actor.html.twig', [
-                'person' => $this->personSelectService->findById($personId),
-                'moviesAsActor' => $this->personSelectService->findWatchedMoviesActedBy($personId),
-                'moviesAsDirector' => $this->personSelectService->findWatchedMoviesDirectedBy($personId),
+                'person' => $this->personApi->findById($personId),
+                'moviesAsActor' => $this->personApi->findWatchedMoviesActedBy($personId),
+                'moviesAsDirector' => $this->personApi->findWatchedMoviesDirectedBy($personId),
             ]),
         );
     }
