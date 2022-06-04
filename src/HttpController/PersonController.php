@@ -2,10 +2,7 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie;
 use Movary\Application\Person;
-use Movary\Util\Json;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -17,28 +14,6 @@ class PersonController
         private readonly Person\Api $personApi,
         private readonly Environment $twig,
     ) {
-    }
-
-    public function fetchWatchedMoviesActedBy(Request $request) : Response
-    {
-        $personId = (int)$request->getRouteParameters()['id'];
-
-        return Response::create(
-            StatusCode::createOk(),
-            Json::encode($this->personApi->findWatchedMoviesActedBy($personId)),
-            [Header::createContentTypeJson()]
-        );
-    }
-
-    public function fetchWatchedMoviesDirectedBy(Request $request) : Response
-    {
-        $personId = (int)$request->getRouteParameters()['id'];
-
-        return Response::create(
-            StatusCode::createOk(),
-            Json::encode($this->personApi->findWatchedMoviesDirectedBy($personId)),
-            [Header::createContentTypeJson()]
-        );
     }
 
     public function renderPage(Request $request) : Response

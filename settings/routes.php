@@ -67,41 +67,4 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']
     );
-
-    ### Api
-    $routeCollector->addRoute(
-        'GET',
-        '/api/history',
-        [\Movary\HttpController\MovieHistoryController::class, 'fetchHistory']
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/api/mostWatchedMovies',
-        [\Movary\HttpController\MostWatchedMoviesController::class, 'fetchMostWatchedMovies']
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/api/mostWatchedActors',
-        [\Movary\HttpController\MostWatchedActorsController::class, 'fetchMostWatchedActors']
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/api/mostWatchedGenres',
-        [\Movary\HttpController\MostWatchedGenresController::class, 'fetchMostWatchedGenres']
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/api/mostWatchedProductionCompanies',
-        [\Movary\HttpController\MostWatchedProductionCompaniesController::class, 'fetchMostWatchedProductionCompanies']
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/api/person/{id:\d+}/director',
-        [\Movary\HttpController\PersonController::class, 'fetchWatchedMoviesDirectedBy']
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/api/person/{id:\d+}/actor',
-        [\Movary\HttpController\PersonController::class, 'fetchWatchedMoviesActedBy']
-    );
 };

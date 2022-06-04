@@ -20,15 +20,6 @@ class MostWatchedActorsController
     ) {
     }
 
-    public function fetchMostWatchedActors() : Response
-    {
-        return Response::create(
-            StatusCode::createOk(),
-            Json::encode($this->movieHistorySelectService->fetchMostWatchedActors()),
-            [Header::createContentTypeJson()]
-        );
-    }
-
     public function renderPage(Request $request) : Response
     {
         $searchTerm = $request->getGetParameters()['s'] ?? null;

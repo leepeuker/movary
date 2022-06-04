@@ -3,8 +3,6 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie\History\Service\Select;
-use Movary\Util\Json;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -19,7 +17,6 @@ class MostWatchedDirectorsController
         private readonly Environment $twig
     ) {
     }
-
 
     public function renderPage(Request $request) : Response
     {
