@@ -443,7 +443,7 @@ class Repository
         ?int $runtime,
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
-        ?string $posterPath,
+        ?string $tmdbPosterPath,
     ) : Entity {
         $this->dbConnection->update(
             'movie',
@@ -455,7 +455,7 @@ class Repository
                 'runtime' => $runtime,
                 'tmdb_vote_average' => $tmdbVoteAverage,
                 'tmdb_vote_count' => $tmdbVoteCount,
-                'poster_path' => $posterPath,
+                'tmdb_poster_path' => $tmdbPosterPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
             ],
             ['id' => $id]

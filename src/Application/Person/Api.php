@@ -10,9 +10,9 @@ class Api
     {
     }
 
-    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $posterPath) : Entity
+    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : Entity
     {
-        return $this->repository->create($name, $gender, $knownForDepartment, $tmdbId, $posterPath);
+        return $this->repository->create($name, $gender, $knownForDepartment, $tmdbId, $tmdbPosterPath);
     }
 
     public function findById(int $personId) : ?Entity
@@ -25,8 +25,8 @@ class Api
         return $this->repository->findByTmdbId($tmdbId);
     }
 
-    public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $posterPath) : void
+    public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : void
     {
-        $this->repository->update($id, $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
+        $this->repository->update($id, $name, $gender, $knownForDepartment, $tmdbId, $tmdbPosterPath);
     }
 }

@@ -12,7 +12,7 @@ class Repository
     {
     }
 
-    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $posterPath) : Entity
+    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : Entity
     {
         $this->dbConnection->insert(
             'person',
@@ -21,7 +21,7 @@ class Repository
                 'gender' => $gender->asInt(),
                 'known_for_department' => $knownForDepartment,
                 'tmdb_id' => $tmdbId,
-                'poster_path' => $posterPath,
+                'tmdb_poster_path' => $tmdbPosterPath,
             ]
         );
 
@@ -50,7 +50,7 @@ class Repository
         return Entity::createFromArray($data);
     }
 
-    public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $posterPath) : void
+    public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : void
     {
         $this->dbConnection->update(
             'person',
@@ -59,7 +59,7 @@ class Repository
                 'gender' => $gender->asInt(),
                 'known_for_department' => $knownForDepartment,
                 'tmdb_id' => $tmdbId,
-                'poster_path' => $posterPath,
+                'tmdb_poster_path' => $tmdbPosterPath,
             ],
             [
                 'id' => $id,

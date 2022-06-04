@@ -158,9 +158,19 @@ class Api
         ?int $runtime,
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
-        ?string $posterPath,
+        ?string $tmdbPosterPath,
     ) : Entity {
-        return $this->movieUpdateService->updateDetails($movieId, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount, $posterPath);
+        return $this->movieUpdateService->updateDetails(
+            $movieId,
+            $tagline,
+            $overview,
+            $originalLanguage,
+            $releaseDate,
+            $runtime,
+            $tmdbVoteAverage,
+            $tmdbVoteCount,
+            $tmdbPosterPath
+        );
     }
 
     public function updateGenres(int $movieId, Genre\EntityList $genres) : void
