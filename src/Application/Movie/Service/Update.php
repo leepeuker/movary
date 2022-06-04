@@ -125,7 +125,7 @@ class Update
         } elseif ($person->getName() !== $name ||
                   $person->getGender() !== $gender ||
                   $person->getKnownForDepartment() !== $knownForDepartment ||
-                  $person->getPosterPath() !== $posterPath
+                  $person->getTmdbPosterPath() !== $posterPath
         ) {
             $this->personApi->update($person->getId(), $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
         }

@@ -12,7 +12,8 @@ class Entity
         private readonly Gender $gender,
         private readonly ?string $knownForDepartment,
         private readonly int $tmdbId,
-        private readonly ?string $posterPath
+        private readonly ?string $posterPath,
+        private readonly ?string $tmdbPosterPath,
     ) {
     }
 
@@ -25,6 +26,7 @@ class Entity
             $data['known_for_department'],
             $data['tmdb_id'],
             $data['poster_path'],
+            $data['tmdb_poster_path'],
         );
     }
 
@@ -56,5 +58,10 @@ class Entity
     public function getTmdbId() : int
     {
         return $this->tmdbId;
+    }
+
+    public function getTmdbPosterPath() : ?string
+    {
+        return $this->tmdbPosterPath;
     }
 }

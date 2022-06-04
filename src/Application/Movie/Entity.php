@@ -23,6 +23,7 @@ class Entity
         private readonly ?DateTime $releaseDate,
         private readonly ?float $tmdbVoteAverage,
         private readonly ?int $tmdbVoteCount,
+        private readonly ?string $tmdbPosterPath,
         private readonly ?DateTime $updatedAtTmdb
     ) {
     }
@@ -45,6 +46,7 @@ class Entity
             $data['release_date'] === null ? null : DateTime::createFromString($data['release_date']),
             $data['tmdb_vote_average'] === null ? null : (float)$data['tmdb_vote_average'],
             $data['tmdb_vote_count'] === null ? null : (int)$data['tmdb_vote_count'],
+            $data['tmdb_poster_path'],
             $data['updated_at_tmdb'] === null ? null : DateTime::createFromString($data['updated_at_tmdb']),
         );
     }
@@ -107,6 +109,11 @@ class Entity
     public function getTmdbId() : int
     {
         return $this->tmdbId;
+    }
+
+    public function getTmdbPosterPath() : ?string
+    {
+        return $this->tmdbPosterPath;
     }
 
     public function getTmdbVoteAverage() : ?float

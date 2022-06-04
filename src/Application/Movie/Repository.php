@@ -126,7 +126,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.id as id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+            SELECT m.id as id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.tmdb_poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             $whereQuery
@@ -140,7 +140,7 @@ class Repository
     public function fetchLastPlays() : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.poster_path
+            'SELECT m.id, m.title, YEAR(m.release_date) as year , m.rating_10, mh.watched_at, m.tmdb_poster_path
             FROM movie_history mh
             JOIN movie m on mh.movie_id = m.id
             ORDER BY watched_at DESC
@@ -170,7 +170,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(*) as count, p.gender, p.poster_path
+            SELECT p.id, p.name, COUNT(*) as count, p.gender, p.tmdb_poster_path
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
@@ -226,7 +226,7 @@ class Repository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(*) as count, p.gender, p.poster_path
+            SELECT p.id, p.name, COUNT(*) as count, p.gender, p.tmdb_poster_path
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id

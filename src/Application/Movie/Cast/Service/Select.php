@@ -21,7 +21,7 @@ class Select
             $castMembers[] = [
                 'id' => $person?->getId(),
                 'name' => $person?->getName(),
-                'posterPath' => $person?->getPosterPath(),
+                'tmdbPosterPath' => $person?->getTmdbPosterPath(),
             ];
         }
 

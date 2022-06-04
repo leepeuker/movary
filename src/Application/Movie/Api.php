@@ -94,7 +94,7 @@ class Api
         return [
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
-            'posterPath' => $entity->getPosterPath(),
+            'tmdbPosterPath' => $entity->getTmdbPosterPath(),
             'rating5' => $entity->getRating5(),
             'rating10' => $entity->getRating10(),
             'tagline' => $entity->getTagline(),

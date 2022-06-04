@@ -16,7 +16,7 @@
         <h2 style="display: flex;padding-top: 0.5rem;">{{ movie.title }} ({{ movie.release_date|date("Y") }})</h2>
         <div style="display: flex;padding-top: 0.3rem">
             <div style="text-align: center">
-                <img src="https://image.tmdb.org/t/p/w342{{ movie.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="https://image.tmdb.org/t/p/w342{{ movie.tmdbPosterPath }}" width="200rem" style="width: 11rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -65,7 +65,7 @@
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small>
                     </div>
-                    <img src="https://image.tmdb.org/t/p/w342{{ castMember.posterPath }}" class="card-img-top" alt="..."
+                    <img src="https://image.tmdb.org/t/p/w342{{ castMember.tmdbPosterPath }}" class="card-img-top" alt="..."
                          style="border-top-left-radius:0;border-top-right-radius:0;">
                 </div>
             {% endfor %}
@@ -78,7 +78,7 @@
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
                     </div>
-                    <img src="https://image.tmdb.org/t/p/w342{{ director.posterPath }}" class="card-img-top" alt="..." style="border-top-left-radius:0;border-top-right-radius:0;">
+                    <img src="https://image.tmdb.org/t/p/w342{{ director.tmdbPosterPath }}" class="card-img-top" alt="..." style="border-top-left-radius:0;border-top-right-radius:0;">
                 </div>
             {% endfor %}
         </div>
