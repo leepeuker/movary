@@ -2,6 +2,8 @@
 
 namespace Movary\Application\Movie;
 
+use Movary\Api\Tmdb\Dto\Cast;
+use Movary\Api\Tmdb\Dto\Crew;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Company;
 use Movary\Application\Genre;
@@ -15,12 +17,12 @@ class Api
         private readonly Service\Create $movieCreateService,
         private readonly Service\Select $movieSelectService,
         private readonly Service\Update $movieUpdateService,
-        private readonly History\Service\Create $historyCreateService,
-        private readonly History\Service\Delete $historyDeleteService,
-        private readonly History\Service\Select $historySelectService,
+        private readonly Movie\History\Service\Create $historyCreateService,
+        private readonly Movie\History\Service\Delete $historyDeleteService,
+        private readonly Movie\History\Service\Select $historySelectService,
         private readonly Movie\Genre\Service\Select $genreSelectService,
         private readonly Movie\Cast\Service\Select $castSelectService,
-        private readonly Crew\Service\Select $crewSelectService,
+        private readonly Movie\Crew\Service\Select $crewSelectService,
     ) {
     }
 
@@ -99,18 +101,18 @@ class Api
         $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $watchedAt, $playsPerDate);
     }
 
-    public function updateCast(int $id, \Movary\Api\Tmdb\Dto\Cast $tmdbCast) : void
+    public function updateCast(int $movieId, Cast $tmdbCast) : void
     {
-        $this->movieUpdateService->updateCast($id, $tmdbCast);
+        $this->movieUpdateService->updateCast($movieId, $tmdbCast);
     }
 
-    public function updateCrew(int $id, \Movary\Api\Tmdb\Dto\Crew $tmdbCrew) : void
+    public function updateCrew(int $movieId, Crew $tmdbCrew) : void
     {
-        $this->movieUpdateService->updateCrew($id, $tmdbCrew);
+        $this->movieUpdateService->updateCrew($movieId, $tmdbCrew);
     }
 
     public function updateDetails(
-        int $id,
+        int $movieId,
         ?string $tagline,
         ?string $overview,
         ?string $originalLanguage,
@@ -120,7 +122,7 @@ class Api
         ?int $tmdbVoteCount,
         ?string $posterPath,
     ) : Entity {
-        return $this->movieUpdateService->updateDetails($id, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount, $posterPath);
+        return $this->movieUpdateService->updateDetails($movieId, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount, $posterPath);
     }
 
     public function updateGenres(int $movieId, Genre\EntityList $genres) : void
@@ -138,13 +140,13 @@ class Api
         $this->movieUpdateService->updateProductionCompanies($movieId, $companies);
     }
 
-    public function updateRating10(int $id, ?int $rating10) : void
+    public function updateRating10(int $movieId, ?int $rating10) : void
     {
-        $this->movieUpdateService->updateRating10($id, $rating10);
+        $this->movieUpdateService->updateRating10($movieId, $rating10);
     }
 
-    public function updateRating5(int $id, ?int $rating5) : void
+    public function updateRating5(int $movieId, ?int $rating5) : void
     {
-        $this->movieUpdateService->updateRating5($id, $rating5);
+        $this->movieUpdateService->updateRating5($movieId, $rating5);
     }
 }
