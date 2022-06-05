@@ -6,6 +6,7 @@ use Movary\Api\Tmdb;
 use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Application\Service\Tmdb\SyncMovie;
+use Movary\Application\SessionService;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Header;
@@ -24,11 +25,16 @@ class HistoryController
         private readonly Tmdb\Api $tmdbApi,
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
+        private readonly SessionService $sessionService
     ) {
     }
 
     public function logMovie(Request $request) : Response
     {
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
         $postParameters = $request->getPostParameters();
 
         $watchDate = Date::createFromDateTime(DateTime::createFromString($postParameters['watchDate']));
@@ -83,6 +89,10 @@ class HistoryController
 
     public function renderLogMoviePage(Request $request) : Response
     {
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
         $searchTerm = $request->getGetParameters()['s'] ?? null;
 
         $movies = [];
