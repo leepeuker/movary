@@ -13,21 +13,21 @@ class Api
     ) {
     }
 
-    public function getUserMovieHistoryByMovieId(TraktId $traktId) : User\Movie\History\DtoList
+    public function fetchUserMovieHistoryByMovieId(TraktId $traktId) : User\Movie\History\DtoList
     {
         $responseData = $this->client->get(sprintf('/users/%s/history/movies/%d', $this->username, $traktId->asInt()));
 
         return User\Movie\History\DtoList::createFromArray($responseData);
     }
 
-    public function getUserMoviesRatings() : User\Movie\Rating\DtoList
+    public function fetchUserMoviesRatings() : User\Movie\Rating\DtoList
     {
         $responseData = $this->client->get(sprintf('/users/%s/ratings/movies', $this->username));
 
         return User\Movie\Rating\DtoList::createFromArray($responseData);
     }
 
-    public function getUserMoviesWatched() : User\Movie\Watched\DtoList
+    public function fetchUserMoviesWatched() : User\Movie\Watched\DtoList
     {
         $responseData = $this->client->get(sprintf('/users/%s/watched/movies', $this->username));
 

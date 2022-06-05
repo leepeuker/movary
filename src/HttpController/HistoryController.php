@@ -5,6 +5,9 @@ namespace Movary\HttpController;
 use Movary\Api\Tmdb;
 use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
+use Movary\Application\Service\Tmdb\SyncMovie;
+use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -20,41 +23,33 @@ class HistoryController
         private readonly Select $movieHistorySelectService,
         private readonly Tmdb\Api $tmdbApi,
         private readonly Movie\Api $movieApi,
+        private readonly SyncMovie $tmdbMovieSyncService,
     ) {
     }
 
-    public function addMovie(Request $request) : Response
+    public function logMovie(Request $request) : Response
     {
-        $watchDate = $request->getPostParameters()['watchDate'];
-        $tmdbId = $request->getPostParameters()['tmdbId'];
+        $postParameters = $request->getPostParameters();
 
-        $movie = $this->tmdbApi->getMovieDetails((int)$tmdbId);
+        $watchDate = Date::createFromDateTime(DateTime::createFromString($postParameters['watchDate']));
+        $tmdbId = (int)$postParameters['tmdbId'];
+        $rating10 = (int)$postParameters['rating10'];
+        $rating5 = (int)$postParameters['rating5'];
 
-        var_dump($movie);
-        // $this->movieApi->create($movie->getTitle(), null, null, null, null, $tmdbId);
-        exit;
+        $movie = $this->movieApi->findByTmdbId($tmdbId);
+
+        if ($movie === null) {
+            $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
+        }
+
+        $this->movieApi->updateRating5($movie->getId(), $rating5);
+        $this->movieApi->updateRating10($movie->getId(), $rating10);
+        $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $watchDate, 1);
 
         return Response::create(
             StatusCode::createSeeOther(),
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])]
-        );
-    }
-
-    public function renderAddMoviePage(Request $request) : Response
-    {
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-
-        $movies = [];
-        if ($searchTerm !== null) {
-            $movies = $this->tmdbApi->searchMovie($searchTerm);
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/addMovie.html.twig', [
-                'movies' => $movies,
-            ]),
         );
     }
 
@@ -81,6 +76,24 @@ class HistoryController
             $this->twig->render('page/history.html.twig', [
                 'historyEntries' => $historyPaginated,
                 'paginationElements' => $paginationElements,
+                'searchTerm' => $searchTerm,
+            ]),
+        );
+    }
+
+    public function renderLogMoviePage(Request $request) : Response
+    {
+        $searchTerm = $request->getGetParameters()['s'] ?? null;
+
+        $movies = [];
+        if ($searchTerm !== null) {
+            $movies = $this->tmdbApi->searchMovie($searchTerm);
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/logMovie.html.twig', [
+                'movies' => $movies,
                 'searchTerm' => $searchTerm,
             ]),
         );

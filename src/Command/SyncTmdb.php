@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\Service\Tmdb\SyncMovieDetails;
+use Movary\Application\Service\Tmdb\SyncMovies;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,7 +17,7 @@ class SyncTmdb extends Command
     protected static $defaultName = 'app:sync-tmdb';
 
     public function __construct(
-        private readonly SyncMovieDetails $syncMovieDetails,
+        private readonly SyncMovies $syncMovieDetails,
         private readonly LoggerInterface $logger
     ) {
         parent::__construct();
@@ -42,7 +42,7 @@ class SyncTmdb extends Command
         try {
             $this->generateOutput($output, 'Syncing movie meta data...');
 
-            $this->syncMovieDetails->execute($maxAgeInHours, $movieCountSyncThreshold);
+            $this->syncMovieDetails->syncMovies($maxAgeInHours, $movieCountSyncThreshold);
 
             $this->generateOutput($output, 'Syncing movie meta data done.');
         } catch (\Throwable $t) {

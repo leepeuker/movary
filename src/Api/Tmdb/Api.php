@@ -11,14 +11,14 @@ class Api
     {
     }
 
-    public function getMovieCredits(int $movieId) : Credits
+    public function fetchMovieCredits(int $movieId) : Credits
     {
         $data = $this->client->get('/movie/' . $movieId . '/credits');
 
         return Credits::createFromArray($data);
     }
 
-    public function getMovieDetails(int $movieId) : Movie
+    public function fetchMovieDetails(int $movieId) : Movie
     {
         $data = $this->client->get('/movie/' . $movieId);
 

@@ -3,6 +3,7 @@
 namespace Movary\Application\Service\Trakt;
 
 use Movary\Api;
+use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application;
 use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
@@ -20,19 +21,19 @@ class SyncWatchedMovies
 
     public function execute(bool $overwriteExistingData = false) : void
     {
-        $watchedMovies = $this->traktApi->getUserMoviesWatched();
+        $watchedMovies = $this->traktApi->fetchUserMoviesWatched();
 
         foreach ($watchedMovies as $watchedMovie) {
-            $movie = $this->movieApi->findByTraktId($watchedMovie->getMovie()->getTraktId());
+            $traktId = $watchedMovie->getMovie()->getTraktId();
+
+            $movie = $this->movieApi->findByTraktId($traktId);
 
             if ($movie === null) {
                 $movie = $this->movieApi->create(
-                    $watchedMovie->getMovie()->getTitle(),
-                    null,
-                    null,
-                    $watchedMovie->getMovie()->getTraktId(),
-                    $watchedMovie->getMovie()->getImdbId(),
-                    $watchedMovie->getMovie()->getTmdbId(),
+                    title: $watchedMovie->getMovie()->getTitle(),
+                    tmdbId: $watchedMovie->getMovie()->getTmdbId(),
+                    traktId: $traktId,
+                    imdbId: $watchedMovie->getMovie()->getImdbId(),
                 );
 
                 $this->logger->info('Added movie: ' . $movie->getTitle());
@@ -42,9 +43,9 @@ class SyncWatchedMovies
                 continue;
             }
 
-            $this->syncMovieHistory($movie, $overwriteExistingData);
+            $this->syncMovieHistory($traktId, $movie, $overwriteExistingData);
 
-            $this->traktApiCacheUserMovieWatchedService->setOne($movie->getTraktId(), $watchedMovie->getLastUpdated());
+            $this->traktApiCacheUserMovieWatchedService->setOne($traktId, $watchedMovie->getLastUpdated());
         }
 
         if ($overwriteExistingData === true) {
@@ -64,19 +65,23 @@ class SyncWatchedMovies
     private function removeMovieHistoryFromNotWatchedMovies(Api\Trakt\ValueObject\User\Movie\Watched\DtoList $watchedMovies) : void
     {
         foreach ($this->movieSelectService->fetchAll() as $movie) {
-            if ($watchedMovies->containsTraktId($movie->getTraktId()) === false) {
-                $this->movieApi->deleteById($movie->getId());
+            $traktId = $movie->getTraktId();
 
-                $this->logger->info('Removed watch dates for movie: ' . $movie->getTitle());
+            if ($traktId !== null && $watchedMovies->containsTraktId($traktId) === true) {
+                continue;
             }
+
+            $this->movieApi->deleteHistoryById($movie->getId());
+
+            $this->logger->info('Removed watch dates for movie: ' . $movie->getTitle());
         }
     }
 
-    private function syncMovieHistory(Application\Movie\Entity $movie, bool $overwriteExistingData) : void
+    private function syncMovieHistory(TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
     {
         $playsPerDates = [];
 
-        foreach ($this->traktApi->getUserMovieHistoryByMovieId($movie->getTraktId()) as $movieHistoryEntry) {
+        foreach ($this->traktApi->fetchUserMovieHistoryByMovieId($traktId) as $movieHistoryEntry) {
             if (empty($playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())]) === true) {
                 $playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())] = 1;
                 continue;

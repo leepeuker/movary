@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'makro/tmdb.html.twig' as tmdb %}
 
 {% block title %}
     Most Watched Actors
@@ -14,7 +15,7 @@
         {{ include('component/navbar.html.twig') }}
 
         <div style="text-align: center;padding-top: 1rem">
-            <form action="/mostWatchedActors" method="GET">
+            <form action="/most-watched-actors" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="submit">Search</button>
@@ -48,7 +49,7 @@
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
+                        <a class="page-link" href="/most-watched-actors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
                             <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
@@ -61,12 +62,12 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
+                        <a class="page-link" href="/most-watched-actors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/mostWatchedActors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
+                        <a class="page-link" href="/most-watched-actors?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

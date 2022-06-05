@@ -12,8 +12,8 @@ class Entity
         private readonly string $title,
         private readonly ?int $rating10,
         private readonly ?int $rating5,
-        private readonly TraktId $traktId,
-        private readonly string $imdbId,
+        private readonly ?TraktId $traktId,
+        private readonly ?string $imdbId,
         private readonly int $tmdbId,
         private readonly ?string $posterPath,
         private readonly ?string $overview,
@@ -35,8 +35,8 @@ class Entity
             $data['title'],
             $data['rating_10'] === null ? null : (int)$data['rating_10'],
             $data['rating_5'] === null ? null : (int)$data['rating_5'],
-            TraktId::createFromString((string)$data['trakt_id']),
-            $data['imdb_id'],
+            empty($data['trakt_id']) === false ? TraktId::createFromString((string)$data['trakt_id']) : null,
+            empty($data['imdb_id']) === false ? (string)$data['imdb_id'] : null,
             (int)$data['tmdb_id'],
             $data['poster_path'],
             $data['overview'],
@@ -56,7 +56,7 @@ class Entity
         return $this->id;
     }
 
-    public function getImdbId() : string
+    public function getImdbId() : ?string
     {
         return $this->imdbId;
     }
@@ -126,7 +126,7 @@ class Entity
         return $this->tmdbVoteCount;
     }
 
-    public function getTraktId() : TraktId
+    public function getTraktId() : ?TraktId
     {
         return $this->traktId;
     }

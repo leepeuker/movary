@@ -16,10 +16,16 @@ class SyncRatings
 
     public function execute(bool $overwriteExistingData = false) : void
     {
-        $this->traktApiCacheUserMovieRatingService->set($this->traktApi->getUserMoviesRatings());
+        $this->traktApiCacheUserMovieRatingService->set($this->traktApi->fetchUserMoviesRatings());
 
         foreach ($this->movieApi->fetchAll() as $movie) {
-            $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($movie->getTraktId());
+            $traktId = $movie->getTraktId();
+
+            if ($traktId === null) {
+                continue;
+            }
+
+            $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($traktId);
 
             if ($rating === null) {
                 continue;

@@ -15,15 +15,33 @@ class Repository
     {
     }
 
-    public function create(string $title, ?int $rating10, ?int $rating5, TraktId $traktId, string $imdbId, int $tmdbId) : Entity
-    {
+    public function create(
+        string $title,
+        int $tmdbId,
+        ?string $tagline = null,
+        ?string $overview = null,
+        ?string $originalLanguage = null,
+        ?Date $releaseDate = null,
+        ?int $runtime = null,
+        ?float $tmdbVoteAverage = null,
+        ?int $tmdbVoteCount = null,
+        ?string $tmdbPosterPath = null,
+        ?TraktId $traktId = null,
+        ?string $imdbId = null,
+    ) : Entity {
         $this->dbConnection->insert(
             'movie',
             [
                 'title' => $title,
-                'rating_10' => $rating10,
-                'rating_5' => $rating5,
-                'trakt_id' => $traktId->asInt(),
+                'tagline' => $tagline,
+                'overview' => $overview,
+                'original_language' => $originalLanguage,
+                'release_date' => $releaseDate,
+                'runtime' => $runtime,
+                'tmdb_vote_average' => $tmdbVoteAverage,
+                'tmdb_vote_count' => $tmdbVoteCount,
+                'tmdb_poster_path' => $tmdbPosterPath,
+                'trakt_id' => $traktId?->asInt(),
                 'imdb_id' => $imdbId,
                 'tmdb_id' => $tmdbId,
             ]

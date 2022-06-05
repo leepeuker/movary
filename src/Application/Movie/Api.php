@@ -28,12 +28,37 @@ class Api
     ) {
     }
 
-    public function create(string $title, ?int $rating10, ?int $rating5, TraktId $traktId, string $imdbId, int $tmdbId) : Entity
-    {
-        return $this->movieCreateService->create($title, $rating10, $rating5, $traktId, $imdbId, $tmdbId);
+    public function create(
+        string $title,
+        int $tmdbId,
+        ?string $tagline = null,
+        ?string $overview = null,
+        ?string $originalLanguage = null,
+        ?Date $releaseDate = null,
+        ?int $runtime = null,
+        ?float $tmdbVoteAverage = null,
+        ?int $tmdbVoteCount = null,
+        ?string $tmdbPosterPath = null,
+        ?TraktId $traktId = null,
+        ?string $imdbId = null,
+    ) : Entity {
+        return $this->movieCreateService->create(
+            $title,
+            $tmdbId,
+            $tagline,
+            $overview,
+            $originalLanguage,
+            $releaseDate,
+            $runtime,
+            $tmdbVoteAverage,
+            $tmdbVoteCount,
+            $tmdbPosterPath,
+            $traktId,
+            $imdbId
+        );
     }
 
-    public function deleteById(int $id) : void
+    public function deleteHistoryById(int $id) : void
     {
         $this->historyDeleteService->deleteByMovieId($id);
     }

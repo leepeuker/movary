@@ -49,23 +49,23 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/mostWatchedActors',
+        '/most-watched-actors',
         [\Movary\HttpController\MostWatchedActorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
         'GET',
-        '/mostWatchedDirectors',
+        '/most-watched-directors',
         [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
         'GET',
-        '/addMovie',
-        [\Movary\HttpController\HistoryController::class, 'renderAddMoviePage']
+        '/log-movie',
+        [\Movary\HttpController\HistoryController::class, 'renderLogMoviePage']
     );
     $routeCollector->addRoute(
         'POST',
-        '/addMovie',
-        [\Movary\HttpController\HistoryController::class, 'addMovie']
+        '/log-movie',
+        [\Movary\HttpController\HistoryController::class, 'logMovie']
     );
     $routeCollector->addRoute(
         'GET',
