@@ -54,7 +54,9 @@ You can only sync specific stuff by using flags (default behaviour syncs all of 
 - `--history`
   Sync trakt watch history (plays)
 - `--overwrite`
-  Use if you want to completely overwrite the local state with the remote (trakt) state (deletes and overwrites local data)
+  Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
+- `--ignore-cache`
+  Use if you want to sync everything from trakt regardless if there was a change since the last sync. 
 
 ### app:sync-tmdb
 
