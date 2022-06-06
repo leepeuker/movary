@@ -16,7 +16,13 @@ class PlexController
 
     public function handlePlexWebhook(Request $request) : Response
     {
-        $this->logger->debug($request->getBody());
+        $webHook = Json::decode($request->getPostParameters()['payload']);
+
+        if ($webHook['event'] !== 'media.scrobble') {
+            return Response::create(StatusCode::createOk());
+        }
+
+        $this->logger->debug(Json::encode($webHook));
 
         return Response::create(StatusCode::createOk());
     }
