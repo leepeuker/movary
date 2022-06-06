@@ -18,8 +18,14 @@ class PlexController
     {
         $webHook = Json::decode($request->getPostParameters()['payload']);
 
-        if ($webHook['event'] !== 'media.scrobble') {
+        if ($webHook['event'] !== 'media.scrobble' || $webHook['owner'] !== true) {
             return Response::create(StatusCode::createOk());
+        }
+
+        var_dump($webHook);
+
+        exit;
+        foreach ($webHook['Metadata']['Guid'] as $guid) {
         }
 
         $this->logger->debug(Json::encode($webHook));
