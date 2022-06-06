@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Application\Movie\Api;
 use Movary\Application\Movie\History\Service\Select;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Response;
@@ -12,7 +13,8 @@ class DashboardController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Select $movieHistorySelectService
+        private readonly Select $movieHistorySelectService,
+        private readonly Api $movieApi,
     ) {
     }
 
@@ -21,8 +23,8 @@ class DashboardController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/dashboard.html.twig', [
-                'totalPlayCount' => $this->movieHistorySelectService->fetchHistoryCount(),
-                'uniqueMoviesCount' => $this->movieHistorySelectService->fetchUniqueMovieInHistoryCount(),
+                'totalPlayCount' => $this->movieApi->fetchHistoryCount(),
+                'uniqueMoviesCount' => $this->movieApi->fetchHistoryCountUnique(),
                 'totalHoursWatched' => $this->movieHistorySelectService->fetchTotalHoursWatched(),
                 'average10Rating' => $this->movieHistorySelectService->fetchAverage10Rating(),
                 'averagePlaysPerDay' => $this->movieHistorySelectService->fetchAveragePlaysPerDay(),

@@ -12,34 +12,24 @@ class SyncWatchedMovies
 {
     public function __construct(
         private readonly Application\Movie\Api $movieApi,
-        private readonly Application\Movie\Service\Select $movieSelectService,
         private readonly Api\Trakt\Api $traktApi,
         private readonly Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly PlaysPerDateFetcher $playsPerDateFetcher,
+        private readonly Application\Service\Tmdb\SyncMovie $tmdbMovieSync
     ) {
     }
 
-    public function execute(bool $overwriteExistingData = false) : void
+    public function execute(bool $overwriteExistingData = false, bool $ignoreCache = false) : void
     {
         $watchedMovies = $this->traktApi->fetchUserMoviesWatched();
 
         foreach ($watchedMovies as $watchedMovie) {
             $traktId = $watchedMovie->getMovie()->getTraktId();
 
-            $movie = $this->movieApi->findByTraktId($traktId);
+            $movie = $this->findOrCreateMovieLocally($watchedMovie->getMovie());
 
-            if ($movie === null) {
-                $movie = $this->movieApi->create(
-                    title: $watchedMovie->getMovie()->getTitle(),
-                    tmdbId: $watchedMovie->getMovie()->getTmdbId(),
-                    traktId: $traktId,
-                    imdbId: $watchedMovie->getMovie()->getImdbId(),
-                );
-
-                $this->logger->info('Added movie: ' . $movie->getTitle());
-            }
-
-            if ($this->isWatchedCacheUpToDate($watchedMovie) === true) {
+            if ($ignoreCache === false && $this->isWatchedCacheUpToDate($watchedMovie) === true) {
                 continue;
             }
 
@@ -55,6 +45,33 @@ class SyncWatchedMovies
         $this->traktApiCacheUserMovieWatchedService->removeMissingMoviesFromCache($watchedMovies);
     }
 
+    private function findOrCreateMovieLocally(Api\Trakt\ValueObject\Movie\Dto $watchedMovie) : Application\Movie\Entity
+    {
+        $traktId = $watchedMovie->getTraktId();
+        $tmdbId = $watchedMovie->getTmdbId();
+
+        $movie = $this->movieApi->findByTraktId($traktId);
+
+        if ($movie !== null) {
+            return $movie;
+        }
+
+        $movie = $this->movieApi->findByTmdbId($tmdbId);
+
+        if ($movie !== null) {
+            $this->movieApi->updateTraktId($movie->getId(), $traktId);
+
+            return $this->movieApi->fetchByTraktId($traktId);
+        }
+
+        $movie = $this->tmdbMovieSync->syncMovie($tmdbId);
+        $this->movieApi->updateTraktId($movie->getId(), $traktId);
+
+        $this->logger->info('Added movie: ' . $movie->getTitle());
+
+        return $this->movieApi->fetchByTraktId($traktId);
+    }
+
     private function isWatchedCacheUpToDate(Api\Trakt\ValueObject\User\Movie\Watched\Dto $watchedMovie) : bool
     {
         $cacheLastUpdated = $this->traktApiCacheUserMovieWatchedService->findLastUpdatedByTraktId($watchedMovie->getMovie()->getTraktId());
@@ -64,7 +81,7 @@ class SyncWatchedMovies
 
     private function removeMovieHistoryFromNotWatchedMovies(Api\Trakt\ValueObject\User\Movie\Watched\DtoList $watchedMovies) : void
     {
-        foreach ($this->movieSelectService->fetchAll() as $movie) {
+        foreach ($this->movieApi->fetchHistoryUniqueMovies() as $movie) {
             $traktId = $movie->getTraktId();
 
             if ($traktId !== null && $watchedMovies->containsTraktId($traktId) === true) {
@@ -79,26 +96,39 @@ class SyncWatchedMovies
 
     private function syncMovieHistory(TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
     {
-        $playsPerDates = [];
+        $traktHistoryEntries = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktId);
 
-        foreach ($this->traktApi->fetchUserMovieHistoryByMovieId($traktId) as $movieHistoryEntry) {
-            if (empty($playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())]) === true) {
-                $playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())] = 1;
+        foreach ($this->movieApi->fetchHistoryByMovieId($movie->getId()) as $localHistoryEntry) {
+            $localHistoryEntryDate = Date::createFromString($localHistoryEntry['watched_at']);
+
+            if ($traktHistoryEntries->containsDate($localHistoryEntryDate) === false) {
+                if ($overwriteExistingData === false) {
+                    continue;
+                }
+
+                $this->movieApi->deleteHistoryByIdAndDate($movie->getId(), $localHistoryEntryDate);
+
                 continue;
             }
 
-            $playsPerDates[(string)Date::createFromDateTime($movieHistoryEntry->getWatchedAt())]++;
+            $localHistoryEntryPlays = $localHistoryEntry['plays'];
+            $traktHistoryEntryPlays = $traktHistoryEntries->getPlaysForDate($localHistoryEntryDate);
+
+            if ($localHistoryEntryPlays < $traktHistoryEntryPlays || ($localHistoryEntryPlays > $traktHistoryEntryPlays && $overwriteExistingData === true)) {
+                $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $localHistoryEntryDate, $traktHistoryEntryPlays);
+
+                $this->logger->info('Updated plays for "' . $movie->getTitle() . '" at ' . $localHistoryEntryDate . " from $localHistoryEntryPlays to $traktHistoryEntryPlays");
+            }
+
+            $traktHistoryEntries->removeDate($localHistoryEntryDate);
         }
 
-        foreach ($playsPerDates as $watchedAt => $playsPerDate) {
-            $watchedAtObject = Date::createFromString($watchedAt);
-            $currentPlays = $this->movieApi->fetchHistoryMoviePlaysOnDate($movie->getId(), $watchedAtObject);
+        foreach ($traktHistoryEntries as $watchedAt => $plays) {
+            $localHistoryEntryDate = Date::createFromString($watchedAt);
 
-            if ($currentPlays < $playsPerDate || ($currentPlays > $playsPerDate && $overwriteExistingData === true)) {
-                $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $watchedAtObject, $playsPerDate);
+            $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $localHistoryEntryDate, $plays);
 
-                $this->logger->info('Updated plays for "' . $movie->getTitle() . '" at ' . $watchedAt . " from $currentPlays to $playsPerDate");
-            }
+            $this->logger->info('Added plays for "' . $movie->getTitle() . '" at ' . $watchedAt . " with $plays");
         }
     }
 }

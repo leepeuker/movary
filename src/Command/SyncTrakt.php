@@ -13,6 +13,8 @@ class SyncTrakt extends Command
 {
     private const OPTION_NAME_HISTORY = 'history';
 
+    private const OPTION_NAME_IGNORE_CACHE = 'ignore-cache';
+
     private const OPTION_NAME_OVERWRITE = 'overwrite';
 
     private const OPTION_NAME_RATINGS = 'ratings';
@@ -30,25 +32,27 @@ class SyncTrakt extends Command
     protected function configure() : void
     {
         $this->setDescription('Sync trakt.tv movie history and rating with local database')
-             ->addOption(self::OPTION_NAME_HISTORY, [], InputOption::VALUE_NONE, 'history')
-             ->addOption(self::OPTION_NAME_RATINGS, [], InputOption::VALUE_NONE, 'ratings')
-             ->addOption(self::OPTION_NAME_OVERWRITE, [], InputOption::VALUE_NONE, 'overwrite');
+             ->addOption(self::OPTION_NAME_HISTORY, [], InputOption::VALUE_NONE, 'Sync movie history.')
+             ->addOption(self::OPTION_NAME_RATINGS, [], InputOption::VALUE_NONE, 'Sync movie ratings.')
+             ->addOption(self::OPTION_NAME_OVERWRITE, [], InputOption::VALUE_NONE, 'Overwrite local data.')
+             ->addOption(self::OPTION_NAME_IGNORE_CACHE, [], InputOption::VALUE_NONE, 'Ignore trakt cache and force sync for everything.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $overwriteExistingData = (bool)$input->getOption(self::OPTION_NAME_OVERWRITE);
+        $ignoreCache = (bool)$input->getOption(self::OPTION_NAME_IGNORE_CACHE);
 
         $syncRatings = (bool)$input->getOption(self::OPTION_NAME_RATINGS);
         $syncHistory = (bool)$input->getOption(self::OPTION_NAME_HISTORY);
 
         try {
             if ($syncRatings === false && $syncHistory === false) {
-                $this->syncHistory($output, $overwriteExistingData);
+                $this->syncHistory($output, $overwriteExistingData, $ignoreCache);
                 $this->syncRatings($output, $overwriteExistingData);
             } else {
                 if ($syncHistory === true) {
-                    $this->syncHistory($output, $overwriteExistingData);
+                    $this->syncHistory($output, $overwriteExistingData, $ignoreCache);
                 }
                 if ($syncRatings === true) {
                     $this->syncRatings($output, $overwriteExistingData);
@@ -63,11 +67,11 @@ class SyncTrakt extends Command
         return Command::SUCCESS;
     }
 
-    private function syncHistory(OutputInterface $output, bool $overwriteExistingData) : void
+    private function syncHistory(OutputInterface $output, bool $overwriteExistingData, bool $ignoreCache) : void
     {
         $this->generateOutput($output, 'Syncing history...');
 
-        $this->syncWatchedMovies->execute($overwriteExistingData);
+        $this->syncWatchedMovies->execute($overwriteExistingData, $ignoreCache);
 
         $this->generateOutput($output, 'Syncing history done.');
     }

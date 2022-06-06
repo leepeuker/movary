@@ -2,6 +2,7 @@
 
 namespace Movary\Application\Service\Tmdb;
 
+use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb;
 use Movary\Application\Movie;
 use Movary\ValueObject\Date;
@@ -13,6 +14,7 @@ class SyncMovie
         private readonly Movie\Api $movieApi,
         private readonly GenreConverter $genreConverter,
         private readonly ProductionCompanyConverter $productionCompanyConverter,
+        private readonly Connection $dbConnection
     ) {
     }
 
@@ -21,6 +23,8 @@ class SyncMovie
         $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
+
+        $this->dbConnection->beginTransaction();
 
         if ($movie === null) {
             $movie = $this->movieApi->create(
@@ -34,18 +38,20 @@ class SyncMovie
                 tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
                 tmdbVoteCount: $tmdbMovie->getVoteCount(),
                 tmdbPosterPath: $tmdbMovie->getPosterPath(),
+                imdbId: $tmdbMovie->getImdbId(),
             );
         } else {
             $movie = $this->movieApi->updateDetails(
-                $movie->getId(),
-                $tmdbMovie->getTagline(),
-                $tmdbMovie->getOverview(),
-                $tmdbMovie->getOriginalLanguage(),
-                $tmdbMovie->getReleaseDate(),
-                $tmdbMovie->getRuntime(),
-                $tmdbMovie->getVoteAverage(),
-                $tmdbMovie->getVoteCount(),
-                $tmdbMovie->getPosterPath(),
+                movieId: $movie->getId(),
+                tagline: $tmdbMovie->getTagline(),
+                overview: $tmdbMovie->getOverview(),
+                originalLanguage: $tmdbMovie->getOriginalLanguage(),
+                releaseDate: $tmdbMovie->getReleaseDate(),
+                runtime: $tmdbMovie->getRuntime(),
+                tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
+                tmdbVoteCount: $tmdbMovie->getVoteCount(),
+                tmdbPosterPath: $tmdbMovie->getPosterPath(),
+                imdbId: $movie->getImdbId(),
             );
         }
 
@@ -53,6 +59,8 @@ class SyncMovie
         $this->movieApi->updateProductionCompanies($movie->getId(), $this->productionCompanyConverter->getMovaryProductionCompaniesFromTmdbMovie($tmdbMovie));
 
         $this->updateCredits($movie->getId(), $tmdbId);
+
+        $this->dbConnection->commit();
 
         return $movie;
     }

@@ -4,6 +4,7 @@ namespace Movary\Application\Movie\Service;
 
 use Movary\Api\Tmdb\Dto\Cast;
 use Movary\Api\Tmdb\Dto\Crew;
+use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Company;
 use Movary\Application\Genre;
 use Movary\Application\Movie;
@@ -73,8 +74,9 @@ class Update
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
+        ?string $imdbId,
     ) : Entity {
-        return $this->repository->updateDetails($id, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount, $tmdbPosterPath);
+        return $this->repository->updateDetails($id, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount, $tmdbPosterPath, $imdbId);
     }
 
     public function updateGenres(int $movieId, Genre\EntityList $genres) : void
@@ -108,6 +110,11 @@ class Update
     public function updateRating5(int $id, ?int $rating5) : void
     {
         $this->repository->updateRating5($id, $rating5);
+    }
+
+    public function updateTraktId(int $movieId, TraktId $traktId) : void
+    {
+        $this->repository->updateTraktId($movieId, $traktId);
     }
 
     private function createOrUpdatePersonByTmdbId(int $tmdbId, string $name, Gender $gender, ?string $knownForDepartment, ?string $posterPath) : Person\Entity

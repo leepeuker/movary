@@ -27,4 +27,9 @@ class Repository
     {
         $this->dbConnection->delete('movie_history', ['movie_id' => $movieId]);
     }
+
+    public function deleteHistoryByIdAndDate(int $movieId, Date $watchedAt) : void
+    {
+        $this->dbConnection->delete('movie_history', ['movie_id' => $movieId, 'watched_at' => $watchedAt]);
+    }
 }

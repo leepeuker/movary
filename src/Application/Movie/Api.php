@@ -63,6 +63,11 @@ class Api
         $this->historyDeleteService->deleteByMovieId($id);
     }
 
+    public function deleteHistoryByIdAndDate(int $id, Date $watchedAt) : void
+    {
+        $this->historyDeleteService->deleteHistoryByIdAndDate($id, $watchedAt);
+    }
+
     public function fetchAll() : EntityList
     {
         return $this->movieSelectService->fetchAll();
@@ -73,9 +78,30 @@ class Api
         return $this->movieSelectService->fetchAllOrderedByLastUpdatedAtTmdbDesc();
     }
 
+    public function fetchByTraktId(TraktId $traktId) : Entity
+    {
+        $movie = $this->findByTraktId($traktId);
+
+        if ($movie === null) {
+            throw new \RuntimeException('Could not find movie with trakt id: ' . $traktId->asInt());
+        }
+
+        return $movie;
+    }
+
     public function fetchHistoryByMovieId(int $movieId) : array
     {
         return $this->historySelectService->fetchHistoryByMovieId($movieId);
+    }
+
+    public function fetchHistoryCount() : int
+    {
+        return $this->historySelectService->fetchHistoryCount();
+    }
+
+    public function fetchHistoryCountUnique() : int
+    {
+        return $this->historySelectService->fetchUniqueMovieInHistoryCount();
     }
 
     public function fetchHistoryMoviePlaysOnDate(int $id, Date $watchedAt) : int
@@ -86,6 +112,11 @@ class Api
     public function fetchHistoryOrderedByWatchedAtDesc() : array
     {
         return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc();
+    }
+
+    public function fetchHistoryUniqueMovies() : EntityList
+    {
+        return $this->historySelectService->fetchHistoryUniqueMovies();
     }
 
     public function fetchWithActor(int $personId) : EntityList
@@ -184,6 +215,7 @@ class Api
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
+        ?string $imdbId,
     ) : Entity {
         return $this->movieUpdateService->updateDetails(
             $movieId,
@@ -194,7 +226,8 @@ class Api
             $runtime,
             $tmdbVoteAverage,
             $tmdbVoteCount,
-            $tmdbPosterPath
+            $tmdbPosterPath,
+            $imdbId
         );
     }
 
@@ -221,5 +254,10 @@ class Api
     public function updateRating5(int $movieId, ?int $rating5) : void
     {
         $this->movieUpdateService->updateRating5($movieId, $rating5);
+    }
+
+    public function updateTraktId(int $movieId, TraktId $traktId) : void
+    {
+        $this->movieUpdateService->updateTraktId($movieId, $traktId);
     }
 }

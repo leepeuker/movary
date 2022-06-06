@@ -155,6 +155,18 @@ class Repository
         );
     }
 
+    public function fetchHistoryUniqueMovies() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT m.*
+            FROM movie_history mh
+            JOIN movie m on mh.movie_id = m.id
+            GROUP BY mh.movie_id
+            SQL,
+        );
+    }
+
     public function fetchLastPlays() : array
     {
         return $this->dbConnection->fetchAllAssociative(
@@ -462,6 +474,7 @@ class Repository
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
+        ?string $imdbId,
     ) : Entity {
         $this->dbConnection->update(
             'movie',
@@ -475,6 +488,7 @@ class Repository
                 'tmdb_vote_count' => $tmdbVoteCount,
                 'tmdb_poster_path' => $tmdbPosterPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
+                'imdb_id' => $imdbId,
             ],
             ['id' => $id]
         );
@@ -495,6 +509,11 @@ class Repository
     public function updateRating5(int $id, ?int $rating5) : void
     {
         $this->dbConnection->update('movie', ['rating_5' => $rating5], ['id' => $id]);
+    }
+
+    public function updateTraktId(int $id, TraktId $traktId) : void
+    {
+        $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt()], ['id' => $id]);
     }
 
     private function fetchById(int $id) : Entity

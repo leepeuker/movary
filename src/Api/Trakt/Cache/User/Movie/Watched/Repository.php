@@ -12,17 +12,6 @@ class Repository
     {
     }
 
-    public function create(TraktId $traktId, DateTime $lastUpdatedAt) : void
-    {
-        $this->dbConnection->insert(
-            'cache_trakt_user_movie_watched',
-            [
-                'trakt_id' => $traktId->asInt(),
-                'last_updated_at' => (string)$lastUpdatedAt,
-            ]
-        );
-    }
-
     /**
      * @return array<TraktId>
      */
@@ -56,6 +45,14 @@ class Repository
         $this->dbConnection->executeQuery(
             'DELETE FROM `cache_trakt_user_movie_watched` WHERE trakt_id = ?',
             [$traktId->asInt()]
+        );
+    }
+
+    public function set(TraktId $traktId, DateTime $lastUpdatedAt) : void
+    {
+        $this->dbConnection->executeQuery(
+            'REPLACE INTO `cache_trakt_user_movie_watched` (trakt_id, last_updated_at) VALUES (?, ?)',
+            [$traktId->asInt(), (string)$lastUpdatedAt]
         );
     }
 }

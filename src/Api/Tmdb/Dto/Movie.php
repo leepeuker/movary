@@ -18,7 +18,8 @@ class Movie
         private readonly int $voteCount,
         private readonly GenreList $genres,
         private readonly ProductionCompanyList $productionCompanies,
-        private readonly string $posterPath
+        private readonly string $posterPath,
+        private readonly ?string $imdbId,
     ) {
     }
 
@@ -37,6 +38,7 @@ class Movie
             GenreList::createFromArray($data['genres']),
             ProductionCompanyList::createFromArray($data['production_companies']),
             $data['poster_path'],
+            empty($data['imdb_id']) === true ? null : $data['imdb_id'],
         );
     }
 
@@ -48,6 +50,11 @@ class Movie
     public function getId() : int
     {
         return $this->id;
+    }
+
+    public function getImdbId() : ?string
+    {
+        return $this->imdbId;
     }
 
     public function getOriginalLanguage() : string

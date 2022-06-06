@@ -5,6 +5,7 @@ namespace Movary\Application\Movie\History\Service;
 use Matriphe\ISO639\ISO639;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie\Entity;
+use Movary\Application\Movie\EntityList;
 use Movary\Application\Movie\Repository;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
@@ -64,6 +65,11 @@ class Select
     public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm = null) : array
     {
         return $this->repository->fetchHistoryPaginated($limit, $page, $searchTerm);
+    }
+
+    public function fetchHistoryUniqueMovies() : EntityList
+    {
+        return EntityList::createFromArray($this->repository->fetchHistoryUniqueMovies());
     }
 
     public function fetchLastPlays() : array

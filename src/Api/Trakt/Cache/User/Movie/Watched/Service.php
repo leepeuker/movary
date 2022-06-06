@@ -28,6 +28,6 @@ class Service
 
     public function setOne(TraktId $traktId, DateTime $lastUpdated) : void
     {
-        $this->repository->create($traktId, $lastUpdated);
+        $this->repository->set($traktId, $lastUpdated);
     }
 }
