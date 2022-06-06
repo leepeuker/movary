@@ -1,0 +1,15 @@
+POST http://127.0.0.1/plex
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+  "name" : "Test New",
+  "coverId" : "",
+  "price" : "1000",
+  "year" : "2017",
+  "description" : "Lorem ipsum",
+  "publisherName" : "Marvel",
+  "addedToCollection" : "2020-08-14",
+  "rating" : "3"
+}

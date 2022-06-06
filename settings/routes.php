@@ -77,4 +77,10 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']
     );
+
+    $routeCollector->addRoute(
+        'POST',
+        '/plex',
+        [\Movary\HttpController\PlexController::class, 'handlePlexWebhook']
+    );
 };
