@@ -12,18 +12,19 @@ class Service
     {
     }
 
+    public function fetchAllUniqueTraktIds() : array
+    {
+        return $this->repository->fetchAllUniqueTraktIds();
+    }
+
     public function findLastUpdatedByTraktId(TraktId $traktId) : ?DateTime
     {
         return $this->repository->findLastUpdatedByTraktId($traktId);
     }
 
-    public function removeMissingMoviesFromCache(DtoList $watchedMovies) : void
+    public function remove(TraktId $traktId) : void
     {
-        foreach ($this->repository->fetchAllUniqueTraktIds() as $traktId) {
-            if ($watchedMovies->containsTraktId($traktId) === false) {
-                $this->repository->removeAllWithTraktId($traktId);
-            }
-        }
+        $this->repository->remove($traktId);
     }
 
     public function setOne(TraktId $traktId, DateTime $lastUpdated) : void

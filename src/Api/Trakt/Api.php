@@ -2,6 +2,7 @@
 
 namespace Movary\Api\Trakt;
 
+use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Api\Trakt\ValueObject\User;
 
@@ -9,8 +10,14 @@ class Api
 {
     public function __construct(
         private readonly Client $client,
-        private readonly string $username
+        private readonly string $username,
+        private readonly Watched\Service $cacheWatchedService
     ) {
+    }
+
+    public function fetchUniqueCachedTraktIds() : array
+    {
+        return $this->cacheWatchedService->fetchAllUniqueTraktIds();
     }
 
     public function fetchUserMovieHistoryByMovieId(TraktId $traktId) : User\Movie\History\DtoList
@@ -32,5 +39,10 @@ class Api
         $responseData = $this->client->get(sprintf('/users/%s/watched/movies', $this->username));
 
         return User\Movie\Watched\DtoList::createFromArray($responseData);
+    }
+
+    public function removeWatchCacheByTraktId(TraktId $traktId) : void
+    {
+        $this->cacheWatchedService->remove($traktId);
     }
 }

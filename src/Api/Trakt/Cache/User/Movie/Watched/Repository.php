@@ -40,7 +40,7 @@ class Repository
         return $data === false ? null : DateTime::createFromString($data);
     }
 
-    public function removeAllWithTraktId(TraktId $traktId) : void
+    public function remove(TraktId $traktId) : void
     {
         $this->dbConnection->executeQuery(
             'DELETE FROM `cache_trakt_user_movie_watched` WHERE trakt_id = ?',

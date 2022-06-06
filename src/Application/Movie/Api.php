@@ -58,9 +58,9 @@ class Api
         );
     }
 
-    public function deleteHistoryById(int $id) : void
+    public function deleteHistoryByTraktId(TraktId $traktId) : void
     {
-        $this->historyDeleteService->deleteByMovieId($id);
+        $this->historyDeleteService->deleteByTraktId($traktId);
     }
 
     public function deleteHistoryByIdAndDate(int $id, Date $watchedAt) : void

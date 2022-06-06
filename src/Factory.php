@@ -9,6 +9,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
+use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Application\SessionService;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Http\Request;
@@ -81,7 +82,8 @@ class Factory
     {
         return new Trakt\Api(
             $container->get(Trakt\Client::class),
-            $config->getAsString('TRAKT_USERNAME')
+            $config->getAsString('TRAKT_USERNAME'),
+            $container->get(Watched\Service::class),
         );
     }
 

@@ -2,6 +2,7 @@
 
 namespace Movary\Application\Movie\History\Service;
 
+use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie\History\Repository;
 use Movary\ValueObject\Date;
 
@@ -14,9 +15,9 @@ class Delete
         $this->repository = $repository;
     }
 
-    public function deleteByMovieId(int $movieId) : void
+    public function deleteByTraktId(TraktId $traktId) : void
     {
-        $this->repository->deleteByMovieId($movieId);
+        $this->repository->deleteByTraktId($traktId);
     }
 
     public function deleteHistoryByIdAndDate(int $movieId, Date $watchedAt) : void

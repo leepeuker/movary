@@ -21,6 +21,11 @@ class TraktId
         return new self((int)$id);
     }
 
+    public function __toString() : string
+    {
+        return (string)$this->id;
+    }
+
     public function asInt() : int
     {
         return $this->id;

@@ -3,6 +3,7 @@
 namespace Movary\Application\Movie\History;
 
 use Doctrine\DBAL\Connection;
+use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\Date;
 
 class Repository
@@ -23,9 +24,15 @@ class Repository
         );
     }
 
-    public function deleteByMovieId(int $movieId) : void
+    public function deleteByTraktId(TraktId $traktId) : void
     {
-        $this->dbConnection->delete('movie_history', ['movie_id' => $movieId]);
+        $this->dbConnection->executeStatement(
+            'DELETE movie_history
+            FROM movie_history
+            INNER JOIN movie m ON movie_history.movie_id = m.id
+            WHERE m.trakt_id = ?',
+            [$traktId->asInt()]
+        );
     }
 
     public function deleteHistoryByIdAndDate(int $movieId, Date $watchedAt) : void

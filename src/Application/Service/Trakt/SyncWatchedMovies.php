@@ -38,11 +38,17 @@ class SyncWatchedMovies
             $this->traktApiCacheUserMovieWatchedService->setOne($traktId, $watchedMovie->getLastUpdated());
         }
 
-        if ($overwriteExistingData === true) {
-            $this->removeMovieHistoryFromNotWatchedMovies($watchedMovies);
-        }
+        foreach ($this->traktApi->fetchUniqueCachedTraktIds() as $traktId) {
+            if ($watchedMovies->containsTraktId($traktId) === false) {
+                if ($overwriteExistingData === true) {
+                    $this->movieApi->deleteHistoryByTraktId($traktId);
 
-        $this->traktApiCacheUserMovieWatchedService->removeMissingMoviesFromCache($watchedMovies);
+                    $this->logger->info('Removed watch dates for movie with trakt id: ' . $traktId);
+                }
+
+                $this->traktApi->removeWatchCacheByTraktId($traktId);
+            }
+        }
     }
 
     private function findOrCreateMovieLocally(Api\Trakt\ValueObject\Movie\Dto $watchedMovie) : Application\Movie\Entity
@@ -77,21 +83,6 @@ class SyncWatchedMovies
         $cacheLastUpdated = $this->traktApiCacheUserMovieWatchedService->findLastUpdatedByTraktId($watchedMovie->getMovie()->getTraktId());
 
         return $cacheLastUpdated !== null && $watchedMovie->getLastUpdated()->isEqual($cacheLastUpdated) === true;
-    }
-
-    private function removeMovieHistoryFromNotWatchedMovies(Api\Trakt\ValueObject\User\Movie\Watched\DtoList $watchedMovies) : void
-    {
-        foreach ($this->movieApi->fetchHistoryUniqueMovies() as $movie) {
-            $traktId = $movie->getTraktId();
-
-            if ($traktId !== null && $watchedMovies->containsTraktId($traktId) === true) {
-                continue;
-            }
-
-            $this->movieApi->deleteHistoryById($movie->getId());
-
-            $this->logger->info('Removed watch dates for movie: ' . $movie->getTitle());
-        }
     }
 
     private function syncMovieHistory(TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
