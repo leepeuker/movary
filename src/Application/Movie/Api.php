@@ -202,6 +202,13 @@ class Api
         return $this->genreSelectService->findByMovieId($movieId);
     }
 
+    public function increaseHistoryPlaysForMovieOnDate(int $movieId, Date $watchedAt, int $playsToAdd = 1) : void
+    {
+        $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $watchedAt);
+
+        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $watchedAt, $playsPerDate + $playsToAdd);
+    }
+
     public function replaceHistoryForMovieByDate(int $movieId, Date $watchedAt, int $playsPerDate) : void
     {
         $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $watchedAt, $playsPerDate);

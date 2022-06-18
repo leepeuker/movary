@@ -10,7 +10,10 @@ use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
+use Movary\Application\Movie;
+use Movary\Application\Service\Tmdb\SyncMovie;
 use Movary\Application\SessionService;
+use Movary\HttpController\PlexController;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Http\Request;
 use Psr\Container\ContainerInterface;
@@ -107,5 +110,15 @@ class Factory
     public static function createTwigFilesystemLoader() : Twig\Loader\FilesystemLoader
     {
         return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
+    }
+
+    public function createPlexController(ContainerInterface $container, Config $config) : PlexController
+    {
+        return new PlexController(
+            $container->get(LoggerInterface::class),
+            $container->get(Movie\Api::class),
+            $container->get(SyncMovie::class),
+            new \DateTimeZone($config->getAsString('TIMEZONE'))
+        );
     }
 }
