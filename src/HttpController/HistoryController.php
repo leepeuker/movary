@@ -7,6 +7,7 @@ use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Application\Service\Tmdb\SyncMovie;
 use Movary\Application\SessionService;
+use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Header;
@@ -27,6 +28,19 @@ class HistoryController
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly SessionService $sessionService
     ) {
+    }
+
+    public function deleteHistoryEntry(Request $request) : Response
+    {
+        $requestBody = Json::decode($request->getBody());
+
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $date = Date::createFromString($requestBody['date']);
+        $count = $requestBody['count'] ?? 1;
+
+        $this->movieApi->deleteHistoryByIdAndDate($movieId, $date, $count);
+
+        return Response::create(StatusCode::createOk());
     }
 
     public function logMovie(Request $request) : Response

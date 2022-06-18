@@ -73,6 +73,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\MovieController::class, 'renderPage']
     );
     $routeCollector->addRoute(
+        'DELETE',
+        '/movie/{id:\d+}/history',
+        [\Movary\HttpController\HistoryController::class, 'deleteHistoryEntry']
+    );
+    $routeCollector->addRoute(
         'GET',
         '/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']

@@ -22,7 +22,7 @@ class Date implements \JsonSerializable
 
     public static function createFromString(string $dateString) : self
     {
-        return new self($dateString);
+        return new self ((new \DateTime($dateString))->format(self::FORMAT));
     }
 
     public function __toString() : string

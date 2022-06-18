@@ -58,14 +58,26 @@ class Api
         );
     }
 
+    public function deleteHistoryByIdAndDate(int $id, Date $watchedAt, ?int $playsToDelete = null) : void
+    {
+        $currentPlays = $this->historySelectService->findHistoryPlaysByMovieIdAndDate($id, $watchedAt);
+
+        if ($currentPlays === null) {
+            return;
+        }
+
+        if ($currentPlays <= $playsToDelete || $playsToDelete === null) {
+            $this->historyDeleteService->deleteHistoryByIdAndDate($id, $watchedAt);
+
+            return;
+        }
+
+        $this->historyCreateService->createOrUpdatePlaysForDate($id, $watchedAt, $currentPlays - $playsToDelete);
+    }
+
     public function deleteHistoryByTraktId(TraktId $traktId) : void
     {
         $this->historyDeleteService->deleteByTraktId($traktId);
-    }
-
-    public function deleteHistoryByIdAndDate(int $id, Date $watchedAt) : void
-    {
-        $this->historyDeleteService->deleteHistoryByIdAndDate($id, $watchedAt);
     }
 
     public function fetchAll() : EntityList

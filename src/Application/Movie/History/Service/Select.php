@@ -4,29 +4,29 @@ namespace Movary\Application\Movie\History\Service;
 
 use Matriphe\ISO639\ISO639;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
+use Movary\Application\Movie;
 use Movary\Application\Movie\Entity;
 use Movary\Application\Movie\EntityList;
-use Movary\Application\Movie\Repository;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
 
 class Select
 {
     public function __construct(
-        private readonly Repository $repository,
+        private readonly Movie\Repository $movieRepository,
         private readonly ISO639 $ISO639
     ) {
     }
 
     public function fetchAverage10Rating() : float
     {
-        return round($this->repository->fetchAverage10Rating(), 1);
+        return round($this->movieRepository->fetchAverage10Rating(), 1);
     }
 
     public function fetchAveragePlaysPerDay() : float
     {
-        $totalPlayCount = $this->repository->fetchHistoryCount();
-        $firstPlayDate = $this->repository->fetchFirstHistoryWatchDate();
+        $totalPlayCount = $this->movieRepository->fetchHistoryCount();
+        $firstPlayDate = $this->movieRepository->fetchFirstHistoryWatchDate();
 
         if ($firstPlayDate === null) {
             return 0.0;
@@ -39,47 +39,47 @@ class Select
 
     public function fetchAverageRuntime() : int
     {
-        return (int)round($this->repository->fetchAverageRuntime());
+        return (int)round($this->movieRepository->fetchAverageRuntime());
     }
 
     public function fetchFirstHistoryWatchDate() : ?Date
     {
-        return $this->repository->fetchFirstHistoryWatchDate();
+        return $this->movieRepository->fetchFirstHistoryWatchDate();
     }
 
     public function fetchHistoryByMovieId(int $movieId) : array
     {
-        return $this->repository->fetchHistoryByMovieId($movieId);
+        return $this->movieRepository->fetchHistoryByMovieId($movieId);
     }
 
     public function fetchHistoryCount(?string $searchTerm = null) : int
     {
-        return $this->repository->fetchHistoryCount($searchTerm);
+        return $this->movieRepository->fetchHistoryCount($searchTerm);
     }
 
     public function fetchHistoryOrderedByWatchedAtDesc() : array
     {
-        return $this->repository->fetchHistoryOrderedByWatchedAtDesc();
+        return $this->movieRepository->fetchHistoryOrderedByWatchedAtDesc();
     }
 
     public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm = null) : array
     {
-        return $this->repository->fetchHistoryPaginated($limit, $page, $searchTerm);
+        return $this->movieRepository->fetchHistoryPaginated($limit, $page, $searchTerm);
     }
 
     public function fetchHistoryUniqueMovies() : EntityList
     {
-        return EntityList::createFromArray($this->repository->fetchHistoryUniqueMovies());
+        return EntityList::createFromArray($this->movieRepository->fetchHistoryUniqueMovies());
     }
 
     public function fetchLastPlays() : array
     {
-        return $this->repository->fetchLastPlays();
+        return $this->movieRepository->fetchLastPlays();
     }
 
     public function fetchMostWatchedActors(int $page = 1, ?int $limit = null, ?Gender $gender = null, ?string $searchTerm = null) : array
     {
-        $mostWatchedActors = $this->repository->fetchMostWatchedActors($page, $limit, $gender, $searchTerm);
+        $mostWatchedActors = $this->movieRepository->fetchMostWatchedActors($page, $limit, $gender, $searchTerm);
 
         foreach ($mostWatchedActors as $index => $mostWatchedActor) {
             $mostWatchedActors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedActor['gender'])->getAbbreviation();
@@ -90,12 +90,12 @@ class Select
 
     public function fetchMostWatchedActorsCount(?string $searchTerm = null) : int
     {
-        return $this->repository->fetchMostWatchedActorsCount($searchTerm);
+        return $this->movieRepository->fetchMostWatchedActorsCount($searchTerm);
     }
 
     public function fetchMostWatchedDirectors(int $page = 1, ?int $limit = null, ?string $searchTerm = null) : array
     {
-        $mostWatchedDirectors = $this->repository->fetchMostWatchedDirectors($page, $limit, $searchTerm);
+        $mostWatchedDirectors = $this->movieRepository->fetchMostWatchedDirectors($page, $limit, $searchTerm);
 
         foreach ($mostWatchedDirectors as $index => $mostWatchedDirector) {
             $mostWatchedDirectors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedDirector['gender'])->getAbbreviation();
@@ -106,17 +106,17 @@ class Select
 
     public function fetchMostWatchedDirectorsCount(?string $searchTerm = null) : int
     {
-        return $this->repository->fetchMostWatchedDirectorsCount($searchTerm);
+        return $this->movieRepository->fetchMostWatchedDirectorsCount($searchTerm);
     }
 
     public function fetchMostWatchedGenres() : array
     {
-        return $this->repository->fetchMostWatchedGenres();
+        return $this->movieRepository->fetchMostWatchedGenres();
     }
 
     public function fetchMostWatchedLanguages() : array
     {
-        $mostWatchedLanguages = $this->repository->fetchMostWatchedLanguages();
+        $mostWatchedLanguages = $this->movieRepository->fetchMostWatchedLanguages();
 
         foreach ($mostWatchedLanguages as $index => $mostWatchedLanguage) {
             $mostWatchedLanguages[$index]['name'] = $this->ISO639->languageByCode1($mostWatchedLanguage['language']);
@@ -127,10 +127,10 @@ class Select
 
     public function fetchMostWatchedProductionCompanies(?int $limit = null) : array
     {
-        $mostWatchedProductionCompanies = $this->repository->fetchMostWatchedProductionCompanies($limit);
+        $mostWatchedProductionCompanies = $this->movieRepository->fetchMostWatchedProductionCompanies($limit);
 
         foreach ($mostWatchedProductionCompanies as $index => $productionCompany) {
-            $moviesByProductionCompany = $this->repository->fetchMoviesByProductionCompany($productionCompany['id']);
+            $moviesByProductionCompany = $this->movieRepository->fetchMoviesByProductionCompany($productionCompany['id']);
             unset($mostWatchedProductionCompanies[$index]['id']);
 
             foreach ($moviesByProductionCompany as $movieByProductionCompany) {
@@ -143,33 +143,38 @@ class Select
 
     public function fetchMostWatchedReleaseYears() : array
     {
-        return $this->repository->fetchMostWatchedReleaseYears();
+        return $this->movieRepository->fetchMostWatchedReleaseYears();
     }
 
     public function fetchMoviesOrderedByMostWatchedDesc() : array
     {
-        return $this->repository->fetchMoviesOrderedByMostWatchedDesc();
+        return $this->movieRepository->fetchMoviesOrderedByMostWatchedDesc();
     }
 
     public function fetchPlaysForMovieIdOnDate(int $movieId, Date $watchedAt) : int
     {
-        return $this->repository->fetchPlaysForMovieIdAtDate($movieId, $watchedAt);
+        return $this->movieRepository->fetchPlaysForMovieIdAtDate($movieId, $watchedAt);
     }
 
     public function fetchTotalHoursWatched() : int
     {
-        $minutes = $this->repository->fetchTotalMinutesWatched();
+        $minutes = $this->movieRepository->fetchTotalMinutesWatched();
 
         return (int)round($minutes / 60);
     }
 
     public function fetchUniqueMovieInHistoryCount() : int
     {
-        return $this->repository->fetchUniqueMovieInHistoryCount();
+        return $this->movieRepository->fetchUniqueMovieInHistoryCount();
     }
 
     public function findByTraktId(TraktId $traktId) : ?Entity
     {
-        return $this->repository->findByTraktId($traktId);
+        return $this->movieRepository->findByTraktId($traktId);
+    }
+
+    public function findHistoryPlaysByMovieIdAndDate(int $movieId, Date $watchedAt) : ?int
+    {
+        return $this->movieRepository->findPlaysForMovieIdAndDate($movieId, $watchedAt);
     }
 }

@@ -37,6 +37,11 @@ class Repository
 
     public function deleteHistoryByIdAndDate(int $movieId, Date $watchedAt) : void
     {
-        $this->dbConnection->delete('movie_history', ['movie_id' => $movieId, 'watched_at' => $watchedAt]);
+        $this->dbConnection->executeStatement(
+            'DELETE movie_history
+            FROM movie_history
+            WHERE movie_id = ? AND watched_at = ?',
+            [$movieId, (string)$watchedAt]
+        );
     }
 }

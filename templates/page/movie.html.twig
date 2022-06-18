@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 {% endblock %}
 
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.2.0/dist/js/datepicker-full.min.js"></script>
+    <script src="/js/movie.js"></script>
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
@@ -90,7 +95,19 @@
         <p style="margin-block-end:0.2rem">Watched at:</p>
         <ul>
             {% for watchDate in watchDates|reverse %}
-                <li class="fw-light">{{ watchDate.watched_at|date("d.m.Y") }}</li>
+                <li class="fw-light">{{ watchDate.watched_at|date("d.m.Y") }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm" style="margin-bottom: 0.5rem" onclick="myFunction(this)" id="delete-button-{{ loop.index }}">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="11"
+                             height="11"
+                             fill="currentColor"
+                             class="bi bi-trash-fill"
+                             viewBox="0 0 16 16">
+                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"></path>
+                        </svg>
+                    </button>
+                    <watchDate id="delete-button-{{ loop.index }}-watch-date" movie-id="{{ watchDate.movie_id }}" date="{{ watchDate.watched_at|date("d.m.Y") }}"></watchDate>
+                </li>
             {% endfor %}
         </ul>
     </main>

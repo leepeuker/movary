@@ -464,6 +464,20 @@ class Repository
         return $data === false ? null : Entity::createFromArray($data);
     }
 
+    public function findPlaysForMovieIdAndDate(int $movieId, Date $watchedAt) : ?int
+    {
+        $result = $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT plays
+            FROM movie_history
+            WHERE movie_id = ? AND watched_at = ?
+            SQL,
+            [$movieId, $watchedAt]
+        );
+
+        return $result[0] ?? null;
+    }
+
     public function updateDetails(
         int $id,
         ?string $tagline,
