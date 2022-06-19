@@ -32,6 +32,10 @@ class HistoryController
 
     public function deleteHistoryEntry(Request $request) : Response
     {
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];

@@ -160,6 +160,7 @@ class Api
         }
 
         return [
+            'id' => $entity->getId(),
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'tmdbPosterPath' => $entity->getTmdbPosterPath(),

@@ -19,7 +19,34 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
 
-        <h2 style="display: flex;padding-top: 0.5rem;">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
+        <h2 style="display: flex;padding-top: 0.5rem;margin-bottom: 0.3rem">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
+
+        <div class="fw-light"
+             {% if loggedIn == true %}data-bs-toggle="modal" data-bs-target="#ratingModal"{% endif %}
+             style="color: rgb(255, 193, 7);
+                     font-size: 1.5rem;
+                     margin-bottom: 0.4rem;
+                     {% if loggedIn == true %}cursor:pointer;{% endif %}">
+            {% if movie.rating10 is null and movie.rating5 is not null %}
+                <i class="bi {% if movie.rating5 < 1 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating5 < 2 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating5 < 3 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating5 < 4 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating5 < 5 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+            {% else %}
+                <i class="bi {% if movie.rating10 < 1 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 2 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 3 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 4 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 5 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 6 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 7 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 8 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 9 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+                <i class="bi {% if movie.rating10 < 10 %}bi-star{% else %}bi-star-fill{% endif %}"></i>
+            {% endif %}
+        </div>
+
         <div style="display: flex;padding-top: 0.3rem">
             <div style="text-align: center">
                 <img src="{{ tmdb.generatePosterImageUrl(movie.tmdbPosterPath) }}" width="200rem" style="width: 11rem;align-self: start;">
@@ -43,28 +70,22 @@
                 <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">{{ movie.originalLanguage }}</span>
                 </div>
-
-                <h6 style="margin-bottom: 0.2rem">Rating</h6>
-                <div>
-                    {% if movie.rating10 is null and movie.rating5 is not null %}
-                        <span class="fw-light">{{ movie.rating5 ? movie.rating5 : '-' }}/5</span>
-                    {% else %}
-                        <span class="fw-light">{{ movie.rating10 ? movie.rating10 : '-' }}/10</span>
-                    {% endif %}
-                </div>
             </div>
         </div>
 
         {% if movie.tagline is not null %}
-            <p class="fw-lighter" style="margin-bottom: 0.6rem;padding-top: 0.8rem">{{ movie.tagline }}</p>
+            <h6 style="margin-bottom: 0.3rem;padding-top: 0.8rem">Tagline</h6>
+            <div class="carousel">
+                <p class="fw-lighter" style="margin-bottom: 0rem">{{ movie.tagline }}</p>
+            </div>
         {% endif %}
 
-        <h6 style="margin-bottom: 0.5rem;{% if movie.tagline is null %}padding-top: 0.8em"{% endif %}">Description</h6>
+        <h6 style="margin-bottom: 0.3rem;{% if movie.tagline is null %}padding-top: 0.8rem"{% endif %}">Plot</h6>
         <div class="carousel">
             <p style="margin-bottom: 0rem">{{ movie.overview }}</p>
         </div>
 
-        <h6 style="margin-bottom: 0.5rem">Acting</h6>
+        <h6 style="margin-bottom: 0.4rem">Acting</h6>
         <div class="carousel">
             {% for castMember in castMembers|slice(0, 25) %}
                 <div class="card" onclick="window.location='/person/{{ castMember.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
@@ -78,7 +99,7 @@
             {% endfor %}
         </div>
 
-        <h6 style="margin-bottom: 0.5rem">Director</h6>
+        <h6 style="margin-bottom: 0.4rem">Director</h6>
         <div class="carousel">
             {% for director in directors|slice(0, 25) %}
                 <div class="card" onclick="window.location='/person/{{ director.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
@@ -86,29 +107,77 @@
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
                     </div>
 
-                    <img src="{{ tmdb.generatePosterImageUrl(director.tmdbPosterPath) }}" class="card-img-top" alt="..."
+                    <img src="{{ tmdb.generatePosterImageUrl(director.tmdbPosterPath) }}"
+                         class="card-img-top"
+                         alt="..."
                          style="border-top-left-radius:0;border-top-right-radius:0;">
                 </div>
             {% endfor %}
         </div>
 
-        <p style="margin-block-end:0.2rem">Watched at:</p>
+        <p style="margin-block-end:0">Watched at:</p>
         <ul>
             {% for watchDate in watchDates|reverse %}
                 <li class="fw-light">{{ watchDate.watched_at|date("d.m.Y") }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
-                    <button type="submit" class="btn btn-outline-danger btn-sm" style="margin-bottom: 0.5rem" onclick="myFunction(this)" id="delete-button-{{ loop.index }}">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="11"
-                             height="11"
-                             fill="currentColor"
-                             class="bi bi-trash-fill"
-                             viewBox="0 0 16 16">
-                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"></path>
-                        </svg>
-                    </button>
-                    <watchDate id="delete-button-{{ loop.index }}-watch-date" movie-id="{{ watchDate.movie_id }}" date="{{ watchDate.watched_at|date("d.m.Y") }}"></watchDate>
+                    {% if loggedIn == true %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm" style="margin-bottom: 0.5rem;margin-top: 0.2rem" onclick="myFunction(this)"
+                                id="delete-button-{{ loop.index }}">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="11"
+                                 height="11"
+                                 fill="currentColor"
+                                 class="bi bi-trash-fill"
+                                 viewBox="0 0 16 16">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"></path>
+                            </svg>
+                        </button>
+                        <watchDate id="delete-button-{{ loop.index }}-watch-date" movie-id="{{ watchDate.movie_id }}" date="{{ watchDate.watched_at|date("d.m.Y") }}"></watchDate>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
     </main>
+
+
+
+    <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="watchDateModalTitle">Log movie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/movie/{{ movie.id }}/rating" method="POST">
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="rating10Text">Rating 10</span>
+                            <input type="number"
+                                   class="form-control"
+                                   name="rating10"
+                                   min="1"
+                                   max="10"
+                                   value="{{ movie.rating10 }}"
+                                   id="rating10"
+                                   aria-describedby="rating10Text">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="rating5Text">Rating 5</span>
+                            <input type="number"
+                                   class="form-control"
+                                   name="rating5"
+                                   min="1"
+                                   max="5"
+                                   value="{{ movie.rating5 }}"
+                                   id="rating5Text"
+                                   aria-describedby="basic-addon2">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Log movie</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
