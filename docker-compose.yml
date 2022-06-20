@@ -1,23 +1,21 @@
 version: "3.5"
 
 services:
-    movary-php:
-        build: ./build/php
-        container_name: movary-php
-        user: "${USER_ID}"
-        working_dir: /var/www/
-        volumes:
-            - ./:/var/www/
+  movary-php:
+    build: ./build/php
+    user: "${USER_ID}"
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www/
 
-    movary-web:
-        build: ./build/nginx/
-        container_name: movary-web
-        working_dir: /var/www/
-        ports:
-            - "${WEB_PORT}:80"
-        volumes:
-            - ./build/nginx/conf.d/:/etc/nginx/conf.d/
-            - ./build/nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./:/var/www/
-        depends_on:
-            - movary-php
+  movary-web:
+    build: ./build/nginx/
+    working_dir: /var/www/
+    ports:
+      - "${WEB_PORT}:80"
+    volumes:
+      - ./build/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./build/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./:/var/www/
+    depends_on:
+      - movary-php

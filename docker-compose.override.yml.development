@@ -3,7 +3,6 @@ version: "3.5"
 services:
     movary-db:
         image: mysql:8.0
-        container_name: movary-db
         environment:
             MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
             MYSQL_USER: ${DATABASE_USER}

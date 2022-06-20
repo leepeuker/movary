@@ -34,6 +34,10 @@ class Select
 
         $totalNumberOfDays = $firstPlayDate->getNumberOfDaysSince(Date::create());
 
+        if ($totalNumberOfDays === 0) {
+            return $totalPlayCount;
+        }
+
         return round($totalPlayCount / $totalNumberOfDays, 1);
     }
 

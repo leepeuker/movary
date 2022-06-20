@@ -3,6 +3,7 @@
 namespace Movary\Api\Tmdb;
 
 use GuzzleHttp\Psr7\Request;
+use Movary\Api\Tmdb\Exception\AuthorizationError;
 use Movary\Util\Json;
 use Psr\Http\Client\ClientInterface;
 
@@ -32,6 +33,10 @@ class Client
         );
 
         $response = $this->httpClient->sendRequest($request);
+
+        if ($response->getStatusCode() === 401) {
+            throw AuthorizationError::create();
+        }
 
         if ($response->getStatusCode() !== 200) {
             throw new \RuntimeException('Api error. Response status code: ' . $response->getStatusCode());

@@ -46,7 +46,7 @@ app_sync_letterboxd:
 # Database
 ##########
 db_migration_migrate:
-	make exec_php_cmd CMD="vendor/bin/phinx $(PHINX) migrate -c ./settings/phinx.php"
+	make exec_php_cmd CMD="vendor/bin/phinx migrate -c ./settings/phinx.php"
 
 db_migration_rollback:
 	make exec_php_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php"
