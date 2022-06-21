@@ -1,13 +1,14 @@
 version: "3.5"
 
 services:
-    movary-db:
-        image: mysql:8.0
-        environment:
-            MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
-            MYSQL_USER: ${DATABASE_USER}
-            MYSQL_PASSWORD: ${DATABASE_PASSWORD}
-        volumes:
-            - ./tmp/db/:/var/lib/mysql
-        ports:
-            - "${DATABASE_PORT_HOST}:3306"
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - ./tmp/db/:/var/lib/mysql
+      - ./tmp/:/tmp/host
+    ports:
+      - "${DATABASE_PORT_HOST}:3306"

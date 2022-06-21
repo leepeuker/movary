@@ -25,10 +25,10 @@ build: down init
 # Container interaction
 #######################
 exec_php_bash:
-	docker exec -it movary-php bash -c "bash"
+	docker-compose exec php bash
 
 exec_php_cmd:
-	docker exec -i movary-php bash -c "${CMD}"
+	docker-compose exec php bash -c "${CMD}"
 
 # Commands
 ##########

@@ -1,14 +1,14 @@
 version: "3.5"
 
 services:
-  movary-php:
+  php:
     build: ./build/php
     user: "${USER_ID}"
     working_dir: /var/www/
     volumes:
       - ./:/var/www/
 
-  movary-web:
+  nginx:
     build: ./build/nginx/
     working_dir: /var/www/
     ports:
@@ -18,4 +18,4 @@ services:
       - ./build/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./:/var/www/
     depends_on:
-      - movary-php
+      - php

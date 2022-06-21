@@ -1,8 +1,8 @@
 version: "3.5"
 
 services:
-    movary-php:
-        restart: always
+  php:
+    restart: always
 
-    movary-web:
-        restart: always
+  web:
+    restart: always
