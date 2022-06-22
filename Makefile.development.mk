@@ -31,6 +31,7 @@ db_import:
 
 db_export:
 	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_ROOT_PASSWORD) $(DATABASE_NAME) > /tmp/host/dump.sql'
+	sudo chown $(USER_ID):$(USER_ID) tmp/dump.sql
 
 db_migration_create:
 	make exec_php_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
