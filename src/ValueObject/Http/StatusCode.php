@@ -20,6 +20,11 @@ class StatusCode
         return new self(405, 'Method Not Allowed');
     }
 
+    public static function createNoContent() : self
+    {
+        return new self(204, 'No Content');
+    }
+
     public static function createNotFound() : self
     {
         return new self(404, 'Not Found');

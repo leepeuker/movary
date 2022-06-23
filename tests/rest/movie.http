@@ -1,0 +1,6 @@
+POST http://127.0.0.1/movie/34/rating
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/x-www-form-urlencoded
+
+rating10=0

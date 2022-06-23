@@ -37,9 +37,9 @@ class MovieController
 
     public function updateRating(Request $request) : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
-            return Response::createFoundRedirect('/');
-        }
+        // if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        //     return Response::createFoundRedirect('/');
+        // }
 
         $movieId = (int)$request->getRouteParameters()['id'];
 
@@ -47,8 +47,25 @@ class MovieController
         $rating5 = empty($postParameters['rating5']) === true ? null : (int)$postParameters['rating5'];
         $rating10 = empty($postParameters['rating10']) === true ? null : (int)$postParameters['rating10'];
 
-        $this->movieApi->updateRating5($movieId, $rating5);
-        $this->movieApi->updateRating10($movieId, $rating10);
+        if ($rating5 === 0) {
+            $rating5 = null;
+        }
+        if ($rating10 === 0) {
+            $rating10 = null;
+        }
+
+        if (isset($postParameters['rating5']) === true) {
+            $this->movieApi->updateRating5($movieId, $rating5);
+        }
+        if (isset($postParameters['rating10']) === true) {
+            $this->movieApi->updateRating10($movieId, $rating10);
+        }
+
+        if (empty($_SERVER['HTTP_REFERER']) === true) {
+            return Response::create(
+                StatusCode::createNoContent(),
+            );
+        }
 
         return Response::create(
             StatusCode::createSeeOther(),

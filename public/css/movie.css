@@ -8,3 +8,8 @@
     flex-shrink: 0;
     scroll-snap-align: start; /* <- the other important piece */
 }
+
+.rating-edit-active {
+    border: black solid;
+    border-width: 0.1rem;
+}
