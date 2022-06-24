@@ -1,25 +1,8 @@
 # https://hub.docker.com/_/php
-FROM php:8.1.4-fpm-alpine3.15
+FROM webdevops/php-nginx:8.1-alpine
 
-# System update
-RUN apk update && apk upgrade
+ENV WEB_DOCUMENT_ROOT="/app/public"
 
-# Install system dependencies
-RUN apk add --no-cache git                  \
-                       bash                 \
-                       nano                 \
-                       curl                 \
-                       unzip                \
-                       make                 \
-                       zip                  \
-                       libzip-dev           \
-                       $PHPIZE_DEPS
-
-
-# Install php dependencies
-RUN docker-php-ext-install mysqli pdo pdo_mysql zip
-
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.3.3
-
-WORKDIR /var/www
+USER application
+WORKDIR /app
+COPY ./ ./

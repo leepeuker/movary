@@ -118,7 +118,6 @@ class Factory
             $container->get(LoggerInterface::class),
             $container->get(Movie\Api::class),
             $container->get(SyncMovie::class),
-            new \DateTimeZone($config->getAsString('TIMEZONE'))
         );
     }
 }

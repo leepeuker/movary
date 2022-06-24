@@ -19,13 +19,13 @@ down:
 
 reup: down up
 
-build: down init
-	docker-compose build --build-arg USER_ID=${USER_ID}
+build: down
+	docker-compose build
 
 # Container interaction
 #######################
-exec_php_bash:
-	docker-compose exec php bash
+exec_app_cmd:
+	docker-compose exec app bash
 
 exec_php_cmd:
 	docker-compose exec php bash -c "${CMD}"

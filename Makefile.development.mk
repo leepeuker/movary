@@ -12,7 +12,7 @@ exec_mysql_query:
 # Composer
 ##########
 composer_install:
-	make exec_php_cmd CMD="composer install"
+	make exec_app_cmd CMD="composer install"
 
 composer_update:
 	make exec_php_cmd CMD="composer update"
