@@ -41,7 +41,7 @@ function editRating (e) {
 }
 
 function getRatingFromStars () {
-	let rating
+	let rating = 0
 
 	for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
 		if (document.getElementById('ratingStar' + ratingStarNumber).classList.contains('bi-star') === true) {

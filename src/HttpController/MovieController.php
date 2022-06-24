@@ -4,7 +4,6 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie;
 use Movary\Application\SessionService;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -45,28 +44,16 @@ class MovieController
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $postParameters = $request->getPostParameters();
-        $personalRating = empty($postParameters['rating']) === true ? null : (int)$postParameters['rating'];
 
-        if ($personalRating === 0 || $personalRating === null) {
-            $personalRating = null;
-        } else {
-            $personalRating = PersonalRating::create($personalRating);
+        $personalRating = null;
+        if (empty($postParameters['rating']) === false && $postParameters['rating'] !== 0) {
+            $personalRating = PersonalRating::create((int)$postParameters['rating']);
         }
 
-        if (isset($postParameters['rating']) === true) {
-            $this->movieApi->updatePersonalRating($movieId, $personalRating);
-        }
-
-        if (empty($_SERVER['HTTP_REFERER']) === true) {
-            return Response::create(
-                StatusCode::createNoContent(),
-            );
-        }
+        $this->movieApi->updatePersonalRating($movieId, $personalRating);
 
         return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            StatusCode::createNoContent(),
         );
     }
 }
