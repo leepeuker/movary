@@ -21,7 +21,7 @@ class SyncMovies
 
     public function syncMovies(?int $maxAgeInHours, ?int $movieCountSyncThreshold) : void
     {
-        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbDesc();
+        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc();
 
         $movieCountSynced = 0;
 
@@ -50,6 +50,6 @@ class SyncMovies
 
     private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays = null) : bool
     {
-        return DateTime::create()->diff($updatedAtTmdb)->getHours() > $maxAgeInDays;
+        return DateTime::create()->diffInHours($updatedAtTmdb) > $maxAgeInDays;
     }
 }

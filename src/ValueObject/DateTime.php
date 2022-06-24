@@ -37,11 +37,9 @@ class DateTime implements \JsonSerializable
         return $this->format(self::DEFAULT_STRING_FORMAT);
     }
 
-    public function diff(DateTime $dateTime) : DateInterval
+    public function diffInHours(DateTime $dateTime) : int
     {
-        $dateInterval = (new \DateTime($this->dateTime))->diff(new \DateTime((string)$dateTime));
-
-        return DateInterval::createByDateInterval($dateInterval);
+        return (int)(((new \DateTime($this->dateTime))->getTimestamp() - (new \DateTime((string)$dateTime))->getTimestamp()) / 60 / 60);
     }
 
     public function format(string $format) : string

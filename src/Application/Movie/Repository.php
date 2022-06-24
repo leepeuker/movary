@@ -58,7 +58,7 @@ class Repository
         return EntityList::createFromArray($data);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbDesc() : EntityList
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : EntityList
     {
         $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie` ORDER BY updated_at_tmdb ASC');
 

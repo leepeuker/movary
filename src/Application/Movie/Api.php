@@ -86,9 +86,9 @@ class Api
         return $this->movieSelectService->fetchAll();
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbDesc() : EntityList
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : EntityList
     {
-        return $this->movieSelectService->fetchAllOrderedByLastUpdatedAtTmdbDesc();
+        return $this->movieSelectService->fetchAllOrderedByLastUpdatedAtTmdbAsc();
     }
 
     public function fetchByTraktId(TraktId $traktId) : Entity

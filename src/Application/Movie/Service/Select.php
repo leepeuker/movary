@@ -18,9 +18,9 @@ class Select
         return $this->repository->fetchAll();
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbDesc() : EntityList
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : EntityList
     {
-        return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbDesc();
+        return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc();
     }
 
     public function fetchWithActor(int $personId) : EntityList
