@@ -95,7 +95,7 @@ function saveRating () {
 		headers: {
 			'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
 		},
-		body: 'rating10=' + newRating
+		body: 'rating=' + newRating
 	})
 		.then(function (data) {
 			console.log('Request succeeded with JSON response', data)

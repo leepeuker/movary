@@ -30,9 +30,9 @@
                                 <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date("d.m.Y") }}</small>
                             </div>
 
-                            {% if historyEntry.rating_10 is not null %}
+                            {% if historyEntry.personal_rating is not null %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                    {{ historyEntry.rating_10 }}
+                                    {{ historyEntry.personal_rating }}
                                 </span>
                             {% endif %}
                         </div>

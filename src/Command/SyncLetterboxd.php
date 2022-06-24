@@ -7,11 +7,14 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncLetterboxd extends Command
 {
     protected static $defaultName = 'app:sync-letterboxd-ratings';
+
+    private const OPTION_NAME_OVERWRITE = 'overwrite';
 
     public function __construct(
         private readonly SyncRatings $syncRatings,
@@ -24,13 +27,15 @@ class SyncLetterboxd extends Command
     {
         $this
             ->setDescription('Sync letterboxd.com movie ratings with local database')
-            ->addArgument('ratingsCsvName', InputArgument::REQUIRED, 'Letterboxed rating csv file name (must be put into the tmp directory)');
+            ->addArgument('ratingsCsvName', InputArgument::REQUIRED, 'Letterboxed rating csv file name (must be put into the tmp directory)')
+            ->addOption(self::OPTION_NAME_OVERWRITE, [], InputOption::VALUE_NONE, 'Overwrite local data.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $ratingsCsvPath = __DIR__ . '/../../tmp/' . $input->getArgument('ratingsCsvName');
+        $overwriteExistingData = (bool)$input->getOption(self::OPTION_NAME_OVERWRITE);
         $verbose = $input->getOption('verbose');
 
         if (is_dir($ratingsCsvPath) === true || is_readable($ratingsCsvPath) === false) {
@@ -40,7 +45,7 @@ class SyncLetterboxd extends Command
         }
 
         try {
-            $this->syncRatings->execute($ratingsCsvPath, $verbose);
+            $this->syncRatings->execute($ratingsCsvPath, $verbose, $overwriteExistingData);
         } catch (\Throwable $t) {
             $this->logger->error('Could not complete letterboxd sync.', ['exception' => $t]);
 

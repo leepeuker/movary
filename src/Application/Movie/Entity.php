@@ -4,14 +4,14 @@ namespace Movary\Application\Movie;
 
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\PersonalRating;
 
 class Entity
 {
     private function __construct(
         private readonly int $id,
         private readonly string $title,
-        private readonly ?int $rating10,
-        private readonly ?int $rating5,
+        private readonly ?PersonalRating $personalRating,
         private readonly ?TraktId $traktId,
         private readonly ?string $imdbId,
         private readonly int $tmdbId,
@@ -33,8 +33,7 @@ class Entity
         return new self(
             (int)$data['id'],
             $data['title'],
-            $data['rating_10'] === null ? null : (int)$data['rating_10'],
-            $data['rating_5'] === null ? null : (int)$data['rating_5'],
+            $data['personal_rating'] === null ? null : PersonalRating::create((int)$data['personal_rating']),
             empty($data['trakt_id']) === false ? TraktId::createFromString((string)$data['trakt_id']) : null,
             empty($data['imdb_id']) === false ? (string)$data['imdb_id'] : null,
             (int)$data['tmdb_id'],
@@ -71,19 +70,14 @@ class Entity
         return $this->overview;
     }
 
+    public function getPersonalRating() : ?PersonalRating
+    {
+        return $this->personalRating;
+    }
+
     public function getPosterPath() : ?string
     {
         return $this->posterPath;
-    }
-
-    public function getRating10() : ?int
-    {
-        return $this->rating10;
-    }
-
-    public function getRating5() : ?int
-    {
-        return $this->rating5;
     }
 
     public function getReleaseDate() : ?DateTime

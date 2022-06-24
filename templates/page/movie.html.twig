@@ -31,8 +31,9 @@
                      {% if loggedIn == true %}cursor:pointer;{% endif %}">
 
             <span id="ratingStarsSpan">
+                {{ movie.personal_rating }}
             {% for i in 1..10 %}
-                <i class="bi bi-star{% if movie.rating10 >= i %}-fill{% endif %}" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
+                <i class="bi bi-star{% if movie.personalRating >= i %}-fill{% endif %}" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
             {% endfor %}
                 {% if loggedIn == true %}
                     <i class="bi bi-pencil-square" style="color: black;font-size: 1.3rem;cursor: pointer" onclick="editRating(this)" id="editRatingButton"></i>
@@ -44,7 +45,7 @@
             </span>
 
 {#            {% for i in 1..10 %} #}
-{#                {% if movie.rating10 < i %} #}
+{#                {% if movie.personalRating < i %} #}
 {#                    <svg xmlns="http://www.w3.org/2000/svg" #}
 {#                         width="25" #}
 {#                         height="25" #}

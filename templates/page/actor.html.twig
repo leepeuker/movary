@@ -54,9 +54,9 @@
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
                                     </div>
 
-                                    {% if movieAsActor.rating10 is not null %}
+                                    {% if movieAsActor.personalRating is not null %}
                                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                            {{ movieAsActor.rating10 }}
+                                            {{ movieAsActor.personalRating }}
                                         </span>
                                     {% endif %}
                                 </div>
@@ -77,9 +77,9 @@
 
                                 </div>
 
-                                {% if movieAsDirector.rating10 is not null %}
+                                {% if movieAsDirector.personalRating is not null %}
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                        {{ movieAsDirector.rating10 }}
+                                        {{ movieAsDirector.personalRating }}
                                     </span>
                                 {% endif %}
                             </div>

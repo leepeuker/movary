@@ -18,9 +18,9 @@ class Select
     ) {
     }
 
-    public function fetchAverage10Rating() : float
+    public function fetchAveragePersonalRating() : float
     {
-        return round($this->movieRepository->fetchAverage10Rating(), 1);
+        return round($this->movieRepository->fetchPersonalRating(), 1);
     }
 
     public function fetchAveragePlaysPerDay() : float

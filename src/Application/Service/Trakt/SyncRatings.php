@@ -4,6 +4,7 @@ namespace Movary\Application\Service\Trakt;
 
 use Movary\Api;
 use Movary\Application;
+use Movary\ValueObject\PersonalRating;
 
 class SyncRatings
 {
@@ -31,8 +32,8 @@ class SyncRatings
                 continue;
             }
 
-            if ($overwriteExistingData === true || $movie->getRating10() === null) {
-                $this->movieApi->updateRating10($movie->getId(), $rating);
+            if ($overwriteExistingData === true || $movie->getPersonalRating() === null) {
+                $this->movieApi->updatePersonalRating($movie->getId(), PersonalRating::create($rating));
             }
         }
     }

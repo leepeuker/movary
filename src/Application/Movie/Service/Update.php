@@ -13,6 +13,7 @@ use Movary\Application\Movie\Repository;
 use Movary\Application\Person;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\PersonalRating;
 
 class Update
 {
@@ -102,14 +103,9 @@ class Update
         }
     }
 
-    public function updateRating10(int $id, ?int $rating10) : void
+    public function updatePersonalRating(int $id, ?PersonalRating $rating) : void
     {
-        $this->repository->updateRating10($id, $rating10);
-    }
-
-    public function updateRating5(int $id, ?int $rating5) : void
-    {
-        $this->repository->updateRating5($id, $rating5);
+        $this->repository->updatePersonalRating($id, $rating);
     }
 
     public function updateTraktId(int $movieId, TraktId $traktId) : void

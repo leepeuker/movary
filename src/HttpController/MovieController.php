@@ -8,6 +8,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\PersonalRating;
 use Twig\Environment;
 
 class MovieController
@@ -37,28 +38,23 @@ class MovieController
 
     public function updateRating(Request $request) : Response
     {
-        // if ($this->sessionService->isCurrentUserLoggedIn() === false) {
-        //     return Response::createFoundRedirect('/');
-        // }
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
 
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $postParameters = $request->getPostParameters();
-        $rating5 = empty($postParameters['rating5']) === true ? null : (int)$postParameters['rating5'];
-        $rating10 = empty($postParameters['rating10']) === true ? null : (int)$postParameters['rating10'];
+        $personalRating = empty($postParameters['rating']) === true ? null : (int)$postParameters['rating'];
 
-        if ($rating5 === 0) {
-            $rating5 = null;
-        }
-        if ($rating10 === 0) {
-            $rating10 = null;
+        if ($personalRating === 0 || $personalRating === null) {
+            $personalRating = null;
+        } else {
+            $personalRating = PersonalRating::create($personalRating);
         }
 
-        if (isset($postParameters['rating5']) === true) {
-            $this->movieApi->updateRating5($movieId, $rating5);
-        }
-        if (isset($postParameters['rating10']) === true) {
-            $this->movieApi->updateRating10($movieId, $rating10);
+        if (isset($postParameters['rating']) === true) {
+            $this->movieApi->updatePersonalRating($movieId, $personalRating);
         }
 
         if (empty($_SERVER['HTTP_REFERER']) === true) {

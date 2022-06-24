@@ -11,6 +11,7 @@ use Movary\Application\Genre;
 use Movary\Application\Movie;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\PersonalRating;
 
 class Api
 {
@@ -164,8 +165,7 @@ class Api
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'tmdbPosterPath' => $entity->getTmdbPosterPath(),
-            'rating5' => $entity->getRating5(),
-            'rating10' => $entity->getRating10(),
+            'personalRating' => $entity->getPersonalRating()?->asInt(),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
@@ -261,19 +261,14 @@ class Api
         $this->movieUpdateService->updateLetterboxdId($movieId, $letterboxdId);
     }
 
+    public function updatePersonalRating(int $movieId, ?PersonalRating $rating) : void
+    {
+        $this->movieUpdateService->updatePersonalRating($movieId, $rating);
+    }
+
     public function updateProductionCompanies(int $movieId, Company\EntityList $companies) : void
     {
         $this->movieUpdateService->updateProductionCompanies($movieId, $companies);
-    }
-
-    public function updateRating10(int $movieId, ?int $rating10) : void
-    {
-        $this->movieUpdateService->updateRating10($movieId, $rating10);
-    }
-
-    public function updateRating5(int $movieId, ?int $rating5) : void
-    {
-        $this->movieUpdateService->updateRating5($movieId, $rating5);
     }
 
     public function updateTraktId(int $movieId, TraktId $traktId) : void

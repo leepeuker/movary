@@ -26,7 +26,7 @@ class DashboardController
                 'totalPlayCount' => $this->movieApi->fetchHistoryCount(),
                 'uniqueMoviesCount' => $this->movieApi->fetchHistoryCountUnique(),
                 'totalHoursWatched' => $this->movieHistorySelectService->fetchTotalHoursWatched(),
-                'average10Rating' => $this->movieHistorySelectService->fetchAverage10Rating(),
+                'averagePersonalRating' => $this->movieHistorySelectService->fetchAveragePersonalRating(),
                 'averagePlaysPerDay' => $this->movieHistorySelectService->fetchAveragePlaysPerDay(),
                 'averageRuntime' => $this->movieHistorySelectService->fetchAverageRuntime(),
                 'firstDiaryEntry' => $this->movieHistorySelectService->fetchFirstHistoryWatchDate(),

@@ -14,6 +14,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\PersonalRating;
 use Twig\Environment;
 
 class HistoryController
@@ -57,8 +58,7 @@ class HistoryController
 
         $watchDate = Date::createFromDateTime(DateTime::createFromString($postParameters['watchDate']));
         $tmdbId = (int)$postParameters['tmdbId'];
-        $rating10 = (int)$postParameters['rating10'];
-        $rating5 = (int)$postParameters['rating5'];
+        $personalRating = PersonalRating::create((int)$postParameters['personalRating']);
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -66,8 +66,7 @@ class HistoryController
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
         }
 
-        $this->movieApi->updateRating5($movie->getId(), $rating5);
-        $this->movieApi->updateRating10($movie->getId(), $rating10);
+        $this->movieApi->updatePersonalRating($movie->getId(), $personalRating);
         $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $watchDate, 1);
 
         return Response::create(

@@ -7,6 +7,7 @@ use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\PersonalRating;
 use RuntimeException;
 
 class Repository
@@ -64,10 +65,10 @@ class Repository
         return EntityList::createFromArray($data);
     }
 
-    public function fetchAverage10Rating() : float
+    public function fetchPersonalRating() : float
     {
         return (float)$this->dbConnection->fetchFirstColumn(
-            'SELECT AVG(rating_10)
+            'SELECT AVG(personal_rating)
             FROM movie
             WHERE id IN (SELECT DISTINCT movie_id FROM movie_history mh)'
         )[0];
@@ -515,14 +516,9 @@ class Repository
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId], ['id' => $id]);
     }
 
-    public function updateRating10(int $id, ?int $rating10) : void
+    public function updatePersonalRating(int $id, ?PersonalRating $personalRating) : void
     {
-        $this->dbConnection->update('movie', ['rating_10' => $rating10], ['id' => $id]);
-    }
-
-    public function updateRating5(int $id, ?int $rating5) : void
-    {
-        $this->dbConnection->update('movie', ['rating_5' => $rating5], ['id' => $id]);
+        $this->dbConnection->update('movie', ['personal_rating' => $personalRating], ['id' => $id]);
     }
 
     public function updateTraktId(int $id, TraktId $traktId) : void

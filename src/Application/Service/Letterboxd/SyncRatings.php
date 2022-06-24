@@ -6,6 +6,7 @@ use League\Csv\Reader;
 use Movary\Api;
 use Movary\Api\Letterboxd\WebScrapper;
 use Movary\Application;
+use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
 
 class SyncRatings
@@ -18,7 +19,7 @@ class SyncRatings
     ) {
     }
 
-    public function execute(string $ratingsCsvPath, bool $verbose = false) : void
+    public function execute(string $ratingsCsvPath, bool $verbose = false, bool $overwriteExistingData = false) : void
     {
         $ratings = Reader::createFromPath($ratingsCsvPath);
         $ratings->setHeaderOffset(0);
@@ -34,11 +35,18 @@ class SyncRatings
                 continue;
             }
 
-            if ($verbose === true) {
-                echo "Updating {$movie->getTitle()} with rating: " . $rating['Rating'] . PHP_EOL;
+            $ratingWithScale10 = $rating['Rating'] * 2;
+            $personalRating = PersonalRating::create((int)$ratingWithScale10);
+
+            if ($overwriteExistingData === false && $movie->getPersonalRating() !== null) {
+                $this->outputMessage("Ignoring {$movie->getTitle()} rating: " . $personalRating . PHP_EOL, $verbose);
+
+                continue;
             }
 
-            $this->movieApi->updateRating5($movie->getId(), (int)$rating['Rating']);
+            $this->outputMessage("Updating {$movie->getTitle()} with rating: " . $personalRating . PHP_EOL, $verbose);
+
+            $this->movieApi->updatePersonalRating($movie->getId(), $personalRating);
         }
 
         $this->scanLogRepository->insertLogForLetterboxdSync();
@@ -67,6 +75,13 @@ class SyncRatings
     {
         if (empty($rating['Letterboxd URI']) === true || empty($rating['Rating']) === true) {
             throw new \RuntimeException('Invalid csv row in letterboxed rating csv.');
+        }
+    }
+
+    private function outputMessage(string $message, bool $verbose) : void
+    {
+        if ($verbose === true) {
+            echo $message;
         }
     }
 }
