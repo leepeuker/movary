@@ -10,7 +10,10 @@ class Config
 
     public static function createFromEnv() : self
     {
-        return new self($_ENV);
+        $fpmEnvironment = $_ENV;
+        $systemEnvironment = getenv();
+
+        return new self(array_merge($fpmEnvironment, $systemEnvironment));
     }
 
     public function getAsArray(string $parameter) : array

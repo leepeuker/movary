@@ -5,4 +5,4 @@ ENV WEB_DOCUMENT_ROOT="/app/public"
 
 USER application
 WORKDIR /app
-COPY ./ ./
+COPY --chown=application ./ ./

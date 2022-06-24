@@ -4,4 +4,4 @@ init:
 # Composer
 ##########
 composer_install:
-	make exec_php_cmd CMD="composer install --no-dev"
+	make exec_app_cmd CMD="composer install --no-dev"

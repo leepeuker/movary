@@ -15,7 +15,7 @@ composer_install:
 	make exec_app_cmd CMD="composer install"
 
 composer_update:
-	make exec_php_cmd CMD="composer update"
+	make exec_app_cmd CMD="composer update"
 
 # Database
 ##########
@@ -34,17 +34,27 @@ db_export:
 	sudo chown $(USER_ID):$(USER_ID) tmp/dump.sql
 
 db_migration_create:
-	make exec_php_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
+	make exec_app_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
 
 # Tests
 #######
 test: test_phpcs test_psalm test_phpstan
 
 test_phpcs:
-	make exec_php_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml ./src"
+	make exec_app_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml ./src"
 
 test_phpstan:
-	make exec_php_cmd CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8"
+	make exec_app_cmd CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8"
 
 test_psalm:
-	make exec_php_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
+	make exec_app_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
+
+
+
+
+
+run_movary_image:
+	docker run --name movary --rm -d -p 80:80 -e DATABASE_HOST=192.168.1.2 -e DATABASE_PORT=$(DATABASE_PORT_HOST) -e DATABASE_USER=$(DATABASE_USER) -e DATABASE_PASSWORD=$(DATABASE_PASSWORD) movary
+
+stop_movary_image:
+	docker stop movary

@@ -25,8 +25,8 @@ class Factory
 {
     public static function createConfig() : Config
     {
-        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-        $dotenv->load();
+        $dotenv = \Dotenv\Dotenv::createMutable(__DIR__ . '/..');
+        $dotenv->safeLoad();
 
         return Config::createFromEnv();
     }
@@ -112,7 +112,7 @@ class Factory
         return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
     }
 
-    public function createPlexController(ContainerInterface $container, Config $config) : PlexController
+    public function createPlexController(ContainerInterface $container) : PlexController
     {
         return new PlexController(
             $container->get(LoggerInterface::class),

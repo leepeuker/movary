@@ -5,14 +5,12 @@ services:
     build:
       context: ./
       dockerfile: ./build/php/Dockerfile
-    user: "1000:1000"
+    user: "${USER_ID}:${USER_ID}"
     ports:
       - "80:80"
     volumes:
       - ./:/app
-    working_dir: /app
     environment:
-      WEB_DOCUMENT_ROOT: "/app/public"
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
 
   mysql:
