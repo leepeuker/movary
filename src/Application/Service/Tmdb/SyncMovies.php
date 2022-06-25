@@ -35,12 +35,16 @@ class SyncMovies
                 continue;
             }
 
+            $this->dbConnection->beginTransaction();
+
             try {
                 $this->syncMovieService->syncMovie($movie->getTmdbId());
             } catch (\Throwable $t) {
                 $this->dbConnection->rollBack();
                 $this->logger->error('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
+
+            $this->dbConnection->commit();
 
             $movieCountSynced++;
         }
