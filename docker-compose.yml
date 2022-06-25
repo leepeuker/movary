@@ -5,6 +5,7 @@ services:
     build:
       context: ./
       dockerfile: ./build/php/Dockerfile
+      target: base
     user: "${USER_ID}:${USER_ID}"
     ports:
       - "${HTTP_PORT}:80"
@@ -13,16 +14,16 @@ services:
     environment:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
 
-  app2:
-    image: registry.hub.docker.com/leepeuker/movary:1.1
-    user: "${USER_ID}:${USER_ID}"
-    ports:
-      - "8080:80"
-    environment:
-      PHP_DATE_TIMEZONE: "${TIMEZONE}"
-      DATABASE_HOST: "192.168.1.2"
-      DATABASE_USER: "${DATABASE_USER}"
-      DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
+#  app2:
+#    image: registry.hub.docker.com/leepeuker/movary:1.1
+#    user: "${USER_ID}:${USER_ID}"
+#    ports:
+#      - "8080:80"
+#    environment:
+#      PHP_DATE_TIMEZONE: "${TIMEZONE}"
+#      DATABASE_HOST: "192.168.1.2"
+#      DATABASE_USER: "${DATABASE_USER}"
+#      DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
 
   mysql:
     image: mysql:8.0
