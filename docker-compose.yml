@@ -7,7 +7,7 @@ services:
       dockerfile: ./build/php/Dockerfile
     user: "${USER_ID}:${USER_ID}"
     ports:
-      - "80:80"
+      - "${HTTP_PORT}:80"
     volumes:
       - ./:/app
     environment:

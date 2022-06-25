@@ -1,2 +1,5 @@
+build/
+tests/
 tmp/*
-tests/*
+
+.env.*
