@@ -12,18 +12,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
-      - name: Copy default env
-        run: cp /home/runner/work/movary/movary/.env.production.example /home/runner/work/movary/movary/.env
-
-      - name: Build docker image
-        run: docker build -t movary -f build/php/Dockerfile .
-
-      - name: Run docker image
-        run: docker run --rm --user $(id -u):$(id -u) -d -v /home/runner/work/movary/movary:/app --name movary movary
-
-      - name: Install composer dependencies
-        run: docker exec movary composer --no-plugins --no-interaction --prefer-dist --no-progress --no-suggest install
-
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
