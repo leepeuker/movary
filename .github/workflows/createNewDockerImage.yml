@@ -19,7 +19,7 @@ jobs:
         run: docker build -t movary -f build/php/Dockerfile .
 
       - name: Run docker image
-        run: docker run --rm -d -v /home/runner/work/movary/movary:/app --name php movary
+        run: docker run --rm -d -v /home/runner/work/movary/movary:/app --name movary movary
 
       - name: Install composer dependencies
         run: docker exec movary composer --no-plugins --no-interaction --prefer-dist --no-progress --no-suggest install
