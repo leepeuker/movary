@@ -16,8 +16,7 @@ class PlexController
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly Movie\Api $movieApi,
-        private readonly SyncMovie $tmdbMovieSyncService,
-        private readonly \DateTimeZone $plexDateTimeZone
+        private readonly SyncMovie $tmdbMovieSyncService
     ) {
     }
 
@@ -52,7 +51,6 @@ class PlexController
         if ($dateTime === false) {
             throw new \RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);
         }
-        $dateTime->setTimezone($this->plexDateTimeZone);
 
         $watchDate = Date::createFromString($dateTime->format('Y-m-d'));
 
