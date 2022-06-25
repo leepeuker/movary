@@ -1,0 +1,20 @@
+version: "3.5"
+
+services:
+  app_production:
+    build:
+      context: ./
+      dockerfile: ./build/php/Dockerfile
+      target: production
+    user: "${USER_ID}:${USER_ID}"
+    ports:
+      - "8080:80"
+    environment:
+      PHP_DATE_TIMEZONE: "${TIMEZONE}"
+      DATABASE_HOST: ""
+      DATABASE_PORT: "${DATABASE_PORT_HOST}"
+      DATABASE_USER: "${DATABASE_USER}"
+      DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
+      TMDB_API_KEY: "${TMDB_API_KEY}"
+      TRAKT_USERNAME: "${TRAKT_USERNAME}"
+      TRAKT_CLIENT_ID: "${TRAKT_CLIENT_ID}"

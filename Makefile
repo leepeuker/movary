@@ -19,11 +19,8 @@ down:
 
 reup: down up
 
-build_dev: down
+build: down
 	docker-compose build
-
-build:
-	docker build --no-cache -t movary -f build/php/Dockerfile .
 
 # Container interaction
 #######################

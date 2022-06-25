@@ -48,13 +48,3 @@ test_phpstan:
 
 test_psalm:
 	make exec_app_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
-
-
-
-
-
-run_movary_image:
-	docker run --name movary --rm -d -p 80:80 -e DATABASE_HOST=192.168.1.2 -e DATABASE_PORT=$(DATABASE_PORT_HOST) -e DATABASE_USER=$(DATABASE_USER) -e DATABASE_PASSWORD=$(DATABASE_PASSWORD) movary
-
-stop_movary_image:
-	docker stop movary

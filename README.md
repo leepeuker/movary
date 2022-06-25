@@ -56,7 +56,7 @@ You can only sync specific stuff by using flags (default behaviour syncs all of 
 - `--overwrite`
   Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
 - `--ignore-cache`
-  Use if you want to sync everything from trakt regardless if there was a change since the last sync. 
+  Use if you want to sync everything from trakt regardless if there was a change since the last sync.
 
 ### app:sync-tmdb
 
@@ -64,7 +64,7 @@ You can only sync specific stuff by using flags (default behaviour syncs all of 
 php bin/console.php app:sync-tmdb
 ```
 
-Synchronize tmdb (meta-)data for existing movies. Without providing `--hours` flag, this will run the sync for all locally existing movies. 
+Synchronize tmdb (meta-)data for existing movies. Without providing `--hours` flag, this will run the sync for all locally existing movies.
 
 This sync includes:
 
@@ -80,7 +80,24 @@ This sync includes:
 - `--threshold`
   Maximum number of movies to sync for this run
 
-## Useful links:
+## Development
+
+### Setup
+
+Follow the following steps for a local development setup:
+
+- run `cp .env.development.example .env` and edit the `.env` file content
+- run `make up` to start the docker-compose container
+- run `make composer_install` to install composer dependencies
+- run `make db_migration_migrate` to execute database migrations
+
+The application should be up-to-date and running locally now.
+
+### Useful links:
 
 - Trakt API docs: https://trakt.docs.apiary.io/
 - TMDB API docs: https://developers.themoviedb.org/3
+
+
+
+https://support.plex.tv/articles/115002267687-webhooks/
