@@ -15,6 +15,7 @@ return [
         'dynamic' => [
             'adapter' => $config->getAsString('DATABASE_DRIVER') === 'pdo_mysql' ? 'mysql' : $config->getAsString('database.driver'),
             'host' => $config->getAsString('DATABASE_HOST'),
+            'port' => $config->getAsString('DATABASE_PORT'),
             'name' => $config->getAsString('DATABASE_NAME'),
             'user' => $config->getAsString('DATABASE_USER'),
             'pass' => $config->getAsString('DATABASE_PASSWORD'),

@@ -15,13 +15,14 @@ services:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
 
 #  app2:
-#    image: registry.hub.docker.com/leepeuker/movary:1.1
+#    image: registry.hub.docker.com/leepeuker/movary:432434
 #    user: "${USER_ID}:${USER_ID}"
 #    ports:
 #      - "8080:80"
 #    environment:
 #      PHP_DATE_TIMEZONE: "${TIMEZONE}"
 #      DATABASE_HOST: "192.168.1.2"
+#      DATABASE_PORT: "3308"
 #      DATABASE_USER: "${DATABASE_USER}"
 #      DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
 
