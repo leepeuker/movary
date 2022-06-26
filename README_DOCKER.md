@@ -1,3 +1,19 @@
+## About
+This is a web app to log and rate watched movies (like a digital movie diary).
+
+It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on MY watch history (-> no social media features).
+
+Features:
+- log your movie watches and ratings
+- statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
+- uses themoviedb.org API for movie (meta) data
+- import watched movies and ratings from trakt.tv and/or letterboxd.com
+- connect with plex.tv to automatically log watched movies (plex premium required)
+
+This is still an early (beta) version. I am planning to add much more and improve existing features in the future.
+
+## Setup
+
 Example (requires a existing mysql server + database):
 
 ```
@@ -20,7 +36,7 @@ Overview:
 <a name="#important-first-steps"></a>
 ### Important: First steps
 
-After the initial docker setup execute the database migrations: `docker exec movary php bin/console.php movary:database:migration --migrate` 
+After the initial docker setup execute the database migrations: `docker exec movary php bin/console.php movary:database:migration --migrate`
 
 The **default password** for the application is: `movary`
 
