@@ -1,29 +1,33 @@
+## Movary
+
+Web app to log and rate watched movies.
+
+1. [About](#install-via-docker)
+2. [Install via docker](#install-via-docker)
+3. [Important: First steps](#important-first-steps)
+4. [Features](#features)
+   1. [Plex Scrobbler](#plex-scrobbler)
+   2. [Trakt.tv Sync](#trakttv-sync)
+   3. [Tmdb Sync](#tmdb-sync)
+5. [Development](#development)
+
+<a name="#about"></a>
 ## About
 This is a web app to log and rate watched movies (like a digital movie diary).
 
 It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on MY watch history (-> no social media features).
 
-Features:
+**Features:**
 - add or update movie watch dates and ratings (only possible when logged in)
 - statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
 - uses themoviedb.org API for movie (meta) data
 - import watched movies and ratings from trakt.tv and/or letterboxd.com
 - connect with plex.tv to automatically log watched movies (plex premium required)
 
-This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease.
+**Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease.
 
-
-Overview:
-1. [Setup](#setup)
-2. [Important: First steps](#important-first-steps)
-3. [Features](#features)
-  1. [Plex Scrobbler](#plex-scrobbler)
-  2. [Trakt.tv Sync](#trakttv-sync)
-  3. [Tmdb Sync](#tmdb-sync)
-4. [Development](#development)
-
-<a name="#setup"></a>
-## Setup
+<a name="#install-via-docker"></a>
+## Install via docker
 
 You must provide a tmdb api key (see https://www.themoviedb.org/settings/api)
 
