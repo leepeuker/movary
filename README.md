@@ -80,7 +80,6 @@ More configuration can be done via the base image webdevops/php-nginx, checkout 
 <a name="#features"></a>
 ## Features
 
-
 <a name="#plex-scrobbler"></a>
 ### Plex Scrobbler
 
