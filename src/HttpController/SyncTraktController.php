@@ -3,9 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\SessionService;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Response;
-use Movary\ValueObject\Http\StatusCode;
 
 class SyncTraktController
 {
@@ -20,17 +18,6 @@ class SyncTraktController
             return Response::createFoundRedirect('/');
         }
 
-        exec(
-            sprintf(
-                "%s 2>&1",
-                'cd ' . __DIR__ . '/../../ && php bin/console.php app:sync-trakt',
-            )
-        );
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
-        );
+        throw new \RuntimeException('Not implemented yet');
     }
 }

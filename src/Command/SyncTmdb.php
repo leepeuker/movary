@@ -14,7 +14,7 @@ class SyncTmdb extends Command
 
     private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
-    protected static $defaultName = 'app:sync-tmdb';
+    protected static $defaultName = self::COMMAND_BASE_NAME . ':sync-tmdb';
 
     public function __construct(
         private readonly SyncMovies $syncMovieDetails,

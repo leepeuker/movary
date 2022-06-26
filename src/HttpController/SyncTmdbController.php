@@ -20,17 +20,6 @@ class SyncTmdbController
             return Response::createFoundRedirect('/');
         }
 
-        exec(
-            sprintf(
-                "%s 2>&1",
-                'cd ' . __DIR__ . '/../../ && php bin/console.php app:sync-tmdb',
-            )
-        );
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
-        );
+        throw new \RuntimeException('Not implemented yet');
     }
 }

@@ -21,18 +21,18 @@ Additionally it enriches the synced movies with data provided by tmdb (e.g. movi
 
 ## Commands
 
-### app:change-admin-password
+### movary:change-admin-password
 
 ```
-php bin/console.php app:change-admin-password <password>
+php bin/console.php movary:change-admin-password <password>
 ```
 
 Change admin password to password provided by first argument.
 
-### app:sync-trakt
+### movary:sync-trakt
 
 ```
-php bin/console.php app:sync-trakt
+php bin/console.php movary:sync-trakt
 ```
 
 Synchronize remote trakt watch history (plays) with local state.
@@ -58,10 +58,10 @@ You can only sync specific stuff by using flags (default behaviour syncs all of 
 - `--ignore-cache`
   Use if you want to sync everything from trakt regardless if there was a change since the last sync.
 
-### app:sync-tmdb
+### movary:sync-tmdb
 
 ```
-php bin/console.php app:sync-tmdb
+php bin/console.php movary:sync-tmdb
 ```
 
 Synchronize tmdb (meta-)data for existing movies. Without providing `--hours` flag, this will run the sync for all locally existing movies.

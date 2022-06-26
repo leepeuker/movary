@@ -17,7 +17,7 @@ build: down
 	docker-compose build --no-cache
 	make up
 	make composer_install
-	make db_migration_migrate
+	make app_database_migrate
 
 # Container interaction
 #######################
@@ -43,12 +43,6 @@ composer_update:
 
 # Database
 ##########
-db_migration_migrate:
-	make exec_app_cmd CMD="vendor/bin/phinx migrate -c ./settings/phinx.php"
-
-db_migration_rollback:
-	make exec_app_cmd CMD="vendor/bin/phinx rollback -c ./settings/phinx.php"
-
 db_create_database:
 	make exec_mysql_query QUERY="DROP DATABASE IF EXISTS $(DATABASE_NAME)"
 	make exec_mysql_query QUERY="CREATE DATABASE $(DATABASE_NAME)"
@@ -70,14 +64,20 @@ db_migration_create:
 ##############
 app_sync_all: app_sync_trakt app_sync_tmdb
 
+app_database_migrate:
+	make exec_app_cmd CMD="php bin/console.php movary:database:migration --migrate"
+
+app_database_rollback:
+	make exec_app_cmd CMD="php bin/console.php movary:database:migration --rollback"
+
 app_sync_trakt:
-	make exec_app_cmd CMD="php bin/console.php app:sync-trakt --overwrite"
+	make exec_app_cmd CMD="php bin/console.php movary:sync-trakt --overwrite"
 
 app_sync_tmdb:
-	make exec_app_cmd CMD="php bin/console.php app:sync-tmdb"
+	make exec_app_cmd CMD="php bin/console.php movary:sync-tmdb"
 
 app_sync_letterboxd:
-	make exec_app_cmd CMD="php bin/console.php app:sync-letterboxd $(CSV_PATH)"
+	make exec_app_cmd CMD="php bin/console.php movary:sync-letterboxd $(CSV_PATH)"
 
 # Tests
 #######

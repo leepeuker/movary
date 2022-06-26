@@ -20,9 +20,11 @@ Overview:
 <a name="#important-first-steps"></a>
 ### Important: First steps
 
-The **default password** is: `movary`
+After the initial docker setup execute the database migrations: `docker exec movary php bin/console.php movary:database:migration --migrate` 
 
-You can **update the password** with: `docker exec movary php bin/console.php app:change-admin-password <new_password>`
+The **default password** for the application is: `movary`
+
+You can **update the password** with: `docker exec movary php bin/console.php movary:change-admin-password <new_password>`
 
 ##### Available environment variables with defaults:
 
@@ -62,7 +64,7 @@ Make sure you have added the variables `TRAKT_USERNAME` and `TRAKT_CLIENT_ID` to
 
 Example:
 
-`docker exec movary php bin/console.php app:sync-trakt --ratings --history`
+`docker exec movary php bin/console.php movary:sync-trakt --ratings --history`
 
 **Flags:**
 
@@ -83,7 +85,7 @@ Make sure you have added the variables `TMDB_API_KEY` to the environment.
 
 Example:
 
-`docker exec movary php bin/console.php app:sync-tmdb`
+`docker exec movary php bin/console.php movary:sync-tmdb`
 
 **Flags:**
 

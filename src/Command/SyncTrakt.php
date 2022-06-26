@@ -19,7 +19,7 @@ class SyncTrakt extends Command
 
     private const OPTION_NAME_RATINGS = 'ratings';
 
-    protected static $defaultName = 'app:sync-trakt';
+    protected static $defaultName = self::COMMAND_BASE_NAME . ':sync-trakt';
 
     public function __construct(
         private readonly SyncRatings $syncRatings,

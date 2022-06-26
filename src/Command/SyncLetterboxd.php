@@ -4,7 +4,6 @@ namespace Movary\Command;
 
 use Movary\Application\Service\Letterboxd\SyncRatings;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncLetterboxd extends Command
 {
-    protected static $defaultName = 'app:sync-letterboxd-ratings';
+    protected static $defaultName = self::COMMAND_BASE_NAME . ':sync-letterboxd-ratings';
 
     private const OPTION_NAME_OVERWRITE = 'overwrite';
 

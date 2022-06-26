@@ -4,14 +4,13 @@ namespace Movary\Command;
 
 use Movary\Application\User\Service;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ChangeAdminPassword extends Command
 {
-    protected static $defaultName = 'app:change-admin-password';
+    protected static $defaultName = self::COMMAND_BASE_NAME . ':change-admin-password';
 
     public function __construct(
         private readonly Service\ChangePassword $changePasswordService,

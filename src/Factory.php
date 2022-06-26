@@ -13,9 +13,11 @@ use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Application\Movie;
 use Movary\Application\Service\Tmdb\SyncMovie;
 use Movary\Application\SessionService;
+use Movary\Command;
 use Movary\HttpController\PlexController;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Http\Request;
+use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -34,6 +36,14 @@ class Factory
     public static function createCurrentHttpRequest() : Request
     {
         return Request::createFromGlobals();
+    }
+
+    public static function createDatabaseMigrationCommand(ContainerInterface $container) : Command\DatabaseMigration
+    {
+        return new Command\DatabaseMigration(
+            $container->get(PhinxApplication::class),
+            __DIR__ . '/../settings/phinx.php'
+        );
     }
 
     public static function createDbConnection(Config $config) : DBAL\Connection
