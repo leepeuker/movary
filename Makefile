@@ -14,7 +14,7 @@ down:
 reup: down up
 
 build: down
-	docker-compose build
+	docker-compose build --no-cache
 	make up
 	make composer_install
 	make db_migration_migrate
