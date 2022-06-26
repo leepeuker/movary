@@ -4,7 +4,7 @@ This is a web app to log and rate watched movies (like a digital movie diary).
 It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on MY watch history (-> no social media features).
 
 Features:
-- log your movie watches and ratings
+- log your movie watches and ratings (only when logged in)
 - statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
 - uses themoviedb.org API for movie (meta) data
 - import watched movies and ratings from trakt.tv and/or letterboxd.com
