@@ -1,6 +1,6 @@
 name: Run tests
 
-on: [pull_request]
+on: [ pull_request ]
 
 jobs:
   run_tests:
@@ -12,6 +12,9 @@ jobs:
 
       - name: Build docker development image
         run: docker build --target development --tag movary ./build/php/
+
+      - name: Run phpcs
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
 
       - name: Run phpcs
         run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml ./src
