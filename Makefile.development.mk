@@ -41,10 +41,10 @@ db_migration_create:
 test: test_phpcs test_psalm test_phpstan
 
 test_phpcs:
-	make exec_app_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml ./src"
+	make exec_app_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml"
 
 test_phpstan:
-	make exec_app_cmd CMD="vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8"
+	make exec_app_cmd CMD="vendor/bin/phpstan analyse -c ./settings/phpstan.neon"
 
 test_psalm:
 	make exec_app_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
