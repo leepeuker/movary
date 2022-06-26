@@ -1,0 +1,23 @@
+name: Run tests
+
+on: [pull_request]
+
+jobs:
+  run_tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Build docker development image
+        run: docker build --target development --tag movary ./build/php/
+
+      - name: Run phpcs
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml ./src
+
+      - name: Run phpstan
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse src -c ./settings/phpstan.neon --level 8
+
+      - name: Run psalm
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/psalm -c ./settings/psalm.xml --show-info=false
