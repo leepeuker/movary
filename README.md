@@ -2,6 +2,8 @@
 
 Web app to log and rate watched movies.
 
+Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (with default password `movary`)
+
 1. [About](#install-via-docker)
 2. [Install via docker](#install-via-docker)
 3. [Important: First steps](#important-first-steps)
