@@ -1,6 +1,6 @@
 ## Movary
 
-Web app to log and rate watched movies.
+Web application to log and rate watched movies.
 
 Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (with default password `movary`)
 
@@ -22,9 +22,10 @@ It was created because I wanted a self hosted solution instead of using external
 **Features:**
 - add or update movie watch dates and ratings (only possible when logged in)
 - statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
-- uses themoviedb.org API for movie (meta) data
+- PWA: can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
 - import watched movies and ratings from trakt.tv and/or letterboxd.com
-- connect with plex.tv to automatically log watched movies (plex premium required)
+- connect with plex to automatically log watched movies (plex premium required)
+- uses themoviedb.org API for movie data
 
 **Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease.
 
