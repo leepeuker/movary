@@ -31,9 +31,9 @@ It was created because I wanted a self hosted solution instead of using external
 
 You must provide a tmdb api key (see https://www.themoviedb.org/settings/api)
 
-Example (requires an existing mysql server + database to work):
+Example with an existing mysql server:
 
-```
+```shell
 docker run --rm -d \
   --name movary \
   -p 80:80 \
@@ -42,6 +42,38 @@ docker run --rm -d \
   -e DATABASE_PASSWORD="<password>" \
   -e TMDB_API_KEY="<tmdb_key>" \
   leepeuker/movary:latest
+```
+
+Example with docker-compose.yml
+
+```yml
+version: "3.5"
+
+services:
+  movary:
+    image: leepeuker/movary:latest
+    container_name: movary
+    ports:
+      - "80:80"
+    environment:
+      DATABASE_HOST: "mysql"
+      DATABASE_NAME: "movary"
+      DATABASE_USER: ""
+      DATABASE_PASSWORD: ""
+      TMDB_API_KEY: ""
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_DATABASE: "movary"
+      MYSQL_USER: ""
+      MYSQL_PASSWORD: ""
+    volumes:
+      - movary-db:/var/lib/mysql
+
+volumes:
+  movary-db:
 ```
 
 <a name="#important-first-steps"></a>
