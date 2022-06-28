@@ -24,6 +24,9 @@ jobs:
         with:
           images: leepeuker/movary
 
+      - uses: olegtarasov/get-tag@v2.1
+        id: tagName
+
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
@@ -34,4 +37,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APPLICATION_VERSION=${{ steps.meta.outputs.tags }}
+            APPLICATION_VERSION=${{ steps.tagName.outputs.tag }}
