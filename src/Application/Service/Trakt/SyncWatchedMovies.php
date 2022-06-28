@@ -16,7 +16,8 @@ class SyncWatchedMovies
         private readonly Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService,
         private readonly LoggerInterface $logger,
         private readonly PlaysPerDateFetcher $playsPerDateFetcher,
-        private readonly Application\Service\Tmdb\SyncMovie $tmdbMovieSync
+        private readonly Application\Service\Tmdb\SyncMovie $tmdbMovieSync,
+        private readonly Application\SyncLog\Repository $scanLogRepository,
     ) {
     }
 
@@ -49,6 +50,8 @@ class SyncWatchedMovies
                 $this->traktApi->removeWatchCacheByTraktId($traktId);
             }
         }
+
+        $this->scanLogRepository->insertLogForTraktSync();
     }
 
     private function findOrCreateMovieLocally(Api\Trakt\ValueObject\Movie\Dto $watchedMovie) : Application\Movie\Entity

@@ -13,7 +13,8 @@ class SettingsController
     public function __construct(
         private readonly Environment $twig,
         private readonly Repository $syncLogRepository,
-        private readonly SessionService $sessionService
+        private readonly SessionService $sessionService,
+        private readonly ?string $applicationVersion = null,
     ) {
     }
 
@@ -26,9 +27,10 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings.html.twig', [
-                'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync(),
-                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync(),
-                'lastSyncLetterboxd' => $this->syncLogRepository->findLastLetterboxdSync(),
+                'applicationVersion' => $this->applicationVersion ?? '-',
+                'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
+                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
+                'lastSyncLetterboxd' => $this->syncLogRepository->findLastLetterboxdSync() ?? '-',
             ]),
         );
     }

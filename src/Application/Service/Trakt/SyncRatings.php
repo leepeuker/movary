@@ -11,7 +11,8 @@ class SyncRatings
     public function __construct(
         private readonly Application\Movie\Api $movieApi,
         private readonly Api\Trakt\Api $traktApi,
-        private readonly Api\Trakt\Cache\User\Movie\Rating\Service $traktApiCacheUserMovieRatingService
+        private readonly Api\Trakt\Cache\User\Movie\Rating\Service $traktApiCacheUserMovieRatingService,
+        private readonly Application\SyncLog\Repository $scanLogRepository
     ) {
     }
 
@@ -36,5 +37,7 @@ class SyncRatings
                 $this->movieApi->updatePersonalRating($movie->getId(), PersonalRating::create($rating));
             }
         }
+
+        $this->scanLogRepository->insertLogForTraktSync();
     }
 }
