@@ -1,4 +1,4 @@
-POST http://127.0.0.1/plex
+POST http://127.0.0.1/plex/a3dda146-9a3c-4329-9d7a-af45cda3f724
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/x-www-form-urlencoded

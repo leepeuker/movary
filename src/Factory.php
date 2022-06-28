@@ -139,13 +139,4 @@ class Factory
     {
         return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
     }
-
-    public function createPlexController(ContainerInterface $container) : PlexController
-    {
-        return new PlexController(
-            $container->get(LoggerInterface::class),
-            $container->get(Movie\Api::class),
-            $container->get(SyncMovie::class),
-        );
-    }
 }

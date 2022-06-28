@@ -4,6 +4,8 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie;
 use Movary\Application\Service\Tmdb\SyncMovie;
+use Movary\Application\SessionService;
+use Movary\Application\User\Api;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -16,12 +18,29 @@ class PlexController
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly Movie\Api $movieApi,
-        private readonly SyncMovie $tmdbMovieSyncService
+        private readonly SyncMovie $tmdbMovieSyncService,
+        private readonly Api $userApi,
+        private readonly SessionService $sessionService
     ) {
+    }
+
+    public function getPlexWebhookId() : Response
+    {
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $plexWebhookId = $this->userApi->findPlexWebhookId();
+
+        return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
 
     public function handlePlexWebhook(Request $request) : Response
     {
+        if ($request->getRouteParameters()['id'] !== $this->userApi->findPlexWebhookId()) {
+            return Response::createNotFound();
+        }
+
         $webHook = Json::decode($request->getPostParameters()['payload']);
 
         if ($webHook['event'] !== 'media.scrobble' || $webHook['user'] === false || $webHook['Metadata']['librarySectionType'] !== 'movie') {
@@ -57,5 +76,16 @@ class PlexController
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $watchDate);
 
         return Response::create(StatusCode::createOk());
+    }
+
+    public function regeneratePlexWebhookId() : Response
+    {
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $plexWebhookId = $this->userApi->regeneratePlexWebhookId();
+
+        return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
 }

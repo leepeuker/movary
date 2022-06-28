@@ -87,10 +87,20 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/user/plex-webhook-id',
+        [\Movary\HttpController\PlexController::class, 'getPlexWebhookId']
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/user/plex-webhook-id',
+        [\Movary\HttpController\PlexController::class, 'regeneratePlexWebhookId']
+    );
 
     $routeCollector->addRoute(
         'POST',
-        '/plex',
+        '/plex/{id:.+}',
         [\Movary\HttpController\PlexController::class, 'handlePlexWebhook']
     );
 };

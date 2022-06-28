@@ -27,6 +27,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings.html.twig', [
+                'plexWebhookUrl' => $this->applicationVersion ?? '-',
                 'applicationVersion' => $this->applicationVersion ?? '-',
                 'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
