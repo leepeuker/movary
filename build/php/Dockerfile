@@ -5,6 +5,8 @@ USER application
 WORKDIR /app
 
 FROM development AS production
+ARG APPLICATION_VERSION
+ENV APPLICATION_VERSION=${APPLICATION_VERSION}
 COPY --chown=application ./ ./
 COPY .env.production.example .env
 RUN composer install --no-dev
