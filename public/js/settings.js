@@ -1,12 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
-	fetchPlexWebhookId().then(webhookId => { updatePlexWebhookUrl(webhookId) })
+	fetchPlexWebhookId().then(webhookId => { setPlexWebhookUrl(webhookId) }).catch(() => {
+		alert('Could not fetch plex webhook url')
+		setPlexWebhookUrl()
+	})
 })
 
 function regeneratePlexWebhookId () {
-	regeneratePlexWebhookIdRequest().then(webhookId => { updatePlexWebhookUrl(webhookId) })
+	regeneratePlexWebhookIdRequest().then(webhookId => { setPlexWebhookUrl(webhookId) }).catch(() => {
+		alert('Could not regenerate plex webhook url')
+		setPlexWebhookUrl()
+	})
 }
 
-function updatePlexWebhookUrl (webhookId) {
+function setPlexWebhookUrl (webhookId) {
 	if (webhookId) {
 		document.getElementById('plexWebhookUrl').innerHTML = location.protocol + '//' + location.host + '/plex/' + webhookId
 	} else {
