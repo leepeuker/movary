@@ -44,7 +44,7 @@ class ExportService
             }
 
             $csv .= sprintf(
-                '%s,%s,%s,%s,%s' . PHP_EOL,
+                '"%s",%s,%s,%s,%s' . PHP_EOL,
                 $movie->getTitle(),
                 (string)$movie->getReleaseDate()?->format('Y'),
                 (string)$movie->getPersonalRating(),
