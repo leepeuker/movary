@@ -23,6 +23,19 @@ class Repository
         return Entity::createFromArray($data);
     }
 
+    public function setPlexWebhookId(string $plexWebhookId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_webhook_uuid' => $plexWebhookId,
+            ],
+            [
+                'id' => self::ADMIN_USER_IO,
+            ]
+        );
+    }
+
     public function updateAdminPassword(string $passwordHash) : void
     {
         $this->dbConnection->update(

@@ -11,7 +11,6 @@ $builder->addDefinitions(
         \Movary\Api\Trakt\Api::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Api\Trakt\Client::class => DI\factory([Factory::class, 'createTraktApiClient']),
         \Movary\Api\Tmdb\Client::class => DI\factory([Factory::class, 'createTmdbApiClient']),
-        \Movary\HttpController\PlexController::class => DI\factory([Factory::class, 'createPlexController']),
         \Movary\HttpController\SettingsController::class => DI\factory([Factory::class, 'createSettingsController']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),
         \Movary\Command\DatabaseMigration::class => DI\factory([Factory::class, 'createDatabaseMigrationCommand']),

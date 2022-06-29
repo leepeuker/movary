@@ -1,0 +1,3 @@
+GET http://127.0.0.1/user/plex-webhook-id
+Accept: */*
+Cache-Control: no-cache

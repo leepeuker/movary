@@ -1,0 +1,11 @@
+.plexWebhookUrl {
+    margin-bottom: 0.5rem;
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border: 1px solid #BCBEC0;
+    padding: 0.4rem;
+    font:12px Monaco,Consolas,"Andale  Mono","DejaVu Sans Mono",monospace
+}

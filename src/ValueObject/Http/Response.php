@@ -24,6 +24,16 @@ class Response
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
     }
 
+    public static function createJson(string $body) : self
+    {
+        return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
+    }
+
+    public static function createNotFound() : self
+    {
+        return new self(StatusCode::createNotFound());
+    }
+
     public function getBody() : ?string
     {
         return $this->body;
