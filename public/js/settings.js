@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 function regeneratePlexWebhookId () {
+	if (confirm('Do you really want to regenerate the webhook url?') === false) {
+		return
+	}
+
 	regeneratePlexWebhookIdRequest().then(webhookId => { setPlexWebhookUrl(webhookId) }).catch(() => {
 		alert('Could not regenerate plex webhook url')
 		setPlexWebhookUrl()
@@ -13,6 +17,10 @@ function regeneratePlexWebhookId () {
 }
 
 function deletePlexWebhookId () {
+	if (confirm('Do you really want to delete the webhook url?') === false) {
+		return
+	}
+
 	deletePlexWebhookIdRequest().then(() => { setPlexWebhookUrl() }).catch(() => {
 		alert('Could not delete plex webhook url')
 	})
