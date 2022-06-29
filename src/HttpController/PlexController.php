@@ -24,6 +24,17 @@ class PlexController
     ) {
     }
 
+    public function deletePlexWebhookId() : Response
+    {
+        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $this->userApi->deletePlexWebhookId();
+
+        return Response::create(StatusCode::createOk());
+    }
+
     public function getPlexWebhookId() : Response
     {
         if ($this->sessionService->isCurrentUserLoggedIn() === false) {
