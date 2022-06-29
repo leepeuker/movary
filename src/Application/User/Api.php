@@ -10,6 +10,11 @@ class Api
     {
     }
 
+    public function deletePlexWebhookId() : void
+    {
+        $this->repository->setPlexWebhookId(null);
+    }
+
     public function findPlexWebhookId() : ?string
     {
         return $this->repository->fetchAdminUser()->getPlexWebhookId();

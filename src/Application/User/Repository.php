@@ -23,7 +23,7 @@ class Repository
         return Entity::createFromArray($data);
     }
 
-    public function setPlexWebhookId(string $plexWebhookId) : void
+    public function setPlexWebhookId(?string $plexWebhookId) : void
     {
         $this->dbConnection->update(
             'user',
