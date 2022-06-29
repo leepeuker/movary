@@ -26,6 +26,7 @@ It was created because I wanted a self hosted solution instead of using external
 - import watched movies and ratings from trakt.tv and/or letterboxd.com
 - connect with plex to automatically log watched movies (plex premium required)
 - uses themoviedb.org API for movie data
+- export your data as csv
 
 **Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease.
 

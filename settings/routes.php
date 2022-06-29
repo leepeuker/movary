@@ -108,4 +108,9 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         '/plex/{id:.+}',
         [\Movary\HttpController\PlexController::class, 'handlePlexWebhook']
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/user/export/csv/{exportType:.+}',
+        [\Movary\HttpController\ExportController::class, 'getCsvExport']
+    );
 };
