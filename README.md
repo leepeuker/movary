@@ -118,8 +118,11 @@ More configuration can be done via the base image webdevops/php-nginx, checkout 
 <a name="#plex-scrobbler"></a>
 ### Plex Scrobbler
 
-Automatically log movies watched in plex to movary.
-Just add the following url as a [webhook](https://support.plex.tv/articles/115002267687-webhooks/) to plex, e.g. `http://127.0.0.1/plex`
+Automatically track movies watched in plex with movary.
+
+You can generate your plex webhook url on the settings page (`/settings`).
+
+Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/).
 
 <a name="#trakttv-sync"></a>
 ### trakt.tv sync
