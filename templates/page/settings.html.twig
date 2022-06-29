@@ -24,10 +24,18 @@
             {#                <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Refresh</button> #}
             {#            </form> #}
 
+
+            <h4>Export data</h4>
+
+            <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/history">history.csv</a>
+            <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/ratings">ratings.csv</a>
+
+            <hr>
+
             <h4>Plex webhook url:</h4>
-            <p id="plexWebhookUrl" class="overflow-auto text-nowrap plexWebhookUrl">-</p>
-            <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger disabled" onclick="deletePlexWebhookId()">Delete url</button>
-            <button type="button" class="btn btn-primary" onclick="regeneratePlexWebhookId()">Regenerate url</button>
+            <p id="plexWebhookUrl" class="overflow-auto text-nowrap plexWebhookUrl" style="margin-left: 10%;margin-right: 10%">-</p>
+            <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger disabled  btn-sm" onclick="deletePlexWebhookId()">Delete url</button>
+            <button type="button" class="btn btn-primary  btn-sm" onclick="regeneratePlexWebhookId()">Regenerate url</button>
 
             <hr>
 

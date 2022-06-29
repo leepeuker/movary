@@ -29,6 +29,11 @@ class Response
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
 
+    public static function createCsv(string $body) : self
+    {
+        return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
+    }
+
     public static function createNotFound() : self
     {
         return new self(StatusCode::createNotFound());

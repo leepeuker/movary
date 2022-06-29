@@ -10,6 +10,11 @@ class Header
     ) {
     }
 
+    public static function createContentTypeCsv() : self
+    {
+        return new self('Content-Type', 'text/csv');
+    }
+
     public static function createContentTypeJson() : self
     {
         return new self('Content-Type', 'application/json');
