@@ -26,11 +26,7 @@ class Login
             session_destroy();
             ini_set('session.cookie_lifetime', '2419200');
             ini_set('session.gc_maxlifetime', '2419200');
-            session_start(
-                [
-                    'cookie_lifetime' => 2419200,
-                ]
-            );
+            session_start(['cookie_lifetime' => 2419200]);
         }
 
         session_regenerate_id();

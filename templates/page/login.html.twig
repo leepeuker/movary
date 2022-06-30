@@ -14,12 +14,20 @@
                     Invalid password
                 </div>
             {% endif %}
-
-            <form action="/login" method="post" enctype="multipart/form-data">
-                <input type="password" class="form-control" name="password" placeholder="Password" required>
-                <br>
-                <button class="btn btn-primary" type="submit">Login</button>
-            </form>
         </div>
+
+        <form action="/login" method="post" enctype="multipart/form-data">
+
+            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
+
+            <div class="checkbox" style="padding-top: 0.5rem;padding-bottom: 0.5rem;padding-left: 0.1rem;">
+                <label style="color: #495057;">
+                    <input type="checkbox" value="true" name="rememberMe"> Remember me
+                </label>
+            </div>
+            <div style="text-align: center">
+                <button class="btn btn-primary" type="submit">Login</button>
+            </div>
+        </form>
     </main>
 {% endblock %}
