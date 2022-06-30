@@ -39,15 +39,7 @@ class AuthenticationController
 
     public function logout() : Response
     {
-        session_regenerate_id();
-
-        $token = filter_input(INPUT_COOKIE, 'id');
-
-        if ($token !== null) {
-            $this->authenticationService->deleteToken($token);
-            unset($_COOKIE['id']);
-            setcookie('id', '', -1);
-        }
+        $this->authenticationService->logout();
 
         return Response::create(
             StatusCode::createSeeOther(),

@@ -59,6 +59,19 @@ class Authentication
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, (int)$expirationDate->format('U'));
     }
 
+    public function logout() : void
+    {
+        $token = filter_input(INPUT_COOKIE, 'id');
+
+        if ($token !== null) {
+            $this->deleteToken($token);
+            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
+        }
+
+        session_regenerate_id();
+    }
+
     private function createExpirationDate(int $days = 1) : DateTime
     {
         $timestamp = strtotime('+' . $days . ' day');
