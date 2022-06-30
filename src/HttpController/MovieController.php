@@ -3,7 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie;
-use Movary\Application\SessionService;
+use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -15,7 +15,7 @@ class MovieController
     public function __construct(
         private readonly Environment $twig,
         private readonly Movie\Api $movieApi,
-        private readonly SessionService $sessionService
+        private readonly Authentication $authenticationService
     ) {
     }
 
@@ -37,7 +37,7 @@ class MovieController
 
     public function updateRating(Request $request) : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

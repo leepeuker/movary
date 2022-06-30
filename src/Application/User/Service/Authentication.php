@@ -17,19 +17,20 @@ class Authentication
         $this->repository->deleteAuthToken($token);
     }
 
-    public function isValidToken(string $token) : bool
+    public function isUserAuthenticated() : bool
     {
-        $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
+        $token = filter_input(INPUT_COOKIE, 'id');
 
-        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
-            if ($tokenExpirationDate !== null) {
-                $this->repository->deleteAuthToken($token);
-            }
-
-            return false;
+        if (empty($token) === false && $this->isValidToken($token) === true) {
+            return true;
         }
 
-        return true;
+        if (empty($token) === false) {
+            unset($_COOKIE['id']);
+            setcookie('id', '', -1);
+        }
+
+        return false;
     }
 
     public function login(string $password, bool $rememberMe) : void
@@ -72,5 +73,20 @@ class Authentication
         $this->repository->createAuthToken($token, $expirationDate);
 
         return $token;
+    }
+
+    private function isValidToken(string $token) : bool
+    {
+        $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
+
+        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
+            if ($tokenExpirationDate !== null) {
+                $this->repository->deleteAuthToken($token);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

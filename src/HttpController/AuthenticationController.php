@@ -16,13 +16,12 @@ class AuthenticationController
     public function __construct(
         private readonly Environment $twig,
         private readonly Service\Authentication $authenticationService,
-        private readonly SessionService $sessionService,
     ) {
     }
 
     public function login(Request $request) : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticated() === true) {
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
@@ -50,8 +49,10 @@ class AuthenticationController
     {
         session_regenerate_id();
 
-        if (isset($_COOKIE['id']) === true) {
-            $this->authenticationService->deleteToken($_COOKIE['id']);
+        $token = filter_input(INPUT_COOKIE, 'id');
+
+        if ($token !== null) {
+            $this->authenticationService->deleteToken($token);
             unset($_COOKIE['id']);
             setcookie('id', '', -1);
         }
@@ -65,7 +66,7 @@ class AuthenticationController
 
     public function renderLoginPage() : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticated() === true) {
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,

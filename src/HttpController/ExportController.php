@@ -3,21 +3,21 @@
 namespace Movary\HttpController;
 
 use Movary\Application\ExportService;
-use Movary\Application\SessionService;
+use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
 class ExportController
 {
     public function __construct(
-        private readonly SessionService $sessionService,
+        private readonly Authentication $authenticationService,
         private readonly ExportService $exportService
     ) {
     }
 
     public function getCsvExport(Request $request) : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/login');
         }
 

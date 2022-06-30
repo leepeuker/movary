@@ -6,7 +6,7 @@ use Movary\Api\Tmdb;
 use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\SessionService;
+use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
@@ -27,13 +27,13 @@ class HistoryController
         private readonly Tmdb\Api $tmdbApi,
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
-        private readonly SessionService $sessionService
+        private readonly Authentication $authenticationService
     ) {
     }
 
     public function deleteHistoryEntry(Request $request) : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -50,7 +50,7 @@ class HistoryController
 
     public function logMovie(Request $request) : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -106,7 +106,7 @@ class HistoryController
 
     public function renderLogMoviePage(Request $request) : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

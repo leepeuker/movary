@@ -2,8 +2,8 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\SessionService;
 use Movary\Application\SyncLog\Repository;
+use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
@@ -13,14 +13,14 @@ class SettingsController
     public function __construct(
         private readonly Environment $twig,
         private readonly Repository $syncLogRepository,
-        private readonly SessionService $sessionService,
+        private readonly Authentication $authenticationService,
         private readonly ?string $applicationVersion = null,
     ) {
     }
 
     public function render() : Response
     {
-        if ($this->sessionService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
