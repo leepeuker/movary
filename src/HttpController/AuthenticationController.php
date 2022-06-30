@@ -15,7 +15,6 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Service\Login $userLoginService,
         private readonly Service\Authentication $authenticationService,
         private readonly SessionService $sessionService,
     ) {
@@ -32,7 +31,7 @@ class AuthenticationController
         }
 
         try {
-            $this->userLoginService->login(
+            $this->authenticationService->login(
                 $request->getPostParameters()['password'],
                 isset($request->getPostParameters()['rememberMe']) === true
             );
