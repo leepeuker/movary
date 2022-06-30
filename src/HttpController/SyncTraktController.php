@@ -14,7 +14,7 @@ class SyncTraktController
 
     public function execute() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

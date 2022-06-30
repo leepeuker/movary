@@ -17,7 +17,7 @@ class ExportController
 
     public function getCsvExport(Request $request) : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/login');
         }
 

@@ -47,6 +47,11 @@ class DateTime implements \JsonSerializable
         return (new \DateTime($this->dateTime))->format($format);
     }
 
+    public function isAfter(DateTime $dateTimeToCompare) : bool
+    {
+        return $this->dateTime > $dateTimeToCompare->dateTime;
+    }
+
     public function isEqual(DateTime $lastUpdated) : bool
     {
         return (string)$this === (string)$lastUpdated;

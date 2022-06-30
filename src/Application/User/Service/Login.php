@@ -4,17 +4,17 @@ namespace Movary\Application\User\Service;
 
 use Movary\Application\User\Exception\InvalidPassword;
 use Movary\Application\User\Repository;
+use Movary\ValueObject\DateTime;
 
 class Login
 {
-    private Repository $userRepository;
-
-    public function __construct(Repository $userRepository)
-    {
-        $this->userRepository = $userRepository;
+    public function __construct(
+        private readonly Repository $userRepository,
+        private readonly Authentication $authenticationService
+    ) {
     }
 
-    public function authenticate(string $password, bool $rememberMe) : void
+    public function login(string $password, bool $rememberMe) : void
     {
         $user = $this->userRepository->fetchAdminUser();
 
@@ -22,15 +22,13 @@ class Login
             throw InvalidPassword::create();
         }
 
+        $expirationTime = DateTime::createFromString(date('Y-m-d H:i:s', strtotime('+1 day')));
         if ($rememberMe === true) {
-            session_destroy();
-            ini_set('session.cookie_lifetime', '2419200');
-            ini_set('session.gc_maxlifetime', '2419200');
-            session_start(['cookie_lifetime' => 2419200]);
+            $expirationTime = DateTime::createFromString(date('Y-m-d H:i:s', strtotime('+30 day')));
         }
 
-        session_regenerate_id();
+        $token = $this->authenticationService->generateToken(DateTime::createFromString((string)$expirationTime));
 
-        $_SESSION['user']['id'] = $user->getId();
+        setcookie('id', $token, (int)$expirationTime->format('U'));
     }
 }

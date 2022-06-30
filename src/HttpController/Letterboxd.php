@@ -21,7 +21,7 @@ class Letterboxd
 
     public function uploadRatingCsv(Request $httpRequest) : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

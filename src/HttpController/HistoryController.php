@@ -33,7 +33,7 @@ class HistoryController
 
     public function deleteHistoryEntry(Request $request) : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -50,7 +50,7 @@ class HistoryController
 
     public function logMovie(Request $request) : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -106,7 +106,7 @@ class HistoryController
 
     public function renderLogMoviePage(Request $request) : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

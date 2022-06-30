@@ -26,7 +26,7 @@ class PlexController
 
     public function deletePlexWebhookId() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -37,7 +37,7 @@ class PlexController
 
     public function getPlexWebhookId() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -91,7 +91,7 @@ class PlexController
 
     public function regeneratePlexWebhookId() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->sessionService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

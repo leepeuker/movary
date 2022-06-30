@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Application\SessionService;
 use Movary\Application\User\Exception\InvalidPassword;
 use Movary\Application\User\Service;
 use Movary\ValueObject\Http\Header;
@@ -12,19 +13,17 @@ use Twig\Environment;
 
 class AuthenticationController
 {
-    private Environment $twig;
-
-    private Service\Login $userLoginService;
-
-    public function __construct(Environment $twig, Service\Login $userLoginService)
-    {
-        $this->twig = $twig;
-        $this->userLoginService = $userLoginService;
+    public function __construct(
+        private readonly Environment $twig,
+        private readonly Service\Login $userLoginService,
+        private readonly Service\Authentication $authenticationService,
+        private readonly SessionService $sessionService,
+    ) {
     }
 
     public function login(Request $request) : Response
     {
-        if (isset($_SESSION['user']) === true) {
+        if ($this->sessionService->isUserAuthenticated() === true) {
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
@@ -33,7 +32,7 @@ class AuthenticationController
         }
 
         try {
-            $this->userLoginService->authenticate(
+            $this->userLoginService->login(
                 $request->getPostParameters()['password'],
                 isset($request->getPostParameters()['rememberMe']) === true
             );
@@ -50,8 +49,13 @@ class AuthenticationController
 
     public function logout() : Response
     {
-        unset($_SESSION['user']);
         session_regenerate_id();
+
+        if (isset($_COOKIE['id']) === true) {
+            $this->authenticationService->deleteToken($_COOKIE['id']);
+            unset($_COOKIE['id']);
+            setcookie('id', '', -1);
+        }
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -62,7 +66,7 @@ class AuthenticationController
 
     public function renderLoginPage() : Response
     {
-        if (isset($_SESSION['user']) === true) {
+        if ($this->sessionService->isUserAuthenticated() === true) {
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
