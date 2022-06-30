@@ -21,14 +21,6 @@ class AuthenticationController
 
     public function login(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
-            );
-        }
-
         try {
             $this->authenticationService->login(
                 $request->getPostParameters()['password'],

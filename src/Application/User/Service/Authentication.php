@@ -8,6 +8,10 @@ use Movary\ValueObject\DateTime;
 
 class Authentication
 {
+    private const AUTHENTICATION_COOKIE_NAME = 'id';
+
+    private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
+
     public function __construct(private readonly Repository $repository)
     {
     }
@@ -19,15 +23,15 @@ class Authentication
 
     public function isUserAuthenticated() : bool
     {
-        $token = filter_input(INPUT_COOKIE, 'id');
+        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
         if (empty($token) === false && $this->isValidToken($token) === true) {
             return true;
         }
 
         if (empty($token) === false) {
-            unset($_COOKIE['id']);
-            setcookie('id', '', -1);
+            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
         }
 
         return false;
@@ -35,6 +39,10 @@ class Authentication
 
     public function login(string $password, bool $rememberMe) : void
     {
+        if ($this->isUserAuthenticated() === true) {
+            return;
+        }
+
         $user = $this->repository->fetchAdminUser();
 
         if (password_verify($password, $user->getPasswordHash()) === false) {
@@ -43,12 +51,12 @@ class Authentication
 
         $expirationDate = $this->createExpirationDate();
         if ($rememberMe === true) {
-            $expirationDate = $this->createExpirationDate(30);
+            $expirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
         }
 
         $token = $this->generateToken(DateTime::createFromString((string)$expirationDate));
 
-        setcookie('id', $token, (int)$expirationDate->format('U'));
+        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, (int)$expirationDate->format('U'));
     }
 
     private function createExpirationDate(int $days = 1) : DateTime
