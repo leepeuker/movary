@@ -49,14 +49,17 @@ class Authentication
             throw InvalidPassword::create();
         }
 
-        $expirationDate = $this->createExpirationDate();
+        $authTokenExpirationDate = $this->createExpirationDate();
+        $cookieExpiration = 0;
+
         if ($rememberMe === true) {
-            $expirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
+            $authTokenExpirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
+            $cookieExpiration = (int)$authTokenExpirationDate->format('U');
         }
 
-        $token = $this->generateToken(DateTime::createFromString((string)$expirationDate));
+        $token = $this->generateToken(DateTime::createFromString((string)$authTokenExpirationDate));
 
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, (int)$expirationDate->format('U'));
+        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration);
     }
 
     public function logout() : void
