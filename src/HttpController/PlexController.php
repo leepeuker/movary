@@ -4,8 +4,8 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie;
 use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\SessionService;
 use Movary\Application\User\Api;
+use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -20,13 +20,13 @@ class PlexController
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Api $userApi,
-        private readonly SessionService $sessionService
+        private readonly Authentication $authenticationService
     ) {
     }
 
     public function deletePlexWebhookId() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -37,7 +37,7 @@ class PlexController
 
     public function getPlexWebhookId() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
@@ -91,7 +91,7 @@ class PlexController
 
     public function regeneratePlexWebhookId() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

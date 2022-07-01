@@ -10,12 +10,9 @@ use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
-use Movary\Application\Movie;
-use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\SessionService;
 use Movary\Application\SyncLog;
+use Movary\Application\User\Service\Authentication;
 use Movary\Command;
-use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Http\Request;
@@ -96,7 +93,7 @@ class Factory
         return new SettingsController(
             $container->get(Twig\Environment::class),
             $container->get(SyncLog\Repository::class),
-            $container->get(SessionService::class),
+            $container->get(Authentication::class),
             $applicationVersion
         );
     }
@@ -130,7 +127,7 @@ class Factory
     {
         $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
 
-        $twig->addGlobal('loggedIn', $container->get(SessionService::class)->isCurrentUserLoggedIn());
+        $twig->addGlobal('loggedIn', $container->get(Authentication::class)->isUserAuthenticated());
 
         return $twig;
     }

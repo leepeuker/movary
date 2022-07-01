@@ -3,7 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Service\Letterboxd\SyncRatings;
-use Movary\Application\SessionService;
+use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -15,13 +15,13 @@ class Letterboxd
     public function __construct(
         private readonly SyncRatings $syncRatings,
         private readonly LoggerInterface $logger,
-        private readonly SessionService $sessionService,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
     public function uploadRatingCsv(Request $httpRequest) : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

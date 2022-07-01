@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Application\SessionService;
 use Movary\Application\User\Exception\InvalidPassword;
 use Movary\Application\User\Service;
 use Movary\ValueObject\Http\Header;
@@ -12,28 +13,16 @@ use Twig\Environment;
 
 class AuthenticationController
 {
-    private Environment $twig;
-
-    private Service\Login $userLoginService;
-
-    public function __construct(Environment $twig, Service\Login $userLoginService)
-    {
-        $this->twig = $twig;
-        $this->userLoginService = $userLoginService;
+    public function __construct(
+        private readonly Environment $twig,
+        private readonly Service\Authentication $authenticationService,
+    ) {
     }
 
     public function login(Request $request) : Response
     {
-        if (isset($_SESSION['user']) === true) {
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
-            );
-        }
-
         try {
-            $this->userLoginService->authenticate(
+            $this->authenticationService->login(
                 $request->getPostParameters()['password'],
                 isset($request->getPostParameters()['rememberMe']) === true
             );
@@ -50,8 +39,7 @@ class AuthenticationController
 
     public function logout() : Response
     {
-        unset($_SESSION['user']);
-        session_regenerate_id();
+        $this->authenticationService->logout();
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -62,7 +50,7 @@ class AuthenticationController
 
     public function renderLoginPage() : Response
     {
-        if (isset($_SESSION['user']) === true) {
+        if ($this->authenticationService->isUserAuthenticated() === true) {
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,

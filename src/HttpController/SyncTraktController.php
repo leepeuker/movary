@@ -2,19 +2,19 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\SessionService;
+use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
 class SyncTraktController
 {
     public function __construct(
-        private readonly SessionService $sessionService
+        private readonly Authentication $authenticationService
     ) {
     }
 
     public function execute() : Response
     {
-        if ($this->sessionService->isCurrentUserLoggedIn() === false) {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 

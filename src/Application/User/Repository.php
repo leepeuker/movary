@@ -3,6 +3,7 @@
 namespace Movary\Application\User;
 
 use Doctrine\DBAL\Connection;
+use Movary\ValueObject\DateTime;
 
 class Repository
 {
@@ -10,6 +11,27 @@ class Repository
 
     public function __construct(private readonly Connection $dbConnection)
     {
+    }
+
+    public function createAuthToken(string $token, DateTime $expirationDate) : void
+    {
+        $this->dbConnection->insert(
+            'user_auth_token',
+            [
+                'token' => $token,
+                'expiration_date' => (string)$expirationDate,
+            ]
+        );
+    }
+
+    public function deleteAuthToken(string $token) : void
+    {
+        $this->dbConnection->delete(
+            'user_auth_token',
+            [
+                'token' => $token,
+            ]
+        );
     }
 
     public function fetchAdminUser() : Entity
@@ -21,6 +43,17 @@ class Repository
         }
 
         return Entity::createFromArray($data);
+    }
+
+    public function findAuthTokenExpirationDate(string $token) : ?DateTime
+    {
+        $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);
+
+        if ($expirationDate === false) {
+            return null;
+        }
+
+        return DateTime::createFromString($expirationDate);
     }
 
     public function setPlexWebhookId(?string $plexWebhookId) : void
