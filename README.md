@@ -1,6 +1,6 @@
 ## Movary
 
-Web application to log and rate watched movies.
+Web application to track and rate your watched movies.
 
 Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (with default password `movary`)
 
@@ -15,7 +15,7 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (with 
 
 <a name="#about"></a>
 ## About
-This is a web app to log and rate watched movies (like a digital movie diary).
+This is a web application to track and rate your watched movies (like a digital movie diary).
 
 It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on MY watch history (-> no social media features).
 
