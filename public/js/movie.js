@@ -58,7 +58,6 @@ function setRatingStars (ratingNumber) {
 	let skipFirstStar = false
 
 	if (ratingNumber == 1 && getRatingFromStars() == 1) {
-		console.log(ratingNumber, getRatingFromStars())
 		skipFirstStar = true
 	}
 
