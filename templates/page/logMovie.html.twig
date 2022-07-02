@@ -2,7 +2,7 @@
 {% import 'makro/tmdb.html.twig' as tmdb %}
 
 {% block title %}
-    Person: {{ person.name }}
+    Log movie
 {% endblock %}
 
 {% block stylesheets %}
@@ -18,7 +18,11 @@
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
-        <div style="text-align: center;padding-top: 1rem" class="clearfix">
+
+        <div id="alerts" style="margin-top: 1rem">
+        </div>
+
+        <div style="text-align: center;" class="clearfix">
             <form action="/log-movie" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
@@ -47,26 +51,40 @@
 
         <br>
 
-        <div class="modal fade" id="watchDateModal" tabindex="-1" aria-labelledby="watchDateModal" aria-hidden="true">
+        <div class="modal fade" id="watchDateModal" tabindex="-1" aria-labelledby="watchDateModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" >
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="watchDateModalTitle">Log movie</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="/log-movie" method="POST">
-                        <div class="modal-body">
-                            <input type="hidden" value="" name="tmdbId" id="tmdbId" required>
-                            <div class="input-group">
-                                <i class="bi bi-calendar-date input-group-text"></i>
-                                <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" name="watchDate" id="watchDate" required>
+                    <div class="modal-body" style="padding-bottom: 0.4rem">
+                        <input type="hidden" value="" name="tmdbId" id="tmdbId" required>
+                        <div class="input-group" id="watchDateGroup">
+                            <i class="bi bi-calendar-date input-group-text"></i>
+                            <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" name="watchDate" id="watchDate" required>
+                            <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
+                                Watch date is required!
                             </div>
-                            <input type="number" class="form-control" name="personalRating" placeholder="Personal Rating" min="1" max="10" required style="margin-top: 1rem">
+                            <div class="invalid-feedback" id="watchDateValidationFormatErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
+                                Watch date format is invalid!
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Log movie</button>
+                        <div class="fw-light" id="ratingStars"
+                             style="color: rgb(255, 193, 7);
+                                     font-size: 1.5rem;
+                                     margin-top: 0.5rem;
+                                     cursor:pointer;">
+                            <span id="ratingStarsSpan">
+                                {% for i in 1..10 %}
+                                    <i class="bi bi-star" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
+                                {% endfor %}
+                            </span>
                         </div>
-                    </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" onclick="logMovie()">Log movie</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -4,3 +4,12 @@ Cache-Control: no-cache
 Content-Type: application/x-www-form-urlencoded
 
 rating=0
+
+####
+
+POST http://127.0.0.1/log-movie
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/application/json
+
+{"watchDate" : "","tmdbId" : 110, "personalRating" : 3}

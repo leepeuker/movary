@@ -69,6 +69,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/fetchMovieRatingByTmdbdId',
+        [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId']
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/movie/{id:\d+}',
         [\Movary\HttpController\MovieController::class, 'renderPage']
     );

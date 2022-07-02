@@ -19,6 +19,11 @@ class Response
         return new self($statusCode, $body, $headers);
     }
 
+    public static function createCsv(string $body) : self
+    {
+        return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
+    }
+
     public static function createFoundRedirect(string $targetUrl) : self
     {
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
@@ -27,11 +32,6 @@ class Response
     public static function createJson(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
-    }
-
-    public static function createCsv(string $body) : self
-    {
-        return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
     }
 
     public static function createNotFound() : self

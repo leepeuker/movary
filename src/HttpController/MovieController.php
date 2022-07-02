@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie;
 use Movary\Application\User\Service\Authentication;
+use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -17,6 +18,17 @@ class MovieController
         private readonly Movie\Api $movieApi,
         private readonly Authentication $authenticationService
     ) {
+    }
+
+    public function fetchMovieRatingByTmdbdId(Request $request) : Response
+    {
+        $tmdbId = $request->getGetParameters()['tmdbId'] ?? null;
+
+        $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
+
+        return Response::createJson(
+            Json::encode(['personalRating' => $movie?->getPersonalRating()?->asInt()])
+        );
     }
 
     public function renderPage(Request $request) : Response

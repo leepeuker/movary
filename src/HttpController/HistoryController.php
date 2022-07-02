@@ -10,7 +10,6 @@ use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -54,11 +53,15 @@ class HistoryController
             return Response::createFoundRedirect('/');
         }
 
-        $postParameters = $request->getPostParameters();
+        $requestData = Json::decode($request->getBody());
 
-        $watchDate = Date::createFromDateTime(DateTime::createFromString($postParameters['watchDate']));
-        $tmdbId = (int)$postParameters['tmdbId'];
-        $personalRating = PersonalRating::create((int)$postParameters['personalRating']);
+        if (isset($requestData['watchDate'], $requestData['tmdbId'], $requestData['personalRating']) === false) {
+            throw new \RuntimeException('Missing parameters');
+        }
+
+        $watchDate = Date::createFromDateTime(DateTime::createFromString($requestData['watchDate']));
+        $tmdbId = (int)$requestData['tmdbId'];
+        $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -67,13 +70,9 @@ class HistoryController
         }
 
         $this->movieApi->updatePersonalRating($movie->getId(), $personalRating);
-        $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $watchDate, 1);
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $watchDate);
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
-        );
+        return Response::create(StatusCode::createOk());
     }
 
     public function renderHistory(Request $request) : Response
