@@ -62,7 +62,7 @@
                         <input type="hidden" value="" name="tmdbId" id="tmdbId" required>
                         <div class="input-group" id="watchDateGroup">
                             <i class="bi bi-calendar-date input-group-text"></i>
-                            <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" name="watchDate" id="watchDate" required>
+                            <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" name="watchDate" id="watchDate" required onfocusout="validateWatchDate(this.value)">
                             <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
                                 Watch date is required!
                             </div>
