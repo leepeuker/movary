@@ -1,10 +1,7 @@
-const elems = document.querySelectorAll('.datepicker_input')
-for (const elem of elems) {
-	const datepicker = new Datepicker(elem, {
-		format: 'dd.mm.yyyy',
-		title: 'Watch date',
-	})
-}
+const datepicker = new Datepicker(document.getElementById('watchDate'), {
+	format: 'dd.mm.yyyy',
+	title: 'Watch date',
+})
 
 const watchModal = document.getElementById('watchDateModal')
 watchModal.addEventListener('show.bs.modal', async function (e) {
@@ -97,12 +94,7 @@ const addAlertMessage = (message, type) => {
 	alertPlaceholder.append(wrapper)
 }
 
-function logMovie () {
-	let rating = getRatingFromStars()
-	let tmdbId = getTmdbId()
-	let watchDate = getWatchDate()
-	let movieTitle = document.getElementById('watchDateModalTitle').innerHTML
-
+function validateWatchDate (watchDate) {
 	document.getElementById('watchDateValidationRequiredErrorMessage').classList.remove('d-block')
 	document.getElementById('watchDateValidationFormatErrorMessage').classList.remove('d-block')
 
@@ -111,19 +103,35 @@ function logMovie () {
 		document.getElementById('watchDate').style.borderColor = '#dc3545'
 		document.getElementById('ratingStars').style.marginTop = '0'
 		document.getElementById('watchDateValidationRequiredErrorMessage').classList.add('d-block')
-		return
+
+		return false
 	}
+
 	if (isValidDate(watchDate) === false) {
 		document.getElementById('watchDate').style.borderStyle = 'solid'
 		document.getElementById('watchDate').style.borderColor = '#dc3545'
 		document.getElementById('ratingStars').style.marginTop = '0'
 		document.getElementById('watchDateValidationFormatErrorMessage').classList.add('d-block')
-		return
+
+		return false
 	}
 
 	document.getElementById('watchDate').style.borderStyle = ''
 	document.getElementById('watchDate').style.borderColor = ''
 	document.getElementById('ratingStars').style.marginTop = '0.5rem'
+
+	return true
+}
+
+function logMovie () {
+	let rating = getRatingFromStars()
+	let tmdbId = getTmdbId()
+	let watchDate = getWatchDate()
+	let movieTitle = document.getElementById('watchDateModalTitle').innerHTML
+
+	if (validateWatchDate(watchDate) === false) {
+		return
+	}
 
 	fetch('/log-movie', {
 		method: 'post', headers: {
