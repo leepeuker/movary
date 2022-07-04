@@ -46,18 +46,16 @@ async function fetchRating (tmdbId) {
 	return data.personalRating
 }
 
-function setRatingStars (ratingNumber) {
-	let skipFirstStar = false
-
-	if (ratingNumber == 1 && getRatingFromStars() == 1) {
-		skipFirstStar = true
+function setRatingStars (newRating) {
+	if (getRatingFromStars() == newRating) {
+		newRating = null
 	}
 
 	for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
 		document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star-fill')
 		document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star')
 
-		if (ratingStarNumber <= ratingNumber && skipFirstStar === false) {
+		if (ratingStarNumber <= newRating) {
 			document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star-fill')
 		} else {
 			document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star')
