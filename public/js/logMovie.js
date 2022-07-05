@@ -3,13 +3,22 @@ const datepicker = new Datepicker(document.getElementById('watchDate'), {
 	title: 'Watch date',
 })
 
+function getCurrentDate () {
+	const today = new Date()
+	const dd = String(today.getDate()).padStart(2, '0')
+	const mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
+	const yyyy = today.getFullYear()
+
+	return dd + '.' + mm + '.' + yyyy
+}
+
 const watchModal = document.getElementById('watchDateModal')
 watchModal.addEventListener('show.bs.modal', async function (e) {
 	let movieId = e.relatedTarget.id
 	let movieTitle = document.getElementById(movieId + '_movieTitle').value
 	let movieYear = document.getElementById(movieId + '_movieReleaseYear').value
 
-	document.getElementById('watchDate').value = ''
+	document.getElementById('watchDate').value = getCurrentDate()
 	document.getElementById('tmdbId').value = movieId
 	document.getElementById('watchDateModalTitle').innerHTML = movieTitle + ' (' + movieYear + ')'
 	let ratingNumber = await fetchRating(movieId)
