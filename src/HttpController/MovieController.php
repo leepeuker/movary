@@ -22,23 +22,29 @@ class MovieController
 
     public function fetchMovieRatingByTmdbdId(Request $request) : Response
     {
+        $userId = 1;
         $tmdbId = $request->getGetParameters()['tmdbId'] ?? null;
 
         $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
+        $userRating = $this->movieApi->findUserRating($movie?->getId(), $userId);
 
         return Response::createJson(
-            Json::encode(['personalRating' => $movie?->getUserRating()?->asInt()])
+            Json::encode(['personalRating' => $userRating?->asInt()])
         );
     }
 
     public function renderPage(Request $request) : Response
     {
+        $userId = 1;
         $movieId = (int)$request->getRouteParameters()['id'];
+
+        $movie = $this->movieApi->findById($movieId);
+        $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/movie.html.twig', [
-                'movie' => $this->movieApi->findById($movieId),
+                'movie' => $movie,
                 'movieGenres' => $this->movieApi->findGenresByMovieId($movieId),
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),
                 'directors' => $this->movieApi->findDirectorsByMovieId($movieId),

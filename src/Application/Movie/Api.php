@@ -165,7 +165,6 @@ class Api
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'tmdbPosterPath' => $entity->getTmdbPosterPath(),
-            'personalRating' => $entity->getUserRating()?->asInt(),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
@@ -201,6 +200,11 @@ class Api
     public function findGenresByMovieId(int $movieId) : ?array
     {
         return $this->genreSelectService->findByMovieId($movieId);
+    }
+
+    public function findUserRating(int $movieId, int $userId) : ?PersonalRating
+    {
+        return $this->movieSelectService->findUserRating($movieId, $userId);
     }
 
     public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedAt, int $playsToAdd = 1) : void
@@ -261,11 +265,6 @@ class Api
         $this->movieUpdateService->updateLetterboxdId($movieId, $letterboxdId);
     }
 
-    public function updateUserRating(int $movieId, int $userId, ?PersonalRating $rating) : void
-    {
-        $this->movieUpdateService->updatePersonalRating($movieId, $userId, $rating);
-    }
-
     public function updateProductionCompanies(int $movieId, Company\EntityList $companies) : void
     {
         $this->movieUpdateService->updateProductionCompanies($movieId, $companies);
@@ -274,5 +273,14 @@ class Api
     public function updateTraktId(int $movieId, TraktId $traktId) : void
     {
         $this->movieUpdateService->updateTraktId($movieId, $traktId);
+    }
+
+    public function updateUserRating(int $movieId, int $userId, ?PersonalRating $rating) : void
+    {
+        if ($rating === null) {
+            // TODO DELETE rating
+        }
+
+        $this->movieUpdateService->updatePersonalRating($movieId, $userId, $rating);
     }
 }

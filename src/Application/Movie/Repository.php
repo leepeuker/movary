@@ -493,6 +493,16 @@ class Repository
         return $result[0] ?? null;
     }
 
+    public function findUserRating(int $movieId, int $userId) : ?PersonalRating
+    {
+        $userRating = $this->dbConnection->fetchFirstColumn(
+            'SELECT rating FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId]
+        )[0];
+
+        return $userRating !== null ? PersonalRating::create($userRating) : null;
+    }
+
     public function updateDetails(
         int $id,
         ?string $tagline,
