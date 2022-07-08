@@ -69,7 +69,7 @@ class HistoryController
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
         }
 
-        $this->movieApi->updatePersonalRating($movie->getId(), $personalRating);
+        $this->movieApi->updateUserRating($movie->getId(), $personalRating);
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $_SESSION['userId'], $watchDate);
 
         return Response::create(StatusCode::createOk());

@@ -33,8 +33,8 @@ class SyncRatings
                 continue;
             }
 
-            if ($overwriteExistingData === true || $movie->getPersonalRating() === null) {
-                $this->movieApi->updatePersonalRating($movie->getId(), PersonalRating::create($rating));
+            if ($overwriteExistingData === true || $movie->getUserRating() === null) {
+                $this->movieApi->updateUserRating($movie->getId(), PersonalRating::create($rating));
             }
         }
 

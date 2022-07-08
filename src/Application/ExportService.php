@@ -39,7 +39,7 @@ class ExportService
         $csv = 'title,year,personalRating,tmdbId,imdbId' . PHP_EOL;
 
         foreach ($movies as $movie) {
-            if ($movie->getPersonalRating() === null) {
+            if ($movie->getUserRating() === null) {
                 continue;
             }
 
@@ -47,7 +47,7 @@ class ExportService
                 '"%s",%s,%s,%s,%s' . PHP_EOL,
                 $movie->getTitle(),
                 (string)$movie->getReleaseDate()?->format('Y'),
-                (string)$movie->getPersonalRating(),
+                (string)$movie->getUserRating(),
                 $movie->getTmdbId(),
                 (string)$movie->getImdbId()
             );

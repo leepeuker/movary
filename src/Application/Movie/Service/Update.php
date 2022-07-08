@@ -103,9 +103,9 @@ class Update
         }
     }
 
-    public function updatePersonalRating(int $id, ?PersonalRating $rating) : void
+    public function updatePersonalRating(int $id, int $userId, ?PersonalRating $rating) : void
     {
-        $this->repository->updatePersonalRating($id, $rating);
+        $this->repository->updatePersonalRating($id, $userId, $rating);
     }
 
     public function updateTraktId(int $movieId, TraktId $traktId) : void

@@ -165,7 +165,7 @@ class Api
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'tmdbPosterPath' => $entity->getTmdbPosterPath(),
-            'personalRating' => $entity->getPersonalRating()?->asInt(),
+            'personalRating' => $entity->getUserRating()?->asInt(),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
@@ -261,9 +261,9 @@ class Api
         $this->movieUpdateService->updateLetterboxdId($movieId, $letterboxdId);
     }
 
-    public function updatePersonalRating(int $movieId, ?PersonalRating $rating) : void
+    public function updateUserRating(int $movieId, int $userId, ?PersonalRating $rating) : void
     {
-        $this->movieUpdateService->updatePersonalRating($movieId, $rating);
+        $this->movieUpdateService->updatePersonalRating($movieId, $userId, $rating);
     }
 
     public function updateProductionCompanies(int $movieId, Company\EntityList $companies) : void

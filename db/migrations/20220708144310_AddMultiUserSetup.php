@@ -11,10 +11,11 @@ final class AddMultiUserSetup extends AbstractMigration
             ALTER TABLE user DROP COLUMN name;
             ALTER TABLE user_auth_token DROP CONSTRAINT user_auth_token_fk_user_id;
             ALTER TABLE user_auth_token DROP COLUMN user_id;
-            ALTER TABLE movie_history DROP CONSTRAINT movie_history_fk_user_id;
-            ALTER TABLE movie_history DROP COLUMN user_id;
+            ALTER TABLE movie_user_watch_dates DROP CONSTRAINT movie_history_fk_user_id;
+            ALTER TABLE movie_user_watch_dates DROP COLUMN user_id;
             DROP TABLE movie_user_rating;
-            RENAME TABLE `movie_user_watch_dates` TO `movie_history `;
+            RENAME TABLE `movie_user_watch_dates` TO `movie_history`;
+            ALTER TABLE movie ADD COLUMN personal_rating TINYINT UNSIGNED DEFAULT NULL;
             SQL
         );
     }
@@ -58,9 +59,14 @@ final class AddMultiUserSetup extends AbstractMigration
                 `movie_id` INT(10) UNSIGNED NOT NULL,
                 `user_id` INT(10) UNSIGNED NOT NULL,
                 `rating` TINYINT NOT NULL,
+                `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE NOW(),
+                `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`movie_id`, `user_id`),
                 FOREIGN KEY (`movie_id`) REFERENCES `movie`(`id`) ON DELETE CASCADE,
                 FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
-            ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
+            ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB;
+            INSERT INTO movie_user_rating (movie_id, user_id, rating) (SELECT id, 1, personal_rating FROM movie WHERE personal_rating IS NOT NULL);
+            ALTER TABLE movie DROP COLUMN personal_rating;
             SQL
         );
     }

@@ -38,7 +38,7 @@ class SyncRatings
             $ratingWithScale10 = $rating['Rating'] * 2;
             $personalRating = PersonalRating::create((int)$ratingWithScale10);
 
-            if ($overwriteExistingData === false && $movie->getPersonalRating() !== null) {
+            if ($overwriteExistingData === false && $movie->getUserRating() !== null) {
                 $this->outputMessage("Ignoring {$movie->getTitle()} rating: " . $personalRating . PHP_EOL, $verbose);
 
                 continue;
@@ -46,7 +46,7 @@ class SyncRatings
 
             $this->outputMessage("Updating {$movie->getTitle()} with rating: " . $personalRating . PHP_EOL, $verbose);
 
-            $this->movieApi->updatePersonalRating($movie->getId(), $personalRating);
+            $this->movieApi->updateUserRating($movie->getId(), $personalRating);
         }
 
         $this->scanLogRepository->insertLogForLetterboxdSync();

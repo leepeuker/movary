@@ -27,7 +27,7 @@ class MovieController
         $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
 
         return Response::createJson(
-            Json::encode(['personalRating' => $movie?->getPersonalRating()?->asInt()])
+            Json::encode(['personalRating' => $movie?->getUserRating()?->asInt()])
         );
     }
 
@@ -62,7 +62,7 @@ class MovieController
             $personalRating = PersonalRating::create((int)$postParameters['rating']);
         }
 
-        $this->movieApi->updatePersonalRating($movieId, $personalRating);
+        $this->movieApi->updateUserRating($movieId, $_SESSION['userId'], $personalRating);
 
         return Response::create(
             StatusCode::createNoContent(),
