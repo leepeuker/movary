@@ -42,7 +42,7 @@ class HistoryController
         $date = Date::createFromString($requestBody['date']);
         $count = $requestBody['count'] ?? 1;
 
-        $this->movieApi->deleteHistoryByIdAndDate($movieId, $date, $count);
+        $this->movieApi->deleteHistoryByIdAndDate($movieId, $_SESSION['userId'], $date, $count);
 
         return Response::create(StatusCode::createOk());
     }
@@ -70,19 +70,20 @@ class HistoryController
         }
 
         $this->movieApi->updatePersonalRating($movie->getId(), $personalRating);
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $watchDate);
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $_SESSION['userId'], $watchDate);
 
         return Response::create(StatusCode::createOk());
     }
 
     public function renderHistory(Request $request) : Response
     {
+        $userId = 1;
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
         $historyPaginated = $this->movieHistorySelectService->fetchHistoryPaginated($limit, (int)$page, $searchTerm);
-        $historyCount = $this->movieHistorySelectService->fetchHistoryCount($searchTerm);
+        $historyCount = $this->movieHistorySelectService->fetchHistoryCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
 

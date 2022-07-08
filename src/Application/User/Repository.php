@@ -13,11 +13,12 @@ class Repository
     {
     }
 
-    public function createAuthToken(string $token, DateTime $expirationDate) : void
+    public function createAuthToken(int $userId, string $token, DateTime $expirationDate) : void
     {
         $this->dbConnection->insert(
             'user_auth_token',
             [
+                'user_id' => $userId,
                 'token' => $token,
                 'expiration_date' => (string)$expirationDate,
             ]
@@ -54,6 +55,28 @@ class Repository
         }
 
         return DateTime::createFromString($expirationDate);
+    }
+
+    public function findPlexWebhookIdByUserId(int $userId) : ?string
+    {
+        $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexWebhookId === false) {
+            return null;
+        }
+
+        return $plexWebhookId;
+    }
+
+    public function findUserIdByPlexWebhookId(string $webhookId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `plex_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
     }
 
     public function setPlexWebhookId(?string $plexWebhookId) : void

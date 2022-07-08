@@ -41,14 +41,18 @@ class PlexController
             return Response::createFoundRedirect('/');
         }
 
-        $plexWebhookId = $this->userApi->findPlexWebhookId();
+        $plexWebhookId = $this->userApi->findPlexWebhookIdByUserId($_SESSION['userId']);
 
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
 
     public function handlePlexWebhook(Request $request) : Response
     {
-        if ($request->getRouteParameters()['id'] !== $this->userApi->findPlexWebhookId()) {
+        $webhookId = $request->getRouteParameters()['id'];
+
+        $userId = $this->userApi->findUserIdByPlexWebhookId($webhookId);
+
+        if ($userId === null) {
             return Response::createNotFound();
         }
 
@@ -84,7 +88,7 @@ class PlexController
 
         $watchDate = Date::createFromString($dateTime->format('Y-m-d'));
 
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $watchDate);
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
 
         return Response::create(StatusCode::createOk());
     }

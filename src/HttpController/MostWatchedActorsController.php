@@ -22,11 +22,12 @@ class MostWatchedActorsController
 
     public function renderPage(Request $request) : Response
     {
+        $userId = 1;
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors((int)$page, $limit, null, $searchTerm);
+        $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors($userId, (int)$page, $limit, null, $searchTerm);
         $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount($searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);

@@ -15,9 +15,14 @@ class Api
         $this->repository->setPlexWebhookId(null);
     }
 
-    public function findPlexWebhookId() : ?string
+    public function findPlexWebhookIdByUserId(int $userId) : ?string
     {
-        return $this->repository->fetchAdminUser()->getPlexWebhookId();
+        return $this->repository->findPlexWebhookIdByUserId($userId);
+    }
+
+    public function findUserIdByPlexWebhookId(string $webhookId) : ?int
+    {
+        return $this->repository->findUserIdByPlexWebhookId($webhookId);
     }
 
     public function regeneratePlexWebhookId() : string

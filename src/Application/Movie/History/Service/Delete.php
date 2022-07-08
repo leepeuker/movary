@@ -20,8 +20,8 @@ class Delete
         $this->repository->deleteByTraktId($traktId);
     }
 
-    public function deleteHistoryByIdAndDate(int $movieId, Date $watchedAt) : void
+    public function deleteHistoryByIdAndDate(int $movieId, int $userId, Date $watchedAt) : void
     {
-        $this->repository->deleteHistoryByIdAndDate($movieId, $watchedAt);
+        $this->repository->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);
     }
 }

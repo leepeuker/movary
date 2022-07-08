@@ -48,7 +48,7 @@ db_create_database:
 	make exec_mysql_query QUERY="CREATE DATABASE $(DATABASE_NAME)"
 	make exec_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DATABASE_NAME).* TO $(DATABASE_USER)@'%'"
 	make exec_mysql_query QUERY="FLUSH PRIVILEGES;"
-	make db_migration_migrate
+	make app_database_migrate
 
 db_import:
 	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_ROOT_PASSWORD} < /tmp/host/dump.sql'

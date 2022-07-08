@@ -14,8 +14,8 @@ class Create
         $this->repository = $repository;
     }
 
-    public function createOrUpdatePlaysForDate(int $movieId, Date $watchedAt, int $plays) : void
+    public function createOrUpdatePlaysForDate(int $movieId, int $userId, Date $watchedAt, int $plays) : void
     {
-        $this->repository->createOrUpdatePlaysForDate($movieId, $watchedAt, $plays);
+        $this->repository->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $plays);
     }
 }

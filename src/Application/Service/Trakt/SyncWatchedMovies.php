@@ -90,6 +90,7 @@ class SyncWatchedMovies
 
     private function syncMovieHistory(TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
     {
+        $userId = 1;
         $traktHistoryEntries = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktId);
 
         foreach ($this->movieApi->fetchHistoryByMovieId($movie->getId()) as $localHistoryEntry) {
@@ -100,7 +101,7 @@ class SyncWatchedMovies
                     continue;
                 }
 
-                $this->movieApi->deleteHistoryByIdAndDate($movie->getId(), $localHistoryEntryDate);
+                $this->movieApi->deleteHistoryByIdAndDate($movie->getId(), $userId, $localHistoryEntryDate);
 
                 continue;
             }
@@ -109,7 +110,7 @@ class SyncWatchedMovies
             $traktHistoryEntryPlays = $traktHistoryEntries->getPlaysForDate($localHistoryEntryDate);
 
             if ($localHistoryEntryPlays < $traktHistoryEntryPlays || ($localHistoryEntryPlays > $traktHistoryEntryPlays && $overwriteExistingData === true)) {
-                $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $localHistoryEntryDate, $traktHistoryEntryPlays);
+                $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $userId, $localHistoryEntryDate, $traktHistoryEntryPlays);
 
                 $this->logger->info('Updated plays for "' . $movie->getTitle() . '" at ' . $localHistoryEntryDate . " from $localHistoryEntryPlays to $traktHistoryEntryPlays");
             }
@@ -120,7 +121,7 @@ class SyncWatchedMovies
         foreach ($traktHistoryEntries as $watchedAt => $plays) {
             $localHistoryEntryDate = Date::createFromString($watchedAt);
 
-            $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $localHistoryEntryDate, $plays);
+            $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $userId, $localHistoryEntryDate, $plays);
 
             $this->logger->info('Added plays for "' . $movie->getTitle() . '" at ' . $watchedAt . " with $plays");
         }

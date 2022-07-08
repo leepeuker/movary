@@ -59,7 +59,7 @@ class Api
         );
     }
 
-    public function deleteHistoryByIdAndDate(int $id, Date $watchedAt, ?int $playsToDelete = null) : void
+    public function deleteHistoryByIdAndDate(int $id, int $userId, Date $watchedAt, ?int $playsToDelete = null) : void
     {
         $currentPlays = $this->historySelectService->findHistoryPlaysByMovieIdAndDate($id, $watchedAt);
 
@@ -68,12 +68,12 @@ class Api
         }
 
         if ($currentPlays <= $playsToDelete || $playsToDelete === null) {
-            $this->historyDeleteService->deleteHistoryByIdAndDate($id, $watchedAt);
+            $this->historyDeleteService->deleteHistoryByIdAndDate($id, $userId, $watchedAt);
 
             return;
         }
 
-        $this->historyCreateService->createOrUpdatePlaysForDate($id, $watchedAt, $currentPlays - $playsToDelete);
+        $this->historyCreateService->createOrUpdatePlaysForDate($id, $userId, $watchedAt, $currentPlays - $playsToDelete);
     }
 
     public function deleteHistoryByTraktId(TraktId $traktId) : void
@@ -107,14 +107,14 @@ class Api
         return $this->historySelectService->fetchHistoryByMovieId($movieId);
     }
 
-    public function fetchHistoryCount() : int
+    public function fetchHistoryCount(int $userId) : int
     {
-        return $this->historySelectService->fetchHistoryCount();
+        return $this->historySelectService->fetchHistoryCount($userId);
     }
 
-    public function fetchHistoryCountUnique() : int
+    public function fetchHistoryCountUnique(int $userId) : int
     {
-        return $this->historySelectService->fetchUniqueMovieInHistoryCount();
+        return $this->historySelectService->fetchUniqueMovieInHistoryCount($userId);
     }
 
     public function fetchHistoryMoviePlaysOnDate(int $id, Date $watchedAt) : int
@@ -203,16 +203,16 @@ class Api
         return $this->genreSelectService->findByMovieId($movieId);
     }
 
-    public function increaseHistoryPlaysForMovieOnDate(int $movieId, Date $watchedAt, int $playsToAdd = 1) : void
+    public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedAt, int $playsToAdd = 1) : void
     {
         $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $watchedAt);
 
-        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $watchedAt, $playsPerDate + $playsToAdd);
+        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate + $playsToAdd);
     }
 
-    public function replaceHistoryForMovieByDate(int $movieId, Date $watchedAt, int $playsPerDate) : void
+    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate) : void
     {
-        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $watchedAt, $playsPerDate);
+        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate);
     }
 
     public function updateCast(int $movieId, Cast $tmdbCast) : void
