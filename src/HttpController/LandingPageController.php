@@ -23,7 +23,7 @@ class LandingPageController
             return Response::createFoundRedirect("/$userId/dashboard");
         }
 
-        $failedLogin = $_SESSION['failedLogin'];
+        $failedLogin = $_SESSION['failedLogin'] ?? null;
         unset($_SESSION['failedLogin']);
 
         return Response::create(

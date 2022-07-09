@@ -15,9 +15,9 @@ class Api
         $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name);
     }
 
-    public function deletePlexWebhookId() : void
+    public function deletePlexWebhookId(int $userId) : void
     {
-        $this->repository->setPlexWebhookId(null);
+        $this->repository->setPlexWebhookId($userId, null);
     }
 
     public function findPlexWebhookIdByUserId(int $userId) : ?string
@@ -25,21 +25,16 @@ class Api
         return $this->repository->findPlexWebhookIdByUserId($userId);
     }
 
-    public function findUserIdByName(string $userName) : ?int
-    {
-        return $this->repository->findUserIdByName($userName);
-    }
-
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByPlexWebhookId($webhookId);
     }
 
-    public function regeneratePlexWebhookId() : string
+    public function regeneratePlexWebhookId(int $userId) : string
     {
         $plexWebhookId = Uuid::uuid4()->toString();
 
-        $this->repository->setPlexWebhookId($plexWebhookId);
+        $this->repository->setPlexWebhookId($userId, $plexWebhookId);
 
         return $plexWebhookId;
     }

@@ -30,7 +30,7 @@ class PlexController
             return Response::createFoundRedirect('/');
         }
 
-        $this->userApi->deletePlexWebhookId();
+        $this->userApi->deletePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::create(StatusCode::createOk());
     }
@@ -99,7 +99,7 @@ class PlexController
             return Response::createFoundRedirect('/');
         }
 
-        $plexWebhookId = $this->userApi->regeneratePlexWebhookId();
+        $plexWebhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }

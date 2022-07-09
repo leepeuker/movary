@@ -131,7 +131,7 @@ class Factory
         $routeUserId = $currentRequest->getRouteParameters()['userId'] ?? null;
 
         $twig->addGlobal('loggedIn', $container->get(Authentication::class)->isUserAuthenticated());
-        $twig->addGlobal('routeUserId', $routeUserId);
+        $twig->addGlobal('routeUserId', $routeUserId ?? $container->get(Authentication::class)->getCurrentUserId());
 
         return $twig;
     }

@@ -114,7 +114,7 @@ class Repository
         return (int)$id;
     }
 
-    public function setPlexWebhookId(?string $plexWebhookId) : void
+    public function setPlexWebhookId(int $userId, ?string $plexWebhookId) : void
     {
         $this->dbConnection->update(
             'user',
@@ -122,7 +122,7 @@ class Repository
                 'plex_webhook_uuid' => $plexWebhookId,
             ],
             [
-                'id' => self::ADMIN_USER_IO,
+                'id' => $userId,
             ]
         );
     }

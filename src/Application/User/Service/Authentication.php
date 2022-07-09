@@ -25,9 +25,10 @@ class Authentication
     public function getCurrentUserId() : ?int
     {
         $userId = $_SESSION['userId'] ?? null;
+        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
-        if ($userId === null) {
-            $userId = $this->repository->findUserIdByAuthToken(filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME));
+        if ($userId === null && $token !== null) {
+            $userId = $this->repository->findUserIdByAuthToken($token);
             $_SESSION['userId'] = $userId;
         }
 

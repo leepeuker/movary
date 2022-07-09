@@ -127,11 +127,6 @@ class Api
         return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc();
     }
 
-    public function fetchHistoryUniqueMovies() : EntityList
-    {
-        return $this->historySelectService->fetchHistoryUniqueMovies();
-    }
-
     public function fetchWithActor(int $personId) : EntityList
     {
         return $this->movieSelectService->fetchWithActor($personId);

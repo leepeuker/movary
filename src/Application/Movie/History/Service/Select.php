@@ -66,14 +66,9 @@ class Select
         return $this->movieRepository->fetchHistoryOrderedByWatchedAtDesc();
     }
 
-    public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm = null) : array
+    public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null) : array
     {
-        return $this->movieRepository->fetchHistoryPaginated($limit, $page, $searchTerm);
-    }
-
-    public function fetchHistoryUniqueMovies() : EntityList
-    {
-        return EntityList::createFromArray($this->movieRepository->fetchHistoryUniqueMovies());
+        return $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $searchTerm);
     }
 
     public function fetchLastPlays(int $userId) : array

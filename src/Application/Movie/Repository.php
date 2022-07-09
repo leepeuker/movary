@@ -129,15 +129,16 @@ class Repository
         );
     }
 
-    public function fetchHistoryPaginated(int $limit, int $page, ?string $searchTerm) : array
+    public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm) : array
     {
-        $payload = [];
+        $payload = [$userId];
+        $whereQuery = 'WHERE mh.user_id = ?';
+
         $offset = ($limit * $page) - $limit;
 
-        $whereQuery = '';
         if ($searchTerm !== null) {
             $payload[] = "%$searchTerm%";
-            $whereQuery = 'WHERE m.title LIKE ?';
+            $whereQuery .= ' AND m.title LIKE ?';
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -150,18 +151,6 @@ class Repository
             LIMIT $offset, $limit
             SQL,
             $payload
-        );
-    }
-
-    public function fetchHistoryUniqueMovies() : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            <<<SQL
-            SELECT m.*
-            FROM movie_user_watch_dates mh
-            JOIN movie m on mh.movie_id = m.id
-            GROUP BY mh.movie_id
-            SQL,
         );
     }
 

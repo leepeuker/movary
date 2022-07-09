@@ -36,13 +36,15 @@ class HistoryController
             return Response::createFoundRedirect('/');
         }
 
+        $userId = $this->authenticationService->getCurrentUserId();
+
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];
         $date = Date::createFromString($requestBody['date']);
         $count = $requestBody['count'] ?? 1;
 
-        $this->movieApi->deleteHistoryByIdAndDate($movieId, $_SESSION['userId'], $date, $count);
+        $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date, $count);
 
         return Response::create(StatusCode::createOk());
     }
@@ -53,7 +55,7 @@ class HistoryController
             return Response::createFoundRedirect('/');
         }
 
-        $userId = $_SESSION['userId'];
+        $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());
 
@@ -85,7 +87,7 @@ class HistoryController
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $historyPaginated = $this->movieHistorySelectService->fetchHistoryPaginated($limit, (int)$page, $searchTerm);
+        $historyPaginated = $this->movieHistorySelectService->fetchHistoryPaginated($userId, $limit, (int)$page, $searchTerm);
         $historyCount = $this->movieHistorySelectService->fetchHistoryCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
