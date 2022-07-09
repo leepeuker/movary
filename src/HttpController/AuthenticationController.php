@@ -3,7 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\SessionService;
-use Movary\Application\User\Exception\InvalidPassword;
+use Movary\Application\User\Exception\InvalidCredentials;
 use Movary\Application\User\Service;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -21,12 +21,15 @@ class AuthenticationController
 
     public function login(Request $request) : Response
     {
+        $postParameters = $request->getPostParameters();
+
         try {
             $this->authenticationService->login(
-                $request->getPostParameters()['password'],
-                isset($request->getPostParameters()['rememberMe']) === true
+                $postParameters['email'],
+                $postParameters['password'],
+                isset($postParameters['rememberMe']) === true
             );
-        } catch (InvalidPassword) {
+        } catch (InvalidCredentials) {
             $_SESSION['failedLogin'] = true;
         }
 

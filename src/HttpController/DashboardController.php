@@ -2,9 +2,11 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie\Api;
+use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
+use Movary\Application\User;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
@@ -14,13 +16,14 @@ class DashboardController
     public function __construct(
         private readonly Environment $twig,
         private readonly Select $movieHistorySelectService,
-        private readonly Api $movieApi,
+        private readonly Movie\Api $movieApi,
+        private readonly User\Api $userApi,
     ) {
     }
 
-    public function render() : Response
+    public function render(Request $request) : Response
     {
-        $userId = $_SESSION['userId'];
+        $userId = (int)$request->getRouteParameters()['userId'];
 
         return Response::create(
             StatusCode::createOk(),

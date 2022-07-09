@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie\History\Service\Select;
+use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -16,13 +17,14 @@ class MostWatchedActorsController
 
     public function __construct(
         private readonly Select $movieHistorySelectService,
-        private readonly Environment $twig
+        private readonly Environment $twig,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
     public function renderPage(Request $request) : Response
     {
-        $userId = 1;
+        $userId = (int)$request->getRouteParameters()['userId'];
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;

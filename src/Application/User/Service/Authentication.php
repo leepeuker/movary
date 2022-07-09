@@ -2,6 +2,7 @@
 
 namespace Movary\Application\User\Service;
 
+use Movary\Application\User\Exception\EmailNotFound;
 use Movary\Application\User\Exception\InvalidPassword;
 use Movary\Application\User\Repository;
 use Movary\ValueObject\DateTime;
@@ -21,6 +22,18 @@ class Authentication
         $this->repository->deleteAuthToken($token);
     }
 
+    public function getCurrentUserId() : ?int
+    {
+        $userId = $_SESSION['userId'] ?? null;
+
+        if ($userId === null) {
+            $userId = $this->repository->findUserIdByAuthToken(filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME));
+            $_SESSION['userId'] = $userId;
+        }
+
+        return $userId;
+    }
+
     public function isUserAuthenticated() : bool
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
@@ -37,13 +50,17 @@ class Authentication
         return false;
     }
 
-    public function login(string $password, bool $rememberMe) : void
+    public function login(string $email, string $password, bool $rememberMe) : void
     {
         if ($this->isUserAuthenticated() === true) {
             return;
         }
 
-        $user = $this->repository->fetchAdminUser();
+        $user = $this->repository->findUserByEmail($email);
+
+        if ($user === null) {
+            throw EmailNotFound::create();
+        }
 
         if (password_verify($password, $user->getPasswordHash()) === false) {
             throw InvalidPassword::create();

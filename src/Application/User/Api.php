@@ -10,6 +10,11 @@ class Api
     {
     }
 
+    public function createUser(string $email, string $password, ?string $name) : void
+    {
+        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name);
+    }
+
     public function deletePlexWebhookId() : void
     {
         $this->repository->setPlexWebhookId(null);
@@ -18,6 +23,11 @@ class Api
     public function findPlexWebhookIdByUserId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookIdByUserId($userId);
+    }
+
+    public function findUserIdByName(string $userName) : ?int
+    {
+        return $this->repository->findUserIdByName($userName);
     }
 
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int

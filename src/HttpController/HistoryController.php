@@ -53,6 +53,8 @@ class HistoryController
             return Response::createFoundRedirect('/');
         }
 
+        $userId = $_SESSION['userId'];
+
         $requestData = Json::decode($request->getBody());
 
         if (isset($requestData['watchDate'], $requestData['tmdbId'], $requestData['personalRating']) === false) {
@@ -69,15 +71,16 @@ class HistoryController
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
         }
 
-        $this->movieApi->updateUserRating($movie->getId(), $personalRating);
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $_SESSION['userId'], $watchDate);
+        $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
 
         return Response::create(StatusCode::createOk());
     }
 
     public function renderHistory(Request $request) : Response
     {
-        $userId = 1;
+        $userId = (int)$request->getRouteParameters()['userId'];
+
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;

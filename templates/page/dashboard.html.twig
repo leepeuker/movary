@@ -69,7 +69,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
                 <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
@@ -94,7 +94,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/most-watched-actors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-actors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
 
@@ -120,7 +120,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/most-watched-actors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-actors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
                 <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
@@ -144,6 +144,7 @@
                                 </div>
                             </div>
                         {% endfor %}
+                        <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-directors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                     </div>
                 </li>
 

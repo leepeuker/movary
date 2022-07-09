@@ -12,14 +12,12 @@
                         <hr class="dropdown-divider">
                     </li>
                 {% endif %}
-                <li><a class="dropdown-item" href="/history">History</a></li>
+                <li><a class="dropdown-item" href="/{{ routeUserId }}/history">History</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="/most-watched-actors">Top Actors</a></li>
-                <li><a class="dropdown-item" href="/most-watched-directors">Top Directors</a></li>
-                <li><a class="dropdown-item disabled" href="/api/most-watched-genres">Top Genres</a></li>
-                <li><a class="dropdown-item disabled" href="/api/most-watched-production-companies">Top Production Companies</a></li>
+                <li><a class="dropdown-item" href="/{{ routeUserId }}/most-watched-actors">Top Actors</a></li>
+                <li><a class="dropdown-item" href="/{{ routeUserId }}/most-watched-directors">Top Directors</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>

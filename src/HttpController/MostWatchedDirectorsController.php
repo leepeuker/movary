@@ -20,7 +20,7 @@ class MostWatchedDirectorsController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = 1;
+        $userId = (int)$request->getRouteParameters()['userId'];
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;

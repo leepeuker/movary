@@ -107,13 +107,15 @@ class Repository
                 SELECT COUNT(*)
                 FROM movie_user_watch_dates mh
                 JOIN movie m on mh.movie_id = m.id
-                WHERE m.title LIKE "%$searchTerm%" AND user_id = $userId
-                SQL
+                WHERE m.title LIKE ? AND user_id = ?
+                SQL,
+                ["%$searchTerm%", $userId]
             )[0];
         }
 
         return $this->dbConnection->fetchFirstColumn(
-            'SELECT COUNT(*) FROM movie_user_watch_dates'
+            'SELECT COUNT(*) FROM movie_user_watch_dates WHERE user_id = ?',
+            [$userId]
         )[0];
     }
 

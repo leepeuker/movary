@@ -25,6 +25,18 @@ class Repository
         );
     }
 
+    public function createUser(string $email, string $passwordHash, ?string $name) : void
+    {
+        $this->dbConnection->insert(
+            'user',
+            [
+                'email' => $email,
+                'password' => $passwordHash,
+                'name' => $name,
+            ]
+        );
+    }
+
     public function deleteAuthToken(string $token) : void
     {
         $this->dbConnection->delete(
@@ -68,9 +80,32 @@ class Repository
         return $plexWebhookId;
     }
 
+    public function findUserByEmail(string $email) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `email` = ?', [$email]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `plex_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
+    public function findUserIdByAuthToken(string $token) : ?int
+    {
+
+        $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
 
         if ($id === false) {
             return null;

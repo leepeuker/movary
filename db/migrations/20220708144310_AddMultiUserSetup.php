@@ -8,6 +8,7 @@ final class AddMultiUserSetup extends AbstractMigration
     {
         $this->execute(
             <<<SQL
+            ALTER TABLE user DROP COLUMN email;
             ALTER TABLE user DROP COLUMN name;
             ALTER TABLE user_auth_token DROP CONSTRAINT user_auth_token_fk_user_id;
             ALTER TABLE user_auth_token DROP COLUMN user_id;
@@ -24,9 +25,11 @@ final class AddMultiUserSetup extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE user ADD COLUMN name VARCHAR(255) DEFAULT NULL AFTER id;
-            UPDATE user SET name = id;
-            ALTER TABLE user MODIFY COLUMN name VARCHAR(255) NOT NULL AFTER id;
+            DELETE FROM user;
+            ALTER TABLE user ADD COLUMN email VARCHAR(255) NOT NULL AFTER id;
+            ALTER TABLE user ADD COLUMN name VARCHAR(255) DEFAULT NULL AFTER email;
+            ALTER TABLE user ADD UNIQUE (email);
+            ALTER TABLE user ADD UNIQUE (name);
             SQL
         );
 
