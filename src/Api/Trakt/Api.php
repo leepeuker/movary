@@ -15,9 +15,9 @@ class Api
     ) {
     }
 
-    public function fetchUniqueCachedTraktIds() : array
+    public function fetchUniqueCachedTraktIds(int $userId) : array
     {
-        return $this->cacheWatchedService->fetchAllUniqueTraktIds();
+        return $this->cacheWatchedService->fetchAllUniqueTraktIds($userId);
     }
 
     public function fetchUserMovieHistoryByMovieId(TraktId $traktId) : User\Movie\History\DtoList
@@ -41,8 +41,8 @@ class Api
         return User\Movie\Watched\DtoList::createFromArray($responseData);
     }
 
-    public function removeWatchCacheByTraktId(TraktId $traktId) : void
+    public function removeWatchCacheByTraktId(int $userId, TraktId $traktId) : void
     {
-        $this->cacheWatchedService->remove($traktId);
+        $this->cacheWatchedService->remove($userId, $traktId);
     }
 }

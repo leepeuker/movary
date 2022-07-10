@@ -5,6 +5,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/',
+        [\Movary\HttpController\LandingPageController::class, 'render']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/{userId:\d+}/dashboard',
         [\Movary\HttpController\DashboardController::class, 'render']
     );
     $routeCollector->addRoute(
@@ -14,7 +19,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/history',
+        '/{userId:\d+}/history',
         [\Movary\HttpController\HistoryController::class, 'renderHistory']
     );
     $routeCollector->addRoute(
@@ -49,12 +54,12 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/most-watched-actors',
+        '/{userId:\d+}/most-watched-actors',
         [\Movary\HttpController\MostWatchedActorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
         'GET',
-        '/most-watched-directors',
+        '/{userId:\d+}/most-watched-directors',
         [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -74,7 +79,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/movie/{id:\d+}',
+        '/{userId:\d+}/movie/{id:\d+}',
         [\Movary\HttpController\MovieController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -89,7 +94,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/person/{id:\d+}',
+        '/{userId:\d+}/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -117,5 +122,10 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/user/export/csv/{exportType:.+}',
         [\Movary\HttpController\ExportController::class, 'getCsvExport']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/user/import/csv/{exportType:.+}',
+        [\Movary\HttpController\ImportController::class, 'handleCsvImport']
     );
 };

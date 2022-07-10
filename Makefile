@@ -48,7 +48,7 @@ db_create_database:
 	make exec_mysql_query QUERY="CREATE DATABASE $(DATABASE_NAME)"
 	make exec_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DATABASE_NAME).* TO $(DATABASE_USER)@'%'"
 	make exec_mysql_query QUERY="FLUSH PRIVILEGES;"
-	make db_migration_migrate
+	make app_database_migrate
 
 db_import:
 	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_ROOT_PASSWORD} < /tmp/host/dump.sql'
@@ -69,6 +69,9 @@ app_database_migrate:
 
 app_database_rollback:
 	make exec_app_cmd CMD="php bin/console.php movary:database:migration --rollback"
+
+app_user_create_test:
+	make exec_app_cmd CMD="php bin/console.php movary:user:create a@a a"
 
 app_sync_trakt:
 	make exec_app_cmd CMD="php bin/console.php movary:sync-trakt --overwrite"

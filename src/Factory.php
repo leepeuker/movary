@@ -127,7 +127,19 @@ class Factory
     {
         $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
 
-        $twig->addGlobal('loggedIn', $container->get(Authentication::class)->isUserAuthenticated());
+        $currentRequest = $container->get(Request::class);
+        $routeUserId = $currentRequest->getRouteParameters()['userId'] ?? null;
+
+        $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticated();
+
+        $twig->addGlobal('loggedIn', $userAuthenticated);
+
+        $currentUserId = null;
+        if ($userAuthenticated === true) {
+            $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
+        }
+
+        $twig->addGlobal('routeUserId', $routeUserId ?? $currentUserId);
 
         return $twig;
     }

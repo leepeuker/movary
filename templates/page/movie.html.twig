@@ -86,7 +86,7 @@
         <h6 style="margin-bottom: 0.4rem">Acting</h6>
         <div class="carousel">
             {% for castMember in castMembers|slice(0, 25) %}
-                <div class="card" onclick="window.location='/person/{{ castMember.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
+                <div class="card" onclick="window.location='/{{ routeUserId }}/person/{{ castMember.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small>
                     </div>
@@ -100,7 +100,7 @@
         <h6 style="margin-bottom: 0.4rem">Director</h6>
         <div class="carousel">
             {% for director in directors|slice(0, 25) %}
-                <div class="card" onclick="window.location='/person/{{ director.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
+                <div class="card" onclick="window.location='/{{ routeUserId }}/person/{{ director.id }}'" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
                     </div>

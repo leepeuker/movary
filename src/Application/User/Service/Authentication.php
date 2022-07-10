@@ -2,6 +2,7 @@
 
 namespace Movary\Application\User\Service;
 
+use Movary\Application\User\Exception\EmailNotFound;
 use Movary\Application\User\Exception\InvalidPassword;
 use Movary\Application\User\Repository;
 use Movary\ValueObject\DateTime;
@@ -21,6 +22,23 @@ class Authentication
         $this->repository->deleteAuthToken($token);
     }
 
+    public function getCurrentUserId() : int
+    {
+        $userId = $_SESSION['userId'] ?? null;
+        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+
+        if ($userId === null && $token !== null) {
+            $userId = $this->repository->findUserIdByAuthToken($token);
+            $_SESSION['userId'] = $userId;
+        }
+
+        if ($userId === null) {
+            throw new \RuntimeException('Could not find a current user');
+        }
+
+        return $userId;
+    }
+
     public function isUserAuthenticated() : bool
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
@@ -37,13 +55,17 @@ class Authentication
         return false;
     }
 
-    public function login(string $password, bool $rememberMe) : void
+    public function login(string $email, string $password, bool $rememberMe) : void
     {
         if ($this->isUserAuthenticated() === true) {
             return;
         }
 
-        $user = $this->repository->fetchAdminUser();
+        $user = $this->repository->findUserByEmail($email);
+
+        if ($user === null) {
+            throw EmailNotFound::create();
+        }
 
         if (password_verify($password, $user->getPasswordHash()) === false) {
             throw InvalidPassword::create();
@@ -57,9 +79,12 @@ class Authentication
             $cookieExpiration = (int)$authTokenExpirationDate->format('U');
         }
 
-        $token = $this->generateToken(DateTime::createFromString((string)$authTokenExpirationDate));
+        $token = $this->generateToken($user->getId(), DateTime::createFromString((string)$authTokenExpirationDate));
 
+        session_regenerate_id();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration);
+
+        $_SESSION['userId'] = $user->getId();
     }
 
     public function logout() : void
@@ -72,7 +97,7 @@ class Authentication
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
         }
 
-        session_regenerate_id();
+        session_destroy();
     }
 
     private function createExpirationDate(int $days = 1) : DateTime
@@ -86,7 +111,7 @@ class Authentication
         return DateTime::createFromString(date('Y-m-d H:i:s', $timestamp));
     }
 
-    private function generateToken(?DateTime $expirationDate = null) : string
+    private function generateToken(int $userId, ?DateTime $expirationDate = null) : string
     {
         if ($expirationDate === null) {
             $expirationDate = $this->createExpirationDate();
@@ -94,7 +119,7 @@ class Authentication
 
         $token = bin2hex(random_bytes(16));
 
-        $this->repository->createAuthToken($token, $expirationDate);
+        $this->repository->createAuthToken($userId, $token, $expirationDate);
 
         return $token;
     }

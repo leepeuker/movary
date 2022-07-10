@@ -10,22 +10,43 @@ class Api
     {
     }
 
-    public function deletePlexWebhookId() : void
+    public function createUser(string $email, string $password, ?string $name) : void
     {
-        $this->repository->setPlexWebhookId(null);
+        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name);
     }
 
-    public function findPlexWebhookId() : ?string
+    public function deletePlexWebhookId(int $userId) : void
     {
-        return $this->repository->fetchAdminUser()->getPlexWebhookId();
+        $this->repository->setPlexWebhookId($userId, null);
     }
 
-    public function regeneratePlexWebhookId() : string
+    public function findPlexWebhookIdByUserId(int $userId) : ?string
+    {
+        return $this->repository->findPlexWebhookIdByUserId($userId);
+    }
+
+    public function findUserIdByPlexWebhookId(string $webhookId) : ?int
+    {
+        return $this->repository->findUserIdByPlexWebhookId($webhookId);
+    }
+
+    public function regeneratePlexWebhookId(int $userId) : string
     {
         $plexWebhookId = Uuid::uuid4()->toString();
 
-        $this->repository->setPlexWebhookId($plexWebhookId);
+        $this->repository->setPlexWebhookId($userId, $plexWebhookId);
 
         return $plexWebhookId;
+    }
+
+    public function updatePassword(int $userId, string $newPassword) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new \RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $this->repository->updatePassword($userId, $passwordHash);
     }
 }

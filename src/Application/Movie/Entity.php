@@ -11,7 +11,6 @@ class Entity
     private function __construct(
         private readonly int $id,
         private readonly string $title,
-        private readonly ?PersonalRating $personalRating,
         private readonly ?TraktId $traktId,
         private readonly ?string $imdbId,
         private readonly int $tmdbId,
@@ -33,7 +32,6 @@ class Entity
         return new self(
             (int)$data['id'],
             $data['title'],
-            $data['personal_rating'] === null ? null : PersonalRating::create((int)$data['personal_rating']),
             empty($data['trakt_id']) === false ? TraktId::createFromString((string)$data['trakt_id']) : null,
             empty($data['imdb_id']) === false ? (string)$data['imdb_id'] : null,
             (int)$data['tmdb_id'],
@@ -68,11 +66,6 @@ class Entity
     public function getOverview() : ?string
     {
         return $this->overview;
-    }
-
-    public function getPersonalRating() : ?PersonalRating
-    {
-        return $this->personalRating;
     }
 
     public function getPosterPath() : ?string

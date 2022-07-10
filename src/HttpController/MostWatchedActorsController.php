@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie\History\Service\Select;
+use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -16,18 +17,19 @@ class MostWatchedActorsController
 
     public function __construct(
         private readonly Select $movieHistorySelectService,
-        private readonly Environment $twig
+        private readonly Environment $twig,
     ) {
     }
 
     public function renderPage(Request $request) : Response
     {
+        $userId = (int)$request->getRouteParameters()['userId'];
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors((int)$page, $limit, null, $searchTerm);
-        $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount($searchTerm);
+        $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors($userId, (int)$page, $limit, null, $searchTerm);
+        $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
 

@@ -6,6 +6,7 @@ use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie\Entity;
 use Movary\Application\Movie\EntityList;
 use Movary\Application\Movie\Repository;
+use Movary\ValueObject\PersonalRating;
 
 class Select
 {
@@ -51,5 +52,10 @@ class Select
     public function findByTraktId(TraktId $traktId) : ?Entity
     {
         return $this->repository->findByTraktId($traktId);
+    }
+
+    public function findUserRating(int $movieId, int $userId) : ?PersonalRating
+    {
+        return $this->repository->findUserRating($movieId, $userId);
     }
 }

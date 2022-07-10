@@ -2,10 +2,10 @@
 
 namespace Movary\Application\User\Exception;
 
-class InvalidPassword extends InvalidCredentials
+class EmailNotFound extends InvalidCredentials
 {
     public static function create() : self
     {
-        return new self('Password wrong.');
+        return new self('No user found with matching email address.');
     }
 }

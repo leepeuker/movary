@@ -2,18 +2,18 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User\Service;
+use Movary\Application\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ChangeAdminPassword extends Command
+class ChangeUserPassword extends Command
 {
-    protected static $defaultName = self::COMMAND_BASE_NAME . ':change-admin-password';
+    protected static $defaultName = self::COMMAND_BASE_NAME . ':user:change-password';
 
     public function __construct(
-        private readonly Service\ChangePassword $changePasswordService,
+        private readonly User\Api $userApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -22,23 +22,28 @@ class ChangeAdminPassword extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Change the current admin password.')
-            ->addArgument('password', InputArgument::REQUIRED, 'New admin password');
+            ->setDescription('Change user password.')
+            ->addArgument('userId', InputArgument::REQUIRED, 'ID of user')
+            ->addArgument('password', InputArgument::REQUIRED, 'New password for user');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
+        $userId = (int)$input->getArgument('userId');
         $password = $input->getArgument('password');
 
         try {
-            $this->changePasswordService->changeAdminPassword($password);
+            $this->userApi->updatePassword($userId, $password);
         } catch (\Throwable $t) {
             $this->logger->error('Could not change admin password.', ['exception' => $t]);
+
+            $this->generateOutput($output, 'Could not update password');
 
             return Command::FAILURE;
         }
 
+        $this->generateOutput($output, 'Updated password');
         return Command::SUCCESS;
     }
 }

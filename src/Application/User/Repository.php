@@ -7,19 +7,30 @@ use Movary\ValueObject\DateTime;
 
 class Repository
 {
-    private const ADMIN_USER_IO = 1;
-
     public function __construct(private readonly Connection $dbConnection)
     {
     }
 
-    public function createAuthToken(string $token, DateTime $expirationDate) : void
+    public function createAuthToken(int $userId, string $token, DateTime $expirationDate) : void
     {
         $this->dbConnection->insert(
             'user_auth_token',
             [
+                'user_id' => $userId,
                 'token' => $token,
                 'expiration_date' => (string)$expirationDate,
+            ]
+        );
+    }
+
+    public function createUser(string $email, string $passwordHash, ?string $name) : void
+    {
+        $this->dbConnection->insert(
+            'user',
+            [
+                'email' => $email,
+                'password' => $passwordHash,
+                'name' => $name,
             ]
         );
     }
@@ -34,17 +45,6 @@ class Repository
         );
     }
 
-    public function fetchAdminUser() : Entity
-    {
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `id` = ?', [self::ADMIN_USER_IO]);
-
-        if (empty($data) === true) {
-            throw new \RuntimeException('Admin user is missing.');
-        }
-
-        return Entity::createFromArray($data);
-    }
-
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);
@@ -56,7 +56,62 @@ class Repository
         return DateTime::createFromString($expirationDate);
     }
 
-    public function setPlexWebhookId(?string $plexWebhookId) : void
+    public function findPlexWebhookIdByUserId(int $userId) : ?string
+    {
+        $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexWebhookId === false) {
+            return null;
+        }
+
+        return $plexWebhookId;
+    }
+
+    public function findUserByEmail(string $email) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `email` = ?', [$email]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
+    public function findUserById(int $userId) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `id` = ?', [$userId]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
+    public function findUserIdByAuthToken(string $token) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
+    public function findUserIdByPlexWebhookId(string $webhookId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `plex_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
+    public function setPlexWebhookId(int $userId, ?string $plexWebhookId) : void
     {
         $this->dbConnection->update(
             'user',
@@ -64,12 +119,12 @@ class Repository
                 'plex_webhook_uuid' => $plexWebhookId,
             ],
             [
-                'id' => self::ADMIN_USER_IO,
+                'id' => $userId,
             ]
         );
     }
 
-    public function updateAdminPassword(string $passwordHash) : void
+    public function updatePassword(int $userId, string $passwordHash) : void
     {
         $this->dbConnection->update(
             'user',
@@ -77,7 +132,7 @@ class Repository
                 'password' => $passwordHash,
             ],
             [
-                'id' => self::ADMIN_USER_IO,
+                'id' => $userId,
             ]
         );
     }

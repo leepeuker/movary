@@ -36,13 +36,15 @@ class HistoryController
             return Response::createFoundRedirect('/');
         }
 
+        $userId = $this->authenticationService->getCurrentUserId();
+
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];
         $date = Date::createFromString($requestBody['date']);
         $count = $requestBody['count'] ?? 1;
 
-        $this->movieApi->deleteHistoryByIdAndDate($movieId, $date, $count);
+        $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date, $count);
 
         return Response::create(StatusCode::createOk());
     }
@@ -52,6 +54,8 @@ class HistoryController
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
+
+        $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());
 
@@ -69,20 +73,22 @@ class HistoryController
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
         }
 
-        $this->movieApi->updatePersonalRating($movie->getId(), $personalRating);
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $watchDate);
+        $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
 
         return Response::create(StatusCode::createOk());
     }
 
     public function renderHistory(Request $request) : Response
     {
+        $userId = (int)$request->getRouteParameters()['userId'];
+
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $historyPaginated = $this->movieHistorySelectService->fetchHistoryPaginated($limit, (int)$page, $searchTerm);
-        $historyCount = $this->movieHistorySelectService->fetchHistoryCount($searchTerm);
+        $historyPaginated = $this->movieHistorySelectService->fetchHistoryPaginated($userId, $limit, (int)$page, $searchTerm);
+        $historyCount = $this->movieHistorySelectService->fetchHistoryCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
 

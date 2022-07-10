@@ -4,30 +4,37 @@
     Login
 {% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="/css/login.css">
+{% endblock %}
+
 {% block body %}
-    <main role="main" class="container">
-        {{ include('component/navbar.html.twig') }}
-
-        <div style="text-align: center;padding-top: 1rem">
-            {% if failedLogin == true %}
-                <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
-                    Invalid password
-                </div>
-            {% endif %}
-        </div>
-
+    <main role="main" class="form-signin w-100 m-auto text-center">
         <form action="/login" method="post" enctype="multipart/form-data">
+            <h1 class="">Movary</h1>
+            <br>
+            <div class="form-floating">
+                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <label for="floatingInput">Email address</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Password</label>
+            </div>
 
-            <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
-
-            <div class="checkbox" style="padding-top: 0.5rem;padding-bottom: 0.5rem;padding-left: 0.1rem;">
-                <label style="color: #495057;">
-                    <input type="checkbox" value="true" name="rememberMe"> Remember me
+            <div class="checkbox mb-3" style="margin-bottom: 0.7rem!important;">
+                <label>
+                    <input type="checkbox" name="rememberMe" value="true"> Remember me
                 </label>
             </div>
-            <div style="text-align: center">
-                <button class="btn btn-primary" type="submit">Login</button>
-            </div>
+
+            {% if failedLogin == true %}
+                <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
+                    Invalid credentials
+                </div>
+            {% endif %}
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
         </form>
+
     </main>
 {% endblock %}

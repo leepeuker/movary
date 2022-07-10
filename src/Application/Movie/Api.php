@@ -25,7 +25,8 @@ class Api
         private readonly Movie\Genre\Service\Select $genreSelectService,
         private readonly Movie\Cast\Service\Select $castSelectService,
         private readonly Movie\Crew\Service\Select $crewSelectService,
-        private readonly ISO639 $ISO639
+        private readonly ISO639 $ISO639,
+        private readonly Repository $movieRepository
     ) {
     }
 
@@ -59,21 +60,21 @@ class Api
         );
     }
 
-    public function deleteHistoryByIdAndDate(int $id, Date $watchedAt, ?int $playsToDelete = null) : void
+    public function deleteHistoryByIdAndDate(int $id, int $userId, Date $watchedAt, ?int $playsToDelete = null) : void
     {
-        $currentPlays = $this->historySelectService->findHistoryPlaysByMovieIdAndDate($id, $watchedAt);
+        $currentPlays = $this->historySelectService->findHistoryPlaysByMovieIdAndDate($id, $userId, $watchedAt);
 
         if ($currentPlays === null) {
             return;
         }
 
         if ($currentPlays <= $playsToDelete || $playsToDelete === null) {
-            $this->historyDeleteService->deleteHistoryByIdAndDate($id, $watchedAt);
+            $this->historyDeleteService->deleteHistoryByIdAndDate($id, $userId, $watchedAt);
 
             return;
         }
 
-        $this->historyCreateService->createOrUpdatePlaysForDate($id, $watchedAt, $currentPlays - $playsToDelete);
+        $this->historyCreateService->createOrUpdatePlaysForDate($id, $userId, $watchedAt, $currentPlays - $playsToDelete);
     }
 
     public function deleteHistoryByTraktId(TraktId $traktId) : void
@@ -102,34 +103,29 @@ class Api
         return $movie;
     }
 
-    public function fetchHistoryByMovieId(int $movieId) : array
+    public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
-        return $this->historySelectService->fetchHistoryByMovieId($movieId);
+        return $this->historySelectService->fetchHistoryByMovieId($movieId, $userId);
     }
 
-    public function fetchHistoryCount() : int
+    public function fetchHistoryCount(int $userId) : int
     {
-        return $this->historySelectService->fetchHistoryCount();
+        return $this->historySelectService->fetchHistoryCount($userId);
     }
 
-    public function fetchHistoryCountUnique() : int
+    public function fetchHistoryCountUnique(int $userId) : int
     {
-        return $this->historySelectService->fetchUniqueMovieInHistoryCount();
+        return $this->historySelectService->fetchUniqueMovieInHistoryCount($userId);
     }
 
-    public function fetchHistoryMoviePlaysOnDate(int $id, Date $watchedAt) : int
+    public function fetchHistoryMoviePlaysOnDate(int $id, int $userId, Date $watchedAt) : int
     {
-        return $this->historySelectService->fetchPlaysForMovieIdOnDate($id, $watchedAt);
+        return $this->historySelectService->fetchPlaysForMovieIdOnDate($id, $userId, $watchedAt);
     }
 
-    public function fetchHistoryOrderedByWatchedAtDesc() : array
+    public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
-        return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc();
-    }
-
-    public function fetchHistoryUniqueMovies() : EntityList
-    {
-        return $this->historySelectService->fetchHistoryUniqueMovies();
+        return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
     public function fetchWithActor(int $personId) : EntityList
@@ -165,7 +161,6 @@ class Api
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'tmdbPosterPath' => $entity->getTmdbPosterPath(),
-            'personalRating' => $entity->getPersonalRating()?->asInt(),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
@@ -203,16 +198,21 @@ class Api
         return $this->genreSelectService->findByMovieId($movieId);
     }
 
-    public function increaseHistoryPlaysForMovieOnDate(int $movieId, Date $watchedAt, int $playsToAdd = 1) : void
+    public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
-        $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $watchedAt);
-
-        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $watchedAt, $playsPerDate + $playsToAdd);
+        return $this->movieSelectService->findUserRating($movieId, $userId);
     }
 
-    public function replaceHistoryForMovieByDate(int $movieId, Date $watchedAt, int $playsPerDate) : void
+    public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedAt, int $playsToAdd = 1) : void
     {
-        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $watchedAt, $playsPerDate);
+        $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $userId, $watchedAt);
+
+        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate + $playsToAdd);
+    }
+
+    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate) : void
+    {
+        $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate);
     }
 
     public function updateCast(int $movieId, Cast $tmdbCast) : void
@@ -261,11 +261,6 @@ class Api
         $this->movieUpdateService->updateLetterboxdId($movieId, $letterboxdId);
     }
 
-    public function updatePersonalRating(int $movieId, ?PersonalRating $rating) : void
-    {
-        $this->movieUpdateService->updatePersonalRating($movieId, $rating);
-    }
-
     public function updateProductionCompanies(int $movieId, Company\EntityList $companies) : void
     {
         $this->movieUpdateService->updateProductionCompanies($movieId, $companies);
@@ -274,5 +269,16 @@ class Api
     public function updateTraktId(int $movieId, TraktId $traktId) : void
     {
         $this->movieUpdateService->updateTraktId($movieId, $traktId);
+    }
+
+    public function updateUserRating(int $movieId, int $userId, ?PersonalRating $rating) : void
+    {
+        if ($rating === null) {
+            $this->movieRepository->deleteUserRating($movieId, $userId);
+
+            return;
+        }
+
+        $this->movieUpdateService->setPersonalRating($movieId, $userId, $rating);
     }
 }

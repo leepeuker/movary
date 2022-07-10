@@ -1,3 +1,9 @@
 GET http://127.0.0.1/user/plex-webhook-id
 Accept: */*
 Cache-Control: no-cache
+
+####
+
+GET http://127.0.0.1/fetchMovieRatingByTmdbdId?tmdbId=226979
+Accept: */*
+Cache-Control: no-cache

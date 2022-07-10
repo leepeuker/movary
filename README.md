@@ -2,7 +2,7 @@
 
 Web application to track and rate your watched movies.
 
-Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (with default password `movary`)
+Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login with user `movary@movary.com` and password `movary`)
 
 1. [About](#install-via-docker)
 2. [Install via docker](#install-via-docker)
@@ -83,9 +83,10 @@ volumes:
 <a name="#important-first-steps"></a>
 ## Important: First steps
 
-- After starting the movary container execute database migrations: `docker exec movary php bin/console.php movary:database:migration --migrate`
-- The **default password** for the application is: `movary`
-- You can **update the password** with: `docker exec movary php bin/console.php movary:change-admin-password <new_password>`
+- Run database migrations: `docker exec movary php bin/console.php movary:database:migration --migrate`
+- Create a user: `docker exec movary php bin/console.php movary:user:create example@email.com your-password`
+
+List all available cli commands: `docker exec movary php bin/console.php movary`
 
 ##### Available environment variables with defaults:
 
@@ -137,6 +138,8 @@ Example:
 
 **Flags:**
 
+- `--userId`
+  User to sync data to
 - `--ratings`
   Sync trakt ratings
 - `--history`

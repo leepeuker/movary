@@ -16,9 +16,9 @@ class SyncRatings
     ) {
     }
 
-    public function execute(bool $overwriteExistingData = false) : void
+    public function execute(int $userId, bool $overwriteExistingData = false) : void
     {
-        $this->traktApiCacheUserMovieRatingService->set($this->traktApi->fetchUserMoviesRatings());
+        $this->traktApiCacheUserMovieRatingService->set($userId, $this->traktApi->fetchUserMoviesRatings());
 
         foreach ($this->movieApi->fetchAll() as $movie) {
             $traktId = $movie->getTraktId();
@@ -27,14 +27,16 @@ class SyncRatings
                 continue;
             }
 
-            $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($traktId);
+            $traktUserRating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($userId, $traktId);
 
-            if ($rating === null) {
+            if ($traktUserRating === null) {
                 continue;
             }
 
-            if ($overwriteExistingData === true || $movie->getPersonalRating() === null) {
-                $this->movieApi->updatePersonalRating($movie->getId(), PersonalRating::create($rating));
+            $userRating = $this->movieApi->findUserRating($movie->getId(), $userId);
+
+            if ($overwriteExistingData === true || $userRating === null) {
+                $this->movieApi->updateUserRating($movie->getId(), $userId, PersonalRating::create($traktUserRating));
             }
         }
 

@@ -12,24 +12,13 @@ class Repository
     {
     }
 
-    public function createOrAddPlaysForDate(int $movieId, Date $watchedAt, int $plays) : void
+    public function createOrUpdatePlaysForDate(int $movieId, int $userId, Date $watchedAt, int $plays) : void
     {
         $this->dbConnection->executeStatement(
-            'REPLACE INTO movie_history (movie_id, watched_at, plays) VALUES (?, ?, ?)',
+            'REPLACE INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays) VALUES (?, ?, ?, ?)',
             [
                 $movieId,
-                (string)$watchedAt,
-                (string)$plays,
-            ]
-        );
-    }
-
-    public function createOrUpdatePlaysForDate(int $movieId, Date $watchedAt, int $plays) : void
-    {
-        $this->dbConnection->executeStatement(
-            'REPLACE INTO movie_history (movie_id, watched_at, plays) VALUES (?, ?, ?)',
-            [
-                $movieId,
+                $userId,
                 (string)$watchedAt,
                 (string)$plays,
             ]
@@ -39,21 +28,21 @@ class Repository
     public function deleteByTraktId(TraktId $traktId) : void
     {
         $this->dbConnection->executeStatement(
-            'DELETE movie_history
-            FROM movie_history
-            INNER JOIN movie m ON movie_history.movie_id = m.id
+            'DELETE movie_user_watch_dates
+            FROM movie_user_watch_dates
+            INNER JOIN movie m ON movie_user_watch_dates.movie_id = m.id
             WHERE m.trakt_id = ?',
             [$traktId->asInt()]
         );
     }
 
-    public function deleteHistoryByIdAndDate(int $movieId, Date $watchedAt) : void
+    public function deleteHistoryByIdAndDate(int $movieId, int $userId, Date $watchedAt) : void
     {
         $this->dbConnection->executeStatement(
-            'DELETE movie_history
-            FROM movie_history
-            WHERE movie_id = ? AND watched_at = ?',
-            [$movieId, (string)$watchedAt]
+            'DELETE movie_user_watch_dates
+            FROM movie_user_watch_dates
+            WHERE movie_id = ? AND watched_at = ? and user_id = ?',
+            [$movieId, (string)$watchedAt, $userId]
         );
     }
 }
