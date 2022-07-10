@@ -18,7 +18,6 @@ class MostWatchedActorsController
     public function __construct(
         private readonly Select $movieHistorySelectService,
         private readonly Environment $twig,
-        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -30,7 +29,7 @@ class MostWatchedActorsController
         $limit = self::DEFAULT_LIMIT;
 
         $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors($userId, (int)$page, $limit, null, $searchTerm);
-        $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount($searchTerm);
+        $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
 

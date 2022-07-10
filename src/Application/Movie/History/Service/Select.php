@@ -6,7 +6,6 @@ use Matriphe\ISO639\ISO639;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie;
 use Movary\Application\Movie\Entity;
-use Movary\Application\Movie\EntityList;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
 
@@ -51,9 +50,9 @@ class Select
         return $this->movieRepository->fetchFirstHistoryWatchDate($userId);
     }
 
-    public function fetchHistoryByMovieId(int $movieId) : array
+    public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
-        return $this->movieRepository->fetchHistoryByMovieId($movieId);
+        return $this->movieRepository->fetchHistoryByMovieId($movieId, $userId);
     }
 
     public function fetchHistoryCount(int $userId, ?string $searchTerm = null) : int
@@ -61,9 +60,9 @@ class Select
         return $this->movieRepository->fetchHistoryCount($userId, $searchTerm);
     }
 
-    public function fetchHistoryOrderedByWatchedAtDesc() : array
+    public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
-        return $this->movieRepository->fetchHistoryOrderedByWatchedAtDesc();
+        return $this->movieRepository->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null) : array
@@ -87,9 +86,9 @@ class Select
         return $mostWatchedActors;
     }
 
-    public function fetchMostWatchedActorsCount(?string $searchTerm = null) : int
+    public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null) : int
     {
-        return $this->movieRepository->fetchMostWatchedActorsCount($searchTerm);
+        return $this->movieRepository->fetchMostWatchedActorsCount($userId, $searchTerm);
     }
 
     public function fetchMostWatchedDirectors(int $userId, int $page = 1, ?int $limit = null, ?string $searchTerm = null) : array
@@ -103,9 +102,9 @@ class Select
         return $mostWatchedDirectors;
     }
 
-    public function fetchMostWatchedDirectorsCount(?string $searchTerm = null) : int
+    public function fetchMostWatchedDirectorsCount(int $userId, ?string $searchTerm = null) : int
     {
-        return $this->movieRepository->fetchMostWatchedDirectorsCount($searchTerm);
+        return $this->movieRepository->fetchMostWatchedDirectorsCount($userId, $searchTerm);
     }
 
     public function fetchMostWatchedGenres(int $userId) : array
@@ -150,9 +149,9 @@ class Select
         return $this->movieRepository->fetchMoviesOrderedByMostWatchedDesc();
     }
 
-    public function fetchPlaysForMovieIdOnDate(int $movieId, Date $watchedAt) : int
+    public function fetchPlaysForMovieIdOnDate(int $movieId, int $userId, Date $watchedAt) : int
     {
-        return $this->movieRepository->fetchPlaysForMovieIdAtDate($movieId, $watchedAt);
+        return $this->movieRepository->fetchPlaysForMovieIdAtDate($movieId, $userId, $watchedAt);
     }
 
     public function fetchTotalHoursWatched(int $userId) : int
@@ -172,8 +171,8 @@ class Select
         return $this->movieRepository->findByTraktId($traktId);
     }
 
-    public function findHistoryPlaysByMovieIdAndDate(int $movieId, Date $watchedAt) : ?int
+    public function findHistoryPlaysByMovieIdAndDate(int $movieId, int $userId, Date $watchedAt) : ?int
     {
-        return $this->movieRepository->findPlaysForMovieIdAndDate($movieId, $watchedAt);
+        return $this->movieRepository->findPlaysForMovieIdAndDate($movieId, $userId, $watchedAt);
     }
 }

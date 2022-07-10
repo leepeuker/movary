@@ -22,7 +22,7 @@ class Authentication
         $this->repository->deleteAuthToken($token);
     }
 
-    public function getCurrentUserId() : ?int
+    public function getCurrentUserId() : int
     {
         $userId = $_SESSION['userId'] ?? null;
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
@@ -30,6 +30,10 @@ class Authentication
         if ($userId === null && $token !== null) {
             $userId = $this->repository->findUserIdByAuthToken($token);
             $_SESSION['userId'] = $userId;
+        }
+
+        if ($userId === null) {
+            throw new \RuntimeException('Could not find a current user');
         }
 
         return $userId;

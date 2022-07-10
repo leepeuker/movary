@@ -38,4 +38,15 @@ class Api
 
         return $plexWebhookId;
     }
+
+    public function updatePassword(int $userId, string $newPassword) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new \RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $this->repository->updatePassword($userId, $passwordHash);
+    }
 }

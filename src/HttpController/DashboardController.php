@@ -17,7 +17,6 @@ class DashboardController
         private readonly Environment $twig,
         private readonly Select $movieHistorySelectService,
         private readonly Movie\Api $movieApi,
-        private readonly User\Api $userApi,
     ) {
     }
 

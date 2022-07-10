@@ -7,8 +7,6 @@ use Movary\ValueObject\DateTime;
 
 class Repository
 {
-    private const ADMIN_USER_IO = 1;
-
     public function __construct(private readonly Connection $dbConnection)
     {
     }
@@ -47,17 +45,6 @@ class Repository
         );
     }
 
-    public function fetchAdminUser() : Entity
-    {
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `id` = ?', [self::ADMIN_USER_IO]);
-
-        if (empty($data) === true) {
-            throw new \RuntimeException('Admin user is missing.');
-        }
-
-        return Entity::createFromArray($data);
-    }
-
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);
@@ -91,9 +78,20 @@ class Repository
         return Entity::createFromArray($data);
     }
 
-    public function findUserIdByPlexWebhookId(string $webhookId) : ?int
+    public function findUserById(int $userId) : ?Entity
     {
-        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `plex_webhook_uuid` = ?', [$webhookId]);
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `id` = ?', [$userId]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
+    public function findUserIdByAuthToken(string $token) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
 
         if ($id === false) {
             return null;
@@ -102,10 +100,9 @@ class Repository
         return (int)$id;
     }
 
-    public function findUserIdByAuthToken(string $token) : ?int
+    public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
-
-        $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `plex_webhook_uuid` = ?', [$webhookId]);
 
         if ($id === false) {
             return null;
@@ -127,7 +124,7 @@ class Repository
         );
     }
 
-    public function updateAdminPassword(string $passwordHash) : void
+    public function updatePassword(int $userId, string $passwordHash) : void
     {
         $this->dbConnection->update(
             'user',
@@ -135,7 +132,7 @@ class Repository
                 'password' => $passwordHash,
             ],
             [
-                'id' => self::ADMIN_USER_IO,
+                'id' => $userId,
             ]
         );
     }

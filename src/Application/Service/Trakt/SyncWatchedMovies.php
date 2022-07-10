@@ -21,7 +21,7 @@ class SyncWatchedMovies
     ) {
     }
 
-    public function execute(bool $overwriteExistingData = false, bool $ignoreCache = false) : void
+    public function execute(int $userId, bool $overwriteExistingData = false, bool $ignoreCache = false) : void
     {
         $watchedMovies = $this->traktApi->fetchUserMoviesWatched();
 
@@ -34,7 +34,7 @@ class SyncWatchedMovies
                 continue;
             }
 
-            $this->syncMovieHistory($traktId, $movie, $overwriteExistingData);
+            $this->syncMovieHistory($userId, $traktId, $movie, $overwriteExistingData);
 
             $this->traktApiCacheUserMovieWatchedService->setOne($traktId, $watchedMovie->getLastUpdated());
         }
@@ -88,12 +88,11 @@ class SyncWatchedMovies
         return $cacheLastUpdated !== null && $watchedMovie->getLastUpdated()->isEqual($cacheLastUpdated) === true;
     }
 
-    private function syncMovieHistory(TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
+    private function syncMovieHistory(int $userId, TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
     {
-        $userId = 1;
         $traktHistoryEntries = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktId);
 
-        foreach ($this->movieApi->fetchHistoryByMovieId($movie->getId()) as $localHistoryEntry) {
+        foreach ($this->movieApi->fetchHistoryByMovieId($movie->getId(), $userId) as $localHistoryEntry) {
             $localHistoryEntryDate = Date::createFromString($localHistoryEntry['watched_at']);
 
             if ($traktHistoryEntries->containsDate($localHistoryEntryDate) === false) {

@@ -14,7 +14,6 @@ class CreateUser extends Command
     protected static $defaultName = self::COMMAND_BASE_NAME . ':user:create';
 
     public function __construct(
-        private readonly Service\ChangePassword $changePasswordService,
         private readonly Api $userApi,
         private readonly LoggerInterface $logger,
     ) {

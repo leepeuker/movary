@@ -103,7 +103,7 @@ class Update
         }
     }
 
-    public function updatePersonalRating(int $id, int $userId, ?PersonalRating $rating) : void
+    public function setPersonalRating(int $id, int $userId, PersonalRating $rating) : void
     {
         $this->repository->updatePersonalRating($id, $userId, $rating);
     }

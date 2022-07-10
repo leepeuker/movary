@@ -25,7 +25,8 @@ class Api
         private readonly Movie\Genre\Service\Select $genreSelectService,
         private readonly Movie\Cast\Service\Select $castSelectService,
         private readonly Movie\Crew\Service\Select $crewSelectService,
-        private readonly ISO639 $ISO639
+        private readonly ISO639 $ISO639,
+        private readonly Repository $movieRepository
     ) {
     }
 
@@ -61,7 +62,7 @@ class Api
 
     public function deleteHistoryByIdAndDate(int $id, int $userId, Date $watchedAt, ?int $playsToDelete = null) : void
     {
-        $currentPlays = $this->historySelectService->findHistoryPlaysByMovieIdAndDate($id, $watchedAt);
+        $currentPlays = $this->historySelectService->findHistoryPlaysByMovieIdAndDate($id, $userId, $watchedAt);
 
         if ($currentPlays === null) {
             return;
@@ -102,9 +103,9 @@ class Api
         return $movie;
     }
 
-    public function fetchHistoryByMovieId(int $movieId) : array
+    public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
-        return $this->historySelectService->fetchHistoryByMovieId($movieId);
+        return $this->historySelectService->fetchHistoryByMovieId($movieId, $userId);
     }
 
     public function fetchHistoryCount(int $userId) : int
@@ -117,14 +118,14 @@ class Api
         return $this->historySelectService->fetchUniqueMovieInHistoryCount($userId);
     }
 
-    public function fetchHistoryMoviePlaysOnDate(int $id, Date $watchedAt) : int
+    public function fetchHistoryMoviePlaysOnDate(int $id, int $userId, Date $watchedAt) : int
     {
-        return $this->historySelectService->fetchPlaysForMovieIdOnDate($id, $watchedAt);
+        return $this->historySelectService->fetchPlaysForMovieIdOnDate($id, $userId, $watchedAt);
     }
 
-    public function fetchHistoryOrderedByWatchedAtDesc() : array
+    public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
-        return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc();
+        return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
     public function fetchWithActor(int $personId) : EntityList
@@ -204,7 +205,7 @@ class Api
 
     public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedAt, int $playsToAdd = 1) : void
     {
-        $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $watchedAt);
+        $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $userId, $watchedAt);
 
         $this->historyCreateService->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate + $playsToAdd);
     }
@@ -273,9 +274,11 @@ class Api
     public function updateUserRating(int $movieId, int $userId, ?PersonalRating $rating) : void
     {
         if ($rating === null) {
-            // TODO DELETE rating
+            $this->movieRepository->deleteUserRating($movieId, $userId);
+
+            return;
         }
 
-        $this->movieUpdateService->updatePersonalRating($movieId, $userId, $rating);
+        $this->movieUpdateService->setPersonalRating($movieId, $userId, $rating);
     }
 }

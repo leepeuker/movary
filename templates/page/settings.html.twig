@@ -17,22 +17,34 @@
         {{ include('component/navbar.html.twig') }}
 
         <div style="text-align: center;padding-top: 1rem">
-
-            {#            <form action="/letterboxd-rating" method="post" enctype="multipart/form-data"> #}
-            {#                <p>letterboxd.com | Last refresh: {{ lastSyncLetterboxd }}<br></p> #}
-            {#                <input type="file" id="letterboxedRating" name="letterboxedRating" accept=".csv" required style="padding-bottom: 1rem;padding-left:6rem"> <br> #}
-            {#                <button class="btn btn-primary" type="submit" id="inputGroupFileAddon04">Refresh</button> #}
-            {#            </form> #}
-
-
-            <h4>Export data</h4>
+            <h5>Export</h5>
 
             <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/history">history.csv</a>
             <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/ratings">ratings.csv</a>
 
             <hr>
 
-            <h4>Plex webhook url:</h4>
+            <h5 style="padding-bottom: 0.5rem">Import</h5>
+
+            <form action="/user/import/csv/history" method="post" enctype="multipart/form-data">
+                <div class="input-group input-group-sm">
+                    <input type="file" class="form-control" name="history" required>
+                    <button class="btn btn-primary" type="submit">Import history.csv</button>
+                </div>
+            </form>
+
+            <br>
+
+            <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.7rem">
+                <div class="input-group input-group-sm">
+                    <input type="file" class="form-control" name="ratings" required>
+                    <button class="btn btn-primary" type="submit">Import rating.csv</button>
+                </div>
+            </form>
+
+            <hr>
+
+            <h5>Plex webhook url:</h5>
             <p id="plexWebhookUrl" class="overflow-auto text-nowrap plexWebhookUrl" style="margin-left: 10%;margin-right: 10%">-</p>
             <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger disabled  btn-sm" onclick="deletePlexWebhookId()">Delete url</button>
             <button type="button" class="btn btn-primary  btn-sm" onclick="regeneratePlexWebhookId()">Regenerate url</button>

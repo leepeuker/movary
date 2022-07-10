@@ -23,7 +23,7 @@
             </form>
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for historyEntry in historyEntries %}
-                    <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/movie/{{ historyEntry.id }}'">
+                    <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/{{ routeUserId }}/movie/{{ historyEntry.id }}'">
                         <div class="card h-100  position-relative">
                             <img src="{{ tmdb.generatePosterImageUrl(historyEntry.tmdb_poster_path) }}" class="card-img-top" alt="...">
                             <div class="card-footer" style="padding: 0.1rem">
@@ -47,12 +47,12 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p=1">
+                        <a class="page-link" href="/{{ routeUserId }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p=1">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
+                        <a class="page-link" href="/{{ routeUserId }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
                             <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
@@ -65,12 +65,12 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
+                        <a class="page-link" href="/{{ routeUserId }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
+                        <a class="page-link" href="/{{ routeUserId }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

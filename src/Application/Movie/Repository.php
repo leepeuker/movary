@@ -51,6 +51,15 @@ class Repository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
+    public function deleteUserRating(int $movieId, int $userId) : void
+    {
+        $this->dbConnection->executeQuery(
+            'DELETE FROM movie_user_rating WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId],
+
+        );
+    }
+
     public function fetchAll() : EntityList
     {
         $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie`');
@@ -91,11 +100,11 @@ class Repository
         return Date::createFromString($watchDate);
     }
 
-    public function fetchHistoryByMovieId(int $movieId) : array
+    public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ?',
-            [$movieId]
+            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId]
         );
     }
 
@@ -119,13 +128,15 @@ class Repository
         )[0];
     }
 
-    public function fetchHistoryOrderedByWatchedAtDesc() : array
+    public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
             'SELECT m.*, mh.watched_at
             FROM movie_user_watch_dates mh
             JOIN movie m on mh.movie_id = m.id
-            ORDER BY watched_at DESC'
+            WHERE mh.user_id = ?
+            ORDER BY watched_at DESC',
+            [$userId]
         );
     }
 
@@ -157,13 +168,12 @@ class Repository
     public function fetchLastPlays(int $userId) : array
     {
         return $this->dbConnection->executeQuery(
-            'SELECT m.*, mh.watched_at
-            FROM movie_user_watch_dates mh
-            JOIN movie m on mh.movie_id = m.id
-            WHERE mh.user_id = ?
-            ORDER BY watched_at DESC
+            'SELECT m.*, mh.watched_at, mur.rating as user_rating
+            FROM movie m
+            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
             LIMIT 6',
-            [$userId]
+            [$userId, $userId]
         )->fetchAllAssociative();
     }
 
@@ -202,9 +212,10 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedActorsCount(?string $searchTerm) : int
+    public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm) : int
     {
-        $payload = [];
+        $payload = [$userId];
+
         $searchTermQuery = '';
         if ($searchTerm !== null) {
             $searchTermQuery = 'AND p.name LIKE ?';
@@ -217,7 +228,7 @@ class Repository
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh) AND p.name != "Stan Lee" {$searchTermQuery}
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?) AND p.name != "Stan Lee" {$searchTermQuery}
             SQL,
             $payload
         );
@@ -258,9 +269,10 @@ class Repository
         );
     }
 
-    public function fetchMostWatchedDirectorsCount(?string $searchTerm = null) : int
+    public function fetchMostWatchedDirectorsCount(int $userId, ?string $searchTerm = null) : int
     {
-        $payload = [];
+        $payload = [$userId];
+
         $searchTermQuery = '';
         if ($searchTerm !== null) {
             $searchTermQuery = 'AND p.name LIKE ?';
@@ -273,7 +285,7 @@ class Repository
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh) {$searchTermQuery}
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?) {$searchTermQuery}
             SQL,
             $payload
         );
@@ -379,11 +391,11 @@ class Repository
         )[0];
     }
 
-    public function fetchPlaysForMovieIdAtDate(int $movieId, Date $watchedAt) : int
+    public function fetchPlaysForMovieIdAtDate(int $movieId, int $userId, Date $watchedAt) : int
     {
         $result = $this->dbConnection->fetchOne(
-            'SELECT plays FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ?',
-            [$movieId, $watchedAt]
+            'SELECT plays FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
+            [$movieId, $watchedAt, $userId]
         );
 
         if ($result === false) {
@@ -470,15 +482,15 @@ class Repository
         return $data === false ? null : Entity::createFromArray($data);
     }
 
-    public function findPlaysForMovieIdAndDate(int $movieId, Date $watchedAt) : ?int
+    public function findPlaysForMovieIdAndDate(int $movieId, int $userId, Date $watchedAt) : ?int
     {
         $result = $this->dbConnection->fetchFirstColumn(
             <<<SQL
             SELECT plays
             FROM movie_user_watch_dates
-            WHERE movie_id = ? AND watched_at = ?
+            WHERE movie_id = ? AND watched_at = ? AND user_id = ?
             SQL,
-            [$movieId, $watchedAt]
+            [$movieId, $watchedAt, $userId]
         );
 
         return $result[0] ?? null;
@@ -531,7 +543,7 @@ class Repository
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId], ['id' => $id]);
     }
 
-    public function updatePersonalRating(int $id, int $userId, ?PersonalRating $personalRating) : void
+    public function updatePersonalRating(int $id, int $userId, PersonalRating $personalRating) : void
     {
         $this->dbConnection->executeQuery(
             'INSERT INTO movie_user_rating (movie_id, user_id, rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE rating=?',

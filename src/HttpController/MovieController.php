@@ -22,11 +22,19 @@ class MovieController
 
     public function fetchMovieRatingByTmdbdId(Request $request) : Response
     {
-        $userId = 1;
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
         $tmdbId = $request->getGetParameters()['tmdbId'] ?? null;
 
+        $userRating = null;
         $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
-        $userRating = $this->movieApi->findUserRating($movie?->getId(), $userId);
+
+        if ($movie !== null) {
+            $userRating = $this->movieApi->findUserRating($movie->getId(), $userId);
+        }
 
         return Response::createJson(
             Json::encode(['personalRating' => $userRating?->asInt()])
@@ -35,7 +43,7 @@ class MovieController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = 1;
+        $userId = (int)$request->getRouteParameters()['userId'];
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $movie = $this->movieApi->findById($movieId);
@@ -48,7 +56,7 @@ class MovieController
                 'movieGenres' => $this->movieApi->findGenresByMovieId($movieId),
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),
                 'directors' => $this->movieApi->findDirectorsByMovieId($movieId),
-                'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId),
+                'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
             ]),
         );
     }

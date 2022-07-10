@@ -26,7 +26,7 @@ class MostWatchedDirectorsController
         $limit = self::DEFAULT_LIMIT;
 
         $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedDirectors($userId, (int)$page, $limit, $searchTerm);
-        $historyCount = $this->movieHistorySelectService->fetchMostWatchedDirectorsCount($searchTerm);
+        $historyCount = $this->movieHistorySelectService->fetchMostWatchedDirectorsCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
 

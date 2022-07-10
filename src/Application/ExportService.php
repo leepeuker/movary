@@ -3,7 +3,6 @@
 namespace Movary\Application;
 
 use Movary\Application\Movie\Api;
-use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 
 class ExportService
@@ -12,34 +11,36 @@ class ExportService
     {
     }
 
-    public function getHistoryCsv() : string
+    public function getHistoryCsv(int $userId) : string
     {
-        $movies = $this->movieApi->fetchHistoryOrderedByWatchedAtDesc();
+        $movies = $this->movieApi->fetchHistoryOrderedByWatchedAtDesc($userId);
 
-        $csv = 'title,year,watchedAt,tmdbId,imdbId' . PHP_EOL;
+        $csv = 'title,year,tmdbId,imdbId,watchedAt' . PHP_EOL;
 
         foreach ($movies as $movie) {
             $csv .= sprintf(
                 '"%s",%s,%s,%s,%s' . PHP_EOL,
                 $movie['title'],
                 DateTime::createFromString($movie['release_date'])->format('Y'),
-                $movie['watched_at'],
                 $movie['tmdb_id'],
                 $movie['imdb_id'],
+                $movie['watched_at'],
             );
         }
 
         return $csv;
     }
 
-    public function getRatingCsv() : string
+    public function getRatingCsv(int $userId) : string
     {
         $movies = $this->movieApi->fetchAll();
 
-        $csv = 'title,year,personalRating,tmdbId,imdbId' . PHP_EOL;
+        $csv = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
 
         foreach ($movies as $movie) {
-            if ($movie->getUserRating() === null) {
+            $userRating = $this->movieApi->findUserRating($movie->getId(), $userId);
+
+            if ($userRating === null) {
                 continue;
             }
 
@@ -47,9 +48,9 @@ class ExportService
                 '"%s",%s,%s,%s,%s' . PHP_EOL,
                 $movie->getTitle(),
                 (string)$movie->getReleaseDate()?->format('Y'),
-                (string)$movie->getUserRating(),
                 $movie->getTmdbId(),
-                (string)$movie->getImdbId()
+                (string)$movie->getImdbId(),
+                (string)$userRating,
             );
         }
 

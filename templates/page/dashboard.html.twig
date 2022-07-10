@@ -50,7 +50,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for lastPlay in lastPlays %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/movie/{{ lastPlay.id }}'">
+                                <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUserId }}/movie/{{ lastPlay.id }}'">
                                     <div class="position-relative">
                                         <img src="{{ tmdb.generatePosterImageUrl(lastPlay.tmdb_poster_path) }}" class="card-img-top" alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
@@ -60,9 +60,9 @@
                                         <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date("d.m.y") }}</small>
                                     </div>
 
-                                    {% if lastPlay.personal_rating is not null %}
+                                    {% if lastPlay.user_rating is not null %}
                                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                            {{ lastPlay.personal_rating }}
+                                            {{ lastPlay.user_rating }}
                                         </span>
                                     {% endif %}
                                 </div>
@@ -80,7 +80,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActor in mostWatchedActors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/person/{{ mostWatchedActor.id }}'" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUserId }}/person/{{ mostWatchedActor.id }}'" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                                     </div>
@@ -106,7 +106,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActress in mostWatchedActresses %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/person/{{ mostWatchedActress.id }}'" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUserId }}/person/{{ mostWatchedActress.id }}'" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
                                     </div>
@@ -131,7 +131,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedDirector in mostWatchedDirectors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/person/{{ mostWatchedDirector.id }}'" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUserId }}/person/{{ mostWatchedDirector.id }}'" style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                                     </div>

@@ -74,12 +74,12 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{userId:\d+}/fetchMovieRatingByTmdbdId',
+        '/fetchMovieRatingByTmdbdId',
         [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId']
     );
     $routeCollector->addRoute(
         'GET',
-        '/movie/{id:\d+}',
+        '/{userId:\d+}/movie/{id:\d+}',
         [\Movary\HttpController\MovieController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -94,7 +94,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/person/{id:\d+}',
+        '/{userId:\d+}/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -122,5 +122,10 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/user/export/csv/{exportType:.+}',
         [\Movary\HttpController\ExportController::class, 'getCsvExport']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/user/import/csv/{exportType:.+}',
+        [\Movary\HttpController\ImportController::class, 'handleCsvImport']
     );
 };

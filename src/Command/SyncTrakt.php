@@ -19,6 +19,8 @@ class SyncTrakt extends Command
 
     private const OPTION_NAME_RATINGS = 'ratings';
 
+    private const OPTION_NAME_USER_ID = 'userId';
+
     protected static $defaultName = self::COMMAND_BASE_NAME . ':sync-trakt';
 
     public function __construct(
@@ -40,6 +42,7 @@ class SyncTrakt extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
+        $userId = (int)$input->getOption(self::OPTION_NAME_USER_ID);
         $overwriteExistingData = (bool)$input->getOption(self::OPTION_NAME_OVERWRITE);
         $ignoreCache = (bool)$input->getOption(self::OPTION_NAME_IGNORE_CACHE);
 
@@ -48,14 +51,14 @@ class SyncTrakt extends Command
 
         try {
             if ($syncRatings === false && $syncHistory === false) {
-                $this->syncHistory($output, $overwriteExistingData, $ignoreCache);
-                $this->syncRatings($output, $overwriteExistingData);
+                $this->syncHistory($output, $userId, $overwriteExistingData, $ignoreCache);
+                $this->syncRatings($output, $userId, $overwriteExistingData);
             } else {
                 if ($syncHistory === true) {
-                    $this->syncHistory($output, $overwriteExistingData, $ignoreCache);
+                    $this->syncHistory($output, $userId, $overwriteExistingData, $ignoreCache);
                 }
                 if ($syncRatings === true) {
-                    $this->syncRatings($output, $overwriteExistingData);
+                    $this->syncRatings($output, $userId, $overwriteExistingData);
                 }
             }
         } catch (\Throwable $t) {
@@ -67,20 +70,20 @@ class SyncTrakt extends Command
         return Command::SUCCESS;
     }
 
-    private function syncHistory(OutputInterface $output, bool $overwriteExistingData, bool $ignoreCache) : void
+    private function syncHistory(OutputInterface $output, int $userId, bool $overwriteExistingData, bool $ignoreCache) : void
     {
         $this->generateOutput($output, 'Syncing history...');
 
-        $this->syncWatchedMovies->execute($overwriteExistingData, $ignoreCache);
+        $this->syncWatchedMovies->execute($userId, $overwriteExistingData, $ignoreCache);
 
         $this->generateOutput($output, 'Syncing history done.');
     }
 
-    private function syncRatings(OutputInterface $output, bool $overwriteExistingData) : void
+    private function syncRatings(OutputInterface $output, int $userId, bool $overwriteExistingData) : void
     {
         $this->generateOutput($output, 'Syncing ratings...');
 
-        $this->syncRatings->execute($overwriteExistingData);
+        $this->syncRatings->execute($userId, $overwriteExistingData);
 
         $this->generateOutput($output, 'Syncing ratings ratings.');
     }

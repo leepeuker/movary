@@ -21,9 +21,11 @@ class ExportController
             return Response::createFoundRedirect('/login');
         }
 
+        $userId = $this->authenticationService->getCurrentUserId();
+
         $exportCsv = match ($request->getRouteParameters()['exportType']) {
-            'history' => $this->exportService->getHistoryCsv(),
-            'ratings' => $this->exportService->getRatingCsv(),
+            'history' => $this->exportService->getHistoryCsv($userId),
+            'ratings' => $this->exportService->getRatingCsv($userId),
             default => null
         };
 
