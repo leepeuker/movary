@@ -4,6 +4,7 @@ namespace Movary\Application\Service\Trakt;
 
 use Movary\Api;
 use Movary\Application;
+use Movary\ValueObject\PersonalRating;
 
 class SyncRatings
 {
@@ -17,7 +18,7 @@ class SyncRatings
 
     public function execute(int $userId, bool $overwriteExistingData = false) : void
     {
-        $this->traktApiCacheUserMovieRatingService->set($this->traktApi->fetchUserMoviesRatings());
+        $this->traktApiCacheUserMovieRatingService->set($userId, $this->traktApi->fetchUserMoviesRatings());
 
         foreach ($this->movieApi->fetchAll() as $movie) {
             $traktId = $movie->getTraktId();
@@ -26,16 +27,16 @@ class SyncRatings
                 continue;
             }
 
-            $rating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($traktId);
+            $traktUserRating = $this->traktApiCacheUserMovieRatingService->findRatingByTraktId($userId, $traktId);
 
-            if ($rating === null) {
+            if ($traktUserRating === null) {
                 continue;
             }
 
             $userRating = $this->movieApi->findUserRating($movie->getId(), $userId);
 
             if ($overwriteExistingData === true || $userRating === null) {
-                $this->movieApi->updateUserRating($movie->getId(), $userId, $userRating);
+                $this->movieApi->updateUserRating($movie->getId(), $userId, PersonalRating::create($traktUserRating));
             }
         }
 

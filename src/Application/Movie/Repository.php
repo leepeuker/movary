@@ -142,21 +142,22 @@ class Repository
 
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm) : array
     {
-        $payload = [$userId];
-        $whereQuery = 'WHERE mh.user_id = ?';
+        $payload = [$userId, $userId];
 
         $offset = ($limit * $page) - $limit;
 
+        $whereQuery = '';
         if ($searchTerm !== null) {
             $payload[] = "%$searchTerm%";
-            $whereQuery .= ' AND m.title LIKE ?';
+            $whereQuery .= 'WHERE  m.title LIKE ?';
         }
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.*, mh.watched_at
-            FROM movie_user_watch_dates mh
-            JOIN movie m on mh.movie_id = m.id
+            SELECT m.*, mh.watched_at, mur.rating as userRating
+            FROM movie m
+            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
             $whereQuery
             ORDER BY watched_at DESC
             LIMIT $offset, $limit
@@ -172,6 +173,7 @@ class Repository
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
+            ORDER BY watched_at DESC
             LIMIT 6',
             [$userId, $userId]
         )->fetchAllAssociative();
@@ -488,9 +490,9 @@ class Repository
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         $userRating = $this->dbConnection->fetchFirstColumn(
-            'SELECT rating FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
-            [$movieId, $userId]
-        )[0];
+                'SELECT rating FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
+                [$movieId, $userId]
+            )[0] ?? null;
 
         return $userRating !== null ? PersonalRating::create($userRating) : null;
     }

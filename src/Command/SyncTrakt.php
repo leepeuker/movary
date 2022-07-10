@@ -34,6 +34,7 @@ class SyncTrakt extends Command
     protected function configure() : void
     {
         $this->setDescription('Sync trakt.tv movie history and rating with local database')
+             ->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user to sync to.')
              ->addOption(self::OPTION_NAME_HISTORY, [], InputOption::VALUE_NONE, 'Sync movie history.')
              ->addOption(self::OPTION_NAME_RATINGS, [], InputOption::VALUE_NONE, 'Sync movie ratings.')
              ->addOption(self::OPTION_NAME_OVERWRITE, [], InputOption::VALUE_NONE, 'Overwrite local data.')
@@ -43,6 +44,11 @@ class SyncTrakt extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $userId = (int)$input->getOption(self::OPTION_NAME_USER_ID);
+        if (empty($userId) === true) {
+            $this->generateOutput($output, 'Missing option --userId');
+            exit;
+        }
+
         $overwriteExistingData = (bool)$input->getOption(self::OPTION_NAME_OVERWRITE);
         $ignoreCache = (bool)$input->getOption(self::OPTION_NAME_IGNORE_CACHE);
 

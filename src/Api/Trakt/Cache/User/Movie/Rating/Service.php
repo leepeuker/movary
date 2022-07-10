@@ -12,18 +12,18 @@ class Service
     {
     }
 
-    public function findRatingByTraktId(TraktId $traktId) : ?int
+    public function findRatingByTraktId(int $userId, TraktId $traktId) : ?int
     {
-        return $this->repository->findByTraktId($traktId);
+        return $this->repository->findByTraktId($userId, $traktId);
     }
 
-    public function set(DtoList $ratings) : void
+    public function set(int $userId, DtoList $ratings) : void
     {
-        $this->repository->clearCache();
+        $this->repository->clearCache($userId);
 
         /** @var Dto $rating */
         foreach ($ratings as $rating) {
-            $this->repository->create($rating->getMovie()->getTraktId(), $rating->getRating(), $rating->getRatedAt());
+            $this->repository->create($userId, $rating->getMovie()->getTraktId(), $rating->getRating(), $rating->getRatedAt());
         }
     }
 }

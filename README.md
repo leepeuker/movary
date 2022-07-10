@@ -138,6 +138,8 @@ Example:
 
 **Flags:**
 
+- `--userId`
+  User to sync data to
 - `--ratings`
   Sync trakt ratings
 - `--history`

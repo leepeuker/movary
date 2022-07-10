@@ -15,7 +15,7 @@
         {{ include('component/navbar.html.twig') }}
 
         <div style="text-align: center;padding-top: 1rem">
-            <form action="/history" method="GET">
+            <form action="/{{ routeUserId }}/history" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="submit">Search</button>
@@ -30,9 +30,9 @@
                                 <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date("d.m.Y") }}</small>
                             </div>
 
-                            {% if historyEntry.personal_rating is not null %}
+                            {% if historyEntry.userRating is not null %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                    {{ historyEntry.personal_rating }}
+                                    {{ historyEntry.userRating }}
                                 </span>
                             {% endif %}
                         </div>

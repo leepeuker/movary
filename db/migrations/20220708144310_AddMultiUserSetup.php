@@ -12,6 +12,10 @@ final class AddMultiUserSetup extends AbstractMigration
             ALTER TABLE user DROP COLUMN name;
             ALTER TABLE user_auth_token DROP CONSTRAINT user_auth_token_fk_user_id;
             ALTER TABLE user_auth_token DROP COLUMN user_id;
+            ALTER TABLE cache_trakt_user_movie_watched DROP CONSTRAINT cache_trakt_user_movie_watched_fk_user_id;
+            ALTER TABLE cache_trakt_user_movie_watched DROP COLUMN user_id;
+            ALTER TABLE cache_trakt_user_movie_rating DROP CONSTRAINT cache_trakt_user_movie_rating_fk_user_id;
+            ALTER TABLE cache_trakt_user_movie_rating DROP COLUMN user_id;
             ALTER TABLE movie_user_watch_dates DROP CONSTRAINT movie_history_fk_user_id;
             ALTER TABLE movie_user_watch_dates DROP COLUMN user_id;
             DROP TABLE movie_user_rating;
@@ -39,6 +43,22 @@ final class AddMultiUserSetup extends AbstractMigration
             DELETE FROM user_auth_token;
             ALTER TABLE user_auth_token ADD COLUMN user_id INT(10) UNSIGNED NOT NULL AFTER id;
             ALTER TABLE user_auth_token ADD CONSTRAINT user_auth_token_fk_user_id FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+            SQL
+        );
+
+        $this->execute(
+            <<<SQL
+            DELETE FROM cache_trakt_user_movie_watched;
+            ALTER TABLE cache_trakt_user_movie_watched ADD COLUMN user_id INT(10) UNSIGNED NOT NULL AFTER trakt_id;
+            ALTER TABLE cache_trakt_user_movie_watched ADD CONSTRAINT cache_trakt_user_movie_watched_fk_user_id FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+            SQL
+        );
+
+        $this->execute(
+            <<<SQL
+            DELETE FROM cache_trakt_user_movie_rating;
+            ALTER TABLE cache_trakt_user_movie_rating ADD COLUMN user_id INT(10) UNSIGNED NOT NULL AFTER trakt_id;
+            ALTER TABLE cache_trakt_user_movie_rating ADD CONSTRAINT cache_trakt_user_movie_rating_fk_user_id FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
             SQL
         );
 
