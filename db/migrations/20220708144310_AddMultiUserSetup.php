@@ -64,9 +64,8 @@ final class AddMultiUserSetup extends AbstractMigration
 
         $this->execute(
             <<<SQL
-            ALTER TABLE movie_history ADD COLUMN user_id INT(10) UNSIGNED DEFAULT NULL AFTER movie_id;
-            UPDATE movie_history SET user_id = 1;
-            ALTER TABLE movie_history MODIFY COLUMN user_id INT(10) UNSIGNED NOT NULL;
+            DELETE FROM movie_history;
+            ALTER TABLE movie_history ADD COLUMN user_id INT(10) UNSIGNED NOT NULL AFTER movie_id;
             ALTER TABLE movie_history ADD CONSTRAINT movie_history_fk_user_id FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
             SQL
         );
