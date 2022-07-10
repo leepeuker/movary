@@ -365,7 +365,7 @@ class Repository
             'SELECT m.title 
             FROM movie m
             JOIN movie_production_company mpc ON m.id = mpc.movie_id
-            WHERE mpc.company_id = ? m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)',
+            WHERE mpc.company_id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)',
             [$productionCompanyId, $userId]
         );
     }
