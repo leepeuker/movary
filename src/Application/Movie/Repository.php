@@ -131,10 +131,10 @@ class Repository
     public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.*, mh.watched_at
-            FROM movie_user_watch_dates mh
-            JOIN movie m on mh.movie_id = m.id
-            WHERE mh.user_id = ?
+            'SELECT m.*, muwd.watched_at, muwd.plays
+            FROM movie_user_watch_dates muwd
+            JOIN movie m on muwd.movie_id = m.id
+            WHERE muwd.user_id = ?
             ORDER BY watched_at DESC',
             [$userId]
         );
@@ -359,25 +359,14 @@ class Repository
         );
     }
 
-    public function fetchMoviesByProductionCompany(int $id) : array
+    public function fetchMoviesByProductionCompany(int $productionCompanyId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
             'SELECT m.title 
             FROM movie m
             JOIN movie_production_company mpc ON m.id = mpc.movie_id
-            WHERE mpc.company_id = ?',
-            [$id]
-        );
-    }
-
-    public function fetchMoviesOrderedByMostWatchedDesc() : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.title, COUNT(*) AS views
-            FROM movie_user_watch_dates mh
-            JOIN movie m on mh.movie_id = m.id
-            GROUP BY m.title
-            ORDER BY COUNT(*) DESC, m.title'
+            WHERE mpc.company_id = ? m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)',
+            [$productionCompanyId, $userId]
         );
     }
 

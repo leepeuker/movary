@@ -128,7 +128,7 @@ class Select
         $mostWatchedProductionCompanies = $this->movieRepository->fetchMostWatchedProductionCompanies($userId, $limit);
 
         foreach ($mostWatchedProductionCompanies as $index => $productionCompany) {
-            $moviesByProductionCompany = $this->movieRepository->fetchMoviesByProductionCompany($productionCompany['id']);
+            $moviesByProductionCompany = $this->movieRepository->fetchMoviesByProductionCompany($productionCompany['id'], $userId);
             unset($mostWatchedProductionCompanies[$index]['id']);
 
             foreach ($moviesByProductionCompany as $movieByProductionCompany) {
@@ -142,11 +142,6 @@ class Select
     public function fetchMostWatchedReleaseYears(int $userId) : array
     {
         return $this->movieRepository->fetchMostWatchedReleaseYears($userId);
-    }
-
-    public function fetchMoviesOrderedByMostWatchedDesc() : array
-    {
-        return $this->movieRepository->fetchMoviesOrderedByMostWatchedDesc();
     }
 
     public function fetchPlaysForMovieIdOnDate(int $movieId, int $userId, Date $watchedAt) : int

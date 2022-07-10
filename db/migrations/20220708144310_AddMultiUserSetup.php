@@ -26,6 +26,7 @@ final class AddMultiUserSetup extends AbstractMigration
         $this->execute(
             <<<SQL
             DELETE FROM user;
+            ALTER TABLE user AUTO_INCREMENT = 1;
             ALTER TABLE user ADD COLUMN email VARCHAR(255) NOT NULL AFTER id;
             ALTER TABLE user ADD COLUMN name VARCHAR(255) DEFAULT NULL AFTER email;
             ALTER TABLE user ADD UNIQUE (email);
