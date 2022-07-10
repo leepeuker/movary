@@ -88,7 +88,6 @@ final class AddMultiUserSetup extends AbstractMigration
                 FOREIGN KEY (`movie_id`) REFERENCES `movie`(`id`) ON DELETE CASCADE,
                 FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
             ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB;
-            INSERT INTO movie_user_rating (movie_id, user_id, rating) (SELECT id, 1, personal_rating FROM movie WHERE personal_rating IS NOT NULL);
             ALTER TABLE movie DROP COLUMN personal_rating;
             SQL
         );
