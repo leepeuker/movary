@@ -31,6 +31,11 @@ class Update
     ) {
     }
 
+    public function setUserRating(int $id, int $userId, PersonalRating $rating) : void
+    {
+        $this->repository->updateUserRating($id, $userId, $rating);
+    }
+
     public function updateCast(int $movieId, Cast $tmdbCast) : void
     {
         $this->movieCasteDeleteService->deleteByMovieId($movieId);
@@ -101,11 +106,6 @@ class Update
         foreach ($genres as $position => $genre) {
             $this->movieProductionCompanyCreateService->create($movieId, $genre->getId(), (int)$position);
         }
-    }
-
-    public function setPersonalRating(int $id, int $userId, PersonalRating $rating) : void
-    {
-        $this->repository->updatePersonalRating($id, $userId, $rating);
     }
 
     public function updateTraktId(int $movieId, TraktId $traktId) : void

@@ -279,6 +279,6 @@ class Api
             return;
         }
 
-        $this->movieUpdateService->setPersonalRating($movieId, $userId, $rating);
+        $this->movieUpdateService->setUserRating($movieId, $userId, $rating);
     }
 }

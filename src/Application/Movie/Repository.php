@@ -534,17 +534,17 @@ class Repository
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId], ['id' => $id]);
     }
 
-    public function updatePersonalRating(int $id, int $userId, PersonalRating $personalRating) : void
+    public function updateTraktId(int $id, TraktId $traktId) : void
+    {
+        $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt()], ['id' => $id]);
+    }
+
+    public function updateUserRating(int $id, int $userId, PersonalRating $personalRating) : void
     {
         $this->dbConnection->executeQuery(
             'INSERT INTO movie_user_rating (movie_id, user_id, rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE rating=?',
             [$id, $userId, $personalRating, $personalRating]
         );
-    }
-
-    public function updateTraktId(int $id, TraktId $traktId) : void
-    {
-        $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt()], ['id' => $id]);
     }
 
     private function fetchById(int $id) : Entity
