@@ -2,10 +2,13 @@
 
 namespace Movary\Application\User;
 
+use Movary\Application\User\Exception\PasswordTooShort;
 use Ramsey\Uuid\Uuid;
 
 class Api
 {
+    const PASSWORD_MIN_LENGTH = 8;
+
     public function __construct(private readonly Repository $repository)
     {
     }
@@ -40,6 +43,17 @@ class Api
         return $this->repository->findUserIdByPlexWebhookId($webhookId);
     }
 
+    public function isValidPassword(int $userId, string $password) : bool
+    {
+        $passwordHash = $this->repository->findUserById($userId)?->getPasswordHash();
+
+        if ($passwordHash === null) {
+            return false;
+        }
+
+        return password_verify($password, $passwordHash) === true;
+    }
+
     public function regeneratePlexWebhookId(int $userId) : string
     {
         $plexWebhookId = Uuid::uuid4()->toString();
@@ -51,6 +65,10 @@ class Api
 
     public function updatePassword(int $userId, string $newPassword) : void
     {
+        if (strlen($newPassword) < self::PASSWORD_MIN_LENGTH) {
+            throw new PasswordTooShort(self::PASSWORD_MIN_LENGTH);
+        }
+
         if ($this->repository->findUserById($userId) === null) {
             throw new \RuntimeException('There is no user with id: ' . $userId);
         }

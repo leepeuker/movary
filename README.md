@@ -4,6 +4,8 @@ Web application to track and rate your watched movies.
 
 Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login with user `movary@movary.com` and password `movary`)
 
+**Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues)!**
+
 1. [About](#install-via-docker)
 2. [Install via docker](#install-via-docker)
 3. [Important: First steps](#important-first-steps)
