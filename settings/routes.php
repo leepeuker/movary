@@ -108,6 +108,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\PlexController::class, 'regeneratePlexWebhookId']
     );
     $routeCollector->addRoute(
+        'POST',
+        '/user/trakt',
+        [\Movary\HttpController\SettingsController::class, 'updateTrakt']
+    );
+    $routeCollector->addRoute(
         'DELETE',
         '/user/plex-webhook-id',
         [\Movary\HttpController\PlexController::class, 'deletePlexWebhookId']

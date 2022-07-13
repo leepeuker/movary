@@ -14,11 +14,10 @@ class Client
 
     public function __construct(
         private readonly ClientInterface $httpClient,
-        private readonly string $clientId
     ) {
     }
 
-    public function get(string $relativeUrl) : array
+    public function get(string $clientId, string $relativeUrl) : array
     {
         $request = new Request(
             'GET',
@@ -26,7 +25,7 @@ class Client
             [
                 'Content-Type' => 'application/json',
                 'trakt-api-version' => self::TRAKT_API_VERSION,
-                'trakt-api-key' => $this->clientId,
+                'trakt-api-key' => $clientId,
             ]
         );
 

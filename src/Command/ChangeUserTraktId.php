@@ -8,9 +8,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ChangeUserPassword extends Command
+class ChangeUserTraktId extends Command
 {
-    protected static $defaultName = self::COMMAND_BASE_NAME . ':user:change-password';
+    protected static $defaultName = self::COMMAND_BASE_NAME . ':user:change-trakt-client-id';
 
     public function __construct(
         private readonly User\Api $userApi,
@@ -22,29 +22,32 @@ class ChangeUserPassword extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Change user password.')
+            ->setDescription('Change user trakt client id.')
             ->addArgument('userId', InputArgument::REQUIRED, 'ID of user')
-            ->addArgument('password', InputArgument::REQUIRED, 'New password for user');
+            ->addArgument('traktClientId', InputArgument::REQUIRED, 'New trakt client id for user');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $userId = (int)$input->getArgument('userId');
-        $password = $input->getArgument('password');
+        $traktClientId = $input->getArgument('traktClientId');
+
+        if (empty($traktClientId) === true) {
+            $traktClientId = null;
+        }
 
         try {
-            $this->userApi->updatePassword($userId, $password);
+            $this->userApi->updateTraktClientId($userId, $traktClientId);
         } catch (\Throwable $t) {
-            $this->logger->error('Could not change password.', ['exception' => $t]);
+            $this->logger->error('Could not change trakt client id.', ['exception' => $t]);
 
-            $this->generateOutput($output, 'Could not update password.');
+            $this->generateOutput($output, 'Could not update trakt client id.');
 
             return Command::FAILURE;
         }
 
-        $this->generateOutput($output, 'Updated password.');
-
+        $this->generateOutput($output, 'Updated trakt client id.');
         return Command::SUCCESS;
     }
 }

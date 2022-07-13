@@ -17,44 +17,68 @@
         {{ include('component/navbar.html.twig') }}
 
         <div style="text-align: center;padding-top: 1rem">
-            <h5>Export</h5>
+            <div style="padding-bottom: 1rem">
+                <h5 style="padding-bottom: 0.5rem">trakt.tv</h5>
 
-            <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/history">history.csv</a>
-            <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/ratings">ratings.csv</a>
+                <p>To generate a client id visit this url <a href="https://trakt.tv/oauth/applications">here</a>.</p>
 
-            <hr>
+                <form action="/user/trakt" method="post">
+                    <p style="font-size: 0.8rem;margin-bottom: 0.5rem">Client ID:</p>
+                    <div class="input-group input-group-sm mb-3">
+                        <input type="text" class="form-control" name="traktClientId" placeholder="Enter client ID here"
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;"
+                               value="{{ traktClientId }}">
+                    </div>
+                    <button class="btn btn-primary btn-sm" type="submit">Update</button>
+                </form>
 
-            <h5 style="padding-bottom: 0.5rem">Import</h5>
+            </div>
 
-            <form action="/user/import/csv/history" method="post" enctype="multipart/form-data">
-                <div class="input-group input-group-sm">
-                    <input type="file" class="form-control" name="history" required>
-                    <button class="btn btn-primary" type="submit">Import history.csv</button>
-                </div>
-            </form>
+            <hr style="margin: 0;padding: 0">
 
-            <br>
+            <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 1rem">
+                <h5>Plex webhook url:</h5>
 
-            <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.7rem">
-                <div class="input-group input-group-sm">
-                    <input type="file" class="form-control" name="ratings" required>
-                    <button class="btn btn-primary" type="submit">Import rating.csv</button>
-                </div>
-            </form>
+                <p id="plexWebhookUrl" class="overflow-auto text-nowrap plexWebhookUrl" style="margin-left: 10%;margin-right: 10%">-</p>
+                <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger disabled  btn-sm" onclick="deletePlexWebhookId()">Delete url</button>
+                <button type="button" class="btn btn-primary  btn-sm" onclick="regeneratePlexWebhookId()">Regenerate url</button>
+            </div>
 
-            <hr>
+            <hr style="margin: 0;padding: 0">
+            <div style="padding-top: 1rem;padding-bottom: 1rem">
 
-            <h5>Plex webhook url:</h5>
-            <p id="plexWebhookUrl" class="overflow-auto text-nowrap plexWebhookUrl" style="margin-left: 10%;margin-right: 10%">-</p>
-            <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger disabled  btn-sm" onclick="deletePlexWebhookId()">Delete url</button>
-            <button type="button" class="btn btn-primary  btn-sm" onclick="regeneratePlexWebhookId()">Regenerate url</button>
+                <h5>Export & Import</h5>
 
-            <hr>
+                <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/history">Export: history.csv</a>
+                <a class="btn btn-primary btn-sm" target="_blank" href="/user/export/csv/ratings">Export: ratings.csv</a>
 
-            <p>Last <a href="https://trakt.tv/" target="_blank">trakt.tv</a> sync: <span class="fw-light">{{ lastSyncTrakt }}</span></p>
-            <p>Last <a href="https://themoviedb.org/" target="_blank">themoviedb.org</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
-            <p>Last <a href="https://letterboxd.com/" target="_blank">letterboxd</a> sync: <span class="fw-light">{{ lastSyncLetterboxd }}</span></p>
-            <p>Current <a href="https://github.com/leepeuker/movary/releases" target="_blank">application</a> version: <span class="fw-light">{{ applicationVersion }}</span></p>
+                <form action="/user/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1rem">
+                    <div class="input-group input-group-sm">
+                        <input type="file" class="form-control" name="history" required>
+                        <button class="btn btn-primary" type="submit">Import history.csv</button>
+                    </div>
+                </form>
+
+                <br>
+
+                <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem">
+                    <div class="input-group input-group-sm">
+                        <input type="file" class="form-control" name="ratings" required>
+                        <button class="btn btn-primary" type="submit">Import rating.csv</button>
+                    </div>
+                </form>
+            </div>
+
+            <hr style="margin: 0;padding: 0">
+            <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 0.1rem">
+
+                <p>Last <a href="https://trakt.tv/" target="_blank">trakt.tv</a> sync: <span class="fw-light">{{ lastSyncTrakt }}</span></p>
+                <p>Last <a href="https://themoviedb.org/" target="_blank">themoviedb.org</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
+                <p>Last <a href="https://letterboxd.com/" target="_blank">letterboxd</a> sync: <span class="fw-light">{{ lastSyncLetterboxd }}</span></p>
+                <p>Current <a href="https://github.com/leepeuker/movary/releases" target="_blank">application</a> version: <span class="fw-light">{{ applicationVersion }}</span>
+                </p>
+
+            </div>
         </div>
     </main>
 {% endblock %}

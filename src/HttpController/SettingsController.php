@@ -3,7 +3,10 @@
 namespace Movary\HttpController;
 
 use Movary\Application\SyncLog\Repository;
+use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
+use Movary\ValueObject\Http\Header;
+use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
@@ -14,6 +17,7 @@ class SettingsController
         private readonly Environment $twig,
         private readonly Repository $syncLogRepository,
         private readonly Authentication $authenticationService,
+        private readonly User\Api $userApi,
         private readonly ?string $applicationVersion = null,
     ) {
     }
@@ -24,15 +28,40 @@ class SettingsController
             return Response::createFoundRedirect('/');
         }
 
+        $userId = $this->authenticationService->getCurrentUserId();
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings.html.twig', [
-                'plexWebhookUrl' => $this->applicationVersion ?? '-',
+                'plexWebhookUrl' => $this->userApi->findPlexWebhookId($userId) ?? '-',
+                'traktClientId' => $this->userApi->findTraktClientId($userId),
                 'applicationVersion' => $this->applicationVersion ?? '-',
                 'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
                 'lastSyncLetterboxd' => $this->syncLogRepository->findLastLetterboxdSync() ?? '-',
             ]),
+        );
+    }
+
+    public function updateTrakt(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $traktClientId = $request->getPostParameters()['traktClientId'];
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        if (empty($traktClientId) === true) {
+            $traktClientId = null;
+        }
+
+        $this->userApi->updateTraktClientId($userId, $traktClientId);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
         );
     }
 }

@@ -11,6 +11,7 @@ use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Application\SyncLog;
+use Movary\Application\User\Api;
 use Movary\Application\User\Service\Authentication;
 use Movary\Command;
 use Movary\HttpController\SettingsController;
@@ -94,6 +95,7 @@ class Factory
             $container->get(Twig\Environment::class),
             $container->get(SyncLog\Repository::class),
             $container->get(Authentication::class),
+            $container->get(Api::class),
             $applicationVersion
         );
     }
@@ -112,14 +114,6 @@ class Factory
             $container->get(Trakt\Client::class),
             $config->getAsString('TRAKT_USERNAME'),
             $container->get(Watched\Service::class),
-        );
-    }
-
-    public static function createTraktApiClient(ContainerInterface $container, Config $config) : Trakt\Client
-    {
-        return new Trakt\Client(
-            $container->get(ClientInterface::class),
-            $config->getAsString('TRAKT_CLIENT_ID')
         );
     }
 

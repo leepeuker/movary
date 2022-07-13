@@ -102,10 +102,6 @@ DATABASE_CHARSET=utf8
 # https://www.themoviedb.org/settings/api
 TMDB_API_KEY= 
 
-# https://trakt.tv/oauth/applications
-TRAKT_USERNAME=
-TRAKT_CLIENT_ID=
-
 TIMEZONE="Europe/Berlin"
 
 LOG_FILE="tmp/app.log"
@@ -129,12 +125,13 @@ Add the generated url as a [webhook to plex](https://support.plex.tv/articles/11
 <a name="#trakttv-sync"></a>
 ### trakt.tv sync
 
-You can sync your watchhistory and ratings from trakt.tv.
-Make sure you have added the variables `TRAKT_USERNAME` and `TRAKT_CLIENT_ID` to the environment.
+You can sync your watch history and ratings from trakt.tv. 
 
-Example:
+The user used in the sync process must have a trakt client id set (can be set via web UI on the settings page or via cli `movary:user:change-trakt-client-id`).
 
-`docker exec movary php bin/console.php movary:sync-trakt --ratings --history`
+Example (syncing history and ratings for user with id 1):
+
+`docker exec movary php bin/console.php movary:sync-trakt --ratings --history --userId=1`
 
 **Flags:**
 

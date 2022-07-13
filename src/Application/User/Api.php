@@ -20,9 +20,14 @@ class Api
         $this->repository->setPlexWebhookId($userId, null);
     }
 
-    public function findPlexWebhookIdByUserId(int $userId) : ?string
+    public function findPlexWebhookId(int $userId) : ?string
     {
-        return $this->repository->findPlexWebhookIdByUserId($userId);
+        return $this->repository->findPlexWebhookId($userId);
+    }
+
+    public function findTraktClientId(int $userId) : ?string
+    {
+        return $this->repository->findTraktClientId($userId);
     }
 
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
@@ -48,5 +53,10 @@ class Api
         $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
 
         $this->repository->updatePassword($userId, $passwordHash);
+    }
+
+    public function updateTraktClientId(int $userId, ?string $traktClientId) : void
+    {
+        $this->repository->updateTraktClientId($userId, $traktClientId);
     }
 }

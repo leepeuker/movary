@@ -2,6 +2,7 @@
 
 namespace Movary\Command;
 
+use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Application\Service\Trakt\SyncRatings;
 use Movary\Application\Service\Trakt\SyncWatchedMovies;
 use Psr\Log\LoggerInterface;
@@ -67,7 +68,12 @@ class SyncTrakt extends Command
                     $this->syncRatings($output, $userId, $overwriteExistingData);
                 }
             }
+        } catch (TraktClientIdNotSet $t) {
+            $this->generateOutput($output, 'ERROR: User as no trakt client id set.');
+
+            return Command::FAILURE;
         } catch (\Throwable $t) {
+            $this->generateOutput($output, 'ERROR: Could not complete trakt sync.');
             $this->logger->error('Could not complete trakt sync.', ['exception' => $t]);
 
             return Command::FAILURE;

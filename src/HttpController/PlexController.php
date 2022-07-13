@@ -41,7 +41,7 @@ class PlexController
             return Response::createFoundRedirect('/');
         }
 
-        $plexWebhookId = $this->userApi->findPlexWebhookIdByUserId($_SESSION['userId']);
+        $plexWebhookId = $this->userApi->findPlexWebhookId($_SESSION['userId']);
 
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
