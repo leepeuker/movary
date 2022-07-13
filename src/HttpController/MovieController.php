@@ -78,8 +78,6 @@ class MovieController
 
         $this->movieApi->updateUserRating($movieId, $_SESSION['userId'], $personalRating);
 
-        return Response::create(
-            StatusCode::createNoContent(),
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 }

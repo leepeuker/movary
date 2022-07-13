@@ -5,6 +5,7 @@ namespace Movary\Application\Service\Trakt;
 use Movary\Api;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application;
+use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
 
@@ -18,12 +19,18 @@ class SyncWatchedMovies
         private readonly PlaysPerDateFetcher $playsPerDateFetcher,
         private readonly Application\Service\Tmdb\SyncMovie $tmdbMovieSync,
         private readonly Application\SyncLog\Repository $scanLogRepository,
+        private readonly Application\User\Api $userApi
     ) {
     }
 
     public function execute(int $userId, bool $overwriteExistingData = false, bool $ignoreCache = false) : void
     {
-        $watchedMovies = $this->traktApi->fetchUserMoviesWatched();
+        $traktClientId = $this->userApi->findTraktClientId($userId);
+        if ($traktClientId === null) {
+            throw new TraktClientIdNotSet();
+        }
+
+        $watchedMovies = $this->traktApi->fetchUserMoviesWatched($traktClientId);
 
         foreach ($watchedMovies as $watchedMovie) {
             $traktId = $watchedMovie->getMovie()->getTraktId();
@@ -34,7 +41,7 @@ class SyncWatchedMovies
                 continue;
             }
 
-            $this->syncMovieHistory($userId, $traktId, $movie, $overwriteExistingData);
+            $this->syncMovieHistory($traktClientId, $userId, $traktId, $movie, $overwriteExistingData);
 
             $this->traktApiCacheUserMovieWatchedService->setOne($userId, $traktId, $watchedMovie->getLastUpdated());
         }
@@ -88,9 +95,9 @@ class SyncWatchedMovies
         return $cacheLastUpdated !== null && $watchedMovie->getLastUpdated()->isEqual($cacheLastUpdated) === true;
     }
 
-    private function syncMovieHistory(int $userId, TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
+    private function syncMovieHistory(string $traktClientId, int $userId, TraktId $traktId, Application\Movie\Entity $movie, bool $overwriteExistingData) : void
     {
-        $traktHistoryEntries = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktId);
+        $traktHistoryEntries = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktClientId, $traktId);
 
         foreach ($this->movieApi->fetchHistoryByMovieId($movie->getId(), $userId) as $localHistoryEntry) {
             $localHistoryEntryDate = Date::createFromString($localHistoryEntry['watched_at']);

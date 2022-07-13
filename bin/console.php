@@ -9,5 +9,6 @@ $application->add($container->get(Movary\Command\SyncLetterboxd::class));
 $application->add($container->get(Movary\Command\CreateUser::class));
 $application->add($container->get(Movary\Command\ChangeUserPassword::class));
 $application->add($container->get(Movary\Command\DatabaseMigration::class));
+$application->add($container->get(Movary\Command\ChangeUserTraktId::class));
 
 $application->run();

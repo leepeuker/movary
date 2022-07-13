@@ -4,6 +4,7 @@ namespace Movary\Application\Service\Trakt;
 
 use Movary\Api;
 use Movary\Application;
+use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\ValueObject\PersonalRating;
 
 class SyncRatings
@@ -12,13 +13,19 @@ class SyncRatings
         private readonly Application\Movie\Api $movieApi,
         private readonly Api\Trakt\Api $traktApi,
         private readonly Api\Trakt\Cache\User\Movie\Rating\Service $traktApiCacheUserMovieRatingService,
-        private readonly Application\SyncLog\Repository $scanLogRepository
+        private readonly Application\SyncLog\Repository $scanLogRepository,
+        private readonly Application\User\Api $userApi,
     ) {
     }
 
     public function execute(int $userId, bool $overwriteExistingData = false) : void
     {
-        $this->traktApiCacheUserMovieRatingService->set($userId, $this->traktApi->fetchUserMoviesRatings());
+        $traktClientId = $this->userApi->findTraktClientId($userId);
+        if ($traktClientId === null) {
+            throw new TraktClientIdNotSet();
+        }
+
+        $this->traktApiCacheUserMovieRatingService->set($userId, $this->traktApi->fetchUserMoviesRatings($traktClientId));
 
         foreach ($this->movieApi->fetchAll() as $movie) {
             $traktId = $movie->getTraktId();

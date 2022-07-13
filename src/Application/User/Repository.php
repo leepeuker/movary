@@ -56,9 +56,20 @@ class Repository
         return DateTime::createFromString($expirationDate);
     }
 
-    public function findPlexWebhookIdByUserId(int $userId) : ?string
+    public function findPlexWebhookId(int $userId) : ?string
     {
         $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexWebhookId === false) {
+            return null;
+        }
+
+        return $plexWebhookId;
+    }
+
+    public function findTraktClientId(int $userId) : ?string
+    {
+        $plexWebhookId = $this->dbConnection->fetchOne('SELECT `trakt_client_id` FROM `user` WHERE `id` = ?', [$userId]);
 
         if ($plexWebhookId === false) {
             return null;
@@ -130,6 +141,19 @@ class Repository
             'user',
             [
                 'password' => $passwordHash,
+            ],
+            [
+                'id' => $userId,
+            ]
+        );
+    }
+
+    public function updateTraktClientId(int $userId, ?string $traktClientId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'trakt_client_id' => $traktClientId,
             ],
             [
                 'id' => $userId,

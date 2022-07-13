@@ -46,6 +46,7 @@ class SyncTmdb extends Command
 
             $this->generateOutput($output, 'Syncing movie meta data done.');
         } catch (\Throwable $t) {
+            $this->generateOutput($output, 'ERROR: Could not complete tmdb sync.');
             $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
 
             return Command::FAILURE;
