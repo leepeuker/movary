@@ -2,7 +2,7 @@
 
 namespace Movary\Application\Movie\History\Service;
 
-use Matriphe\ISO639\ISO639;
+use Movary\Api\Tmdb;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie;
 use Movary\Application\Movie\Entity;
@@ -13,7 +13,7 @@ class Select
 {
     public function __construct(
         private readonly Movie\Repository $movieRepository,
-        private readonly ISO639 $ISO639
+        private readonly Tmdb\Api $tmdbApi
     ) {
     }
 
@@ -117,7 +117,7 @@ class Select
         $mostWatchedLanguages = $this->movieRepository->fetchMostWatchedLanguages($userId);
 
         foreach ($mostWatchedLanguages as $index => $mostWatchedLanguage) {
-            $mostWatchedLanguages[$index]['name'] = $this->ISO639->languageByCode1($mostWatchedLanguage['language']);
+            $mostWatchedLanguages[$index]['name'] = $this->tmdbApi->getLanguageByCode($mostWatchedLanguage['language']);
         }
 
         return $mostWatchedLanguages;

@@ -318,7 +318,7 @@ class Repository
         return $this->dbConnection->fetchAllAssociative(
             'SELECT DISTINCT original_language AS language, COUNT(*) AS count
             FROM movie m
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?) AND m.original_language IS NOT NULL
             GROUP BY original_language
             ORDER BY COUNT(*) DESC, original_language',
             [$userId]
