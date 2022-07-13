@@ -8,6 +8,7 @@ final class AddTraktClientIdToUserTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
+            ALTER TABLE user DROP COLUMN trakt_user_name;
             ALTER TABLE user DROP COLUMN trakt_client_id;
             SQL
         );
@@ -17,7 +18,8 @@ final class AddTraktClientIdToUserTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE user ADD COLUMN trakt_client_id VARCHAR(255) DEFAULT NULL AFTER plex_webhook_uuid;
+            ALTER TABLE user ADD COLUMN trakt_user_name VARCHAR(255) DEFAULT NULL AFTER plex_webhook_uuid;
+            ALTER TABLE user ADD COLUMN trakt_client_id VARCHAR(255) DEFAULT NULL AFTER trakt_user_name;
             SQL
         );
     }

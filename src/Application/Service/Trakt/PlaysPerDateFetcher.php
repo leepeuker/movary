@@ -12,11 +12,11 @@ class PlaysPerDateFetcher
     {
     }
 
-    public function fetchTraktPlaysPerDate(string $traktClientId, TraktId $traktId) : PlaysPerDateDtoList
+    public function fetchTraktPlaysPerDate(string $traktClientId, string $username, TraktId $traktId) : PlaysPerDateDtoList
     {
         $playsPerDates = PlaysPerDateDtoList::create();
 
-        foreach ($this->traktApi->fetchUserMovieHistoryByMovieId($traktClientId, $traktId) as $movieHistoryEntry) {
+        foreach ($this->traktApi->fetchUserMovieHistoryByMovieId($traktClientId, $username, $traktId) as $movieHistoryEntry) {
             $watchDate = Date::createFromDateTime($movieHistoryEntry->getWatchedAt());
 
             $playsPerDates->incrementPlaysForDate($watchDate);

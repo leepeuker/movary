@@ -5,6 +5,7 @@ namespace Movary\Application\Service\Trakt;
 use Movary\Api;
 use Movary\Application;
 use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
+use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\ValueObject\PersonalRating;
 
 class SyncRatings
@@ -25,7 +26,12 @@ class SyncRatings
             throw new TraktClientIdNotSet();
         }
 
-        $this->traktApiCacheUserMovieRatingService->set($userId, $this->traktApi->fetchUserMoviesRatings($traktClientId));
+        $traktUserName = $this->userApi->findTraktUserName($userId);
+        if ($traktUserName === null) {
+            throw new TraktUserNameNotSet();
+        }
+
+        $this->traktApiCacheUserMovieRatingService->set($userId, $this->traktApi->fetchUserMoviesRatings($traktClientId, $traktUserName));
 
         foreach ($this->movieApi->fetchAll() as $movie) {
             $traktId = $movie->getTraktId();

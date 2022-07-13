@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ChangeUserTraktId extends Command
+class ChangeUserTraktClientId extends Command
 {
     protected static $defaultName = self::COMMAND_BASE_NAME . ':user:change-trakt-client-id';
 

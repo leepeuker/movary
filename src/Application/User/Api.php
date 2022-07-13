@@ -30,6 +30,11 @@ class Api
         return $this->repository->findTraktClientId($userId);
     }
 
+    public function findTraktUserName(int $userId) : ?string
+    {
+        return $this->repository->findTraktUserName($userId);
+    }
+
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByPlexWebhookId($webhookId);
@@ -58,5 +63,10 @@ class Api
     public function updateTraktClientId(int $userId, ?string $traktClientId) : void
     {
         $this->repository->updateTraktClientId($userId, $traktClientId);
+    }
+
+    public function updateTraktUserName(int $userId, ?string $traktUserName) : void
+    {
+        $this->repository->updateTraktUserName($userId, $traktUserName);
     }
 }

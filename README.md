@@ -8,18 +8,22 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 2. [Install via docker](#install-via-docker)
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
-   1. [Plex Scrobbler](#plex-scrobbler)
-   2. [Trakt.tv Sync](#trakttv-sync)
-   3. [Tmdb Sync](#tmdb-sync)
+    1. [Plex Scrobbler](#plex-scrobbler)
+    2. [Trakt.tv Sync](#trakttv-sync)
+    3. [Tmdb Sync](#tmdb-sync)
 5. [Development](#development)
 
 <a name="#about"></a>
+
 ## About
+
 This is a web application to track and rate your watched movies (like a digital movie diary).
 
-It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on MY watch history (-> no social media features).
+It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on MY watch history (-> no
+social media features).
 
 **Features:**
+
 - add or update movie watch dates and ratings (only possible when logged in)
 - statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
 - PWA: can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
@@ -31,6 +35,7 @@ It was created because I wanted a self hosted solution instead of using external
 **Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease.
 
 <a name="#install-via-docker"></a>
+
 ## Install via docker
 
 You must provide a tmdb api key (see https://www.themoviedb.org/settings/api)
@@ -81,6 +86,7 @@ volumes:
 ```
 
 <a name="#important-first-steps"></a>
+
 ## Important: First steps
 
 - Run database migrations: `docker exec movary php bin/console.php movary:database:migration --migrate`
@@ -108,12 +114,15 @@ LOG_FILE="tmp/app.log"
 LOG_LEVEL=warning
 ``` 
 
-More configuration can be done via the base image webdevops/php-nginx, checkout their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
+More configuration can be done via the base image webdevops/php-nginx, checkout
+their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
 
 <a name="#features"></a>
+
 ## Features
 
 <a name="#plex-scrobbler"></a>
+
 ### Plex Scrobbler
 
 Automatically track movies watched in plex with movary.
@@ -123,11 +132,13 @@ You can generate your plex webhook url on the settings page (`/settings`).
 Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/).
 
 <a name="#trakttv-sync"></a>
+
 ### trakt.tv sync
 
-You can sync your watch history and ratings from trakt.tv. 
+You can sync your watch history and ratings from trakt.tv.
 
-The user used in the sync process must have a trakt client id set (can be set via web UI on the settings page or via cli `movary:user:change-trakt-client-id`).
+The user used in the sync process must have a trakt username and client id set (can be set via web UI on the settings page or via cli `movary:user:change-trakt-client-id`
+and `movary:user:change-trakt-username`).
 
 Example (syncing history and ratings for user with id 1):
 
@@ -147,6 +158,7 @@ Example (syncing history and ratings for user with id 1):
   Use if you want to sync everything from trakt regardless if there was a change since the last sync.
 
 <a name="#tmdb-sync"></a>
+
 ### tmdb sync
 
 Update movie (meta) data with themoviedb.org information.
@@ -164,6 +176,7 @@ Example:
   Maximum number of movies to sync
 
 <a name="#development"></a>
+
 ## Development
 
 ### Setup

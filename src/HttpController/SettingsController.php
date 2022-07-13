@@ -35,6 +35,7 @@ class SettingsController
             $this->twig->render('page/settings.html.twig', [
                 'plexWebhookUrl' => $this->userApi->findPlexWebhookId($userId) ?? '-',
                 'traktClientId' => $this->userApi->findTraktClientId($userId),
+                'traktUserName' => $this->userApi->findTraktUserName($userId),
                 'applicationVersion' => $this->applicationVersion ?? '-',
                 'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
@@ -50,13 +51,18 @@ class SettingsController
         }
 
         $traktClientId = $request->getPostParameters()['traktClientId'];
+        $traktUserName = $request->getPostParameters()['traktUserName'];
         $userId = $this->authenticationService->getCurrentUserId();
 
         if (empty($traktClientId) === true) {
             $traktClientId = null;
         }
+        if (empty($traktUserName) === true) {
+            $traktUserName = null;
+        }
 
         $this->userApi->updateTraktClientId($userId, $traktClientId);
+        $this->userApi->updateTraktUserName($userId, $traktUserName);
 
         return Response::create(
             StatusCode::createSeeOther(),
