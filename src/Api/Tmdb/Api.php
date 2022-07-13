@@ -7,6 +7,8 @@ use Movary\Api\Tmdb\Dto\Movie;
 
 class Api
 {
+    private array $languages = [];
+
     public function __construct(private readonly Client $client)
     {
     }
@@ -23,6 +25,21 @@ class Api
         $data = $this->client->get('/movie/' . $movieId);
 
         return Movie::createFromArray($data);
+    }
+
+    public function getLanguageByCode(string $languageCode) : string
+    {
+        if ($this->languages === []) {
+            $this->languages = $this->client->get('/configuration/languages');
+        }
+
+        foreach ($this->languages as $language) {
+            if ($language['iso_639_1'] === $languageCode) {
+                return $language['english_name'];
+            }
+        }
+
+        throw new \RuntimeException('Language code not handled: ' . $languageCode);
     }
 
     public function searchMovie(string $searchTerm) : array

@@ -2,7 +2,7 @@
 
 namespace Movary\Application\Movie;
 
-use Matriphe\ISO639\ISO639;
+use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\Dto\Cast;
 use Movary\Api\Tmdb\Dto\Crew;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
@@ -25,7 +25,7 @@ class Api
         private readonly Movie\Genre\Service\Select $genreSelectService,
         private readonly Movie\Cast\Service\Select $castSelectService,
         private readonly Movie\Crew\Service\Select $crewSelectService,
-        private readonly ISO639 $ISO639,
+        private readonly Tmdb\Api $tmdbApi,
         private readonly Repository $movieRepository
     ) {
     }
@@ -156,6 +156,8 @@ class Api
             $renderedRuntime .= ' ' . $minutes . 'm';
         }
 
+        $originalLanguageCode = $entity->getOriginalLanguage();
+
         return [
             'id' => $entity->getId(),
             'title' => $entity->getTitle(),
@@ -164,7 +166,7 @@ class Api
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
-            'originalLanguage' => $this->ISO639->languageByCode1($entity->getOriginalLanguage()),
+            'originalLanguage' => $originalLanguageCode === null ? null : $this->tmdbApi->getLanguageByCode($originalLanguageCode),
         ];
     }
 
