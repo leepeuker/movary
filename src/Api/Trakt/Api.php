@@ -10,7 +10,6 @@ class Api
 {
     public function __construct(
         private readonly Client $client,
-        private readonly string $username,
         private readonly Watched\Service $cacheWatchedService
     ) {
     }
@@ -20,23 +19,23 @@ class Api
         return $this->cacheWatchedService->fetchAllUniqueTraktIds($userId);
     }
 
-    public function fetchUserMovieHistoryByMovieId(string $clientId, TraktId $traktId) : User\Movie\History\DtoList
+    public function fetchUserMovieHistoryByMovieId(string $clientId, string $username, TraktId $traktId) : User\Movie\History\DtoList
     {
-        $responseData = $this->client->get($clientId, sprintf('/users/%s/history/movies/%d', $this->username, $traktId->asInt()));
+        $responseData = $this->client->get($clientId, sprintf('/users/%s/history/movies/%d', $username, $traktId->asInt()));
 
         return User\Movie\History\DtoList::createFromArray($responseData);
     }
 
-    public function fetchUserMoviesRatings(string $clientId,) : User\Movie\Rating\DtoList
+    public function fetchUserMoviesRatings(string $clientId, string $username) : User\Movie\Rating\DtoList
     {
-        $responseData = $this->client->get($clientId, sprintf('/users/%s/ratings/movies', $this->username));
+        $responseData = $this->client->get($clientId, sprintf('/users/%s/ratings/movies', $username));
 
         return User\Movie\Rating\DtoList::createFromArray($responseData);
     }
 
-    public function fetchUserMoviesWatched(string $clientId) : User\Movie\Watched\DtoList
+    public function fetchUserMoviesWatched(string $clientId, string $username) : User\Movie\Watched\DtoList
     {
-        $responseData = $this->client->get($clientId, sprintf('/users/%s/watched/movies', $this->username));
+        $responseData = $this->client->get($clientId, sprintf('/users/%s/watched/movies', $username));
 
         return User\Movie\Watched\DtoList::createFromArray($responseData);
     }

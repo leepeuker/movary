@@ -78,6 +78,17 @@ class Repository
         return $plexWebhookId;
     }
 
+    public function findTraktUserName(int $userId) : ?string
+    {
+        $plexWebhookId = $this->dbConnection->fetchOne('SELECT `trakt_user_name` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexWebhookId === false) {
+            return null;
+        }
+
+        return $plexWebhookId;
+    }
+
     public function findUserByEmail(string $email) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `email` = ?', [$email]);
@@ -154,6 +165,19 @@ class Repository
             'user',
             [
                 'trakt_client_id' => $traktClientId,
+            ],
+            [
+                'id' => $userId,
+            ]
+        );
+    }
+
+    public function updateTraktUserName(int $userId, ?string $traktUserName) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'trakt_user_name' => $traktUserName,
             ],
             [
                 'id' => $userId,

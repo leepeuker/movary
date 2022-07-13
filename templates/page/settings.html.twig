@@ -23,11 +23,16 @@
                 <p>To generate a client id visit this url <a href="https://trakt.tv/oauth/applications">here</a>.</p>
 
                 <form action="/user/trakt" method="post">
+                    <p style="font-size: 0.8rem;margin-bottom: 0.5rem">Username:</p>
+                    <div class="input-group input-group-sm mb-3">
+                        <input type="text" class="form-control" name="traktUserName" placeholder="Enter user name here" value="{{ traktUserName }}"
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                    </div>
+
                     <p style="font-size: 0.8rem;margin-bottom: 0.5rem">Client ID:</p>
                     <div class="input-group input-group-sm mb-3">
-                        <input type="text" class="form-control" name="traktClientId" placeholder="Enter client ID here"
-                               style="margin-left: 10%;margin-right: 10%;text-align: center;"
-                               value="{{ traktClientId }}">
+                        <input type="text" class="form-control" name="traktClientId" placeholder="Enter client ID here" value="{{ traktClientId }}"
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
                     </div>
                     <button class="btn btn-primary btn-sm" type="submit">Update</button>
                 </form>

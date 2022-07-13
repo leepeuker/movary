@@ -3,6 +3,7 @@
 namespace Movary\Command;
 
 use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
+use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\Application\Service\Trakt\SyncRatings;
 use Movary\Application\Service\Trakt\SyncWatchedMovies;
 use Psr\Log\LoggerInterface;
@@ -70,6 +71,10 @@ class SyncTrakt extends Command
             }
         } catch (TraktClientIdNotSet $t) {
             $this->generateOutput($output, 'ERROR: User as no trakt client id set.');
+
+            return Command::FAILURE;
+        } catch (TraktUserNameNotSet $t) {
+            $this->generateOutput($output, 'ERROR: User as no trakt user name set.');
 
             return Command::FAILURE;
         } catch (\Throwable $t) {

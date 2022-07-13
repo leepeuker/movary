@@ -108,11 +108,10 @@ class Factory
         );
     }
 
-    public static function createTraktApi(ContainerInterface $container, Config $config) : Trakt\Api
+    public static function createTraktApi(ContainerInterface $container) : Trakt\Api
     {
         return new Trakt\Api(
             $container->get(Trakt\Client::class),
-            $config->getAsString('TRAKT_USERNAME'),
             $container->get(Watched\Service::class),
         );
     }
