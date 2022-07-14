@@ -10,7 +10,7 @@ final class AddDateFormatToUserTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE user DROP COLUMN date_format;
+            ALTER TABLE user DROP COLUMN date_format_id;
             SQL
         );
     }
@@ -19,7 +19,7 @@ final class AddDateFormatToUserTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE user ADD COLUMN date_format TINYINT UNSIGNED DEFAULT 0 AFTER password;
+            ALTER TABLE user ADD COLUMN date_format_id TINYINT UNSIGNED DEFAULT 0 AFTER password;
             SQL
         );
     }

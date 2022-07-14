@@ -138,8 +138,8 @@ class Factory
 
             $userApi = $container->get(User\Api::class);
 
-            $dateFormat = DateFormat::getPhpByOffset($userApi->fetchDateFormat($currentUserId));
-            $dataFormatJavascript = DateFormat::getJavascriptByOffset($userApi->fetchDateFormat($currentUserId));
+            $dateFormat = DateFormat::getPhpById($userApi->fetchDateFormat($currentUserId));
+            $dataFormatJavascript = DateFormat::getJavascriptById($userApi->fetchDateFormat($currentUserId));
         }
 
         $twig->addGlobal('routeUserId', $routeUserId ?? $currentUserId);

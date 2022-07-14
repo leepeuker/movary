@@ -116,7 +116,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings.html.twig', [
                 'dateFormats' => DateFormat::getFormats(),
-                'dateFormatSelected' => $this->userApi->fetchDateFormat($userId),
+                'dateFormatSelected' => $this->userApi->fetchDateFormatId($userId),
                 'dateFormatUpdated' => $dateFormatUpdated,
                 'plexWebhookUrl' => $this->userApi->findPlexWebhookId($userId) ?? '-',
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
@@ -139,7 +139,7 @@ class SettingsController
         );
     }
 
-    public function updateDateFormat(Request $request) : Response
+    public function updateDateFormatId(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
@@ -148,7 +148,7 @@ class SettingsController
         $postParameters = $request->getPostParameters();
         $dateFormat = empty($postParameters['dateFormat']) === true ? 0 : (int)$postParameters['dateFormat'];
 
-        $this->userApi->updateDateFormat($this->authenticationService->getCurrentUserId(), $dateFormat);
+        $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
 
         $_SESSION['dateFormatUpdated'] = true;
 

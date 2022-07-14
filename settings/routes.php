@@ -135,7 +135,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/user/date-format',
-        [\Movary\HttpController\SettingsController::class, 'updateDateFormat']
+        [\Movary\HttpController\SettingsController::class, 'updateDateFormatId']
     );
     $routeCollector->addRoute(
         'DELETE',

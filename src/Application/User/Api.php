@@ -28,9 +28,9 @@ class Api
         $this->repository->deleteUser($userId);
     }
 
-    public function fetchDateFormat(int $userId) : int
+    public function fetchDateFormatId(int $userId) : int
     {
-        $dateFormat = $this->repository->findDateFormat($userId);
+        $dateFormat = $this->repository->findDateFormatId($userId);
 
         if ($dateFormat === null) {
             throw new \RuntimeException('Could not find date format for user.');
@@ -79,9 +79,9 @@ class Api
         return $plexWebhookId;
     }
 
-    public function updateDateFormat(int $userId, int $dateFormat) : void
+    public function updateDateFormatId(int $userId, int $dateFormat) : void
     {
-        $this->repository->updateDateFormat($userId, $dateFormat);
+        $this->repository->updateDateFormatId($userId, $dateFormat);
     }
 
     public function updatePassword(int $userId, string $newPassword) : void

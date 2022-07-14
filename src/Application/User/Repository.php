@@ -61,9 +61,9 @@ class Repository
         return DateTime::createFromString($expirationDate);
     }
 
-    public function findDateFormat(int $userId) : ?int
+    public function findDateFormatId(int $userId) : ?int
     {
-        $dateFormat = $this->dbConnection->fetchOne('SELECT `date_format` FROM `user` WHERE `id` = ?', [$userId]);
+        $dateFormat = $this->dbConnection->fetchOne('SELECT `date_format_id` FROM `user` WHERE `id` = ?', [$userId]);
 
         if ($dateFormat === false) {
             return null;
@@ -162,12 +162,12 @@ class Repository
         );
     }
 
-    public function updateDateFormat(int $userId, int $dateFormat) : void
+    public function updateDateFormatId(int $userId, int $dateFormat) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'date_format' => $dateFormat,
+                'date_format_id' => $dateFormat,
             ],
             [
                 'id' => $userId,
