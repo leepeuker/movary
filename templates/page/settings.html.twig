@@ -38,22 +38,26 @@
 
                     {% if passwordErrorNotEqual == true %}
                         <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
-                            Passwords were not equal. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            Passwords were not equal.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordErrorMinLength == true %}
                         <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
-                            Password must be at least {{ passwordErrorMinLength }} characters long. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            Password must be at least {{ passwordErrorMinLength }} characters long.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordErrorCurrentInvalid == true %}
                         <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
-                            Current password is not correct. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            Current password is not correct.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordUpdated == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
-                            Password was updated. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            Password was updated.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     <button class="btn btn-primary btn-sm" type="submit">Submit</button>
@@ -65,7 +69,7 @@
             <div style="padding-top: 1rem;padding-bottom: 1rem">
                 <h5 style="padding-bottom: 0.5rem">trakt.tv</h5>
 
-                <p>To generate a client id visit this url <a href="https://trakt.tv/oauth/applications">here</a>.</p>
+                <p>To get your username and generate a client id visit <a href="https://trakt.tv/oauth/applications" target="_blank">this url</a>.</p>
 
                 <form action="/user/trakt" method="post">
                     <p style="font-size: 0.8rem;margin-bottom: 0.5rem">Username:</p>
@@ -79,6 +83,14 @@
                         <input type="text" class="form-control" name="traktClientId" placeholder="Enter client ID here" value="{{ traktClientId }}"
                                style="margin-left: 10%;margin-right: 10%;text-align: center;">
                     </div>
+
+                    {% if traktCredentialsUpdated == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                            Trakt credentials were updated.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
                     <button class="btn btn-primary btn-sm" type="submit">Submit</button>
                 </form>
             </div>
@@ -109,14 +121,39 @@
                     </div>
                 </form>
 
-                <br>
+                {% if importHistorySuccessful == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        History was successfully imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
 
-                <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem">
+                {% if importHistoryError == 'history' %}
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        History could not be imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
                     <div class="input-group input-group-sm">
                         <input type="file" class="form-control" name="ratings" required>
                         <button class="btn btn-primary" type="submit">Import rating.csv</button>
                     </div>
                 </form>
+                {% if importRatingsSuccessful == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Ratings were successfully imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                {% if importHistoryError == 'ratings' %}
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Ratings could not be imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
             </div>
 
             <hr style="margin: 0;padding: 0">
