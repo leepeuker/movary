@@ -16,8 +16,53 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
 
-        <div style="text-align: center;padding-top: 1rem">
-            <div style="padding-bottom: 1rem">
+        <div style="text-align: center;">
+
+            <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 1rem">
+                <h5>Change password</h5>
+                <form action="/user/password" method="post" style="padding-top: 0.3rem">
+                    <div class="input-group input-group-sm mb-3">
+                        <input type="password" class="form-control" name="currentPassword" placeholder="Current password" required
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <input type="password" class="form-control" name="newPassword" placeholder="New password" required minlength="8"
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
+                        <input type="password" class="form-control" name="newPasswordRepeat" placeholder="Repeat password" required minlength="8"
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                    </div>
+
+                    {% if passwordErrorNotEqual == true %}
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                            Passwords were not equal. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if passwordErrorMinLength == true %}
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                            Password must be at least {{ passwordErrorMinLength }} characters long. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if passwordErrorCurrentInvalid == true %}
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                            Current password is not correct. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if passwordUpdated == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                            Password was updated. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    <button class="btn btn-primary btn-sm" type="submit">Submit</button>
+                </form>
+            </div>
+
+            <hr style="margin: 0;padding: 0">
+
+            <div style="padding-top: 1rem;padding-bottom: 1rem">
                 <h5 style="padding-bottom: 0.5rem">trakt.tv</h5>
 
                 <p>To generate a client id visit this url <a href="https://trakt.tv/oauth/applications">here</a>.</p>
@@ -34,15 +79,14 @@
                         <input type="text" class="form-control" name="traktClientId" placeholder="Enter client ID here" value="{{ traktClientId }}"
                                style="margin-left: 10%;margin-right: 10%;text-align: center;">
                     </div>
-                    <button class="btn btn-primary btn-sm" type="submit">Update</button>
+                    <button class="btn btn-primary btn-sm" type="submit">Submit</button>
                 </form>
-
             </div>
 
             <hr style="margin: 0;padding: 0">
 
             <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 1rem">
-                <h5>Plex webhook url:</h5>
+                <h5>Plex webhook url</h5>
 
                 <p id="plexWebhookUrl" class="overflow-auto text-nowrap plexWebhookUrl" style="margin-left: 10%;margin-right: 10%">-</p>
                 <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger disabled  btn-sm" onclick="deletePlexWebhookId()">Delete url</button>
@@ -50,6 +94,7 @@
             </div>
 
             <hr style="margin: 0;padding: 0">
+
             <div style="padding-top: 1rem;padding-bottom: 1rem">
 
                 <h5>Export & Import</h5>

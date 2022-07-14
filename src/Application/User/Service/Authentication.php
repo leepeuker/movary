@@ -2,6 +2,7 @@
 
 namespace Movary\Application\User\Service;
 
+use Movary\Application\User\Api;
 use Movary\Application\User\Exception\EmailNotFound;
 use Movary\Application\User\Exception\InvalidPassword;
 use Movary\Application\User\Repository;
@@ -13,7 +14,7 @@ class Authentication
 
     private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
-    public function __construct(private readonly Repository $repository)
+    public function __construct(private readonly Repository $repository, private readonly Api $userApi)
     {
     }
 
@@ -67,7 +68,7 @@ class Authentication
             throw EmailNotFound::create();
         }
 
-        if (password_verify($password, $user->getPasswordHash()) === false) {
+        if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
             throw InvalidPassword::create();
         }
 
