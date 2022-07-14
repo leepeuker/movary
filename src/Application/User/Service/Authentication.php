@@ -99,6 +99,7 @@ class Authentication
         }
 
         session_destroy();
+        session_start();
     }
 
     private function createExpirationDate(int $days = 1) : DateTime

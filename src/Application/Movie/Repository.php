@@ -51,6 +51,11 @@ class Repository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
+    public function deleteAllUserRatings(int $userId) : void
+    {
+        $this->dbConnection->delete('movie_user_rating', ['user_id' => $userId]);
+    }
+
     public function deleteUserRating(int $movieId, int $userId) : void
     {
         $this->dbConnection->executeQuery(

@@ -118,11 +118,25 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'updatePassword']
     );
     $routeCollector->addRoute(
+        'GET',
+        '/user/delete-ratings',
+        [\Movary\HttpController\SettingsController::class, 'deleteRatings']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/user/delete-history',
+        [\Movary\HttpController\SettingsController::class, 'deleteHistory']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/user/delete-account',
+        [\Movary\HttpController\SettingsController::class, 'deleteAccount']
+    );
+    $routeCollector->addRoute(
         'DELETE',
         '/user/plex-webhook-id',
         [\Movary\HttpController\PlexController::class, 'deletePlexWebhookId']
     );
-
     $routeCollector->addRoute(
         'POST',
         '/plex/{id:.+}',

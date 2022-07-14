@@ -20,6 +20,11 @@ class Delete
         $this->repository->deleteByTraktId($traktId);
     }
 
+    public function deleteByUserId(int $userId) : void
+    {
+        $this->repository->deleteByUserId($userId);
+    }
+
     public function deleteHistoryByIdAndDate(int $movieId, int $userId, Date $watchedAt) : void
     {
         $this->repository->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);

@@ -82,6 +82,16 @@ class Api
         $this->historyDeleteService->deleteByTraktId($traktId);
     }
 
+    public function deleteHistoryByUserId(int $userId) : void
+    {
+        $this->historyDeleteService->deleteByUserId($userId);
+    }
+
+    public function deleteRatingsByUserId(int $userId) : void
+    {
+        $this->movieRepository->deleteAllUserRatings($userId);
+    }
+
     public function fetchAll() : EntityList
     {
         return $this->movieSelectService->fetchAll();
