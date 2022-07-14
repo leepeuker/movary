@@ -1,9 +1,6 @@
-document.addEventListener('DOMContentLoaded', function () {
-	console.log(document.getElementById('dateFormatJavascript').value)
-	const datepicker = new Datepicker(document.getElementById('watchDate'), {
-		format: document.getElementById('dateFormatJavascript').value,
-		title: 'Watch date',
-	})
+const datepicker = new Datepicker(document.getElementById('watchDate'), {
+	format: document.getElementById('dateFormatJavascript').value,
+	title: 'Watch date',
 })
 
 function getCurrentDate () {
