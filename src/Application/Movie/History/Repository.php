@@ -36,12 +36,17 @@ class Repository
         );
     }
 
+    public function deleteByUserId(int $userId) : void
+    {
+        $this->dbConnection->delete('movie_user_watch_dates', ['user_id' => $userId]);
+    }
+
     public function deleteHistoryByIdAndDate(int $movieId, int $userId, Date $watchedAt) : void
     {
         $this->dbConnection->executeStatement(
             'DELETE movie_user_watch_dates
             FROM movie_user_watch_dates
-            WHERE movie_id = ? AND watched_at = ? and user_id = ?',
+            WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
             [$movieId, (string)$watchedAt, $userId]
         );
     }

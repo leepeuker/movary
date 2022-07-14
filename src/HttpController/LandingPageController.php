@@ -24,11 +24,15 @@ class LandingPageController
         }
 
         $failedLogin = $_SESSION['failedLogin'] ?? null;
-        unset($_SESSION['failedLogin']);
+        $deletedAccount = $_SESSION['deletedAccount'] ?? null;
+        unset($_SESSION['failedLogin'], $_SESSION['deletedAccount']);
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/login.html.twig', ['failedLogin' => empty($failedLogin) === false])
+            $this->twig->render('page/login.html.twig', [
+                'failedLogin' => empty($failedLogin) === false,
+                'deletedAccount' => empty($deletedAccount) === false,
+            ])
         );
     }
 }

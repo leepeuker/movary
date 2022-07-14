@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Application\Movie;
 use Movary\Application\SyncLog\Repository;
 use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
@@ -18,8 +19,62 @@ class SettingsController
         private readonly Repository $syncLogRepository,
         private readonly Authentication $authenticationService,
         private readonly User\Api $userApi,
+        private readonly Movie\Api $movieApi,
         private readonly ?string $applicationVersion = null,
     ) {
+    }
+
+    public function deleteAccount() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $this->userApi->deleteUser($this->authenticationService->getCurrentUserId());
+
+        $this->authenticationService->logout();
+
+        $_SESSION['deletedAccount'] = true;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+        );
+    }
+
+    public function deleteHistory() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
+
+        $_SESSION['deletedUserHistory'] = true;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+        );
+    }
+
+    public function deleteRatings() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
+
+        $_SESSION['deletedUserRatings'] = true;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+        );
     }
 
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
@@ -39,6 +94,8 @@ class SettingsController
         $importHistorySuccessful = empty($_SESSION['importHistorySuccessful']) === false ? $_SESSION['importHistorySuccessful'] : null;
         $importRatingsSuccessful = empty($_SESSION['importRatingsSuccessful']) === false ? $_SESSION['importRatingsSuccessful'] : null;
         $importHistoryError = empty($_SESSION['importHistoryError']) === false ? $_SESSION['importHistoryError'] : null;
+        $deletedUserHistory = empty($_SESSION['deletedUserHistory']) === false ? $_SESSION['deletedUserHistory'] : null;
+        $deletedUserRatings = empty($_SESSION['deletedUserRatings']) === false ? $_SESSION['deletedUserRatings'] : null;
         unset(
             $_SESSION['passwordUpdated'],
             $_SESSION['passwordErrorCurrentInvalid'],
@@ -48,6 +105,8 @@ class SettingsController
             $_SESSION['importHistorySuccessful'],
             $_SESSION['importRatingsSuccessful'],
             $_SESSION['importHistoryError'],
+            $_SESSION['deletedUserHistory'],
+            $_SESSION['deletedUserRatings'],
         );
 
         return Response::create(
@@ -62,6 +121,8 @@ class SettingsController
                 'importRatingsSuccessful' => $importRatingsSuccessful,
                 'passwordUpdated' => $passwordUpdated,
                 'importHistoryError' => $importHistoryError,
+                'deletedUserHistory' => $deletedUserHistory,
+                'deletedUserRatings' => $deletedUserRatings,
                 'traktClientId' => $this->userApi->findTraktClientId($userId),
                 'traktUserName' => $this->userApi->findTraktUserName($userId),
                 'applicationVersion' => $this->applicationVersion ?? '-',

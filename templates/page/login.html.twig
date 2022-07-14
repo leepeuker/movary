@@ -14,11 +14,11 @@
             <h1 class="">Movary</h1>
             <br>
             <div class="form-floating">
-                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
                 <label for="floatingInput">Email address</label>
             </div>
             <div class="form-floating">
-                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" required>
                 <label for="floatingPassword">Password</label>
             </div>
 
@@ -28,6 +28,11 @@
                 </label>
             </div>
 
+            {% if deletedAccount == true %}
+                <div class="alert alert-success" role="alert" style="margin-bottom: 0.7rem!important;">
+                    Account deleted successfully.
+                </div>
+            {% endif %}
             {% if failedLogin == true %}
                 <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
                     Invalid credentials

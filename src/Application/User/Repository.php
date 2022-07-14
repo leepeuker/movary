@@ -45,6 +45,11 @@ class Repository
         );
     }
 
+    public function deleteUser(int $userId) : void
+    {
+        $this->dbConnection->delete('user', ['id' => $userId]);
+    }
+
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);

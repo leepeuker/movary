@@ -159,6 +159,34 @@
             <hr style="margin: 0;padding: 0">
             <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 0.1rem">
 
+                <h5 style="margin-bottom: 1rem">Delete your data</h5>
+
+                <div style="margin-bottom: 1rem">
+                    <a class="btn btn-warning btn-sm" href="/user/delete-history" onclick="confirm('Are you sure you want to delete your watch history?')">Delete history</a>
+                    <a class="btn btn-warning btn-sm" href="/user/delete-ratings" onclick="confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
+                    {% if deletedUserHistory == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                            History deleted successfully.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if deletedUserRatings == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                            Ratings deleted successfully.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                </div>
+                <div style="margin-bottom: 1rem">
+                    <a class="btn btn-danger btn-sm" href="/user/delete-account" onclick="confirm('Are you sure you want to delete your account with all your data?')">Delete
+                        account</a>
+                </div>
+
+            </div>
+
+            <hr style="margin: 0;padding: 0">
+            <div style="padding-top: 1rem;padding-bottom: 0.1rem">
+
                 <p>Last <a href="https://trakt.tv/" target="_blank">trakt.tv</a> sync: <span class="fw-light">{{ lastSyncTrakt }}</span></p>
                 <p>Last <a href="https://themoviedb.org/" target="_blank">themoviedb.org</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
                 <p>Last <a href="https://letterboxd.com/" target="_blank">letterboxd</a> sync: <span class="fw-light">{{ lastSyncLetterboxd }}</span></p>

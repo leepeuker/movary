@@ -23,6 +23,11 @@ class Api
         $this->repository->setPlexWebhookId($userId, null);
     }
 
+    public function deleteUser(int $userId) : void
+    {
+        $this->repository->deleteUser($userId);
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookId($userId);
