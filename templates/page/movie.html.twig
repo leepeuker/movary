@@ -116,7 +116,7 @@
         <p style="margin-block-end:0">Watched at:</p>
         <ul>
             {% for watchDate in watchDates|reverse %}
-                <li class="fw-light">{{ watchDate.watched_at|date(dateFormat) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
+                <li class="fw-light">{{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
                     {% if loggedIn == true %}
                         <button type="submit" class="btn btn-outline-danger btn-sm" style="margin-bottom: 0.5rem;margin-top: 0.2rem" onclick="deleteWatchDate(this)"
                                 id="delete-button-{{ loop.index }}">
@@ -129,7 +129,7 @@
                                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"></path>
                             </svg>
                         </button>
-                        <watchDate id="delete-button-{{ loop.index }}-watch-date" movie-id="{{ watchDate.movie_id }}" date="{{ watchDate.watched_at|date(dateFormat) }}"></watchDate>
+                        <watchDate id="delete-button-{{ loop.index }}-watch-date" movie-id="{{ watchDate.movie_id }}" date="{{ watchDate.watched_at|date(dateFormatPhp) }}"></watchDate>
                     {% endif %}
                 </li>
             {% endfor %}

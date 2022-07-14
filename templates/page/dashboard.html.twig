@@ -57,7 +57,7 @@
 
                                     </div>
                                     <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormat) }}</small>
+                                        <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>
                                     </div>
 
                                     {% if lastPlay.user_rating is not null %}

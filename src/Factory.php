@@ -131,19 +131,19 @@ class Factory
         $twig->addGlobal('loggedIn', $userAuthenticated);
 
         $currentUserId = null;
-        $dateFormat = DateFormat::getPhpDefault();
+        $dateFormatPhp = DateFormat::getPhpDefault();
         $dataFormatJavascript = DateFormat::getJavascriptDefault();
         if ($userAuthenticated === true) {
             $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
 
-            $userApi = $container->get(User\Api::class);
+            $userDateFormat = $container->get(User\Api::class)->fetchDateFormatId($currentUserId);
 
-            $dateFormat = DateFormat::getPhpById($userApi->fetchDateFormat($currentUserId));
-            $dataFormatJavascript = DateFormat::getJavascriptById($userApi->fetchDateFormat($currentUserId));
+            $dateFormatPhp = DateFormat::getPhpById($userDateFormat);
+            $dataFormatJavascript = DateFormat::getJavascriptById($userDateFormat);
         }
 
         $twig->addGlobal('routeUserId', $routeUserId ?? $currentUserId);
-        $twig->addGlobal('dateFormat', $dateFormat);
+        $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
 
         return $twig;
