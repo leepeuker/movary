@@ -1,5 +1,5 @@
 const datepicker = new Datepicker(document.getElementById('watchDate'), {
-	format: 'dd.mm.yyyy',
+	format: document.getElementById('dateFormatJavascript').value,
 	title: 'Watch date',
 })
 
@@ -9,7 +9,17 @@ function getCurrentDate () {
 	const mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
 	const yyyy = today.getFullYear()
 
-	return dd + '.' + mm + '.' + yyyy
+	if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yyyy') {
+		return dd + '.' + mm + '.' + yyyy
+	}
+	if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yy') {
+		return dd + '.' + mm + '.' + yyyy.toString().slice(-2)
+	}
+	if (document.getElementById('dateFormatJavascript').value === 'yy-mm-dd') {
+		return yyyy.toString().slice(-2) + '-' + mm + '-' + dd
+	}
+
+	return yyyy + '-' + mm + '-' + dd
 }
 
 const watchModal = document.getElementById('watchDateModal')
@@ -168,6 +178,8 @@ function logMovie () {
 }
 
 function isValidDate (dateString) {
+	return true
+
 	// First check for the pattern
 	if (!/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(dateString)) {
 		return false

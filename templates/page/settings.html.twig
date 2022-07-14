@@ -18,6 +18,29 @@
 
         <div style="text-align: center;">
 
+            <div style="padding-top: 1rem;padding-bottom: 1rem">
+                <h5>Change date format</h5>
+                <form action="/user/date-format" method="post" style="padding-top: 0.3rem">
+                    <div class="input-group input-group-sm">
+                        <select class="form-select form-select-sm mb-3" name="dateFormat" style="margin-left: 10%;margin-right: 10%;text-align: center;padding-right:0;" required>
+
+                            {% for dateFormatOffset, dateFormat in dateFormats %}
+                                <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if dateFormatUpdated == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                            Date format was updated.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    <button class="btn btn-primary btn-sm" type="submit">Submit</button>
+                </form>
+            </div>
+
+            <hr style="margin: 0;padding: 0">
+
             <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 1rem">
                 <h5>Change password</h5>
                 <form action="/user/password" method="post" style="padding-top: 0.3rem">

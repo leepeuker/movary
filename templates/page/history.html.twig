@@ -27,7 +27,7 @@
                         <div class="card h-100  position-relative">
                             <img src="{{ tmdb.generatePosterImageUrl(historyEntry.tmdb_poster_path) }}" class="card-img-top" alt="...">
                             <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date("d.m.Y") }}</small>
+                                <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date(dateFormatPhp) }}</small>
                             </div>
 
                             {% if historyEntry.userRating is not null %}

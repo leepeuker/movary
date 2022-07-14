@@ -7,7 +7,7 @@ use Ramsey\Uuid\Uuid;
 
 class Api
 {
-    const PASSWORD_MIN_LENGTH = 8;
+    private const PASSWORD_MIN_LENGTH = 8;
 
     public function __construct(private readonly Repository $repository)
     {
@@ -26,6 +26,17 @@ class Api
     public function deleteUser(int $userId) : void
     {
         $this->repository->deleteUser($userId);
+    }
+
+    public function fetchDateFormatId(int $userId) : int
+    {
+        $dateFormat = $this->repository->findDateFormatId($userId);
+
+        if ($dateFormat === null) {
+            throw new \RuntimeException('Could not find date format for user.');
+        }
+
+        return $dateFormat;
     }
 
     public function findPlexWebhookId(int $userId) : ?string
@@ -66,6 +77,11 @@ class Api
         $this->repository->setPlexWebhookId($userId, $plexWebhookId);
 
         return $plexWebhookId;
+    }
+
+    public function updateDateFormatId(int $userId, int $dateFormat) : void
+    {
+        $this->repository->updateDateFormatId($userId, $dateFormat);
     }
 
     public function updatePassword(int $userId, string $newPassword) : void

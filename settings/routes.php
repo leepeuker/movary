@@ -133,6 +133,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'deleteAccount']
     );
     $routeCollector->addRoute(
+        'POST',
+        '/user/date-format',
+        [\Movary\HttpController\SettingsController::class, 'updateDateFormatId']
+    );
+    $routeCollector->addRoute(
         'DELETE',
         '/user/plex-webhook-id',
         [\Movary\HttpController\PlexController::class, 'deletePlexWebhookId']

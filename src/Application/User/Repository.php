@@ -61,6 +61,17 @@ class Repository
         return DateTime::createFromString($expirationDate);
     }
 
+    public function findDateFormatId(int $userId) : ?int
+    {
+        $dateFormat = $this->dbConnection->fetchOne('SELECT `date_format_id` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($dateFormat === false) {
+            return null;
+        }
+
+        return (int)$dateFormat;
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
@@ -144,6 +155,19 @@ class Repository
             'user',
             [
                 'plex_webhook_uuid' => $plexWebhookId,
+            ],
+            [
+                'id' => $userId,
+            ]
+        );
+    }
+
+    public function updateDateFormatId(int $userId, int $dateFormat) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'date_format_id' => $dateFormat,
             ],
             [
                 'id' => $userId,

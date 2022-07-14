@@ -6,6 +6,7 @@ use Movary\Application\Movie;
 use Movary\Application\SyncLog\Repository;
 use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
+use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -96,6 +97,7 @@ class SettingsController
         $importHistoryError = empty($_SESSION['importHistoryError']) === false ? $_SESSION['importHistoryError'] : null;
         $deletedUserHistory = empty($_SESSION['deletedUserHistory']) === false ? $_SESSION['deletedUserHistory'] : null;
         $deletedUserRatings = empty($_SESSION['deletedUserRatings']) === false ? $_SESSION['deletedUserRatings'] : null;
+        $dateFormatUpdated = empty($_SESSION['dateFormatUpdated']) === false ? $_SESSION['dateFormatUpdated'] : null;
         unset(
             $_SESSION['passwordUpdated'],
             $_SESSION['passwordErrorCurrentInvalid'],
@@ -107,11 +109,15 @@ class SettingsController
             $_SESSION['importHistoryError'],
             $_SESSION['deletedUserHistory'],
             $_SESSION['deletedUserRatings'],
+            $_SESSION['dateFormatUpdated'],
         );
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings.html.twig', [
+                'dateFormats' => DateFormat::getFormats(),
+                'dateFormatSelected' => $this->userApi->fetchDateFormatId($userId),
+                'dateFormatUpdated' => $dateFormatUpdated,
                 'plexWebhookUrl' => $this->userApi->findPlexWebhookId($userId) ?? '-',
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
                 'passwordErrorMinLength' => $passwordErrorMinLength,
@@ -130,6 +136,26 @@ class SettingsController
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
                 'lastSyncLetterboxd' => $this->syncLogRepository->findLastLetterboxdSync() ?? '-',
             ]),
+        );
+    }
+
+    public function updateDateFormatId(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $postParameters = $request->getPostParameters();
+        $dateFormat = empty($postParameters['dateFormat']) === true ? 0 : (int)$postParameters['dateFormat'];
+
+        $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
+
+        $_SESSION['dateFormatUpdated'] = true;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
         );
     }
 
