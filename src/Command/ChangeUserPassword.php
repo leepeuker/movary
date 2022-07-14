@@ -35,6 +35,10 @@ class ChangeUserPassword extends Command
 
         try {
             $this->userApi->updatePassword($userId, $password);
+        } catch (User\Exception\PasswordTooShort $t) {
+            $this->generateOutput($output, "Error: Password must be at least {$t->getMinLength()} characters long.");
+
+            return Command::FAILURE;
         } catch (\Throwable $t) {
             $this->logger->error('Could not change password.', ['exception' => $t]);
 
