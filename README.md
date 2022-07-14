@@ -21,8 +21,11 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 
 This is a web application to track and rate your watched movies (like a digital movie diary).
 
-It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on MY watch history (-> no
+It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (->
+no
 social media features).
+
+It has support for multiple users accounts if you want to share it with friends.
 
 **Features:**
 
@@ -30,11 +33,12 @@ social media features).
 - statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
 - PWA: can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
 - import watched movies and ratings from trakt.tv and/or letterboxd.com
-- connect with plex to automatically log watched movies (plex premium required)
+- connect with plex via webhook to automatically log watched movies (plex premium required)
 - uses themoviedb.org API for movie data
-- export your data as csv
+- export your personal data
 
-**Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease.
+**Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease, which can
+lead to breaking changes until then, so keep the release notes in mind when updating.
 
 <a name="#install-via-docker"></a>
 
