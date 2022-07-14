@@ -8,8 +8,6 @@ use Movary\Api\Tmdb\Dto\Movie;
 
 class Api
 {
-    private array $languages = [];
-
     public function __construct(
         private readonly Client $client,
         private readonly Iso6931 $iso6931,
