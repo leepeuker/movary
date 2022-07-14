@@ -22,6 +22,7 @@ class SettingsController
     ) {
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function render() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -34,7 +35,20 @@ class SettingsController
         $passwordErrorMinLength = empty($_SESSION['passwordErrorMinLength']) === false ? $_SESSION['passwordErrorMinLength'] : null;
         $passwordErrorCurrentInvalid = empty($_SESSION['passwordErrorCurrentInvalid']) === false ? $_SESSION['passwordErrorCurrentInvalid'] : null;
         $passwordUpdated = empty($_SESSION['passwordUpdated']) === false ? $_SESSION['passwordUpdated'] : null;
-        unset($_SESSION['passwordUpdated'], $_SESSION['passwordErrorCurrentInvalid'], $_SESSION['passwordErrorMinLength'], $_SESSION['passwordErrorNotEqual']);
+        $traktCredentialsUpdated = empty($_SESSION['traktCredentialsUpdated']) === false ? $_SESSION['traktCredentialsUpdated'] : null;
+        $importHistorySuccessful = empty($_SESSION['importHistorySuccessful']) === false ? $_SESSION['importHistorySuccessful'] : null;
+        $importRatingsSuccessful = empty($_SESSION['importRatingsSuccessful']) === false ? $_SESSION['importRatingsSuccessful'] : null;
+        $importHistoryError = empty($_SESSION['importHistoryError']) === false ? $_SESSION['importHistoryError'] : null;
+        unset(
+            $_SESSION['passwordUpdated'],
+            $_SESSION['passwordErrorCurrentInvalid'],
+            $_SESSION['passwordErrorMinLength'],
+            $_SESSION['passwordErrorNotEqual'],
+            $_SESSION['traktCredentialsUpdated'],
+            $_SESSION['importHistorySuccessful'],
+            $_SESSION['importRatingsSuccessful'],
+            $_SESSION['importHistoryError'],
+        );
 
         return Response::create(
             StatusCode::createOk(),
@@ -43,7 +57,11 @@ class SettingsController
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
                 'passwordErrorMinLength' => $passwordErrorMinLength,
                 'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
+                'traktCredentialsUpdated' => $traktCredentialsUpdated,
+                'importHistorySuccessful' => $importHistorySuccessful,
+                'importRatingsSuccessful' => $importRatingsSuccessful,
                 'passwordUpdated' => $passwordUpdated,
+                'importHistoryError' => $importHistoryError,
                 'traktClientId' => $this->userApi->findTraktClientId($userId),
                 'traktUserName' => $this->userApi->findTraktUserName($userId),
                 'applicationVersion' => $this->applicationVersion ?? '-',
@@ -97,6 +115,37 @@ class SettingsController
         $this->userApi->updatePassword($this->authenticationService->getCurrentUserId(), $newPassword);
 
         $_SESSION['passwordUpdated'] = true;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+        );
+    }
+
+    public function updateTrakt(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = $request->getPostParameters();
+
+        $traktClientId = $postParameters['traktClientId'];
+        if (empty($traktClientId) === true) {
+            $traktClientId = null;
+        }
+
+        $traktUserName = $postParameters['traktUserName'];
+        if (empty($traktUserName) === true) {
+            $traktUserName = null;
+        }
+
+        $this->userApi->updateTraktClientId($userId, $traktClientId);
+        $this->userApi->updateTraktUserName($userId, $traktUserName);
+
+        $_SESSION['traktCredentialsUpdated'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),

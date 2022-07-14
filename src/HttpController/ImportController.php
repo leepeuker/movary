@@ -8,12 +8,14 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Psr\Log\LoggerInterface;
 
 class ImportController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly ImportService $importService
+        private readonly ImportService $importService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -27,11 +29,16 @@ class ImportController
         $exportType = $request->getRouteParameters()['exportType'];
         $fileParameters = $request->getFileParameters();
 
-        match ($exportType) {
-            'history' => $this->importHistory($userId, $fileParameters),
-            'ratings' => $this->importRatings($userId, $fileParameters),
-            default => throw new \RuntimeException('Export type not handled: ' . $exportType)
-        };
+        try {
+            match ($exportType) {
+                'history' => $this->importHistory($userId, $fileParameters),
+                'ratings' => $this->importRatings($userId, $fileParameters),
+                default => throw new \RuntimeException('Export type not handled: ' . $exportType)
+            };
+        } catch (\Throwable $t) {
+            $this->logger->error('Could not import: ' . $exportType, ['exception' => $t]);
+            $_SESSION['importHistoryError'] = $exportType;
+        }
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -47,6 +54,8 @@ class ImportController
         }
 
         $this->importService->importHistory($userId, $fileParameter['history']['tmp_name']);
+
+        $_SESSION['importHistorySuccessful'] = true;
     }
 
     private function importRatings(int $userId, array $fileParameter) : void
@@ -56,5 +65,7 @@ class ImportController
         }
 
         $this->importService->importRatings($userId, $fileParameter['ratings']['tmp_name']);
+
+        $_SESSION['importRatingsSuccessful'] = true;
     }
 }
