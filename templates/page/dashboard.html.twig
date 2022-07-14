@@ -57,7 +57,7 @@
 
                                     </div>
                                     <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date("d.m.y") }}</small>
+                                        <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormat) }}</small>
                                     </div>
 
                                     {% if lastPlay.user_rating is not null %}
@@ -94,7 +94,8 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-actors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-actors"
+                       style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
 
@@ -106,7 +107,8 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActress in mostWatchedActresses %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUserId }}/person/{{ mostWatchedActress.id }}'" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUserId }}/person/{{ mostWatchedActress.id }}'"
+                                     style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
                                     </div>
@@ -120,7 +122,8 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-actors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-actors"
+                       style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
                 <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
@@ -131,7 +134,8 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedDirector in mostWatchedDirectors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUserId }}/person/{{ mostWatchedDirector.id }}'" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUserId }}/person/{{ mostWatchedDirector.id }}'"
+                                     style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                                     </div>
@@ -144,7 +148,8 @@
                                 </div>
                             </div>
                         {% endfor %}
-                        <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-directors" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+                        <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUserId }}/most-watched-directors"
+                           style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                     </div>
                 </li>
 

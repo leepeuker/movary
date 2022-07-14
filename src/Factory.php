@@ -17,6 +17,7 @@ use Movary\Application\User\Service\Authentication;
 use Movary\Command;
 use Movary\HttpController\SettingsController;
 use Movary\ValueObject\Config;
+use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
@@ -130,11 +131,20 @@ class Factory
         $twig->addGlobal('loggedIn', $userAuthenticated);
 
         $currentUserId = null;
+        $dateFormat = DateFormat::getPhpDefault();
+        $dataFormatJavascript = DateFormat::getJavascriptDefault();
         if ($userAuthenticated === true) {
             $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
+
+            $userApi = $container->get(User\Api::class);
+
+            $dateFormat = DateFormat::getPhpByOffset($userApi->fetchDateFormat($currentUserId));
+            $dataFormatJavascript = DateFormat::getJavascriptByOffset($userApi->fetchDateFormat($currentUserId));
         }
 
         $twig->addGlobal('routeUserId', $routeUserId ?? $currentUserId);
+        $twig->addGlobal('dateFormat', $dateFormat);
+        $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
 
         return $twig;
     }
