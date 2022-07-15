@@ -71,7 +71,7 @@ app_database_rollback:
 	make exec_app_cmd CMD="php bin/console.php movary:database:migration --rollback"
 
 app_user_create_test:
-	make exec_app_cmd CMD="php bin/console.php movary:user:create a@a a"
+	make exec_app_cmd CMD="php bin/console.php user:create a@a a"
 
 app_sync_trakt:
 	make exec_app_cmd CMD="php bin/console.php movary:sync-trakt --overwrite"

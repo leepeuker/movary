@@ -14,7 +14,7 @@ class DatabaseMigration extends Command
 
     private const OPTION_NAME_ROLLBACK = 'rollback';
 
-    protected static $defaultName = self::COMMAND_BASE_NAME . ':database:migration';
+    protected static $defaultName = 'database:migration';
 
     public function __construct(
         private readonly PhinxApplication $phinxApplication,

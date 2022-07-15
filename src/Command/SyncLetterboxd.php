@@ -11,9 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SyncLetterboxd extends Command
 {
-    protected static $defaultName = self::COMMAND_BASE_NAME . ':sync-letterboxd-ratings';
-
     private const OPTION_NAME_OVERWRITE = 'overwrite';
+
+    protected static $defaultName = 'letterboxd:sync';
 
     public function __construct(
         private readonly SyncRatings $syncRatings,

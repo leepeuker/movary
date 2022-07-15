@@ -175,6 +175,19 @@ class Repository
         );
     }
 
+    public function updateEmail(int $userId, string $email) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'email' => $email,
+            ],
+            [
+                'id' => $userId,
+            ]
+        );
+    }
+
     public function updatePassword(int $userId, string $passwordHash) : void
     {
         $this->dbConnection->update(

@@ -84,6 +84,11 @@ class Api
         $this->repository->updateDateFormatId($userId, $dateFormat);
     }
 
+    public function updateEmail(int $userId, string $email) : void
+    {
+        $this->repository->updateEmail($userId, $email);
+    }
+
     public function updatePassword(int $userId, string $newPassword) : void
     {
         if (strlen($newPassword) < self::PASSWORD_MIN_LENGTH) {
@@ -106,6 +111,8 @@ class Api
 
     public function updateTraktUserName(int $userId, ?string $traktUserName) : void
     {
+        $traktUserName = $traktUserName === '' ? null : $traktUserName;
+
         $this->repository->updateTraktUserName($userId, $traktUserName);
     }
 }

@@ -3,15 +3,14 @@
 namespace Movary\Command;
 
 use Movary\Application\User\Api;
-use Movary\Application\User\Service;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreateUser extends Command
+class UserCreate extends Command
 {
-    protected static $defaultName = self::COMMAND_BASE_NAME . ':user:create';
+    protected static $defaultName = 'user:create';
 
     public function __construct(
         private readonly Api $userApi,
@@ -46,7 +45,7 @@ class CreateUser extends Command
             return Command::FAILURE;
         }
 
-        $this->generateOutput($output, 'Created user.');
+        $this->generateOutput($output, 'User created.');
 
         return Command::SUCCESS;
     }

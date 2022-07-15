@@ -95,8 +95,8 @@ volumes:
 
 ## Important: First steps
 
-- Run database migrations: `docker exec movary php bin/console.php movary:database:migration --migrate`
-- Create a user: `docker exec movary php bin/console.php movary:user:create example@email.com your-password`
+- Run database migrations: `docker exec movary php bin/console.php database:migration --migrate`
+- Create a user: `docker exec movary php bin/console.php user:create example@email.com your-password`
 
 List all available cli commands: `docker exec movary php bin/console.php movary`
 
@@ -143,12 +143,11 @@ Add the generated url as a [webhook to plex](https://support.plex.tv/articles/11
 
 You can sync your watch history and ratings from trakt.tv.
 
-The user used in the sync process must have a trakt username and client id set (can be set via web UI on the settings page or via cli `movary:user:change-trakt-client-id`
-and `movary:user:change-trakt-username`).
+The user used in the sync process must have a trakt username and client id set (can be set via web UI on the settings page or via cli `user:update`).
 
 Example (syncing history and ratings for user with id 1):
 
-`docker exec movary php bin/console.php movary:sync-trakt --ratings --history --userId=1`
+`docker exec movary php bin/console.php trakt:sync --ratings --history --userId=1`
 
 **Flags:**
 
@@ -172,7 +171,7 @@ Make sure you have added the variables `TMDB_API_KEY` to the environment.
 
 Example:
 
-`docker exec movary php bin/console.php movary:sync-tmdb`
+`docker exec movary php bin/console.php tmdb:sync`
 
 **Flags:**
 
