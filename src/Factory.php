@@ -40,9 +40,25 @@ class Factory
         return Request::createFromGlobals();
     }
 
-    public static function createDatabaseMigrationCommand(ContainerInterface $container) : Command\DatabaseMigration
+    public static function createDatabaseMigrationMigrateCommand(ContainerInterface $container) : Command\DatabaseMigrationMigrate
     {
-        return new Command\DatabaseMigration(
+        return new Command\DatabaseMigrationMigrate(
+            $container->get(PhinxApplication::class),
+            __DIR__ . '/../settings/phinx.php'
+        );
+    }
+
+    public static function createDatabaseMigrationRollbackCommand(ContainerInterface $container) : Command\DatabaseMigrationRollback
+    {
+        return new Command\DatabaseMigrationRollback(
+            $container->get(PhinxApplication::class),
+            __DIR__ . '/../settings/phinx.php'
+        );
+    }
+
+    public static function createDatabaseMigrationStatusCommand(ContainerInterface $container) : Command\DatabaseMigrationStatus
+    {
+        return new Command\DatabaseMigrationStatus(
             $container->get(PhinxApplication::class),
             __DIR__ . '/../settings/phinx.php'
         );
