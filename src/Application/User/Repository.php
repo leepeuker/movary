@@ -50,6 +50,11 @@ class Repository
         $this->dbConnection->delete('user', ['id' => $userId]);
     }
 
+    public function fetchAll() : array
+    {
+        return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user`');
+    }
+
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);

@@ -28,6 +28,11 @@ class Api
         $this->repository->deleteUser($userId);
     }
 
+    public function fetchAll() : array
+    {
+        return $this->repository->fetchAll();
+    }
+
     public function fetchDateFormatId(int $userId) : int
     {
         $dateFormat = $this->repository->findDateFormatId($userId);

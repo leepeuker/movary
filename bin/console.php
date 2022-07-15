@@ -10,5 +10,6 @@ $application->add($container->get(Movary\Command\DatabaseMigration::class));
 $application->add($container->get(Movary\Command\UserCreate::class));
 $application->add($container->get(Movary\Command\UserDelete::class));
 $application->add($container->get(Movary\Command\UserUpdate::class));
+$application->add($container->get(Movary\Command\UserList::class));
 
 $application->run();
