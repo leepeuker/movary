@@ -95,7 +95,7 @@ volumes:
 
 ## Important: First steps
 
-- Run database migrations: `docker exec movary php bin/console.php database:migration --migrate`
+- Run database migrations: `docker exec movary php bin/console.php database:migration:migrate`
 - Create a user: `docker exec movary php bin/console.php user:create example@email.com your-password`
 
 List all available cli commands: `docker exec movary php bin/console.php`
