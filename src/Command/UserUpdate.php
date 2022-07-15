@@ -27,8 +27,8 @@ class UserUpdate extends Command
             ->addArgument('userId', InputArgument::REQUIRED, 'ID of user')
             ->addOption('email', [], InputOption::VALUE_OPTIONAL, 'New email')
             ->addOption('password', [], InputOption::VALUE_OPTIONAL, 'New password')
-            ->addOption('traktUserName', [], InputOption::VALUE_OPTIONAL, 'New trakt user name', 'not-set')
-            ->addOption('traktClientId', [], InputOption::VALUE_OPTIONAL, 'New trakt client id', 'not-set');
+            ->addOption('traktUserName', [], InputOption::VALUE_OPTIONAL, 'New trakt user name')
+            ->addOption('traktClientId', [], InputOption::VALUE_OPTIONAL, 'New trakt client id');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
@@ -48,12 +48,16 @@ class UserUpdate extends Command
             }
 
             $traktUserName = $input->getOption('traktUserName');
-            if ($traktUserName !== 'not-set') {
+            if ($traktUserName !== null) {
+                $traktUserName = $traktUserName === '' ? null : $traktUserName;
+
                 $this->userApi->updateTraktUserName($userId, $traktUserName);
             }
 
             $traktClientId = $input->getOption('traktClientId');
-            if ($traktClientId !== 'not-set') {
+            if ($traktClientId !== null) {
+                $traktClientId = $traktClientId === '' ? null : $traktClientId;
+
                 $this->userApi->updateTraktClientId($userId, $traktClientId);
             }
         } catch (User\Exception\PasswordTooShort $t) {

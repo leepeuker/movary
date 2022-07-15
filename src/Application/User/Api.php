@@ -111,8 +111,6 @@ class Api
 
     public function updateTraktUserName(int $userId, ?string $traktUserName) : void
     {
-        $traktUserName = $traktUserName === '' ? null : $traktUserName;
-
         $this->repository->updateTraktUserName($userId, $traktUserName);
     }
 }
