@@ -65,22 +65,22 @@ db_migration_create:
 app_sync_all: app_sync_trakt app_sync_tmdb
 
 app_database_migrate:
-	make exec_app_cmd CMD="php bin/console.php movary:database:migration --migrate"
+	make exec_app_cmd CMD="php bin/console.php database:migration --migrate"
 
 app_database_rollback:
-	make exec_app_cmd CMD="php bin/console.php movary:database:migration --rollback"
+	make exec_app_cmd CMD="php bin/console.php database:migration --rollback"
 
 app_user_create_test:
-	make exec_app_cmd CMD="php bin/console.php movary:user:create a@a a"
+	make exec_app_cmd CMD="php bin/console.php user:create a@a a"
 
 app_sync_trakt:
-	make exec_app_cmd CMD="php bin/console.php movary:sync-trakt --overwrite"
+	make exec_app_cmd CMD="php bin/console.php trakt:sync --overwrite --userId=1"
 
 app_sync_tmdb:
-	make exec_app_cmd CMD="php bin/console.php movary:sync-tmdb"
+	make exec_app_cmd CMD="php bin/console.php tmdb:sync"
 
 app_sync_letterboxd:
-	make exec_app_cmd CMD="php bin/console.php movary:sync-letterboxd $(CSV_PATH)"
+	make exec_app_cmd CMD="php bin/console.php letterboxd:sync $(CSV_PATH)"
 
 # Tests
 #######

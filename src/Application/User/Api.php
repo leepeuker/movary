@@ -28,6 +28,11 @@ class Api
         $this->repository->deleteUser($userId);
     }
 
+    public function fetchAll() : array
+    {
+        return $this->repository->fetchAll();
+    }
+
     public function fetchDateFormatId(int $userId) : int
     {
         $dateFormat = $this->repository->findDateFormatId($userId);
@@ -82,6 +87,11 @@ class Api
     public function updateDateFormatId(int $userId, int $dateFormat) : void
     {
         $this->repository->updateDateFormatId($userId, $dateFormat);
+    }
+
+    public function updateEmail(int $userId, string $email) : void
+    {
+        $this->repository->updateEmail($userId, $email);
     }
 
     public function updatePassword(int $userId, string $newPassword) : void

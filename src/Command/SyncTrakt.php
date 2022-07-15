@@ -23,7 +23,7 @@ class SyncTrakt extends Command
 
     private const OPTION_NAME_USER_ID = 'userId';
 
-    protected static $defaultName = self::COMMAND_BASE_NAME . ':sync-trakt';
+    protected static $defaultName = 'trakt:sync';
 
     public function __construct(
         private readonly SyncRatings $syncRatings,
