@@ -7,7 +7,11 @@ class Entity
     private function __construct(
         private readonly int $id,
         private readonly string $passwordHash,
+        private readonly bool $areCoreAccountChangesDisabled,
         private readonly ?string $plexWebhookUuid,
+        private readonly ?string $dateFormat,
+        private readonly ?string $TraktUserName,
+        private readonly ?string $TraktClientId,
     ) {
     }
 
@@ -16,8 +20,22 @@ class Entity
         return new self(
             (int)$data['id'],
             $data['password'],
+            (bool)$data['core_account_changes_disabled'],
             $data['plex_webhook_uuid'],
+            $data['date_format'],
+            $data['trakt_user_name'],
+            $data['trakt_client_id'],
         );
+    }
+
+    public function areCoreAccountChangesDisabled() : bool
+    {
+        return $this->areCoreAccountChangesDisabled;
+    }
+
+    public function getDateFormat() : ?string
+    {
+        return $this->dateFormat;
     }
 
     public function getId() : int
@@ -33,5 +51,15 @@ class Entity
     public function getPlexWebhookId() : ?string
     {
         return $this->plexWebhookUuid;
+    }
+
+    public function getTraktClientId() : ?string
+    {
+        return $this->TraktClientId;
+    }
+
+    public function getTraktUserName() : ?string
+    {
+        return $this->TraktUserName;
     }
 }
