@@ -65,10 +65,10 @@ db_migration_create:
 app_sync_all: app_sync_trakt app_sync_tmdb
 
 app_database_migrate:
-	make exec_app_cmd CMD="php bin/console.php database:migration --migrate"
+	make exec_app_cmd CMD="php bin/console.php database:migration:migrate "
 
 app_database_rollback:
-	make exec_app_cmd CMD="php bin/console.php database:migration --rollback"
+	make exec_app_cmd CMD="php bin/console.php database:migration:rollback"
 
 app_user_create_test:
 	make exec_app_cmd CMD="php bin/console.php user:create a@a a"

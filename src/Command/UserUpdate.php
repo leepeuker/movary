@@ -27,6 +27,7 @@ class UserUpdate extends Command
             ->addArgument('userId', InputArgument::REQUIRED, 'ID of user')
             ->addOption('email', [], InputOption::VALUE_OPTIONAL, 'New email')
             ->addOption('password', [], InputOption::VALUE_OPTIONAL, 'New password')
+            ->addOption('coreAccountChangesDisabled', [], InputOption::VALUE_OPTIONAL, 'Set core account changes disabled status')
             ->addOption('traktUserName', [], InputOption::VALUE_OPTIONAL, 'New trakt user name')
             ->addOption('traktClientId', [], InputOption::VALUE_OPTIONAL, 'New trakt client id');
     }
@@ -59,6 +60,12 @@ class UserUpdate extends Command
                 $traktClientId = $traktClientId === '' ? null : $traktClientId;
 
                 $this->userApi->updateTraktClientId($userId, $traktClientId);
+            }
+
+            $coreAccountChangesDisabled = $input->getOption('coreAccountChangesDisabled');
+            if ($coreAccountChangesDisabled !== null) {
+
+                $this->userApi->updateCoreAccountChangesDisabled($userId, (bool)$coreAccountChangesDisabled);
             }
         } catch (User\Exception\PasswordTooShort $t) {
             $this->generateOutput($output, "Error: Password must be at least {$t->getMinLength()} characters long.");

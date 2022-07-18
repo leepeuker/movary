@@ -46,16 +46,19 @@
                 <form action="/user/password" method="post" style="padding-top: 0.3rem">
                     <div class="input-group input-group-sm mb-3">
                         <input type="password" class="form-control" name="currentPassword" placeholder="Current password" required
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                                style="margin-left: 10%;margin-right: 10%;text-align: center;">
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
                         <input type="password" class="form-control" name="newPassword" placeholder="New password" required minlength="8"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                                style="margin-left: 10%;margin-right: 10%;text-align: center;">
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
                         <input type="password" class="form-control" name="newPasswordRepeat" placeholder="Repeat password" required minlength="8"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                                style="margin-left: 10%;margin-right: 10%;text-align: center;">
                     </div>
 
@@ -201,7 +204,8 @@
                     {% endif %}
                 </div>
                 <div style="margin-bottom: 1rem">
-                    <a class="btn btn-danger btn-sm" href="/user/delete-account" onclick="confirm('Are you sure you want to delete your account with all your data?')">Delete
+                    <a class="btn btn-danger btn-sm {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-account"
+                       onclick="confirm('Are you sure you want to delete your account with all your data?')">Delete
                         account</a>
                 </div>
 

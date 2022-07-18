@@ -167,6 +167,19 @@ class Repository
         );
     }
 
+    public function updateCoreAccountChangesDisabled(int $userId, bool $coreAccountChangesDisabled) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'core_account_changes_disabled' => $coreAccountChangesDisabled === true ? 1 : 0,
+            ],
+            [
+                'id' => $userId,
+            ]
+        );
+    }
+
     public function updateDateFormatId(int $userId, int $dateFormat) : void
     {
         $this->dbConnection->update(

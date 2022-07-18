@@ -112,13 +112,16 @@ class SettingsController
             $_SESSION['dateFormatUpdated'],
         );
 
+        $user = $this->userApi->fetchUser($userId);
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings.html.twig', [
+                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'dateFormats' => DateFormat::getFormats(),
-                'dateFormatSelected' => $this->userApi->fetchDateFormatId($userId),
+                'dateFormatSelected' => $user->getDateFormat(),
                 'dateFormatUpdated' => $dateFormatUpdated,
-                'plexWebhookUrl' => $this->userApi->findPlexWebhookId($userId) ?? '-',
+                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
                 'passwordErrorMinLength' => $passwordErrorMinLength,
                 'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
@@ -129,8 +132,8 @@ class SettingsController
                 'importHistoryError' => $importHistoryError,
                 'deletedUserHistory' => $deletedUserHistory,
                 'deletedUserRatings' => $deletedUserRatings,
-                'traktClientId' => $this->userApi->findTraktClientId($userId),
-                'traktUserName' => $this->userApi->findTraktUserName($userId),
+                'traktClientId' => $user->getTraktClientId(),
+                'traktUserName' => $user->getTraktUserName(),
                 'applicationVersion' => $this->applicationVersion ?? '-',
                 'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',

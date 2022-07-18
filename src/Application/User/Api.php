@@ -44,6 +44,17 @@ class Api
         return $dateFormat;
     }
 
+    public function fetchUser(int $userId) : Entity
+    {
+        $user = $this->repository->findUserById($userId);
+
+        if ($user === null) {
+            throw new \RuntimeException('User does not exist with id : ' . $userId);
+        }
+
+        return $user;
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookId($userId);
@@ -82,6 +93,11 @@ class Api
         $this->repository->setPlexWebhookId($userId, $plexWebhookId);
 
         return $plexWebhookId;
+    }
+
+    public function updateCoreAccountChangesDisabled(int $userId, bool $updateCoreAccountChangesDisabled) : void
+    {
+        $this->repository->updateCoreAccountChangesDisabled($userId, $updateCoreAccountChangesDisabled);
     }
 
     public function updateDateFormatId(int $userId, int $dateFormat) : void
