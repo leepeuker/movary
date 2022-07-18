@@ -31,7 +31,14 @@ class SettingsController
             return Response::createFoundRedirect('/');
         }
 
-        $this->userApi->deleteUser($this->authenticationService->getCurrentUserId());
+        $userId = $this->authenticationService->getCurrentUserId();
+        $user = $this->userApi->fetchUser($userId);
+
+        if ($user->areCoreAccountChangesDisabled() === true) {
+            throw new \RuntimeException('Account deletion is disabled for user: ' . $userId);
+        }
+
+        $this->userApi->deleteUser($userId);
 
         $this->authenticationService->logout();
 
@@ -168,11 +175,14 @@ class SettingsController
             return Response::createFoundRedirect('/');
         }
 
+        $userId = $this->authenticationService->getCurrentUserId();
+        $user = $this->userApi->fetchUser($userId);
+
         $newPassword = $request->getPostParameters()['newPassword'];
         $newPasswordRepeat = $request->getPostParameters()['newPasswordRepeat'];
         $currentPassword = $request->getPostParameters()['currentPassword'];
 
-        if ($this->userApi->isValidPassword($this->authenticationService->getCurrentUserId(), $currentPassword) === false) {
+        if ($this->userApi->isValidPassword($userId, $currentPassword) === false) {
             $_SESSION['passwordErrorCurrentInvalid'] = true;
 
             return Response::create(
@@ -202,7 +212,11 @@ class SettingsController
             );
         }
 
-        $this->userApi->updatePassword($this->authenticationService->getCurrentUserId(), $newPassword);
+        if ($user->areCoreAccountChangesDisabled() === true) {
+            throw new \RuntimeException('Password changes are disabled for user: ' . $userId);
+        }
+
+        $this->userApi->updatePassword($userId, $newPassword);
 
         $_SESSION['passwordUpdated'] = true;
 
