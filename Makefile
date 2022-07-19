@@ -82,6 +82,9 @@ app_sync_tmdb:
 app_sync_letterboxd:
 	make exec_app_cmd CMD="php bin/console.php letterboxd:sync $(CSV_PATH)"
 
+app_jobs_process:
+	make exec_app_cmd CMD="php bin/console.php jobs:process"
+
 # Tests
 #######
 test: test_phpcs test_psalm test_phpstan
