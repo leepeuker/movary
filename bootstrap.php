@@ -15,6 +15,7 @@ $builder->addDefinitions(
         \Movary\Command\DatabaseMigrationStatus::class => DI\factory([Factory::class, 'createDatabaseMigrationStatusCommand']),
         \Movary\Command\DatabaseMigrationMigrate::class => DI\factory([Factory::class, 'createDatabaseMigrationMigrateCommand']),
         \Movary\Command\DatabaseMigrationRollback::class => DI\factory([Factory::class, 'createDatabaseMigrationRollbackCommand']),
+        \Movary\Command\ProcessJobs::class => DI\factory([Factory::class, 'createProcessJobCommand']),
         \Psr\Http\Client\ClientInterface::class => DI\factory([Factory::class, 'createHttpClient']),
         \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createFileLogger']),
         \Doctrine\DBAL\Connection::class => DI\factory([Factory::class, 'createDbConnection']),

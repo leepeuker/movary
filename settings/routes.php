@@ -133,6 +133,16 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'deleteAccount']
     );
     $routeCollector->addRoute(
+        'GET',
+        '/jobs/schedule/trakt-history-sync',
+        [\Movary\HttpController\JobController::class, 'scheduleTraktHistorySync']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/jobs/schedule/trakt-ratings-sync',
+        [\Movary\HttpController\JobController::class, 'scheduleTraktRatingsSync']
+    );
+    $routeCollector->addRoute(
         'POST',
         '/user/date-format',
         [\Movary\HttpController\SettingsController::class, 'updateDateFormatId']

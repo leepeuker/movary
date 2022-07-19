@@ -9,4 +9,5 @@ ARG APPLICATION_VERSION
 ENV APPLICATION_VERSION=${APPLICATION_VERSION}
 COPY --chown=application ./ ./
 COPY .env.production.example .env
+COPY build/php/supervisor.d/movary.conf /opt/docker/etc/supervisor.d/movary.conf
 RUN composer install --no-dev

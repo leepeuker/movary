@@ -119,6 +119,18 @@
 
                     <button class="btn btn-primary btn-sm" type="submit">Submit</button>
                 </form>
+
+                <div style="margin-top: 0.9rem">
+                    <a class="btn btn-warning btn-sm" href="/jobs/schedule/trakt-history-sync">Schedule history sync</a>
+                    <a class="btn btn-warning btn-sm" href="/jobs/schedule/trakt-ratings-sync">Schedule ratings sync</a>
+
+                    {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0!important;margin-top: 1rem">
+                            Trakt {% if traktScheduleHistorySyncSuccessful == true %}history{% else %}ratings{% endif %} sync successfully scheduled. Should be processed soon.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
             <hr style="margin: 0;padding: 0">

@@ -9,7 +9,7 @@ class Entity
         private readonly string $passwordHash,
         private readonly bool $areCoreAccountChangesDisabled,
         private readonly ?string $plexWebhookUuid,
-        private readonly ?string $dateFormat,
+        private readonly ?int $dateFormatId,
         private readonly ?string $TraktUserName,
         private readonly ?string $TraktClientId,
     ) {
@@ -22,7 +22,7 @@ class Entity
             $data['password'],
             (bool)$data['core_account_changes_disabled'],
             $data['plex_webhook_uuid'],
-            $data['date_format'],
+            $data['date_format_id'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
         );
@@ -33,9 +33,9 @@ class Entity
         return $this->areCoreAccountChangesDisabled;
     }
 
-    public function getDateFormat() : ?string
+    public function getDateFormatId() : ?int
     {
-        return $this->dateFormat;
+        return $this->dateFormatId;
     }
 
     public function getId() : int
