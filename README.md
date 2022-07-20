@@ -10,9 +10,9 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 2. [Install via docker](#install-via-docker)
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
-    1. [Plex Scrobbler](#plex-scrobbler)
-    2. [Trakt.tv Sync](#trakttv-sync)
-    3. [Tmdb Sync](#tmdb-sync)
+    1. [Tmdb Sync](#tmdb-sync)
+    2. [Plex Scrobbler](#plex-scrobbler)
+    3. [Trakt.tv Sync](#trakttv-sync)
 5. [Development](#development)
 
 <a name="#about"></a>
@@ -111,6 +111,10 @@ DATABASE_PASSWORD=
 DATABASE_DRIVER=pdo_mysql
 DATABASE_CHARSET=utf8
 
+# Minimum number of seconds the job processing worker has to run 
+# => the smallest possible timeperiode between processing two jobs
+MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
+
 # https://www.themoviedb.org/settings/api
 TMDB_API_KEY= 
 
@@ -126,6 +130,26 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 <a name="#features"></a>
 
 ## Features
+
+<a name="#tmdb-sync"></a>
+
+### tmdb sync
+
+Update movie (meta) data with themoviedb.org information.
+Make sure you have added the variables `TMDB_API_KEY` to the environment.
+
+Example:
+
+`docker exec movary php bin/console.php tmdb:sync`
+
+**Flags:**
+
+- `--hours`
+  Only movies which were last synced X hours or longer ago will be synced
+- `--threshold`
+  Maximum number of movies to sync
+
+<a name="#development"></a>
 
 <a name="#plex-scrobbler"></a>
 
@@ -161,26 +185,6 @@ Example (syncing history and ratings for user with id 1):
   Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
 - `--ignore-cache`
   Use if you want to sync everything from trakt regardless if there was a change since the last sync.
-
-<a name="#tmdb-sync"></a>
-
-### tmdb sync
-
-Update movie (meta) data with themoviedb.org information.
-Make sure you have added the variables `TMDB_API_KEY` to the environment.
-
-Example:
-
-`docker exec movary php bin/console.php tmdb:sync`
-
-**Flags:**
-
-- `--hours`
-  Only movies which were last synced X hours or longer ago will be synced
-- `--threshold`
-  Maximum number of movies to sync
-
-<a name="#development"></a>
 
 ## Development
 
