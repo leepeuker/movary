@@ -105,6 +105,8 @@ class SettingsController
         $deletedUserHistory = empty($_SESSION['deletedUserHistory']) === false ? $_SESSION['deletedUserHistory'] : null;
         $deletedUserRatings = empty($_SESSION['deletedUserRatings']) === false ? $_SESSION['deletedUserRatings'] : null;
         $dateFormatUpdated = empty($_SESSION['dateFormatUpdated']) === false ? $_SESSION['dateFormatUpdated'] : null;
+        $scheduledTraktHistorySync = empty($_SESSION['scheduledTraktHistorySync']) === false ? $_SESSION['scheduledTraktHistorySync'] : null;
+        $scheduledTraktRatingsSync = empty($_SESSION['scheduledTraktRatingsSync']) === false ? $_SESSION['scheduledTraktRatingsSync'] : null;
         unset(
             $_SESSION['passwordUpdated'],
             $_SESSION['passwordErrorCurrentInvalid'],
@@ -117,6 +119,8 @@ class SettingsController
             $_SESSION['deletedUserHistory'],
             $_SESSION['deletedUserRatings'],
             $_SESSION['dateFormatUpdated'],
+            $_SESSION['scheduledTraktHistorySync'],
+            $_SESSION['scheduledTraktRatingsSync'],
         );
 
         $user = $this->userApi->fetchUser($userId);
@@ -126,13 +130,15 @@ class SettingsController
             $this->twig->render('page/settings.html.twig', [
                 'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'dateFormats' => DateFormat::getFormats(),
-                'dateFormatSelected' => $user->getDateFormat(),
+                'dateFormatSelected' => $user->getDateFormatId(),
                 'dateFormatUpdated' => $dateFormatUpdated,
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
                 'passwordErrorMinLength' => $passwordErrorMinLength,
                 'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
+                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistorySync,
+                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsSync,
                 'importHistorySuccessful' => $importHistorySuccessful,
                 'importRatingsSuccessful' => $importRatingsSuccessful,
                 'passwordUpdated' => $passwordUpdated,

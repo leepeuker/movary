@@ -19,7 +19,7 @@ class SyncMovies
     ) {
     }
 
-    public function syncMovies(?int $maxAgeInHours, ?int $movieCountSyncThreshold) : void
+    public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
     {
         $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc();
 

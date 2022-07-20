@@ -169,4 +169,20 @@ class Factory
     {
         return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
     }
+
+    public function createProcessJobCommand(ContainerInterface $container, Config $config) : Command\ProcessJobs
+    {
+        try {
+            $minRuntimeInSeconds = $config->getAsInt('MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING');
+        } catch (\OutOfBoundsException) {
+            $minRuntimeInSeconds = null;
+        }
+
+        return new Command\ProcessJobs(
+            $container->get(Worker\Repository::class),
+            $container->get(Worker\Service::class),
+            $container->get(LoggerInterface::class),
+            $minRuntimeInSeconds,
+        );
+    }
 }
