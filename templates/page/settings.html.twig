@@ -121,8 +121,8 @@
                 </form>
 
                 <div style="margin-top: 0.9rem">
-                    <a class="btn btn-warning btn-sm" href="/jobs/schedule/trakt-history-sync">Schedule history sync</a>
-                    <a class="btn btn-warning btn-sm" href="/jobs/schedule/trakt-ratings-sync">Schedule ratings sync</a>
+                    <a class="btn btn-warning btn-sm {% if traktUserName is null or traktClientId is null %}disabled{% endif %}" href="/jobs/schedule/trakt-history-sync">Schedule history sync</a>
+                    <a class="btn btn-warning btn-sm {% if traktUserName is null or traktClientId is null %}disabled{% endif %}" href="/jobs/schedule/trakt-ratings-sync">Schedule ratings sync</a>
 
                     {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0!important;margin-top: 1rem">
