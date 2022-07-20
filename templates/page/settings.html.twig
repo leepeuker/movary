@@ -100,14 +100,24 @@
                 <form action="/user/trakt" method="post">
                     <p style="font-size: 0.8rem;margin-bottom: 0.5rem">Username:</p>
                     <div class="input-group input-group-sm mb-3">
-                        <input type="text" class="form-control" name="traktUserName" placeholder="Enter user name here" value="{{ traktUserName }}"
-                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                        <input type="text"
+                               class="form-control"
+                               name="traktUserName"
+                               placeholder="Enter user name here"
+                               value="{{ traktUserName }}"
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
 
                     <p style="font-size: 0.8rem;margin-bottom: 0.5rem">Client ID:</p>
                     <div class="input-group input-group-sm mb-3">
-                        <input type="text" class="form-control" name="traktClientId" placeholder="Enter client ID here" value="{{ traktClientId }}"
-                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                        <input type="text"
+                               class="form-control"
+                               name="traktClientId"
+                               placeholder="Enter client ID here"
+                               value="{{ traktClientId }} "
+                               style="margin-left: 10%;margin-right: 10%;text-align: center;"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
 
                     {% if traktCredentialsUpdated == true %}
@@ -117,12 +127,14 @@
                         </div>
                     {% endif %}
 
-                    <button class="btn btn-primary btn-sm" type="submit">Submit</button>
+                    <button class="btn btn-primary btn-sm" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Submit</button>
                 </form>
 
                 <div style="margin-top: 0.9rem">
-                    <a class="btn btn-warning btn-sm {% if traktUserName is null or traktClientId is null %}disabled{% endif %}" href="/jobs/schedule/trakt-history-sync">Schedule history sync</a>
-                    <a class="btn btn-warning btn-sm {% if traktUserName is null or traktClientId is null %}disabled{% endif %}" href="/jobs/schedule/trakt-ratings-sync">Schedule ratings sync</a>
+                    <a class="btn btn-warning btn-sm {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
+                       href="/jobs/schedule/trakt-history-sync">Schedule history sync</a>
+                    <a class="btn btn-warning btn-sm {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
+                       href="/jobs/schedule/trakt-ratings-sync">Schedule ratings sync</a>
 
                     {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0!important;margin-top: 1rem">
@@ -155,7 +167,7 @@
                 <form action="/user/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1rem">
                     <div class="input-group input-group-sm">
                         <input type="file" class="form-control" name="history" required>
-                        <button class="btn btn-primary" type="submit">Import history.csv</button>
+                        <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history.csv</button>
                     </div>
                 </form>
 
@@ -176,7 +188,7 @@
                 <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
                     <div class="input-group input-group-sm">
                         <input type="file" class="form-control" name="ratings" required>
-                        <button class="btn btn-primary" type="submit">Import rating.csv</button>
+                        <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import rating.csv</button>
                     </div>
                 </form>
                 {% if importRatingsSuccessful == true %}
@@ -200,8 +212,10 @@
                 <h5 style="margin-bottom: 1rem">Delete your data</h5>
 
                 <div style="margin-bottom: 1rem">
-                    <a class="btn btn-warning btn-sm" href="/user/delete-history" onclick="confirm('Are you sure you want to delete your watch history?')">Delete history</a>
-                    <a class="btn btn-warning btn-sm" href="/user/delete-ratings" onclick="confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
+                    <a class="btn btn-warning btn-sm {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-history"
+                       onclick="confirm('Are you sure you want to delete your watch history?')">Delete history</a>
+                    <a class="btn btn-warning btn-sm {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-ratings"
+                       onclick="confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
                     {% if deletedUserHistory == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
                             History deleted successfully.
