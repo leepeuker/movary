@@ -161,6 +161,7 @@ class Factory
         $twig->addGlobal('routeUserId', $routeUserId ?? $currentUserId);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
+        $twig->addGlobal('requestUrlPath', self::createCurrentHttpRequest()->getPath());
 
         return $twig;
     }

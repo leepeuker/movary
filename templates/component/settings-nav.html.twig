@@ -1,0 +1,16 @@
+<ul class="nav nav-pills nav-fill" style="margin-top: 1rem;">
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" aria-current="page" href="/settings/account">Account</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/plex' %}active{% endif %}" href="/settings/plex">Plex</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/trakt' %}active{% endif %}" href="/settings/trakt">Trakt.tv</a>
+    </li>
+{#    <li class="nav-item">#}
+{#        <a class="nav-link disabled" href="/settings/letterboxd">Letterboxd</a>#}
+{#    </li>#}
+</ul>
+
+<hr>
