@@ -160,6 +160,21 @@ class SettingsController
         );
     }
 
+    public function renderAppPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-app.html.twig', [
+                'applicationVersion' => $this->applicationVersion ?? '-',
+                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
+            ]),
+        );
+    }
+
     public function renderTraktPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -175,9 +190,12 @@ class SettingsController
             $_SESSION['scheduledTraktRatingsSync'],
         );
 
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-trakt.html.twig', [
+                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistorySync,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsSync,

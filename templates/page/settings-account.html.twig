@@ -80,7 +80,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
-                    <button class="btn btn-primary" type="submit">Submit</button>
+                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Submit</button>
                 </form>
             </div>
 
@@ -88,7 +88,9 @@
 
             <div style="padding-top: 1rem;padding-bottom: 1rem">
 
-                <h5 style="margin-bottom: 1rem">Export & Import</h5>
+                <h5>Export & Import</h5>
+
+                <p class="text-muted">Export or import your movary history or ratings.</p>
 
                 <a class="btn btn-primary" target="_blank" href="/user/export/csv/history">Export: history.csv</a>
                 <a class="btn btn-primary" target="_blank" href="/user/export/csv/ratings">Export: ratings.csv</a>
@@ -139,7 +141,9 @@
 
             <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 0.1rem">
 
-                <h5 style="margin-bottom: 1rem">Delete your data</h5>
+                <h5>Delete your data</h5>
+
+                <p class="text-muted">This will irrecoverable delete your data, so be sure that this is really what you want.</p>
 
                 <div style="margin-bottom: 1rem">
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-history"
@@ -165,13 +169,6 @@
                         account</a>
                 </div>
 
-            </div>
-
-            <hr style="margin: 0;padding: 0">
-            <div style="padding-top: 1rem;padding-bottom: 0.1rem">
-                <p>Last <a href="https://themoviedb.org/" target="_blank">themoviedb.org</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
-                <p>Current <a href="https://github.com/leepeuker/movary/releases" target="_blank">application</a> version: <span class="fw-light">{{ applicationVersion }}</span>
-                </p>
             </div>
         </div>
     </main>

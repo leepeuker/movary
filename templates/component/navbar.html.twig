@@ -7,22 +7,22 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 {% if loggedIn == true %}
-                    <li><a class="dropdown-item" href="/log-movie">Log movie</a></li>
+                    <li><a class="dropdown-item {% if requestUrlPath starts with '/log-movie' %}active{% endif %}" href="/log-movie">Log movie</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
                 {% endif %}
-                <li><a class="dropdown-item" href="/{{ routeUserId }}/history">History</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}" href="/{{ routeUserId }}/history">History</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="/{{ routeUserId }}/most-watched-actors">Top Actors</a></li>
-                <li><a class="dropdown-item" href="/{{ routeUserId }}/most-watched-directors">Top Directors</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/most-watched-actors#' %}active{% endif %}" href="/{{ routeUserId }}/most-watched-actors">Top Actors</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/most-watched-directors#' %}active{% endif %}" href="/{{ routeUserId }}/most-watched-directors">Top Directors</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
                 {% if loggedIn == true %}
-                    <li><a class="dropdown-item" href="/settings/account">Settings</a></li>
+                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="/settings/account">Settings</a></li>
                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                 {% else %}
                     <li><a class="dropdown-item" href="/login">Login</a></li>

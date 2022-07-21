@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Plex
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-bottom: 1rem">
+                <p style="margin-bottom: 0.5rem">Last <a href="https://themoviedb.org/" target="_blank">tmdb</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
+                <p><a href="https://github.com/leepeuker/movary/releases" target="_blank">Application</a> version: <span class="fw-light">{{ applicationVersion }}</span>
+                </p>
+            </div>
+        </div>
+    </main>
+{% endblock %}

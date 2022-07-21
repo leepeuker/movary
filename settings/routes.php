@@ -29,6 +29,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/app',
+        [\Movary\HttpController\SettingsController::class, 'renderAppPage']
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/{userId:\d+}/history',
         [\Movary\HttpController\HistoryController::class, 'renderHistory']
     );
