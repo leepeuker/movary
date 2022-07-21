@@ -16,7 +16,7 @@
                 <p class="text-muted">Date format movary uses when displaying dates for you.</p>
                 <form action="/user/date-format" method="post">
                     <div class="input-group">
-                        <select class="form-select mb-3" name="dateFormat" style="margin-left: 10%;margin-right: 10%;text-align: center;padding-right:0;" required>
+                        <select class="form-select mb-3" name="dateFormat" style="margin-left: 5%;margin-right: 5%;;text-align: center;padding-right:0;" required>
 
                             {% for dateFormatOffset, dateFormat in dateFormats %}
                                 <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
@@ -24,7 +24,7 @@
                         </select>
                     </div>
                     {% if dateFormatUpdated == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
                             Date format was updated.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -41,41 +41,41 @@
                     <div class="input-group  mb-3">
                         <input type="password" class="form-control" name="currentPassword" placeholder="Current password" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
-                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                               style="margin-left: 5%;margin-right: 5%;;text-align: center;">
                     </div>
 
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" name="newPassword" placeholder="New password" required minlength="8"
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
-                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                               style="margin-left: 5%;margin-right: 5%;;text-align: center;">
                     </div>
 
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" name="newPasswordRepeat" placeholder="Repeat password" required minlength="8"
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
-                               style="margin-left: 10%;margin-right: 10%;text-align: center;">
+                               style="margin-left: 5%;margin-right: 5%;;text-align: center;">
                     </div>
 
                     {% if passwordErrorNotEqual == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
                             Passwords were not equal.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordErrorMinLength == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
                             Password must be at least {{ passwordErrorMinLength }} characters long.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordErrorCurrentInvalid == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
                             Current password is not correct.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordUpdated == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
                             Password was updated.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -103,14 +103,14 @@
                 </form>
 
                 {% if importHistorySuccessful == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         History was successfully imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endif %}
 
                 {% if importHistoryError == 'history' %}
-                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         History could not be imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -123,14 +123,14 @@
                     </div>
                 </form>
                 {% if importRatingsSuccessful == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         Ratings were successfully imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endif %}
 
                 {% if importHistoryError == 'ratings' %}
-                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         Ratings could not be imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -151,13 +151,13 @@
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-ratings"
                        onclick="confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
                     {% if deletedUserHistory == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
                             History deleted successfully.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if deletedUserRatings == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
                             Ratings deleted successfully.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>

@@ -42,7 +42,7 @@
                     </div>
 
                     {% if traktCredentialsUpdated == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
                             Trakt credentials were updated.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -67,7 +67,7 @@
                        href="/jobs/schedule/trakt-ratings-sync">Ratings sync</a>
 
                     {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 10%;margin-right: 10%;margin-bottom: 0!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
                             Trakt {% if traktScheduleHistorySyncSuccessful == true %}history{% else %}ratings{% endif %} sync successfully scheduled. Should be processed soon.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
