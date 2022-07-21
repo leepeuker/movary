@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Trakt.tv
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-bottom: 1rem">
+                <h5>API Credentials</h5>
+
+                <p class="text-muted" style="margin-bottom: 0.5rem">To get your username and client id from trakt visit <a href="https://trakt.tv/oauth/applications"
+                                                                                                                           target="_blank">this url</a>.</p>
+
+                <form action="/user/trakt" method="post">
+                    <p style="margin-bottom: 0.5rem">Username:</p>
+                    <div class="input-group mb-3">
+                        <input type="text"
+                               class="form-control"
+                               name="traktUserName"
+                               placeholder="Enter username here"
+                               value="{{ traktUserName }}"
+                               style="margin-left: 5%;margin-right: 5%;text-align: center;"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                    </div>
+
+                    <p style="margin-bottom: 0.5rem">Client ID:</p>
+                    <div class="input-group mb-3">
+                        <input type="text"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}
+                               class="form-control"
+                               name="traktClientId"
+                               placeholder="Enter client id here"
+                               value="{{ traktClientId }}"
+                               style="margin-left: 5%;margin-right: 5%;text-align: center;"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                    </div>
+
+                    {% if traktCredentialsUpdated == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
+                            Trakt credentials were updated.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Submit</button>
+                </form>
+
+                <hr>
+
+                <h5>Sync data</h5>
+
+                <p class="text-muted">You must have your trakt username and client id set to be able to sync your data with trakt. <br>
+                    The sync only imports data missing in movary from trakt.
+                </p>
+
+                <div style="margin-top: 0.9rem">
+                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
+                       href="/jobs/schedule/trakt-history-sync">History sync</a>
+
+                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
+                       href="/jobs/schedule/trakt-ratings-sync">Ratings sync</a>
+
+                    {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
+                            Trakt {% if traktScheduleHistorySyncSuccessful == true %}history{% else %}ratings{% endif %} sync successfully scheduled. Should be processed soon.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <p style="margin-top: 0.8rem">Last sync: <span class="fw-light">{{ lastSyncTrakt }}</span></p>
+            </div>
+        </div>
+    </main>
+{% endblock %}

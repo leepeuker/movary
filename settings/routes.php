@@ -14,8 +14,23 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings',
-        [\Movary\HttpController\SettingsController::class, 'render']
+        '/settings/account',
+        [\Movary\HttpController\SettingsController::class, 'renderAccountPage']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/trakt',
+        [\Movary\HttpController\SettingsController::class, 'renderTraktPage']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/plex',
+        [\Movary\HttpController\SettingsController::class, 'renderPlexPage']
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/app',
+        [\Movary\HttpController\SettingsController::class, 'renderAppPage']
     );
     $routeCollector->addRoute(
         'GET',

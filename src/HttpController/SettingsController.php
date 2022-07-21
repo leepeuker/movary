@@ -86,7 +86,7 @@ class SettingsController
     }
 
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-    public function render() : Response
+    public function renderAccountPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
@@ -98,36 +98,30 @@ class SettingsController
         $passwordErrorMinLength = empty($_SESSION['passwordErrorMinLength']) === false ? $_SESSION['passwordErrorMinLength'] : null;
         $passwordErrorCurrentInvalid = empty($_SESSION['passwordErrorCurrentInvalid']) === false ? $_SESSION['passwordErrorCurrentInvalid'] : null;
         $passwordUpdated = empty($_SESSION['passwordUpdated']) === false ? $_SESSION['passwordUpdated'] : null;
-        $traktCredentialsUpdated = empty($_SESSION['traktCredentialsUpdated']) === false ? $_SESSION['traktCredentialsUpdated'] : null;
         $importHistorySuccessful = empty($_SESSION['importHistorySuccessful']) === false ? $_SESSION['importHistorySuccessful'] : null;
         $importRatingsSuccessful = empty($_SESSION['importRatingsSuccessful']) === false ? $_SESSION['importRatingsSuccessful'] : null;
         $importHistoryError = empty($_SESSION['importHistoryError']) === false ? $_SESSION['importHistoryError'] : null;
         $deletedUserHistory = empty($_SESSION['deletedUserHistory']) === false ? $_SESSION['deletedUserHistory'] : null;
         $deletedUserRatings = empty($_SESSION['deletedUserRatings']) === false ? $_SESSION['deletedUserRatings'] : null;
         $dateFormatUpdated = empty($_SESSION['dateFormatUpdated']) === false ? $_SESSION['dateFormatUpdated'] : null;
-        $scheduledTraktHistorySync = empty($_SESSION['scheduledTraktHistorySync']) === false ? $_SESSION['scheduledTraktHistorySync'] : null;
-        $scheduledTraktRatingsSync = empty($_SESSION['scheduledTraktRatingsSync']) === false ? $_SESSION['scheduledTraktRatingsSync'] : null;
         unset(
             $_SESSION['passwordUpdated'],
             $_SESSION['passwordErrorCurrentInvalid'],
             $_SESSION['passwordErrorMinLength'],
             $_SESSION['passwordErrorNotEqual'],
-            $_SESSION['traktCredentialsUpdated'],
             $_SESSION['importHistorySuccessful'],
             $_SESSION['importRatingsSuccessful'],
             $_SESSION['importHistoryError'],
             $_SESSION['deletedUserHistory'],
             $_SESSION['deletedUserRatings'],
             $_SESSION['dateFormatUpdated'],
-            $_SESSION['scheduledTraktHistorySync'],
-            $_SESSION['scheduledTraktRatingsSync'],
         );
 
         $user = $this->userApi->fetchUser($userId);
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings.html.twig', [
+            $this->twig->render('page/settings-account.html.twig', [
                 'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'dateFormats' => DateFormat::getFormats(),
                 'dateFormatSelected' => $user->getDateFormatId(),
@@ -136,9 +130,6 @@ class SettingsController
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
                 'passwordErrorMinLength' => $passwordErrorMinLength,
                 'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
-                'traktCredentialsUpdated' => $traktCredentialsUpdated,
-                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistorySync,
-                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsSync,
                 'importHistorySuccessful' => $importHistorySuccessful,
                 'importRatingsSuccessful' => $importRatingsSuccessful,
                 'passwordUpdated' => $passwordUpdated,
@@ -148,9 +139,67 @@ class SettingsController
                 'traktClientId' => $user->getTraktClientId(),
                 'traktUserName' => $user->getTraktUserName(),
                 'applicationVersion' => $this->applicationVersion ?? '-',
-                'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
-                'lastSyncLetterboxd' => $this->syncLogRepository->findLastLetterboxdSync() ?? '-',
+            ]),
+        );
+    }
+
+    public function renderPlexPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-plex.html.twig', [
+                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
+            ]),
+        );
+    }
+
+    public function renderAppPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-app.html.twig', [
+                'applicationVersion' => $this->applicationVersion ?? '-',
+                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
+            ]),
+        );
+    }
+
+    public function renderTraktPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $traktCredentialsUpdated = empty($_SESSION['traktCredentialsUpdated']) === false ? $_SESSION['traktCredentialsUpdated'] : null;
+        $scheduledTraktHistorySync = empty($_SESSION['scheduledTraktHistorySync']) === false ? $_SESSION['scheduledTraktHistorySync'] : null;
+        $scheduledTraktRatingsSync = empty($_SESSION['scheduledTraktRatingsSync']) === false ? $_SESSION['scheduledTraktRatingsSync'] : null;
+        unset(
+            $_SESSION['traktCredentialsUpdated'],
+            $_SESSION['scheduledTraktHistorySync'],
+            $_SESSION['scheduledTraktRatingsSync'],
+        );
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-trakt.html.twig', [
+                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'traktCredentialsUpdated' => $traktCredentialsUpdated,
+                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistorySync,
+                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsSync,
+                'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
             ]),
         );
     }
