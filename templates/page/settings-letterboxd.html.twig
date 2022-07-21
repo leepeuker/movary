@@ -28,7 +28,7 @@
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" accept=".csv" name="historyCsv" id="historyCsv" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Schedule import</button>
+                    <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
 
                     {% if letterboxdHistorySyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
@@ -46,7 +46,7 @@
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" accept=".csv" name="ratingsCsv" id="ratingsCsv" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Schedule import</button>
+                    <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
 
                     {% if letterboxdRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
