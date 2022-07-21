@@ -147,9 +147,9 @@
 
                 <div style="margin-bottom: 1rem">
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-history"
-                       onclick="confirm('Are you sure you want to delete your watch history?')">Delete history</a>
+                       onclick="return confirm('Are you sure you want to delete your watch history?')">Delete history</a>
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-ratings"
-                       onclick="confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
+                       onclick="return confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
                     {% if deletedUserHistory == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
                             History deleted successfully.
@@ -165,7 +165,7 @@
                 </div>
                 <div style="margin-bottom: 1rem">
                     <a class="btn btn-danger {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-account"
-                       onclick="confirm('Are you sure you want to delete your account with all your data?')">Delete
+                       onclick="return confirm('Are you sure you want to delete your account with all your data?')">Delete
                         account</a>
                 </div>
 
