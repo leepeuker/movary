@@ -6,9 +6,9 @@ use Ramsey\Uuid\Uuid;
 
 class Job implements \JsonSerializable
 {
-    private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_sync_history';
+    private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
 
-    private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_sync_ratings';
+    private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
 
     private const TYPE_TMDB_SYNC = 'tmdb_sync';
 
@@ -37,7 +37,7 @@ class Job implements \JsonSerializable
         return new self($uuid, $type, $parameters);
     }
 
-    public static function createLetterboxImportHistorySync(int $userId, string $importFile) : self
+    public static function createLetterboxImportHistory(int $userId, string $importFile) : self
     {
         return new self((string)Uuid::uuid4(), self::TYPE_LETTERBOXD_IMPORT_HISTORY, ['userId' => $userId, 'importFile' => $importFile]);
     }

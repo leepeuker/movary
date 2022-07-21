@@ -20,7 +20,7 @@ class Service
 
     public function addLetterboxdImportHistoryJob(int $userId, string $importFile) : void
     {
-        $job = Job::createLetterboxImportHistorySync($userId, $importFile);
+        $job = Job::createLetterboxImportHistory($userId, $importFile);
 
         $this->repository->addJob($job);
     }
