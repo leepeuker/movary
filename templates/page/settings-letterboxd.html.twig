@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Trakt.tv
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-bottom: 1rem">
+                <h5 style="margin-bottom: 0.5rem">Import data</h5>
+
+                <p class="text-muted" style="margin-bottom: 0.5rem">
+                    Export your data from <a href="https://letterboxd.com/settings/data/" target="_blank">letterboxd</a>.
+                    <br>
+                    The received zip archive contains .csv files with your data, which can be imported into movary.
+                </p>
+
+                <hr>
+
+                <form action="/jobs/schedule/letterboxd-history-sync" method="post" enctype="multipart/form-data">
+                    <h5 style="margin-bottom: 0.5rem">Watch history</h5>
+                    <p class="text-muted" style="margin-bottom: 0.5rem">Upload the watched.csv file</p>
+                    <div class="input-group mb-3">
+                        <input type="file" class="form-control" accept=".csv" name="historyCsv" id="historyCsv" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Schedule import</button>
+
+                    {% if letterboxdHistorySyncSuccessful == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
+                            Ratings sync successfully scheduled. Should be processed soon.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                </form>
+
+                <hr>
+
+                <form action="/jobs/schedule/letterboxd-ratings-sync" method="post" enctype="multipart/form-data">
+                    <h5 style="margin-bottom: 0.5rem">Ratings</h5>
+                    <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
+                    <div class="input-group mb-3">
+                        <input type="file" class="form-control" accept=".csv" name="ratingsCsv" id="ratingsCsv" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Schedule import</button>
+
+                    {% if letterboxdRatingsSyncSuccessful == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
+                            Ratings sync successfully scheduled. Should be processed soon.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}

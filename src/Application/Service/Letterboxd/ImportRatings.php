@@ -2,25 +2,23 @@
 
 namespace Movary\Application\Service\Letterboxd;
 
-use League\Csv\Reader;
 use Movary\Api;
-use Movary\Api\Letterboxd\WebScrapper;
-use Movary\Application;
-use Movary\ValueObject\PersonalRating;
-use Psr\Log\LoggerInterface;
 
-class SyncRatings
+class ImportRatings
 {
     public function __construct(
         // private readonly Application\Movie\Api $movieApi,
         // private readonly WebScrapper $webScrapper,
         // private readonly LoggerInterface $logger,
         // private readonly Application\SyncLog\Repository $scanLogRepository
-    ) {
+    )
+    {
     }
 
-    public function execute(string $ratingsCsvPath, bool $verbose = false, bool $overwriteExistingData = false) : void
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+    public function execute(int $userId, string $ratingsCsvPath, bool $verbose = false, bool $overwriteExistingData = false) : void
     {
+        // TODO fix this stuff
         // $ratings = Reader::createFromPath($ratingsCsvPath);
         // $ratings->setHeaderOffset(0);
         //
@@ -49,7 +47,9 @@ class SyncRatings
         //     $this->movieApi->updateUserRating($movie->getId(), $personalRating);
         // }
         //
-        // $this->scanLogRepository->insertLogForLetterboxdSync();
+        // $this->scanLogRepository->insertLogForLetterboxdSync();#
+
+        unlink($ratingsCsvPath);
     }
 
     // public function findMovieByLetterboxdUri(string $letterboxdUri) : ?Application\Movie\Entity

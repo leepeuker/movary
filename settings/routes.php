@@ -24,6 +24,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/letterboxd',
+        [\Movary\HttpController\SettingsController::class, 'renderLetterboxdPage']
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/plex',
         [\Movary\HttpController\SettingsController::class, 'renderPlexPage']
     );
@@ -36,11 +41,6 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/{userId:\d+}/history',
         [\Movary\HttpController\HistoryController::class, 'renderHistory']
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/letterboxd-rating',
-        [\Movary\HttpController\Letterboxd::class, 'uploadRatingCsv']
     );
     $routeCollector->addRoute(
         'POST',
@@ -156,6 +156,16 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/jobs/schedule/trakt-ratings-sync',
         [\Movary\HttpController\JobController::class, 'scheduleTraktRatingsSync']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/jobs/schedule/letterboxd-history-sync',
+        [\Movary\HttpController\JobController::class, 'scheduleLetterboxdHistoryImport']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/jobs/schedule/letterboxd-ratings-sync',
+        [\Movary\HttpController\JobController::class, 'scheduleLetterboxdRatingsImport']
     );
     $routeCollector->addRoute(
         'POST',

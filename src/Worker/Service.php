@@ -2,6 +2,7 @@
 
 namespace Movary\Worker;
 
+use Movary\Application\Service\Letterboxd;
 use Movary\Application\Service\Tmdb\SyncMovies;
 use Movary\Application\Service\Trakt;
 
@@ -11,8 +12,24 @@ class Service
         private readonly Repository $repository,
         private readonly Trakt\SyncWatchedMovies $traktSyncWatchedMovies,
         private readonly Trakt\SyncRatings $traktSyncRatings,
-        private readonly SyncMovies $tmdbSyncMovies
+        private readonly Letterboxd\ImportRatings $letterboxdImportRatings,
+        private readonly Letterboxd\ImportWatchedMovies $letterboxdImportHistory,
+        private readonly SyncMovies $tmdbSyncMovies,
     ) {
+    }
+
+    public function addLetterboxdImportHistoryJob(int $userId, string $importFile) : void
+    {
+        $job = Job::createLetterboxImportHistorySync($userId, $importFile);
+
+        $this->repository->addJob($job);
+    }
+
+    public function addLetterboxdImportRatingsJob(int $userId, string $importFile) : void
+    {
+        $job = Job::createLetterboxImportRatings($userId, $importFile);
+
+        $this->repository->addJob($job);
     }
 
     public function addTmdbSyncJob() : void
@@ -41,6 +58,8 @@ class Service
         $parameters = $job->getParameters();
 
         match (true) {
+            $job->isOfTypeLetterboxdImportRankings() => $this->letterboxdImportRatings->execute($parameters['userId'], $parameters['importFile']),
+            $job->isOfTypeLetterboxdImportHistory() => $this->letterboxdImportHistory->execute($parameters['userId'], $parameters['importFile']),
             $job->isOfTypeTraktSyncRankings() => $this->traktSyncRatings->execute($parameters['userId']),
             $job->isOfTypeTraktSyncHistory() => $this->traktSyncWatchedMovies->execute($parameters['userId']),
             $job->isOfTypeTmdbSync() => $this->tmdbSyncMovies->syncMovies(),

@@ -32,7 +32,7 @@ It has support for multiple users accounts if you want to share it with friends.
 - add or update movie watch dates and ratings (only possible when logged in)
 - statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
 - PWA: can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
-- import watched movies and ratings from trakt.tv and/or letterboxd.com
+- import watched movies and ratings from trakt.tv and letterboxd.com
 - connect with plex via webhook to automatically log watched movies (plex premium required)
 - uses themoviedb.org API for movie data
 - export your personal data
