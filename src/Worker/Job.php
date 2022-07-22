@@ -6,6 +6,10 @@ use Ramsey\Uuid\Uuid;
 
 class Job implements \JsonSerializable
 {
+    private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
+
+    private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
+
     private const TYPE_TMDB_SYNC = 'tmdb_sync';
 
     private const TYPE_TRAKT_SYNC_HISTORY = 'trakt_sync_history';
@@ -33,6 +37,16 @@ class Job implements \JsonSerializable
         return new self($uuid, $type, $parameters);
     }
 
+    public static function createLetterboxImportHistory(int $userId, string $importFile) : self
+    {
+        return new self((string)Uuid::uuid4(), self::TYPE_LETTERBOXD_IMPORT_HISTORY, ['userId' => $userId, 'importFile' => $importFile]);
+    }
+
+    public static function createLetterboxImportRatings(int $userId, string $importFile) : self
+    {
+        return new self((string)Uuid::uuid4(), self::TYPE_LETTERBOXD_IMPORT_RATINGS, ['userId' => $userId, 'importFile' => $importFile]);
+    }
+
     public static function createTmdbSync() : self
     {
         return new self((string)Uuid::uuid4(), self::TYPE_TMDB_SYNC, []);
@@ -56,6 +70,16 @@ class Job implements \JsonSerializable
     public function getType() : string
     {
         return $this->type;
+    }
+
+    public function isOfTypeLetterboxdImportHistory() : bool
+    {
+        return $this->type === self::TYPE_LETTERBOXD_IMPORT_HISTORY;
+    }
+
+    public function isOfTypeLetterboxdImportRankings() : bool
+    {
+        return $this->type === self::TYPE_LETTERBOXD_IMPORT_RATINGS;
     }
 
     public function isOfTypeTmdbSync() : bool

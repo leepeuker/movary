@@ -144,6 +144,52 @@ class SettingsController
         );
     }
 
+    public function renderAppPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-app.html.twig', [
+                'applicationVersion' => $this->applicationVersion ?? '-',
+                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
+            ]),
+        );
+    }
+
+    public function renderLetterboxdPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $letterboxdHistorySyncSuccessful = empty($_SESSION['letterboxdHistorySyncSuccessful']) === false ? $_SESSION['letterboxdHistorySyncSuccessful'] : null;
+        $letterboxdRatingsSyncSuccessful = empty($_SESSION['letterboxdRatingsSyncSuccessful']) === false ? $_SESSION['letterboxdRatingsSyncSuccessful'] : null;
+        $letterboxdRatingsImportFileInvalid = empty($_SESSION['letterboxdRatingsImportFileInvalid']) === false ? $_SESSION['letterboxdRatingsImportFileInvalid'] : null;
+        $letterboxdHistoryImportFileInvalid = empty($_SESSION['letterboxdHistoryImportFileInvalid']) === false ? $_SESSION['letterboxdHistoryImportFileInvalid'] : null;
+        unset(
+            $_SESSION['letterboxdHistorySyncSuccessful'],
+            $_SESSION['letterboxdRatingsSyncSuccessful'],
+            $_SESSION['letterboxdRatingsImportFileInvalid'],
+            $_SESSION['letterboxdHistoryImportFileInvalid'],
+        );
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-letterboxd.html.twig', [
+                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'letterboxdHistorySyncSuccessful' => $letterboxdHistorySyncSuccessful,
+                'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
+                'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
+                'letterboxdHistoryImportFileInvalid' => $letterboxdHistoryImportFileInvalid,
+            ]),
+        );
+    }
+
     public function renderPlexPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -156,21 +202,6 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-plex.html.twig', [
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-            ]),
-        );
-    }
-
-    public function renderAppPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-app.html.twig', [
-                'applicationVersion' => $this->applicationVersion ?? '-',
-                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
             ]),
         );
     }
