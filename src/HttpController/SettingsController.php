@@ -169,9 +169,13 @@ class SettingsController
 
         $letterboxdHistorySyncSuccessful = empty($_SESSION['letterboxdHistorySyncSuccessful']) === false ? $_SESSION['letterboxdHistorySyncSuccessful'] : null;
         $letterboxdRatingsSyncSuccessful = empty($_SESSION['letterboxdRatingsSyncSuccessful']) === false ? $_SESSION['letterboxdRatingsSyncSuccessful'] : null;
+        $letterboxdRatingsImportFileInvalid = empty($_SESSION['letterboxdRatingsImportFileInvalid']) === false ? $_SESSION['letterboxdRatingsImportFileInvalid'] : null;
+        $letterboxdHistoryImportFileInvalid = empty($_SESSION['letterboxdHistoryImportFileInvalid']) === false ? $_SESSION['letterboxdHistoryImportFileInvalid'] : null;
         unset(
             $_SESSION['letterboxdHistorySyncSuccessful'],
             $_SESSION['letterboxdRatingsSyncSuccessful'],
+            $_SESSION['letterboxdRatingsImportFileInvalid'],
+            $_SESSION['letterboxdHistoryImportFileInvalid'],
         );
 
         return Response::create(
@@ -180,6 +184,8 @@ class SettingsController
                 'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'letterboxdHistorySyncSuccessful' => $letterboxdHistorySyncSuccessful,
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
+                'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
+                'letterboxdHistoryImportFileInvalid' => $letterboxdHistoryImportFileInvalid,
             ]),
         );
     }

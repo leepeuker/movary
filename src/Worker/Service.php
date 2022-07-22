@@ -13,7 +13,7 @@ class Service
         private readonly Trakt\SyncWatchedMovies $traktSyncWatchedMovies,
         private readonly Trakt\SyncRatings $traktSyncRatings,
         private readonly Letterboxd\ImportRatings $letterboxdImportRatings,
-        private readonly Letterboxd\ImportWatchedMovies $letterboxdImportHistory,
+        private readonly Letterboxd\ImportHistory $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,
     ) {
     }

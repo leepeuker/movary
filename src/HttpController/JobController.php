@@ -2,6 +2,8 @@
 
 namespace Movary\HttpController;
 
+use Movary\Application\Service\Letterboxd\ImportHistoryFileValidator;
+use Movary\Application\Service\Letterboxd\ImportRatingsFileValidator;
 use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -13,7 +15,9 @@ class JobController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly Service $workerService
+        private readonly Service $workerService,
+        private readonly ImportHistoryFileValidator $letterboxdImportHistoryFileValidator,
+        private readonly ImportRatingsFileValidator $letterboxdImportRatingsFileValidator,
     ) {
     }
 
@@ -33,6 +37,16 @@ class JobController
 
         $targetFile = __DIR__ . '/../../tmp/letterboxd-history-' . $userId . '-' . time() . '.csv';
         move_uploaded_file($fileParameters['historyCsv']['tmp_name'], $targetFile);
+
+        if ($this->letterboxdImportHistoryFileValidator->isValid($targetFile) === false) {
+            $_SESSION['letterboxdHistoryImportFileInvalid'] = true;
+
+            return Response::create(
+                StatusCode::createSeeOther(),
+                null,
+                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            );
+        }
 
         $this->workerService->addLetterboxdImportHistoryJob($userId, $targetFile);
 
@@ -54,13 +68,29 @@ class JobController
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['ratingsCsv']['tmp_name']) === true) {
-            throw new \RuntimeException('Missing ratings csv file');
+            $_SESSION['letterboxdRatingsImportFileMissing'] = true;
+
+            return Response::create(
+                StatusCode::createSeeOther(),
+                null,
+                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            );
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
 
         $targetFile = __DIR__ . '/../../tmp/letterboxd-ratings-' . $userId . '-' . time() . '.csv';
         move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
+
+        if ($this->letterboxdImportRatingsFileValidator->isValid($targetFile) === false) {
+            $_SESSION['letterboxdRatingsImportFileInvalid'] = true;
+
+            return Response::create(
+                StatusCode::createSeeOther(),
+                null,
+                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            );
+        }
 
         $this->workerService->addLetterboxdImportRatingsJob($userId, $targetFile);
 
