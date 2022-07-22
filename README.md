@@ -12,7 +12,8 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 4. [Features](#features)
     1. [Tmdb Sync](#tmdb-sync)
     2. [Plex Scrobbler](#plex-scrobbler)
-    3. [Trakt.tv Sync](#trakttv-sync)
+    3. [trakt.tv Sync](#trakttv-sync)
+    4. [letterboxd.com Import](#letterboxd-import)
 5. [Development](#development)
 
 <a name="#about"></a>
@@ -165,11 +166,13 @@ Add the generated url as a [webhook to plex](https://support.plex.tv/articles/11
 
 ### trakt.tv sync
 
-You can sync your watch history and ratings from trakt.tv.
+You can import your watch history and ratings from trakt.tv (exporting from movary to trakt not supported yet).
 
-The user used in the sync process must have a trakt username and client id set (can be set via web UI on the settings page or via cli `user:update`).
+The user used in the sync process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
 
-Example (syncing history and ratings for user with id 1):
+The import can be executed via the settings page `/settings/trakt` or via cli.
+
+Example cli sync (import history and ratings for user with id 1):
 
 `docker exec movary php bin/console.php trakt:sync --ratings --history --userId=1`
 
@@ -185,6 +188,12 @@ Example (syncing history and ratings for user with id 1):
   Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
 - `--ignore-cache`
   Use if you want to sync everything from trakt regardless if there was a change since the last sync.
+
+### letterboxd.com import
+
+You can import your watch history and ratings from letterboxd.com.
+
+Visit the movary settings page `/settings/letterboxd` for more instructions
 
 ## Development
 
