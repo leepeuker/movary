@@ -164,7 +164,7 @@ Add the generated url as a [webhook to plex](https://support.plex.tv/articles/11
 
 <a name="#trakttv-sync"></a>
 
-### trakt.tv sync
+### Trakt.tv Sync
 
 You can import your watch history and ratings from trakt.tv (exporting from movary to trakt not supported yet).
 
@@ -188,8 +188,10 @@ Example cli sync (import history and ratings for user with id 1):
   Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
 - `--ignore-cache`
   Use if you want to sync everything from trakt regardless if there was a change since the last sync.
+  
+<a name="#letterboxd-import"></a>
 
-### letterboxd.com import
+### Letterboxd.com Import
 
 You can import your watch history and ratings from letterboxd.com.
 
