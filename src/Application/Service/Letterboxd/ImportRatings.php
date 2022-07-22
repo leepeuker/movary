@@ -17,23 +17,25 @@ class ImportRatings
         private readonly Movie\Api $movieApi,
         private readonly WebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
-        private readonly SyncLog\Repository $scanLogRepository
+        private readonly SyncLog\Repository $scanLogRepository,
+        private readonly ImportRatingsFileValidator $fileValidator,
     ) {
     }
 
     public function execute(int $userId, string $ratingsCsvPath, bool $verbose = false, bool $overwriteExistingData = false) : void
     {
+        $this->ensureValidCsvFile($ratingsCsvPath);
+
         $ratings = Reader::createFromPath($ratingsCsvPath);
         $ratings->setHeaderOffset(0);
 
         foreach ($ratings->getRecords() as $rating) {
-            $this->ensureValidCsvRow($rating);
             $csvLineRating = CsvLineRating::createFromCsvLine($rating);
 
             $movie = $this->findMovieByLetterboxdUri($csvLineRating->getLetterboxdUri());
 
             if ($movie === null) {
-                $this->logger->info('Movie not in history: ' . $csvLineRating->getName());
+                $this->logger->info('Ignoring rating for movie which is not in history: ' . $csvLineRating->getName());
 
                 continue;
             }
@@ -42,7 +44,7 @@ class ImportRatings
             $personalRating = PersonalRating::create((int)$userRating);
 
             if ($overwriteExistingData === false && $this->movieApi->findUserRating($movie->getId(), $userId) !== null) {
-                $this->logger->info('Ignoring rating for movie: ' . $csvLineRating->getLetterboxdUri());
+                $this->logger->info('Ignoring rating for movie which already has one: ' . $movie->getTitle());
 
                 $this->outputMessage("Ignoring {$movie->getTitle()} rating: " . $personalRating . PHP_EOL, $verbose);
 
@@ -79,10 +81,10 @@ class ImportRatings
         return $movie;
     }
 
-    private function ensureValidCsvRow(array $rating) : void
+    private function ensureValidCsvFile(string $ratingsCsvPath) : void
     {
-        if (empty($rating['Letterboxd URI']) === true || empty($rating['Rating']) === true) {
-            throw new \RuntimeException('Invalid csv row in letterboxed rating csv.');
+        if ($this->fileValidator->isValid($ratingsCsvPath) === false) {
+            throw new \RuntimeException('Invalid letterboxed ratings csv file.');
         }
     }
 

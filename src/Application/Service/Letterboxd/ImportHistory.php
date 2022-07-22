@@ -16,13 +16,15 @@ class ImportHistory
         private readonly Movie\Api $movieApi,
         private readonly WebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
-        private readonly Tmdb\SyncMovie $tmdbMovieSync
+        private readonly Tmdb\SyncMovie $tmdbMovieSync,
+        private readonly ImportHistoryFileValidator $fileValidator,
     ) {
     }
 
-    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function execute(int $userId, string $historyCsvPath, bool $overwriteExistingData = false) : void
     {
+        $this->ensureValidCsvRow($historyCsvPath);
+
         $watchDates = Reader::createFromPath($historyCsvPath);
         $watchDates->setHeaderOffset(0);
 
@@ -38,7 +40,7 @@ class ImportHistory
                 $watchDatesToImport[$movie->getId()] = PlaysPerDateDtoList::create();
             }
 
-            $watchDatesToImport[$movie->getId()]->incrementPlaysForDate($csvLineHistory->getDate());
+            $watchDatesToImport[$movie->getId()]->incrementPlaysForDate($csvLineHistory->getDate    ());
         }
 
         foreach ($watchDates->getRecords() as $watchDate) {
@@ -83,5 +85,12 @@ class ImportHistory
         }
 
         return $movie;
+    }
+
+    private function ensureValidCsvRow(string $historyCsvPath) : void
+    {
+        if ($this->fileValidator->isValid($historyCsvPath) === false) {
+            throw new \RuntimeException('Invalid letterboxed watched csv file.');
+        }
     }
 }
