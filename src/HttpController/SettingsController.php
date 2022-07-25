@@ -142,8 +142,6 @@ class SettingsController
                 'importHistoryError' => $importHistoryError,
                 'deletedUserHistory' => $deletedUserHistory,
                 'deletedUserRatings' => $deletedUserRatings,
-                'traktClientId' => $user->getTraktClientId(),
-                'traktUserName' => $user->getTraktUserName(),
                 'username' => $user->getName(),
                 'applicationVersion' => $this->applicationVersion ?? '-',
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
@@ -233,6 +231,8 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-trakt.html.twig', [
+                'traktClientId' => $user->getTraktClientId(),
+                'traktUserName' => $user->getTraktUserName(),
                 'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistorySync,

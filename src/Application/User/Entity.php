@@ -11,8 +11,8 @@ class Entity
         private readonly bool $areCoreAccountChangesDisabled,
         private readonly int $dateFormatId,
         private readonly ?string $plexWebhookUuid,
-        private readonly ?string $TraktUserName,
-        private readonly ?string $TraktClientId,
+        private readonly ?string $traktUserName,
+        private readonly ?string $traktClientId,
     ) {
     }
 
@@ -62,11 +62,11 @@ class Entity
 
     public function getTraktClientId() : ?string
     {
-        return $this->TraktClientId;
+        return $this->traktClientId;
     }
 
     public function getTraktUserName() : ?string
     {
-        return $this->TraktUserName;
+        return $this->traktUserName;
     }
 }
