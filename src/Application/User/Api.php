@@ -2,19 +2,24 @@
 
 namespace Movary\Application\User;
 
-use Movary\Application\User\Exception\PasswordTooShort;
+use Movary\Application\User\Service\Validator;
 use Ramsey\Uuid\Uuid;
 
 class Api
 {
-    private const PASSWORD_MIN_LENGTH = 8;
-
-    public function __construct(private readonly Repository $repository)
-    {
+    public function __construct(
+        private readonly Repository $repository,
+        private readonly Validator $userValidator
+    ) {
     }
 
-    public function createUser(string $email, string $password, ?string $name) : void
+    public function createUser(string $email, string $password, string $name) : void
     {
+        $this->userValidator->ensureEmailIsUnique($email);
+        $this->userValidator->ensurePasswordIsValid($password);
+        $this->userValidator->ensureNameFormatIsValid($name);
+        $this->userValidator->ensureNameIsUnique($name);
+
         $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name);
     }
 
@@ -70,6 +75,11 @@ class Api
         return $this->repository->findTraktUserName($userId);
     }
 
+    public function findUserByName(string $name) : ?Entity
+    {
+        return $this->repository->findUserByName($name);
+    }
+
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByPlexWebhookId($webhookId);
@@ -107,14 +117,22 @@ class Api
 
     public function updateEmail(int $userId, string $email) : void
     {
+        $this->userValidator->ensureEmailIsUnique($email, $userId);
+
         $this->repository->updateEmail($userId, $email);
+    }
+
+    public function updateName(int $userId, string $name) : void
+    {
+        $this->userValidator->ensureNameFormatIsValid($name);
+        $this->userValidator->ensureNameIsUnique($name, $userId);
+
+        $this->repository->updateName($userId, $name);
     }
 
     public function updatePassword(int $userId, string $newPassword) : void
     {
-        if (strlen($newPassword) < self::PASSWORD_MIN_LENGTH) {
-            throw new PasswordTooShort(self::PASSWORD_MIN_LENGTH);
-        }
+        $this->userValidator->ensurePasswordIsValid($newPassword);
 
         if ($this->repository->findUserById($userId) === null) {
             throw new \RuntimeException('There is no user with id: ' . $userId);

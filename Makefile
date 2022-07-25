@@ -71,7 +71,7 @@ app_database_rollback:
 	make exec_app_cmd CMD="php bin/console.php database:migration:rollback"
 
 app_user_create_test:
-	make exec_app_cmd CMD="php bin/console.php user:create a@a a"
+	make exec_app_cmd CMD="php bin/console.php user:create a@a aaaaaaaa a"
 
 app_sync_trakt:
 	make exec_app_cmd CMD="php bin/console.php trakt:sync --overwrite --userId=1"

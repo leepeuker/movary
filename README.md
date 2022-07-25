@@ -97,7 +97,7 @@ volumes:
 ## Important: First steps
 
 - Run database migrations: `docker exec movary php bin/console.php database:migration:migrate`
-- Create a user: `docker exec movary php bin/console.php user:create example@email.com your-password`
+- Create a user: `docker exec movary php bin/console.php user:create email@example.com password username`
 
 List all available cli commands: `docker exec movary php bin/console.php`
 
@@ -188,7 +188,7 @@ Example cli sync (import history and ratings for user with id 1):
   Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
 - `--ignore-cache`
   Use if you want to sync everything from trakt regardless if there was a change since the last sync.
-  
+
 <a name="#letterboxd-import"></a>
 
 ### Letterboxd.com Import

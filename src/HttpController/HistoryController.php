@@ -6,6 +6,7 @@ use Movary\Api\Tmdb;
 use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Application\Service\Tmdb\SyncMovie;
+use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
@@ -26,7 +27,8 @@ class HistoryController
         private readonly Tmdb\Api $tmdbApi,
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
-        private readonly Authentication $authenticationService
+        private readonly Authentication $authenticationService,
+        private readonly User\Api $userApi
     ) {
     }
 
@@ -81,7 +83,10 @@ class HistoryController
 
     public function renderHistory(Request $request) : Response
     {
-        $userId = (int)$request->getRouteParameters()['userId'];
+        $userId = $this->userApi->findUserByName((string)$request->getRouteParameters()['username'])?->getId();
+        if ($userId === null) {
+            return Response::createNotFound();
+        }
 
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;

@@ -11,7 +11,7 @@
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
 
-            <div style="padding-bottom: 1rem">
+            <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 0.5rem">Import data</h5>
 
                 <p class="text-muted" style="margin-bottom: 0.5rem">
@@ -26,7 +26,7 @@
                 <hr>
 
                 <form action="/jobs/schedule/letterboxd-history-sync" method="post" enctype="multipart/form-data">
-                    <h5 style="margin-bottom: 0.5rem">Watch history</h5>
+                    <h5 style="margin-bottom: 0.5rem">Watched movies</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the watched.csv file</p>
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" accept=".csv" name="historyCsv" id="historyCsv" required>
@@ -35,7 +35,7 @@
 
                     {% if letterboxdHistorySyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
-                            Ratings sync successfully scheduled. Should be processed soon.
+                            Watched movies sync successfully scheduled. Should be processed soon.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}

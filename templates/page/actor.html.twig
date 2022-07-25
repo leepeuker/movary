@@ -48,7 +48,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                         {% for movieAsActor in moviesAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUserId }}/movie/{{ movieAsActor.id }}'">
+                                <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
                                         <img src="{{ tmdb.generatePosterImageUrl(movieAsActor.tmdbPosterPath) }}" class="card-img-top" alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
@@ -70,7 +70,7 @@
                 <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative">
-                            <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUserId }}/movie/{{ movieAsDirector.id }}'">
+                            <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
                                     <img src="{{ tmdb.generatePosterImageUrl(movieAsDirector.tmdbPosterPath) }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">

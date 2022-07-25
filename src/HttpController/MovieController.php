@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie;
+use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -16,7 +17,8 @@ class MovieController
     public function __construct(
         private readonly Environment $twig,
         private readonly Movie\Api $movieApi,
-        private readonly Authentication $authenticationService
+        private readonly Authentication $authenticationService,
+        private readonly User\Api $userApi,
     ) {
     }
 
@@ -43,7 +45,11 @@ class MovieController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = (int)$request->getRouteParameters()['userId'];
+        $userId = $this->userApi->findUserByName((string)$request->getRouteParameters()['username'])?->getId();
+        if ($userId === null) {
+            return Response::createNotFound();
+        }
+
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $movie = $this->movieApi->findById($movieId);

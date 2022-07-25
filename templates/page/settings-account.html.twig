@@ -11,7 +11,7 @@
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
 
-            <div style="padding-bottom: 1rem">
+            <div style="background-color: #F8F8F8;padding-bottom: 1rem;padding-top: 1rem">
                 <h5>Change date format</h5>
                 <p class="text-muted">Date format movary uses when displaying dates for you.</p>
                 <form action="/user/date-format" method="post">
@@ -33,12 +33,42 @@
                 </form>
             </div>
 
+            <hr style="margin: 0;padding-bottom: 1rem">
+
+            <div style="padding-bottom: 1rem">
+                <h5>Change username</h5>
+                <p class="text-muted">Must consist of only letters and numbers.</p>
+                <form action="/user/name" method="post">
+
+                    <div class="input-group mb-3">
+{#                        <input type="text" class="form-control" name="username" placeholder="Username" value="{{ username }}" pattern="^[a-zA-Z0-9]+$" required#}
+                        <input type="text" class="form-control" name="username" placeholder="Username" value="{{ username }}" required
+                               title="Only letters and numbers allowed"
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}
+                               style="margin-left: 5%;margin-right: 5%;;text-align: center;">
+                    </div>
+                    {% if usernameUpdated == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
+                            Username was updated.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if usernameErrorInvalidFormat == true %}
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
+                            Invalid name: must only consist of letters and numbers
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </form>
+            </div>
+
             <hr style="margin: 0;padding: 0">
 
             <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 1rem">
                 <h5>Change password</h5>
                 <form action="/user/password" method="post" style="padding-top: 0.3rem">
-                    <div class="input-group  mb-3">
+                    <div class="input-group mb-3">
                         <input type="password" class="form-control" name="currentPassword" placeholder="Current password" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                                style="margin-left: 5%;margin-right: 5%;;text-align: center;">
