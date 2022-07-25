@@ -104,6 +104,8 @@ class SettingsController
         $deletedUserHistory = empty($_SESSION['deletedUserHistory']) === false ? $_SESSION['deletedUserHistory'] : null;
         $deletedUserRatings = empty($_SESSION['deletedUserRatings']) === false ? $_SESSION['deletedUserRatings'] : null;
         $dateFormatUpdated = empty($_SESSION['dateFormatUpdated']) === false ? $_SESSION['dateFormatUpdated'] : null;
+        $usernameUpdated = empty($_SESSION['usernameUpdated']) === false ? $_SESSION['usernameUpdated'] : null;
+        $usernameErrorInvalidFormat = empty($_SESSION['usernameErrorInvalidFormat']) === false ? $_SESSION['usernameErrorInvalidFormat'] : null;
         unset(
             $_SESSION['passwordUpdated'],
             $_SESSION['passwordErrorCurrentInvalid'],
@@ -115,6 +117,8 @@ class SettingsController
             $_SESSION['deletedUserHistory'],
             $_SESSION['deletedUserRatings'],
             $_SESSION['dateFormatUpdated'],
+            $_SESSION['usernameUpdated'],
+            $_SESSION['usernameErrorInvalidFormat'],
         );
 
         $user = $this->userApi->fetchUser($userId);
@@ -126,6 +130,8 @@ class SettingsController
                 'dateFormats' => DateFormat::getFormats(),
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'dateFormatUpdated' => $dateFormatUpdated,
+                'usernameUpdated' => $usernameUpdated,
+                'usernameErrorInvalidFormat' => $usernameErrorInvalidFormat,
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
                 'passwordErrorMinLength' => $passwordErrorMinLength,
@@ -138,6 +144,7 @@ class SettingsController
                 'deletedUserRatings' => $deletedUserRatings,
                 'traktClientId' => $user->getTraktClientId(),
                 'traktUserName' => $user->getTraktUserName(),
+                'username' => $user->getName(),
                 'applicationVersion' => $this->applicationVersion ?? '-',
                 'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
             ]),
@@ -247,6 +254,32 @@ class SettingsController
         $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
 
         $_SESSION['dateFormatUpdated'] = true;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+        );
+    }
+
+    public function updateName(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $name = $request->getPostParameters()['username'] ?? null;
+        if ($name === '' || $name === null) {
+            throw new \RuntimeException('Invalid username: ' . $name);
+        }
+
+        try {
+            $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
+
+            $_SESSION['usernameUpdated'] = true;
+        } catch (User\Exception\UsernameInvalidFormat $e) {
+            $_SESSION['usernameErrorInvalidFormat'] = true;
+        }
 
         return Response::create(
             StatusCode::createSeeOther(),

@@ -140,25 +140,26 @@ class Factory
         $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
 
         $currentRequest = $container->get(Request::class);
-        $routeUserId = $currentRequest->getRouteParameters()['userId'] ?? null;
+        $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;
 
         $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticated();
 
         $twig->addGlobal('loggedIn', $userAuthenticated);
 
-        $currentUserId = null;
+        $user = null;
         $dateFormatPhp = DateFormat::getPhpDefault();
         $dataFormatJavascript = DateFormat::getJavascriptDefault();
         if ($userAuthenticated === true) {
             $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
 
-            $userDateFormat = $container->get(User\Api::class)->fetchDateFormatId($currentUserId);
+            /** @var User\Entity $user */
+            $user = $container->get(User\Api::class)->fetchUser($currentUserId);
 
-            $dateFormatPhp = DateFormat::getPhpById($userDateFormat);
-            $dataFormatJavascript = DateFormat::getJavascriptById($userDateFormat);
+            $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
+            $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
-        $twig->addGlobal('routeUserId', $routeUserId ?? $currentUserId);
+        $twig->addGlobal('routeUsername', $routeUsername ?? $user?->getName());
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
         $twig->addGlobal('requestUrlPath', self::createCurrentHttpRequest()->getPath());

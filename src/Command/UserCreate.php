@@ -3,6 +3,10 @@
 namespace Movary\Command;
 
 use Movary\Application\User\Api;
+use Movary\Application\User\Exception\EmailNotUnique;
+use Movary\Application\User\Exception\PasswordTooShort;
+use Movary\Application\User\Exception\UsernameInvalidFormat;
+use Movary\Application\User\Exception\UsernameNotUnique;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,7 +29,7 @@ class UserCreate extends Command
             ->setDescription('Create a new user.')
             ->addArgument('email', InputArgument::REQUIRED, 'Email address for user')
             ->addArgument('password', InputArgument::REQUIRED, 'Password for user')
-            ->addArgument('name', InputArgument::OPTIONAL, 'Name for user');
+            ->addArgument('name', InputArgument::REQUIRED, 'Name for user');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
@@ -37,6 +41,22 @@ class UserCreate extends Command
 
         try {
             $this->userApi->createUser($email, $password, $name);
+        } catch (EmailNotUnique $e) {
+            $this->generateOutput($output, 'Could not create user: Email already in use');
+
+            return Command::FAILURE;
+        } catch (PasswordTooShort $e) {
+            $this->generateOutput($output, 'Could not create user: Password must contain at least 8 characters');
+
+            return Command::FAILURE;
+        } catch (UsernameInvalidFormat $e) {
+            $this->generateOutput($output, 'Could not create user: Name must only consist of numbers and letters');
+
+            return Command::FAILURE;
+        } catch (UsernameNotUnique $e) {
+            $this->generateOutput($output, 'Could not create user: Name already in use');
+
+            return Command::FAILURE;
         } catch (\Throwable $t) {
             $this->logger->error('Could not create user.', ['exception' => $t]);
 

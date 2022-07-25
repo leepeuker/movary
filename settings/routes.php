@@ -9,7 +9,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{userId:\d+}/dashboard',
+        '/{username:.+}/dashboard',
         [\Movary\HttpController\DashboardController::class, 'render']
     );
     $routeCollector->addRoute(
@@ -39,7 +39,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{userId:\d+}/history',
+        '/{username:.+}/history',
         [\Movary\HttpController\HistoryController::class, 'renderHistory']
     );
     $routeCollector->addRoute(
@@ -69,12 +69,12 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{userId:\d+}/most-watched-actors',
+        '/{username:.+}/most-watched-actors',
         [\Movary\HttpController\MostWatchedActorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
         'GET',
-        '/{userId:\d+}/most-watched-directors',
+        '/{username:.+}/most-watched-directors',
         [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -94,7 +94,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{userId:\d+}/movie/{id:\d+}',
+        '/{username:.+}/movie/{id:\d+}',
         [\Movary\HttpController\MovieController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -109,7 +109,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{userId:\d+}/person/{id:\d+}',
+        '/{username:.+}/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -131,6 +131,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/user/password',
         [\Movary\HttpController\SettingsController::class, 'updatePassword']
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/user/name',
+        [\Movary\HttpController\SettingsController::class, 'updateName']
     );
     $routeCollector->addRoute(
         'GET',

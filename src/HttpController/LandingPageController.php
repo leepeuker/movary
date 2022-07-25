@@ -18,9 +18,9 @@ class LandingPageController
     public function render() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === true) {
-            $userId = $this->authenticationService->getCurrentUserId();
+            $userName = $this->authenticationService->getCurrentUser()->getName();
 
-            return Response::createFoundRedirect("/$userId/dashboard");
+            return Response::createFoundRedirect("/$userName/dashboard");
         }
 
         $failedLogin = $_SESSION['failedLogin'] ?? null;

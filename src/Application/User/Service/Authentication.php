@@ -3,6 +3,7 @@
 namespace Movary\Application\User\Service;
 
 use Movary\Application\User\Api;
+use Movary\Application\User\Entity;
 use Movary\Application\User\Exception\EmailNotFound;
 use Movary\Application\User\Exception\InvalidPassword;
 use Movary\Application\User\Repository;
@@ -21,6 +22,11 @@ class Authentication
     public function deleteToken(string $token) : void
     {
         $this->repository->deleteAuthToken($token);
+    }
+
+    public function getCurrentUser() : Entity
+    {
+        return $this->userApi->fetchUser($this->getCurrentUserId());
     }
 
     public function getCurrentUserId() : int

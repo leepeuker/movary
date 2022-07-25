@@ -23,7 +23,7 @@ class Repository
         );
     }
 
-    public function createUser(string $email, string $passwordHash, ?string $name) : void
+    public function createUser(string $email, string $passwordHash, string $name) : void
     {
         $this->dbConnection->insert(
             'user',
@@ -132,6 +132,17 @@ class Repository
         return Entity::createFromArray($data);
     }
 
+    public function findUserByName(string $name) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `name` = ?', [$name]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
     public function findUserIdByAuthToken(string $token) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
@@ -199,6 +210,19 @@ class Repository
             'user',
             [
                 'email' => $email,
+            ],
+            [
+                'id' => $userId,
+            ]
+        );
+    }
+
+    public function updateName(int $userId, string $name) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'name' => $name,
             ],
             [
                 'id' => $userId,

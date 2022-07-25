@@ -17,12 +17,16 @@ class DashboardController
         private readonly Environment $twig,
         private readonly Select $movieHistorySelectService,
         private readonly Movie\Api $movieApi,
+        private readonly User\Api $userApi,
     ) {
     }
 
     public function render(Request $request) : Response
     {
-        $userId = (int)$request->getRouteParameters()['userId'];
+        $userId = $this->userApi->findUserByName((string)$request->getRouteParameters()['username'])?->getId();
+        if ($userId === null) {
+            return Response::createNotFound();
+        }
 
         return Response::create(
             StatusCode::createOk(),

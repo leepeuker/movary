@@ -3,6 +3,10 @@
 namespace Movary\Command;
 
 use Movary\Application\User;
+use Movary\Application\User\Exception\EmailNotUnique;
+use Movary\Application\User\Exception\PasswordTooShort;
+use Movary\Application\User\Exception\UsernameInvalidFormat;
+use Movary\Application\User\Exception\UsernameNotUnique;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,6 +30,7 @@ class UserUpdate extends Command
             ->setDescription('Update user data.')
             ->addArgument('userId', InputArgument::REQUIRED, 'ID of user')
             ->addOption('email', [], InputOption::VALUE_OPTIONAL, 'New email')
+            ->addOption('name', [], InputOption::VALUE_OPTIONAL, 'New name')
             ->addOption('password', [], InputOption::VALUE_OPTIONAL, 'New password')
             ->addOption('coreAccountChangesDisabled', [], InputOption::VALUE_OPTIONAL, 'Set core account changes disabled status')
             ->addOption('traktUserName', [], InputOption::VALUE_OPTIONAL, 'New trakt user name')
@@ -33,6 +38,7 @@ class UserUpdate extends Command
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $userId = (int)$input->getArgument('userId');
@@ -41,6 +47,11 @@ class UserUpdate extends Command
             $email = $input->getOption('email');
             if ($email !== null) {
                 $this->userApi->updateEmail($userId, $email);
+            }
+
+            $name = $input->getOption('name');
+            if ($name !== null) {
+                $this->userApi->updateName($userId, $name);
             }
 
             $password = $input->getOption('password');
@@ -64,11 +75,22 @@ class UserUpdate extends Command
 
             $coreAccountChangesDisabled = $input->getOption('coreAccountChangesDisabled');
             if ($coreAccountChangesDisabled !== null) {
-
                 $this->userApi->updateCoreAccountChangesDisabled($userId, (bool)$coreAccountChangesDisabled);
             }
-        } catch (User\Exception\PasswordTooShort $t) {
-            $this->generateOutput($output, "Error: Password must be at least {$t->getMinLength()} characters long.");
+        } catch (EmailNotUnique $e) {
+            $this->generateOutput($output, 'Could not update user: Email already in use');
+
+            return Command::FAILURE;
+        } catch (PasswordTooShort $e) {
+            $this->generateOutput($output, 'Could not update user: Password must contain at least 8 characters');
+
+            return Command::FAILURE;
+        } catch (UsernameInvalidFormat $e) {
+            $this->generateOutput($output, 'Could not update user: Name must only consist of numbers and letters');
+
+            return Command::FAILURE;
+        } catch (UsernameNotUnique $e) {
+            $this->generateOutput($output, 'Could not update user: Name already in use');
 
             return Command::FAILURE;
         } catch (\Throwable $t) {
