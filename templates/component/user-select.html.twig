@@ -1,7 +1,7 @@
 <div style="margin-top: 1rem;margin-bottom: 1rem">
     <div class="input-group">
         <span class="input-group-text">User</span>
-        <select class="form-select" onchange="changeUserContext(this)">
+        <select class="form-select" id="changeUserContextSelect">
             <option disabled>Select user</option>
             {% for user in users %}
                 <option value="{{ user.name }}" {% if routeUsername == user.name %}selected{% endif %}>{{ user.name }}</option>
@@ -9,3 +9,4 @@
         </select>
     </div>
 </div>
+
