@@ -45,7 +45,7 @@ class Api
 
     public function fetchAllHavingWatchedMoviesWithPerson(int $personId) : array
     {
-        return $this->repository->fetchAllHavingWatchedMoviesWithPerson($personId);
+        return $this->repository->fetchAllHavingWatchedMovieWithPerson($personId);
     }
 
     public function fetchDateFormatId(int $userId) : int

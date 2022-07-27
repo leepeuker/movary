@@ -58,7 +58,7 @@ class Repository
     public function fetchAllHavingWatchedMovie(int $movieId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT user.name 
+            'SELECT DISTINCT user.name 
             FROM `user` 
             JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
             WHERE movie_id = ?',
@@ -66,10 +66,10 @@ class Repository
         );
     }
 
-    public function fetchAllHavingWatchedMoviesWithPerson(int $personId) : array
+    public function fetchAllHavingWatchedMovieWithPerson(int $personId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT user.name
+            'SELECT DISTINCT user.name
             FROM `user` 
             JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
             JOIN movie_cast mc ON muwd.movie_id = mc.movie_id 
