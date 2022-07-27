@@ -7,8 +7,12 @@ if ('serviceWorker' in navigator) {
 	})
 }
 
-function changeUserContext (e) {
-	const currentUrlPath = window.location.pathname
+const selectElement = document.querySelector('#changeUserContextSelect')
 
-	window.location.href = currentUrlPath.replace(/\/[a-zA-Z0-9]+\//, '/' + e.value + '/')
+if (selectElement !== null) {
+	selectElement.addEventListener('change', (e) => {
+		const currentUrlPath = window.location.pathname
+
+		window.location.href = currentUrlPath.replace(/\/[a-zA-Z0-9]+\//, '/' + selectElement.value + '/')
+	})
 }
