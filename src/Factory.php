@@ -159,6 +159,7 @@ class Factory
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
+        $twig->addGlobal('currentUsername', $user?->getName());
         $twig->addGlobal('routeUsername', $routeUsername ?? $user?->getName());
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
