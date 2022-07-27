@@ -13,7 +13,9 @@
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
-        <div style="text-align: center;padding-top: 1rem">
+        <div style="text-align: center">
+            {{ include('component/user-select.html.twig') }}
+
             <h2 style="padding-bottom: 0.5rem">Overview</h2>
             <div class="row justify-content-md-center">
                 <div class="col ">
@@ -80,7 +82,8 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActor in mostWatchedActors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUsername }}/person/{{ mostWatchedActor.id }}'" style="cursor: pointer;">
+                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUsername }}/person/{{ mostWatchedActor.id }}'"
+                                     style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                                     </div>

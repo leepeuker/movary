@@ -8,7 +8,10 @@
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
-        <h2 style="display: flex;padding-top: 0.5rem;">{{ person.name }}</h2>
+        {{ include('component/user-select.html.twig') }}
+
+        <h2 style="display: flex;">{{ person.name }}</h2>
+
         <div style="display: flex;">
             <div style="text-align: center">
                 <img src="{{ tmdb.generatePosterImageUrl(person.tmdbPosterPath) }}" width="200rem" style="width: 11rem;align-self: start;">

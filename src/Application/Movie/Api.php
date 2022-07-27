@@ -138,14 +138,14 @@ class Api
         return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
-    public function fetchWithActor(int $personId) : EntityList
+    public function fetchWithActor(int $personId, int $userId) : EntityList
     {
-        return $this->movieSelectService->fetchWithActor($personId);
+        return $this->movieSelectService->fetchWithActor($personId, $userId);
     }
 
-    public function fetchWithDirector(int $personId) : EntityList
+    public function fetchWithDirector(int $personId, int $userId) : EntityList
     {
-        return $this->movieSelectService->fetchWithDirector($personId);
+        return $this->movieSelectService->fetchWithDirector($personId, $userId);
     }
 
     public function findById(int $movieId) : ?array

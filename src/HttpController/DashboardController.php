@@ -31,6 +31,7 @@ class DashboardController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/dashboard.html.twig', [
+                'users' => $this->userApi->fetchAll(),
                 'totalPlayCount' => $this->movieApi->fetchHistoryCount($userId),
                 'uniqueMoviesCount' => $this->movieApi->fetchHistoryCountUnique($userId),
                 'totalHoursWatched' => $this->movieHistorySelectService->fetchTotalHoursWatched($userId),

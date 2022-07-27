@@ -38,6 +38,16 @@ class Api
         return $this->repository->fetchAll();
     }
 
+    public function fetchAllHavingWatchedMovie(int $movieId) : array
+    {
+        return $this->repository->fetchAllHavingWatchedMovie($movieId);
+    }
+
+    public function fetchAllHavingWatchedMoviesWithPerson(int $personId) : array
+    {
+        return $this->repository->fetchAllHavingWatchedMoviesWithPerson($personId);
+    }
+
     public function fetchDateFormatId(int $userId) : int
     {
         $dateFormat = $this->repository->findDateFormatId($userId);

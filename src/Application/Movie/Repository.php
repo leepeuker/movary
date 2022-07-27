@@ -420,7 +420,7 @@ class Repository
         )->fetchFirstColumn()[0];
     }
 
-    public function fetchWithActor(int $personId) : array
+    public function fetchWithActor(int $personId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
@@ -428,14 +428,15 @@ class Repository
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
-            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh)
+            JOIN movie_user_watch_dates muwd ON m.id = muwd.movie_id
+            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh) AND muwd.user_id = ?
             ORDER BY m.title
             SQL,
-            [$personId]
+            [$personId, $userId]
         );
     }
 
-    public function fetchWithDirector(int $personId) : array
+    public function fetchWithDirector(int $personId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
@@ -443,10 +444,11 @@ class Repository
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
-            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh)
+            JOIN movie_user_watch_dates muwd ON m.id = muwd.movie_id
+            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh) AND muwd.user_id = ?
             ORDER BY m.title
             SQL,
-            [$personId]
+            [$personId, $userId]
         );
     }
 

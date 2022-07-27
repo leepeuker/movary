@@ -18,8 +18,9 @@
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
+        {{ include('component/user-select.html.twig') }}
 
-        <h2 style="display: flex;padding-top: 0.5rem;margin-bottom: 0.3rem">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
+        <h2 style="display: flex;margin-bottom: 0.3rem">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
 
 
         <input type="hidden" id="movieId" value="{{ movie.id }}">

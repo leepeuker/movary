@@ -55,6 +55,29 @@ class Repository
         return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user`');
     }
 
+    public function fetchAllHavingWatchedMovie(int $movieId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT user.name 
+            FROM `user` 
+            JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
+            WHERE movie_id = ?',
+            [$movieId]
+        );
+    }
+
+    public function fetchAllHavingWatchedMoviesWithPerson(int $personId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT user.name
+            FROM `user` 
+            JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
+            JOIN movie_cast mc ON muwd.movie_id = mc.movie_id 
+            WHERE person_id = ?',
+            [$personId]
+        );
+    }
+
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);
