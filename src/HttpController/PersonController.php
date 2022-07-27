@@ -31,7 +31,7 @@ class PersonController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/actor.html.twig', [
+            $this->twig->render('page/person.html.twig', [
                 'users' => $this->userApi->fetchAllHavingWatchedMoviesWithPerson($personId),
                 'person' => $this->personApi->findById($personId),
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),

@@ -5,6 +5,10 @@
     Person: {{ person.name }}
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/userSelect.js"></script>
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
