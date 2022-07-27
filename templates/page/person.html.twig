@@ -57,13 +57,13 @@
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
-                                        <img src="{{ tmdb.generatePosterImageUrl(movieAsActor.tmdbPosterPath) }}" class="card-img-top" alt="..."
+                                        <img src="{{ tmdb.generatePosterImageUrl(movieAsActor.tmdb_poster_path) }}" class="card-img-top" alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
                                     </div>
 
-                                    {% if movieAsActor.personalRating is not null %}
+                                    {% if movieAsActor.userRating is not null %}
                                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                            {{ movieAsActor.personalRating }}
+                                            {{ movieAsActor.userRating }}
                                         </span>
                                     {% endif %}
                                 </div>
@@ -79,14 +79,13 @@
                         <div class="col position-relative">
                             <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
-                                    <img src="{{ tmdb.generatePosterImageUrl(movieAsDirector.tmdbPosterPath) }}" class="card-img-top" alt="..."
+                                    <img src="{{ tmdb.generatePosterImageUrl(movieAsDirector.tmdb_poster_path) }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
 
                                 </div>
-
-                                {% if movieAsDirector.personalRating is not null %}
+                                {% if movieAsDirector.userRating is not null %}
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                        {{ movieAsDirector.personalRating }}
+                                        {{ movieAsDirector.userRating }}
                                     </span>
                                 {% endif %}
                             </div>
