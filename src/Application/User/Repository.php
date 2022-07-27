@@ -52,7 +52,7 @@ class Repository
 
     public function fetchAll() : array
     {
-        return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user`');
+        return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user` ORDER BY name');
     }
 
     public function fetchAllHavingWatchedMovie(int $movieId) : array
@@ -61,7 +61,8 @@ class Repository
             'SELECT DISTINCT user.name 
             FROM `user` 
             JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
-            WHERE movie_id = ?',
+            WHERE movie_id = ?
+            ORDER BY name',
             [$movieId]
         );
     }
@@ -73,7 +74,8 @@ class Repository
             FROM `user` 
             JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
             JOIN movie_cast mc ON muwd.movie_id = mc.movie_id 
-            WHERE person_id = ?',
+            WHERE person_id = ?
+            ORDER BY name',
             [$personId]
         );
     }
