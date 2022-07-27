@@ -14,7 +14,9 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
 
-        <div style="text-align: center;padding-top: 1rem">
+        <div style="text-align: center;">
+            {{ include('component/user-select.html.twig') }}
+
             <form action="/most-watched-actors" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">

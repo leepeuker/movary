@@ -24,14 +24,14 @@ class Select
         return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc();
     }
 
-    public function fetchWithActor(int $personId) : EntityList
+    public function fetchWithActor(int $personId, int $userId) : EntityList
     {
-        return EntityList::createFromArray($this->repository->fetchWithActor($personId));
+        return EntityList::createFromArray($this->repository->fetchWithActor($personId, $userId));
     }
 
-    public function fetchWithDirector(int $personId) : EntityList
+    public function fetchWithDirector(int $personId, int $userId) : EntityList
     {
-        return EntityList::createFromArray($this->repository->fetchWithDirector($personId));
+        return EntityList::createFromArray($this->repository->fetchWithDirector($personId, $userId));
     }
 
     public function findById(int $movieId) : ?Entity

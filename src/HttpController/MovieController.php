@@ -58,6 +58,7 @@ class MovieController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/movie.html.twig', [
+                'users' => $this->userApi->fetchAllHavingWatchedMovie($movieId),
                 'movie' => $movie,
                 'movieGenres' => $this->movieApi->findGenresByMovieId($movieId),
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),

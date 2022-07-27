@@ -46,6 +46,7 @@ class MostWatchedDirectorsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/mostWatchedDirectors.html.twig', [
+                'users' => $this->userApi->fetchAll(),
                 'mostWatchedDirectors' => $mostWatchedActors,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $searchTerm,
