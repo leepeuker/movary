@@ -134,8 +134,8 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/user/name',
-        [\Movary\HttpController\SettingsController::class, 'updateName']
+        '/user/general',
+        [\Movary\HttpController\SettingsController::class, 'updateGeneral']
     );
     $routeCollector->addRoute(
         'GET',
@@ -171,11 +171,6 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/jobs/schedule/letterboxd-ratings-sync',
         [\Movary\HttpController\JobController::class, 'scheduleLetterboxdRatingsImport']
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/user/date-format',
-        [\Movary\HttpController\SettingsController::class, 'updateDateFormatId']
     );
     $routeCollector->addRoute(
         'DELETE',

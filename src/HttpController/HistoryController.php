@@ -6,8 +6,8 @@ use Movary\Api\Tmdb;
 use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
+use Movary\Application\User\Service\UserPageAuthorizationChecker;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -27,7 +27,7 @@ class HistoryController
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Authentication $authenticationService,
-        private readonly User\Api $userApi,
+        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
 
@@ -82,7 +82,7 @@ class HistoryController
 
     public function renderHistory(Request $request) : Response
     {
-        $userId = $this->userApi->findUserByName((string)$request->getRouteParameters()['username'])?->getId();
+        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
         if ($userId === null) {
             return Response::createNotFound();
         }
@@ -106,7 +106,7 @@ class HistoryController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/history.html.twig', [
-                'users' => $this->userApi->fetchAll(),
+                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'historyEntries' => $historyPaginated,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $searchTerm,

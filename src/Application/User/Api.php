@@ -38,14 +38,39 @@ class Api
         return $this->repository->fetchAll();
     }
 
-    public function fetchAllHavingWatchedMovie(int $movieId) : array
+    public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
     {
-        return $this->repository->fetchAllHavingWatchedMovie($movieId);
+        return $this->repository->fetchAllHavingWatchedMovieInternVisibleUsernames($movieId);
+    }
+
+    public function fetchAllHavingWatchedMoviePublicVisibleUsernames(int $movieId) : array
+    {
+        return $this->repository->fetchAllHavingWatchedMoviePublicVisibleUsernames($movieId);
+    }
+
+    public function fetchAllHavingWatchedMovieWithPersonInternVisibleUsernames(int $personId) : array
+    {
+        return $this->repository->fetchAllHavingWatchedMovieWithPersonInternVisibleUsernames($personId);
+    }
+
+    public function fetchAllHavingWatchedMovieWithPersonPublicVisibleUsernames(int $personId) : array
+    {
+        return $this->repository->fetchAllHavingWatchedMovieWithPersonPublicVisibleUsernames($personId);
     }
 
     public function fetchAllHavingWatchedMoviesWithPerson(int $personId) : array
     {
         return $this->repository->fetchAllHavingWatchedMovieWithPerson($personId);
+    }
+
+    public function fetchAllInternVisibleUsernames() : array
+    {
+        return $this->repository->fetchAllInternVisibleUsernames();
+    }
+
+    public function fetchAllPublicVisibleUsernames() : array
+    {
+        return $this->repository->fetchAllPublicVisibleUsernames();
     }
 
     public function fetchDateFormatId(int $userId) : int
@@ -151,6 +176,11 @@ class Api
         $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
 
         $this->repository->updatePassword($userId, $passwordHash);
+    }
+
+    public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
+    {
+        $this->repository->updatePrivacyLevel($userId, $privacyLevel);
     }
 
     public function updateTraktClientId(int $userId, ?string $traktClientId) : void

@@ -11,55 +11,69 @@
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
 
-            <div style="background-color: #F8F8F8;padding-bottom: 1rem;padding-top: 1rem">
-                <h5>Change date format</h5>
-                <p class="text-muted">Date format movary uses when displaying dates for you.</p>
-                <form action="/user/date-format" method="post">
-                    <div class="input-group">
-                        <select class="form-select mb-3" name="dateFormat" style="margin-left: 5%;margin-right: 5%;;text-align: center;padding-right:0;" required>
+            <br>
 
+            <div style="margin-bottom: 1rem">
+                <form action="/user/general" method="post">
+                    <h5 style="margin-bottom: 1rem;">General settings</h5>
+                    <div class="mb-3">
+                        <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
+                        <select class="form-select" name="dateFormat" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
                             {% for dateFormatOffset, dateFormat in dateFormats %}
                                 <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
                             {% endfor %}
                         </select>
+                        <div id="emailHelp" class="form-text">Date format movary uses when displaying dates to user</div>
                     </div>
-                    {% if dateFormatUpdated == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
-                            Date format was updated.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
-                    <button class="btn btn-primary" type="submit">Submit</button>
-                </form>
-            </div>
 
-            <hr style="margin: 0;padding-bottom: 1rem">
-
-            <div style="padding-bottom: 1rem">
-                <h5>Change username</h5>
-                <p class="text-muted">Must consist of only letters and numbers.</p>
-                <form action="/user/name" method="post">
-
-                    <div class="input-group mb-3">
-{#                        <input type="text" class="form-control" name="username" placeholder="Username" value="{{ username }}" pattern="^[a-zA-Z0-9]+$" required#}
-                        <input type="text" class="form-control" name="username" placeholder="Username" value="{{ username }}" required
+                    <div class="mb-3">
+                        <label for="nameInput" class="form-label"><b>Username</b></label>
+                        <input type="text"
+                               class="form-control"
+                               name="username"
+                               placeholder="Username"
+                               value="{{ username }}"
                                title="Only letters and numbers allowed"
+                               required
+                               id="nameInput"
+                               aria-describedby="usernameHelp"
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
-                               style="margin-left: 5%;margin-right: 5%;;text-align: center;">
+                               style="text-align: center;">
+                        <div id="usernameHelp" class="form-text">Must consist of only letters and numbers</div>
                     </div>
-                    {% if usernameUpdated == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
-                            Username was updated.
+
+                    <div class="mb-3">
+                        <label for="privacyInput" class="form-label"><b>Privacy</b></label>
+                        <select class="form-select" name="privacyLevel" style="text-align: center;padding-right:0;" id="privacyInput" aria-describedby="privacyHelp" required>
+                            <option value="0" {% if privacyLevel == 0 %}selected{% endif %}>Not visible</option>
+                            <option value="1" {% if privacyLevel == 1 %}selected{% endif %}>Visible to users</option>
+                            <option value="2" {% if privacyLevel == 2 %}selected{% endif %}>Visible to everyone</option>
+                        </select>
+                        <div id="privacyHelp" class="form-text">Decide who you want to share your history and ratings with</div>
+                    </div>
+
+                    {% if generalUpdated == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="padding-right: 1rem">
+                            User updated
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
-                    {% if usernameErrorInvalidFormat == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
-                            Invalid name: must only consist of letters and numbers
+
+                    {% if generalErrorUsernameInvalidFormat == true %}
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="padding-right: 1rem">
+                            Error: Username invalid
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
-                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Submit</button>
+
+                    {% if generalErrorUsernameNotUnique == true %}
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="padding-right: 1rem">
+                            Error: Username already in use
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
 
@@ -67,7 +81,8 @@
 
             <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 1rem">
                 <h5>Change password</h5>
-                <form action="/user/password" method="post" style="padding-top: 0.3rem">
+                <p class="text-muted">Must be at least 8 characters long.</p>
+                <form action="/user/password" method="post">
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" name="currentPassword" placeholder="Current password" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}

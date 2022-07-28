@@ -8,6 +8,7 @@ class Entity
         private readonly int $id,
         private readonly string $name,
         private readonly string $passwordHash,
+        private readonly int $privacyLevel,
         private readonly bool $areCoreAccountChangesDisabled,
         private readonly int $dateFormatId,
         private readonly ?string $plexWebhookUuid,
@@ -22,6 +23,7 @@ class Entity
             (int)$data['id'],
             $data['name'],
             $data['password'],
+            $data['privacy_level'],
             (bool)$data['core_account_changes_disabled'],
             $data['date_format_id'],
             $data['plex_webhook_uuid'],
@@ -58,6 +60,11 @@ class Entity
     public function getPlexWebhookId() : ?string
     {
         return $this->plexWebhookUuid;
+    }
+
+    public function getPrivacyLevel() : int
+    {
+        return $this->privacyLevel;
     }
 
     public function getTraktClientId() : ?string
