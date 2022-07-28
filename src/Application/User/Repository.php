@@ -55,12 +55,24 @@ class Repository
         return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user` ORDER BY name');
     }
 
-    public function fetchAllHavingWatchedMovie(int $movieId) : array
+    public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
             'SELECT DISTINCT user.name 
             FROM `user` 
-            JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
+            JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id AND user.privacy_level >= 1
+            WHERE movie_id = ?
+            ORDER BY name',
+            [$movieId]
+        );
+    }
+
+    public function fetchAllHavingWatchedMoviePublicVisibleUsernames(int $movieId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT DISTINCT user.name 
+            FROM `user` 
+            JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id AND user.privacy_level >= 2
             WHERE movie_id = ?
             ORDER BY name',
             [$movieId]
@@ -77,6 +89,52 @@ class Repository
             WHERE person_id = ?
             ORDER BY name',
             [$personId]
+        );
+    }
+
+    public function fetchAllHavingWatchedMovieWithPersonInternVisibleUsernames(int $personId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT DISTINCT user.name
+            FROM `user` 
+            JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
+            JOIN movie_cast mc ON muwd.movie_id = mc.movie_id AND user.privacy_level >= 1
+            WHERE person_id = ?
+            ORDER BY name',
+            [$personId]
+        );
+    }
+
+    public function fetchAllHavingWatchedMovieWithPersonPublicVisibleUsernames(int $personId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT DISTINCT user.name
+            FROM `user` 
+            JOIN movie_user_watch_dates muwd ON user.id = muwd.user_id 
+            JOIN movie_cast mc ON muwd.movie_id = mc.movie_id AND user.privacy_level >= 2
+            WHERE person_id = ?
+            ORDER BY name',
+            [$personId]
+        );
+    }
+
+    public function fetchAllInternVisibleUsernames() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT DISTINCT user.name
+            FROM `user` 
+            WHERE privacy_level >= 1
+            ORDER BY name'
+        );
+    }
+
+    public function fetchAllPublicVisibleUsernames() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT DISTINCT user.name
+            FROM `user` 
+            WHERE privacy_level >= 2
+            ORDER BY name'
         );
     }
 

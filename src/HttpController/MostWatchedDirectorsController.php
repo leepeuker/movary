@@ -3,7 +3,6 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie\History\Service\Select;
-use Movary\Application\User\Api;
 use Movary\Application\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -17,7 +16,6 @@ class MostWatchedDirectorsController
     public function __construct(
         private readonly Select $movieHistorySelectService,
         private readonly Environment $twig,
-        private readonly Api $userApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
@@ -48,7 +46,7 @@ class MostWatchedDirectorsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/mostWatchedDirectors.html.twig', [
-                'users' => $this->userApi->fetchAll(),
+                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'mostWatchedDirectors' => $mostWatchedActors,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $searchTerm,
