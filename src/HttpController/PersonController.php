@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Application\Movie;
 use Movary\Application\Person;
 use Movary\Application\User;
+use Movary\Application\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -17,12 +18,13 @@ class PersonController
         private readonly Movie\Api $movieApi,
         private readonly User\Api $userApi,
         private readonly Environment $twig,
+        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userApi->findUserByName((string)$request->getRouteParameters()['username'])?->getId();
+        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
         if ($userId === null) {
             return Response::createNotFound();
         }

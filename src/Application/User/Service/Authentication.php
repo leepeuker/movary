@@ -62,6 +62,23 @@ class Authentication
         return false;
     }
 
+    public function isUserPageVisible(int $privacyLevel, int $userId) : bool
+    {
+        if ($privacyLevel === 2) {
+            return true;
+        }
+
+        if ($privacyLevel === 1 && $this->isUserAuthenticated() === true) {
+            return true;
+        }
+
+        if ($this->isUserAuthenticated() === true && $this->getCurrentUserId() === $userId) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function login(string $email, string $password, bool $rememberMe) : void
     {
         if ($this->isUserAuthenticated() === true) {

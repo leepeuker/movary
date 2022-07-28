@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Application\Movie;
 use Movary\Application\Movie\History\Service\Select;
 use Movary\Application\User;
+use Movary\Application\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -18,12 +19,13 @@ class DashboardController
         private readonly Select $movieHistorySelectService,
         private readonly Movie\Api $movieApi,
         private readonly User\Api $userApi,
+        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
 
     public function render(Request $request) : Response
     {
-        $userId = $this->userApi->findUserByName((string)$request->getRouteParameters()['username'])?->getId();
+        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
         if ($userId === null) {
             return Response::createNotFound();
         }
