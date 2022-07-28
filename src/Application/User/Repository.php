@@ -268,6 +268,19 @@ class Repository
         );
     }
 
+    public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'privacy_level' => $privacyLevel,
+            ],
+            [
+                'id' => $userId,
+            ]
+        );
+    }
+
     public function updateTraktClientId(int $userId, ?string $traktClientId) : void
     {
         $this->dbConnection->update(

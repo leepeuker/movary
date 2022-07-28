@@ -153,6 +153,11 @@ class Api
         $this->repository->updatePassword($userId, $passwordHash);
     }
 
+    public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
+    {
+        $this->repository->updatePrivacyLevel($userId, $privacyLevel);
+    }
+
     public function updateTraktClientId(int $userId, ?string $traktClientId) : void
     {
         $this->repository->updateTraktClientId($userId, $traktClientId);

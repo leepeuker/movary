@@ -103,9 +103,9 @@ class SettingsController
         $importHistoryError = empty($_SESSION['importHistoryError']) === false ? $_SESSION['importHistoryError'] : null;
         $deletedUserHistory = empty($_SESSION['deletedUserHistory']) === false ? $_SESSION['deletedUserHistory'] : null;
         $deletedUserRatings = empty($_SESSION['deletedUserRatings']) === false ? $_SESSION['deletedUserRatings'] : null;
-        $dateFormatUpdated = empty($_SESSION['dateFormatUpdated']) === false ? $_SESSION['dateFormatUpdated'] : null;
-        $usernameUpdated = empty($_SESSION['usernameUpdated']) === false ? $_SESSION['usernameUpdated'] : null;
-        $usernameErrorInvalidFormat = empty($_SESSION['usernameErrorInvalidFormat']) === false ? $_SESSION['usernameErrorInvalidFormat'] : null;
+        $generalUpdated = empty($_SESSION['generalUpdated']) === false ? $_SESSION['generalUpdated'] : null;
+        $generalErrorUsernameInvalidFormat = empty($_SESSION['generalErrorUsernameInvalidFormat']) === false ? $_SESSION['generalErrorUsernameInvalidFormat'] : null;
+        $generalErrorUsernameNotUnique = empty($_SESSION['generalErrorUsernameNotUnique']) === false ? $_SESSION['generalErrorUsernameNotUnique'] : null;
         unset(
             $_SESSION['passwordUpdated'],
             $_SESSION['passwordErrorCurrentInvalid'],
@@ -116,9 +116,9 @@ class SettingsController
             $_SESSION['importHistoryError'],
             $_SESSION['deletedUserHistory'],
             $_SESSION['deletedUserRatings'],
-            $_SESSION['dateFormatUpdated'],
-            $_SESSION['usernameUpdated'],
-            $_SESSION['usernameErrorInvalidFormat'],
+            $_SESSION['generalUpdated'],
+            $_SESSION['generalErrorUsernameInvalidFormat'],
+            $_SESSION['generalErrorUsernameNotUnique'],
         );
 
         $user = $this->userApi->fetchUser($userId);
@@ -129,9 +129,10 @@ class SettingsController
                 'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'dateFormats' => DateFormat::getFormats(),
                 'dateFormatSelected' => $user->getDateFormatId(),
-                'dateFormatUpdated' => $dateFormatUpdated,
-                'usernameUpdated' => $usernameUpdated,
-                'usernameErrorInvalidFormat' => $usernameErrorInvalidFormat,
+                'privacyLevel' => $user->getPrivacyLevel(),
+                'generalUpdated' => $generalUpdated,
+                'generalErrorUsernameInvalidFormat' => $generalErrorUsernameInvalidFormat,
+                'generalErrorUsernameNotUnique' => $generalErrorUsernameNotUnique,
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
                 'passwordErrorNotEqual' => $passwordErrorNotEqual,
                 'passwordErrorMinLength' => $passwordErrorMinLength,
@@ -242,43 +243,28 @@ class SettingsController
         );
     }
 
-    public function updateDateFormatId(Request $request) : Response
+    public function updateGeneral(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
         $postParameters = $request->getPostParameters();
+
+        $privacyLevel = isset($postParameters['privacyLevel']) === false ? 1 : (int)$postParameters['privacyLevel'];
         $dateFormat = empty($postParameters['dateFormat']) === true ? 0 : (int)$postParameters['dateFormat'];
-
-        $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
-
-        $_SESSION['dateFormatUpdated'] = true;
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
-        );
-    }
-
-    public function updateName(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
-        }
-
-        $name = $request->getPostParameters()['username'] ?? null;
-        if ($name === '' || $name === null) {
-            throw new \RuntimeException('Invalid username: ' . $name);
-        }
+        $name = $postParameters['username'] ?? '';
 
         try {
+            $this->userApi->updatePrivacyLevel($this->authenticationService->getCurrentUserId(), $privacyLevel);
+            $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
             $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
 
-            $_SESSION['usernameUpdated'] = true;
+            $_SESSION['generalUpdated'] = true;
         } catch (User\Exception\UsernameInvalidFormat $e) {
-            $_SESSION['usernameErrorInvalidFormat'] = true;
+            $_SESSION['generalErrorUsernameInvalidFormat'] = true;
+        } catch (User\Exception\UsernameNotUnique $e) {
+            $_SESSION['generalErrorUsernameNotUnique'] = true;
         }
 
         return Response::create(
