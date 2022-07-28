@@ -59,7 +59,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
-                    <button class="btn btn-primary" type="submit">Submit</button>
+                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Submit</button>
                 </form>
             </div>
 
@@ -127,7 +127,7 @@
 
                 <form action="/user/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1.2rem">
                     <div class="input-group">
-                        <input type="file" class="form-control" name="history" required>
+                        <input type="file" class="form-control" name="history" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                         <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history.csv</button>
                     </div>
                 </form>
@@ -148,7 +148,7 @@
 
                 <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
                     <div class="input-group">
-                        <input type="file" class="form-control" name="ratings" required>
+                        <input type="file" class="form-control" name="ratings" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                         <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import rating.csv</button>
                     </div>
                 </form>

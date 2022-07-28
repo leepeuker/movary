@@ -29,7 +29,8 @@
                     <h5 style="margin-bottom: 0.5rem">Watched movies</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the watched.csv file</p>
                     <div class="input-group mb-3">
-                        <input type="file" class="form-control" accept=".csv" name="historyCsv" id="historyCsv" required>
+                        <input type="file" class="form-control" accept=".csv" name="historyCsv" id="historyCsv" required
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
                     <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
 
@@ -53,7 +54,8 @@
                     <h5 style="margin-bottom: 0.5rem">Ratings</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
                     <div class="input-group mb-3">
-                        <input type="file" class="form-control" accept=".csv" name="ratingsCsv" id="ratingsCsv" required>
+                        <input type="file" class="form-control" accept=".csv" name="ratingsCsv" id="ratingsCsv" required
+                               {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
                     <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
 
