@@ -147,6 +147,7 @@ function logMovie () {
 	let tmdbId = getTmdbId()
 	let watchDate = getWatchDate()
 	let movieTitle = document.getElementById('watchDateModalTitle').innerHTML
+	let dateFormatPhp = document.getElementById('dateFormatPhp').value
 
 	if (validateWatchDate(watchDate) === false) {
 		return
@@ -156,7 +157,10 @@ function logMovie () {
 		method: 'post', headers: {
 			'Content-type': 'application/json',
 		}, body: JSON.stringify({
-			'tmdbId': tmdbId, 'watchDate': watchDate, 'personalRating': rating,
+			'tmdbId': tmdbId,
+			'watchDate': watchDate,
+			'dateFormat': dateFormatPhp,
+			'personalRating': rating,
 		})
 	})
 		.then(function (response) {

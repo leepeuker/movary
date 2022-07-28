@@ -10,7 +10,6 @@ use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
-use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -28,7 +27,7 @@ class HistoryController
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Authentication $authenticationService,
-        private readonly User\Api $userApi
+        private readonly User\Api $userApi,
     ) {
     }
 
@@ -43,7 +42,7 @@ class HistoryController
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];
-        $date = Date::createFromString($requestBody['date']);
+        $date = Date::createFromStringAndFormat($requestBody['date'], $requestBody['dateFormat']);
         $count = $requestBody['count'] ?? 1;
 
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date, $count);
@@ -65,7 +64,7 @@ class HistoryController
             throw new \RuntimeException('Missing parameters');
         }
 
-        $watchDate = Date::createFromDateTime(DateTime::createFromString($requestData['watchDate']));
+        $watchDate = Date::createFromStringAndFormat($requestData['watchDate'], $requestData['dateFormat']);
         $tmdbId = (int)$requestData['tmdbId'];
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
 

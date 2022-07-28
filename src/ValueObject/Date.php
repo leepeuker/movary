@@ -25,6 +25,17 @@ class Date implements \JsonSerializable
         return new self ((new \DateTime($dateString))->format(self::FORMAT));
     }
 
+    public static function createFromStringAndFormat(string $dateString, string $dateFormat) : self
+    {
+        $dateTime = \DateTime::createFromFormat($dateFormat, $dateString);
+
+        if ($dateTime === false) {
+            throw new \RuntimeException(sprintf('Could not create datetime of string "%s" with format "%s".', $dateString, $dateFormat));
+        }
+
+        return new self ($dateTime->format(self::FORMAT));
+    }
+
     public function __toString() : string
     {
         return $this->date;

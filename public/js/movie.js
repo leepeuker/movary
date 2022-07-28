@@ -8,6 +8,7 @@ function deleteWatchDate (e) {
 		return
 	}
 
+	const dateFormatPhp = document.getElementById('dateFormatPhp').value
 	const watchDate = document.getElementById(e.id + '-watch-date')
 
 	const apiUrl = '/movie/' + watchDate.getAttribute('movie-id') + '/history'
@@ -16,7 +17,8 @@ function deleteWatchDate (e) {
 		url: apiUrl,
 		type: 'DELETE',
 		data: JSON.stringify({
-			'date': watchDate.getAttribute('date')
+			'date': watchDate.getAttribute('date'),
+			'dateFormat': dateFormatPhp
 		}),
 		success: function (data, textStatus, xhr) {
 			window.location.reload()
