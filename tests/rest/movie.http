@@ -12,4 +12,13 @@ Accept: */*
 Cache-Control: no-cache
 Content-Type: application/application/json
 
-{"watchDate" : "","tmdbId" : 110, "personalRating" : 3}
+{"watchDate" : "22.07.22","tmdbId" : 9323, "personalRating" : 6, "dateFormat" : "d.m.y"}
+
+####
+
+DELETE http://127.0.0.1/movie/26/history
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/application/json
+
+{"date" : "23.07.22", "dateFormat" : "d.m.y"}
