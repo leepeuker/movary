@@ -41,7 +41,7 @@ class WebScrapper
                         if (empty($matchesVoteCount[1]) === true) {
                             $this->logger->info('Could not find imdb rating vote count for: ' . "https://www.imdb.com/title/$imdbId/");
                         } else {
-                            $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 10000000);
+                            $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 1000000);
                         }
                     } else {
                         $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 1000000);

@@ -56,7 +56,7 @@ class WebScrapperTest extends TestCase
                 'sc-7ab21ed2-1 jGRxWM">8.3< sc-7ab21ed2-3 dPVcnq">32M<',
                 [
                     'average' => 8.3,
-                    'voteCount' => 320000000,
+                    'voteCount' => 32000000,
                 ],
             ],
             [
