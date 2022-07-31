@@ -44,7 +44,7 @@ class WebScrapper
                             $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 10000000);
                         }
                     } else {
-                        $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 10000000);
+                        $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 1000000);
                     }
                 } else {
                     $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 1000);
