@@ -2,6 +2,7 @@
 tmp/*
 !tmp/.gitkeep
 docker-compose.override.yml
+.phpunit.result.cache
 
 .idea/
 vendor/
