@@ -97,9 +97,14 @@ class Api
         return $this->movieSelectService->fetchAll();
     }
 
+    public function fetchAllOrderedByLastUpdatedAtImdbAsc(?int $maxAgeInHours = null, ?int $limit = null) : EntityList
+    {
+        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $limit);
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : EntityList
     {
-        return $this->movieSelectService->fetchAllOrderedByLastUpdatedAtTmdbAsc();
+        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc();
     }
 
     public function fetchByTraktId(TraktId $traktId) : Entity
@@ -266,6 +271,11 @@ class Api
     public function updateGenres(int $movieId, Genre\EntityList $genres) : void
     {
         $this->movieUpdateService->updateGenres($movieId, $genres);
+    }
+
+    public function updateImdbRating(int $movieId, ?float $imdbRating) : void
+    {
+        $this->movieUpdateService->updateImdbRating($movieId, $imdbRating);
     }
 
     public function updateLetterboxdId(int $movieId, string $letterboxdId) : void

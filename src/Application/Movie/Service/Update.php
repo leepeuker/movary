@@ -94,6 +94,11 @@ class Update
         }
     }
 
+    public function updateImdbRating(int $movieId, ?float $imdbRating) : void
+    {
+        $this->repository->updateImdbRating($movieId, $imdbRating);
+    }
+
     public function updateLetterboxdId(int $movieId, string $letterboxdId) : void
     {
         $this->repository->updateLetterboxdId($movieId, $letterboxdId);

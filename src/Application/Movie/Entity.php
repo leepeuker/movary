@@ -4,7 +4,6 @@ namespace Movary\Application\Movie;
 
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\PersonalRating;
 
 class Entity
 {
@@ -23,7 +22,8 @@ class Entity
         private readonly ?float $tmdbVoteAverage,
         private readonly ?int $tmdbVoteCount,
         private readonly ?string $tmdbPosterPath,
-        private readonly ?DateTime $updatedAtTmdb
+        private readonly ?DateTime $updatedAtTmdb,
+        private readonly ?DateTime $updatedAtImdb,
     ) {
     }
 
@@ -45,6 +45,7 @@ class Entity
             $data['tmdb_vote_count'] === null ? null : (int)$data['tmdb_vote_count'],
             $data['tmdb_poster_path'],
             $data['updated_at_tmdb'] === null ? null : DateTime::createFromString($data['updated_at_tmdb']),
+            $data['updated_at_imdb'] === null ? null : DateTime::createFromString($data['updated_at_imdb']),
         );
     }
 
@@ -116,6 +117,11 @@ class Entity
     public function getTraktId() : ?TraktId
     {
         return $this->traktId;
+    }
+
+    public function getUpdatedAtImdb() : ?DateTime
+    {
+        return $this->updatedAtImdb;
     }
 
     public function getUpdatedAtTmdb() : ?DateTime

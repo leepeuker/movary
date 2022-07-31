@@ -72,6 +72,24 @@ class Repository
         return EntityList::createFromArray($data);
     }
 
+    public function fetchAllOrderedByLastUpdatedAtImdbAsc(?int $maxAgeInHours = null, ?int $limit = null) : EntityList
+    {
+        $limitQuery = '';
+        if ($limit !== null) {
+            $limitQuery = " LIMIT $limit";
+        }
+
+        $data = $this->dbConnection->fetchAllAssociative(
+            'SELECT * 
+                FROM `movie` 
+                WHERE updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR)
+                ORDER BY updated_at_imdb ASC' . $limitQuery,
+            [(int)$maxAgeInHours]
+        );
+
+        return EntityList::createFromArray($data);
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : EntityList
     {
         $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie` ORDER BY updated_at_tmdb ASC');
@@ -536,6 +554,11 @@ class Repository
         );
 
         return $this->fetchById($id);
+    }
+
+    public function updateImdbRating(int $id, ?float $imdbRating) : void
+    {
+        $this->dbConnection->update('movie', ['imdb_rating' => $imdbRating, 'updated_at_imdb' => (string)DateTime::create()], ['id' => $id]);
     }
 
     public function updateLetterboxdId(int $id, string $letterboxdId) : void
