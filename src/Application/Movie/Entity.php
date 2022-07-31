@@ -4,7 +4,6 @@ namespace Movary\Application\Movie;
 
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\PersonalRating;
 
 class Entity
 {
@@ -23,7 +22,10 @@ class Entity
         private readonly ?float $tmdbVoteAverage,
         private readonly ?int $tmdbVoteCount,
         private readonly ?string $tmdbPosterPath,
-        private readonly ?DateTime $updatedAtTmdb
+        private readonly ?float $imdbRatingAverage,
+        private readonly ?int $imdbRatingVoteCount,
+        private readonly ?DateTime $updatedAtTmdb,
+        private readonly ?DateTime $updatedAtImdb,
     ) {
     }
 
@@ -44,7 +46,10 @@ class Entity
             $data['tmdb_vote_average'] === null ? null : (float)$data['tmdb_vote_average'],
             $data['tmdb_vote_count'] === null ? null : (int)$data['tmdb_vote_count'],
             $data['tmdb_poster_path'],
+            $data['imdb_rating_average'] === null ? null : (float)$data['imdb_rating_average'],
+            $data['imdb_rating_vote_count'] === null ? null : (int)$data['imdb_rating_vote_count'],
             $data['updated_at_tmdb'] === null ? null : DateTime::createFromString($data['updated_at_tmdb']),
+            $data['updated_at_imdb'] === null ? null : DateTime::createFromString($data['updated_at_imdb']),
         );
     }
 
@@ -56,6 +61,16 @@ class Entity
     public function getImdbId() : ?string
     {
         return $this->imdbId;
+    }
+
+    public function getImdbRatingAverage() : ?float
+    {
+        return $this->imdbRatingAverage;
+    }
+
+    public function getImdbVoteCount() : ?int
+    {
+        return $this->imdbRatingVoteCount;
     }
 
     public function getOriginalLanguage() : ?string
@@ -116,6 +131,11 @@ class Entity
     public function getTraktId() : ?TraktId
     {
         return $this->traktId;
+    }
+
+    public function getUpdatedAtImdb() : ?DateTime
+    {
+        return $this->updatedAtImdb;
     }
 
     public function getUpdatedAtTmdb() : ?DateTime

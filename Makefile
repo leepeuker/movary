@@ -87,7 +87,7 @@ app_jobs_process:
 
 # Tests
 #######
-test: test_phpcs test_psalm test_phpstan
+test: test_phpcs test_psalm test_phpstan test_phpunit
 
 test_phpcs:
 	make exec_app_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml"
@@ -97,3 +97,6 @@ test_phpstan:
 
 test_psalm:
 	make exec_app_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
+
+test_phpunit:
+	make exec_app_cmd CMD="vendor/bin/phpunit -c ./settings/phpunit.xml --testsuite unit"

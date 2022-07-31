@@ -2,6 +2,7 @@
 
 namespace Movary\Application\Movie;
 
+use Movary\Api\Imdb;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\Dto\Cast;
 use Movary\Api\Tmdb\Dto\Crew;
@@ -26,7 +27,10 @@ class Api
         private readonly Movie\Cast\Service\Select $castSelectService,
         private readonly Movie\Crew\Service\Select $crewSelectService,
         private readonly Tmdb\Api $tmdbApi,
-        private readonly Repository $movieRepository
+        private readonly Repository $movieRepository,
+        private readonly Movie\Service\VoteCountFormatter $voteCountFormatter,
+        private readonly Imdb\UrlGenerator $imdbUrlGenerator,
+        private readonly Tmdb\UrlGenerator $tmdbUrlGenerator,
     ) {
     }
 
@@ -97,9 +101,14 @@ class Api
         return $this->movieSelectService->fetchAll();
     }
 
+    public function fetchAllOrderedByLastUpdatedAtImdbAsc(?int $maxAgeInHours = null, ?int $limit = null) : EntityList
+    {
+        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $limit);
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : EntityList
     {
-        return $this->movieSelectService->fetchAllOrderedByLastUpdatedAtTmdbAsc();
+        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc();
     }
 
     public function fetchByTraktId(TraktId $traktId) : Entity
@@ -168,6 +177,8 @@ class Api
 
         $originalLanguageCode = $entity->getOriginalLanguage();
 
+        $imdbId = $entity->getImdbId();
+
         return [
             'id' => $entity->getId(),
             'title' => $entity->getTitle(),
@@ -176,6 +187,12 @@ class Api
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
+            'imdbUrl' => $imdbId !== null ? $this->imdbUrlGenerator->buildUrl($imdbId) : null,
+            'imdbRatingAverage' => $entity->getImdbRatingAverage(),
+            'imdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getImdbVoteCount()),
+            'tmdbUrl' => $this->tmdbUrlGenerator->buildUrl($entity->getTmdbId()),
+            'tmdbRatingAverage' => $entity->getTmdbVoteAverage(),
+            'tmdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getTmdbVoteCount()),
             'originalLanguage' => $originalLanguageCode === null ? null : $this->tmdbApi->getLanguageByCode($originalLanguageCode),
         ];
     }
@@ -266,6 +283,11 @@ class Api
     public function updateGenres(int $movieId, Genre\EntityList $genres) : void
     {
         $this->movieUpdateService->updateGenres($movieId, $genres);
+    }
+
+    public function updateImdbRating(int $movieId, ?float $imdbRating, ?int $imdbRatingVoteCount) : void
+    {
+        $this->movieUpdateService->updateImdbRating($movieId, $imdbRating, $imdbRatingVoteCount);
     }
 
     public function updateLetterboxdId(int $movieId, string $letterboxdId) : void

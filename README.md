@@ -14,6 +14,7 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
     2. [Plex Scrobbler](#plex-scrobbler)
     3. [trakt.tv Sync](#trakttv-sync)
     4. [letterboxd.com Import](#letterboxd-import)
+    4. [IMBb.com Sync](#imdb-sync)
 5. [Development](#development)
 
 <a name="#about"></a>
@@ -150,8 +151,6 @@ Example:
 - `--threshold`
   Maximum number of movies to sync
 
-<a name="#development"></a>
-
 <a name="#plex-scrobbler"></a>
 
 ### Plex Scrobbler
@@ -196,6 +195,25 @@ Example cli sync (import history and ratings for user with id 1):
 You can import your watch history and ratings from letterboxd.com.
 
 Visit the movary settings page `/settings/letterboxd` for more instructions
+
+<a name="#imdb-sync"></a>
+
+### IMDb Sync
+
+Sync imdb ratings.
+
+Example:
+
+`docker exec movary php bin/console.php imdb:sync`
+
+**Flags:**
+
+- `--hours`
+  Only movie ratings which were last synced X hours or longer ago will be synced
+- `--threshold`
+  Maximum number of movie ratings to sync
+
+<a name="#development"></a>
 
 ## Development
 
