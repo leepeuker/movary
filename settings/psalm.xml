@@ -27,6 +27,27 @@
         <MixedArrayAccess errorLevel="info"/>
         <MixedAssignment errorLevel="info"/>
         <ImplicitToStringCast errorLevel="suppress"/>
+
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <directory name="tests/unit"/>
+            </errorLevel>
+        </InternalMethod>
+        <PossiblyUndefinedMethod>
+            <errorLevel type="suppress">
+                <directory name="tests/unit"/>
+            </errorLevel>
+        </PossiblyUndefinedMethod>
+        <RedundantCondition>
+            <errorLevel type="suppress">
+                <directory name="tests/unit"/>
+            </errorLevel>
+        </RedundantCondition>
+        <PossiblyInvalidArgument>
+            <errorLevel type="suppress">
+                <directory name="tests/unit"/>
+            </errorLevel>
+        </PossiblyInvalidArgument>
     </issueHandlers>
 
     <plugins>

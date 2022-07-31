@@ -14,6 +14,7 @@ class WebScrapper
     ) {
     }
 
+    // phpcs:ignore
     public function findRating(string $imdbId) : array
     {
         $rating = ['average' => null, 'voteCount' => null];
@@ -36,7 +37,12 @@ class WebScrapper
                 if (empty($matchesVoteCount[1]) === true) {
                     preg_match('/sc-7ab21ed2-3 dPVcnq">(\d+\.\d)M</', $responseBodyContent, $matchesVoteCount);
                     if (empty($matchesVoteCount[1]) === true) {
-                        $this->logger->info('Could not find imdb rating vote count for: ' . "https://www.imdb.com/title/$imdbId/");
+                        preg_match('/sc-7ab21ed2-3 dPVcnq">(\d+)M</', $responseBodyContent, $matchesVoteCount);
+                        if (empty($matchesVoteCount[1]) === true) {
+                            $this->logger->info('Could not find imdb rating vote count for: ' . "https://www.imdb.com/title/$imdbId/");
+                        } else {
+                            $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 10000000);
+                        }
                     } else {
                         $rating['voteCount'] = (int)((float)$matchesVoteCount[1] * 10000000);
                     }
