@@ -556,9 +556,13 @@ class Repository
         return $this->fetchById($id);
     }
 
-    public function updateImdbRating(int $id, ?float $imdbRating) : void
+    public function updateImdbRating(int $id, ?float $imdbRating, ?int $imdbRatingVoteCount) : void
     {
-        $this->dbConnection->update('movie', ['imdb_rating' => $imdbRating, 'updated_at_imdb' => (string)DateTime::create()], ['id' => $id]);
+        $this->dbConnection->update('movie', [
+            'imdb_rating_average' => $imdbRating,
+            'imdb_rating_vote_count' => $imdbRatingVoteCount,
+            'updated_at_imdb' => (string)DateTime::create(),
+        ], ['id' => $id]);
     }
 
     public function updateLetterboxdId(int $id, string $letterboxdId) : void

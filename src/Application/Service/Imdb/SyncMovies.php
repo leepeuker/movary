@@ -29,7 +29,7 @@ class SyncMovies
             try {
                 $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
 
-                $this->movieApi->updateImdbRating($movie->getId(), $imdbRating);
+                $this->movieApi->updateImdbRating($movie->getId(), $imdbRating['average'], $imdbRating['voteCount']);
             } catch (\Throwable $t) {
                 $this->logger->error('Could not sync imdb rating for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
