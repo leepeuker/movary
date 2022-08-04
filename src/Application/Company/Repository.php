@@ -25,6 +25,22 @@ class Repository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
+    public function delete(int $tmdbId) : void
+    {
+        $this->dbConnection->delete('company', ['tmdb_id' => $tmdbId]);
+    }
+
+    public function findByNameAndOriginCountry(string $name, ?string $originCountry) : ?Entity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `company` WHERE name = ? AND origin_country = ?', [$name, $originCountry]);
+
+        if ($data === false) {
+            return null;
+        }
+
+        return Entity::createFromArray($data);
+    }
+
     public function findByTmdbId(int $tmdbId) : ?Entity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `company` WHERE tmdb_id = ?', [$tmdbId]);
@@ -34,6 +50,22 @@ class Repository
         }
 
         return Entity::createFromArray($data);
+    }
+
+    public function update(int $id, string $name, ?string $originCountry) : Entity
+    {
+        $this->dbConnection->update(
+            'company',
+            [
+                'name' => $name,
+                'origin_country' => $originCountry,
+            ],
+            [
+                'id' => $id,
+            ]
+        );
+
+        return $this->fetchById($id);
     }
 
     private function fetchById(int $id) : Entity

@@ -3,6 +3,7 @@
 namespace Movary\Api\Tmdb;
 
 use Movary\Api\Tmdb\Cache\Iso6931;
+use Movary\Api\Tmdb\Dto\Company;
 use Movary\Api\Tmdb\Dto\Credits;
 use Movary\Api\Tmdb\Dto\Movie;
 
@@ -12,6 +13,13 @@ class Api
         private readonly Client $client,
         private readonly Iso6931 $iso6931,
     ) {
+    }
+
+    public function fetchCompany(int $companyId) : Company
+    {
+        $data = $this->client->get('/company/' . $companyId);
+
+        return Company::createFromArray($data);
     }
 
     public function fetchMovieCredits(int $movieId) : Credits
