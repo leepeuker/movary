@@ -2,30 +2,64 @@
 
 namespace Movary\Application\Service\Tmdb;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Movary\Api\Tmdb;
 use Movary\Application\Company\Api;
+use Movary\Application\Company\Entity;
 use Movary\Application\Company\EntityList;
 
 class ProductionCompanyConverter
 {
-    public function __construct(private readonly Api $companyApi)
+    public function __construct(private readonly Api $companyApi, private readonly Tmdb\Api $tmdbApi)
     {
     }
 
     public function getMovaryProductionCompaniesFromTmdbMovie(Tmdb\Dto\Movie $movieDetails) : EntityList
     {
-        $productionCompany = EntityList::create();
+        $productionCompanies = EntityList::create();
 
         foreach ($movieDetails->getProductionCompanies() as $tmdbCompany) {
             $company = $this->companyApi->findByTmdbId($tmdbCompany->getId());
 
             if ($company === null) {
-                $company = $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
+                $company = $this->createMissingCompany($tmdbCompany);
             }
 
-            $productionCompany->add($company);
+            $productionCompanies->add($company);
         }
 
-        return $productionCompany;
+        return $productionCompanies;
+    }
+
+    private function createMissingCompany(Tmdb\Dto\ProductionCompany $tmdbCompany) : Entity
+    {
+        try {
+            return $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
+        } catch (UniqueConstraintViolationException $e) {
+            $companyCausingConstraintViolation = $this->companyApi->findByNameAndOriginCountry($tmdbCompany->getName(), $tmdbCompany->getOriginCountry());
+
+            if ($companyCausingConstraintViolation === null) {
+                throw $e;
+            }
+
+            $this->fixUniqueConstraintViolation($companyCausingConstraintViolation);
+        }
+
+        return $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
+    }
+
+    private function fixUniqueConstraintViolation(Entity $companyCausingConstraintViolation) : void
+    {
+        try {
+            // The unique constraint violation indicates that the local company is no longer matching the remote tmdb company
+            $tmdbCompany = $this->tmdbApi->fetchCompany($companyCausingConstraintViolation->getTmdbId());
+        } catch (Tmdb\Exception\ResourceNotFound $e) {
+            // Remote company no longer exists, so we can delete it locally
+            $this->companyApi->deleteByTmdbId($companyCausingConstraintViolation->getTmdbId());
+
+            return;
+        }
+
+        $this->companyApi->update($tmdbCompany->getId(), $tmdbCompany->getName(), $tmdbCompany->getOriginCountry());
     }
 }
