@@ -21,14 +21,14 @@
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
 
-        <h2 style="display: flex;margin-bottom: 0.3rem">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
+        <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
 
         <input type="hidden" id="movieId" value="{{ movie.id }}">
 
         <div class="fw-light" id="ratingStars"
              style="color: rgb(255, 193, 7);
                      font-size: 1.5rem;
-                     margin-bottom: 0.4rem;
+                     margin-bottom: 0.5rem;
                      {% if loggedIn == true %}cursor:pointer;{% endif %}">
 
             <span id="ratingStarsSpan">
@@ -46,7 +46,7 @@
             </span>
         </div>
 
-        <div style="display: flex;padding-top: 0.3rem">
+        <div style="display: flex;">
             <div style="text-align: center">
                 <img src="{{ tmdb.generatePosterImageUrl(movie.tmdbPosterPath) }}" width="200rem" style="width: 11rem;align-self: start;">
             </div>
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div class="carousel" style="display: flex;margin-top: 0.8rem;margin-bottom: 0.8rem">
+        <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
             {% if movie.imdbRatingAverage is not null %}
                 <div style="display: flex; align-items: center;cursor:pointer;" onclick="window.open('{{ movie.imdbUrl }}', '_blank')">
                     <img src="/images/imdb-logo.svg" style="width: 3rem">
@@ -97,7 +97,7 @@
             </div>
         {% endif %}
 
-        <h6 style="margin-bottom: 0.3rem;{% if movie.tagline is null %}padding-top: 0.8rem"{% endif %}">Plot</h6>
+        <h6 style="margin-bottom: 0.4rem;">Plot</h6>
         <div class="carousel">
             <p style="margin-bottom: 0rem">{{ movie.overview }}</p>
         </div>
