@@ -17,10 +17,11 @@ $builder->addDefinitions(
         \Movary\Command\DatabaseMigrationRollback::class => DI\factory([Factory::class, 'createDatabaseMigrationRollbackCommand']),
         \Movary\Command\ProcessJobs::class => DI\factory([Factory::class, 'createProcessJobCommand']),
         \Psr\Http\Client\ClientInterface::class => DI\factory([Factory::class, 'createHttpClient']),
-        \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createFileLogger']),
+        \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createLogger']),
         \Doctrine\DBAL\Connection::class => DI\factory([Factory::class, 'createDbConnection']),
         \Twig\Loader\LoaderInterface::class => DI\factory([Factory::class, 'createTwigFilesystemLoader']),
         \Twig\Environment::class => DI\factory([Factory::class, 'createTwigEnvironment']),
+        \Monolog\Formatter\LineFormatter::class => DI\factory([Factory::class, 'createLineFormatter']),
     ]
 );
 
