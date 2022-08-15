@@ -8,6 +8,7 @@ use Movary\Api\Letterboxd\WebScrapper;
 use Movary\Application\Movie;
 use Movary\Application\Service\Letterboxd\ValueObject\CsvLineRating;
 use Movary\Application\SyncLog;
+use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
 
@@ -60,6 +61,16 @@ class ImportRatings
         $this->scanLogRepository->insertLogForLetterboxdSync();#
 
         unlink($ratingsCsvPath);
+    }
+
+    public function executeJob(Job $job) : void
+    {
+        $userId = $job->getUserId();
+        if ($userId === null) {
+            throw new \RuntimeException('Missing userId');
+        }
+
+        $this->execute($userId, $job->getParameters()['importFile']);
     }
 
     public function findMovieByLetterboxdUri(string $letterboxdUri) : ?Movie\Entity

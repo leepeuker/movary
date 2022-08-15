@@ -4,6 +4,10 @@ namespace Movary\Worker;
 
 use Doctrine\DBAL\Connection;
 use Movary\Util\Json;
+use Movary\ValueObject\Job;
+use Movary\ValueObject\JobList;
+use Movary\ValueObject\JobStatus;
+use Movary\ValueObject\JobType;
 
 class Repository
 {
@@ -11,35 +15,39 @@ class Repository
     {
     }
 
-    public function addJob(Job $job) : void
+    public function addJob(JobType $type, JobStatus $status, ?int $userId = null, ?array $parameters = null) : void
     {
         $this->dbConnection->insert(
             'job_queue',
             [
-                'job' => Json::encode($job),
+                'job_type' => $type,
+                'job_status' => $status,
+                'user_id' => $userId,
+                'parameters' => $parameters !== null ? Json::encode($parameters) : null,
             ]
         );
     }
 
-    public function fetchOldestJob() : ?Job
+    public function fetchJobs(int $userId) : JobList
     {
-        $this->dbConnection->beginTransaction();
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `job_queue` WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC, id DESC LIMIT 20', [$userId]);
 
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `job_queue` ORDER BY `created_at` LIMIT 1');
+        return JobList::createFromArray($data);
+    }
+
+    public function fetchOldestWaitingJob() : ?Job
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `job_queue` WHERE job_status = ? ORDER BY `created_at` LIMIT 1', [JobStatus::createWaiting()]);
 
         if ($data === false) {
             return null;
         }
 
-        $this->deleteJob($data['id']);
-
-        $this->dbConnection->commit();
-
-        return Job::createFromArray(Json::decode($data['job']));
+        return Job::createFromArray($data);
     }
 
-    private function deleteJob(int $id) : void
+    public function updateJobStatus(int $id, JobStatus $status) : void
     {
-        $this->dbConnection->delete('job_queue', ['id' => $id]);
+        $this->dbConnection->update('job_queue', ['job_status' => (string)$status], ['id' => $id]);
     }
 }

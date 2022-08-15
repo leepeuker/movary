@@ -10,6 +10,7 @@ use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\Worker\Service;
+use Twig\Environment;
 
 class JobController
 {
@@ -18,7 +19,25 @@ class JobController
         private readonly Service $workerService,
         private readonly ImportHistoryFileValidator $letterboxdImportHistoryFileValidator,
         private readonly ImportRatingsFileValidator $letterboxdImportRatingsFileValidator,
+        private readonly Environment $twig,
     ) {
+    }
+
+    public function renderQueuePage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $jobs = $this->workerService->fetchJobsForStatusPage($this->authenticationService->getCurrentUserId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render(
+                'page/job-queue.html.twig',
+                ['jobs' => $jobs]
+            ),
+        );
     }
 
     public function scheduleLetterboxdHistoryImport(Request $request) : Response
@@ -109,7 +128,7 @@ class JobController
             return Response::createFoundRedirect('/');
         }
 
-        $this->workerService->addTraktHistorySyncJob($this->authenticationService->getCurrentUserId());
+        $this->workerService->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
         $_SESSION['scheduledTraktHistorySync'] = true;
 
@@ -126,7 +145,7 @@ class JobController
             return Response::createFoundRedirect('/');
         }
 
-        $this->workerService->addTraktRatingsSyncJob($this->authenticationService->getCurrentUserId());
+        $this->workerService->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
         $_SESSION['scheduledTraktRatingsSync'] = true;
 

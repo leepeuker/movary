@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Account
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="padding-top: 1rem">
+            <p>Last 20 Jobs:</p>
+            <div style="text-align: center;">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">User</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Updated</th>
+                        <th scope="col">Created</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for job in jobs %}
+                        <tr>
+                            <td>{{ job.id }}</td>
+                            <td>{{ job.userName|default('-') }}</td>
+                            <td>{{ job.type }}</td>
+                            <td>{{ job.status }}</td>
+                            <td>{{ job.updatedAt|default('-') }}</td>
+                            <td>{{ job.createdAt }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+{% endblock %}
