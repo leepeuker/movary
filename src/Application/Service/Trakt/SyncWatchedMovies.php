@@ -8,6 +8,7 @@ use Movary\Application;
 use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\ValueObject\Date;
+use Movary\ValueObject\Job;
 use Psr\Log\LoggerInterface;
 
 class SyncWatchedMovies
@@ -65,6 +66,16 @@ class SyncWatchedMovies
         }
 
         $this->scanLogRepository->insertLogForTraktSync();
+    }
+
+    public function executeJob(Job $job) : void
+    {
+        $userId = $job->getUserId();
+        if ($userId === null) {
+            throw new \RuntimeException('Missing userId');
+        }
+
+        $this->execute($userId);
     }
 
     private function findOrCreateMovieLocally(Api\Trakt\ValueObject\Movie\Dto $watchedMovie) : Application\Movie\Entity

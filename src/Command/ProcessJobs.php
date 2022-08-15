@@ -2,6 +2,8 @@
 
 namespace Movary\Command;
 
+use Movary\ValueObject\JobStatus;
+use Movary\ValueObject\JobType;
 use Movary\Worker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,17 +68,26 @@ class ProcessJobs extends Command
         return Command::SUCCESS;
     }
 
-    private function processJob() : ?string
+    private function processJob() : ?JobType
     {
-        $job = $this->repository->fetchOldestJob();
+        $job = $this->repository->fetchOldestWaitingJob();
 
         if ($job === null) {
             return null;
         }
 
-        $this->workerService->processJob($job);
+        try {
+            $this->workerService->setJobToInProgress($job->getId());
 
-        /** @noinspection PhpUnreachableStatementInspection */
+            $this->workerService->processJob($job);
+
+            $this->repository->updateJobStatus($job->getId(), JobStatus::createDone());
+        } catch (\Exception $e) {
+            $this->repository->updateJobStatus($job->getId(), JobStatus::createFailed());
+
+            throw $e;
+        }
+
         return $job->getType();
     }
 }

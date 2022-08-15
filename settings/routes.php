@@ -79,6 +79,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/job-queue',
+        [\Movary\HttpController\JobController::class, 'renderQueuePage']
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/log-movie',
         [\Movary\HttpController\HistoryController::class, 'renderLogMoviePage']
     );

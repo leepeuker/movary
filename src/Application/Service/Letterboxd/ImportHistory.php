@@ -8,6 +8,7 @@ use Movary\Application\Movie;
 use Movary\Application\Service\Letterboxd\ValueObject\CsvLineHistory;
 use Movary\Application\Service\Tmdb;
 use Movary\Application\Service\Trakt\PlaysPerDateDtoList;
+use Movary\ValueObject\Job;
 use Psr\Log\LoggerInterface;
 
 class ImportHistory
@@ -40,7 +41,7 @@ class ImportHistory
                 $watchDatesToImport[$movie->getId()] = PlaysPerDateDtoList::create();
             }
 
-            $watchDatesToImport[$movie->getId()]->incrementPlaysForDate($csvLineHistory->getDate    ());
+            $watchDatesToImport[$movie->getId()]->incrementPlaysForDate($csvLineHistory->getDate());
         }
 
         foreach ($watchDates->getRecords() as $watchDate) {
@@ -65,6 +66,16 @@ class ImportHistory
         }
 
         unlink($historyCsvPath);
+    }
+
+    public function executeJob(Job $job) : void
+    {
+        $userId = $job->getUserId();
+        if ($userId === null) {
+            throw new \RuntimeException('Missing userId');
+        }
+
+        $this->execute($userId, $job->getParameters()['importFile']);
     }
 
     public function fetchMovieByLetterboxdUri(string $letterboxdUri) : Movie\Entity

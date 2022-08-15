@@ -5,6 +5,10 @@ namespace Movary\Worker;
 use Movary\Application\Service\Letterboxd;
 use Movary\Application\Service\Tmdb\SyncMovies;
 use Movary\Application\Service\Trakt;
+use Movary\Application\User\Api;
+use Movary\ValueObject\Job;
+use Movary\ValueObject\JobStatus;
+use Movary\ValueObject\JobType;
 
 class Service
 {
@@ -15,55 +19,72 @@ class Service
         private readonly Letterboxd\ImportRatings $letterboxdImportRatings,
         private readonly Letterboxd\ImportHistory $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,
+        private readonly Api $userApi,
     ) {
     }
 
     public function addLetterboxdImportHistoryJob(int $userId, string $importFile) : void
     {
-        $job = Job::createLetterboxImportHistory($userId, $importFile);
-
-        $this->repository->addJob($job);
+        $this->repository->addJob(JobType::createLetterboxdImportHistory(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
     }
 
     public function addLetterboxdImportRatingsJob(int $userId, string $importFile) : void
     {
-        $job = Job::createLetterboxImportRatings($userId, $importFile);
-
-        $this->repository->addJob($job);
+        $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
     }
 
-    public function addTmdbSyncJob() : void
+    public function addTmdbSyncJob(JobStatus $jobStatus) : void
     {
-        $job = Job::createTmdbSync();
-
-        $this->repository->addJob($job);
+        $this->repository->addJob(JobType::createTmdbSync(), $jobStatus);
     }
 
-    public function addTraktHistorySyncJob(int $userId) : void
+    public function addTraktImportHistoryJob(int $userId) : void
     {
-        $job = Job::createTraktHistorySync($userId);
-
-        $this->repository->addJob($job);
+        $this->repository->addJob(JobType::createTraktImportHistory(), JobStatus::createWaiting(), $userId);
     }
 
-    public function addTraktRatingsSyncJob(int $userId) : void
+    public function addTraktImportRatingsJob(int $userId) : void
     {
-        $job = Job::createTraktRatingsSync($userId);
+        $this->repository->addJob(JobType::createTraktImportRatings(), JobStatus::createWaiting(), $userId);
+    }
 
-        $this->repository->addJob($job);
+    public function fetchJobsForStatusPage(int $userId) : array
+    {
+        $jobs = $this->repository->fetchJobs($userId);
+
+        $jobsData = [];
+        foreach ($jobs as $job) {
+            $jobUserId = $job->getUserId();
+
+            $userName = $jobUserId === null ? null : $this->userApi->fetchUser($jobUserId)->getName();
+
+            $jobsData[] = [
+                'id' => $job->getId(),
+                'type' => $job->getType(),
+                'status' => $job->getStatus(),
+                'userName' => $userName,
+                'updatedAt' => $job->getUpdatedAt(),
+                'createdAt' => $job->getCreatedAt(),
+            ];
+        }
+
+        return $jobsData;
     }
 
     public function processJob(Job $job) : void
     {
-        $parameters = $job->getParameters();
-
         match (true) {
-            $job->isOfTypeLetterboxdImportRankings() => $this->letterboxdImportRatings->execute($parameters['userId'], $parameters['importFile']),
-            $job->isOfTypeLetterboxdImportHistory() => $this->letterboxdImportHistory->execute($parameters['userId'], $parameters['importFile']),
-            $job->isOfTypeTraktSyncRankings() => $this->traktSyncRatings->execute($parameters['userId']),
-            $job->isOfTypeTraktSyncHistory() => $this->traktSyncWatchedMovies->execute($parameters['userId']),
-            $job->isOfTypeTmdbSync() => $this->tmdbSyncMovies->syncMovies(),
+            $job->getType()->isOfTypeLetterboxdImportRankings() => $this->letterboxdImportRatings->executeJob($job),
+            $job->getType()->isOfTypeLetterboxdImportHistory() => $this->letterboxdImportHistory->executeJob($job),
+            $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
+            $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
+            $job->getType()->isOfTypeTmdbSync() => $this->tmdbSyncMovies->syncMovies(),
             default => throw new \RuntimeException('Job type not supported: ' . $job->getType()),
         };
+    }
+
+    public function setJobToInProgress(int $id) : void
+    {
+        $this->repository->updateJobStatus($id, JobStatus::createInProgress());
     }
 }

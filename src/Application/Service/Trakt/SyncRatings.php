@@ -6,6 +6,7 @@ use Movary\Api;
 use Movary\Application;
 use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
+use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
 
 class SyncRatings
@@ -54,5 +55,15 @@ class SyncRatings
         }
 
         $this->scanLogRepository->insertLogForTraktSync();
+    }
+
+    public function executeJob(Job $job) : void
+    {
+        $userId = $job->getUserId();
+        if ($userId === null) {
+            throw new \RuntimeException('Missing userId');
+        }
+
+        $this->execute($userId);
     }
 }
