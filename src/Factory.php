@@ -79,26 +79,30 @@ class Factory
         );
     }
 
-    public static function createFileLogger(Config $config) : LoggerInterface
-    {
-        $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
-        $formatter->includeStacktraces(true);
-
-        $handler = new StreamHandler(
-            __DIR__ . '/../' . $config->getAsString('LOG_FILE'),
-            $config->getAsString('LOG_LEVEL')
-        );
-        $handler->setFormatter($formatter);
-
-        $logger = new Logger('file');
-        $logger->pushHandler($handler);
-
-        return $logger;
-    }
-
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client();
+    }
+
+    public static function createLineFormatter(Config $config) : LineFormatter
+    {
+        $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
+        $formatter->includeStacktraces($config->getAsBool('LOG_ENABLE_STACKTRACE'));
+
+        return $formatter;
+    }
+
+    public static function createLogger(ContainerInterface $container, Config $config) : LoggerInterface
+    {
+        $logger = new Logger('movary');
+
+        $logger->pushHandler(self::createLoggerStreamHandlerStdout($container, $config));
+
+        if ($config->getAsBool('LOG_ENABLE_FILE_LOGGING') === true) {
+            $logger->pushHandler(self::createLoggerStreamHandlerFile($container, $config));
+        }
+
+        return $logger;
     }
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
@@ -171,6 +175,25 @@ class Factory
     public static function createTwigFilesystemLoader() : Twig\Loader\FilesystemLoader
     {
         return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
+    }
+
+    private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler
+    {
+        $streamHandler = new StreamHandler(
+            __DIR__ . '/../tmp/app.log',
+            $config->getAsString('LOG_LEVEL')
+        );
+        $streamHandler->setFormatter($container->get(LineFormatter::class));
+
+        return $streamHandler;
+    }
+
+    private static function createLoggerStreamHandlerStdout(ContainerInterface $container, Config $config) : StreamHandler
+    {
+        $streamHandler = new StreamHandler('php://stdout', $config->getAsString('LOG_LEVEL'));
+        $streamHandler->setFormatter($container->get(LineFormatter::class));
+
+        return $streamHandler;
     }
 
     public function createProcessJobCommand(ContainerInterface $container, Config $config) : Command\ProcessJobs
