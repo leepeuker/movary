@@ -130,7 +130,7 @@ class JobController
 
         $this->workerService->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
-        $_SESSION['scheduledTraktHistorySync'] = true;
+        $_SESSION['scheduledTraktHistoryImport'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -147,7 +147,7 @@ class JobController
 
         $this->workerService->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
-        $_SESSION['scheduledTraktRatingsSync'] = true;
+        $_SESSION['scheduledTraktRatingsImport'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),

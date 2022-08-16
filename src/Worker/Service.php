@@ -14,8 +14,8 @@ class Service
 {
     public function __construct(
         private readonly Repository $repository,
-        private readonly Trakt\SyncWatchedMovies $traktSyncWatchedMovies,
-        private readonly Trakt\SyncRatings $traktSyncRatings,
+        private readonly Trakt\ImportWatchedMovies $traktSyncWatchedMovies,
+        private readonly Trakt\ImportRatings $traktSyncRatings,
         private readonly Letterboxd\ImportRatings $letterboxdImportRatings,
         private readonly Letterboxd\ImportHistory $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,

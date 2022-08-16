@@ -42,7 +42,7 @@ class Repository
         $this->insertLogForSyncByType(self::TYPE_TMDB);
     }
 
-    public function insertLogForTraktSync() : void
+    public function insertLogForTraktImport() : void
     {
         $this->insertLogForSyncByType(self::TYPE_TRAKT);
     }

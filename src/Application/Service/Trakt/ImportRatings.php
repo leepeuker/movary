@@ -9,7 +9,7 @@ use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
 
-class SyncRatings
+class ImportRatings
 {
     public function __construct(
         private readonly Application\Movie\Api $movieApi,
@@ -54,7 +54,7 @@ class SyncRatings
             }
         }
 
-        $this->scanLogRepository->insertLogForTraktSync();
+        $this->scanLogRepository->insertLogForTraktImport();
     }
 
     public function executeJob(Job $job) : void
