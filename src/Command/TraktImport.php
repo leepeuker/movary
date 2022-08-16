@@ -6,6 +6,8 @@ use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\Application\Service\Trakt\ImportRatings;
 use Movary\Application\Service\Trakt\ImportWatchedMovies;
+use Movary\ValueObject\JobStatus;
+use Movary\Worker\Service;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,7 +30,8 @@ class TraktImport extends Command
     public function __construct(
         private readonly ImportRatings $importRatings,
         private readonly ImportWatchedMovies $importWatchedMovies,
-        private readonly LoggerInterface $logger
+        private readonly Service $workerService,
+        private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
     }
@@ -93,6 +96,8 @@ class TraktImport extends Command
 
         $this->importWatchedMovies->execute($userId, $overwriteExistingData, $ignoreCache);
 
+        $this->workerService->addTraktImportHistoryJob($userId, JobStatus::createDone());
+
         $this->generateOutput($output, 'Importing history done.');
     }
 
@@ -101,6 +106,8 @@ class TraktImport extends Command
         $this->generateOutput($output, 'Importing ratings...');
 
         $this->importRatings->execute($userId, $overwriteExistingData);
+
+        $this->workerService->addTraktImportRatingsJob($userId, JobStatus::createDone());
 
         $this->generateOutput($output, 'Importing ratings ratings.');
     }

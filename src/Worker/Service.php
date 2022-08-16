@@ -38,14 +38,14 @@ class Service
         $this->repository->addJob(JobType::createTmdbSync(), $jobStatus);
     }
 
-    public function addTraktImportHistoryJob(int $userId) : void
+    public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : void
     {
-        $this->repository->addJob(JobType::createTraktImportHistory(), JobStatus::createWaiting(), $userId);
+        $this->repository->addJob(JobType::createTraktImportHistory(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
-    public function addTraktImportRatingsJob(int $userId) : void
+    public function addTraktImportRatingsJob(int $userId, ?JobStatus $jobStatus = null) : void
     {
-        $this->repository->addJob(JobType::createTraktImportRatings(), JobStatus::createWaiting(), $userId);
+        $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
     public function fetchJobsForStatusPage(int $userId) : array

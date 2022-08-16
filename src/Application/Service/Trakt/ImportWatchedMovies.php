@@ -20,7 +20,6 @@ class ImportWatchedMovies
         private readonly LoggerInterface $logger,
         private readonly PlaysPerDateFetcher $playsPerDateFetcher,
         private readonly Application\Service\Tmdb\SyncMovie $tmdbMovieSync,
-        private readonly Application\SyncLog\Repository $scanLogRepository,
         private readonly Application\User\Api $userApi
     ) {
     }
@@ -64,8 +63,6 @@ class ImportWatchedMovies
                 $this->traktApi->removeWatchCacheByTraktId($userId, $traktId);
             }
         }
-
-        $this->scanLogRepository->insertLogForTraktImport();
     }
 
     public function executeJob(Job $job) : void

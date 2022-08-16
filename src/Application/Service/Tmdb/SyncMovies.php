@@ -4,7 +4,6 @@ namespace Movary\Application\Service\Tmdb;
 
 use Doctrine\DBAL;
 use Movary\Application\Movie;
-use Movary\Application\SyncLog\Repository;
 use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
 
@@ -15,7 +14,6 @@ class SyncMovies
         private readonly Movie\Api $movieApi,
         private readonly DBAL\Connection $dbConnection,
         private readonly LoggerInterface $logger,
-        private readonly Repository $scanLogRepository,
     ) {
     }
 
@@ -48,8 +46,6 @@ class SyncMovies
 
             $movieCountSynced++;
         }
-
-        $this->scanLogRepository->insertLogForTmdbSync();
     }
 
     private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays = null) : bool

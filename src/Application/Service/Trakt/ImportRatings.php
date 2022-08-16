@@ -15,7 +15,6 @@ class ImportRatings
         private readonly Application\Movie\Api $movieApi,
         private readonly Api\Trakt\Api $traktApi,
         private readonly Api\Trakt\Cache\User\Movie\Rating\Service $traktApiCacheUserMovieRatingService,
-        private readonly Application\SyncLog\Repository $scanLogRepository,
         private readonly Application\User\Api $userApi,
     ) {
     }
@@ -53,8 +52,6 @@ class ImportRatings
                 $this->movieApi->updateUserRating($movie->getId(), $userId, PersonalRating::create($traktUserRating));
             }
         }
-
-        $this->scanLogRepository->insertLogForTraktImport();
     }
 
     public function executeJob(Job $job) : void
