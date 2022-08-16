@@ -36,7 +36,7 @@
 
                     {% if letterboxdHistorySyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
-                            Watched movies sync successfully scheduled. Should be processed soon.
+                            Watched movies import <a href="/job-queue">scheduled</a>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
@@ -61,7 +61,7 @@
 
                     {% if letterboxdRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
-                            Ratings sync successfully scheduled. Should be processed soon.
+                            Ratings import <a href="/job-queue">scheduled</a>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}

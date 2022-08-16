@@ -12,7 +12,8 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 4. [Features](#features)
     1. [Tmdb Sync](#tmdb-sync)
     2. [Plex Scrobbler](#plex-scrobbler)
-    3. [trakt.tv Sync](#trakttv-sync)
+    3. [trakt.tv Import](#trakttv-import)
+    3. [trakt.tv Export](#trakttv-export)
     4. [letterboxd.com Import](#letterboxd-import)
     4. [IMBb.com Sync](#imdb-sync)
 5. [Development](#development)
@@ -161,32 +162,38 @@ You can generate your plex webhook url on the settings page (`/settings`).
 
 Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/).
 
-<a name="#trakttv-sync"></a>
+<a name="#trakttv-import"></a>
 
-### Trakt.tv Sync
+### Trakt.tv Import
 
 You can import your watch history and ratings from trakt.tv (exporting from movary to trakt not supported yet).
 
-The user used in the sync process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
+The user used in the import process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
 
 The import can be executed via the settings page `/settings/trakt` or via cli.
 
-Example cli sync (import history and ratings for user with id 1):
+Example cli import (import history and ratings for user with id 1):
 
-`docker exec movary php bin/console.php trakt:sync --ratings --history --userId=1`
+`docker exec movary php bin/console.php trakt:import --ratings --history --userId=1`
 
 **Flags:**
 
 - `--userId`
-  User to sync data to
+  User to import data to
 - `--ratings`
-  Sync trakt ratings
+  Import trakt ratings
 - `--history`
-  Sync trakt watch history (plays)
+  Import trakt watch history (plays)
 - `--overwrite`
   Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
 - `--ignore-cache`
-  Use if you want to sync everything from trakt regardless if there was a change since the last sync.
+  Use if you want to import everything from trakt regardless if there was a change since the last import.
+
+- <a name="#trakttv-export"></a>
+
+### Trakt.tv Export
+
+coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
 
 <a name="#letterboxd-import"></a>
 
