@@ -189,11 +189,11 @@ Example cli import (import history and ratings for user with id 1):
 - `--ignore-cache`
   Use if you want to import everything from trakt regardless if there was a change since the last import.
 
-- <a name="#trakttv-export"></a>
+<a name="#trakttv-export"></a>
 
 ### Trakt.tv Export
 
-coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
+coming soon ([maybe?](https://github.com/leepeuker/movary/issues/97))
 
 <a name="#letterboxd-import"></a>
 
