@@ -11,7 +11,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\Job;
 use Psr\Log\LoggerInterface;
 
-class SyncWatchedMovies
+class ImportWatchedMovies
 {
     public function __construct(
         private readonly Application\Movie\Api $movieApi,
@@ -48,7 +48,7 @@ class SyncWatchedMovies
                 continue;
             }
 
-            $this->syncMovieHistory($traktClientId, $traktUserName, $userId, $traktId, $movie, $overwriteExistingData);
+            $this->importMovieHistory($traktClientId, $traktUserName, $userId, $traktId, $movie, $overwriteExistingData);
 
             $this->traktApiCacheUserMovieWatchedService->setOne($userId, $traktId, $watchedMovie->getLastUpdated());
         }
@@ -65,7 +65,7 @@ class SyncWatchedMovies
             }
         }
 
-        $this->scanLogRepository->insertLogForTraktSync();
+        $this->scanLogRepository->insertLogForTraktImport();
     }
 
     public function executeJob(Job $job) : void
@@ -105,14 +105,7 @@ class SyncWatchedMovies
         return $this->movieApi->fetchByTraktId($traktId);
     }
 
-    private function isWatchedCacheUpToDate(int $userId, Api\Trakt\ValueObject\User\Movie\Watched\Dto $watchedMovie) : bool
-    {
-        $cacheLastUpdated = $this->traktApiCacheUserMovieWatchedService->findLastUpdatedByTraktId($userId, $watchedMovie->getMovie()->getTraktId());
-
-        return $cacheLastUpdated !== null && $watchedMovie->getLastUpdated()->isEqual($cacheLastUpdated) === true;
-    }
-
-    private function syncMovieHistory(
+    private function importMovieHistory(
         string $traktClientId,
         string $traktUserName,
         int $userId,
@@ -154,5 +147,12 @@ class SyncWatchedMovies
 
             $this->logger->info('Added plays for "' . $movie->getTitle() . '" at ' . $watchedAt . " with $plays");
         }
+    }
+
+    private function isWatchedCacheUpToDate(int $userId, Api\Trakt\ValueObject\User\Movie\Watched\Dto $watchedMovie) : bool
+    {
+        $cacheLastUpdated = $this->traktApiCacheUserMovieWatchedService->findLastUpdatedByTraktId($userId, $watchedMovie->getMovie()->getTraktId());
+
+        return $cacheLastUpdated !== null && $watchedMovie->getLastUpdated()->isEqual($cacheLastUpdated) === true;
     }
 }

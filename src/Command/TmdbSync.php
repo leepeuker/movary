@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SyncTmdb extends Command
+class TmdbSync extends Command
 {
     private const OPTION_NAME_FORCE_HOURS = 'hours';
 

@@ -219,12 +219,12 @@ class SettingsController
         }
 
         $traktCredentialsUpdated = empty($_SESSION['traktCredentialsUpdated']) === false ? $_SESSION['traktCredentialsUpdated'] : null;
-        $scheduledTraktHistorySync = empty($_SESSION['scheduledTraktHistorySync']) === false ? $_SESSION['scheduledTraktHistorySync'] : null;
-        $scheduledTraktRatingsSync = empty($_SESSION['scheduledTraktRatingsSync']) === false ? $_SESSION['scheduledTraktRatingsSync'] : null;
+        $scheduledTraktHistoryImport = empty($_SESSION['scheduledTraktHistoryImport']) === false ? $_SESSION['scheduledTraktHistoryImport'] : null;
+        $scheduledTraktRatingsImport = empty($_SESSION['scheduledTraktRatingsImport']) === false ? $_SESSION['scheduledTraktRatingsImport'] : null;
         unset(
             $_SESSION['traktCredentialsUpdated'],
-            $_SESSION['scheduledTraktHistorySync'],
-            $_SESSION['scheduledTraktRatingsSync'],
+            $_SESSION['scheduledTraktHistoryImport'],
+            $_SESSION['scheduledTraktRatingsImport'],
         );
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
@@ -236,8 +236,8 @@ class SettingsController
                 'traktUserName' => $user->getTraktUserName(),
                 'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
-                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistorySync,
-                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsSync,
+                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
+                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
                 'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
             ]),
         );
