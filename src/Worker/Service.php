@@ -6,6 +6,7 @@ use Movary\Application\Service\Letterboxd;
 use Movary\Application\Service\Tmdb\SyncMovies;
 use Movary\Application\Service\Trakt;
 use Movary\Application\User\Api;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
@@ -38,14 +39,14 @@ class Service
         $this->repository->addJob(JobType::createTmdbSync(), $jobStatus);
     }
 
-    public function addTraktImportHistoryJob(int $userId) : void
+    public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : void
     {
-        $this->repository->addJob(JobType::createTraktImportHistory(), JobStatus::createWaiting(), $userId);
+        $this->repository->addJob(JobType::createTraktImportHistory(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
-    public function addTraktImportRatingsJob(int $userId) : void
+    public function addTraktImportRatingsJob(int $userId, ?JobStatus $jobStatus = null) : void
     {
-        $this->repository->addJob(JobType::createTraktImportRatings(), JobStatus::createWaiting(), $userId);
+        $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
     public function fetchJobsForStatusPage(int $userId) : array
@@ -69,6 +70,23 @@ class Service
         }
 
         return $jobsData;
+    }
+
+    public function findLastTmdbSync() : ?DateTime
+    {
+        return $this->repository->findLastDateForJobByType(JobType::createTmdbSync());
+    }
+
+    public function findLastTraktSync(int $userId) : ?DateTime
+    {
+        $ratingsDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportRatings(), $userId);
+        $historyDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportHistory(), $userId);
+
+        if ($ratingsDate > $historyDate) {
+            return $ratingsDate;
+        }
+
+        return $historyDate;
     }
 
     public function processJob(Job $job) : void

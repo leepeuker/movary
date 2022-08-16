@@ -73,14 +73,11 @@ app_database_rollback:
 app_user_create_test:
 	make exec_app_cmd CMD="php bin/console.php user:create a@a aaaaaaaa a"
 
-app_sync_trakt:
-	make exec_app_cmd CMD="php bin/console.php trakt:sync --overwrite --userId=1"
+app_import_trakt:
+	make exec_app_cmd CMD="php bin/console.php trakt:import --overwrite --userId=1"
 
 app_sync_tmdb:
 	make exec_app_cmd CMD="php bin/console.php tmdb:sync"
-
-app_sync_letterboxd:
-	make exec_app_cmd CMD="php bin/console.php letterboxd:sync $(CSV_PATH)"
 
 app_jobs_process:
 	make exec_app_cmd CMD="php bin/console.php jobs:process"

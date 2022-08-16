@@ -7,7 +7,6 @@ use Movary\Api;
 use Movary\Api\Letterboxd\WebScrapper;
 use Movary\Application\Movie;
 use Movary\Application\Service\Letterboxd\ValueObject\CsvLineRating;
-use Movary\Application\SyncLog;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
@@ -18,7 +17,6 @@ class ImportRatings
         private readonly Movie\Api $movieApi,
         private readonly WebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
-        private readonly SyncLog\Repository $scanLogRepository,
         private readonly ImportRatingsFileValidator $fileValidator,
     ) {
     }
@@ -57,8 +55,6 @@ class ImportRatings
 
             $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         }
-
-        $this->scanLogRepository->insertLogForLetterboxdSync();#
 
         unlink($ratingsCsvPath);
     }
