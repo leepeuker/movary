@@ -193,7 +193,7 @@ Example cli import (import history and ratings for user with id 1):
 
 ### Trakt.tv Export
 
-coming soon ([maybe?](https://github.com/leepeuker/movary/issues/97))
+coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
 
 <a name="#letterboxd-import"></a>
 
