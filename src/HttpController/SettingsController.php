@@ -159,6 +159,7 @@ class SettingsController
             $this->twig->render('page/settings-app.html.twig', [
                 'applicationVersion' => $this->applicationVersion ?? '-',
                 'lastSyncTmdb' => $this->workerService->findLastTmdbSync() ?? '-',
+                'lastSyncImdb' => $this->workerService->findLastImdbSync() ?? '-',
             ]),
         );
     }

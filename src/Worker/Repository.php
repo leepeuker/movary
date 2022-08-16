@@ -31,7 +31,7 @@ class Repository
 
     public function fetchJobs(int $userId) : JobList
     {
-        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `job_queue` WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC, id DESC LIMIT 20', [$userId]);
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `job_queue` WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC, id DESC LIMIT 30', [$userId]);
 
         return JobList::createFromArray($data);
     }

@@ -4,6 +4,8 @@ namespace Movary\ValueObject;
 
 class JobType
 {
+    private const TYPE_IMDB_SYNC = 'imdb_sync';
+
     private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
 
     private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
@@ -22,6 +24,7 @@ class JobType
                 self::TYPE_TMDB_SYNC,
                 self::TYPE_TRAKT_IMPORT_HISTORY,
                 self::TYPE_TRAKT_IMPORT_RATINGS,
+                self::TYPE_IMDB_SYNC,
             ]) === false) {
             throw new \RuntimeException('Not supported job type: ' . $this->type);
         }
@@ -30,6 +33,11 @@ class JobType
     public static function createFromString(string $status) : self
     {
         return new self($status);
+    }
+
+    public static function createImdbSync() : self
+    {
+        return new self(self::TYPE_IMDB_SYNC);
     }
 
     public static function createLetterboxdImportHistory() : self
