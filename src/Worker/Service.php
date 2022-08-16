@@ -39,6 +39,11 @@ class Service
         $this->repository->addJob(JobType::createTmdbSync(), $jobStatus);
     }
 
+    public function addImdbSyncJob(JobStatus $jobStatus) : void
+    {
+        $this->repository->addJob(JobType::createImdbSync(), $jobStatus);
+    }
+
     public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : void
     {
         $this->repository->addJob(JobType::createTraktImportHistory(), $jobStatus ?? JobStatus::createWaiting(), $userId);
@@ -70,6 +75,11 @@ class Service
         }
 
         return $jobsData;
+    }
+
+    public function findLastImdbSync() : ?DateTime
+    {
+        return $this->repository->findLastDateForJobByType(JobType::createImdbSync());
     }
 
     public function findLastTmdbSync() : ?DateTime
