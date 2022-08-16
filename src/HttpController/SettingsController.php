@@ -3,7 +3,6 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie;
-use Movary\Application\SyncLog\Repository;
 use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\DateFormat;
@@ -11,13 +10,14 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\Worker\Service;
 use Twig\Environment;
 
 class SettingsController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Repository $syncLogRepository,
+        private readonly Service $workerService,
         private readonly Authentication $authenticationService,
         private readonly User\Api $userApi,
         private readonly Movie\Api $movieApi,
@@ -144,8 +144,6 @@ class SettingsController
                 'deletedUserHistory' => $deletedUserHistory,
                 'deletedUserRatings' => $deletedUserRatings,
                 'username' => $user->getName(),
-                'applicationVersion' => $this->applicationVersion ?? '-',
-                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
             ]),
         );
     }
@@ -160,7 +158,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
                 'applicationVersion' => $this->applicationVersion ?? '-',
-                'lastSyncTmdb' => $this->syncLogRepository->findLastTmdbSync() ?? '-',
+                'lastSyncTmdb' => $this->workerService->findLastTmdbSync() ?? '-',
             ]),
         );
     }
@@ -238,7 +236,7 @@ class SettingsController
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
-                'lastSyncTrakt' => $this->syncLogRepository->findLastTraktSync() ?? '-',
+                'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
             ]),
         );
     }

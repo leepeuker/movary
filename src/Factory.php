@@ -19,6 +19,7 @@ use Movary\HttpController\SettingsController;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
+use Movary\Worker\Service;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -115,7 +116,7 @@ class Factory
 
         return new SettingsController(
             $container->get(Twig\Environment::class),
-            $container->get(SyncLog\Repository::class),
+            $container->get(Service::class),
             $container->get(Authentication::class),
             $container->get(User\Api::class),
             $container->get(Movie\Api::class),

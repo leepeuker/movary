@@ -6,6 +6,7 @@ use Movary\Application\Service\Letterboxd;
 use Movary\Application\Service\Tmdb\SyncMovies;
 use Movary\Application\Service\Trakt;
 use Movary\Application\User\Api;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
@@ -69,6 +70,23 @@ class Service
         }
 
         return $jobsData;
+    }
+
+    public function findLastTmdbSync() : ?DateTime
+    {
+        return $this->repository->findLastDateForJobByType(JobType::createTmdbSync());
+    }
+
+    public function findLastTraktSync(int $userId) : ?DateTime
+    {
+        $ratingsDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportRatings(), $userId);
+        $historyDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportHistory(), $userId);
+
+        if ($ratingsDate > $historyDate) {
+            return $ratingsDate;
+        }
+
+        return $historyDate;
     }
 
     public function processJob(Job $job) : void

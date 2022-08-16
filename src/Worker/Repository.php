@@ -4,6 +4,7 @@ namespace Movary\Worker;
 
 use Doctrine\DBAL\Connection;
 use Movary\Util\Json;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\JobList;
 use Movary\ValueObject\JobStatus;
@@ -44,6 +45,36 @@ class Repository
         }
 
         return Job::createFromArray($data);
+    }
+
+    public function findLastDateForJobByType(JobType $jobType) : ?DateTime
+    {
+        $data = $this->dbConnection->fetchOne('SELECT created_at FROM `job_queue` WHERE job_type = ? AND job_status = ? ORDER BY created_at', [$jobType, JobStatus::createDone()]);
+
+        if ($data === false) {
+            return null;
+        }
+
+        return DateTime::createFromString($data);
+    }
+
+    public function findLastDateForJobByTypeAndUserId(JobType $jobType, int $userId) : ?DateTime
+    {
+        $data =
+            $this->dbConnection->fetchOne(
+                'SELECT created_at FROM `job_queue` WHERE job_type = ? AND job_status = ? AND user_id = ? ORDER BY created_at DESC',
+                [
+                    $jobType,
+                    JobStatus::createDone(),
+                    $userId,
+                ]
+            );
+
+        if ($data === false) {
+            return null;
+        }
+
+        return DateTime::createFromString($data);
     }
 
     public function updateJobStatus(int $id, JobStatus $status) : void
