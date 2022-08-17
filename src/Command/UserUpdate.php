@@ -44,6 +44,14 @@ class UserUpdate extends Command
         $userId = (int)$input->getArgument('userId');
 
         try {
+            $this->userApi->fetchUser($userId);
+        } catch (\RuntimeException $e) {
+            $this->generateOutput($output, 'User id does not exist: ' . $userId);
+
+            return Command::FAILURE;
+        }
+
+        try {
             $email = $input->getOption('email');
             if ($email !== null) {
                 $this->userApi->updateEmail($userId, $email);
