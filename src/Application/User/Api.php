@@ -131,6 +131,11 @@ class Api
         return password_verify($password, $passwordHash) === true;
     }
 
+    public function hasUsers() : bool
+    {
+        return $this->repository->getCountOfUsers() > 0;
+    }
+
     public function regeneratePlexWebhookId(int $userId) : string
     {
         $plexWebhookId = Uuid::uuid4()->toString();

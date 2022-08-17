@@ -93,6 +93,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\HistoryController::class, 'logMovie']
     );
     $routeCollector->addRoute(
+        'POST',
+        '/create-user',
+        [\Movary\HttpController\CreateUserController::class, 'createUser']
+    );
+    $routeCollector->addRoute(
         'GET',
         '/fetchMovieRatingByTmdbdId',
         [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId']
