@@ -8,7 +8,7 @@ final class RemoveScanLog extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            DROP TABLE movary.`sync_log`
+            DROP TABLE `sync_log`
             SQL
         );
     }
