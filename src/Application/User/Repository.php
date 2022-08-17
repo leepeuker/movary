@@ -248,6 +248,17 @@ class Repository
         return (int)$id;
     }
 
+    public function getCountOfUsers() : int
+    {
+        $count = $this->dbConnection->fetchOne('SELECT COUNT(*) FROM user');
+
+        if ($count === false) {
+            throw new \RuntimeException('Could not fetch user count.');
+        }
+
+        return $count;
+    }
+
     public function setPlexWebhookId(int $userId, ?string $plexWebhookId) : void
     {
         $this->dbConnection->update(
