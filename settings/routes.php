@@ -39,7 +39,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:.+}/history',
+        '/{username:[a-zA-Z0-9]+}/history',
         [\Movary\HttpController\HistoryController::class, 'renderHistory']
     );
     $routeCollector->addRoute(
