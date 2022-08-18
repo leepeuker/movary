@@ -9,7 +9,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:.+}/dashboard',
+        '/{username:[a-zA-Z0-9]+}/dashboard',
         [\Movary\HttpController\DashboardController::class, 'render']
     );
     $routeCollector->addRoute(
@@ -69,12 +69,12 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:.+}/most-watched-actors',
+        '/{username:[a-zA-Z0-9]+}/most-watched-actors',
         [\Movary\HttpController\MostWatchedActorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:.+}/most-watched-directors',
+        '/{username:[a-zA-Z0-9]+}/most-watched-directors',
         [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -104,7 +104,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:.+}/movie/{id:\d+}',
+        '/{username:[a-zA-Z0-9]+}/movie/{id:\d+}',
         [\Movary\HttpController\MovieController::class, 'renderPage']
     );
     $routeCollector->addRoute(
@@ -119,7 +119,7 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:.+}/person/{id:\d+}',
+        '/{username:[a-zA-Z0-9]+}/person/{id:\d+}',
         [\Movary\HttpController\PersonController::class, 'renderPage']
     );
     $routeCollector->addRoute(
