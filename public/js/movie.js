@@ -113,10 +113,11 @@ function saveRating () {
 	document.getElementById('resetRatingButton').style.display = 'none'
 }
 
-function resetRating () {
-	ratingEditMode = false
+function resetRating (e) {
+	ratingEditMode = true
 
-	setRatingStars(originalRating)
+	setRatingStars(null)
+	saveRating(e)
 
 	ratingEditMode = false
 
