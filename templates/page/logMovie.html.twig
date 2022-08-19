@@ -38,7 +38,7 @@
         {% else %}
             <ul class="list-group">
                 {% for movie in movies %}
-                    <li class="list-group-item list-group-item-action">
+                    <li class="list-group-item list-group-item-action" style="padding: 0.4rem">
                         <div class="col clearfix" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#watchDateModal" id="{{ movie.id }}">
                             <img src="{{ tmdb.generatePosterImageUrl(movie.poster_path) }}" class="rounded float-start" alt="..." width="120rem">
                             <h5 style="padding-left: 8rem">{{ movie.title }} ({{ movie.release_date|date("Y") }})</h5>
