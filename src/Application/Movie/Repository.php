@@ -459,6 +459,7 @@ class Repository
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
             'releaseDate' => 'release_date',
+            'runtime' => 'runtime',
             default => 'title'
         };
 

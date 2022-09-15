@@ -25,7 +25,8 @@
             <form action="/{{ routeUsername }}/movies" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
-                    <button class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3"><i class="bi bi-chevron-down"></i></button>
+                    <button class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3"><i
+                                class="bi bi-chevron-down"></i></button>
                     <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
                 </div>
                 <div style="display: none;border: #aab0b3 1px;margin-top:1em;margin-bottom:1em" id="searchOptions">
@@ -44,13 +45,14 @@
                             <option value="title" {{ sortBy == 'title' ? 'selected' }}>Title</option>
                             <option value="releaseDate" {{ sortBy == 'releaseDate' ? 'selected' }}>Release date</option>
                             <option value="rating" {{ sortBy == 'rating' ? 'selected' }}>Rating</option>
+                            <option value="runtime" {{ sortBy == 'runtime' ? 'selected' }}>Runtime</option>
                         </select>
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Sort order</span>
                         <select class="form-control" name="so" id="sort-order">
-                            <option value="asc" {{ sortOrder == 'desc' ?: 'selected' }}>Asc</option>
                             <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>Desc</option>
+                            <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>Asc</option>
                         </select>
                     </div>
                 </div>
