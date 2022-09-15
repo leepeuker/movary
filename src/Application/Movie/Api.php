@@ -147,6 +147,16 @@ class Api
         return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
+    public function fetchUniqueMoviesCount(int $userId, ?string $searchTerm) : int
+    {
+        return $this->historySelectService->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
+    }
+
+    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder) : array
+    {
+        return $this->historySelectService->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder);
+    }
+
     public function fetchWithActor(int $personId, int $userId) : array
     {
         return $this->movieSelectService->fetchWithActor($personId, $userId);

@@ -430,12 +430,51 @@ class Repository
         )->fetchFirstColumn()[0];
     }
 
-    public function fetchUniqueMovieInHistoryCount(int $userId) : int
+    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm) : int
     {
+        if ($searchTerm !== null) {
+            return $this->dbConnection->fetchFirstColumn(
+                <<<SQL
+                SELECT COUNT(DISTINCT movie_id)
+                FROM movie_user_watch_dates mh
+                JOIN movie m on mh.movie_id = m.id
+                WHERE m.title LIKE ? AND user_id = ?
+                SQL,
+                ["%$searchTerm%", $userId]
+            )[0];
+        }
+
         return $this->dbConnection->executeQuery(
             'SELECT COUNT(DISTINCT movie_id) FROM movie_user_watch_dates WHERE user_id = ?',
             [$userId]
         )->fetchFirstColumn()[0];
+    }
+
+    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder) : array
+    {
+        $payload = [$userId, $userId, "%$searchTerm%"];
+
+        $offset = ($limit * $page) - $limit;
+
+        $sortBySanitized = match ($sortBy) {
+            'rating' => 'rating',
+            'releaseDate' => 'release_date',
+            default => 'title'
+        };
+
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT m.*, mur.rating as userRating
+            FROM movie m
+            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
+            WHERE  m.title LIKE ?
+            GROUP BY m.id, title, release_date, rating
+            ORDER BY $sortBySanitized $sortOrder 
+            LIMIT $offset, $limit
+            SQL,
+            $payload
+        );
     }
 
     public function fetchWithActor(int $personId, int $userId) : array
@@ -517,9 +556,9 @@ class Repository
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         $userRating = $this->dbConnection->fetchFirstColumn(
-                'SELECT rating FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
-                [$movieId, $userId]
-            )[0] ?? null;
+            'SELECT rating FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId]
+        )[0] ?? null;
 
         return $userRating !== null ? PersonalRating::create($userRating) : null;
     }
