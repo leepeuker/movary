@@ -73,6 +73,9 @@ app_database_rollback:
 app_user_create_test:
 	make exec_app_cmd CMD="php bin/console.php user:create a@a aaaaaaaa a"
 
+app_user_change_password_test:
+	make exec_app_cmd CMD="php bin/console.php user:update 2 --password=aaaaaaaa"
+
 app_import_trakt:
 	make exec_app_cmd CMD="php bin/console.php trakt:import --overwrite --userId=1"
 
