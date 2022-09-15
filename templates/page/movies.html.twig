@@ -80,12 +80,16 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="/{{ routeUsername }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p=1">
+                        <a class="page-link"
+                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p=1"
+                        >
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/{{ routeUsername }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
+                        <a class="page-link"
+                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p={{ paginationElements.previous }}"
+                        >
                             <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
@@ -98,12 +102,16 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="/{{ routeUsername }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
+                        <a class="page-link"
+                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p={{ paginationElements.next }}"
+                        >
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/{{ routeUsername }}/history?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
+                        <a class="page-link"
+                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p={{ paginationElements.maxPage }}"
+                        >
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
