@@ -432,22 +432,15 @@ class Repository
 
     public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm) : int
     {
-        if ($searchTerm !== null) {
-            return $this->dbConnection->fetchFirstColumn(
-                <<<SQL
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
                 SELECT COUNT(DISTINCT movie_id)
                 FROM movie_user_watch_dates mh
                 JOIN movie m on mh.movie_id = m.id
                 WHERE m.title LIKE ? AND user_id = ?
                 SQL,
-                ["%$searchTerm%", $userId]
-            )[0];
-        }
-
-        return $this->dbConnection->executeQuery(
-            'SELECT COUNT(DISTINCT movie_id) FROM movie_user_watch_dates WHERE user_id = ?',
-            [$userId]
-        )->fetchFirstColumn()[0];
+            ["%$searchTerm%", $userId]
+        )[0];
     }
 
     public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder) : array
@@ -469,9 +462,9 @@ class Repository
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
-            WHERE  m.title LIKE ?
+            WHERE m.title LIKE ?
             GROUP BY m.id, title, release_date, rating
-            ORDER BY $sortBySanitized $sortOrder 
+            ORDER BY $sortBySanitized $sortOrder, title asc
             LIMIT $offset, $limit
             SQL,
             $payload

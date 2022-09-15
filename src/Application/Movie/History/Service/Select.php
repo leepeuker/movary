@@ -156,7 +156,7 @@ class Select
         return (int)round($minutes / 60);
     }
 
-    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm = 'null') : int
+    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
     }
