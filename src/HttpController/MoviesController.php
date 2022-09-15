@@ -15,7 +15,7 @@ class MoviesController
 
     private const DEFAULT_SORT_BY = 'title';
 
-    private const DEFAULT_SORT_ORDER = 'DESC';
+    private const DEFAULT_SORT_ORDER = 'ASC';
 
     public function __construct(
         private readonly Environment $twig,
