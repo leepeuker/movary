@@ -43,6 +43,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\HistoryController::class, 'renderHistory']
     );
     $routeCollector->addRoute(
+        'GET',
+        '/{username:[a-zA-Z0-9]+}/movies',
+        [\Movary\HttpController\MoviesController::class, 'renderPage']
+    );
+    $routeCollector->addRoute(
         'POST',
         '/refresh-trakt',
         [\Movary\HttpController\SyncTraktController::class, 'execute']

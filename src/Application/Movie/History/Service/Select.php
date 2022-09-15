@@ -156,9 +156,20 @@ class Select
         return (int)round($minutes / 60);
     }
 
-    public function fetchUniqueMovieInHistoryCount(int $userId) : int
+    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm = 'null') : int
     {
-        return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId);
+        return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
+    }
+
+    public function fetchUniqueMoviesPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm = null,
+        string $sortBy = 'title',
+        string $sortOrder = 'ASC'
+    ) : array {
+        return $this->movieRepository->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder);
     }
 
     public function findByTraktId(TraktId $traktId) : ?Entity
