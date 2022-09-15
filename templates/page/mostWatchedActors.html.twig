@@ -21,7 +21,7 @@
         <div style="text-align: center;">
             {{ include('component/user-select.html.twig') }}
 
-            <form action="/most-watched-actors" method="GET">
+            <form action="/{{ routeUsername }}/most-watched-actors" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="submit">Search</button>
