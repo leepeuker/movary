@@ -24,7 +24,9 @@ class PlexController
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Api $userApi,
-        private readonly Authentication $authenticationService
+        private readonly Authentication $authenticationService,
+        private readonly bool $plexEnableScrobbleWebhook,
+        private readonly bool $plexEnableRatingWebhook,
     ) {
     }
 
@@ -110,6 +112,10 @@ class PlexController
 
     private function logRating(array $webHook, Movie\Entity $movie, int $userId) : Response
     {
+        if ($this->plexEnableRatingWebhook === false) {
+            return Response::create(StatusCode::createOk());
+        }
+
         if (isset($webHook['rating']) === false) {
             throw new \RuntimeException('Could not get rating from: ' . Json::encode($webHook));
         }
@@ -123,6 +129,10 @@ class PlexController
 
     private function logView(array $webHook, Movie\Entity $movie, int $userId) : Response
     {
+        if ($this->plexEnableScrobbleWebhook === false) {
+            return Response::create(StatusCode::createOk());
+        }
+
         $dateTime = \DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
         if ($dateTime === false) {
             throw new \RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);

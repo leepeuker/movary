@@ -5,7 +5,7 @@ Content-Type: application/x-www-form-urlencoded
 
 payload=
   {
-    "rating": 5.0,
+    "rating": 4.0,
     "event": "media.rate",
     "user": true,
     "owner": true,
