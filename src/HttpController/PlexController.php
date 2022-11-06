@@ -56,7 +56,11 @@ class PlexController
             return Response::createNotFound();
         }
 
-        $webHook = Json::decode($request->getPostParameters()['payload']);
+        $requestPayload = $request->getPostParameters()['payload'];
+
+        $this->logger->debug($requestPayload);
+
+        $webHook = Json::decode($requestPayload);
 
         if ($webHook['event'] !== 'media.scrobble' || $webHook['user'] === false || $webHook['Metadata']['librarySectionType'] !== 'movie') {
             return Response::create(StatusCode::createOk());
