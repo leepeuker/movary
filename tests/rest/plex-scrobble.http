@@ -1,4 +1,4 @@
-POST http://127.0.0.1/plex/6666319d-99fc-4c63-b36f-21efcb42757d
+POST http://127.0.0.1/plex/16914287-329d-4f3b-ba57-4a092f13058d
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/x-www-form-urlencoded
@@ -10,18 +10,18 @@ payload=
     "owner": true,
     "Account": {
       "id": 1,
-      "thumb": "https:\/\/plex.tv\/users\/9b8808a24abf6760\/avatar?c=1648303960",
-      "title": "lee.peuker"
+      "thumb": "https:\/\/plex.tv\/users\/342gd465rhe4f\/avatar?c=sdf46z43",
+      "title": "title"
     },
     "Server": {
-      "title": "Pleex",
-      "uuid": "27e03b118babf1f25f8e9930678545c623e18b67"
+      "title": "Plex",
+      "uuid": "27a04b118b1bf1f25f8e99306785453623e18b67"
     },
     "Player": {
       "local": true,
-      "publicAddress": "91.11.71.208",
+      "publicAddress": "92.11.74.228",
       "title": "SHIELD Android TV",
-      "uuid": "a899167a24aea9ab-com-plexapp-android"
+      "uuid": "f34345234ef4523423432-com-plexapp-android"
     },
     "Metadata": {
       "librarySectionType": "movie",
