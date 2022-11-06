@@ -13,7 +13,7 @@ down:
 
 reup: down up
 
-build: down
+build:
 	docker-compose build --no-cache
 	make up
 	make composer_install

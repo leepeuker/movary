@@ -1,0 +1,567 @@
+POST http://127.0.0.1/plex/16914287-329d-4f3b-ba57-4a092f13058d
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/x-www-form-urlencoded
+
+payload=
+  {
+    "rating": 4.0,
+    "event": "media.rate",
+    "user": true,
+    "owner": true,
+    "Account": {
+      "id": 1,
+      "thumb": "https:\/\/plex.tv\/users\/342gd465rhe4f\/avatar?c=sdf46z43",
+      "title": "title"
+    },
+    "Server": {
+      "title": "Plex",
+      "uuid": "27a04b118b1bf1f25f8e99306785453623e18b67"
+    },
+    "Player": {
+      "local": true,
+      "publicAddress": "92.11.74.228",
+      "title": "SHIELD Android TV",
+      "uuid": "f34345234ef4523423432-com-plexapp-android"
+    },
+    "Metadata": {
+      "librarySectionType": "movie",
+      "ratingKey": "26697",
+      "key": "\/library\/metadata\/26697",
+      "guid": "plex:\/\/movie\/5d7768313c3c2a001fbcd1f0",
+      "studio": "TAFT Entertainment Pictures",
+      "type": "movie",
+      "title": "Big Trouble in Little China",
+      "librarySectionTitle": "Movies",
+      "librarySectionID": 1,
+      "librarySectionKey": "\/library\/sections\/1",
+      "contentRating": "PG-13",
+      "summary": "When trucker Jack Burton agreed to take his friend, Wang Chi, to pick up his fiancee at the airport, he never expected to get involved in a supernatural battle between good and evil. Wang's fiancee has emerald green eyes, which make her a perfect target for immortal sorcerer Lo Pan and his three invincible cronies. Lo Pan must marry a girl with green eyes so he can regain his physical form.",
+      "audienceRating": 7.2,
+      "viewCount": 1,
+      "lastViewedAt": 1654975910,
+      "year": 1986,
+      "tagline": "Adventure doesn't come any bigger!",
+      "thumb": "\/library\/metadata\/26697\/thumb\/1653883268",
+      "art": "\/library\/metadata\/26697\/art\/1653883268",
+      "duration": 5940000,
+      "originallyAvailableAt": "1986-07-02",
+      "addedAt": 1528229166,
+      "updatedAt": 1653883268,
+      "audienceRatingImage": "imdb:\/\/image.rating",
+      "chapterSource": "media",
+      "primaryExtraKey": "\/library\/metadata\/37161",
+      "Genre": [
+        {
+          "id": 634,
+          "filter": "genre=634",
+          "tag": "Action",
+          "count": 1077
+        },
+        {
+          "id": 483,
+          "filter": "genre=483",
+          "tag": "Adventure",
+          "count": 888
+        },
+        {
+          "id": 1448,
+          "filter": "genre=1448",
+          "tag": "Fantasy",
+          "count": 588
+        },
+        {
+          "id": 15,
+          "filter": "genre=15",
+          "tag": "Comedy",
+          "count": 1219
+        }
+      ],
+      "Director": [
+        {
+          "id": 289896,
+          "filter": "director=289896",
+          "tag": "John Carpenter",
+          "count": 13
+        }
+      ],
+      "Writer": [
+        {
+          "id": 289897,
+          "filter": "writer=289897",
+          "tag": "W.D. Richter",
+          "count": 3
+        },
+        {
+          "id": 289898,
+          "filter": "writer=289898",
+          "tag": "David Z. Weinstein"
+        },
+        {
+          "id": 289899,
+          "filter": "writer=289899",
+          "tag": "Gary Goldman",
+          "count": 2
+        }
+      ],
+      "Producer": [
+        {
+          "id": 277796,
+          "filter": "producer=277796",
+          "tag": "Larry J. Franco",
+          "count": 10
+        }
+      ],
+      "Country": [
+        {
+          "id": 104557,
+          "filter": "country=104557",
+          "tag": "United States of America",
+          "count": 2750
+        }
+      ],
+      "Guid": [
+        {
+          "id": "imdb:\/\/tt0090728"
+        },
+        {
+          "id": "tmdb:\/\/6978"
+        },
+        {
+          "id": "tvdb:\/\/1876"
+        }
+      ],
+      "Rating": [
+        {
+          "image": "imdb:\/\/image.rating",
+          "value": 7.2,
+          "type": "audience",
+          "count": 3250
+        },
+        {
+          "image": "rottentomatoes:\/\/image.rating.upright",
+          "value": 8.2,
+          "type": "audience",
+          "count": 2153
+        },
+        {
+          "image": "rottentomatoes:\/\/image.rating.ripe",
+          "value": 7.5,
+          "type": "critic",
+          "count": 2045
+        },
+        {
+          "image": "themoviedb:\/\/image.rating",
+          "value": 7.2,
+          "type": "audience",
+          "count": 3252
+        }
+      ],
+      "Role": [
+        {
+          "id": 287045,
+          "filter": "actor=287045",
+          "tag": "Kurt Russell",
+          "count": 18,
+          "role": "Jack Burton",
+          "thumb": "https:\/\/metadata-static.plex.tv\/a\/people\/ada71a2b9ba38388e8fe95037f09a7ed.jpg"
+        },
+        {
+          "id": 289900,
+          "filter": "actor=289900",
+          "tag": "Kim Cattrall",
+          "count": 3,
+          "role": "Gracie Law",
+          "thumb": "https:\/\/metadata-static.plex.tv\/e\/people\/e8b6e3e84a54d6c9c965639595654c26.jpg"
+        },
+        {
+          "id": 289901,
+          "filter": "actor=289901",
+          "tag": "Dennis Dun",
+          "count": 2,
+          "role": "Wang Chi",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768282e80df001ebdd00e.jpg"
+        },
+        {
+          "id": 275678,
+          "filter": "actor=275678",
+          "tag": "James Hong",
+          "count": 16,
+          "role": "David Lo Pan",
+          "thumb": "https:\/\/metadata-static.plex.tv\/0\/people\/0ae9c310f07028bae6edce302e2cc369.jpg"
+        },
+        {
+          "id": 289902,
+          "filter": "actor=289902",
+          "tag": "Victor Wong",
+          "count": 4,
+          "role": "Egg Shen",
+          "thumb": "https:\/\/metadata-static.plex.tv\/4\/people\/41e55dbc35fe62021306e3a6b3eda8f1.jpg"
+        },
+        {
+          "id": 272570,
+          "filter": "actor=272570",
+          "tag": "Kate Burton",
+          "count": 6,
+          "role": "Margo",
+          "thumb": "https:\/\/metadata-static.plex.tv\/4\/people\/4eb52a322e6799cb61ad9da22967a63d.jpg"
+        },
+        {
+          "id": 285246,
+          "filter": "actor=285246",
+          "tag": "Donald Li",
+          "count": 2,
+          "role": "Eddie Lee",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768313c3c2a001fbcd485.jpg"
+        },
+        {
+          "id": 289903,
+          "filter": "actor=289903",
+          "tag": "Carter Wong",
+          "role": "Thunder",
+          "thumb": "https:\/\/metadata-static.plex.tv\/1\/people\/1e1ced41ce60bbff66ec0da318c807eb.jpg"
+        },
+        {
+          "id": 289904,
+          "filter": "actor=289904",
+          "tag": "Peter Kwong",
+          "count": 2,
+          "role": "Rain",
+          "thumb": "https:\/\/metadata-static.plex.tv\/4\/people\/469df79cf7d2d2b867a82cc648277750.jpg"
+        },
+        {
+          "id": 289905,
+          "filter": "actor=289905",
+          "tag": "James Pax",
+          "role": "Lightning",
+          "thumb": "https:\/\/metadata-static.plex.tv\/7\/people\/70d778ad2389223f69e3850c9962e2fb.jpg"
+        },
+        {
+          "id": 289906,
+          "filter": "actor=289906",
+          "tag": "Suzee Pai",
+          "count": 2,
+          "role": "Miao Yin",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768313c3c2a001fbcd487.jpg"
+        },
+        {
+          "id": 289907,
+          "filter": "actor=289907",
+          "tag": "Chao Li Chi",
+          "count": 3,
+          "role": "Uncle Chu",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d776829999c64001ec2cf00.jpg"
+        },
+        {
+          "id": 287645,
+          "filter": "actor=287645",
+          "tag": "Jeff Imada",
+          "count": 4,
+          "role": "Needles",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768315af944001f1f8ef9.jpg"
+        },
+        {
+          "id": 289908,
+          "filter": "actor=289908",
+          "tag": "Rummel Mor",
+          "role": "Joe Lucky"
+        },
+        {
+          "id": 289909,
+          "filter": "actor=289909",
+          "tag": "Craig Ng",
+          "role": "One Ear",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768313c3c2a001fbcd489.jpg"
+        },
+        {
+          "id": 289910,
+          "filter": "actor=289910",
+          "tag": "June Kyoto Lu",
+          "role": "White Tiger",
+          "thumb": "https:\/\/metadata-static.plex.tv\/a\/people\/a223cc043f4149d375e776dc5b150258.jpg"
+        },
+        {
+          "id": 289911,
+          "filter": "actor=289911",
+          "tag": "Noel Toy",
+          "role": "Mrs. O'Toole"
+        },
+        {
+          "id": 289912,
+          "filter": "actor=289912",
+          "tag": "Jade Go",
+          "role": "Chinese Girl in White Tiger"
+        },
+        {
+          "id": 289913,
+          "filter": "actor=289913",
+          "tag": "Jerry Hardin",
+          "role": "Pinstripe Lawyer",
+          "thumb": "https:\/\/metadata-static.plex.tv\/8\/people\/83029b1a2dbd0a014fe1062a4e5dc072.jpg"
+        },
+        {
+          "id": 289914,
+          "filter": "actor=289914",
+          "tag": "James Lew",
+          "count": 10,
+          "role": "Chang Sing #1",
+          "thumb": "https:\/\/metadata-static.plex.tv\/2\/people\/26c5b092f482f25871fcb09246f585a0.jpg"
+        },
+        {
+          "id": 289915,
+          "filter": "actor=289915",
+          "tag": "Jim Lau",
+          "count": 2,
+          "role": "Chang Sing #2",
+          "thumb": "https:\/\/metadata-static.plex.tv\/5\/people\/51879c7211664cae209061805a3c7b9c.jpg"
+        },
+        {
+          "id": 289916,
+          "filter": "actor=289916",
+          "tag": "Kenny Endoso",
+          "count": 2,
+          "role": "Chang Sing #3",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768285af944001f1f71f2.jpg"
+        },
+        {
+          "id": 289917,
+          "filter": "actor=289917",
+          "tag": "Stuart Quan",
+          "count": 3,
+          "role": "Chang Sing #4",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768313c3c2a001fbcd48d.jpg"
+        },
+        {
+          "id": 289918,
+          "filter": "actor=289918",
+          "tag": "Gary Toy",
+          "role": "Chang Sing #5"
+        },
+        {
+          "id": 280831,
+          "filter": "actor=280831",
+          "tag": "George Cheung",
+          "count": 12,
+          "role": "Chang Sing #6",
+          "thumb": "https:\/\/metadata-static.plex.tv\/f\/people\/f847ebb3b1b048e7db81fd1b632b5262.jpg"
+        },
+        {
+          "id": 289919,
+          "filter": "actor=289919",
+          "tag": "Jimmy Jue",
+          "role": "Wounded Chang Sing"
+        },
+        {
+          "id": 289920,
+          "filter": "actor=289920",
+          "tag": "Noble Craig",
+          "count": 2,
+          "role": "Sewer Monster"
+        },
+        {
+          "id": 289921,
+          "filter": "actor=289921",
+          "tag": "Danny Kwan",
+          "role": "Chinese Guard"
+        },
+        {
+          "id": 289922,
+          "filter": "actor=289922",
+          "tag": "Min Luong",
+          "role": "Tara"
+        },
+        {
+          "id": 289923,
+          "filter": "actor=289923",
+          "tag": "Paul J.Q. Lee",
+          "count": 2,
+          "role": "Chinese Gambler",
+          "thumb": "https:\/\/metadata-static.plex.tv\/b\/people\/b4a5cd8eb4c77ff706048e102f5c8eb0.jpg"
+        },
+        {
+          "id": 285146,
+          "filter": "actor=285146",
+          "tag": "Al Leong",
+          "count": 11,
+          "role": "Wing Kong Hatchet Man",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768253c3c2a001fbcace9.jpg"
+        },
+        {
+          "id": 287648,
+          "filter": "actor=287648",
+          "tag": "Gerald Okamura",
+          "count": 3,
+          "role": "Wing Kong Hatchet Man",
+          "thumb": "https:\/\/metadata-static.plex.tv\/5\/people\/5c55c2958a8b7098f531fe2082c1f751.jpg"
+        },
+        {
+          "id": 277992,
+          "filter": "actor=277992",
+          "tag": "Willie Wong",
+          "count": 3,
+          "role": "Wing Kong Hatchet Man"
+        },
+        {
+          "id": 289924,
+          "filter": "actor=289924",
+          "tag": "Eric Lee",
+          "role": "Wing Kong Hatchet Man",
+          "thumb": "https:\/\/metadata-static.plex.tv\/1\/people\/1156c356c1d51ef2d4ec5ed309e17dee.jpg"
+        },
+        {
+          "id": 289925,
+          "filter": "actor=289925",
+          "tag": "Yukio G. Collins",
+          "role": "Wing Kong Hatchet Man"
+        },
+        {
+          "id": 284880,
+          "filter": "actor=284880",
+          "tag": "Bill M. Ryusaki",
+          "count": 2,
+          "role": "Wing Kong Hatchet Man"
+        },
+        {
+          "id": 287035,
+          "filter": "actor=287035",
+          "tag": "Brian Imada",
+          "count": 2,
+          "role": "Wing Kong Hatchet Man",
+          "thumb": "https:\/\/metadata-static.plex.tv\/8\/people\/89af4812e124ea7fe01387d73d40dd84.jpg"
+        },
+        {
+          "id": 289926,
+          "filter": "actor=289926",
+          "tag": "Nathan Jung",
+          "count": 2,
+          "role": "Wing Kong Hatchet Man",
+          "thumb": "https:\/\/metadata-static.plex.tv\/d\/people\/d9290e8c3e0e17e48135565f91c34d61.jpg"
+        },
+        {
+          "id": 289927,
+          "filter": "actor=289927",
+          "tag": "Dan Inosanto",
+          "role": "Wing Kong Hatchet Man",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d7768313c3c2a001fbcd499.jpg"
+        },
+        {
+          "id": 289928,
+          "filter": "actor=289928",
+          "tag": "Vernon Rieta",
+          "role": "Wing Kong Hatchet Man"
+        },
+        {
+          "id": 289929,
+          "filter": "actor=289929",
+          "tag": "Daniel Wong",
+          "role": "Wing Kong Security Guard"
+        },
+        {
+          "id": 289930,
+          "filter": "actor=289930",
+          "tag": "Daniel Eric Lee",
+          "role": "Wing Kong Security Guard"
+        },
+        {
+          "id": 289931,
+          "filter": "actor=289931",
+          "tag": "Lia Chang",
+          "count": 2,
+          "role": "Female Wing Kong Guard"
+        },
+        {
+          "id": 270864,
+          "filter": "actor=270864",
+          "tag": "Diana Tanaka",
+          "role": "Female Wing Kong Guard",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d776830999c64001ec2e34e.jpg"
+        },
+        {
+          "id": 289932,
+          "filter": "actor=289932",
+          "tag": "Donna L. Noguschi",
+          "role": "Female Wing Kong Guard"
+        },
+        {
+          "id": 289933,
+          "filter": "actor=289933",
+          "tag": "Shinko Isobe",
+          "role": "Female Wing Kong Guard"
+        },
+        {
+          "id": 289934,
+          "filter": "actor=289934",
+          "tag": "John Carpenter",
+          "count": 8,
+          "role": "Worker in Chinatown (uncredited)",
+          "thumb": "https:\/\/metadata-static.plex.tv\/6\/people\/6c0329ab2a16500e2dc0fae6140f2f8d.jpg"
+        },
+        {
+          "id": 277812,
+          "filter": "actor=277812",
+          "tag": "Cary-Hiroyuki Tagawa",
+          "count": 9,
+          "role": "Wing Kong Man - Extra (uncredited)",
+          "thumb": "https:\/\/metadata-static.plex.tv\/people\/5d77682785719b001f3a0eb8.jpg"
+        },
+        {
+          "id": 289935,
+          "filter": "actor=289935",
+          "tag": "Conan Lee",
+          "count": 3,
+          "role": "Chang Sing Member (uncredited)",
+          "thumb": "https:\/\/metadata-static.plex.tv\/a\/people\/aa24eb06ab698760381baccdd9a32706.jpg"
+        },
+        {
+          "id": 289936,
+          "filter": "actor=289936",
+          "tag": "Leo Lee",
+          "count": 4,
+          "role": "Chang Sing Fighter in Ally (uncredited)",
+          "thumb": "https:\/\/metadata-static.plex.tv\/4\/people\/42ce515b9bd9473246ebed0b267ea2a6.jpg"
+        },
+        {
+          "id": 289937,
+          "filter": "actor=289937",
+          "tag": "Bill Saito",
+          "role": "Wing Kong Hatchet Man (uncredited)",
+          "thumb": "https:\/\/metadata-static.plex.tv\/2\/people\/2cae5110acc245819a5798ec1cbd6f4b.jpg"
+        },
+        {
+          "id": 368406,
+          "filter": "actor=368406",
+          "tag": "Phil Jordan",
+          "role": "Chinatown patron (uncredited)",
+          "thumb": "https:\/\/metadata-static.plex.tv\/7\/people\/7e19ab773ea56d9ed5b65398e6fec785.jpg"
+        }
+      ],
+      "Label": [
+        {
+          "id": 367176,
+          "filter": "label=367176",
+          "tag": "Best of 80s",
+          "count": 96
+        },
+        {
+          "id": 367179,
+          "filter": "label=367179",
+          "tag": "Best of 1980s",
+          "count": 96
+        }
+      ],
+      "Field": [
+        {
+          "locked": true,
+          "name": "thumb"
+        },
+        {
+          "locked": true,
+          "name": "collection"
+        },
+        {
+          "locked": true,
+          "name": "label"
+        }
+      ]
+    }
+  }

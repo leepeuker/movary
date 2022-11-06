@@ -11,10 +11,12 @@ use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Application\Movie;
+use Movary\Application\Service\Tmdb\SyncMovie;
 use Movary\Application\SyncLog;
 use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
 use Movary\Command;
+use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
@@ -121,6 +123,31 @@ class Factory
             $container->get(User\Api::class),
             $container->get(Movie\Api::class),
             $applicationVersion
+        );
+    }
+
+    public static function createPlexController(ContainerInterface $container, Config $config) : PlexController
+    {
+        try {
+            $plexEnableScrobbleWebhook = $config->getAsBool('PLEX_ENABLE_SCROBBLE');
+        } catch (\OutOfBoundsException) {
+            $plexEnableScrobbleWebhook = true;
+        }
+
+        try {
+            $plexEnableRatingWebhook = $config->getAsBool('PLEX_ENABLE_RATING');
+        } catch (\OutOfBoundsException) {
+            $plexEnableRatingWebhook = false;
+        }
+
+        return new PlexController(
+            $container->get(LoggerInterface::class),
+            $container->get(Movie\Api::class),
+            $container->get(SyncMovie::class),
+            $container->get(User\Api::class),
+            $container->get(Authentication::class),
+            $plexEnableScrobbleWebhook,
+            $plexEnableRatingWebhook,
         );
     }
 

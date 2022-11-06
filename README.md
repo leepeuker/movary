@@ -160,9 +160,11 @@ Example:
 
 Automatically track movies watched in plex with movary.
 
-You can generate your plex webhook url on the settings page (`/settings`).
+You can generate your plex webhook url on the apps settings page (`/settings`).
 
 Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/).
+
+As a default only your watches are tracked, but you can additionally enable the tracking of your movie ratings.
 
 <a name="#trakttv-import"></a>
 

@@ -11,16 +11,22 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
 
 class PlexController
 {
+    private const MEDIA_RATE = 'media.rate';
+    private const MEDIA_SCROBBLE = 'media.scrobble';
+
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly Movie\Api $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Api $userApi,
-        private readonly Authentication $authenticationService
+        private readonly Authentication $authenticationService,
+        private readonly bool $plexEnableScrobbleWebhook,
+        private readonly bool $plexEnableRatingWebhook,
     ) {
     }
 
@@ -56,9 +62,15 @@ class PlexController
             return Response::createNotFound();
         }
 
-        $webHook = Json::decode($request->getPostParameters()['payload']);
+        $requestPayload = $request->getPostParameters()['payload'];
 
-        if ($webHook['event'] !== 'media.scrobble' || $webHook['user'] === false || $webHook['Metadata']['librarySectionType'] !== 'movie') {
+        $this->logger->debug($requestPayload);
+
+        $webHook = Json::decode((string)$requestPayload);
+
+        if (($webHook['event'] !== self::MEDIA_SCROBBLE && $webHook['event'] !== self::MEDIA_RATE)
+            || $webHook['user'] === false
+            || $webHook['Metadata']['librarySectionType'] !== 'movie') {
             return Response::create(StatusCode::createOk());
         }
 
@@ -81,16 +93,10 @@ class PlexController
             $movie = $this->tmdbMovieSyncService->syncMovie((int)$tmdbId);
         }
 
-        $dateTime = \DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
-        if ($dateTime === false) {
-            throw new \RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);
-        }
-
-        $watchDate = Date::createFromString($dateTime->format('Y-m-d'));
-
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
-
-        return Response::create(StatusCode::createOk());
+        return match (true) {
+            $webHook['event'] === self::MEDIA_SCROBBLE => $this->logView($webHook, $movie, $userId),
+            $webHook['event'] === self::MEDIA_RATE => $this->logRating($webHook, $movie, $userId),
+        };
     }
 
     public function regeneratePlexWebhookId() : Response
@@ -102,5 +108,40 @@ class PlexController
         $plexWebhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
+    }
+
+    private function logRating(array $webHook, Movie\Entity $movie, int $userId) : Response
+    {
+        if ($this->plexEnableRatingWebhook === false) {
+            return Response::create(StatusCode::createOk());
+        }
+
+        if (isset($webHook['rating']) === false) {
+            throw new \RuntimeException('Could not get rating from: ' . Json::encode($webHook));
+        }
+
+        $rating = PersonalRating::create((int)$webHook['rating']);
+
+        $this->movieApi->updateUserRating($movie->getId(), $userId, $rating);
+
+        return Response::create(StatusCode::createOk());
+    }
+
+    private function logView(array $webHook, Movie\Entity $movie, int $userId) : Response
+    {
+        if ($this->plexEnableScrobbleWebhook === false) {
+            return Response::create(StatusCode::createOk());
+        }
+
+        $dateTime = \DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
+        if ($dateTime === false) {
+            throw new \RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);
+        }
+
+        $watchDate = Date::createFromString($dateTime->format('Y-m-d'));
+
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+
+        return Response::create(StatusCode::createOk());
     }
 }
