@@ -158,6 +158,11 @@ class Select
         return (int)round($minutes / 60);
     }
 
+    public function fetchUniqueMovieGenres(int $userId) : array
+    {
+        return $this->movieRepository->fetchUniqueMovieGenres($userId);
+    }
+
     public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
@@ -189,8 +194,19 @@ class Select
         string $sortOrder = 'ASC',
         ?Year $releaseYear = null,
         ?string $language = null,
+        ?string $genre = null,
     ) : array {
-        return $this->movieRepository->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder, $releaseYear, $language);
+        return $this->movieRepository->fetchUniqueMoviesPaginated(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $releaseYear,
+            $language,
+            $genre,
+        );
     }
 
     public function findByTraktId(TraktId $traktId) : ?Entity

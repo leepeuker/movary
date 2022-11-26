@@ -9,6 +9,8 @@ use Movary\ValueObject\Year;
 
 class MoviesRequestMapper
 {
+    private const DEFAULT_GENRE = null;
+
     private const DEFAULT_RELEASE_YEAR = null;
 
     private const DEFAULT_LIMIT = 24;
@@ -34,6 +36,7 @@ class MoviesRequestMapper
         $releaseYear = $request->getGetParameters()['ry'] ?? self::DEFAULT_RELEASE_YEAR;
         $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
         $language = $request->getGetParameters()['la'] ?? null;
+        $genre = $request->getGetParameters()['ge'] ?? self::DEFAULT_GENRE;
 
         return MoviesRequestDto::createFromParameters(
             $userId,
@@ -44,6 +47,7 @@ class MoviesRequestMapper
             $sortOrder,
             $releaseYear,
             $language,
+            $genre,
         );
     }
 }

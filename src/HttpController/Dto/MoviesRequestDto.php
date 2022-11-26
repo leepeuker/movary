@@ -14,7 +14,8 @@ class MoviesRequestDto
         private readonly string $sortBy,
         private readonly string $sortOrder,
         private readonly ?Year $releaseYear,
-        private readonly ?string $language
+        private readonly ?string $language,
+        private readonly ?string $genre,
     ) {
     }
 
@@ -26,7 +27,8 @@ class MoviesRequestDto
         string $sortBy,
         string $sortOrder,
         ?Year $releaseYear,
-        ?string $language
+        ?string $language,
+        ?string $genre,
     ) : self {
         return new self(
             $userId,
@@ -37,7 +39,13 @@ class MoviesRequestDto
             $sortOrder,
             $releaseYear,
             $language,
+            $genre,
         );
+    }
+
+    public function getGenre() : ?string
+    {
+        return $this->genre;
     }
 
     public function getLanguage() : ?string

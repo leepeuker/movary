@@ -431,6 +431,22 @@ class Repository
         )->fetchFirstColumn()[0];
     }
 
+    public function fetchUniqueMovieGenres(int $userId) : array
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT g.name
+            FROM movie_user_watch_dates mh
+            JOIN movie m on mh.movie_id = m.id
+            JOIN movie_genre mg on m.id = mg.movie_id
+            JOIN genre g on mg.genre_id = g.id
+            WHERE user_id = ?
+            ORDER BY g.name
+            SQL,
+            [$userId]
+        );
+    }
+
     public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm) : int
     {
         return $this->dbConnection->fetchFirstColumn(
@@ -480,7 +496,8 @@ class Repository
         string $sortBy,
         string $sortOrder,
         ?Year $releaseYear,
-        ?string $language
+        ?string $language,
+        ?string $genre,
     ) : array {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -505,12 +522,19 @@ class Repository
             $payload[] = $language;
         }
 
+        if (empty($genre) === false) {
+            $whereQuery .= 'AND g.name = ? ';
+            $payload[] = $genre;
+        }
+
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT m.*, mur.rating as userRating
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
+            JOIN movie_genre mg on m.id = mg.movie_id
+            JOIN genre g on mg.genre_id = g.id
             $whereQuery
             GROUP BY m.id, title, release_date, rating
             ORDER BY $sortBySanitized $sortOrder, title asc

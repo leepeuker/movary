@@ -37,7 +37,8 @@ class MoviesController
             $requestData->getSortBy(),
             $requestData->getSortOrder(),
             $requestData->getReleaseYear(),
-            $requestData->getLanguage()
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
         );
         $historyCount = $this->movieApi->fetchUniqueMoviesCount($userId, $requestData->getSearchTerm());
 
@@ -62,8 +63,10 @@ class MoviesController
                 'sortOrder' => $requestData->getSortOrder(),
                 'releaseYear' => (string)$requestData->getReleaseYear(),
                 'language' => (string)$requestData->getLanguage(),
+                'genre' => (string)$requestData->getGenre(),
                 'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
                 'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($userId),
+                'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($userId),
             ]),
         );
     }
