@@ -4,51 +4,49 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie;
 use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\HttpController\Mapper\MoviesRequestMapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\ValueObject\Year;
 use Twig\Environment;
 
 class MoviesController
 {
-    private const DEFAULT_LIMIT = 24;
-
-    private const DEFAULT_SORT_BY = 'title';
-
-    private const DEFAULT_SORT_ORDER = 'ASC';
-
     public function __construct(
         private readonly Environment $twig,
         private readonly Movie\Api $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly MoviesRequestMapper $moviesRequestMapper
     ) {
     }
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        $requestData = $this->moviesRequestMapper->mapRenderPageRequest($request);
+
+        $userId = $requestData->getUserId();
         if ($userId === null) {
             return Response::createNotFound();
         }
 
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-        $page = $request->getGetParameters()['p'] ?? 1;
-        $limit = $request->getGetParameters()['pp'] ?? self::DEFAULT_LIMIT;
-        $sortBy = $request->getGetParameters()['sb'] ?? self::DEFAULT_SORT_BY;
-        $sortOrder = $request->getGetParameters()['so'] ?? self::DEFAULT_SORT_ORDER;
-        $releaseYear = $request->getGetParameters()['ry'] ?? null;
-        $releaseYear = $releaseYear !== null ? Year::createFromString($releaseYear) : $releaseYear;
+        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated(
+            $userId,
+            $requestData->getLimit(),
+            $requestData->getPage(),
+            $requestData->getSearchTerm(),
+            $requestData->getSortBy(),
+            $requestData->getSortOrder(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage()
+        );
+        $historyCount = $this->movieApi->fetchUniqueMoviesCount($userId, $requestData->getSearchTerm());
 
-        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated($userId, (int)$limit, (int)$page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
-        $historyCount = $this->movieApi->fetchUniqueMoviesCount($userId, $searchTerm);
-
-        $maxPage = (int)ceil($historyCount / $limit);
+        $maxPage = (int)ceil($historyCount / $requestData->getLimit());
 
         $paginationElements = [
-            'previous' => $page > 1 ? $page - 1 : null,
-            'next' => $page < $maxPage ? $page + 1 : null,
-            'currentPage' => $page,
+            'previous' => $requestData->getPage() > 1 ? $requestData->getPage() - 1 : null,
+            'next' => $requestData->getPage() < $maxPage ? $requestData->getPage() + 1 : null,
+            'currentPage' => $requestData->getPage(),
             'maxPage' => $maxPage,
         ];
 
@@ -58,12 +56,14 @@ class MoviesController
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'movies' => $uniqueMovies,
                 'paginationElements' => $paginationElements,
-                'searchTerm' => $searchTerm,
-                'perPage' => $limit,
-                'sortBy' => $sortBy,
-                'sortOrder' => $sortOrder,
-                'releaseYear' => $releaseYear,
+                'searchTerm' => $requestData->getSearchTerm(),
+                'perPage' => $requestData->getLimit(),
+                'sortBy' => $requestData->getSortBy(),
+                'sortOrder' => $requestData->getSortOrder(),
+                'releaseYear' => (string)$requestData->getReleaseYear(),
+                'language' => (string)$requestData->getLanguage(),
                 'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
+                'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($userId),
             ]),
         );
     }

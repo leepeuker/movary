@@ -444,6 +444,20 @@ class Repository
         )[0];
     }
 
+    public function fetchUniqueMovieLanguages(int $userId) : array
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+                SELECT DISTINCT m.original_language
+                FROM movie_user_watch_dates mh
+                JOIN movie m on mh.movie_id = m.id
+                WHERE user_id = ?
+                ORDER BY original_language DESC
+                SQL,
+            [$userId]
+        );
+    }
+
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
         return $this->dbConnection->fetchFirstColumn(
@@ -458,9 +472,17 @@ class Repository
         );
     }
 
-    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder, ?Year $releaseYear) : array
-    {
-        $payload = [$userId, $userId, "%$searchTerm%", "%$releaseYear%"];
+    public function fetchUniqueMoviesPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm,
+        string $sortBy,
+        string $sortOrder,
+        ?Year $releaseYear,
+        ?string $language
+    ) : array {
+        $payload = [$userId, $userId, "%$searchTerm%"];
 
         $offset = ($limit * $page) - $limit;
 
@@ -471,13 +493,25 @@ class Repository
             default => 'title'
         };
 
+        $whereQuery = 'WHERE m.title LIKE ? ';
+
+        if (empty($releaseYear) === false) {
+            $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            $payload[] = (string)$releaseYear;
+        }
+
+        if (empty($language) === false) {
+            $whereQuery .= 'AND original_language = ? ';
+            $payload[] = $language;
+        }
+
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT m.*, mur.rating as userRating
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
-            WHERE m.title LIKE ? AND m.release_date LIKE ?
+            $whereQuery
             GROUP BY m.id, title, release_date, rating
             ORDER BY $sortBySanitized $sortOrder, title asc
             LIMIT $offset, $limit

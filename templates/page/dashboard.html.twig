@@ -193,7 +193,9 @@
                         {% for mostWatchedLanguage in mostWatchedLanguages %}
                             {% if loop.index <= 12 %}
                                 <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100 position-relative">
+                                    <div class="card h-100 position-relative"
+                                         style="cursor: pointer"
+                                         onclick="window.location='/{{ routeUsername }}/movies?la={{ mostWatchedLanguage.code }}'">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.name }}</small>
                                         </div>
@@ -239,7 +241,9 @@
                         {% for mostWatchedReleaseYear in mostWatchedReleaseYears %}
                             {% if loop.index <= 12 %}
                                 <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}'">
+                                    <div class="card h-100 position-relative"
+                                         style="cursor: pointer"
+                                         onclick="window.location='/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}'">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold;">{{ mostWatchedReleaseYear.name }}</small>
                                         </div>

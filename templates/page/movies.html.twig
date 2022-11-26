@@ -64,6 +64,15 @@
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Language</span>
+                        <select class="form-control" name="la" id="language">
+                            <option value="" {{ language is null ? 'selected' }}>All</option>
+                            {% for uniqueLanguage in uniqueLanguages %}
+                                <option value="{{ uniqueLanguage.code }}" {{ uniqueLanguage.code == language ? 'selected' }}>{{ uniqueLanguage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </form>
 

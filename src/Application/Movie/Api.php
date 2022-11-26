@@ -148,14 +148,36 @@ class Api
         return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
+    public function fetchUniqueMovieLanguages(int $userId) : array
+    {
+        return $this->historySelectService->fetchUniqueMovieLanguages($userId);
+    }
+
     public function fetchUniqueMoviesCount(int $userId, ?string $searchTerm) : int
     {
         return $this->historySelectService->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
     }
 
-    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder, ?Year $releaseYear) : array
-    {
-        return $this->historySelectService->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
+    public function fetchUniqueMoviesPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm,
+        string $sortBy,
+        string $sortOrder,
+        ?Year $releaseYear,
+        ?string $language,
+    ) : array {
+        return $this->historySelectService->fetchUniqueMoviesPaginated(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $releaseYear,
+            $language
+        );
     }
 
     public function fetchUniqueMovieReleaseYears(int $userId) : array
