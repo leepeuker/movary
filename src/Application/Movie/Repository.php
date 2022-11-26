@@ -8,6 +8,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\Year;
 use RuntimeException;
 
 class Repository
@@ -457,7 +458,7 @@ class Repository
         );
     }
 
-    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder, ?int $releaseYear) : array
+    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder, ?Year $releaseYear) : array
     {
         $payload = [$userId, $userId, "%$searchTerm%", "%$releaseYear%"];
 

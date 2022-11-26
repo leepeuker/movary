@@ -13,6 +13,7 @@ use Movary\Application\Movie;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\Year;
 
 class Api
 {
@@ -152,7 +153,7 @@ class Api
         return $this->historySelectService->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
     }
 
-    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder, ?int $releaseYear) : array
+    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder, ?Year $releaseYear) : array
     {
         return $this->historySelectService->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
     }

@@ -8,6 +8,7 @@ use Movary\Application\Movie;
 use Movary\Application\Movie\Entity;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\Year;
 
 class Select
 {
@@ -173,7 +174,7 @@ class Select
         ?string $searchTerm = null,
         string $sortBy = 'title',
         string $sortOrder = 'ASC',
-        ?int $releaseYear = null
+        ?Year $releaseYear = null
     ) : array {
         return $this->movieRepository->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
     }
