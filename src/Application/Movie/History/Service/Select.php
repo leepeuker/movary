@@ -119,6 +119,7 @@ class Select
 
         foreach ($mostWatchedLanguages as $index => $mostWatchedLanguage) {
             $mostWatchedLanguages[$index]['name'] = $this->tmdbApi->getLanguageByCode($mostWatchedLanguage['language']);
+            $mostWatchedLanguages[$index]['code'] = $mostWatchedLanguage['language'];
         }
 
         return $mostWatchedLanguages;
@@ -162,6 +163,18 @@ class Select
         return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
     }
 
+    public function fetchUniqueMovieLanguages(int $userId) : array
+    {
+        $uniqueLanguages = [];
+
+        foreach ($this->movieRepository->fetchUniqueMovieLanguages($userId) as $index => $item) {
+            $uniqueLanguages[$index]['name'] = $this->tmdbApi->getLanguageByCode($item);
+            $uniqueLanguages[$index]['code'] = $item;
+        }
+
+        return $uniqueLanguages;
+    }
+
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
         return $this->movieRepository->fetchUniqueMovieReleaseYears($userId);
@@ -174,9 +187,10 @@ class Select
         ?string $searchTerm = null,
         string $sortBy = 'title',
         string $sortOrder = 'ASC',
-        ?Year $releaseYear = null
+        ?Year $releaseYear = null,
+        ?string $language = null,
     ) : array {
-        return $this->movieRepository->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
+        return $this->movieRepository->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder, $releaseYear, $language);
     }
 
     public function findByTraktId(TraktId $traktId) : ?Entity
