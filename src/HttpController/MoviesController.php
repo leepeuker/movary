@@ -40,7 +40,13 @@ class MoviesController
             $requestData->getLanguage(),
             $requestData->getGenre(),
         );
-        $historyCount = $this->movieApi->fetchUniqueMoviesCount($userId, $requestData->getSearchTerm());
+        $historyCount = $this->movieApi->fetchUniqueMoviesCount(
+            $userId,
+            $requestData->getSearchTerm(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
+        );
 
         $maxPage = (int)ceil($historyCount / $requestData->getLimit());
 

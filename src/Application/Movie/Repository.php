@@ -447,16 +447,37 @@ class Repository
         );
     }
 
-    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm) : int
+    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
     {
+        $payload = [$userId, "%$searchTerm%"];
+
+        $whereQuery = 'WHERE m.title LIKE ? ';
+
+        if (empty($releaseYear) === false) {
+            $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            $payload[] = (string)$releaseYear;
+        }
+
+        if (empty($language) === false) {
+            $whereQuery .= 'AND m.original_language = ? ';
+            $payload[] = $language;
+        }
+
+        if (empty($genre) === false) {
+            $whereQuery .= 'AND g.name = ? ';
+            $payload[] = $genre;
+        }
+
         return $this->dbConnection->fetchFirstColumn(
             <<<SQL
-                SELECT COUNT(DISTINCT movie_id)
-                FROM movie_user_watch_dates mh
-                JOIN movie m on mh.movie_id = m.id
-                WHERE m.title LIKE ? AND user_id = ?
-                SQL,
-            ["%$searchTerm%", $userId]
+            SELECT COUNT(DISTINCT m.id)
+            FROM movie m
+            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+            JOIN movie_genre mg on m.id = mg.movie_id
+            JOIN genre g on mg.genre_id = g.id
+            $whereQuery
+            SQL,
+            $payload
         )[0];
     }
 
