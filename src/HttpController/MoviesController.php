@@ -12,7 +12,9 @@ use Twig\Environment;
 class MoviesController
 {
     private const DEFAULT_LIMIT = 24;
+
     private const DEFAULT_SORT_BY = 'title';
+
     private const DEFAULT_SORT_ORDER = 'ASC';
 
     public function __construct(
