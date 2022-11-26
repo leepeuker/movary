@@ -163,9 +163,9 @@ class Select
         return $this->movieRepository->fetchUniqueMovieGenres($userId);
     }
 
-    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm = null) : int
+    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm = null, ?Year $releaseYear = null, ?string $language = null, ?string $genre = null) : int
     {
-        return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
+        return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId, $searchTerm, $releaseYear, $language, $genre);
     }
 
     public function fetchUniqueMovieLanguages(int $userId) : array
