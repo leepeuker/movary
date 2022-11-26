@@ -161,15 +161,21 @@ class Select
         return $this->movieRepository->fetchUniqueMovieInHistoryCount($userId, $searchTerm);
     }
 
+    public function fetchUniqueMovieReleaseYears(int $userId) : array
+    {
+        return $this->movieRepository->fetchUniqueMovieReleaseYears($userId);
+    }
+
     public function fetchUniqueMoviesPaginated(
         int $userId,
         int $limit,
         int $page,
         ?string $searchTerm = null,
         string $sortBy = 'title',
-        string $sortOrder = 'ASC'
+        string $sortOrder = 'ASC',
+        ?int $releaseYear = null
     ) : array {
-        return $this->movieRepository->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder);
+        return $this->movieRepository->fetchUniqueMoviesPaginated($userId, $limit, $page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
     }
 
     public function findByTraktId(TraktId $traktId) : ?Entity

@@ -55,6 +55,15 @@
                             <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>Desc</option>
                         </select>
                     </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Release year</span>
+                        <select class="form-control" name="ry" id="release-year">
+                            <option value="" {{ releaseYear is null ? 'selected' }}>All</option>
+                            {% for uniqueReleaseYear in uniqueReleaseYears %}
+                                <option value="{{ uniqueReleaseYear }}" {{ releaseYear == uniqueReleaseYear ? 'selected' }}>{{ uniqueReleaseYear }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </form>
 

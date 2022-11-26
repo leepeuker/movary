@@ -12,9 +12,7 @@ use Twig\Environment;
 class MoviesController
 {
     private const DEFAULT_LIMIT = 24;
-
     private const DEFAULT_SORT_BY = 'title';
-
     private const DEFAULT_SORT_ORDER = 'ASC';
 
     public function __construct(
@@ -36,8 +34,10 @@ class MoviesController
         $limit = $request->getGetParameters()['pp'] ?? self::DEFAULT_LIMIT;
         $sortBy = $request->getGetParameters()['sb'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $request->getGetParameters()['so'] ?? self::DEFAULT_SORT_ORDER;
+        $releaseYear = $request->getGetParameters()['ry'] ?? null;
+        $releaseYear = $releaseYear !== null ? (int)$releaseYear : $releaseYear;
 
-        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated($userId, (int)$limit, (int)$page, $searchTerm, $sortBy, $sortOrder);
+        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated($userId, (int)$limit, (int)$page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
         $historyCount = $this->movieApi->fetchUniqueMoviesCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
@@ -59,6 +59,8 @@ class MoviesController
                 'perPage' => $limit,
                 'sortBy' => $sortBy,
                 'sortOrder' => $sortOrder,
+                'releaseYear' => $releaseYear,
+                'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
             ]),
         );
     }

@@ -51,10 +51,10 @@ db_create_database:
 	make app_database_migrate
 
 db_import:
-	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_ROOT_PASSWORD} < /tmp/host/dump.sql'
+	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_ROOT_PASSWORD} < /tmp/dump.sql'
 
 db_export:
-	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_ROOT_PASSWORD) $(DATABASE_NAME) > /tmp/host/dump.sql'
+	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_ROOT_PASSWORD) $(DATABASE_NAME) > /tmp/dump.sql'
 	sudo chown $(USER_ID):$(USER_ID) tmp/dump.sql
 
 db_migration_create:
