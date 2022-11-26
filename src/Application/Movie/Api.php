@@ -148,6 +148,11 @@ class Api
         return $this->historySelectService->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
+    public function fetchUniqueMovieGenres(int $userId) : array
+    {
+        return $this->historySelectService->fetchUniqueMovieGenres($userId);
+    }
+
     public function fetchUniqueMovieLanguages(int $userId) : array
     {
         return $this->historySelectService->fetchUniqueMovieLanguages($userId);
@@ -167,6 +172,7 @@ class Api
         string $sortOrder,
         ?Year $releaseYear,
         ?string $language,
+        ?string $genre,
     ) : array {
         return $this->historySelectService->fetchUniqueMoviesPaginated(
             $userId,
@@ -176,7 +182,8 @@ class Api
             $sortBy,
             $sortOrder,
             $releaseYear,
-            $language
+            $language,
+            $genre,
         );
     }
 

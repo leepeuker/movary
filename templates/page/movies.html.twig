@@ -65,6 +65,15 @@
                         </select>
                     </div>
                     <div class="input-group mb-3">
+                        <span class="input-group-text">Genre</span>
+                        <select class="form-control" name="ge" id="genre">
+                            <option value="" {{ genre is null ? 'selected' }}>All</option>
+                            {% for uniqueGenre in uniqueGenres %}
+                                <option value="{{ uniqueGenre }}" {{ uniqueGenre == genre ? 'selected' }}>{{ uniqueGenre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
                         <span class="input-group-text">Language</span>
                         <select class="form-control" name="la" id="language">
                             <option value="" {{ language is null ? 'selected' }}>All</option>
