@@ -101,22 +101,27 @@
                 {% endfor %}
             </div>
 
+            {% set searchTermQuery = (searchTerm is null) ? '' : "s=#{searchTerm}&" %}
+            {% set sortByQuery = (sortBy is null) ? '' : "sb=#{sortBy}&" %}
+            {% set sortOrderQuery = (sortOrder is null) ? '' : "so=#{sortOrder}&" %}
+            {% set perPageQuery = (perPage is null) ? '' : "pp=#{perPage}&" %}
+            {% set releaseYearQuery = (releaseYear is null) ? '' : "ry=#{releaseYear}&" %}
+            {% set genreQuery = (genre is null) ? '' : "ge=#{genre}&" %}
+            {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
+            {% set baseUrl = '/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery %}
+
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&laquo;</span></p></li>
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link"
-                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p=1"
-                        >
+                        <a class="page-link" href="{{ baseUrl }}p=1">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link"
-                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p={{ paginationElements.previous }}"
-                        >
+                        <a class="page-link" href="{{ baseUrl }}p={{ paginationElements.previous }}">
                             <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
@@ -130,15 +135,13 @@
                 {% else %}
                     <li class="page-item">
                         <a class="page-link"
-                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p={{ paginationElements.next }}"
+                           href="{{ baseUrl }}p={{ paginationElements.next }}"
                         >
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link"
-                           href="/{{ routeUsername }}/movies?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}{{ (sortOrder is null) ? '' : "so=#{sortOrder}&" }}{{ (sortBy is null) ? '' : "sb=#{sortBy}&" }}{{ (perPage is null) ? '' : "pp=#{perPage}&" }}p={{ paginationElements.maxPage }}"
-                        >
+                        <a class="page-link" href="{{ baseUrl }}p={{ paginationElements.maxPage }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
