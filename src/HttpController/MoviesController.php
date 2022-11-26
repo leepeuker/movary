@@ -7,6 +7,7 @@ use Movary\Application\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\Year;
 use Twig\Environment;
 
 class MoviesController
@@ -36,8 +37,10 @@ class MoviesController
         $limit = $request->getGetParameters()['pp'] ?? self::DEFAULT_LIMIT;
         $sortBy = $request->getGetParameters()['sb'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $request->getGetParameters()['so'] ?? self::DEFAULT_SORT_ORDER;
+        $releaseYear = $request->getGetParameters()['ry'] ?? null;
+        $releaseYear = $releaseYear !== null ? Year::createFromString($releaseYear) : $releaseYear;
 
-        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated($userId, (int)$limit, (int)$page, $searchTerm, $sortBy, $sortOrder);
+        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated($userId, (int)$limit, (int)$page, $searchTerm, $sortBy, $sortOrder, $releaseYear);
         $historyCount = $this->movieApi->fetchUniqueMoviesCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
@@ -59,6 +62,8 @@ class MoviesController
                 'perPage' => $limit,
                 'sortBy' => $sortBy,
                 'sortOrder' => $sortOrder,
+                'releaseYear' => $releaseYear,
+                'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
             ]),
         );
     }

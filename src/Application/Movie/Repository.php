@@ -8,6 +8,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\Year;
 use RuntimeException;
 
 class Repository
@@ -378,7 +379,7 @@ class Repository
             FROM movie m
             WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)
             GROUP BY year(release_date)
-            ORDER BY COUNT(*) DESC, year(release_date)
+            ORDER BY COUNT(*) DESC, year(release_date) DESC
             SQL,
             [$userId]
         );
@@ -443,9 +444,23 @@ class Repository
         )[0];
     }
 
-    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder) : array
+    public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
-        $payload = [$userId, $userId, "%$searchTerm%"];
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+                SELECT DISTINCT YEAR(m.release_date)
+                FROM movie_user_watch_dates mh
+                JOIN movie m on mh.movie_id = m.id
+                WHERE user_id = ?
+                ORDER BY YEAR(m.release_date) DESC
+                SQL,
+            [$userId]
+        );
+    }
+
+    public function fetchUniqueMoviesPaginated(int $userId, int $limit, int $page, ?string $searchTerm, string $sortBy, string $sortOrder, ?Year $releaseYear) : array
+    {
+        $payload = [$userId, $userId, "%$searchTerm%", "%$releaseYear%"];
 
         $offset = ($limit * $page) - $limit;
 
@@ -462,7 +477,7 @@ class Repository
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
-            WHERE m.title LIKE ?
+            WHERE m.title LIKE ? AND m.release_date LIKE ?
             GROUP BY m.id, title, release_date, rating
             ORDER BY $sortBySanitized $sortOrder, title asc
             LIMIT $offset, $limit
