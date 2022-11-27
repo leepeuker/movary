@@ -23,7 +23,7 @@ class File
         file_put_contents($filename, $data);
     }
 
-    public function deleteDirectory(string $path) : void
+    public function deleteDirectoryRecursively(string $path) : void
     {
         $files = glob(rtrim($path, '/') . '/*');
 
@@ -33,7 +33,7 @@ class File
 
         foreach ($files as $file) {
             if (is_dir($file) === true) {
-                $this->deleteDirectory($file);
+                $this->deleteDirectoryRecursively($file);
 
                 continue;
             }

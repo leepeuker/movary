@@ -80,13 +80,17 @@ class TmdbImageCacheRefresh extends Command
     {
         $this->generateOutput($output, 'Caching movie images...');
 
-        $this->imageCacheService->cacheMovieImages($forceRefresh);
+        $cachedImageCount = $this->imageCacheService->cacheMovieImages($forceRefresh);
+
+        $this->generateOutput($output, "Cached [$cachedImageCount] movie images.");
     }
 
     private function cachePersonImages(OutputInterface $output, bool $forceRefresh = false) : void
     {
         $this->generateOutput($output, 'Caching person images...');
 
-        $this->imageCacheService->cachePersonImages($forceRefresh);
+        $cachedImageCount = $this->imageCacheService->cachePersonImages($forceRefresh);
+
+        $this->generateOutput($output, "Cached [$cachedImageCount] person images.");
     }
 }
