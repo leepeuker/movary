@@ -1,6 +1,6 @@
 .env
-tmp/*
 public/images/cached/*
+tmp/*
 !tmp/.gitkeep
 docker-compose.override.yml
 .phpunit.result.cache
