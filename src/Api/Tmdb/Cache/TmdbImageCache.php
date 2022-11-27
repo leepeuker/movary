@@ -7,7 +7,7 @@ use Movary\ValueObject\Url;
 
 class TmdbImageCache
 {
-    const TMDB_BASE_URL = 'https://image.tmdb.org/t/p/w342/';
+    private const TMDB_BASE_URL = 'https://image.tmdb.org/t/p/w342/';
 
     public function __construct(
         private readonly \PDO $pdo,
@@ -51,16 +51,17 @@ class TmdbImageCache
                 continue;
             }
 
-            $tmdbPosterUrl = $this->createTmdbImageUrl($row['tmdb_poster_path']);
-            $cachedImagePublicPath = $this->imageCacheService->cacheImage($tmdbPosterUrl, $forceRefresh);
+            $cachedImagePublicPath = $this->imageCacheService->cacheImage(
+                $this->createTmdbImageUrl($row['tmdb_poster_path']),
+                $forceRefresh
+            );
 
             if ($cachedImagePublicPath === null) {
                 continue;
             }
 
-            $this->pdo
-                ->prepare("UPDATE $tableName SET poster_path = ? WHERE id = ?")
-                ->execute([$cachedImagePublicPath, $row['id']]);
+            $payload = [$cachedImagePublicPath, $row['id']];
+            $this->pdo->prepare("UPDATE $tableName SET poster_path = ? WHERE id = ?")->execute($payload);
 
             $cachedImages++;
         }
