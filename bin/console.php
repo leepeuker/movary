@@ -5,6 +5,8 @@ $container = require(__DIR__ . '/../bootstrap.php');
 $application = $container->get(Symfony\Component\Console\Application::class);
 $application->add($container->get(Movary\Command\TraktImport::class));
 $application->add($container->get(Movary\Command\TmdbSync::class));
+$application->add($container->get(Movary\Command\TmdbImageCacheRefresh::class));
+$application->add($container->get(Movary\Command\TmdbImageCacheDelete::class));
 $application->add($container->get(Movary\Command\DatabaseMigrationStatus::class));
 $application->add($container->get(Movary\Command\DatabaseMigrationMigrate::class));
 $application->add($container->get(Movary\Command\DatabaseMigrationRollback::class));
