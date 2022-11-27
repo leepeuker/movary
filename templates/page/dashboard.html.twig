@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-{% import 'makro/tmdb.html.twig' as tmdb %}
 
 {% block title %}
     Dashboard
@@ -59,7 +58,9 @@
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ lastPlay.id }}'">
                                     <div class="position-relative">
-                                        <img src="{{ tmdb.generatePosterImageUrl(lastPlay.tmdb_poster_path) }}" class="card-img-top" alt="..."
+                                        <img src="{{ lastPlay.poster_path }}"
+                                             class="card-img-top"
+                                             alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
 
                                     </div>
@@ -93,7 +94,7 @@
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                                     </div>
                                     <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                                    <img src="{{ tmdb.generatePosterImageUrl(mostWatchedActor.tmdb_poster_path) }}" class="card-img-top" alt="..."
+                                    <img src="{{ mostWatchedActor.poster_path }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.count }}x</small>
@@ -121,7 +122,7 @@
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
                                     </div>
                                     <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
-                                    <img src="{{ tmdb.generatePosterImageUrl(mostWatchedActress.tmdb_poster_path) }}" class="card-img-top" alt="..."
+                                    <img src="{{ mostWatchedActress.poster_path }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.count }}x</small>
@@ -148,7 +149,7 @@
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                                     </div>
                                     <input id="directorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
-                                    <img src="{{ tmdb.generatePosterImageUrl(mostWatchedDirector.tmdb_poster_path) }}" class="card-img-top" alt="..."
+                                    <img src="{{ mostWatchedDirector.poster_path }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.count }}x</small>

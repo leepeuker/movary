@@ -1,7 +1,0 @@
-{% macro generatePosterImageUrl(posterPath) %}
-    {% if posterPath is not null %}
-        https://image.tmdb.org/t/p/w342{{ posterPath }}
-    {% else %}
-        /images/placeholder-image.png
-    {% endif %}
-{% endmacro %}

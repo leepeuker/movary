@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-{% import 'makro/tmdb.html.twig' as tmdb %}
 
 {% block title %}
     Person: {{ person.name }}
@@ -18,7 +17,7 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ tmdb.generatePosterImageUrl(person.tmdbPosterPath) }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="{{ person.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -57,7 +56,7 @@
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
-                                        <img src="{{ tmdb.generatePosterImageUrl(movieAsActor.tmdb_poster_path) }}" class="card-img-top" alt="..."
+                                        <img src="{{ movieAsActor.poster_path }}" class="card-img-top" alt="..."
                                              style="border-top-left-radius:0;border-top-right-radius:0;">
                                     </div>
 
@@ -79,7 +78,7 @@
                         <div class="col position-relative">
                             <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
-                                    <img src="{{ tmdb.generatePosterImageUrl(movieAsDirector.tmdb_poster_path) }}" class="card-img-top" alt="..."
+                                    <img src="{{ movieAsDirector.poster_path }}" class="card-img-top" alt="..."
                                          style="border-top-left-radius:0;border-top-right-radius:0;">
 
                                 </div>

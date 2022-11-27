@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-{% import 'makro/tmdb.html.twig' as tmdb %}
 
 {% block title %}
     History
@@ -89,7 +88,7 @@
                 {% for movie in movies %}
                     <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movie.id }}'">
                         <div class="card h-100  position-relative">
-                            <img src="{{ tmdb.generatePosterImageUrl(movie.tmdb_poster_path) }}" class="card-img-top" alt="...">
+                            <img src="{{ movie.poster_path }}" class="card-img-top" alt="...">
 
                             {% if movie.userRating is not null %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">

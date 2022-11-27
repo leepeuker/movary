@@ -2,16 +2,15 @@
 
 namespace Movary\Api\Tmdb\Cache;
 
+use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Application\Service\ImageCacheService;
-use Movary\ValueObject\Url;
 
 class TmdbImageCache
 {
-    private const TMDB_BASE_URL = 'https://image.tmdb.org/t/p/w342/';
-
     public function __construct(
         private readonly \PDO $pdo,
         private readonly ImageCacheService $imageCacheService,
+        private readonly TmdbUrlGenerator $tmdbUrlGenerator
     ) {
     }
 
@@ -52,7 +51,7 @@ class TmdbImageCache
             }
 
             $cachedImagePublicPath = $this->imageCacheService->cacheImage(
-                $this->createTmdbImageUrl($row['tmdb_poster_path']),
+                $this->tmdbUrlGenerator->generateImageUrl($row['tmdb_poster_path']),
                 $forceRefresh
             );
 
@@ -67,12 +66,5 @@ class TmdbImageCache
         }
 
         return $cachedImages;
-    }
-
-    private function createTmdbImageUrl(mixed $tmdbImagePath) : Url
-    {
-        $trimmedImagePath = trim($tmdbImagePath, '/');
-
-        return Url::createFromString(self::TMDB_BASE_URL . $trimmedImagePath);
     }
 }

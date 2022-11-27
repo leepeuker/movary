@@ -6,6 +6,7 @@ use Movary\Api\Tmdb;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Movie;
 use Movary\Application\Movie\Entity;
+use Movary\Application\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Year;
@@ -14,7 +15,8 @@ class Select
 {
     public function __construct(
         private readonly Movie\Repository $movieRepository,
-        private readonly Tmdb\Api $tmdbApi
+        private readonly Tmdb\Api $tmdbApi,
+        private readonly UrlGenerator $urlGenerator,
     ) {
     }
 
@@ -68,12 +70,16 @@ class Select
 
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null) : array
     {
-        return $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $searchTerm);
+        $historyEntries = $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $searchTerm);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($historyEntries);
     }
 
     public function fetchLastPlays(int $userId) : array
     {
-        return $this->movieRepository->fetchLastPlays($userId);
+        $lastPlays = $this->movieRepository->fetchLastPlays($userId);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
     }
 
     public function fetchMostWatchedActors(int $userId, int $page = 1, ?int $limit = null, ?Gender $gender = null, ?string $searchTerm = null) : array
@@ -84,7 +90,7 @@ class Select
             $mostWatchedActors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedActor['gender'])->getAbbreviation();
         }
 
-        return $mostWatchedActors;
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($mostWatchedActors);
     }
 
     public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null) : int
@@ -100,7 +106,7 @@ class Select
             $mostWatchedDirectors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedDirector['gender'])->getAbbreviation();
         }
 
-        return $mostWatchedDirectors;
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($mostWatchedDirectors);
     }
 
     public function fetchMostWatchedDirectorsCount(int $userId, ?string $searchTerm = null) : int
@@ -196,7 +202,7 @@ class Select
         ?string $language = null,
         ?string $genre = null,
     ) : array {
-        return $this->movieRepository->fetchUniqueMoviesPaginated(
+        $movies = $this->movieRepository->fetchUniqueMoviesPaginated(
             $userId,
             $limit,
             $page,
@@ -207,6 +213,8 @@ class Select
             $language,
             $genre,
         );
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
     }
 
     public function findByTraktId(TraktId $traktId) : ?Entity
