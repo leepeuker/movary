@@ -178,16 +178,13 @@ Example:
 
 ### tmdb image cache
 
-To e.g. prevent rate limit issues with the TMDB api you should cache tmdb images (movie/person posters) with movary.
-This will store a local copy of the image in the `storage` directory.
-Make sure you persist the content of the `storage` directory to keep data e.g. when restarting docker container.
-
 Enable by setting environment variable `TMDB_ENABLE_IMAGE_CACHING` to `1`.
 
-This will activate:
+To e.g. prevent rate limit issues with the TMDB api you should cache tmdb images (movie/person posters) with movary.
+This will store a local copy of the image in the `storage` directory and serve this image instead of the original one from TMDB.
+Make sure you persist the content of the `storage` directory to keep data e.g. when restarting docker container.
 
-- using locally cached image path for image urls (if existing) instead of tmdb.org url
-- cache new images automatically when adding/updating movie/person meta data
+Execute the cache refresh command regularly, e.g. via cronjob, to keep the cache up to date.
 
 Helpful commands:
 
