@@ -1,4 +1,5 @@
 .env
+public/images/cached/*
 tmp/*
 !tmp/.gitkeep
 docker-compose.override.yml

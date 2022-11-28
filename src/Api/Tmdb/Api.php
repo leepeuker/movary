@@ -2,7 +2,7 @@
 
 namespace Movary\Api\Tmdb;
 
-use Movary\Api\Tmdb\Cache\Iso6931;
+use Movary\Api\Tmdb\Cache\TmdbIso6931Cache;
 use Movary\Api\Tmdb\Dto\Company;
 use Movary\Api\Tmdb\Dto\Credits;
 use Movary\Api\Tmdb\Dto\Movie;
@@ -11,7 +11,7 @@ class Api
 {
     public function __construct(
         private readonly Client $client,
-        private readonly Iso6931 $iso6931,
+        private readonly TmdbIso6931Cache $iso6931,
     ) {
     }
 

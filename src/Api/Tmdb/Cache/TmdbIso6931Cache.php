@@ -5,7 +5,7 @@ namespace Movary\Api\Tmdb\Cache;
 use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb\Client;
 
-class Iso6931
+class TmdbIso6931Cache
 {
     private array $languages = [];
 

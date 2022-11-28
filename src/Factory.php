@@ -12,7 +12,6 @@ use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Application\Movie;
 use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\SyncLog;
 use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
 use Movary\Command;
@@ -22,6 +21,7 @@ use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
 use Movary\Worker\Service;
+use PDO;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -108,21 +108,22 @@ class Factory
         return $logger;
     }
 
-    public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
+    public static function createPdo(Config $config) : PDO
     {
-        try {
-            $applicationVersion = $config->getAsString('APPLICATION_VERSION');
-        } catch (\OutOfBoundsException) {
-            $applicationVersion = null;
-        }
+        $dbName = $config->getAsString('DATABASE_NAME');
+        $host = $config->getAsString('DATABASE_HOST');
+        $port = $config->getAsString('DATABASE_PORT');
+        $charset = $config->getAsString('DATABASE_CHARSET');
 
-        return new SettingsController(
-            $container->get(Twig\Environment::class),
-            $container->get(Service::class),
-            $container->get(Authentication::class),
-            $container->get(User\Api::class),
-            $container->get(Movie\Api::class),
-            $applicationVersion
+        return new PDO(
+            "mysql:host={$host};dbname=$dbName;charset=$charset;port=$port",
+            $config->getAsString('DATABASE_USER'),
+            $config->getAsString('DATABASE_PASSWORD'),
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ],
         );
     }
 
@@ -148,6 +149,24 @@ class Factory
             $container->get(Authentication::class),
             $plexEnableScrobbleWebhook,
             $plexEnableRatingWebhook,
+        );
+    }
+
+    public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
+    {
+        try {
+            $applicationVersion = $config->getAsString('APPLICATION_VERSION');
+        } catch (\OutOfBoundsException) {
+            $applicationVersion = null;
+        }
+
+        return new SettingsController(
+            $container->get(Twig\Environment::class),
+            $container->get(Service::class),
+            $container->get(Authentication::class),
+            $container->get(User\Api::class),
+            $container->get(Movie\Api::class),
+            $applicationVersion
         );
     }
 
