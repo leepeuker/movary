@@ -104,16 +104,23 @@ volumes:
 
 ## Important: First steps
 
-- Run database migrations: `docker exec movary php bin/console.php database:migration:migrate`
+- Run database migrations, e.g.: `docker exec movary php bin/console.php database:migration:migrate`
 - Create initial user:
-  - via web ui by visiting movary landingpage `/`
-  - via cli `docker exec movary php bin/console.php user:create email@example.com password username`
+    - via web ui by visiting movary landingpage `/`
+    - via cli `docker exec movary php bin/console.php user:create email@example.com password username`
 
 List all available cli commands: `docker exec movary php bin/console.php`
 
 ##### Available environment variables with defaults:
 
 ```
+### Enviroment
+ENV=production
+TIMEZONE="Europe/Berlin"
+# Minimum number of seconds the job processing worker has to run => the smallest possible timeperiode between processing two jobs
+MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
+
+### Database
 DATABASE_HOST=
 DATABASE_PORT=3306
 DATABASE_NAME=movary
@@ -122,17 +129,21 @@ DATABASE_PASSWORD=
 DATABASE_DRIVER=pdo_mysql
 DATABASE_CHARSET=utf8
 
-# Minimum number of seconds the job processing worker has to run 
-# => the smallest possible timeperiode between processing two jobs
-MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
-
+### TMDB 
 # https://www.themoviedb.org/settings/api
 TMDB_API_KEY= 
+# Save and deliver movie/person posters locally
+TMDB_ENABLE_IMAGE_CACHING=0
 
-TIMEZONE="Europe/Berlin"
+### Plex 
+# https://app.plex.tv/desktop/#!/settings/webhooks
+PLEX_ENABLE_SCROBBLE=1
+PLEX_ENABLE_RATING=0
 
-LOG_FILE="tmp/app.log"
+### Logging
 LOG_LEVEL=warning
+LOG_ENABLE_STACKTRACE=0
+LOG_ENABLE_FILE_LOGGING=0
 ``` 
 
 More configuration can be done via the base image webdevops/php-nginx, checkout

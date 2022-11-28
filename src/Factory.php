@@ -230,7 +230,7 @@ class Factory
         try {
             $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
         } catch (\OutOfBoundsException) {
-            $enableImageCaching = true;
+            $enableImageCaching = false;
         }
 
         return new UrlGenerator(
