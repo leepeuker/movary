@@ -6,13 +6,15 @@ use Movary\Api\Tmdb\TmdbUrlGenerator;
 
 class UrlGenerator
 {
-    public function __construct(private readonly TmdbUrlGenerator $tmdbUrlGenerator)
-    {
+    public function __construct(
+        private readonly TmdbUrlGenerator $tmdbUrlGenerator,
+        private readonly bool $enableImageCaching
+    ) {
     }
 
     public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath) : string
     {
-        if (empty($posterPath) === false) {
+        if ($this->enableImageCaching === true && empty($posterPath) === false) {
             return '/' . trim($posterPath, '/');
         }
 

@@ -52,13 +52,16 @@ You must provide a tmdb api key (see https://www.themoviedb.org/settings/api)
 Example with an existing mysql server:
 
 ```shell
-docker run --rm -d \
+$ docker volume create movary-storage
+
+$ docker run --rm -d \
   --name movary \
   -p 80:80 \
   -e DATABASE_HOST="<host>" \
   -e DATABASE_USER="<user>" \
   -e DATABASE_PASSWORD="<password>" \
   -e TMDB_API_KEY="<tmdb_key>" \
+  -v movary-storage:/app/storage
   leepeuker/movary:latest
 ```
 
@@ -79,6 +82,8 @@ services:
       DATABASE_USER: ""
       DATABASE_PASSWORD: ""
       TMDB_API_KEY: ""
+    volumes:
+      - movary-storage:/app/storage
 
   mysql:
     image: mysql:8.0
@@ -92,6 +97,7 @@ services:
 
 volumes:
   movary-db:
+  movary-storage:
 ```
 
 <a name="#important-first-steps"></a>
@@ -99,7 +105,7 @@ volumes:
 ## Important: First steps
 
 - Run database migrations: `docker exec movary php bin/console.php database:migration:migrate`
-- Create initial user: 
+- Create initial user:
   - via web ui by visiting movary landingpage `/`
   - via cli `docker exec movary php bin/console.php user:create email@example.com password username`
 

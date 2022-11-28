@@ -12,6 +12,7 @@ use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Application\Movie;
 use Movary\Application\Service\Tmdb\SyncMovie;
+use Movary\Application\Service\UrlGenerator;
 use Movary\Application\User;
 use Movary\Application\User\Service\Authentication;
 use Movary\Command;
@@ -222,6 +223,20 @@ class Factory
     public static function createTwigFilesystemLoader() : Twig\Loader\FilesystemLoader
     {
         return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
+    }
+
+    public static function createUrlGenerator(ContainerInterface $container, Config $config) : UrlGenerator
+    {
+        try {
+            $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
+        } catch (\OutOfBoundsException) {
+            $enableImageCaching = true;
+        }
+
+        return new UrlGenerator(
+            $container->get(Tmdb\TmdbUrlGenerator::class),
+            $enableImageCaching
+        );
     }
 
     private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler

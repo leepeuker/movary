@@ -11,8 +11,13 @@ services:
       - "8080:80"
     environment:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
-      DATABASE_HOST: ""
+      DATABASE_HOST: "mysql"
       DATABASE_PORT: "${DATABASE_PORT_HOST}"
       DATABASE_USER: "${DATABASE_USER}"
       DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
       TMDB_API_KEY: "${TMDB_API_KEY}"
+    volumes:
+      - movary-storage:/app/storage
+
+volumes:
+  movary-storage:
