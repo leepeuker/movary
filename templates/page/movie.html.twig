@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-{% import 'makro/tmdb.html.twig' as tmdb %}
 
 {% block title %}
     Movie: {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
@@ -48,7 +47,7 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ tmdb.generatePosterImageUrl(movie.tmdbPosterPath) }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="{{ movie.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -111,7 +110,7 @@
                         <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small>
                     </div>
 
-                    <img src="{{ tmdb.generatePosterImageUrl(castMember.tmdbPosterPath) }}" class="card-img-top" alt="..."
+                    <img src="{{ castMember.posterPath }}" class="card-img-top" alt="..."
                          style="border-top-left-radius:0;border-top-right-radius:0;">
                 </div>
             {% endfor %}
@@ -126,7 +125,7 @@
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
                     </div>
 
-                    <img src="{{ tmdb.generatePosterImageUrl(director.tmdbPosterPath) }}"
+                    <img src="{{ director.posterPath }}"
                          class="card-img-top"
                          alt="..."
                          style="border-top-left-radius:0;border-top-right-radius:0;">

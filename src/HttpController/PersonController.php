@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie;
 use Movary\Application\Person;
+use Movary\Application\Service\UrlGenerator;
 use Movary\Application\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -17,6 +18,7 @@ class PersonController
         private readonly Movie\Api $movieApi,
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly UrlGenerator $urlGenerator,
     ) {
     }
 
@@ -29,11 +31,21 @@ class PersonController
 
         $personId = (int)$request->getRouteParameters()['id'];
 
+        $person = $this->personApi->findById($personId);
+        if ($person === null) {
+            return Response::createNotFound();
+        }
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/person.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieWithPersonVisibleUsernamesForCurrentVisitor($personId),
-                'person' => $this->personApi->findById($personId),
+                'person' => [
+                    'name' => $person->getName(),
+                    'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
+                    'knownForDepartment' => $person->getKnownForDepartment(),
+                    'gender' => $person->getGender(),
+                ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
             ]),

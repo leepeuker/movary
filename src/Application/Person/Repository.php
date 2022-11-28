@@ -8,8 +8,9 @@ use RuntimeException;
 
 class Repository
 {
-    public function __construct(private readonly Connection $dbConnection)
-    {
+    public function __construct(
+        private readonly Connection $dbConnection,
+    ) {
     }
 
     public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : Entity

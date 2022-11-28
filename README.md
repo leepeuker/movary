@@ -11,11 +11,12 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
     1. [Tmdb Sync](#tmdb-sync)
-    2. [Plex Scrobbler](#plex-scrobbler)
-    3. [trakt.tv Import](#trakttv-import)
-    3. [trakt.tv Export](#trakttv-export)
-    4. [letterboxd.com Import](#letterboxd-import)
-    4. [IMBb.com Sync](#imdb-sync)
+    2. [Tmdb Image Cache](#tmdb-image-cache)
+    3. [Plex Scrobbler](#plex-scrobbler)
+    4. [trakt.tv Import](#trakttv-import)
+    5. [trakt.tv Export](#trakttv-export)
+    6. [letterboxd.com Import](#letterboxd-import)
+    7. [IMBb Rating Sync](#imdb-sync)
 5. [Development](#development)
 
 <a name="#about"></a>
@@ -47,22 +48,27 @@ lead to breaking changes until then, so keep the release notes in mind when upda
 
 ## Install via docker
 
+This is the preferred and currently only tested way to run the app.
+
 You must provide a tmdb api key (see https://www.themoviedb.org/settings/api)
 
 Example with an existing mysql server:
 
 ```shell
-docker run --rm -d \
+$ docker volume create movary-storage
+
+$ docker run --rm -d \
   --name movary \
   -p 80:80 \
   -e DATABASE_HOST="<host>" \
   -e DATABASE_USER="<user>" \
   -e DATABASE_PASSWORD="<password>" \
   -e TMDB_API_KEY="<tmdb_key>" \
+  -v movary-storage:/app/storage
   leepeuker/movary:latest
 ```
 
-Example with docker-compose.yml
+Example with docker-compose.yml with a mysql server
 
 ```yml
 version: "3.5"
@@ -79,6 +85,8 @@ services:
       DATABASE_USER: ""
       DATABASE_PASSWORD: ""
       TMDB_API_KEY: ""
+    volumes:
+      - movary-storage:/app/storage
 
   mysql:
     image: mysql:8.0
@@ -92,22 +100,30 @@ services:
 
 volumes:
   movary-db:
+  movary-storage:
 ```
 
 <a name="#important-first-steps"></a>
 
 ## Important: First steps
 
-- Run database migrations: `docker exec movary php bin/console.php database:migration:migrate`
-- Create initial user: 
-  - via web ui by visiting movary landingpage `/`
-  - via cli `docker exec movary php bin/console.php user:create email@example.com password username`
+- Run database migrations, e.g.: `docker exec movary php bin/console.php database:migration:migrate`
+- Create initial user:
+    - via web ui by visiting movary landingpage `/`
+    - via cli `docker exec movary php bin/console.php user:create email@example.com password username`
 
 List all available cli commands: `docker exec movary php bin/console.php`
 
 ##### Available environment variables with defaults:
 
 ```
+### Enviroment
+ENV=production
+TIMEZONE="Europe/Berlin"
+# Minimum number of seconds the job processing worker has to run => the smallest possible timeperiode between processing two jobs
+MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
+
+### Database
 DATABASE_HOST=
 DATABASE_PORT=3306
 DATABASE_NAME=movary
@@ -116,17 +132,21 @@ DATABASE_PASSWORD=
 DATABASE_DRIVER=pdo_mysql
 DATABASE_CHARSET=utf8
 
-# Minimum number of seconds the job processing worker has to run 
-# => the smallest possible timeperiode between processing two jobs
-MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
-
+### TMDB 
 # https://www.themoviedb.org/settings/api
 TMDB_API_KEY= 
+# Save and deliver movie/person posters locally
+TMDB_ENABLE_IMAGE_CACHING=0
 
-TIMEZONE="Europe/Berlin"
+### Plex 
+# https://app.plex.tv/desktop/#!/settings/webhooks
+PLEX_ENABLE_SCROBBLE=1
+PLEX_ENABLE_RATING=0
 
-LOG_FILE="tmp/app.log"
+### Logging
 LOG_LEVEL=warning
+LOG_ENABLE_STACKTRACE=0
+LOG_ENABLE_FILE_LOGGING=0
 ``` 
 
 More configuration can be done via the base image webdevops/php-nginx, checkout
@@ -153,6 +173,26 @@ Example:
   Only movies which were last synced X hours or longer ago will be synced
 - `--threshold`
   Maximum number of movies to sync
+
+<a name="#tmdb-image"></a>
+
+### tmdb image cache
+
+To e.g. prevent rate limit issues with the TMDB api you should cache tmdb images (movie/person posters) with movary.
+This will store a local copy of the image in the `storage` directory.
+Make sure you persist the content of the `storage` directory to keep data e.g. when restarting docker container.
+
+Enable by setting environment variable `TMDB_ENABLE_IMAGE_CACHING` to `1`.
+
+This will activate:
+
+- using locally cached image path for image urls (if existing) instead of tmdb.org url
+- cache new images automatically when adding/updating movie/person meta data
+
+Helpful commands:
+
+- Refresh image cache: `php bin/console.php tmdb:imageCache:refresh`
+- Delete cached images: `php bin/console.php tmdb:imageCache:delete`
 
 <a name="#plex-scrobbler"></a>
 

@@ -10,6 +10,7 @@ use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Company;
 use Movary\Application\Genre;
 use Movary\Application\Movie;
+use Movary\Application\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\PersonalRating;
@@ -31,7 +32,8 @@ class Api
         private readonly Repository $movieRepository,
         private readonly Movie\Service\VoteCountFormatter $voteCountFormatter,
         private readonly Imdb\UrlGenerator $imdbUrlGenerator,
-        private readonly Tmdb\UrlGenerator $tmdbUrlGenerator,
+        private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
+        private readonly UrlGenerator $urlGenerator,
     ) {
     }
 
@@ -228,14 +230,14 @@ class Api
             'id' => $entity->getId(),
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
-            'tmdbPosterPath' => $entity->getTmdbPosterPath(),
+            'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($entity->getTmdbPosterPath(), $entity->getPosterPath()),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
             'imdbUrl' => $imdbId !== null ? $this->imdbUrlGenerator->buildUrl($imdbId) : null,
             'imdbRatingAverage' => $entity->getImdbRatingAverage(),
             'imdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getImdbVoteCount()),
-            'tmdbUrl' => $this->tmdbUrlGenerator->buildUrl($entity->getTmdbId()),
+            'tmdbUrl' => (string)$this->tmdbUrlGenerator->generateMovieUrl($entity->getTmdbId()),
             'tmdbRatingAverage' => $entity->getTmdbVoteAverage(),
             'tmdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getTmdbVoteCount()),
             'originalLanguage' => $originalLanguageCode === null ? null : $this->tmdbApi->getLanguageByCode($originalLanguageCode),

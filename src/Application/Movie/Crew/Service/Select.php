@@ -4,11 +4,15 @@ namespace Movary\Application\Movie\Crew\Service;
 
 use Movary\Application\Movie\Crew\Repository;
 use Movary\Application\Person;
+use Movary\Application\Service\UrlGenerator;
 
 class Select
 {
-    public function __construct(private readonly Repository $repository, private readonly Person\Api $personApi)
-    {
+    public function __construct(
+        private readonly Repository $repository,
+        private readonly Person\Api $personApi,
+        private readonly UrlGenerator $urlGenerator,
+    ) {
     }
 
     public function findDirectorsByMovieId(int $movieId) : ?array
@@ -21,7 +25,7 @@ class Select
             $directors[] = [
                 'id' => $person?->getId(),
                 'name' => $person?->getName(),
-                'tmdbPosterPath' => $person?->getTmdbPosterPath(),
+                'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person?->getTmdbPosterPath(), $person?->getPosterPath()),
             ];
         }
 
