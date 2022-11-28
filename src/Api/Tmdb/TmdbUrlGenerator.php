@@ -11,8 +11,8 @@ class TmdbUrlGenerator
         return Url::createFromString('https://image.tmdb.org/t/p/' . $size . '/' . trim($path, '/'));
     }
 
-    public function generateMovieUrl(int $tmdbId) : string
+    public function generateMovieUrl(int $tmdbId) : Url
     {
-        return "https://www.themoviedb.org/movie/$tmdbId/";
+        return Url::createFromString("https://www.themoviedb.org/movie/$tmdbId/");
     }
 }

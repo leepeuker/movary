@@ -237,7 +237,7 @@ class Api
             'imdbUrl' => $imdbId !== null ? $this->imdbUrlGenerator->buildUrl($imdbId) : null,
             'imdbRatingAverage' => $entity->getImdbRatingAverage(),
             'imdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getImdbVoteCount()),
-            'tmdbUrl' => $this->tmdbUrlGenerator->generateMovieUrl($entity->getTmdbId()),
+            'tmdbUrl' => (string)$this->tmdbUrlGenerator->generateMovieUrl($entity->getTmdbId()),
             'tmdbRatingAverage' => $entity->getTmdbVoteAverage(),
             'tmdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getTmdbVoteCount()),
             'originalLanguage' => $originalLanguageCode === null ? null : $this->tmdbApi->getLanguageByCode($originalLanguageCode),
