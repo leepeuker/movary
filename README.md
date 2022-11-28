@@ -11,11 +11,12 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
     1. [Tmdb Sync](#tmdb-sync)
-    2. [Plex Scrobbler](#plex-scrobbler)
-    3. [trakt.tv Import](#trakttv-import)
-    3. [trakt.tv Export](#trakttv-export)
-    4. [letterboxd.com Import](#letterboxd-import)
-    4. [IMBb.com Sync](#imdb-sync)
+    2. [Tmdb Image Cache](#tmdb-image-cache)
+    3. [Plex Scrobbler](#plex-scrobbler)
+    4. [trakt.tv Import](#trakttv-import)
+    5. [trakt.tv Export](#trakttv-export)
+    6. [letterboxd.com Import](#letterboxd-import)
+    7. [IMBb Rating Sync](#imdb-sync)
 5. [Development](#development)
 
 <a name="#about"></a>
@@ -47,6 +48,8 @@ lead to breaking changes until then, so keep the release notes in mind when upda
 
 ## Install via docker
 
+This is the preferred and currently only tested way to run the app.
+
 You must provide a tmdb api key (see https://www.themoviedb.org/settings/api)
 
 Example with an existing mysql server:
@@ -65,7 +68,7 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-Example with docker-compose.yml
+Example with docker-compose.yml with a mysql server
 
 ```yml
 version: "3.5"
@@ -170,6 +173,26 @@ Example:
   Only movies which were last synced X hours or longer ago will be synced
 - `--threshold`
   Maximum number of movies to sync
+
+<a name="#tmdb-image"></a>
+
+### tmdb image cache
+
+To e.g. prevent rate limit issues with the TMDB api you should cache tmdb images (movie/person posters) with movary.
+This will store a local copy of the image in the `storage` directory.
+Make sure you persist the content of the `storage` directory to keep data e.g. when restarting docker container.
+
+Enable by setting environment variable `TMDB_ENABLE_IMAGE_CACHING` to `1`.
+
+This will activate:
+
+- using locally cached image path for image urls (if existing) instead of tmdb.org url
+- cache new images automatically when adding/updating movie/person meta data
+
+Helpful commands:
+
+- Refresh image cache: `php bin/console.php tmdb:imageCache:refresh`
+- Delete cached images: `php bin/console.php tmdb:imageCache:delete`
 
 <a name="#plex-scrobbler"></a>
 
