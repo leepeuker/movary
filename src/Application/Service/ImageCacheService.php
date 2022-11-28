@@ -2,8 +2,10 @@
 
 namespace Movary\Application\Service;
 
+use GuzzleHttp\Psr7\Request;
 use Movary\Util\File;
 use Movary\ValueObject\Url;
+use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
 
 class ImageCacheService
@@ -14,7 +16,8 @@ class ImageCacheService
 
     public function __construct(
         private readonly File $fileUtil,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly ClientInterface $httpClient
     ) {
         $this->fileUtil->createDirectory(self::CACHE_DIR, self::CACHE_DIR_PERMISSIONS);
     }
@@ -32,17 +35,19 @@ class ImageCacheService
 
         $this->fileUtil->createDirectory(dirname($imageFile), self::CACHE_DIR_PERMISSIONS);
 
-        $imageData = file_get_contents((string)$imageUrl);
-        if ($imageData === false) {
+        $request = new Request('GET', (string)$imageUrl);
+
+        $response = $this->httpClient->sendRequest($request);
+        if ($response->getStatusCode() !== 200) {
             sleep(1);
 
-            $imageData = file_get_contents((string)$imageUrl);
-            if ($imageData === false) {
+            $response = $this->httpClient->sendRequest($request);
+            if ($response->getStatusCode() !== 200) {
                 throw new \RuntimeException('Could not fetch image for caching: ' . $imageUrl);
             }
         }
 
-        $this->fileUtil->createFile($imageFile, $imageData);
+        $this->fileUtil->createFile($imageFile, $response->getBody()->getContents());
         $this->logger->debug('Cached image: ' . $imageUrl);
 
         return str_replace(__DIR__ . '/../../../public/', '', $imageFile);
