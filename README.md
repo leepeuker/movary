@@ -12,14 +12,14 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 2. [Install via docker](#install-via-docker)
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
-    1. [Tmdb Sync](#link-tmdb-sync)
-    2. [Tmdb Image Cache](#link-tmdb-image-cache)
-    3. [Plex Scrobbler](#link-plex-scrobbler)
-    4. [trakt.tv Import](#link-trakttv-import)
-    5. [trakt.tv Export](#link-trakttv-export)
-    6. [Letterboxd.com Import](#link-letterboxd-import)
-    7. [IMDb Rating Sync](#link-imdb-sync)
-5. [Development](#link-development)
+    1. [Tmdb Sync](#tmdb-sync)
+    2. [Tmdb Image Cache](#tmdb-image-cache)
+    3. [Plex Scrobbler](#plex-scrobbler)
+    4. [trakt.tv Import](#trakttv-import)
+    5. [trakt.tv Export](#trakttv-export)
+    6. [Letterboxd.com Import](#letterboxdcom-import)
+    7. [IMDb Rating Sync](#imdb-rating-sync)
+5. [Development](#development)
 
 ## About
 
