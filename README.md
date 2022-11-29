@@ -248,9 +248,9 @@ Visit the movary settings page `/settings/letterboxd` for more instructions
 
 <a name="#imdb-sync"></a>
 
-### IMDb Sync
+### IMDb Rating Sync
 
-Sync imdb ratings.
+Sync ratings from imdb.
 
 Example:
 
@@ -259,7 +259,7 @@ Example:
 **Flags:**
 
 - `--hours`
-  Only movie ratings which were last synced X hours or longer ago will be synced
+  Only sync movie ratings which were last synced at least X hours ago
 - `--threshold`
   Maximum number of movie ratings to sync
 
