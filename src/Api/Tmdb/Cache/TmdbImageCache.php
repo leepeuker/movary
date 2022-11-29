@@ -100,7 +100,7 @@ class TmdbImageCache
     {
         $cachedImages = 0;
 
-        $query = "SELECT id, tmdb_poster_path FROM $tableName";
+        $query = "SELECT id, poster_path, tmdb_poster_path FROM $tableName";
         if (count($filerIds) > 0) {
             $placeholders = str_repeat('?, ', count($filerIds));
             $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';
@@ -109,8 +109,18 @@ class TmdbImageCache
         $statement = $this->pdo->prepare($query);
         $statement->execute($filerIds);
 
-        foreach ($statement->getIterator() as $row) {
-            if ($this->cacheImageDataByTableName($row, $tableName, $forceRefresh) === true) {
+        foreach ($statement->getIterator() as $imageDataBeforeUpdate) {
+            if ($this->cacheImageDataByTableName($imageDataBeforeUpdate, $tableName, $forceRefresh) === true) {
+                if ($imageDataBeforeUpdate['poster_path'] !== null) {
+                    $statement = $this->pdo->prepare("SELECT poster_path FROM $tableName WHERE id = ?");
+                    $statement->execute([$imageDataBeforeUpdate['id']]);
+
+                    $imageDataAfterUpdate = $statement->fetch();
+                    if ($imageDataAfterUpdate['poster_path'] !== $imageDataBeforeUpdate['poster_path']) {
+                        $this->imageCacheService->deleteImage($imageDataBeforeUpdate['poster_path']);
+                    }
+                }
+
                 $cachedImages++;
             }
         }

@@ -63,6 +63,11 @@ class File
         rmdir($path);
     }
 
+    public function deleteFile(string $imageFile) : void
+    {
+        unlink($imageFile);
+    }
+
     public function fileExists(string $fileName) : bool
     {
         return file_exists($fileName) === true;

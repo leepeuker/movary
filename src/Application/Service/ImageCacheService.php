@@ -53,6 +53,13 @@ class ImageCacheService
         return str_replace(__DIR__ . '/../../../public/', '', $imageFile);
     }
 
+    public function deleteImage(string $posterPath) : void
+    {
+        $imageFile = __DIR__ . '/../../../public/' . trim($posterPath, '/');
+
+        $this->fileUtil->deleteFile($imageFile);
+    }
+
     public function deleteImages() : void
     {
         $this->fileUtil->deleteDirectoryContent(self::CACHE_DIR);
