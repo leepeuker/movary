@@ -1,6 +1,8 @@
 ## Movary
 
-Web application to track and rate your watched movies.
+Movary is a web application to track and rate your watched movies. 
+
+Open source and self hosted -> you should own your data!
 
 Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login with user `movary@movary.com` and password `movary123`)
 
@@ -234,7 +236,7 @@ Example cli import (import history and ratings for user with id 1):
 
 ### Trakt.tv Export
 
-coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
+Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
 
 <a name="#letterboxd-import"></a>
 
