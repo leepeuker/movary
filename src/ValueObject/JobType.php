@@ -10,6 +10,8 @@ class JobType
 
     private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
 
+    private const TYPE_TMDB_IMAGE_CHACHE = 'tmdb_image_cache';
+
     private const TYPE_TMDB_SYNC = 'tmdb_sync';
 
     private const TYPE_TRAKT_IMPORT_HISTORY = 'trakt_import_history';
@@ -21,6 +23,7 @@ class JobType
         if (in_array($this->type, [
                 self::TYPE_LETTERBOXD_IMPORT_HISTORY,
                 self::TYPE_LETTERBOXD_IMPORT_RATINGS,
+                self::TYPE_TMDB_IMAGE_CHACHE,
                 self::TYPE_TMDB_SYNC,
                 self::TYPE_TRAKT_IMPORT_HISTORY,
                 self::TYPE_TRAKT_IMPORT_RATINGS,
@@ -48,6 +51,11 @@ class JobType
     public static function createLetterboxdImportRatings() : self
     {
         return new self(self::TYPE_LETTERBOXD_IMPORT_RATINGS);
+    }
+
+    public static function createTmdbImageCache() : self
+    {
+        return new self(self::TYPE_TMDB_IMAGE_CHACHE);
     }
 
     public static function createTmdbSync() : self
@@ -78,6 +86,11 @@ class JobType
     public function isOfTypeLetterboxdImportRankings() : bool
     {
         return $this->type === self::TYPE_LETTERBOXD_IMPORT_RATINGS;
+    }
+
+    public function isOfTypeTmdbImageCache() : bool
+    {
+        return $this->type === self::TYPE_TMDB_IMAGE_CHACHE;
     }
 
     public function isOfTypeTmdbSync() : bool

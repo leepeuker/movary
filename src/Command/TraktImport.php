@@ -7,7 +7,7 @@ use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\Application\Service\Trakt\ImportRatings;
 use Movary\Application\Service\Trakt\ImportWatchedMovies;
 use Movary\ValueObject\JobStatus;
-use Movary\Worker\Service;
+use Movary\Worker\JobScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,7 +30,7 @@ class TraktImport extends Command
     public function __construct(
         private readonly ImportRatings $importRatings,
         private readonly ImportWatchedMovies $importWatchedMovies,
-        private readonly Service $workerService,
+        private readonly JobScheduler $jobScheduler,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -39,11 +39,11 @@ class TraktImport extends Command
     protected function configure() : void
     {
         $this->setDescription('Import trakt.tv movie history and rating with local database.')
-             ->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user to import to.')
-             ->addOption(self::OPTION_NAME_HISTORY, [], InputOption::VALUE_NONE, 'Import movie history.')
-             ->addOption(self::OPTION_NAME_RATINGS, [], InputOption::VALUE_NONE, 'Import movie ratings.')
-             ->addOption(self::OPTION_NAME_OVERWRITE, [], InputOption::VALUE_NONE, 'Overwrite local data.')
-             ->addOption(self::OPTION_NAME_IGNORE_CACHE, [], InputOption::VALUE_NONE, 'Ignore trakt cache and force import everything.');
+            ->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user to import to.')
+            ->addOption(self::OPTION_NAME_HISTORY, [], InputOption::VALUE_NONE, 'Import movie history.')
+            ->addOption(self::OPTION_NAME_RATINGS, [], InputOption::VALUE_NONE, 'Import movie ratings.')
+            ->addOption(self::OPTION_NAME_OVERWRITE, [], InputOption::VALUE_NONE, 'Overwrite local data.')
+            ->addOption(self::OPTION_NAME_IGNORE_CACHE, [], InputOption::VALUE_NONE, 'Ignore trakt cache and force import everything.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
@@ -96,7 +96,7 @@ class TraktImport extends Command
 
         $this->importWatchedMovies->execute($userId, $overwriteExistingData, $ignoreCache);
 
-        $this->workerService->addTraktImportHistoryJob($userId, JobStatus::createDone());
+        $this->jobScheduler->addTraktImportHistoryJob($userId, JobStatus::createDone());
 
         $this->generateOutput($output, 'Importing history done.');
     }
@@ -107,7 +107,7 @@ class TraktImport extends Command
 
         $this->importRatings->execute($userId, $overwriteExistingData);
 
-        $this->workerService->addTraktImportRatingsJob($userId, JobStatus::createDone());
+        $this->jobScheduler->addTraktImportRatingsJob($userId, JobStatus::createDone());
 
         $this->generateOutput($output, 'Importing ratings ratings.');
     }

@@ -9,6 +9,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\Worker\JobScheduler;
 use Movary\Worker\Service;
 use Twig\Environment;
 
@@ -17,6 +18,7 @@ class JobController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly Service $workerService,
+        private readonly JobScheduler $jobScheduler,
         private readonly ImportHistoryFileValidator $letterboxdImportHistoryFileValidator,
         private readonly ImportRatingsFileValidator $letterboxdImportRatingsFileValidator,
         private readonly Environment $twig,
@@ -67,7 +69,7 @@ class JobController
             );
         }
 
-        $this->workerService->addLetterboxdImportHistoryJob($userId, $targetFile);
+        $this->jobScheduler->addLetterboxdImportHistoryJob($userId, $targetFile);
 
         $_SESSION['letterboxdHistorySyncSuccessful'] = true;
 
@@ -111,7 +113,7 @@ class JobController
             );
         }
 
-        $this->workerService->addLetterboxdImportRatingsJob($userId, $targetFile);
+        $this->jobScheduler->addLetterboxdImportRatingsJob($userId, $targetFile);
 
         $_SESSION['letterboxdRatingsSyncSuccessful'] = true;
 
@@ -128,7 +130,7 @@ class JobController
             return Response::createFoundRedirect('/');
         }
 
-        $this->workerService->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
+        $this->jobScheduler->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
         $_SESSION['scheduledTraktHistoryImport'] = true;
 
@@ -145,7 +147,7 @@ class JobController
             return Response::createFoundRedirect('/');
         }
 
-        $this->workerService->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
+        $this->jobScheduler->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
         $_SESSION['scheduledTraktRatingsImport'] = true;
 

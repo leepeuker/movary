@@ -23,7 +23,7 @@ class File
         file_put_contents($filename, $data);
     }
 
-    public function deleteDirectoryRecursively(string $path) : void
+    public function deleteDirectoryContent(string $path) : void
     {
         $files = glob(rtrim($path, '/') . '/*');
 
@@ -33,7 +33,26 @@ class File
 
         foreach ($files as $file) {
             if (is_dir($file) === true) {
-                $this->deleteDirectoryRecursively($file);
+                $this->deleteDirectoryContentRecursively($file);
+
+                continue;
+            }
+
+            unlink($file);
+        }
+    }
+
+    public function deleteDirectoryContentRecursively(string $path) : void
+    {
+        $files = glob(rtrim($path, '/') . '/*');
+
+        if ($files === false) {
+            throw new \RuntimeException('Could not get files in directory: ' . $path);
+        }
+
+        foreach ($files as $file) {
+            if (is_dir($file) === true) {
+                $this->deleteDirectoryContentRecursively($file);
 
                 continue;
             }

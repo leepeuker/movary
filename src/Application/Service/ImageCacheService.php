@@ -55,6 +55,6 @@ class ImageCacheService
 
     public function deleteImages() : void
     {
-        $this->fileUtil->deleteDirectoryRecursively(self::CACHE_DIR);
+        $this->fileUtil->deleteDirectoryContent(self::CACHE_DIR);
     }
 }
