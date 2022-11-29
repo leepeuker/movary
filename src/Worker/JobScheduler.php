@@ -7,6 +7,8 @@ use Movary\ValueObject\JobType;
 
 class JobScheduler
 {
+    private const IMAGE_CACHE_MOVIE_ID_BATCH_LIMIT = 200;
+
     public function __construct(
         private readonly Repository $repository,
         private array $scheduledMovieIdsForImageCacheJob = [],
@@ -19,9 +21,7 @@ class JobScheduler
             return;
         }
 
-        $movieIds = array_keys($this->scheduledMovieIdsForImageCacheJob);
-
-        $this->repository->addJob(JobType::createTmdbImageCache(), JobStatus::createWaiting(), parameters: ['movieIds' => $movieIds]);
+        $this->addTmdbImageCacheJob(array_keys($this->scheduledMovieIdsForImageCacheJob));
     }
 
     public function addImdbSyncJob(JobStatus $jobStatus) : void
@@ -37,6 +37,11 @@ class JobScheduler
     public function addLetterboxdImportRatingsJob(int $userId, string $importFile) : void
     {
         $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
+    }
+
+    public function addTmdbImageCacheJob(array $movieIds = []) : void
+    {
+        $this->repository->addJob(JobType::createTmdbImageCache(), JobStatus::createWaiting(), parameters: ['movieIds' => $movieIds]);
     }
 
     public function addTmdbSyncJob(JobStatus $jobStatus) : void
@@ -56,6 +61,11 @@ class JobScheduler
 
     public function storeMovieIdForTmdbImageCacheJob(int $movieId) : void
     {
+        if (count($this->scheduledMovieIdsForImageCacheJob) >= self::IMAGE_CACHE_MOVIE_ID_BATCH_LIMIT) {
+            $this->addTmdbImageCacheJob(array_keys($this->scheduledMovieIdsForImageCacheJob));
+            $this->scheduledMovieIdsForImageCacheJob = [];
+        }
+
         $this->scheduledMovieIdsForImageCacheJob[$movieId] = true;
     }
 }
