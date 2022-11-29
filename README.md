@@ -8,20 +8,20 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 
 **Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues)!**
 
-1. [About](#install-via-docker)
-2. [Install via docker](#install-via-docker)
-3. [Important: First steps](#important-first-steps)
+1. [About](#link-about)
+2. [Install via docker](#link-install-via-docker)
+3. [Important: First steps](#link-important-first-steps)
 4. [Features](#features)
-    1. [Tmdb Sync](#tmdb-sync)
-    2. [Tmdb Image Cache](#tmdb-image-cache)
-    3. [Plex Scrobbler](#plex-scrobbler)
-    4. [trakt.tv Import](#trakttv-import)
-    5. [trakt.tv Export](#trakttv-export)
-    6. [Letterboxd.com Import](#letterboxd-import)
-    7. [IMDb Rating Sync](#imdb-sync)
-5. [Development](#development)
+    1. [Tmdb Sync](#link-tmdb-sync)
+    2. [Tmdb Image Cache](#link-tmdb-image-cache)
+    3. [Plex Scrobbler](#link-plex-scrobbler)
+    4. [trakt.tv Import](#link-trakttv-import)
+    5. [trakt.tv Export](#link-trakttv-export)
+    6. [Letterboxd.com Import](#link-letterboxd-import)
+    7. [IMDb Rating Sync](#link-imdb-sync)
+5. [Development](#link-development)
 
-<a name="#about"></a>
+<a name="#link-about"></a>
 
 ## About
 
@@ -44,7 +44,7 @@ It has support for multiple users accounts if you want to share your instance wi
 **Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease, which can
 lead to breaking changes until then, so keep the release notes in mind when updating.
 
-<a name="#install-via-docker"></a>
+<a name="#link-install-via-docker"></a>
 
 ## Install via docker
 
@@ -103,7 +103,7 @@ volumes:
   movary-storage:
 ```
 
-<a name="#important-first-steps"></a>
+<a name="#link-important-first-steps"></a>
 
 ## Important: First steps
 
@@ -152,11 +152,11 @@ LOG_ENABLE_FILE_LOGGING=0
 More configuration can be done via the base image webdevops/php-nginx, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
 
-<a name="#features"></a>
+<a name="#link-features"></a>
 
 ## Features
 
-<a name="#tmdb-sync"></a>
+<a name="#link-tmdb-sync"></a>
 
 ### tmdb sync
 
@@ -174,7 +174,7 @@ Example:
 - `--threshold`
   Maximum number of movies to sync
 
-<a name="#tmdb-image"></a>
+<a name="#link-tmdb-image"></a>
 
 ### tmdb image cache
 
@@ -191,7 +191,7 @@ Helpful commands:
 - Refresh image cache: `php bin/console.php tmdb:imageCache:refresh`
 - Delete cached images: `php bin/console.php tmdb:imageCache:delete`
 
-<a name="#plex-scrobbler"></a>
+<a name="#link-plex-scrobbler"></a>
 
 ### Plex Scrobbler
 
@@ -203,7 +203,7 @@ Add the generated url as a [webhook to plex](https://support.plex.tv/articles/11
 
 As a default only your watches are tracked, but you can additionally enable the tracking of your movie ratings.
 
-<a name="#trakttv-import"></a>
+<a name="#link-trakttv-import"></a>
 
 ### Trakt.tv Import
 
@@ -230,13 +230,13 @@ Example cli import (import history and ratings for user with id 1):
 - `--ignore-cache`
   Use if you want to import everything from trakt regardless if there was a change since the last import.
 
-<a name="#trakttv-export"></a>
+<a name="#link-trakttv-export"></a>
 
 ### Trakt.tv Export
 
 Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
 
-<a name="#letterboxd-import"></a>
+<a name="#link-letterboxd-import"></a>
 
 ### Letterboxd.com Import
 
@@ -244,7 +244,7 @@ You can import your watch history and ratings from letterboxd.com.
 
 Visit the movary settings page `/settings/letterboxd` for more instructions
 
-<a name="#imdb-sync"></a>
+<a name="#link-imdb-sync"></a>
 
 ### IMDb Rating Sync
 
@@ -261,7 +261,7 @@ Example:
 - `--threshold`
   Maximum number of movie ratings to sync
 
-<a name="#development"></a>
+<a name="#link-development"></a>
 
 ## Development
 
