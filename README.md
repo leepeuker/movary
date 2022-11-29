@@ -101,8 +101,6 @@ volumes:
   movary-storage:
 ```
 
-<a name="#link-important-first-steps"></a>
-
 ## Important: First steps
 
 - Run database migrations, e.g.: `docker exec movary php bin/console.php database:migration:migrate`
