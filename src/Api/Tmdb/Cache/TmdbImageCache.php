@@ -2,6 +2,7 @@
 
 namespace Movary\Api\Tmdb\Cache;
 
+use Iterator;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Application\Service\ImageCacheService;
 use Movary\ValueObject\Job;
@@ -100,7 +101,28 @@ class TmdbImageCache
     {
         $cachedImages = 0;
 
-        $query = "SELECT id, tmdb_poster_path FROM $tableName";
+        foreach ($this->fetchImageData($tableName, $filerIds) as $imageDataBeforeUpdate) {
+            if ($this->cacheImageDataByTableName($imageDataBeforeUpdate, $tableName, $forceRefresh) === true) {
+                if ($imageDataBeforeUpdate['poster_path'] !== null) {
+                    $statement = $this->pdo->prepare("SELECT poster_path FROM $tableName WHERE id = ?");
+                    $statement->execute([$imageDataBeforeUpdate['id']]);
+
+                    $imageDataAfterUpdate = $statement->fetch();
+                    if ($imageDataAfterUpdate['poster_path'] !== $imageDataBeforeUpdate['poster_path']) {
+                        $this->imageCacheService->deleteImage($imageDataBeforeUpdate['poster_path']);
+                    }
+                }
+
+                $cachedImages++;
+            }
+        }
+
+        return $cachedImages;
+    }
+
+    private function fetchImageData(string $tableName, array $filerIds = []) : Iterator
+    {
+        $query = "SELECT id, poster_path, tmdb_poster_path FROM $tableName";
         if (count($filerIds) > 0) {
             $placeholders = str_repeat('?, ', count($filerIds));
             $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';
@@ -109,12 +131,6 @@ class TmdbImageCache
         $statement = $this->pdo->prepare($query);
         $statement->execute($filerIds);
 
-        foreach ($statement->getIterator() as $row) {
-            if ($this->cacheImageDataByTableName($row, $tableName, $forceRefresh) === true) {
-                $cachedImages++;
-            }
-        }
-
-        return $cachedImages;
+        return $statement->getIterator();
     }
 }
