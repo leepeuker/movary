@@ -22,6 +22,7 @@ class Service
         private readonly Letterboxd\ImportHistory $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,
         private readonly Api $userApi,
+        private readonly TmdbImageCache $tmdbImageCache,
     ) {
     }
 
@@ -75,7 +76,7 @@ class Service
         match (true) {
             $job->getType()->isOfTypeLetterboxdImportRankings() => $this->letterboxdImportRatings->executeJob($job),
             $job->getType()->isOfTypeLetterboxdImportHistory() => $this->letterboxdImportHistory->executeJob($job),
-            $job->getType()->isOfTypeTmdbImageCache() => true,
+            $job->getType()->isOfTypeTmdbImageCache() => $this->tmdbImageCache->executeJob($job),
             $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
             $job->getType()->isOfTypeTmdbSync() => $this->tmdbSyncMovies->syncMovies(),

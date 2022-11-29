@@ -4,6 +4,7 @@ namespace Movary\Api\Tmdb\Cache;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Application\Service\ImageCacheService;
+use Movary\ValueObject\Job;
 
 class TmdbImageCache
 {
@@ -12,6 +13,29 @@ class TmdbImageCache
         private readonly ImageCacheService $imageCacheService,
         private readonly TmdbUrlGenerator $tmdbUrlGenerator
     ) {
+    }
+
+    public function cacheAllImagesByMovieId(int $movieId, bool $forceRefresh = false) : void
+    {
+        $this->cacheImages('movie', $forceRefresh, [$movieId]);
+
+        $statement = $this->pdo->prepare(
+            "SELECT DISTINCT (id)
+            FROM (
+                SELECT id
+                FROM person
+                JOIN movie_cast cast on person.id = cast.person_id
+                WHERE cast.movie_id = ?
+                UNION
+                SELECT id
+                FROM person
+                JOIN movie_crew crew on person.id = crew.person_id
+                WHERE crew.movie_id = ?
+            ) personIdTable"
+        );
+        $statement->execute([$movieId, $movieId]);
+
+        $this->cacheImages('person', $forceRefresh, array_column($statement->fetchAll(), 'id'));
     }
 
     /**
@@ -33,36 +57,62 @@ class TmdbImageCache
     public function deleteCache() : void
     {
         $this->imageCacheService->deleteImages();
+        $this->pdo->prepare('UPDATE movie SET poster_path = null')->execute();
+        $this->pdo->prepare('UPDATE person SET poster_path = null')->execute();
+    }
+
+    public function executeJob(Job $job) : void
+    {
+        $movieIds = $job->getParameters()['movieIds'] ?? [];
+
+        foreach ($movieIds as $movieId) {
+            $this->cacheAllImagesByMovieId($movieId);
+        }
     }
 
     /**
-     * @return int Count of newly cached images
+     * @return bool True if image cache was re/generated, false otherwise
      */
-    private function cacheImages(string $tableName, bool $forceRefresh) : int
+    private function cacheImageDataByTableName(array $data, string $tableName, bool $forceRefresh = false) : bool
+    {
+        if ($data['tmdb_poster_path'] === null) {
+            return false;
+        }
+
+        $cachedImagePublicPath = $this->imageCacheService->cacheImage(
+            $this->tmdbUrlGenerator->generateImageUrl($data['tmdb_poster_path']),
+            $forceRefresh
+        );
+
+        if ($cachedImagePublicPath === null) {
+            return false;
+        }
+
+        $payload = [$cachedImagePublicPath, $data['id']];
+
+        return $this->pdo->prepare("UPDATE $tableName SET poster_path = ? WHERE id = ?")->execute($payload);
+    }
+
+    /**
+     * @return int Count of re/generated cached images
+     */
+    private function cacheImages(string $tableName, bool $forceRefresh, array $filerIds = []) : int
     {
         $cachedImages = 0;
 
-        $statement = $this->pdo->prepare("SELECT id, tmdb_poster_path FROM $tableName");
-        $statement->execute();
+        $query = "SELECT id, tmdb_poster_path FROM $tableName";
+        if (count($filerIds) > 0) {
+            $placeholders = str_repeat('?, ', count($filerIds));
+            $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';
+        }
+
+        $statement = $this->pdo->prepare($query);
+        $statement->execute($filerIds);
 
         foreach ($statement->getIterator() as $row) {
-            if ($row['tmdb_poster_path'] === null) {
-                continue;
+            if ($this->cacheImageDataByTableName($row, $tableName, $forceRefresh) === true) {
+                $cachedImages++;
             }
-
-            $cachedImagePublicPath = $this->imageCacheService->cacheImage(
-                $this->tmdbUrlGenerator->generateImageUrl($row['tmdb_poster_path']),
-                $forceRefresh
-            );
-
-            if ($cachedImagePublicPath === null) {
-                continue;
-            }
-
-            $payload = [$cachedImagePublicPath, $row['id']];
-            $this->pdo->prepare("UPDATE $tableName SET poster_path = ? WHERE id = ?")->execute($payload);
-
-            $cachedImages++;
         }
 
         return $cachedImages;
