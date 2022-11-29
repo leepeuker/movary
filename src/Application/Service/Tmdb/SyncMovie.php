@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb;
 use Movary\Application\Movie;
 use Movary\ValueObject\Date;
+use Movary\Worker\JobScheduler;
 
 class SyncMovie
 {
@@ -14,7 +15,8 @@ class SyncMovie
         private readonly Movie\Api $movieApi,
         private readonly GenreConverter $genreConverter,
         private readonly ProductionCompanyConverter $productionCompanyConverter,
-        private readonly Connection $dbConnection
+        private readonly Connection $dbConnection,
+        private readonly JobScheduler $jobScheduler,
     ) {
     }
 
@@ -40,7 +42,11 @@ class SyncMovie
                 tmdbPosterPath: $tmdbMovie->getPosterPath(),
                 imdbId: $tmdbMovie->getImdbId(),
             );
+
+            $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
         } else {
+            $originalPosterPath = $movie->getPosterPath();
+
             $movie = $this->movieApi->updateDetails(
                 movieId: $movie->getId(),
                 tagline: $tmdbMovie->getTagline(),
@@ -53,6 +59,10 @@ class SyncMovie
                 tmdbPosterPath: $tmdbMovie->getPosterPath(),
                 imdbId: $movie->getImdbId(),
             );
+
+            if ($originalPosterPath !== $movie->getPosterPath()) {
+                $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
+            }
         }
 
         $this->movieApi->updateGenres($movie->getId(), $this->genreConverter->getMovaryGenresFromTmdbMovie($tmdbMovie));

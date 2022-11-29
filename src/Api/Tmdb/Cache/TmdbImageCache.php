@@ -17,7 +17,7 @@ class TmdbImageCache
     /**
      * @return int Count of newly cached images
      */
-    public function cacheMovieImages(bool $forceRefresh = false) : int
+    public function cacheAllMovieImages(bool $forceRefresh = false) : int
     {
         return $this->cacheImages('movie', $forceRefresh);
     }
@@ -25,7 +25,7 @@ class TmdbImageCache
     /**
      * @return int Count of newly cached images
      */
-    public function cachePersonImages(bool $forceRefresh = false) : int
+    public function cacheAllPersonImages(bool $forceRefresh = false) : int
     {
         return $this->cacheImages('person', $forceRefresh);
     }

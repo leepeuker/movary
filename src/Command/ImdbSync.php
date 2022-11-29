@@ -4,7 +4,7 @@ namespace Movary\Command;
 
 use Movary\Application\Service\Imdb\SyncMovies;
 use Movary\ValueObject\JobStatus;
-use Movary\Worker\Service;
+use Movary\Worker\JobScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,7 +20,7 @@ class ImdbSync extends Command
 
     public function __construct(
         private readonly SyncMovies $syncMovieDetails,
-        private readonly Service $workerService,
+        private readonly JobScheduler $jobScheduler,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -47,7 +47,7 @@ class ImdbSync extends Command
 
             $this->syncMovieDetails->syncMovies($maxAgeInHours, $movieCountSyncThreshold);
 
-            $this->workerService->addImdbSyncJob(JobStatus::createDone());
+            $this->jobScheduler->addImdbSyncJob(JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing imdb movie ratings done.');
         } catch (\Throwable $t) {

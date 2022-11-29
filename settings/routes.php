@@ -49,16 +49,6 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/refresh-trakt',
-        [\Movary\HttpController\SyncTraktController::class, 'execute']
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/refresh-tmdb',
-        [\Movary\HttpController\SyncTmdbController::class, 'execute']
-    );
-    $routeCollector->addRoute(
-        'POST',
         '/login',
         [\Movary\HttpController\AuthenticationController::class, 'login']
     );

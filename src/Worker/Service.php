@@ -2,6 +2,7 @@
 
 namespace Movary\Worker;
 
+use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\Application\Service\Letterboxd;
 use Movary\Application\Service\Tmdb\SyncMovies;
 use Movary\Application\Service\Trakt;
@@ -22,36 +23,6 @@ class Service
         private readonly SyncMovies $tmdbSyncMovies,
         private readonly Api $userApi,
     ) {
-    }
-
-    public function addLetterboxdImportHistoryJob(int $userId, string $importFile) : void
-    {
-        $this->repository->addJob(JobType::createLetterboxdImportHistory(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
-    }
-
-    public function addLetterboxdImportRatingsJob(int $userId, string $importFile) : void
-    {
-        $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
-    }
-
-    public function addTmdbSyncJob(JobStatus $jobStatus) : void
-    {
-        $this->repository->addJob(JobType::createTmdbSync(), $jobStatus);
-    }
-
-    public function addImdbSyncJob(JobStatus $jobStatus) : void
-    {
-        $this->repository->addJob(JobType::createImdbSync(), $jobStatus);
-    }
-
-    public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : void
-    {
-        $this->repository->addJob(JobType::createTraktImportHistory(), $jobStatus ?? JobStatus::createWaiting(), $userId);
-    }
-
-    public function addTraktImportRatingsJob(int $userId, ?JobStatus $jobStatus = null) : void
-    {
-        $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
     public function fetchJobsForStatusPage(int $userId) : array
@@ -104,6 +75,7 @@ class Service
         match (true) {
             $job->getType()->isOfTypeLetterboxdImportRankings() => $this->letterboxdImportRatings->executeJob($job),
             $job->getType()->isOfTypeLetterboxdImportHistory() => $this->letterboxdImportHistory->executeJob($job),
+            $job->getType()->isOfTypeTmdbImageCache() => true,
             $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
             $job->getType()->isOfTypeTmdbSync() => $this->tmdbSyncMovies->syncMovies(),
