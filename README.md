@@ -27,11 +27,9 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 
 This is a web application to track and rate your watched movies (like a digital movie diary).
 
-It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (->
-no
-social media features).
+It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (-> no big social media features).
 
-It has support for multiple users accounts if you want to share it with friends.
+It has support for multiple users accounts if you want to share your instance with a few friends/family.
 
 **Features:**
 
