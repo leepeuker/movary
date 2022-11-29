@@ -17,8 +17,8 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
     3. [Plex Scrobbler](#plex-scrobbler)
     4. [trakt.tv Import](#trakttv-import)
     5. [trakt.tv Export](#trakttv-export)
-    6. [letterboxd.com Import](#letterboxd-import)
-    7. [IMBb Rating Sync](#imdb-sync)
+    6. [Letterboxd.com Import](#letterboxd-import)
+    7. [IMDb Rating Sync](#imdb-sync)
 5. [Development](#development)
 
 <a name="#about"></a>
