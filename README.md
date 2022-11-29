@@ -9,8 +9,8 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 **Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues)!**
 
 1. [About](#about)
-2. [Install via docker](#link-install-via-docker)
-3. [Important: First steps](#link-important-first-steps)
+2. [Install via docker](#install-via-docker)
+3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
     1. [Tmdb Sync](#link-tmdb-sync)
     2. [Tmdb Image Cache](#link-tmdb-image-cache)
