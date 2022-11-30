@@ -20,6 +20,7 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
     6. [Letterboxd.com Import](#letterboxdcom-import)
     7. [IMDb Rating Sync](#imdb-rating-sync)
 5. [Development](#development)
+6. [Support](#support)
 
 ## About
 
@@ -148,11 +149,7 @@ LOG_ENABLE_FILE_LOGGING=0
 More configuration can be done via the base image webdevops/php-nginx, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
 
-<a name="#link-features"></a>
-
 ## Features
-
-<a name="#link-tmdb-sync"></a>
 
 ### tmdb sync
 
@@ -170,8 +167,6 @@ Example:
 - `--threshold`
   Maximum number of movies to sync
 
-<a name="#link-tmdb-image"></a>
-
 ### tmdb image cache
 
 Enable by setting environment variable `TMDB_ENABLE_IMAGE_CACHING` to `1`.
@@ -187,8 +182,6 @@ Helpful commands:
 - Refresh image cache: `php bin/console.php tmdb:imageCache:refresh`
 - Delete cached images: `php bin/console.php tmdb:imageCache:delete`
 
-<a name="#link-plex-scrobbler"></a>
-
 ### Plex Scrobbler
 
 Automatically track movies watched in plex with movary.
@@ -198,8 +191,6 @@ You can generate your plex webhook url on the apps settings page (`/settings`).
 Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/).
 
 As a default only your watches are tracked, but you can additionally enable the tracking of your movie ratings.
-
-<a name="#link-trakttv-import"></a>
 
 ### Trakt.tv Import
 
@@ -226,13 +217,9 @@ Example cli import (import history and ratings for user with id 1):
 - `--ignore-cache`
   Use if you want to import everything from trakt regardless if there was a change since the last import.
 
-<a name="#link-trakttv-export"></a>
-
 ### Trakt.tv Export
 
 Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
-
-<a name="#link-letterboxd-import"></a>
 
 ### Letterboxd.com Import
 
@@ -257,8 +244,6 @@ Example:
 - `--threshold`
   Maximum number of movie ratings to sync
 
-<a name="#link-development"></a>
-
 ## Development
 
 ### Setup
@@ -275,3 +260,8 @@ The application should be up-to-date and running locally now.
 
 - Trakt API docs: https://trakt.docs.apiary.io/
 - TMDB API docs: https://developers.themoviedb.org/3
+
+## Support
+
+- Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
+- Ask questions or discuss movary related topics in the [official subreddit](https://github.com/leepeuker/movary/issues)
