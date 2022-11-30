@@ -104,12 +104,14 @@ volumes:
 
 ## Important: First steps
 
-- Run database migrations, e.g.: `docker exec movary php bin/console.php database:migration:migrate`
+You can run commands in docker via e.g. `docker exec movary php bin/console.php`
+
+- Run database migrations, e.g.: `php bin/console.php database:migration:migrate` (on initial installation and after every update)
 - Create initial user:
     - via web ui by visiting movary landingpage `/`
-    - via cli `docker exec movary php bin/console.php user:create email@example.com password username`
+    - via cli `php bin/console.php user:create email@example.com password username`
 
-List all available cli commands: `docker exec movary php bin/console.php`
+It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IMAGE_CACHING=1`).
 
 ##### Available environment variables with defaults:
 
@@ -130,14 +132,16 @@ DATABASE_DRIVER=pdo_mysql
 DATABASE_CHARSET=utf8
 
 ### TMDB 
-# https://www.themoviedb.org/settings/api
+# Used for metda data collection, see: https://www.themoviedb.org/settings/api
 TMDB_API_KEY= 
 # Save and deliver movie/person posters locally
 TMDB_ENABLE_IMAGE_CACHING=0
 
 ### Plex 
 # https://app.plex.tv/desktop/#!/settings/webhooks
+# Import new views watched via plex
 PLEX_ENABLE_SCROBBLE=1
+# Import new ratings set via plex
 PLEX_ENABLE_RATING=0
 
 ### Logging
@@ -158,7 +162,7 @@ Make sure you have added the variables `TMDB_API_KEY` to the environment.
 
 Example:
 
-`docker exec movary php bin/console.php tmdb:sync`
+`php bin/console.php tmdb:sync`
 
 **Flags:**
 
@@ -202,7 +206,7 @@ The import can be executed via the settings page `/settings/trakt` or via cli.
 
 Example cli import (import history and ratings for user with id 1):
 
-`docker exec movary php bin/console.php trakt:import --ratings --history --userId=1`
+`php bin/console.php trakt:import --ratings --history --userId=1`
 
 **Flags:**
 
@@ -235,7 +239,7 @@ Sync ratings from imdb.
 
 Example:
 
-`docker exec movary php bin/console.php imdb:sync`
+`php bin/console.php imdb:sync`
 
 **Flags:**
 
