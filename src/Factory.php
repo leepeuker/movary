@@ -8,6 +8,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
+use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Command;
@@ -248,7 +249,8 @@ class Factory
         }
 
         return new UrlGenerator(
-            $container->get(Tmdb\TmdbUrlGenerator::class),
+            $container->get(TmdbUrlGenerator::class),
+            $container->get(ImageCacheService::class),
             $enableImageCaching
         );
     }

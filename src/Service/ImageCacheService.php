@@ -64,4 +64,11 @@ class ImageCacheService
     {
         $this->fileUtil->deleteDirectoryContent($this->publicDirectory);
     }
+
+    public function posterPathExists(string $posterPath) : bool
+    {
+        $imageFile = $this->publicDirectory . trim($posterPath, '/');
+
+        return $this->fileUtil->fileExists($imageFile);
+    }
 }

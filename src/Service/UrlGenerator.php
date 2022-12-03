@@ -8,13 +8,14 @@ class UrlGenerator
 {
     public function __construct(
         private readonly TmdbUrlGenerator $tmdbUrlGenerator,
+        private readonly ImageCacheService $imageCacheService,
         private readonly bool $enableImageCaching,
     ) {
     }
 
     public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath) : string
     {
-        if ($this->enableImageCaching === true && empty($posterPath) === false) {
+        if ($this->enableImageCaching === true && empty($posterPath) === false && $this->imageCacheService->posterPathExists($posterPath) === true) {
             return '/' . trim($posterPath, '/');
         }
 
