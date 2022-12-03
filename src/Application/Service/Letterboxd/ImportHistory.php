@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 class ImportHistory
 {
     public function __construct(
-        private readonly Movie\Api $movieApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly WebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
         private readonly Tmdb\SyncMovie $tmdbMovieSync,
@@ -78,7 +78,7 @@ class ImportHistory
         $this->execute($userId, $job->getParameters()['importFile']);
     }
 
-    public function fetchMovieByLetterboxdUri(string $letterboxdUri) : Movie\Entity
+    public function fetchMovieByLetterboxdUri(string $letterboxdUri) : Movie\MovieEntity
     {
         $letterboxdId = basename($letterboxdUri);
         $movie = $this->movieApi->findByLetterboxdId($letterboxdId);

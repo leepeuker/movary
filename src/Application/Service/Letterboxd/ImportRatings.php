@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 class ImportRatings
 {
     public function __construct(
-        private readonly Movie\Api $movieApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly WebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
         private readonly ImportRatingsFileValidator $fileValidator,
@@ -69,7 +69,7 @@ class ImportRatings
         $this->execute($userId, $job->getParameters()['importFile']);
     }
 
-    public function findMovieByLetterboxdUri(string $letterboxdUri) : ?Movie\Entity
+    public function findMovieByLetterboxdUri(string $letterboxdUri) : ?Movie\MovieEntity
     {
         $letterboxdId = basename($letterboxdUri);
         $movie = $this->movieApi->findByLetterboxdId($letterboxdId);

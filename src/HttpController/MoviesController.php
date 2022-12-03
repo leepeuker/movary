@@ -14,7 +14,7 @@ class MoviesController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Movie\Api $movieApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly MoviesRequestMapper $moviesRequestMapper
     ) {

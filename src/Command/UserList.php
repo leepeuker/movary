@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User\Api;
+use Movary\Application\User\UserApi;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -11,7 +11,7 @@ class UserList extends Command
     protected static $defaultName = 'user:list';
 
     public function __construct(
-        private readonly Api $userApi,
+        private readonly UserApi $userApi,
     ) {
         parent::__construct();
     }

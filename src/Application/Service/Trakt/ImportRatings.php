@@ -12,10 +12,10 @@ use Movary\ValueObject\PersonalRating;
 class ImportRatings
 {
     public function __construct(
-        private readonly Application\Movie\Api $movieApi,
+        private readonly Application\Movie\MovieApi $movieApi,
         private readonly Api\Trakt\Api $traktApi,
         private readonly Api\Trakt\Cache\User\Movie\Rating\Service $traktApiCacheUserMovieRatingService,
-        private readonly Application\User\Api $userApi,
+        private readonly Application\User\UserApi $userApi,
     ) {
     }
 

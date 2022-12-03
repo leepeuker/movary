@@ -4,7 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Application\Movie;
 use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\User\Api;
+use Movary\Application\User\UserApi;
 use Movary\Application\User\Service\Authentication;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
@@ -21,9 +21,9 @@ class PlexController
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly Movie\Api $movieApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
-        private readonly Api $userApi,
+        private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,
         private readonly bool $plexEnableScrobbleWebhook,
         private readonly bool $plexEnableRatingWebhook,
@@ -110,7 +110,7 @@ class PlexController
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
 
-    private function logRating(array $webHook, Movie\Entity $movie, int $userId) : Response
+    private function logRating(array $webHook, Movie\MovieEntity $movie, int $userId) : Response
     {
         if ($this->plexEnableRatingWebhook === false) {
             return Response::create(StatusCode::createOk());
@@ -127,7 +127,7 @@ class PlexController
         return Response::create(StatusCode::createOk());
     }
 
-    private function logView(array $webHook, Movie\Entity $movie, int $userId) : Response
+    private function logView(array $webHook, Movie\MovieEntity $movie, int $userId) : Response
     {
         if ($this->plexEnableScrobbleWebhook === false) {
             return Response::create(StatusCode::createOk());

@@ -2,12 +2,12 @@
 
 namespace Movary\Application\User\Service;
 
-use Movary\Application\User\Api;
+use Movary\Application\User\UserApi;
 
 class UserPageAuthorizationChecker
 {
     public function __construct(
-        private readonly Api $userApi,
+        private readonly UserApi $userApi,
         private readonly Authentication $authenticationService
     ) {
     }

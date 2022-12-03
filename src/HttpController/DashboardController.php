@@ -3,8 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Application\Movie;
-use Movary\Application\Movie\History\Service\Select;
-use Movary\Application\User;
+use Movary\Application\Movie\History\MovieHistoryApi;
 use Movary\Application\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
@@ -16,8 +15,8 @@ class DashboardController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Select $movieHistorySelectService,
-        private readonly Movie\Api $movieApi,
+        private readonly MovieHistoryApi $movieHistoryApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
@@ -35,19 +34,19 @@ class DashboardController
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'totalPlayCount' => $this->movieApi->fetchHistoryCount($userId),
                 'uniqueMoviesCount' => $this->movieApi->fetchHistoryCountUnique($userId),
-                'totalHoursWatched' => $this->movieHistorySelectService->fetchTotalHoursWatched($userId),
-                'averagePersonalRating' => $this->movieHistorySelectService->fetchAveragePersonalRating($userId),
-                'averagePlaysPerDay' => $this->movieHistorySelectService->fetchAveragePlaysPerDay($userId),
-                'averageRuntime' => $this->movieHistorySelectService->fetchAverageRuntime($userId),
-                'firstDiaryEntry' => $this->movieHistorySelectService->fetchFirstHistoryWatchDate($userId),
-                'lastPlays' => $this->movieHistorySelectService->fetchLastPlays($userId),
-                'mostWatchedActors' => $this->movieHistorySelectService->fetchMostWatchedActors($userId, 1, 6, Gender::createMale()),
-                'mostWatchedActresses' => $this->movieHistorySelectService->fetchMostWatchedActors($userId, 1, 6, Gender::createFemale()),
-                'mostWatchedDirectors' => $this->movieHistorySelectService->fetchMostWatchedDirectors($userId, 1, 6),
-                'mostWatchedLanguages' => $this->movieHistorySelectService->fetchMostWatchedLanguages($userId),
-                'mostWatchedGenres' => $this->movieHistorySelectService->fetchMostWatchedGenres($userId),
-                'mostWatchedProductionCompanies' => $this->movieHistorySelectService->fetchMostWatchedProductionCompanies($userId, 12),
-                'mostWatchedReleaseYears' => $this->movieHistorySelectService->fetchMostWatchedReleaseYears($userId),
+                'totalHoursWatched' => $this->movieHistoryApi->fetchTotalHoursWatched($userId),
+                'averagePersonalRating' => $this->movieHistoryApi->fetchAveragePersonalRating($userId),
+                'averagePlaysPerDay' => $this->movieHistoryApi->fetchAveragePlaysPerDay($userId),
+                'averageRuntime' => $this->movieHistoryApi->fetchAverageRuntime($userId),
+                'firstDiaryEntry' => $this->movieHistoryApi->fetchFirstHistoryWatchDate($userId),
+                'lastPlays' => $this->movieHistoryApi->fetchLastPlays($userId),
+                'mostWatchedActors' => $this->movieHistoryApi->fetchMostWatchedActors($userId, 1, 6, Gender::createMale()),
+                'mostWatchedActresses' => $this->movieHistoryApi->fetchMostWatchedActors($userId, 1, 6, Gender::createFemale()),
+                'mostWatchedDirectors' => $this->movieHistoryApi->fetchMostWatchedDirectors($userId, 1, 6),
+                'mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($userId),
+                'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),
+                'mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12),
+                'mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId),
             ]),
         );
     }

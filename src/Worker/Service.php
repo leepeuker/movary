@@ -6,7 +6,7 @@ use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\Application\Service\Letterboxd;
 use Movary\Application\Service\Tmdb\SyncMovies;
 use Movary\Application\Service\Trakt;
-use Movary\Application\User\Api;
+use Movary\Application\User\UserApi;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\JobStatus;
@@ -21,7 +21,7 @@ class Service
         private readonly Letterboxd\ImportRatings $letterboxdImportRatings,
         private readonly Letterboxd\ImportHistory $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,
-        private readonly Api $userApi,
+        private readonly UserApi $userApi,
         private readonly TmdbImageCache $tmdbImageCache,
     ) {
     }

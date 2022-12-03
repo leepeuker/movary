@@ -3,17 +3,17 @@
 namespace Movary\Application;
 
 use League\Csv\Reader;
-use Movary\Application\Movie\Api;
+use Movary\Application\Movie\MovieApi;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\PersonalRating;
 
 class ImportService
 {
-    public function __construct(private readonly Api $movieApi)
+    public function __construct(private readonly MovieApi $movieApi)
     {
     }
 
-    public function findOrCreateMovie(int $tmdbId, string $title, ?string $imdbId) : Movie\Entity
+    public function findOrCreateMovie(int $tmdbId, string $title, ?string $imdbId) : Movie\MovieEntity
     {
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 

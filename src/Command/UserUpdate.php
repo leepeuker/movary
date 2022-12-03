@@ -18,7 +18,7 @@ class UserUpdate extends Command
     protected static $defaultName = 'user:update';
 
     public function __construct(
-        private readonly User\Api $userApi,
+        private readonly User\UserApi $userApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();

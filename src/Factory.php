@@ -144,9 +144,9 @@ class Factory
 
         return new PlexController(
             $container->get(LoggerInterface::class),
-            $container->get(Movie\Api::class),
+            $container->get(Movie\MovieApi::class),
             $container->get(SyncMovie::class),
-            $container->get(User\Api::class),
+            $container->get(User\UserApi::class),
             $container->get(Authentication::class),
             $plexEnableScrobbleWebhook,
             $plexEnableRatingWebhook,
@@ -165,8 +165,8 @@ class Factory
             $container->get(Twig\Environment::class),
             $container->get(Service::class),
             $container->get(Authentication::class),
-            $container->get(User\Api::class),
-            $container->get(Movie\Api::class),
+            $container->get(User\UserApi::class),
+            $container->get(Movie\MovieApi::class),
             $applicationVersion
         );
     }
@@ -204,8 +204,8 @@ class Factory
         if ($userAuthenticated === true) {
             $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
 
-            /** @var User\Entity $user */
-            $user = $container->get(User\Api::class)->fetchUser($currentUserId);
+            /** @var User\UserEntity $user */
+            $user = $container->get(User\UserApi::class)->fetchUser($currentUserId);
 
             $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());

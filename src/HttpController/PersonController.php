@@ -14,8 +14,8 @@ use Twig\Environment;
 class PersonController
 {
     public function __construct(
-        private readonly Person\Api $personApi,
-        private readonly Movie\Api $movieApi,
+        private readonly Person\PersonApi $personApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly UrlGenerator $urlGenerator,

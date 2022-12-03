@@ -11,7 +11,7 @@ class SyncMovies
 {
     public function __construct(
         private readonly SyncMovie $syncMovieService,
-        private readonly Movie\Api $movieApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly DBAL\Connection $dbConnection,
         private readonly LoggerInterface $logger,
     ) {

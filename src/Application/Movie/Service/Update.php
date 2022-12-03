@@ -7,9 +7,12 @@ use Movary\Api\Tmdb\Dto\Crew;
 use Movary\Api\Trakt\ValueObject\Movie\TraktId;
 use Movary\Application\Company;
 use Movary\Application\Genre;
-use Movary\Application\Movie;
-use Movary\Application\Movie\Entity;
-use Movary\Application\Movie\Repository;
+use Movary\Application\Movie\Cast\CastApi;
+use Movary\Application\Movie\Crew\CrewApi;
+use Movary\Application\Movie\Genre\MovieGenreApi;
+use Movary\Application\Movie\MovieEntity;
+use Movary\Application\Movie\MovieRepository;
+use Movary\Application\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Application\Person;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
@@ -18,16 +21,12 @@ use Movary\ValueObject\PersonalRating;
 class Update
 {
     public function __construct(
-        private readonly Repository $repository,
-        private readonly Movie\Genre\Service\Create $movieGenreCreateService,
-        private readonly Movie\Genre\Service\Delete $movieGenreDeleteService,
-        private readonly Movie\ProductionCompany\Service\Create $movieProductionCompanyCreateService,
-        private readonly Movie\ProductionCompany\Service\Delete $movieProductionCompanyDeleteService,
-        private readonly Person\Api $personApi,
-        private readonly Movie\Cast\Service\Create $movieCastCreateService,
-        private readonly Movie\Cast\Service\Delete $movieCasteDeleteService,
-        private readonly Movie\Crew\Service\Create $movieCrewCreateService,
-        private readonly Movie\Crew\Service\Delete $movieCrewDeleteService,
+        private readonly MovieRepository $repository,
+        private readonly MovieGenreApi $movieGenreApi,
+        private readonly ProductionCompanyApi $movieProductionCompanyApi,
+        private readonly Person\PersonApi $personApi,
+        private readonly CastApi $castApi,
+        private readonly CrewApi $crewApi,
     ) {
     }
 
@@ -38,7 +37,7 @@ class Update
 
     public function updateCast(int $movieId, Cast $tmdbCast) : void
     {
-        $this->movieCasteDeleteService->deleteByMovieId($movieId);
+        $this->castApi->deleteByMovieId($movieId);
 
         foreach ($tmdbCast as $position => $castMember) {
             $person = $this->createOrUpdatePersonByTmdbId(
@@ -49,13 +48,13 @@ class Update
                 $castMember->getPerson()->getPosterPath(),
             );
 
-            $this->movieCastCreateService->create($movieId, $person->getId(), $castMember->getCharacter(), $position);
+            $this->castApi->create($movieId, $person->getId(), $castMember->getCharacter(), $position);
         }
     }
 
     public function updateCrew(int $movieId, Crew $tmdbCrew) : void
     {
-        $this->movieCrewDeleteService->deleteByMovieId($movieId);
+        $this->movieProductionCompanyApi->deleteByMovieId($movieId);
 
         foreach ($tmdbCrew as $position => $crewMember) {
             $person = $this->createOrUpdatePersonByTmdbId(
@@ -66,7 +65,7 @@ class Update
                 $crewMember->getPerson()->getPosterPath(),
             );
 
-            $this->movieCrewCreateService->create($movieId, $person->getId(), $crewMember->getJob(), $crewMember->getDepartment(), $position);
+            $this->crewApi->create($movieId, $person->getId(), $crewMember->getJob(), $crewMember->getDepartment(), $position);
         }
     }
 
@@ -81,16 +80,16 @@ class Update
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
         ?string $imdbId,
-    ) : Entity {
+    ) : MovieEntity {
         return $this->repository->updateDetails($id, $tagline, $overview, $originalLanguage, $releaseDate, $runtime, $tmdbVoteAverage, $tmdbVoteCount, $tmdbPosterPath, $imdbId);
     }
 
-    public function updateGenres(int $movieId, Genre\EntityList $genres) : void
+    public function updateGenres(int $movieId, Genre\GenreEntityList $genres) : void
     {
-        $this->movieGenreDeleteService->deleteByMovieId($movieId);
+        $this->movieGenreApi->deleteByMovieId($movieId);
 
         foreach ($genres as $position => $genre) {
-            $this->movieGenreCreateService->create($movieId, $genre->getId(), (int)$position);
+            $this->movieGenreApi->create($movieId, $genre->getId(), (int)$position);
         }
     }
 
@@ -104,12 +103,12 @@ class Update
         $this->repository->updateLetterboxdId($movieId, $letterboxdId);
     }
 
-    public function updateProductionCompanies(int $movieId, Company\EntityList $genres) : void
+    public function updateProductionCompanies(int $movieId, Company\CompanyEntityList $genres) : void
     {
-        $this->movieProductionCompanyDeleteService->deleteByMovieId($movieId);
+        $this->movieProductionCompanyApi->deleteByMovieId($movieId);
 
         foreach ($genres as $position => $genre) {
-            $this->movieProductionCompanyCreateService->create($movieId, $genre->getId(), (int)$position);
+            $this->movieProductionCompanyApi->create($movieId, $genre->getId(), (int)$position);
         }
     }
 
@@ -118,22 +117,24 @@ class Update
         $this->repository->updateTraktId($movieId, $traktId);
     }
 
-    private function createOrUpdatePersonByTmdbId(int $tmdbId, string $name, Gender $gender, ?string $knownForDepartment, ?string $posterPath) : Person\Entity
+    private function createOrUpdatePersonByTmdbId(int $tmdbId, string $name, Gender $gender, ?string $knownForDepartment, ?string $posterPath) : Person\PersonEntity
     {
         $person = $this->personApi->findByTmdbId($tmdbId);
 
         if ($person === null) {
-            $person = $this->personApi->create(
+            return $this->personApi->create(
                 $name,
                 $gender,
                 $knownForDepartment,
                 $tmdbId,
                 $posterPath,
             );
-        } elseif ($person->getName() !== $name ||
-                  $person->getGender() !== $gender ||
-                  $person->getKnownForDepartment() !== $knownForDepartment ||
-                  $person->getTmdbPosterPath() !== $posterPath
+        }
+
+        if ($person->getName() !== $name ||
+            $person->getGender() !== $gender ||
+            $person->getKnownForDepartment() !== $knownForDepartment ||
+            $person->getTmdbPosterPath() !== $posterPath
         ) {
             $this->personApi->update($person->getId(), $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
         }

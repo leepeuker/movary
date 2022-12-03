@@ -12,7 +12,7 @@ class SyncMovie
 {
     public function __construct(
         private readonly Tmdb\Api $tmdbApi,
-        private readonly Movie\Api $movieApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly GenreConverter $genreConverter,
         private readonly ProductionCompanyConverter $productionCompanyConverter,
         private readonly Connection $dbConnection,
@@ -20,7 +20,7 @@ class SyncMovie
     ) {
     }
 
-    public function syncMovie(int $tmdbId) : Movie\Entity
+    public function syncMovie(int $tmdbId) : Movie\MovieEntity
     {
         $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);
 

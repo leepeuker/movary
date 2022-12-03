@@ -10,7 +10,7 @@ class SyncMovies
 {
     public function __construct(
         private readonly WebScrapper $imdbWebScrapper,
-        private readonly Movie\Api $movieApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly LoggerInterface $logger,
     ) {
     }

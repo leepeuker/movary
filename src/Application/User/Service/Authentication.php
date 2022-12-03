@@ -2,11 +2,11 @@
 
 namespace Movary\Application\User\Service;
 
-use Movary\Application\User\Api;
-use Movary\Application\User\Entity;
+use Movary\Application\User\UserApi;
+use Movary\Application\User\UserEntity;
 use Movary\Application\User\Exception\EmailNotFound;
 use Movary\Application\User\Exception\InvalidPassword;
-use Movary\Application\User\Repository;
+use Movary\Application\User\UserRepository;
 use Movary\ValueObject\DateTime;
 
 class Authentication
@@ -15,7 +15,7 @@ class Authentication
 
     private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
-    public function __construct(private readonly Repository $repository, private readonly Api $userApi)
+    public function __construct(private readonly UserRepository $repository, private readonly UserApi $userApi)
     {
     }
 
@@ -24,7 +24,7 @@ class Authentication
         $this->repository->deleteAuthToken($token);
     }
 
-    public function getCurrentUser() : Entity
+    public function getCurrentUser() : UserEntity
     {
         return $this->userApi->fetchUser($this->getCurrentUserId());
     }

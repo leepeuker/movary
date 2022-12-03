@@ -14,13 +14,13 @@ use Psr\Log\LoggerInterface;
 class ImportWatchedMovies
 {
     public function __construct(
-        private readonly Application\Movie\Api $movieApi,
+        private readonly Application\Movie\MovieApi $movieApi,
         private readonly Api\Trakt\Api $traktApi,
         private readonly Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService,
         private readonly LoggerInterface $logger,
         private readonly PlaysPerDateFetcher $playsPerDateFetcher,
         private readonly Application\Service\Tmdb\SyncMovie $tmdbMovieSync,
-        private readonly Application\User\Api $userApi
+        private readonly Application\User\UserApi $userApi
     ) {
     }
 
@@ -75,7 +75,7 @@ class ImportWatchedMovies
         $this->execute($userId);
     }
 
-    private function findOrCreateMovieLocally(Api\Trakt\ValueObject\Movie\Dto $watchedMovie) : Application\Movie\Entity
+    private function findOrCreateMovieLocally(Api\Trakt\ValueObject\Movie\Dto $watchedMovie) : Application\Movie\MovieEntity
     {
         $traktId = $watchedMovie->getTraktId();
         $tmdbId = $watchedMovie->getTmdbId();
@@ -107,7 +107,7 @@ class ImportWatchedMovies
         string $traktUserName,
         int $userId,
         TraktId $traktId,
-        Application\Movie\Entity $movie,
+        Application\Movie\MovieEntity $movie,
         bool $overwriteExistingData
     ) : void {
         $traktHistoryEntries = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktClientId, $traktUserName, $traktId);

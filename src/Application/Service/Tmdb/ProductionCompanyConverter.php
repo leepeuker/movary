@@ -4,19 +4,19 @@ namespace Movary\Application\Service\Tmdb;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Movary\Api\Tmdb;
-use Movary\Application\Company\Api;
-use Movary\Application\Company\Entity;
-use Movary\Application\Company\EntityList;
+use Movary\Application\Company\CompanyApi;
+use Movary\Application\Company\CompanyEntity;
+use Movary\Application\Company\CompanyEntityList;
 
 class ProductionCompanyConverter
 {
-    public function __construct(private readonly Api $companyApi, private readonly Tmdb\Api $tmdbApi)
+    public function __construct(private readonly CompanyApi $companyApi, private readonly Tmdb\Api $tmdbApi)
     {
     }
 
-    public function getMovaryProductionCompaniesFromTmdbMovie(Tmdb\Dto\Movie $movieDetails) : EntityList
+    public function getMovaryProductionCompaniesFromTmdbMovie(Tmdb\Dto\Movie $movieDetails) : CompanyEntityList
     {
-        $productionCompanies = EntityList::create();
+        $productionCompanies = CompanyEntityList::create();
 
         foreach ($movieDetails->getProductionCompanies() as $tmdbCompany) {
             $company = $this->companyApi->findByTmdbId($tmdbCompany->getId());
@@ -31,7 +31,7 @@ class ProductionCompanyConverter
         return $productionCompanies;
     }
 
-    private function createMissingCompany(Tmdb\Dto\ProductionCompany $tmdbCompany) : Entity
+    private function createMissingCompany(Tmdb\Dto\ProductionCompany $tmdbCompany) : CompanyEntity
     {
         try {
             return $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
@@ -48,7 +48,7 @@ class ProductionCompanyConverter
         return $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
     }
 
-    private function fixUniqueConstraintViolation(Entity $companyCausingConstraintViolation) : void
+    private function fixUniqueConstraintViolation(CompanyEntity $companyCausingConstraintViolation) : void
     {
         try {
             // The unique constraint violation indicates that the local company is no longer matching the remote tmdb company

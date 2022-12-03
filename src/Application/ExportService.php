@@ -2,12 +2,12 @@
 
 namespace Movary\Application;
 
-use Movary\Application\Movie\Api;
+use Movary\Application\Movie\MovieApi;
 use Movary\ValueObject\DateTime;
 
 class ExportService
 {
-    public function __construct(private readonly Api $movieApi)
+    public function __construct(private readonly MovieApi $movieApi)
     {
     }
 

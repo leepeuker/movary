@@ -19,8 +19,8 @@ class SettingsController
         private readonly Environment $twig,
         private readonly Service $workerService,
         private readonly Authentication $authenticationService,
-        private readonly User\Api $userApi,
-        private readonly Movie\Api $movieApi,
+        private readonly User\UserApi $userApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly ?string $applicationVersion = null,
     ) {
     }

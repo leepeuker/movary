@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User\Api;
+use Movary\Application\User\UserApi;
 use Movary\Application\User\Exception\EmailNotUnique;
 use Movary\Application\User\Exception\PasswordTooShort;
 use Movary\Application\User\Exception\UsernameInvalidFormat;
@@ -17,7 +17,7 @@ class UserCreate extends Command
     protected static $defaultName = 'user:create';
 
     public function __construct(
-        private readonly Api $userApi,
+        private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();

@@ -2,7 +2,7 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\User\Api;
+use Movary\Application\User\UserApi;
 use Movary\Application\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -13,7 +13,7 @@ class LandingPageController
     public function __construct(
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
-        private readonly Api $userApi
+        private readonly UserApi $userApi
     ) {
     }
 

@@ -2,10 +2,10 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\User\Api;
 use Movary\Application\User\Exception\PasswordTooShort;
 use Movary\Application\User\Exception\UsernameInvalidFormat;
 use Movary\Application\User\Service\Authentication;
+use Movary\Application\User\UserApi;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -15,7 +15,7 @@ class CreateUserController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly Api $userApi
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -38,7 +38,7 @@ class CreateUserController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
@@ -48,7 +48,7 @@ class CreateUserController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
@@ -67,7 +67,7 @@ class CreateUserController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 }

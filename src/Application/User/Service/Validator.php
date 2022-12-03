@@ -6,13 +6,13 @@ use Movary\Application\User\Exception\EmailNotUnique;
 use Movary\Application\User\Exception\PasswordTooShort;
 use Movary\Application\User\Exception\UsernameInvalidFormat;
 use Movary\Application\User\Exception\UsernameNotUnique;
-use Movary\Application\User\Repository;
+use Movary\Application\User\UserRepository;
 
 class Validator
 {
     private const PASSWORD_MIN_LENGTH = 8;
 
-    public function __construct(private readonly Repository $repository)
+    public function __construct(private readonly UserRepository $repository)
     {
     }
 
