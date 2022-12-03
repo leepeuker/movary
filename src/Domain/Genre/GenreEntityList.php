@@ -2,7 +2,7 @@
 
 namespace Movary\Domain\Genre;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @method GenreEntity[] getIterator()

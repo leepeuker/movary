@@ -7,7 +7,7 @@ use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\ValueObject\Date;
-use Movary\Worker\JobScheduler;
+use Movary\JobQueue\JobQueueScheduler;
 
 class SyncMovie
 {
@@ -17,7 +17,7 @@ class SyncMovie
         private readonly GenreConverter $genreConverter,
         private readonly ProductionCompanyConverter $productionCompanyConverter,
         private readonly Connection $dbConnection,
-        private readonly JobScheduler $jobScheduler,
+        private readonly JobQueueScheduler $jobScheduler,
     ) {
     }
 

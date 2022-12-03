@@ -2,7 +2,7 @@
 
 namespace Movary\Domain\Movie\History;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @method MovieHistoryEntity[] getIterator()

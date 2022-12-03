@@ -3,22 +3,20 @@
 namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\ImportHistoryFileValidator;
 use Movary\Service\Letterboxd\ImportRatingsFileValidator;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\Worker\JobScheduler;
-use Movary\Worker\Service;
 use Twig\Environment;
 
 class JobController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly Service $workerService,
-        private readonly JobScheduler $jobScheduler,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly ImportHistoryFileValidator $letterboxdImportHistoryFileValidator,
         private readonly ImportRatingsFileValidator $letterboxdImportRatingsFileValidator,
         private readonly Environment $twig,
@@ -31,13 +29,13 @@ class JobController
             return Response::createFoundRedirect('/');
         }
 
-        $jobs = $this->workerService->fetchJobsForStatusPage($this->authenticationService->getCurrentUserId());
+        $jobs = $this->jobQueueApi->fetchJobsForStatusPage($this->authenticationService->getCurrentUserId());
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render(
                 'page/job-queue.html.twig',
-                ['jobs' => $jobs]
+                ['jobs' => $jobs],
             ),
         );
     }
@@ -65,18 +63,18 @@ class JobController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
-        $this->jobScheduler->addLetterboxdImportHistoryJob($userId, $targetFile);
+        $this->jobQueueApi->addLetterboxdImportHistoryJob($userId, $targetFile);
 
         $_SESSION['letterboxdHistorySyncSuccessful'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -94,7 +92,7 @@ class JobController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
@@ -109,18 +107,18 @@ class JobController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
-        $this->jobScheduler->addLetterboxdImportRatingsJob($userId, $targetFile);
+        $this->jobQueueApi->addLetterboxdImportRatingsJob($userId, $targetFile);
 
         $_SESSION['letterboxdRatingsSyncSuccessful'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -130,14 +128,14 @@ class JobController
             return Response::createFoundRedirect('/');
         }
 
-        $this->jobScheduler->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
+        $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
         $_SESSION['scheduledTraktHistoryImport'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -147,14 +145,14 @@ class JobController
             return Response::createFoundRedirect('/');
         }
 
-        $this->jobScheduler->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
+        $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
         $_SESSION['scheduledTraktRatingsImport'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 }

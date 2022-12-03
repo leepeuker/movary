@@ -555,8 +555,8 @@ class MovieRepository
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
-            JOIN movie_genre mg on m.id = mg.movie_id
-            JOIN genre g on mg.genre_id = g.id
+            LEFT JOIN movie_genre mg on m.id = mg.movie_id
+            LEFT JOIN genre g on mg.genre_id = g.id
             $whereQuery
             GROUP BY m.id, title, release_date, rating
             ORDER BY $sortBySanitized $sortOrder, title asc

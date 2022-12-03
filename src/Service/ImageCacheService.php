@@ -10,16 +10,15 @@ use Psr\Log\LoggerInterface;
 
 class ImageCacheService
 {
-    private const CACHE_DIR = __DIR__ . '/../../../public/images/cached/';
-
     private const CACHE_DIR_PERMISSIONS = 0755;
 
     public function __construct(
         private readonly File $fileUtil,
         private readonly LoggerInterface $logger,
-        private readonly ClientInterface $httpClient
+        private readonly ClientInterface $httpClient,
+        private readonly string $cacheDirectory,
     ) {
-        $this->fileUtil->createDirectory(self::CACHE_DIR, self::CACHE_DIR_PERMISSIONS);
+        $this->fileUtil->createDirectory($this->cacheDirectory, self::CACHE_DIR_PERMISSIONS);
     }
 
     /**
@@ -27,7 +26,7 @@ class ImageCacheService
      */
     public function cacheImage(Url $imageUrl, bool $forceRefresh = false) : ?string
     {
-        $imageFile = self::CACHE_DIR . trim((string)$imageUrl->getPath(), '/');
+        $imageFile = $this->cacheDirectory . trim((string)$imageUrl->getPath(), '/');
 
         if ($forceRefresh === false && $this->fileUtil->fileExists($imageFile) === true) {
             return null;
@@ -62,6 +61,6 @@ class ImageCacheService
 
     public function deleteImages() : void
     {
-        $this->fileUtil->deleteDirectoryContent(self::CACHE_DIR);
+        $this->fileUtil->deleteDirectoryContent($this->cacheDirectory);
     }
 }

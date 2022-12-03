@@ -2,7 +2,7 @@
 
 namespace Movary\Service\Trakt;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 use Movary\ValueObject\Date;
 
 /**

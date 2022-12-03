@@ -11,14 +11,14 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\Worker\Service;
+use Movary\JobQueue\JobQueueApi;
 use Twig\Environment;
 
 class SettingsController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Service $workerService,
+        private readonly JobQueueApi $workerService,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,

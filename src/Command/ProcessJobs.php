@@ -2,9 +2,9 @@
 
 namespace Movary\Command;
 
+use Movary\JobQueue;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
-use Movary\Worker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,10 +17,10 @@ class ProcessJobs extends Command
     protected static $defaultName = 'jobs:process';
 
     public function __construct(
-        private readonly Worker\Repository $repository,
-        private readonly Worker\Service $workerService,
+        private readonly JobQueue\JobQueueApi $jobApi,
+        private readonly JobQueue\JobProcessor $jobProcessor,
         private readonly LoggerInterface $logger,
-        private readonly ?int $minRuntimeInSeconds = null
+        private readonly ?int $minRuntimeInSeconds = null,
     ) {
         parent::__construct();
     }
@@ -70,20 +70,20 @@ class ProcessJobs extends Command
 
     private function processJob() : ?JobType
     {
-        $job = $this->repository->fetchOldestWaitingJob();
+        $job = $this->jobApi->fetchOldestWaitingJob();
 
         if ($job === null) {
             return null;
         }
 
         try {
-            $this->workerService->setJobToInProgress($job->getId());
+            $this->jobApi->setJobToInProgress($job->getId());
 
-            $this->workerService->processJob($job);
+            $this->jobProcessor->processJob($job);
 
-            $this->repository->updateJobStatus($job->getId(), JobStatus::createDone());
+            $this->jobApi->updateJobStatus($job->getId(), JobStatus::createDone());
         } catch (\Exception $e) {
-            $this->repository->updateJobStatus($job->getId(), JobStatus::createFailed());
+            $this->jobApi->updateJobStatus($job->getId(), JobStatus::createFailed());
 
             throw $e;
         }

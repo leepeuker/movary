@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Worker;
+namespace Movary\JobQueue;
 
 use Doctrine\DBAL\Connection;
 use Movary\Util\Json;
@@ -10,7 +10,7 @@ use Movary\ValueObject\JobList;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 
-class Repository
+class JobQueueRepository
 {
     public function __construct(private readonly Connection $dbConnection)
     {

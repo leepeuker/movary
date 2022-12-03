@@ -2,7 +2,7 @@
 
 namespace Movary\Api\Tmdb\Dto;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @method TmdbCastMember[] getIterator()

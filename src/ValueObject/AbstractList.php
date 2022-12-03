@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary;
+namespace Movary\ValueObject;
 
 /**
  * @template TValue
@@ -27,7 +27,7 @@ abstract class AbstractList implements \Countable, \IteratorAggregate, \JsonSeri
 
     public function count() : int
     {
-        return count($this->data);
+        return \count($this->data);
     }
 
     public function getIterator() : \ArrayIterator

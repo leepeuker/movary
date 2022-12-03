@@ -2,7 +2,7 @@
 
 namespace Movary\Domain\Movie\Crew;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @method CrewEntity[] getIterator()

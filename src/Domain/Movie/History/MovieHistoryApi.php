@@ -200,6 +200,10 @@ class MovieHistoryApi
         $uniqueLanguages = [];
 
         foreach ($this->movieRepository->fetchUniqueMovieLanguages($userId) as $index => $item) {
+            if (empty($item) === true) {
+                continue;
+            }
+
             $uniqueLanguages[$index]['name'] = $this->tmdbApi->getLanguageByCode($item);
             $uniqueLanguages[$index]['code'] = $item;
         }

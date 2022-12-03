@@ -2,7 +2,7 @@
 
 namespace Movary\Domain\Movie\ProductionCompany;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @method ProductionCompanyEntity[] getIterator()

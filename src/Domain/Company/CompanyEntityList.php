@@ -2,7 +2,7 @@
 
 namespace Movary\Domain\Company;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @method CompanyEntity[] getIterator()

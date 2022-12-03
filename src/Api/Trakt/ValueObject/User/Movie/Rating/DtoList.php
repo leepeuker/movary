@@ -2,7 +2,7 @@
 
 namespace Movary\Api\Trakt\ValueObject\User\Movie\Rating;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @psalm-suppress ImplementedReturnTypeMismatch

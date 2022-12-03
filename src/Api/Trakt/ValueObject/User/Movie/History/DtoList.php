@@ -2,7 +2,7 @@
 
 namespace Movary\Api\Trakt\ValueObject\User\Movie\History;
 
-use Movary\AbstractList;
+use Movary\ValueObject\AbstractList;
 
 /**
  * @method Dto[] getIterator()

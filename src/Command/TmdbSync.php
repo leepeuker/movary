@@ -2,9 +2,9 @@
 
 namespace Movary\Command;
 
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\ValueObject\JobStatus;
-use Movary\Worker\JobScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,7 +20,7 @@ class TmdbSync extends Command
 
     public function __construct(
         private readonly SyncMovies $syncMovieDetails,
-        private readonly JobScheduler $jobScheduler,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -47,7 +47,7 @@ class TmdbSync extends Command
 
             $this->syncMovieDetails->syncMovies($maxAgeInHours, $movieCountSyncThreshold);
 
-            $this->jobScheduler->addTmdbSyncJob(JobStatus::createDone());
+            $this->jobQueueApi->addTmdbSyncJob(JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing movie meta data done.');
         } catch (\Throwable $t) {

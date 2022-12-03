@@ -2,8 +2,6 @@
 
 namespace Movary\ValueObject;
 
-use Movary\AbstractList;
-
 /**
  * @method Job[] getIterator()
  * @psalm-suppress ImplementedReturnTypeMismatch

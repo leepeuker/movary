@@ -10,18 +10,20 @@ use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
+use Movary\Command;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Command;
 use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
+use Movary\JobQueue\JobQueueApi;
+use Movary\Service\ImageCacheService;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\UrlGenerator;
+use Movary\Util\File;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
-use Movary\Worker\Service;
 use PDO;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
@@ -79,13 +81,23 @@ class Factory
                 'password' => $config->getAsString('DATABASE_PASSWORD'),
                 'host' => $config->getAsString('DATABASE_HOST'),
                 'driver' => $config->getAsString('DATABASE_DRIVER'),
-            ]
+            ],
         );
     }
 
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client();
+    }
+
+    public static function createImageCacheService(ContainerInterface $container) : ImageCacheService
+    {
+        return new ImageCacheService(
+            $container->get(File::class),
+            $container->get(LoggerInterface::class),
+            $container->get(ClientInterface::class),
+            __DIR__ . '/../public/images/cached/'
+        );
     }
 
     public static function createLineFormatter(Config $config) : LineFormatter
@@ -163,7 +175,7 @@ class Factory
 
         return new SettingsController(
             $container->get(Twig\Environment::class),
-            $container->get(Service::class),
+            $container->get(JobQueueApi::class),
             $container->get(Authentication::class),
             $container->get(User\UserApi::class),
             $container->get(Movie\MovieApi::class),
@@ -267,8 +279,8 @@ class Factory
         }
 
         return new Command\ProcessJobs(
-            $container->get(Worker\Repository::class),
-            $container->get(Worker\Service::class),
+            $container->get(JobQueue\JobQueueApi::class),
+            $container->get(JobQueue\JobProcessor::class),
             $container->get(LoggerInterface::class),
             $minRuntimeInSeconds,
         );

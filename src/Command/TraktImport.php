@@ -2,12 +2,12 @@
 
 namespace Movary\Command;
 
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\Service\Trakt\ImportRatings;
 use Movary\Service\Trakt\ImportWatchedMovies;
 use Movary\ValueObject\JobStatus;
-use Movary\Worker\JobScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,7 +30,7 @@ class TraktImport extends Command
     public function __construct(
         private readonly ImportRatings $importRatings,
         private readonly ImportWatchedMovies $importWatchedMovies,
-        private readonly JobScheduler $jobScheduler,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -96,7 +96,7 @@ class TraktImport extends Command
 
         $this->importWatchedMovies->execute($userId, $overwriteExistingData, $ignoreCache);
 
-        $this->jobScheduler->addTraktImportHistoryJob($userId, JobStatus::createDone());
+        $this->jobQueueApi->addTraktImportHistoryJob($userId, JobStatus::createDone());
 
         $this->generateOutput($output, 'Importing history done.');
     }
@@ -107,7 +107,7 @@ class TraktImport extends Command
 
         $this->importRatings->execute($userId, $overwriteExistingData);
 
-        $this->jobScheduler->addTraktImportRatingsJob($userId, JobStatus::createDone());
+        $this->jobQueueApi->addTraktImportRatingsJob($userId, JobStatus::createDone());
 
         $this->generateOutput($output, 'Importing ratings ratings.');
     }

@@ -9,6 +9,7 @@ $builder->addDefinitions(
     [
         \Movary\ValueObject\Config::class => DI\factory([Factory::class, 'createConfig']),
         \Movary\Api\Trakt\TraktApi::class => DI\factory([Factory::class, 'createTraktApi']),
+        \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\HttpController\SettingsController::class => DI\factory([Factory::class, 'createSettingsController']),
