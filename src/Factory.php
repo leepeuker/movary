@@ -93,12 +93,11 @@ class Factory
 
     public static function createImageCacheService(ContainerInterface $container) : ImageCacheService
     {
-        // TODO BULLSHIT with the paths
         return new ImageCacheService(
             $container->get(File::class),
             $container->get(LoggerInterface::class),
             $container->get(ClientInterface::class),
-            __DIR__ . '/../public/images/cached/',
+            __DIR__ . '/../public/',
             '/images/cached/',
         );
     }

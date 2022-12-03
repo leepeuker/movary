@@ -16,10 +16,10 @@ class ImageCacheService
         private readonly File $fileUtil,
         private readonly LoggerInterface $logger,
         private readonly ClientInterface $httpClient,
-        private readonly string $cacheDirectory,
-        private readonly string $imageCacheBaseUrlPath,
+        private readonly string $publicDirectory,
+        private readonly string $imageBasePath,
     ) {
-        $this->fileUtil->createDirectory($this->cacheDirectory, self::CACHE_DIR_PERMISSIONS);
+        $this->fileUtil->createDirectory($this->publicDirectory, self::CACHE_DIR_PERMISSIONS);
     }
 
     /**
@@ -27,7 +27,7 @@ class ImageCacheService
      */
     public function cacheImage(Url $imageUrl, bool $forceRefresh = false) : ?string
     {
-        $imageFile = $this->cacheDirectory . trim((string)$imageUrl->getPath(), '/');
+        $imageFile = $this->publicDirectory . trim($this->imageBasePath, '/') . '/' . trim((string)$imageUrl->getPath(), '/');
 
         if ($forceRefresh === false && $this->fileUtil->fileExists($imageFile) === true) {
             return null;
@@ -50,19 +50,18 @@ class ImageCacheService
         $this->fileUtil->createFile($imageFile, $response->getBody()->getContents());
         $this->logger->debug('Cached image: ' . $imageUrl);
 
-        return $this->imageCacheBaseUrlPath . trim((string)$imageUrl->getPath(), '/');
+        return $this->imageBasePath . trim((string)$imageUrl->getPath(), '/');
     }
 
-    // TODO NOT WORKING
     public function deleteImage(string $posterPath) : void
     {
-        $imageFile = $this->cacheDirectory .  '../../' . trim($posterPath, '/');
+        $imageFile = $this->publicDirectory . trim($posterPath, '/');
 
         $this->fileUtil->deleteFile($imageFile);
     }
 
     public function deleteImages() : void
     {
-        $this->fileUtil->deleteDirectoryContent($this->cacheDirectory);
+        $this->fileUtil->deleteDirectoryContent($this->publicDirectory);
     }
 }
