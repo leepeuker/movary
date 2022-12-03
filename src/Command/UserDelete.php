@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User\UserApi;
+use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

@@ -8,9 +8,9 @@ $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(
     [
         \Movary\ValueObject\Config::class => DI\factory([Factory::class, 'createConfig']),
-        \Movary\Api\Trakt\Api::class => DI\factory([Factory::class, 'createTraktApi']),
-        \Movary\Api\Tmdb\Client::class => DI\factory([Factory::class, 'createTmdbApiClient']),
-        \Movary\Application\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
+        \Movary\Api\Trakt\TraktApi::class => DI\factory([Factory::class, 'createTraktApi']),
+        \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
+        \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\HttpController\SettingsController::class => DI\factory([Factory::class, 'createSettingsController']),
         \Movary\HttpController\PlexController::class => DI\factory([Factory::class, 'createPlexController']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),

@@ -3,7 +3,7 @@
 namespace Tests\Unit\Movary\Application\Service;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
-use Movary\Application\Service\UrlGenerator;
+use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Url;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie;
-use Movary\Application\User\Service\Authentication;
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\Movie\MovieApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -16,7 +16,7 @@ class MovieController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Movie\MovieApi $movieApi,
+        private readonly MovieApi $movieApi,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
@@ -39,7 +39,7 @@ class MovieController
         }
 
         return Response::createJson(
-            Json::encode(['personalRating' => $userRating?->asInt()])
+            Json::encode(['personalRating' => $userRating?->asInt()]),
         );
     }
 

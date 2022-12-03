@@ -3,7 +3,7 @@
 namespace Movary\Api\Tmdb\Cache;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
-use Movary\Application\Service\ImageCacheService;
+use Movary\Service\ImageCacheService;
 use Movary\ValueObject\Job;
 
 class TmdbImageCache

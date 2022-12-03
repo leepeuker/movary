@@ -2,10 +2,11 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie;
-use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\User\UserApi;
-use Movary\Application\User\Service\Authentication;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
+use Movary\Domain\Movie;
+use Movary\Domain\Movie\MovieApi;
+use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -17,11 +18,12 @@ use Psr\Log\LoggerInterface;
 class PlexController
 {
     private const MEDIA_RATE = 'media.rate';
+
     private const MEDIA_SCROBBLE = 'media.scrobble';
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly Movie\MovieApi $movieApi,
+        private readonly MovieApi $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,

@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Service\Letterboxd\ImportHistoryFileValidator;
-use Movary\Application\Service\Letterboxd\ImportRatingsFileValidator;
-use Movary\Application\User\Service\Authentication;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Service\Letterboxd\ImportHistoryFileValidator;
+use Movary\Service\Letterboxd\ImportRatingsFileValidator;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;

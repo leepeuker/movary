@@ -3,8 +3,8 @@
 namespace Tests\Unit\Movary\Application\Api\Imdb;
 
 use GuzzleHttp\Client;
-use Movary\Api\Imdb\UrlGenerator;
-use Movary\Api\Imdb\WebScrapper;
+use Movary\Api\Imdb\ImdbUrlGenerator;
+use Movary\Api\Imdb\ImdbWebScrapper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -15,9 +15,9 @@ class WebScrapperTest extends TestCase
 {
     private Client|MockObject $httpClientMock;
 
-    private WebScrapper $subject;
+    private ImdbWebScrapper $subject;
 
-    private MockObject|UrlGenerator $urlGeneratorMock;
+    private MockObject|ImdbUrlGenerator $urlGeneratorMock;
 
     private LoggerInterface|MockObject $loggerMock;
 
@@ -72,10 +72,10 @@ class WebScrapperTest extends TestCase
     public function setUp() : void
     {
         $this->httpClientMock = $this->createMock(Client::class);
-        $this->urlGeneratorMock = $this->createMock(UrlGenerator::class);
+        $this->urlGeneratorMock = $this->createMock(ImdbUrlGenerator::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
 
-        $this->subject = new WebScrapper($this->httpClientMock, $this->urlGeneratorMock, $this->loggerMock);
+        $this->subject = new ImdbWebScrapper($this->httpClientMock, $this->urlGeneratorMock, $this->loggerMock);
     }
 
     /**

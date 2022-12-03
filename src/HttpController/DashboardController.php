@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie;
-use Movary\Application\Movie\History\MovieHistoryApi;
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\MovieApi;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -16,7 +16,7 @@ class DashboardController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly Movie\MovieApi $movieApi,
+        private readonly MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }

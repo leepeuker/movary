@@ -2,8 +2,8 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\ImportService;
-use Movary\Application\User\Service\Authentication;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Service\ImportService;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;

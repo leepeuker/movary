@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User\UserApi;
+use Movary\Domain\User\UserApi;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

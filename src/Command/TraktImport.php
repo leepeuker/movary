@@ -2,10 +2,10 @@
 
 namespace Movary\Command;
 
-use Movary\Application\Service\Trakt\Exception\TraktClientIdNotSet;
-use Movary\Application\Service\Trakt\Exception\TraktUserNameNotSet;
-use Movary\Application\Service\Trakt\ImportRatings;
-use Movary\Application\Service\Trakt\ImportWatchedMovies;
+use Movary\Service\Trakt\Exception\TraktClientIdNotSet;
+use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
+use Movary\Service\Trakt\ImportRatings;
+use Movary\Service\Trakt\ImportWatchedMovies;
 use Movary\ValueObject\JobStatus;
 use Movary\Worker\JobScheduler;
 use Psr\Log\LoggerInterface;

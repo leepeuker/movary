@@ -3,7 +3,7 @@
 namespace Movary\Api\Trakt\Cache\User\Movie\Watched;
 
 use Doctrine\DBAL\Connection;
-use Movary\Api\Trakt\ValueObject\Movie\TraktId;
+use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\ValueObject\DateTime;
 
 class Repository

@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\Service\Tmdb\SyncMovies;
+use Movary\Service\Tmdb\SyncMovies;
 use Movary\ValueObject\JobStatus;
 use Movary\Worker\JobScheduler;
 use Psr\Log\LoggerInterface;

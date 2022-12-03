@@ -2,12 +2,12 @@
 
 namespace Movary\HttpController;
 
-use Movary\Api\Tmdb;
-use Movary\Application\Movie;
-use Movary\Application\Movie\History\MovieHistoryApi;
-use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\User\Service\Authentication;
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Api\Tmdb\TmdbApi;
+use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -23,8 +23,8 @@ class HistoryController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly Tmdb\Api $tmdbApi,
-        private readonly Movie\MovieApi $movieApi,
+        private readonly TmdbApi $tmdbApi,
+        private readonly MovieApi $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,

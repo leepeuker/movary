@@ -3,10 +3,11 @@
 namespace Movary\Worker;
 
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
-use Movary\Application\Service\Letterboxd;
-use Movary\Application\Service\Tmdb\SyncMovies;
-use Movary\Application\Service\Trakt;
-use Movary\Application\User\UserApi;
+use Movary\Domain\User\UserApi;
+use Movary\Service\Letterboxd;
+use Movary\Service\Tmdb\SyncMovies;
+use Movary\Service\Trakt;
+use Movary\Service\Trakt\ImportWatchedMovies;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\JobStatus;
@@ -16,7 +17,7 @@ class Service
 {
     public function __construct(
         private readonly Repository $repository,
-        private readonly Trakt\ImportWatchedMovies $traktSyncWatchedMovies,
+        private readonly ImportWatchedMovies $traktSyncWatchedMovies,
         private readonly Trakt\ImportRatings $traktSyncRatings,
         private readonly Letterboxd\ImportRatings $letterboxdImportRatings,
         private readonly Letterboxd\ImportHistory $letterboxdImportHistory,

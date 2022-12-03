@@ -2,7 +2,7 @@
 
 namespace unit\Application\Movie\Service;
 
-use Movary\Application\Movie\Service\VoteCountFormatter;
+use Movary\Service\VoteCountFormatter;
 use PHPUnit\Framework\TestCase;
 
 class VoteCountFormatterTest extends TestCase

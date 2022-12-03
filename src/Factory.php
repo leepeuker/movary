@@ -10,14 +10,14 @@ use Monolog\Logger;
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
-use Movary\Application\Movie;
-use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\Service\UrlGenerator;
-use Movary\Application\User;
-use Movary\Application\User\Service\Authentication;
+use Movary\Domain\Movie;
+use Movary\Domain\User;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Command;
 use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
+use Movary\Service\Tmdb\SyncMovie;
+use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
@@ -171,18 +171,18 @@ class Factory
         );
     }
 
-    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\Client
+    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\TmdbClient
     {
-        return new Tmdb\Client(
+        return new Tmdb\TmdbClient(
             $container->get(ClientInterface::class),
             $config->getAsString('TMDB_API_KEY')
         );
     }
 
-    public static function createTraktApi(ContainerInterface $container) : Trakt\Api
+    public static function createTraktApi(ContainerInterface $container) : Trakt\TraktApi
     {
-        return new Trakt\Api(
-            $container->get(Trakt\Client::class),
+        return new Trakt\TraktApi(
+            $container->get(Trakt\TraktClient::class),
             $container->get(Watched\Service::class),
         );
     }

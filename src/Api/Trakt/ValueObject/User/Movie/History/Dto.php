@@ -8,7 +8,7 @@ use Movary\ValueObject\DateTime;
 class Dto
 {
     private function __construct(
-        private readonly Movie\Dto $movie,
+        private readonly \Movary\Api\Trakt\ValueObject\TraktMovie $movie,
         private readonly DateTime $watchedAt
     ) {
     }
@@ -16,12 +16,12 @@ class Dto
     public static function createFromArray(array $data) : self
     {
         return new self(
-            Movie\Dto::createFromArray($data['movie']),
+            \Movary\Api\Trakt\ValueObject\TraktMovie::createFromArray($data['movie']),
             DateTime::createFromString($data['watched_at']),
         );
     }
 
-    public function getMovie() : Movie\Dto
+    public function getMovie() : \Movary\Api\Trakt\ValueObject\TraktMovie
     {
         return $this->movie;
     }

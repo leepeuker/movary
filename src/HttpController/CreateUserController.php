@@ -2,10 +2,10 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\User\Exception\PasswordTooShort;
-use Movary\Application\User\Exception\UsernameInvalidFormat;
-use Movary\Application\User\Service\Authentication;
-use Movary\Application\User\UserApi;
+use Movary\Domain\User\Exception\PasswordTooShort;
+use Movary\Domain\User\Exception\UsernameInvalidFormat;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;

@@ -2,10 +2,10 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie;
-use Movary\Application\Person;
-use Movary\Application\Service\UrlGenerator;
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\Person;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\Movie\MovieApi;
+use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -15,7 +15,7 @@ class PersonController
 {
     public function __construct(
         private readonly Person\PersonApi $personApi,
-        private readonly Movie\MovieApi $movieApi,
+        private readonly MovieApi $movieApi,
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly UrlGenerator $urlGenerator,

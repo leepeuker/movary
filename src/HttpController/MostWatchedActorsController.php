@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie\History\MovieHistoryApi;
-use Movary\Application\Movie\History\Service\Select;
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\History\Service\Select;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;

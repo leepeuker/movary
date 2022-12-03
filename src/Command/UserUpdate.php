@@ -2,11 +2,11 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User;
-use Movary\Application\User\Exception\EmailNotUnique;
-use Movary\Application\User\Exception\PasswordTooShort;
-use Movary\Application\User\Exception\UsernameInvalidFormat;
-use Movary\Application\User\Exception\UsernameNotUnique;
+use Movary\Domain\User;
+use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordTooShort;
+use Movary\Domain\User\Exception\UsernameInvalidFormat;
+use Movary\Domain\User\Exception\UsernameNotUnique;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

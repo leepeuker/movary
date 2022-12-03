@@ -2,8 +2,8 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\User\UserApi;
-use Movary\Application\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
+use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
