@@ -2,8 +2,8 @@
 
 namespace Movary\Api\Trakt\ValueObject\User\Movie\Watched;
 
-use Movary\AbstractList;
-use Movary\Api\Trakt\ValueObject\Movie\TraktId;
+use Movary\Api\Trakt\ValueObject\TraktId;
+use Movary\ValueObject\AbstractList;
 use Movary\ValueObject\DateTime;
 
 /**

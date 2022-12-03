@@ -2,7 +2,7 @@
 
 namespace Movary\Api\Trakt\Cache\User\Movie\Watched;
 
-use Movary\Api\Trakt\ValueObject\Movie\TraktId;
+use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\ValueObject\DateTime;
 
 class Service

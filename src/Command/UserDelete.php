@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User\Api;
+use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,7 +13,7 @@ class UserDelete extends Command
     protected static $defaultName = 'user:delete';
 
     public function __construct(
-        private readonly Api $userApi,
+        private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();

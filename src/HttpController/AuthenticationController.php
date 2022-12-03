@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\SessionService;
-use Movary\Application\User\Exception\InvalidCredentials;
-use Movary\Application\User\Service;
+use Movary\Domain\SessionService;
+use Movary\Domain\User\Exception\InvalidCredentials;
+use Movary\Domain\User\Service;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;

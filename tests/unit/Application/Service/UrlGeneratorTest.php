@@ -3,13 +3,16 @@
 namespace Tests\Unit\Movary\Application\Service;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
-use Movary\Application\Service\UrlGenerator;
+use Movary\Service\ImageCacheService;
+use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Url;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UrlGeneratorTest extends TestCase
 {
+    private ImageCacheService|MockObject $imageCacheServiceMock;
+
     private UrlGenerator $subject;
 
     private MockObject|TmdbUrlGenerator $tmdbUrlGeneratorMock;
@@ -21,21 +24,37 @@ class UrlGeneratorTest extends TestCase
                 'tmdbPosterPath' => 'foo',
                 'posterPath' => 'bar',
                 'expectedResult' => '/bar',
+                'posterPathExists' => true,
+            ],
+            [
+                'tmdbPosterPath' => 'foo',
+                'posterPath' => 'bar',
+                'expectedResult' => '/bar',
+                'posterPathExists' => true,
             ],
             [
                 'tmdbPosterPath' => null,
                 'posterPath' => 'bar',
                 'expectedResult' => '/bar',
+                'posterPathExists' => true,
+            ],
+            [
+                'tmdbPosterPath' => null,
+                'posterPath' => 'bar',
+                'expectedResult' => '/images/placeholder-image.png',
+                'posterPathExists' => false,
             ],
             [
                 'tmdbPosterPath' => 'foo',
                 'posterPath' => null,
                 'expectedResult' => 'http://localhost',
+                'posterPathExists' => true,
             ],
             [
                 'tmdbPosterPath' => null,
                 'posterPath' => null,
                 'expectedResult' => '/images/placeholder-image.png',
+                'posterPathExists' => true,
             ],
         ];
     }
@@ -43,16 +62,26 @@ class UrlGeneratorTest extends TestCase
     public function setUp() : void
     {
         $this->tmdbUrlGeneratorMock = $this->createMock(TmdbUrlGenerator::class);
+        $this->imageCacheServiceMock = $this->createMock(ImageCacheService::class);
 
         $this->subject = new UrlGenerator(
             $this->tmdbUrlGeneratorMock,
+            $this->imageCacheServiceMock,
             true
         );
     }
 
     /** @dataProvider provideTestGenerateImageSrcUrlFromParametersData */
-    public function testGenerateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath, string $expectedResult) : void
+    public function testGenerateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath, string $expectedResult, bool $posterPathExists) : void
     {
+        if ($posterPath !== null) {
+            $this->imageCacheServiceMock
+                ->expects(self::once())
+                ->method('posterPathExists')
+                ->with($posterPath)
+                ->willReturn($posterPathExists);
+        }
+
         if ($posterPath === null && $tmdbPosterPath !== null) {
             $this->tmdbUrlGeneratorMock
                 ->expects(self::once())
@@ -63,7 +92,7 @@ class UrlGeneratorTest extends TestCase
 
         self::assertEquals(
             $expectedResult,
-            $this->subject->generateImageSrcUrlFromParameters($tmdbPosterPath, $posterPath)
+            $this->subject->generateImageSrcUrlFromParameters($tmdbPosterPath, $posterPath),
         );
     }
 
@@ -78,6 +107,12 @@ class UrlGeneratorTest extends TestCase
             'poster_path' => null,
             'tmdb_poster_path' => 'tmdb_poster_path',
         ];
+
+        $this->imageCacheServiceMock
+            ->expects(self::once())
+            ->method('posterPathExists')
+            ->with('poster_path')
+            ->willReturn(true);
 
         $this->tmdbUrlGeneratorMock
             ->expects(self::once())
@@ -97,7 +132,7 @@ class UrlGeneratorTest extends TestCase
 
         self::assertEquals(
             $expectedResult,
-            $this->subject->replacePosterPathWithImageSrcUrl($dbResults)
+            $this->subject->replacePosterPathWithImageSrcUrl($dbResults),
         );
     }
 }

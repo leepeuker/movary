@@ -3,14 +3,16 @@
 namespace Movary\Api\Tmdb\Cache;
 
 use Doctrine\DBAL\Connection;
-use Movary\Api\Tmdb\Client;
+use Movary\Api\Tmdb\TmdbClient;
 
 class TmdbIso6931Cache
 {
     private array $languages = [];
 
-    public function __construct(private readonly Connection $dbConnection, private readonly Client $client)
-    {
+    public function __construct(
+        private readonly Connection $dbConnection,
+        private readonly TmdbClient $client,
+    ) {
     }
 
     public function getLanguageByCode(string $languageCode) : string

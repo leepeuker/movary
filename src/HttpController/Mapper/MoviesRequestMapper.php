@@ -2,7 +2,7 @@
 
 namespace Movary\HttpController\Mapper;
 
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Dto\MoviesRequestDto;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Year;

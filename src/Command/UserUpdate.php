@@ -2,11 +2,11 @@
 
 namespace Movary\Command;
 
-use Movary\Application\User;
-use Movary\Application\User\Exception\EmailNotUnique;
-use Movary\Application\User\Exception\PasswordTooShort;
-use Movary\Application\User\Exception\UsernameInvalidFormat;
-use Movary\Application\User\Exception\UsernameNotUnique;
+use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordTooShort;
+use Movary\Domain\User\Exception\UsernameInvalidFormat;
+use Movary\Domain\User\Exception\UsernameNotUnique;
+use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +18,7 @@ class UserUpdate extends Command
     protected static $defaultName = 'user:update';
 
     public function __construct(
-        private readonly User\Api $userApi,
+        private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();

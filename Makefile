@@ -96,7 +96,7 @@ test_phpstan:
 	make exec_app_cmd CMD="vendor/bin/phpstan analyse -c ./settings/phpstan.neon"
 
 test_psalm:
-	make exec_app_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false"
+	make exec_app_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false --no-cache"
 
 test_phpunit:
 	make exec_app_cmd CMD="vendor/bin/phpunit -c ./settings/phpunit.xml --testsuite unit"

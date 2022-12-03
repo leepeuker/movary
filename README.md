@@ -208,6 +208,8 @@ Example cli import (import history and ratings for user with id 1):
 
 `php bin/console.php trakt:import --ratings --history --userId=1`
 
+**Info:** Importing hundreds or thousands of movies for the first time can take a few minutes.
+
 **Flags:**
 
 - `--userId`
@@ -230,6 +232,8 @@ Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
 You can import your watch history and ratings from letterboxd.com.
 
 Visit the movary settings page `/settings/letterboxd` for more instructions
+
+**Info:** Importing hundreds or thousands of movies for the first time can take a few minutes.
 
 <a name="#link-imdb-sync"></a>
 

@@ -2,25 +2,26 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie;
-use Movary\Application\User;
-use Movary\Application\User\Service\Authentication;
+use Movary\Domain\User;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
+use Movary\Domain\Movie;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\Worker\Service;
+use Movary\JobQueue\JobQueueApi;
 use Twig\Environment;
 
 class SettingsController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Service $workerService,
+        private readonly JobQueueApi $workerService,
         private readonly Authentication $authenticationService,
-        private readonly User\Api $userApi,
-        private readonly Movie\Api $movieApi,
+        private readonly UserApi $userApi,
+        private readonly Movie\MovieApi $movieApi,
         private readonly ?string $applicationVersion = null,
     ) {
     }
@@ -47,7 +48,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -64,7 +65,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -81,7 +82,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -269,7 +270,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -292,7 +293,7 @@ class SettingsController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
@@ -302,7 +303,7 @@ class SettingsController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
@@ -312,7 +313,7 @@ class SettingsController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])]
+                [Header::createLocation($_SERVER['HTTP_REFERER'])],
             );
         }
 
@@ -327,7 +328,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -358,7 +359,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 }

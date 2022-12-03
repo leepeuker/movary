@@ -20,7 +20,7 @@
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
 
-        <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} ({{ movie.releaseDate|date("Y") }})</h2>
+        <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
 
         <input type="hidden" id="movieId" value="{{ movie.id }}">
 
@@ -54,6 +54,7 @@
                 <h6 style="margin-bottom: 0.2rem">Genres</h6>
                 <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
+                        {% if movieGenres|length == 0 %} - {% endif %}
                         {% for movieGenre in movieGenres %}{{ movieGenre.name }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </span>
@@ -61,12 +62,18 @@
 
                 <h6 style="margin-bottom: 0.2rem">Runtime</h6>
                 <div style="margin-bottom: 0.4rem">
-                    <span class="fw-light">{{ movie.runtime }}</span>
+                    <span class="fw-light">
+                        {% if movie.runtime == '' %} - {% endif %}
+                        {{ movie.runtime }}
+                    </span>
                 </div>
 
                 <h6 style="margin-bottom: 0.2rem">Language</h6>
                 <div style="margin-bottom: 0.4rem">
-                    <span class="fw-light">{{ movie.originalLanguage }}</span>
+                    <span class="fw-light">
+                        {% if movie.originalLanguage == '' %} - {% endif %}
+                        {{ movie.originalLanguage }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -92,22 +99,30 @@
         {% if movie.tagline is not null %}
             <h6 style="margin-bottom: 0.3rem">Tagline</h6>
             <div class="carousel">
-                <p class="fw-lighter" style="margin-bottom: 0rem">{{ movie.tagline }}</p>
+                <p class="fw-lighter" style="margin-bottom: 0rem">
+                    {{ movie.tagline }}
+                </p>
             </div>
         {% endif %}
 
         <h6 style="margin-bottom: 0.4rem;">Plot</h6>
         <div class="carousel">
-            <p style="margin-bottom: 0rem">{{ movie.overview }}</p>
+            <p style="margin-bottom: 0rem">
+                {% if movie.overview == '' %} - {% endif %}
+                {{ movie.overview }}
+            </p>
         </div>
 
         <h6 style="margin-bottom: 0.4rem">Acting</h6>
         <div class="carousel">
-            {% for castMember in castMembers|slice(0, 25) %}
+            {% if castMembers|length == 0 %} - {% endif %}
+            {% for castMember in castMembers|slice(0, 40) %}
                 <div class="card" onclick="window.location='/{{ routeUsername }}/person/{{ castMember.id }}'"
                      style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
-                        <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.name }}</small>
+                        <small class="text-muted" style="font-size: 0.9rem;">
+                            {{ castMember.name }}
+                        </small>
                     </div>
 
                     <img src="{{ castMember.posterPath }}" class="card-img-top" alt="..."
@@ -118,6 +133,7 @@
 
         <h6 style="margin-bottom: 0.4rem;margin-top: 0.8rem">Director</h6>
         <div class="carousel">
+            {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
                 <div class="card" onclick="window.location='/{{ routeUsername }}/person/{{ director.id }}'"
                      style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">

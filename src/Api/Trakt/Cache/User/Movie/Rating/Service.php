@@ -2,7 +2,7 @@
 
 namespace Movary\Api\Trakt\Cache\User\Movie\Rating;
 
-use Movary\Api\Trakt\ValueObject\Movie\TraktId;
+use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\Api\Trakt\ValueObject\User\Movie\Rating\Dto;
 use Movary\Api\Trakt\ValueObject\User\Movie\Rating\DtoList;
 

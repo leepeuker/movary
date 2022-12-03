@@ -2,8 +2,8 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie;
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\Movie\MovieApi;
 use Movary\HttpController\Mapper\MoviesRequestMapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -14,9 +14,9 @@ class MoviesController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Movie\Api $movieApi,
+        private readonly MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly MoviesRequestMapper $moviesRequestMapper
+        private readonly MoviesRequestMapper $moviesRequestMapper,
     ) {
     }
 

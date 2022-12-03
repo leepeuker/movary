@@ -8,20 +8,24 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
+use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
-use Movary\Application\Movie;
-use Movary\Application\Service\Tmdb\SyncMovie;
-use Movary\Application\Service\UrlGenerator;
-use Movary\Application\User;
-use Movary\Application\User\Service\Authentication;
 use Movary\Command;
+use Movary\Domain\Movie;
+use Movary\Domain\User;
+use Movary\Domain\User\Service\Authentication;
 use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
+use Movary\JobQueue\JobQueueApi;
+use Movary\Service\ImageCacheService;
+use Movary\Service\JobProcessor;
+use Movary\Service\Tmdb\SyncMovie;
+use Movary\Service\UrlGenerator;
+use Movary\Util\File;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
-use Movary\Worker\Service;
 use PDO;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
@@ -79,13 +83,24 @@ class Factory
                 'password' => $config->getAsString('DATABASE_PASSWORD'),
                 'host' => $config->getAsString('DATABASE_HOST'),
                 'driver' => $config->getAsString('DATABASE_DRIVER'),
-            ]
+            ],
         );
     }
 
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client();
+    }
+
+    public static function createImageCacheService(ContainerInterface $container) : ImageCacheService
+    {
+        return new ImageCacheService(
+            $container->get(File::class),
+            $container->get(LoggerInterface::class),
+            $container->get(ClientInterface::class),
+            __DIR__ . '/../public/',
+            '/images/cached/',
+        );
     }
 
     public static function createLineFormatter(Config $config) : LineFormatter
@@ -144,9 +159,9 @@ class Factory
 
         return new PlexController(
             $container->get(LoggerInterface::class),
-            $container->get(Movie\Api::class),
+            $container->get(Movie\MovieApi::class),
             $container->get(SyncMovie::class),
-            $container->get(User\Api::class),
+            $container->get(User\UserApi::class),
             $container->get(Authentication::class),
             $plexEnableScrobbleWebhook,
             $plexEnableRatingWebhook,
@@ -163,26 +178,26 @@ class Factory
 
         return new SettingsController(
             $container->get(Twig\Environment::class),
-            $container->get(Service::class),
+            $container->get(JobQueueApi::class),
             $container->get(Authentication::class),
-            $container->get(User\Api::class),
-            $container->get(Movie\Api::class),
+            $container->get(User\UserApi::class),
+            $container->get(Movie\MovieApi::class),
             $applicationVersion
         );
     }
 
-    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\Client
+    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\TmdbClient
     {
-        return new Tmdb\Client(
+        return new Tmdb\TmdbClient(
             $container->get(ClientInterface::class),
             $config->getAsString('TMDB_API_KEY')
         );
     }
 
-    public static function createTraktApi(ContainerInterface $container) : Trakt\Api
+    public static function createTraktApi(ContainerInterface $container) : Trakt\TraktApi
     {
-        return new Trakt\Api(
-            $container->get(Trakt\Client::class),
+        return new Trakt\TraktApi(
+            $container->get(Trakt\TraktClient::class),
             $container->get(Watched\Service::class),
         );
     }
@@ -204,8 +219,8 @@ class Factory
         if ($userAuthenticated === true) {
             $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
 
-            /** @var User\Entity $user */
-            $user = $container->get(User\Api::class)->fetchUser($currentUserId);
+            /** @var User\UserEntity $user */
+            $user = $container->get(User\UserApi::class)->fetchUser($currentUserId);
 
             $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
@@ -234,7 +249,8 @@ class Factory
         }
 
         return new UrlGenerator(
-            $container->get(Tmdb\TmdbUrlGenerator::class),
+            $container->get(TmdbUrlGenerator::class),
+            $container->get(ImageCacheService::class),
             $enableImageCaching
         );
     }
@@ -267,8 +283,8 @@ class Factory
         }
 
         return new Command\ProcessJobs(
-            $container->get(Worker\Repository::class),
-            $container->get(Worker\Service::class),
+            $container->get(JobQueueApi::class),
+            $container->get(JobProcessor::class),
             $container->get(LoggerInterface::class),
             $minRuntimeInSeconds,
         );

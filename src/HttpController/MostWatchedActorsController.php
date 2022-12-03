@@ -2,8 +2,9 @@
 
 namespace Movary\HttpController;
 
-use Movary\Application\Movie\History\Service\Select;
-use Movary\Application\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\History\Service\Select;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -14,7 +15,7 @@ class MostWatchedActorsController
     private const DEFAULT_LIMIT = 24;
 
     public function __construct(
-        private readonly Select $movieHistorySelectService,
+        private readonly MovieHistoryApi $movieHistoryApi,
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
@@ -31,8 +32,8 @@ class MostWatchedActorsController
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $mostWatchedActors = $this->movieHistorySelectService->fetchMostWatchedActors($userId, (int)$page, $limit, null, $searchTerm);
-        $historyCount = $this->movieHistorySelectService->fetchMostWatchedActorsCount($userId, $searchTerm);
+        $mostWatchedActors = $this->movieHistoryApi->fetchMostWatchedActors($userId, (int)$page, $limit, null, $searchTerm);
+        $historyCount = $this->movieHistoryApi->fetchMostWatchedActorsCount($userId, $searchTerm);
 
         $maxPage = (int)ceil($historyCount / $limit);
 
