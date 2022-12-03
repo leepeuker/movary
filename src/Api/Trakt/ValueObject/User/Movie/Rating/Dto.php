@@ -2,29 +2,29 @@
 
 namespace Movary\Api\Trakt\ValueObject\User\Movie\Rating;
 
-use Movary\Api\Trakt\ValueObject\Movie;
+use Movary\Api\Trakt\ValueObject\TraktMovie;
 use Movary\ValueObject\DateTime;
 
 class Dto
 {
     private function __construct(
-        private readonly \Movary\Api\Trakt\ValueObject\TraktMovie $movie,
+        private readonly TraktMovie $movie,
         private readonly int $rating,
-        private readonly DateTime $ratedAt
+        private readonly DateTime $ratedAt,
     ) {
     }
 
     public static function createFromArray(array $data) : self
     {
         return new self(
-            \Movary\Api\Trakt\ValueObject\TraktMovie::createFromArray($data['movie']),
+            TraktMovie::createFromArray($data['movie']),
             $data['rating'],
             DateTime::createFromStringAndTimeZone($data['rated_at'], 'GMT'),
 
         );
     }
 
-    public function getMovie() : \Movary\Api\Trakt\ValueObject\TraktMovie
+    public function getMovie() : TraktMovie
     {
         return $this->movie;
     }

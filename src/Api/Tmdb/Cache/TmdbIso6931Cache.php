@@ -9,8 +9,10 @@ class TmdbIso6931Cache
 {
     private array $languages = [];
 
-    public function __construct(private readonly Connection $dbConnection, private readonly TmdbClient $client)
-    {
+    public function __construct(
+        private readonly Connection $dbConnection,
+        private readonly TmdbClient $client,
+    ) {
     }
 
     public function getLanguageByCode(string $languageCode) : string
