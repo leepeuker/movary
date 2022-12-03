@@ -18,6 +18,7 @@ use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ImageCacheService;
+use Movary\Service\JobProcessor;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\UrlGenerator;
 use Movary\Util\File;
@@ -92,11 +93,13 @@ class Factory
 
     public static function createImageCacheService(ContainerInterface $container) : ImageCacheService
     {
+        // TODO BULLSHIT with the paths
         return new ImageCacheService(
             $container->get(File::class),
             $container->get(LoggerInterface::class),
             $container->get(ClientInterface::class),
-            __DIR__ . '/../public/images/cached/'
+            __DIR__ . '/../public/images/cached/',
+            '/images/cached/',
         );
     }
 
@@ -279,8 +282,8 @@ class Factory
         }
 
         return new Command\ProcessJobs(
-            $container->get(JobQueue\JobQueueApi::class),
-            $container->get(JobQueue\JobProcessor::class),
+            $container->get(JobQueueApi::class),
+            $container->get(JobProcessor::class),
             $container->get(LoggerInterface::class),
             $minRuntimeInSeconds,
         );

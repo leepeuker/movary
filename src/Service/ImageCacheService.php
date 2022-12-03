@@ -17,6 +17,7 @@ class ImageCacheService
         private readonly LoggerInterface $logger,
         private readonly ClientInterface $httpClient,
         private readonly string $cacheDirectory,
+        private readonly string $imageCacheBaseUrlPath,
     ) {
         $this->fileUtil->createDirectory($this->cacheDirectory, self::CACHE_DIR_PERMISSIONS);
     }
@@ -49,12 +50,13 @@ class ImageCacheService
         $this->fileUtil->createFile($imageFile, $response->getBody()->getContents());
         $this->logger->debug('Cached image: ' . $imageUrl);
 
-        return str_replace(__DIR__ . '/../../../public/', '', $imageFile);
+        return $this->imageCacheBaseUrlPath . trim((string)$imageUrl->getPath(), '/');
     }
 
+    // TODO NOT WORKING
     public function deleteImage(string $posterPath) : void
     {
-        $imageFile = __DIR__ . '/../../../public/' . trim($posterPath, '/');
+        $imageFile = $this->cacheDirectory .  '../../' . trim($posterPath, '/');
 
         $this->fileUtil->deleteFile($imageFile);
     }

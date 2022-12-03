@@ -11,7 +11,7 @@ class TmdbImageCache
     public function __construct(
         private readonly \PDO $pdo,
         private readonly ImageCacheService $imageCacheService,
-        private readonly TmdbUrlGenerator $tmdbUrlGenerator
+        private readonly TmdbUrlGenerator $tmdbUrlGenerator,
     ) {
     }
 
@@ -31,7 +31,7 @@ class TmdbImageCache
                 FROM person
                 JOIN movie_crew crew on person.id = crew.person_id
                 WHERE crew.movie_id = ?
-            ) personIdTable"
+            ) personIdTable",
         );
         $statement->execute([$movieId, $movieId]);
 
@@ -81,7 +81,7 @@ class TmdbImageCache
 
         $cachedImagePublicPath = $this->imageCacheService->cacheImage(
             $this->tmdbUrlGenerator->generateImageUrl($data['tmdb_poster_path']),
-            $forceRefresh
+            $data['poster_path'] === null ? true : $forceRefresh,
         );
 
         if ($cachedImagePublicPath === null) {
@@ -109,7 +109,7 @@ class TmdbImageCache
         $statement = $this->pdo->prepare($query);
         $statement->execute($filerIds);
 
-        foreach ($statement->getIterator() as $imageDataBeforeUpdate) {
+        foreach ($statement as $imageDataBeforeUpdate) {
             if ($this->cacheImageDataByTableName($imageDataBeforeUpdate, $tableName, $forceRefresh) === true) {
                 if ($imageDataBeforeUpdate['poster_path'] !== null) {
                     $statement = $this->pdo->prepare("SELECT poster_path FROM $tableName WHERE id = ?");

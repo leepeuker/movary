@@ -320,7 +320,7 @@ class MovieApi
 
     public function updateCrew(int $movieId, TmdbCrew $tmdbCrew) : void
     {
-        $this->movieProductionCompanyApi->deleteByMovieId($movieId);
+        $this->crewApi->deleteByMovieId($movieId);
 
         foreach ($tmdbCrew as $position => $crewMember) {
             $person = $this->createOrUpdatePersonByTmdbId(

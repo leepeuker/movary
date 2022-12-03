@@ -6,8 +6,8 @@ use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
-use Movary\ValueObject\Date;
 use Movary\JobQueue\JobQueueScheduler;
+use Movary\ValueObject\Date;
 
 class SyncMovie
 {
@@ -46,7 +46,7 @@ class SyncMovie
 
             $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
         } else {
-            $originalPosterPath = $movie->getPosterPath();
+            $originalTmdbPosterPath = $movie->getTmdbPosterPath();
 
             $movie = $this->movieApi->updateDetails(
                 movieId: $movie->getId(),
@@ -61,7 +61,7 @@ class SyncMovie
                 imdbId: $movie->getImdbId(),
             );
 
-            if ($originalPosterPath !== $movie->getPosterPath()) {
+            if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()) {
                 $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
             }
         }

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\JobQueue;
+namespace Movary\Service;
 
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\Service\Letterboxd;

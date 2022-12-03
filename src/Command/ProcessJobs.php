@@ -3,6 +3,7 @@
 namespace Movary\Command;
 
 use Movary\JobQueue;
+use Movary\Service\JobProcessor;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 use Psr\Log\LoggerInterface;
@@ -18,7 +19,7 @@ class ProcessJobs extends Command
 
     public function __construct(
         private readonly JobQueue\JobQueueApi $jobApi,
-        private readonly JobQueue\JobProcessor $jobProcessor,
+        private readonly JobProcessor $jobProcessor,
         private readonly LoggerInterface $logger,
         private readonly ?int $minRuntimeInSeconds = null,
     ) {
