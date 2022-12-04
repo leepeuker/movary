@@ -14,7 +14,6 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th scope="col">Id</th>
                         <th scope="col">User</th>
                         <th scope="col">Type</th>
                         <th scope="col">Status</th>
@@ -25,7 +24,6 @@
                     <tbody>
                     {% for job in jobs %}
                         <tr>
-                            <td>{{ job.id }}</td>
                             <td>{{ job.userName|default('-') }}</td>
                             <td>{{ job.type }}</td>
                             <td>{{ job.status }}</td>
