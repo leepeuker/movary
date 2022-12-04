@@ -24,3 +24,6 @@ jobs:
 
       - name: Run psalm
         run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/psalm -c ./settings/psalm.xml --show-info=false
+
+      - name: Run phpunit
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpunit -c ./settings/phpunit.xml --testsuite unit
