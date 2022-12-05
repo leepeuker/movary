@@ -15,7 +15,7 @@
                 <p style="margin-bottom: 0.5rem">Last <a href="https://themoviedb.org/" target="_blank">TMDB</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
                 <p style="margin-bottom: 0.5rem">Last <a href="https://www.imdb.com/" target="_blank">IMDb</a> sync: <span class="fw-light">{{ lastSyncImdb }}</span></p>
                 <p>App version: <span class="fw-light">{{ currentApplicationVersion }}</span>
-                    {% if currentApplicationVersion != latestApplicationVersion.name %}
+                    {% if latestApplicationVersion is not null and currentApplicationVersion != latestApplicationVersion.name %}
                         (<a href="{{ latestApplicationVersion.url }}" target="_blank">Update available</a>)
                     {% endif %}
                 </p>
