@@ -2,7 +2,6 @@
 
 namespace Movary\JobQueue;
 
-use Movary\Domain\User\UserApi;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\JobStatus;
@@ -12,7 +11,6 @@ class JobQueueApi
 {
     public function __construct(
         private readonly JobQueueRepository $repository,
-        private readonly UserApi $userApi,
     ) {
     }
 
@@ -51,23 +49,18 @@ class JobQueueApi
         $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
-    public function fetchJobsForStatusPage(int $userId) : array
+    public function fetchJobsForStatusPage(int $userId, int $limit) : array
     {
-        $jobs = $this->repository->fetchJobs($userId);
+        $jobs = $this->repository->fetchJobs($userId, $limit);
 
         $jobsData = [];
         foreach ($jobs as $job) {
-            $jobUserId = $job->getUserId();
-
-            $userName = $jobUserId === null ? null : $this->userApi->fetchUser($jobUserId)->getName();
-
             $jobsData[] = [
-                'id' => $job->getId(),
-                'type' => $job->getType(),
-                'status' => $job->getStatus(),
-                'userName' => $userName,
-                'updatedAt' => $job->getUpdatedAt(),
-                'createdAt' => $job->getCreatedAt(),
+                'type' => $job['job_type'],
+                'status' => $job['job_status'],
+                'userName' => $job['name'],
+                'updatedAt' => $job['updated_at'],
+                'createdAt' => $job['created_at'],
             ];
         }
 

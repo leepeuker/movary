@@ -46,13 +46,15 @@ class JobController
         return Response::createFoundRedirect('/job-queue');
     }
 
-    public function renderQueuePage() : Response
+    public function renderQueuePage(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createFoundRedirect('/');
         }
 
-        $jobs = $this->jobQueueApi->fetchJobsForStatusPage($this->authenticationService->getCurrentUserId());
+        $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
+
+        $jobs = $this->jobQueueApi->fetchJobsForStatusPage($this->authenticationService->getCurrentUserId(), (int)$jobsPerPage);
 
         return Response::create(
             StatusCode::createOk(),
