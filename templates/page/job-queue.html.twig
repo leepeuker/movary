@@ -25,6 +25,7 @@
                     </svg>
                 </button>
             </p>
+
             <div class="table-responsive" style="text-align: center;">
                 <table class="table">
                     <thead>
@@ -50,11 +51,13 @@
                 </table>
             </div>
         </div>
+
         {% if jobs|length == 0 %}<p>No jobs in history</p>{% endif %}
         <div class="d-grid gap-2">
-            <a class="btn btn-warning" type="button" href="/job-queue/purge-processed">Purge processed jobs</a>
+            <a class="btn btn-warning" type="button" href="/job-queue/purge-processed"
+                onclick="return confirm('Are you sure you want to purge all jobs with status `done` and `waiting`?')"> Purge processed jobs</a>
             <a class="btn btn-outline-danger" type="button" href="/job-queue/purge-all"
-               onclick="return confirm('Are you sure? This will not stop currently running jobs, it will just delete their queue entries.')">Purge all jobs</a>
+               onclick="return confirm('Are you sure you want to purge all jobs? This will not stop currently running jobs, it will just delete their queue entries.')">Purge all jobs</a>
         </div>
         <br>
     </main>

@@ -49,9 +49,9 @@ class JobQueueApi
         $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
-    public function fetchJobsForStatusPage(int $userId, int $limit) : array
+    public function fetchJobsForStatusPage(int $limit) : array
     {
-        $jobs = $this->repository->fetchJobs($userId, $limit);
+        $jobs = $this->repository->fetchJobs($limit);
 
         $jobsData = [];
         foreach ($jobs as $job) {
