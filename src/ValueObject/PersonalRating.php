@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject;
 
+use RuntimeException;
+
 class PersonalRating
 {
     private const ALLOWED_RATINGS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -9,7 +11,7 @@ class PersonalRating
     private function __construct(private readonly int $rating)
     {
         if (in_array($this->rating, self::ALLOWED_RATINGS, true) === false) {
-            throw new \RuntimeException('Invalid rating: ' . $this->rating);
+            throw new RuntimeException('Invalid rating: ' . $this->rating);
         }
     }
 

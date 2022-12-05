@@ -2,12 +2,13 @@
 
 namespace Movary\Domain\User\Service;
 
-use Movary\Domain\User\UserApi;
-use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\Exception\EmailNotFound;
 use Movary\Domain\User\Exception\InvalidPassword;
+use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\ValueObject\DateTime;
+use RuntimeException;
 
 class Authentication
 {
@@ -40,7 +41,7 @@ class Authentication
         }
 
         if ($userId === null) {
-            throw new \RuntimeException('Could not find a current user');
+            throw new RuntimeException('Could not find a current user');
         }
 
         return $userId;
@@ -130,7 +131,7 @@ class Authentication
         $timestamp = strtotime('+' . $days . ' day');
 
         if ($timestamp === false) {
-            throw new \RuntimeException('Could not generate timestamp for auth token expiration date.');
+            throw new RuntimeException('Could not generate timestamp for auth token expiration date.');
         }
 
         return DateTime::createFromString(date('Y-m-d H:i:s', $timestamp));

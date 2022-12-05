@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class TmdbSync extends Command
 {
@@ -50,7 +51,7 @@ class TmdbSync extends Command
             $this->jobQueueApi->addTmdbSyncJob(JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing movie meta data done.');
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete tmdb sync.');
             $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
 

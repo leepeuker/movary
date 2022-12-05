@@ -7,7 +7,7 @@ class ProductionCompanyEntity
     private function __construct(
         private readonly int $movieId,
         private readonly int $companyId,
-        private readonly int $position
+        private readonly int $position,
     ) {
     }
 

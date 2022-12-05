@@ -6,7 +6,7 @@ class StatusCode
 {
     private function __construct(
         private readonly int $code,
-        private readonly string $string
+        private readonly string $string,
     ) {
     }
 

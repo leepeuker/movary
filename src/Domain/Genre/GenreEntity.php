@@ -7,7 +7,7 @@ class GenreEntity
     private function __construct(
         private readonly int $id,
         private readonly string $name,
-        private readonly int $tmdbId
+        private readonly int $tmdbId,
     ) {
     }
 

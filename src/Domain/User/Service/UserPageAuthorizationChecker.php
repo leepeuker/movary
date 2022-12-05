@@ -8,7 +8,7 @@ class UserPageAuthorizationChecker
 {
     public function __construct(
         private readonly UserApi $userApi,
-        private readonly Authentication $authenticationService
+        private readonly Authentication $authenticationService,
     ) {
     }
 

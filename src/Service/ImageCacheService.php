@@ -7,6 +7,7 @@ use Movary\Util\File;
 use Movary\ValueObject\Url;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class ImageCacheService
 {
@@ -43,7 +44,7 @@ class ImageCacheService
 
             $response = $this->httpClient->sendRequest($request);
             if ($response->getStatusCode() !== 200) {
-                throw new \RuntimeException('Could not fetch image for caching: ' . $imageUrl);
+                throw new RuntimeException('Could not fetch image for caching: ' . $imageUrl);
             }
         }
 

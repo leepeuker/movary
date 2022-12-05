@@ -7,7 +7,7 @@ class CsvLineRating
     private function __construct(
         private readonly string $name,
         private readonly string $letterboxdUri,
-        private readonly ?int $rating
+        private readonly ?int $rating,
     ) {
     }
 

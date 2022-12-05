@@ -27,7 +27,7 @@ class AuthenticationController
             $this->authenticationService->login(
                 $postParameters['email'],
                 $postParameters['password'],
-                isset($postParameters['rememberMe']) === true
+                isset($postParameters['rememberMe']) === true,
             );
         } catch (InvalidCredentials) {
             $_SESSION['failedLogin'] = true;
@@ -36,7 +36,7 @@ class AuthenticationController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])]
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 
@@ -47,7 +47,7 @@ class AuthenticationController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation('/')]
+            [Header::createLocation('/')],
         );
     }
 
@@ -57,7 +57,7 @@ class AuthenticationController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation('/')]
+                [Header::createLocation('/')],
             );
         }
 

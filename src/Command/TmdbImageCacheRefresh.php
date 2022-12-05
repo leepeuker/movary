@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class TmdbImageCacheRefresh extends Command
 {
@@ -66,7 +67,7 @@ class TmdbImageCacheRefresh extends Command
             }
 
             $this->generateOutput($output, 'Caching images done.');
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete tmdb image caching.');
             $this->logger->error('Could not complete tmdb image caching.', ['exception' => $t]);
 

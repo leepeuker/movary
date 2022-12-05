@@ -8,10 +8,12 @@ use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class UserUpdate extends Command
 {
@@ -45,7 +47,7 @@ class UserUpdate extends Command
 
         try {
             $this->userApi->fetchUser($userId);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->generateOutput($output, 'User id does not exist: ' . $userId);
 
             return Command::FAILURE;
@@ -101,7 +103,7 @@ class UserUpdate extends Command
             $this->generateOutput($output, 'Could not update user: Name already in use');
 
             return Command::FAILURE;
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->logger->error('Could not change password.', ['exception' => $t]);
 
             $this->generateOutput($output, 'Could not update user.');

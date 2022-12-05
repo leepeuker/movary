@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject;
 
+use RuntimeException;
+
 class DateFormat
 {
     private const DEFAULT_ID = 0;
@@ -37,7 +39,7 @@ class DateFormat
     public static function getJavascriptById(int $id) : string
     {
         if (isset(self::FORMATS[$id]) === false) {
-            throw new \RuntimeException('Id does not exist: ' . $id);
+            throw new RuntimeException('Id does not exist: ' . $id);
         }
 
         return self::FORMATS[$id][self::KEY_JAVASCRIPT];
@@ -51,7 +53,7 @@ class DateFormat
     public static function getPhpById(int $offset) : string
     {
         if (isset(self::FORMATS[$offset]) === false) {
-            throw new \RuntimeException('Id does not exist: ' . $offset);
+            throw new RuntimeException('Id does not exist: ' . $offset);
         }
 
         return self::FORMATS[$offset][self::KEY_PHP];

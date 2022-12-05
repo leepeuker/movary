@@ -4,6 +4,7 @@ namespace Movary\Domain\User;
 
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\DateTime;
+use RuntimeException;
 
 class UserRepository
 {
@@ -253,7 +254,7 @@ class UserRepository
         $count = $this->dbConnection->fetchOne('SELECT COUNT(*) FROM user');
 
         if ($count === false) {
-            throw new \RuntimeException('Could not fetch user count.');
+            throw new RuntimeException('Could not fetch user count.');
         }
 
         return $count;

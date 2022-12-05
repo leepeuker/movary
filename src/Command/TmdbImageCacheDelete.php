@@ -6,6 +6,7 @@ use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class TmdbImageCacheDelete extends Command
 {
@@ -32,7 +33,7 @@ class TmdbImageCacheDelete extends Command
             $this->imageCacheService->deleteCache();
 
             $this->generateOutput($output, 'Deleting cached images done.');
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete deleting image cache.');
             $this->logger->error('Could not complete deleting image cache.', ['exception' => $t]);
 

@@ -9,7 +9,7 @@ class Entity
 {
     private function __construct(
         private readonly TraktId $traktId,
-        private readonly DateTime $lastUpdatedAt
+        private readonly DateTime $lastUpdatedAt,
     ) {
     }
 

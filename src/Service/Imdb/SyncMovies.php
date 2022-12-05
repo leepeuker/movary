@@ -5,6 +5,7 @@ namespace Movary\Service\Imdb;
 use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class SyncMovies
 {
@@ -30,7 +31,7 @@ class SyncMovies
                 $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
 
                 $this->movieApi->updateImdbRating($movie->getId(), $imdbRating['average'], $imdbRating['voteCount']);
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 $this->logger->error('Could not sync imdb rating for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
 

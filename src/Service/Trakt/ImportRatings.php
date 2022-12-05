@@ -4,12 +4,13 @@ namespace Movary\Service\Trakt;
 
 use Movary\Api;
 use Movary\Api\Trakt\TraktApi;
-use Movary\Domain\User\UserApi;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\User\UserApi;
 use Movary\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
+use RuntimeException;
 
 class ImportRatings
 {
@@ -60,7 +61,7 @@ class ImportRatings
     {
         $userId = $job->getUserId();
         if ($userId === null) {
-            throw new \RuntimeException('Missing userId');
+            throw new RuntimeException('Missing userId');
         }
 
         $this->execute($userId);

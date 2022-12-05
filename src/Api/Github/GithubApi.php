@@ -2,6 +2,7 @@
 
 namespace Movary\Api\Github;
 
+use Exception;
 use GuzzleHttp\Client;
 use Movary\Util\Json;
 use Movary\ValueObject\Url;
@@ -21,7 +22,7 @@ class GithubApi
     {
         try {
             $response = $this->httpClient->get(self::GITHUB_RELEASES_URL);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('Could not send request to fetch github releases.', ['exception' => $e]);
 
             return null;

@@ -2,8 +2,8 @@
 
 namespace Movary\HttpController;
 
-use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Mapper\MoviesRequestMapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;

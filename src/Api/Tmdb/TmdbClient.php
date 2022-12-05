@@ -8,6 +8,7 @@ use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
 use Movary\Util\Json;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 class TmdbClient
 {
@@ -15,7 +16,7 @@ class TmdbClient
 
     public function __construct(
         private readonly ClientInterface $httpClient,
-        private readonly string $apiKey
+        private readonly string $apiKey,
     ) {
     }
 
@@ -39,7 +40,7 @@ class TmdbClient
         match (true) {
             $statusCode === 401 => throw TmdbAuthorizationError::create(),
             $statusCode === 404 => $this->handleNotFound($url, $response),
-            $statusCode !== 200 => throw new \RuntimeException('Api error. Response status code: ' . $statusCode),
+            $statusCode !== 200 => throw new RuntimeException('Api error. Response status code: ' . $statusCode),
             default => true
         };
 
@@ -56,6 +57,6 @@ class TmdbClient
             throw TmdbResourceNotFound::create($url);
         }
 
-        throw new \RuntimeException('Api error. Response status code: 404');
+        throw new RuntimeException('Api error. Response status code: 404');
     }
 }

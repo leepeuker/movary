@@ -10,7 +10,7 @@ class ImdbWebScrapper
     public function __construct(
         private readonly Client $httpClient,
         private readonly ImdbUrlGenerator $urlGenerator,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 

@@ -2,6 +2,8 @@
 
 namespace Movary\Domain\User\Exception;
 
-class InvalidCredentials extends \RuntimeException
+use RuntimeException;
+
+class InvalidCredentials extends RuntimeException
 {
 }

@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject;
 
+use RuntimeException;
+
 class JobStatus
 {
     private const STATUS_DONE = 'done';
@@ -15,7 +17,7 @@ class JobStatus
     private function __construct(private readonly string $status)
     {
         if (in_array($this->status, [self::STATUS_DONE, self::STATUS_IN_PROGRESS, self::STATUS_WAITING, self::STATUS_FAILED]) === false) {
-            throw new \RuntimeException('Not supported job status: ' . $this->status);
+            throw new RuntimeException('Not supported job status: ' . $this->status);
         }
     }
 

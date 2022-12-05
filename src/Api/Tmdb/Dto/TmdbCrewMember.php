@@ -7,7 +7,7 @@ class TmdbCrewMember
     private function __construct(
         private readonly TmdbPerson $person,
         private readonly string $department,
-        private readonly string $job
+        private readonly string $job,
     ) {
     }
 

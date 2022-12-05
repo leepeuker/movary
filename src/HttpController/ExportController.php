@@ -11,7 +11,7 @@ class ExportController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly ExportService $exportService
+        private readonly ExportService $exportService,
     ) {
     }
 

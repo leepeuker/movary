@@ -101,25 +101,25 @@
                     </div>
 
                     {% if passwordErrorNotEqual == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
                             Passwords were not equal.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordErrorMinLength == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
                             Password must be at least {{ passwordErrorMinLength }} characters long.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordErrorCurrentInvalid == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
                             Current password is not correct.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if passwordUpdated == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
                             Password was updated.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -147,14 +147,14 @@
                 </form>
 
                 {% if importHistorySuccessful == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         History was successfully imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endif %}
 
                 {% if importHistoryError == 'history' %}
-                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         History could not be imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -167,14 +167,14 @@
                     </div>
                 </form>
                 {% if importRatingsSuccessful == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         Ratings were successfully imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endif %}
 
                 {% if importHistoryError == 'ratings' %}
-                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
                         Ratings could not be imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -195,13 +195,13 @@
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-ratings"
                        onclick="return confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
                     {% if deletedUserHistory == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
                             History deleted successfully.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if deletedUserRatings == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
                             Ratings deleted successfully.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>

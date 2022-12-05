@@ -7,6 +7,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\PersonalRating;
+use RuntimeException;
 
 class ImportService
 {
@@ -36,7 +37,7 @@ class ImportService
 
         foreach ($csv->getRecords() as $record) {
             if (isset($record['tmdbId'], $record['imdbId'], $record['title'], $record['watchedAt']) === false) {
-                throw new \RuntimeException('Import csv is missing data');
+                throw new RuntimeException('Import csv is missing data');
             }
 
             $tmdbId = (int)$record['tmdbId'];
@@ -54,7 +55,7 @@ class ImportService
 
         foreach ($csv->getRecords() as $record) {
             if (isset($record['tmdbId'], $record['imdbId'], $record['title'], $record['userRating']) === false) {
-                throw new \RuntimeException('Import csv is missing data');
+                throw new RuntimeException('Import csv is missing data');
             }
 
             $tmdbId = (int)$record['tmdbId'];

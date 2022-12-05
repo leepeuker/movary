@@ -35,13 +35,13 @@
                     <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
 
                     {% if letterboxdHistorySyncSuccessful == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
                             Watched movies import <a href="/job-queue">scheduled</a>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if letterboxdHistoryImportFileInvalid == true %}
-                        <div class="alert alert-success alert-danger" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-danger" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
                             Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Name".
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -60,13 +60,13 @@
                     <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
 
                     {% if letterboxdRatingsSyncSuccessful == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
                             Ratings import <a href="/job-queue">scheduled</a>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                     {% if letterboxdRatingsImportFileInvalid == true %}
-                        <div class="alert alert-success alert-danger" role="alert" style="margin-left: 5%;margin-right: 5%;;margin-bottom: 0!important;margin-top: 1rem">
+                        <div class="alert alert-success alert-danger" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
                             Csv file invalid: Must contain the columns "Rating", "Letterboxd URI" and "Name".
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>

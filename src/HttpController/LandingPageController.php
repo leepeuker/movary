@@ -2,8 +2,8 @@
 
 namespace Movary\HttpController;
 
-use Movary\Domain\User\UserApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
@@ -13,7 +13,7 @@ class LandingPageController
     public function __construct(
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
-        private readonly UserApi $userApi
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -45,7 +45,7 @@ class LandingPageController
                     'errorPasswordNotEqual' => $errorPasswordNotEqual,
                     'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
                     'errorGeneric' => $errorGeneric,
-                ])
+                ]),
             );
         }
 
@@ -58,7 +58,7 @@ class LandingPageController
             $this->twig->render('page/login.html.twig', [
                 'failedLogin' => empty($failedLogin) === false,
                 'deletedAccount' => empty($deletedAccount) === false,
-            ])
+            ]),
         );
     }
 }

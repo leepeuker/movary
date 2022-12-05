@@ -4,6 +4,7 @@ namespace Movary\Service\Trakt;
 
 use Movary\ValueObject\AbstractList;
 use Movary\ValueObject\Date;
+use RuntimeException;
 
 /**
  * @method array<string, int> getIterator()
@@ -24,7 +25,7 @@ class PlaysPerDateDtoList extends AbstractList
     public function getPlaysForDate(Date $watchDate) : int
     {
         if ($this->containsDate($watchDate) === false) {
-            throw new \RuntimeException('Cannot get plays for missing date: ' . $watchDate);
+            throw new RuntimeException('Cannot get plays for missing date: ' . $watchDate);
         }
 
         return $this->data[(string)$watchDate];
