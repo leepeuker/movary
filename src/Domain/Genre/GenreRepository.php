@@ -18,7 +18,7 @@ class GenreRepository
             [
                 'name' => $name,
                 'tmdb_id' => $tmdbId,
-            ]
+            ],
         );
 
         return $this->fetchById((int)$this->dbConnection->lastInsertId());

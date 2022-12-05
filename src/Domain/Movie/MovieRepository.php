@@ -261,7 +261,7 @@ class MovieRepository
         );
 
         if ($count === false) {
-            throw new \RuntimeException('Could not execute query.');
+            throw new RuntimeException('Could not execute query.');
         }
 
         return (int)$count;
@@ -318,7 +318,7 @@ class MovieRepository
         );
 
         if ($count === false) {
-            throw new \RuntimeException('Could not execute query.');
+            throw new RuntimeException('Could not execute query.');
         }
 
         return (int)$count;

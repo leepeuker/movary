@@ -10,6 +10,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use RuntimeException;
 use Twig\Environment;
 
 class JobController
@@ -71,7 +72,7 @@ class JobController
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['historyCsv']['tmp_name']) === true) {
-            throw new \RuntimeException('Missing ratings csv file');
+            throw new RuntimeException('Missing ratings csv file');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();

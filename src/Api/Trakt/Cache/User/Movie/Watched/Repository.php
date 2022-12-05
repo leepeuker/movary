@@ -34,7 +34,7 @@ class Repository
             'SELECT last_updated_at
             FROM cache_trakt_user_movie_watched
             WHERE trakt_id = ? AND user_id = ?',
-            [$traktId->asInt(), $userId]
+            [$traktId->asInt(), $userId],
         );
 
         return $data === false ? null : DateTime::createFromString($data);
@@ -44,7 +44,7 @@ class Repository
     {
         $this->dbConnection->executeQuery(
             'DELETE FROM `cache_trakt_user_movie_watched` WHERE trakt_id = ? AND user_id = ?',
-            [$traktId->asInt(), $userId]
+            [$traktId->asInt(), $userId],
         );
     }
 
@@ -52,7 +52,7 @@ class Repository
     {
         $this->dbConnection->executeQuery(
             'REPLACE INTO `cache_trakt_user_movie_watched` (trakt_id, user_id, last_updated_at) VALUES (?, ?, ?)',
-            [$traktId->asInt(), $userId, (string)$lastUpdatedAt]
+            [$traktId->asInt(), $userId, (string)$lastUpdatedAt],
         );
     }
 }

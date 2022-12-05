@@ -26,7 +26,7 @@ class Repository
                 'user_id' => $userId,
                 'rating' => $rating,
                 'rated_at' => (string)$ratedAt,
-            ]
+            ],
         );
     }
 

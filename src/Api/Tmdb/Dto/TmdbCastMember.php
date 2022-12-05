@@ -8,7 +8,7 @@ class TmdbCastMember
         private readonly int $castId,
         private readonly TmdbPerson $person,
         private readonly string $character,
-        private readonly int $order
+        private readonly int $order,
     ) {
     }
 

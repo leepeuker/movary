@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject;
 
+use OutOfBoundsException;
+
 class Config
 {
     public function __construct(private readonly array $config)
@@ -44,7 +46,7 @@ class Config
     private function ensureKeyExists(string $key) : void
     {
         if (isset($this->config[$key]) === false) {
-            throw new \OutOfBoundsException('Key does not exist: ' . $key);
+            throw new OutOfBoundsException('Key does not exist: ' . $key);
         }
     }
 

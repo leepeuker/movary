@@ -14,6 +14,7 @@ use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Job;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class ImportWatchedMovies
 {
@@ -73,7 +74,7 @@ class ImportWatchedMovies
     {
         $userId = $job->getUserId();
         if ($userId === null) {
-            throw new \RuntimeException('Missing userId');
+            throw new RuntimeException('Missing userId');
         }
 
         $this->execute($userId);

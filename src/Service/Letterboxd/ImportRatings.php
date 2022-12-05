@@ -11,6 +11,7 @@ use Movary\Service\Letterboxd\ValueObject\CsvLineRating;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class ImportRatings
 {
@@ -64,7 +65,7 @@ class ImportRatings
     {
         $userId = $job->getUserId();
         if ($userId === null) {
-            throw new \RuntimeException('Missing userId');
+            throw new RuntimeException('Missing userId');
         }
 
         $this->execute($userId, $job->getParameters()['importFile']);
@@ -92,7 +93,7 @@ class ImportRatings
     private function ensureValidCsvFile(string $ratingsCsvPath) : void
     {
         if ($this->fileValidator->isValid($ratingsCsvPath) === false) {
-            throw new \RuntimeException('Invalid letterboxed ratings csv file.');
+            throw new RuntimeException('Invalid letterboxed ratings csv file.');
         }
     }
 

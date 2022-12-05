@@ -2,7 +2,9 @@
 
 namespace Movary\Api\Tmdb\Exception;
 
-class TmdbResourceNotFound extends \RuntimeException
+use RuntimeException;
+
+class TmdbResourceNotFound extends RuntimeException
 {
     public static function create(string $url) : self
     {

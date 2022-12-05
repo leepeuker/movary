@@ -2,6 +2,7 @@
 
 namespace Movary\Command;
 
+use Exception;
 use Movary\JobQueue;
 use Movary\Service\JobProcessor;
 use Movary\ValueObject\JobStatus;
@@ -44,7 +45,7 @@ class ProcessJobs extends Command
 
         try {
             $processedJobType = $this->processJob();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error('Could not process job.', ['exception' => $e]);
 
             return Command::FAILURE;
@@ -83,7 +84,7 @@ class ProcessJobs extends Command
             $this->jobProcessor->processJob($job);
 
             $this->jobApi->updateJobStatus($job->getId(), JobStatus::createDone());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->jobApi->updateJobStatus($job->getId(), JobStatus::createFailed());
 
             throw $e;

@@ -2,10 +2,11 @@
 
 namespace Movary\HttpController;
 
-use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
+use DateTime;
 use Movary\Domain\Movie;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
@@ -14,6 +15,7 @@ use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class PlexController
 {
@@ -119,7 +121,7 @@ class PlexController
         }
 
         if (isset($webHook['rating']) === false) {
-            throw new \RuntimeException('Could not get rating from: ' . Json::encode($webHook));
+            throw new RuntimeException('Could not get rating from: ' . Json::encode($webHook));
         }
 
         $rating = PersonalRating::create((int)$webHook['rating']);
@@ -135,9 +137,9 @@ class PlexController
             return Response::create(StatusCode::createOk());
         }
 
-        $dateTime = \DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
+        $dateTime = DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
         if ($dateTime === false) {
-            throw new \RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);
+            throw new RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);
         }
 
         $watchDate = Date::createFromString($dateTime->format('Y-m-d'));

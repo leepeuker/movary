@@ -19,7 +19,7 @@ class CompanyRepository
                 'name' => $name,
                 'origin_country' => $originCountry,
                 'tmdb_id' => $tmdbId,
-            ]
+            ],
         );
 
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
@@ -62,7 +62,7 @@ class CompanyRepository
             ],
             [
                 'id' => $id,
-            ]
+            ],
         );
 
         return $this->fetchById($id);

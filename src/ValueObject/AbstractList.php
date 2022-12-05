@@ -2,11 +2,17 @@
 
 namespace Movary\ValueObject;
 
+use ArrayIterator;
+use Countable;
+use IteratorAggregate;
+use JsonSerializable;
+use function count;
+
 /**
  * @template TValue
- * @implements \IteratorAggregate<int|string, TValue>
+ * @implements IteratorAggregate<int|string, TValue>
  */
-abstract class AbstractList implements \Countable, \IteratorAggregate, \JsonSerializable
+abstract class AbstractList implements Countable, IteratorAggregate, JsonSerializable
 {
     protected array $data;
 
@@ -27,12 +33,12 @@ abstract class AbstractList implements \Countable, \IteratorAggregate, \JsonSeri
 
     public function count() : int
     {
-        return \count($this->data);
+        return count($this->data);
     }
 
-    public function getIterator() : \ArrayIterator
+    public function getIterator() : ArrayIterator
     {
-        return new \ArrayIterator($this->data);
+        return new ArrayIterator($this->data);
     }
 
     public function jsonSerialize() : array

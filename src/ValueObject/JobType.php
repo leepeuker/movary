@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject;
 
+use RuntimeException;
+
 class JobType
 {
     private const TYPE_IMDB_SYNC = 'imdb_sync';
@@ -29,7 +31,7 @@ class JobType
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
             ]) === false) {
-            throw new \RuntimeException('Not supported job type: ' . $this->type);
+            throw new RuntimeException('Not supported job type: ' . $this->type);
         }
     }
 

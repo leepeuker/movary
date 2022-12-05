@@ -5,6 +5,7 @@ namespace Movary\Api\Trakt;
 use GuzzleHttp\Psr7\Request;
 use Movary\Util\Json;
 use Psr\Http\Client\ClientInterface;
+use RuntimeException;
 
 class TraktClient
 {
@@ -32,7 +33,7 @@ class TraktClient
         $response = $this->httpClient->sendRequest($request);
 
         if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException('Api error. Response status code: ' . $response->getStatusCode());
+            throw new RuntimeException('Api error. Response status code: ' . $response->getStatusCode());
         }
 
         return Json::decode((string)$response->getBody());

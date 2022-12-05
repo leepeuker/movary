@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class TraktImport extends Command
 {
@@ -80,7 +81,7 @@ class TraktImport extends Command
             $this->generateOutput($output, 'ERROR: User as no trakt user name set.');
 
             return Command::FAILURE;
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete trakt import.');
             $this->logger->error('Could not complete trakt import.', ['exception' => $t]);
 

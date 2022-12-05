@@ -2,7 +2,9 @@
 
 namespace Movary\Domain\User\Exception;
 
-class PasswordTooShort extends \Exception
+use Exception;
+
+class PasswordTooShort extends Exception
 {
     public function __construct(private readonly int $minLength)
     {

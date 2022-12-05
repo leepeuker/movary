@@ -2,15 +2,16 @@
 
 namespace Movary\Command;
 
-use Movary\Domain\User\UserApi;
 use Movary\Domain\User\Exception\EmailNotUnique;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
+use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class UserCreate extends Command
 {
@@ -57,7 +58,7 @@ class UserCreate extends Command
             $this->generateOutput($output, 'Could not create user: Name already in use');
 
             return Command::FAILURE;
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->logger->error('Could not create user.', ['exception' => $t]);
 
             $this->generateOutput($output, 'Could not create user.');

@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class UserDelete extends Command
 {
@@ -31,7 +32,7 @@ class UserDelete extends Command
     {
         try {
             $this->userApi->deleteUser((int)$input->getArgument('userId'));
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->logger->error('Could not delete user.', ['exception' => $t]);
 
             $this->generateOutput($output, 'Could not delete user.');

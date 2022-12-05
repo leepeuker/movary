@@ -3,6 +3,7 @@
 namespace Movary\Api\Letterboxd;
 
 use GuzzleHttp\Client;
+use RuntimeException;
 
 class LetterboxdWebScrapper
 {
@@ -19,7 +20,7 @@ class LetterboxdWebScrapper
         if (empty($tmdbIdMatches[1]) === true) {
             preg_match('/film_id=\"(\d+)\"/', $responseBodyContent, $tmdbIdMatches);
             if (empty($tmdbIdMatches[1]) === true) {
-                throw new \RuntimeException('Could not find tmdb id on page: ' . $letterboxedMovieUri);
+                throw new RuntimeException('Could not find tmdb id on page: ' . $letterboxedMovieUri);
             }
         }
 

@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class ImdbSync extends Command
 {
@@ -50,7 +51,7 @@ class ImdbSync extends Command
             $this->jobQueueApi->addImdbSyncJob(JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing imdb movie ratings done.');
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete imdb sync.');
             $this->logger->error('Could not complete imdb sync.', ['exception' => $t]);
 

@@ -10,7 +10,7 @@ class Response
     private function __construct(
         private readonly StatusCode $statusCode,
         private readonly ?string $body = null,
-        private readonly array $headers = []
+        private readonly array $headers = [],
     ) {
     }
 

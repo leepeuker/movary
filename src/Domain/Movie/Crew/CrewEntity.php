@@ -8,7 +8,7 @@ class CrewEntity
         private readonly int $movieId,
         private readonly int $personId,
         private readonly string $job,
-        private readonly int $position
+        private readonly int $position,
     ) {
     }
 

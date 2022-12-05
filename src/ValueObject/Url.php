@@ -3,6 +3,7 @@
 namespace Movary\ValueObject;
 
 use Exception;
+use RuntimeException;
 
 class Url
 {
@@ -28,7 +29,7 @@ class Url
         $path = parse_url($this->url, PHP_URL_PATH);
 
         if ($path === false) {
-            throw new \RuntimeException(sprintf('Could not parse path from url "%s"', $this->url));
+            throw new RuntimeException(sprintf('Could not parse path from url "%s"', $this->url));
         }
 
         return $path;

@@ -13,7 +13,7 @@ class DatabaseMigrationMigrate extends Command
 
     public function __construct(
         private readonly PhinxApplication $phinxApplication,
-        private readonly string $phinxConfigurationFile
+        private readonly string $phinxConfigurationFile,
     ) {
         parent::__construct();
     }

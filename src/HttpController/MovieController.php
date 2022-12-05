@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController;
 
+use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\Domain\Movie\MovieApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;

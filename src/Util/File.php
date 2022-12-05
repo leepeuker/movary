@@ -28,7 +28,7 @@ class File
         $files = glob(rtrim($path, '/') . '/*');
 
         if ($files === false) {
-            throw new \RuntimeException('Could not get files in directory: ' . $path);
+            throw new RuntimeException('Could not get files in directory: ' . $path);
         }
 
         foreach ($files as $file) {
@@ -47,7 +47,7 @@ class File
         $files = glob(rtrim($path, '/') . '/*');
 
         if ($files === false) {
-            throw new \RuntimeException('Could not get files in directory: ' . $path);
+            throw new RuntimeException('Could not get files in directory: ' . $path);
         }
 
         foreach ($files as $file) {

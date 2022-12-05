@@ -3,6 +3,7 @@
 namespace Movary;
 
 use Doctrine\DBAL;
+use Dotenv\Dotenv;
 use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
@@ -10,7 +11,6 @@ use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
-use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\TraktClient;
@@ -31,6 +31,7 @@ use Movary\Util\File;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
+use OutOfBoundsException;
 use PDO;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
@@ -42,7 +43,7 @@ class Factory
 {
     public static function createConfig() : Config
     {
-        $dotenv = \Dotenv\Dotenv::createMutable(__DIR__ . '/..');
+        $dotenv = Dotenv::createMutable(__DIR__ . '/..');
         $dotenv->safeLoad();
 
         return Config::createFromEnv();
@@ -152,13 +153,13 @@ class Factory
     {
         try {
             $plexEnableScrobbleWebhook = $config->getAsBool('PLEX_ENABLE_SCROBBLE');
-        } catch (\OutOfBoundsException) {
+        } catch (OutOfBoundsException) {
             $plexEnableScrobbleWebhook = true;
         }
 
         try {
             $plexEnableRatingWebhook = $config->getAsBool('PLEX_ENABLE_RATING');
-        } catch (\OutOfBoundsException) {
+        } catch (OutOfBoundsException) {
             $plexEnableRatingWebhook = false;
         }
 
@@ -177,7 +178,7 @@ class Factory
     {
         try {
             $applicationVersion = $config->getAsString('APPLICATION_VERSION');
-        } catch (\OutOfBoundsException) {
+        } catch (OutOfBoundsException) {
             $applicationVersion = null;
         }
 
@@ -250,7 +251,7 @@ class Factory
     {
         try {
             $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
-        } catch (\OutOfBoundsException) {
+        } catch (OutOfBoundsException) {
             $enableImageCaching = false;
         }
 
@@ -284,7 +285,7 @@ class Factory
     {
         try {
             $minRuntimeInSeconds = $config->getAsInt('MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING');
-        } catch (\OutOfBoundsException) {
+        } catch (OutOfBoundsException) {
             $minRuntimeInSeconds = null;
         }
 

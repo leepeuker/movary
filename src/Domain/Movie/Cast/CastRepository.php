@@ -19,7 +19,7 @@ class CastRepository
                 'person_id' => $personId,
                 'character_name' => $character,
                 'position' => $position,
-            ]
+            ],
         );
     }
 

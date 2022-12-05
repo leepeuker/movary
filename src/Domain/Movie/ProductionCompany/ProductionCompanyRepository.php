@@ -18,7 +18,7 @@ class ProductionCompanyRepository
                 'movie_id' => $movieId,
                 'company_id' => $genreId,
                 'position' => $position,
-            ]
+            ],
         );
     }
 

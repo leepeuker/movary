@@ -14,6 +14,7 @@ use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\PersonalRating;
+use RuntimeException;
 use Twig\Environment;
 
 class HistoryController
@@ -61,7 +62,7 @@ class HistoryController
         $requestData = Json::decode($request->getBody());
 
         if (isset($requestData['watchDate'], $requestData['tmdbId'], $requestData['personalRating']) === false) {
-            throw new \RuntimeException('Missing parameters');
+            throw new RuntimeException('Missing parameters');
         }
 
         $watchDate = Date::createFromStringAndFormat($requestData['watchDate'], $requestData['dateFormat']);
@@ -129,7 +130,7 @@ class HistoryController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/logMovie.html.twig', [
+            $this->twig->render('page/log-movie.html.twig', [
                 'movies' => $movies,
                 'searchTerm' => $searchTerm,
             ]),

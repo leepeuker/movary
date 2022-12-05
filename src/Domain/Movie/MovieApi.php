@@ -23,6 +23,7 @@ use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\Year;
+use RuntimeException;
 
 class MovieApi
 {
@@ -125,7 +126,7 @@ class MovieApi
         $movie = $this->findByTraktId($traktId);
 
         if ($movie === null) {
-            throw new \RuntimeException('Could not find movie with trakt id: ' . $traktId->asInt());
+            throw new RuntimeException('Could not find movie with trakt id: ' . $traktId->asInt());
         }
 
         return $movie;

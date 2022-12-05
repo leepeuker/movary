@@ -8,7 +8,7 @@ class MovieHistoryEntity
 {
     private function __construct(
         private readonly int $id,
-        private readonly Date $watchedAt
+        private readonly Date $watchedAt,
     ) {
     }
 

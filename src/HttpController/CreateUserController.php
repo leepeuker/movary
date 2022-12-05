@@ -10,6 +10,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Throwable;
 
 class CreateUserController
 {
@@ -60,7 +61,7 @@ class CreateUserController
             $_SESSION['errorPasswordTooShort'] = true;
         } catch (UsernameInvalidFormat $e) {
             $_SESSION['errorUsernameInvalidFormat'] = true;
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             $_SESSION['errorGeneric'] = true;
         }
 

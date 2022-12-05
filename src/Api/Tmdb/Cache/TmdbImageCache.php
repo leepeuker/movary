@@ -5,11 +5,12 @@ namespace Movary\Api\Tmdb\Cache;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Service\ImageCacheService;
 use Movary\ValueObject\Job;
+use PDO;
 
 class TmdbImageCache
 {
     public function __construct(
-        private readonly \PDO $pdo,
+        private readonly PDO $pdo,
         private readonly ImageCacheService $imageCacheService,
         private readonly TmdbUrlGenerator $tmdbUrlGenerator,
     ) {

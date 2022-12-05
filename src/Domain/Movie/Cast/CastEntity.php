@@ -8,7 +8,7 @@ class CastEntity
         private readonly int $movieId,
         private readonly int $personId,
         private readonly ?string $character,
-        private readonly int $position
+        private readonly int $position,
     ) {
     }
 

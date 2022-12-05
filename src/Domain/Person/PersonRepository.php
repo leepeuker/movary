@@ -23,7 +23,7 @@ class PersonRepository
                 'known_for_department' => $knownForDepartment,
                 'tmdb_id' => $tmdbId,
                 'tmdb_poster_path' => $tmdbPosterPath,
-            ]
+            ],
         );
 
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
@@ -64,7 +64,7 @@ class PersonRepository
             ],
             [
                 'id' => $id,
-            ]
+            ],
         );
     }
 

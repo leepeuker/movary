@@ -4,6 +4,7 @@ namespace Movary\Domain\User;
 
 use Movary\Domain\User\Service\Validator;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
 
 class UserApi
 {
@@ -78,7 +79,7 @@ class UserApi
         $dateFormat = $this->repository->findDateFormatId($userId);
 
         if ($dateFormat === null) {
-            throw new \RuntimeException('Could not find date format for user.');
+            throw new RuntimeException('Could not find date format for user.');
         }
 
         return $dateFormat;
@@ -89,7 +90,7 @@ class UserApi
         $user = $this->repository->findUserById($userId);
 
         if ($user === null) {
-            throw new \RuntimeException('User does not exist with id : ' . $userId);
+            throw new RuntimeException('User does not exist with id : ' . $userId);
         }
 
         return $user;
@@ -175,7 +176,7 @@ class UserApi
         $this->userValidator->ensurePasswordIsValid($newPassword);
 
         if ($this->repository->findUserById($userId) === null) {
-            throw new \RuntimeException('There is no user with id: ' . $userId);
+            throw new RuntimeException('There is no user with id: ' . $userId);
         }
 
         $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);

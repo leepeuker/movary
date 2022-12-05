@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject;
 
+use RuntimeException;
+
 class DateInterval
 {
     private \DateInterval $dateInterval;
@@ -21,7 +23,7 @@ class DateInterval
         $days = $this->dateInterval->days;
 
         if ($days === false) {
-            throw new \RuntimeException('Could not get days');
+            throw new RuntimeException('Could not get days');
         }
 
         return $days;

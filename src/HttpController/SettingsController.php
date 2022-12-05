@@ -13,6 +13,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use RuntimeException;
 use Twig\Environment;
 
 class SettingsController
@@ -38,7 +39,7 @@ class SettingsController
         $user = $this->userApi->fetchUser($userId);
 
         if ($user->areCoreAccountChangesDisabled() === true) {
-            throw new \RuntimeException('Account deletion is disabled for user: ' . $userId);
+            throw new RuntimeException('Account deletion is disabled for user: ' . $userId);
         }
 
         $this->userApi->deleteUser($userId);
@@ -321,7 +322,7 @@ class SettingsController
         }
 
         if ($user->areCoreAccountChangesDisabled() === true) {
-            throw new \RuntimeException('Password changes are disabled for user: ' . $userId);
+            throw new RuntimeException('Password changes are disabled for user: ' . $userId);
         }
 
         $this->userApi->updatePassword($userId, $newPassword);

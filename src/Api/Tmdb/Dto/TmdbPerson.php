@@ -15,7 +15,7 @@ class TmdbPerson
         private readonly ?string $knownForDepartment,
         private readonly ?string $profilePath,
         private readonly string $creditId,
-        private readonly ?string $posterPath
+        private readonly ?string $posterPath,
     ) {
     }
 

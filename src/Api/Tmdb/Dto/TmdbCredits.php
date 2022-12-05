@@ -6,7 +6,7 @@ class TmdbCredits
 {
     private function __construct(
         private readonly TmdbCast $cast,
-        private readonly TmdbCrew $crew
+        private readonly TmdbCrew $crew,
     ) {
     }
 

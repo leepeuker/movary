@@ -2,7 +2,10 @@
 
 namespace Movary\ValueObject;
 
-class DateTime implements \JsonSerializable
+use DateTimeZone;
+use JsonSerializable;
+
+class DateTime implements JsonSerializable
 {
     private const DEFAULT_STRING_FORMAT = 'Y-m-d H:i:s';
 
@@ -24,12 +27,12 @@ class DateTime implements \JsonSerializable
 
     public static function createFromString(string $dateTimeString) : self
     {
-        return new self(new \DateTime($dateTimeString, new \DateTimeZone(self::DEFAULT_TIME_ZONE)));
+        return new self(new \DateTime($dateTimeString, new DateTimeZone(self::DEFAULT_TIME_ZONE)));
     }
 
     public static function createFromStringAndTimeZone(string $dateTimeString, string $timeZone) : self
     {
-        return new self(new \DateTime($dateTimeString, new \DateTimeZone($timeZone)));
+        return new self(new \DateTime($dateTimeString, new DateTimeZone($timeZone)));
     }
 
     public function __toString() : string

@@ -4,6 +4,7 @@ namespace Movary\Api\Tmdb\Cache;
 
 use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb\TmdbClient;
+use RuntimeException;
 
 class TmdbIso6931Cache
 {
@@ -31,7 +32,7 @@ class TmdbIso6931Cache
             }
         }
 
-        throw new \RuntimeException('Language code not handled: ' . $languageCode);
+        throw new RuntimeException('Language code not handled: ' . $languageCode);
     }
 
     private function loadFromDatabase() : bool

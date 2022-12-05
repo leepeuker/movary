@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject\Http;
 
+use UnexpectedValueException;
+
 class Request
 {
     private array $routeParameters = [];
@@ -40,7 +42,7 @@ class Request
         $getParameters = filter_input_array(INPUT_GET) ?? [];
 
         if ($getParameters === false) {
-            throw new \UnexpectedValueException('Could not load GET parameters.');
+            throw new UnexpectedValueException('Could not load GET parameters.');
         }
 
         return $getParameters;
@@ -67,7 +69,7 @@ class Request
         $postParameters = filter_input_array(INPUT_POST) ?? [];
 
         if ($postParameters === false) {
-            throw new \UnexpectedValueException('Could not load POST parameters.');
+            throw new UnexpectedValueException('Could not load POST parameters.');
         }
 
         return $postParameters;

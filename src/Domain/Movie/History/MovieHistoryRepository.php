@@ -21,7 +21,7 @@ class MovieHistoryRepository
                 $userId,
                 (string)$watchedAt,
                 (string)$plays,
-            ]
+            ],
         );
     }
 
@@ -32,7 +32,7 @@ class MovieHistoryRepository
             FROM movie_user_watch_dates
             INNER JOIN movie m ON movie_user_watch_dates.movie_id = m.id
             WHERE m.trakt_id = ?',
-            [$traktId->asInt()]
+            [$traktId->asInt()],
         );
     }
 
@@ -47,7 +47,7 @@ class MovieHistoryRepository
             'DELETE movie_user_watch_dates
             FROM movie_user_watch_dates
             WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
-            [$movieId, (string)$watchedAt, $userId]
+            [$movieId, (string)$watchedAt, $userId],
         );
     }
 }

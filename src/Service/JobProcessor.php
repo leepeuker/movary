@@ -8,6 +8,7 @@ use Movary\Service\Tmdb\SyncMovies;
 use Movary\Service\Trakt;
 use Movary\Service\Trakt\ImportWatchedMovies;
 use Movary\ValueObject\Job;
+use RuntimeException;
 
 class JobProcessor
 {
@@ -31,7 +32,7 @@ class JobProcessor
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
             $job->getType()->isOfTypeTmdbSync() => $this->tmdbSyncMovies->syncMovies(),
 
-            default => throw new \RuntimeException('Job type not supported: ' . $job->getType()),
+            default => throw new RuntimeException('Job type not supported: ' . $job->getType()),
         };
     }
 }

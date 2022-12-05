@@ -8,7 +8,7 @@ class CompanyEntity
         private readonly int $id,
         private readonly string $name,
         private readonly string $originCountry,
-        private readonly int $tmdbId
+        private readonly int $tmdbId,
     ) {
     }
 

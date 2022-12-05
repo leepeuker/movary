@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject;
 
+use RuntimeException;
+
 class Gender
 {
     private const GENDER_ABBREVIATION = [
@@ -44,7 +46,7 @@ class Gender
     private static function ensureValidGender(int $gender) : void
     {
         if (in_array($gender, self::VALID_GENDERS, true) === false) {
-            throw new \RuntimeException('Invalid gender :' . $gender);
+            throw new RuntimeException('Invalid gender :' . $gender);
         }
     }
 

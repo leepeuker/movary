@@ -2,7 +2,9 @@
 
 namespace Movary\Api\Tmdb\Exception;
 
-class TmdbAuthorizationError extends \RuntimeException
+use RuntimeException;
+
+class TmdbAuthorizationError extends RuntimeException
 {
     public static function create() : self
     {

@@ -4,7 +4,6 @@ namespace Movary\Service\Letterboxd;
 
 use League\Csv\Reader;
 use Movary\Api\Letterboxd\LetterboxdWebScrapper;
-use Movary\Service\Tmdb;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Service\Letterboxd\ValueObject\CsvLineHistory;
@@ -12,6 +11,7 @@ use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\Trakt\PlaysPerDateDtoList;
 use Movary\ValueObject\Job;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class ImportHistory
 {
@@ -74,7 +74,7 @@ class ImportHistory
     {
         $userId = $job->getUserId();
         if ($userId === null) {
-            throw new \RuntimeException('Missing userId');
+            throw new RuntimeException('Missing userId');
         }
 
         $this->execute($userId, $job->getParameters()['importFile']);
@@ -103,7 +103,7 @@ class ImportHistory
     private function ensureValidCsvRow(string $historyCsvPath) : void
     {
         if ($this->fileValidator->isValid($historyCsvPath) === false) {
-            throw new \RuntimeException('Invalid letterboxed watched csv file.');
+            throw new RuntimeException('Invalid letterboxed watched csv file.');
         }
     }
 }

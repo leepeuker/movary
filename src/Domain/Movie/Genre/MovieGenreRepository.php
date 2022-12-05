@@ -3,7 +3,6 @@
 namespace Movary\Domain\Movie\Genre;
 
 use Doctrine\DBAL\Connection;
-use RuntimeException;
 
 class MovieGenreRepository
 {
@@ -19,7 +18,7 @@ class MovieGenreRepository
                 'movie_id' => $movieId,
                 'genre_id' => $genreId,
                 'position' => $position,
-            ]
+            ],
         );
     }
 

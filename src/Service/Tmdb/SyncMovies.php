@@ -6,6 +6,7 @@ use Doctrine\DBAL;
 use Movary\Domain\Movie\MovieApi;
 use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class SyncMovies
 {
@@ -37,7 +38,7 @@ class SyncMovies
 
             try {
                 $this->syncMovieService->syncMovie($movie->getTmdbId());
-            } catch (\Throwable $t) {
+            } catch (Throwable $t) {
                 $this->dbConnection->rollBack();
                 $this->logger->error('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }

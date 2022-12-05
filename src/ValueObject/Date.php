@@ -2,7 +2,10 @@
 
 namespace Movary\ValueObject;
 
-class Date implements \JsonSerializable
+use JsonSerializable;
+use RuntimeException;
+
+class Date implements JsonSerializable
 {
     private const FORMAT = 'Y-m-d';
 
@@ -30,7 +33,7 @@ class Date implements \JsonSerializable
         $dateTime = \DateTime::createFromFormat($dateFormat, $dateString);
 
         if ($dateTime === false) {
-            throw new \RuntimeException(sprintf('Could not create datetime of string "%s" with format "%s".', $dateString, $dateFormat));
+            throw new RuntimeException(sprintf('Could not create datetime of string "%s" with format "%s".', $dateString, $dateFormat));
         }
 
         return new self ($dateTime->format(self::FORMAT));
@@ -46,7 +49,7 @@ class Date implements \JsonSerializable
         $daysSince = (new \DateTime($this->date))->diff((new \DateTime($date->date)))->days;
 
         if ($daysSince === false) {
-            throw new \RuntimeException('Could not get number of days since: ' . $date);
+            throw new RuntimeException('Could not get number of days since: ' . $date);
         }
 
         return $daysSince;

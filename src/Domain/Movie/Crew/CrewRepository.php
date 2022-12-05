@@ -20,7 +20,7 @@ class CrewRepository
                 'job' => $job,
                 'department' => $department,
                 'position' => $position,
-            ]
+            ],
         );
     }
 
