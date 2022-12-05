@@ -29,9 +29,9 @@ class JobQueueApi
         $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
     }
 
-    public function addTmdbImageCacheJob(array $movieIds = []) : void
+    public function addTmdbImageCacheJob(array $movieIds = [], ?JobStatus $jobStatus = null) : void
     {
-        $this->repository->addJob(JobType::createTmdbImageCache(), JobStatus::createWaiting(), parameters: ['movieIds' => $movieIds]);
+        $this->repository->addJob(JobType::createTmdbImageCache(), $jobStatus ?? JobStatus::createWaiting(), parameters: ['movieIds' => $movieIds]);
     }
 
     public function addTmdbSyncJob(JobStatus $jobStatus) : void
