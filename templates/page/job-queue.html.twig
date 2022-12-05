@@ -35,5 +35,10 @@
                 </table>
             </div>
         </div>
+        {% if jobs|length == 0 %}<p>No jobs in history</p>{% endif %}
+        <div class="d-grid gap-2">
+            <a class="btn btn-warning" type="button" href="/job-queue/purge-processed">Purge processed jobs</a>
+            <a class="btn btn-danger" type="button" href="/job-queue/purge-all">Purge all jobs</a>
+        </div>
     </main>
 {% endblock %}
