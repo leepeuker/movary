@@ -7,14 +7,19 @@ use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Movary\Api\Github\GithubApi;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
+use Movary\Api\Trakt\TraktApi;
+use Movary\Api\Trakt\TraktClient;
 use Movary\Command;
 use Movary\Domain\Movie;
+use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
@@ -180,8 +185,9 @@ class Factory
             $container->get(Twig\Environment::class),
             $container->get(JobQueueApi::class),
             $container->get(Authentication::class),
-            $container->get(User\UserApi::class),
-            $container->get(Movie\MovieApi::class),
+            $container->get(UserApi::class),
+            $container->get(MovieApi::class),
+            $container->get(GithubApi::class),
             $applicationVersion
         );
     }
@@ -194,10 +200,10 @@ class Factory
         );
     }
 
-    public static function createTraktApi(ContainerInterface $container) : Trakt\TraktApi
+    public static function createTraktApi(ContainerInterface $container) : TraktApi
     {
-        return new Trakt\TraktApi(
-            $container->get(Trakt\TraktClient::class),
+        return new TraktApi(
+            $container->get(TraktClient::class),
             $container->get(Watched\Service::class),
         );
     }

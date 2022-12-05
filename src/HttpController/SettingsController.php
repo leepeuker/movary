@@ -2,16 +2,17 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Github\GithubApi;
+use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
-use Movary\Domain\Movie;
+use Movary\JobQueue\JobQueueApi;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\JobQueue\JobQueueApi;
 use Twig\Environment;
 
 class SettingsController
@@ -22,7 +23,8 @@ class SettingsController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,
-        private readonly ?string $applicationVersion = null,
+        private readonly GithubApi $githubApi,
+        private readonly ?string $currentApplicationVersion = null,
     ) {
     }
 
@@ -158,7 +160,8 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
-                'applicationVersion' => $this->applicationVersion ?? '-',
+                'currentApplicationVersion' => $this->currentApplicationVersion ?? '-',
+                'latestApplicationVersion' => $this->githubApi->findLatestApplicationLatestVersion(),
                 'lastSyncTmdb' => $this->workerService->findLastTmdbSync() ?? '-',
                 'lastSyncImdb' => $this->workerService->findLastImdbSync() ?? '-',
             ]),
