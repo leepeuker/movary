@@ -3,6 +3,8 @@
 namespace Movary\Command;
 
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
+use Movary\JobQueue\JobQueueApi;
+use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,6 +21,7 @@ class TmdbImageCacheRefresh extends Command
 
     public function __construct(
         private readonly TmdbImageCache $imageCacheService,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -65,6 +68,8 @@ class TmdbImageCacheRefresh extends Command
 
                     return Command::FAILURE;
             }
+
+            $this->jobQueueApi->addTmdbImageCacheJob(jobStatus: JobStatus::createDone());
 
             $this->generateOutput($output, 'Caching images done.');
         } catch (Throwable $t) {
