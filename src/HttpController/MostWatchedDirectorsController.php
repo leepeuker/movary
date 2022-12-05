@@ -45,7 +45,7 @@ class MostWatchedDirectorsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/mostWatchedDirectors.html.twig', [
+            $this->twig->render('page/most-watched-directors.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'mostWatchedDirectors' => $mostWatchedActors,
                 'paginationElements' => $paginationElements,

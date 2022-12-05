@@ -79,6 +79,11 @@ return static function(FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/job-queue/purge-history',
+        [\Movary\HttpController\JobController::class, 'purgeHistory']
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/log-movie',
         [\Movary\HttpController\HistoryController::class, 'renderLogMoviePage']
     );

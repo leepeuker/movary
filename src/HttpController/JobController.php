@@ -23,6 +23,17 @@ class JobController
     ) {
     }
 
+    public function purgeHistory() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $this->jobQueueApi->purgeHistory();
+
+        return Response::createFoundRedirect('/job-queue');
+    }
+
     public function renderQueuePage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {

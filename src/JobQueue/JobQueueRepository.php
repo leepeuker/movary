@@ -25,7 +25,7 @@ class JobQueueRepository
                 'job_status' => $status,
                 'user_id' => $userId,
                 'parameters' => $parameters !== null ? Json::encode($parameters) : null,
-            ]
+            ],
         );
     }
 
@@ -67,7 +67,7 @@ class JobQueueRepository
                     $jobType,
                     JobStatus::createDone(),
                     $userId,
-                ]
+                ],
             );
 
         if ($data === false) {
@@ -75,6 +75,12 @@ class JobQueueRepository
         }
 
         return DateTime::createFromString($data);
+    }
+
+    public function purgeHistory() : void
+    {
+        $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createDone()]);
+        $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createFailed()]);
     }
 
     public function updateJobStatus(int $id, JobStatus $status) : void

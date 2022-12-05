@@ -101,6 +101,11 @@ class JobQueueApi
         return $historyDate;
     }
 
+    public function purgeHistory() : void
+    {
+        $this->repository->purgeHistory();
+    }
+
     public function setJobToInProgress(int $id) : void
     {
         $this->repository->updateJobStatus($id, JobStatus::createInProgress());
