@@ -14,7 +14,10 @@
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <p style="margin-bottom: 0.5rem">Last <a href="https://themoviedb.org/" target="_blank">TMDB</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
                 <p style="margin-bottom: 0.5rem">Last <a href="https://www.imdb.com/" target="_blank">IMDb</a> sync: <span class="fw-light">{{ lastSyncImdb }}</span></p>
-                <p><a href="https://github.com/leepeuker/movary/releases" target="_blank">Application</a> version: <span class="fw-light">{{ applicationVersion }}</span>
+                <p>App version: <span class="fw-light">{{ currentApplicationVersion }}</span>
+                    {% if currentApplicationVersion != latestApplicationVersion.name %}
+                        (<a href="{{ latestApplicationVersion.url }}" target="_blank">Update available</a>)
+                    {% endif %}
                 </p>
             </div>
         </div>
