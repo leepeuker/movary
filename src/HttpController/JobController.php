@@ -54,7 +54,7 @@ class JobController
 
         $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
 
-        $jobs = $this->jobQueueApi->fetchJobsForStatusPage($this->authenticationService->getCurrentUserId(), (int)$jobsPerPage);
+        $jobs = $this->jobQueueApi->fetchJobsForStatusPage((int)$jobsPerPage);
 
         return Response::create(
             StatusCode::createOk(),

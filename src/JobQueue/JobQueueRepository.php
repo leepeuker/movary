@@ -28,16 +28,14 @@ class JobQueueRepository
         );
     }
 
-    public function fetchJobs(int $userId, int $limit) : array
+    public function fetchJobs(int $limit) : array
     {
         return $this->dbConnection->fetchAllAssociative(
             "SELECT jobs.job_type, users.name, jobs.job_status, jobs.updated_at, jobs.created_at
             FROM job_queue jobs
             LEFT JOIN user users on jobs.user_id = users.id
-            WHERE jobs.user_id = ? OR jobs.user_id IS NULL 
             ORDER BY jobs.created_at DESC, jobs.id DESC 
             LIMIT $limit",
-            [$userId],
         );
     }
 
