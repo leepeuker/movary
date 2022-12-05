@@ -77,7 +77,13 @@ class JobQueueRepository
         return DateTime::createFromString($data);
     }
 
-    public function purgeHistory() : void
+    public function purgeNotProcessedJobs() : void
+    {
+        $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createWaiting()]);
+        $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createInProgress()]);
+    }
+
+    public function purgeProcessedJobs() : void
     {
         $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createDone()]);
         $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createFailed()]);
