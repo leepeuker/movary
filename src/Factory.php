@@ -23,6 +23,7 @@ use Movary\Domain\User\UserApi;
 use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
+use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Tmdb\SyncMovie;
@@ -106,6 +107,20 @@ class Factory
             $container->get(ClientInterface::class),
             __DIR__ . '/../public/',
             '/images/cached/',
+        );
+    }
+
+    public static function createJobQueueScheduler(ContainerInterface $container, Config $config) : JobQueueScheduler
+    {
+        try {
+            $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
+        } catch (OutOfBoundsException) {
+            $enableImageCaching = false;
+        }
+
+        return new JobQueueScheduler(
+            $container->get(JobQueueApi::class),
+            $enableImageCaching
         );
     }
 

@@ -8,6 +8,7 @@ class JobQueueScheduler
 
     public function __construct(
         private readonly JobQueueApi $jobQueueApi,
+        private readonly bool $enableImageCaching,
         private array $movieIdsForImageCacheJob = [],
         private array $personIdsForImageCacheJob = [],
     ) {
@@ -42,6 +43,10 @@ class JobQueueScheduler
 
     private function addTmdbImageCacheJob() : void
     {
+        if ($this->enableImageCaching === false) {
+            return;
+        }
+
         $this->jobQueueApi->addTmdbImageCacheJob(array_keys($this->movieIdsForImageCacheJob), array_keys($this->personIdsForImageCacheJob));
 
         $this->personIdsForImageCacheJob = [];
