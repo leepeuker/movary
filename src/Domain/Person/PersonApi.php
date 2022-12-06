@@ -27,7 +27,7 @@ class PersonApi
         return $this->repository->create($tmdbId, $name, $gender, $knownForDepartment, $tmdbPosterPath, $birthDate, $deathDate, $placeOfBirth, $updatedAtTmdb);
     }
 
-    public function fetchOrCreatePersonByTmdbId(
+    public function createOrUpdatePersonByTmdbId(
         int $tmdbId,
         string $name,
         Gender $gender,

@@ -305,7 +305,7 @@ class MovieApi
         $this->castApi->deleteByMovieId($movieId);
 
         foreach ($tmdbCast as $position => $castMember) {
-            $person = $this->personApi->fetchOrCreatePersonByTmdbId(
+            $person = $this->personApi->createOrUpdatePersonByTmdbId(
                 $castMember->getPerson()->getTmdbId(),
                 $castMember->getPerson()->getName(),
                 $castMember->getPerson()->getGender(),
@@ -322,7 +322,7 @@ class MovieApi
         $this->crewApi->deleteByMovieId($movieId);
 
         foreach ($tmdbCrew as $position => $crewMember) {
-            $person = $this->personApi->fetchOrCreatePersonByTmdbId(
+            $person = $this->personApi->createOrUpdatePersonByTmdbId(
                 $crewMember->getPerson()->getTmdbId(),
                 $crewMember->getPerson()->getName(),
                 $crewMember->getPerson()->getGender(),
