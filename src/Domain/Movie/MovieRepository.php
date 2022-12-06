@@ -92,9 +92,15 @@ class MovieRepository
         return MovieEntityList::createFromArray($data);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : MovieEntityList
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : MovieEntityList
     {
-        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie` ORDER BY updated_at_tmdb ASC');
+        $query = 'SELECT * FROM `movie` ORDER BY updated_at_tmdb ASC';
+
+        if ($limit !== null) {
+            $query .= ' LIMIT ' . $limit;
+        }
+
+        $data = $this->dbConnection->fetchAllAssociative($query);
 
         return MovieEntityList::createFromArray($data);
     }

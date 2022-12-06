@@ -2,6 +2,8 @@
 
 namespace Movary\Domain\Person;
 
+use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 
 class PersonApi
@@ -11,9 +13,60 @@ class PersonApi
     ) {
     }
 
-    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : PersonEntity
+    public function create(
+        int $tmdbId,
+        string $name,
+        Gender $gender,
+        ?string $knownForDepartment,
+        ?string $tmdbPosterPath,
+        ?Date $birthDate = null,
+        ?Date $deathDate = null,
+        ?string $placeOfBirth = null,
+        ?DateTime $updatedAtTmdb = null,
+    ) : PersonEntity {
+        return $this->repository->create($tmdbId, $name, $gender, $knownForDepartment, $tmdbPosterPath, $birthDate, $deathDate, $placeOfBirth, $updatedAtTmdb);
+    }
+
+    public function fetchOrCreatePersonByTmdbId(
+        int $tmdbId,
+        string $name,
+        Gender $gender,
+        ?string $knownForDepartment,
+        ?string $posterPath,
+    ) : PersonEntity {
+        $person = $this->findByTmdbId($tmdbId);
+
+        if ($person === null) {
+            return $this->create(
+                tmdbId: $tmdbId,
+                name: $name,
+                gender: $gender,
+                knownForDepartment: $knownForDepartment,
+                tmdbPosterPath: $posterPath,
+            );
+        }
+
+        if ($person->getName() !== $name ||
+            $person->getGender() !== $gender ||
+            $person->getKnownForDepartment() !== $knownForDepartment ||
+            $person->getTmdbPosterPath() !== $posterPath
+        ) {
+            $this->update(
+                $person->getId(),
+                $tmdbId,
+                $name,
+                $gender,
+                $knownForDepartment,
+                $posterPath,
+            );
+        }
+
+        return $person;
+    }
+
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Iterator
     {
-        return $this->repository->create($name, $gender, $knownForDepartment, $tmdbId, $tmdbPosterPath);
+        return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);
     }
 
     public function findById(int $personId) : ?PersonEntity
@@ -26,8 +79,18 @@ class PersonApi
         return $this->repository->findByTmdbId($tmdbId);
     }
 
-    public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : void
-    {
-        $this->repository->update($id, $name, $gender, $knownForDepartment, $tmdbId, $tmdbPosterPath);
+    public function update(
+        int $id,
+        int $tmdbId,
+        string $name,
+        Gender $gender,
+        ?string $knownForDepartment,
+        ?string $tmdbPosterPath,
+        ?Date $birthDate = null,
+        ?Date $deathDate = null,
+        ?string $placeOfBirth = null,
+        ?DateTime $updatedAtTmdb = null,
+    ) : void {
+        $this->repository->update($id, $tmdbId, $name, $gender, $knownForDepartment, $tmdbPosterPath, $birthDate, $deathDate, $placeOfBirth, $updatedAtTmdb);
     }
 }

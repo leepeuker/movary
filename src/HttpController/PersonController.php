@@ -6,6 +6,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Person;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Service\UrlGenerator;
+use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -32,8 +33,21 @@ class PersonController
         $personId = (int)$request->getRouteParameters()['id'];
 
         $person = $this->personApi->findById($personId);
+
         if ($person === null) {
             return Response::createNotFound();
+        }
+
+        $birthDate = $person->getBirthDate();
+        $deathDate = $person->getDeathDate();
+
+        $age = null;
+        if ($birthDate !== null) {
+            if ($deathDate !== null) {
+                $age = $birthDate->getNumberOfYearsSince($deathDate);
+            } else {
+                $age = $birthDate->getNumberOfYearsSince(Date::create());
+            }
         }
 
         return Response::create(
@@ -45,6 +59,10 @@ class PersonController
                     'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
                     'knownForDepartment' => $person->getKnownForDepartment(),
                     'gender' => $person->getGender(),
+                    'age' => $age,
+                    'birthDate' => $person->getBirthDate(),
+                    'deathDate' => $person->getDeathDate(),
+                    'placeOfBirth' => $person->getPlaceOfBirth(),
                 ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),

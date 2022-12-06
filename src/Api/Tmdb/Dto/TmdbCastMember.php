@@ -6,7 +6,7 @@ class TmdbCastMember
 {
     private function __construct(
         private readonly int $castId,
-        private readonly TmdbPerson $person,
+        private readonly TmdbCreditsPerson $person,
         private readonly string $character,
         private readonly int $order,
     ) {
@@ -16,7 +16,7 @@ class TmdbCastMember
     {
         return new self(
             $data['cast_id'],
-            TmdbPerson::createFromArray($data),
+            TmdbCreditsPerson::createFromArray($data),
             $data['character'],
             $data['order'],
         );
@@ -37,7 +37,7 @@ class TmdbCastMember
         return $this->order;
     }
 
-    public function getPerson() : TmdbPerson
+    public function getPerson() : TmdbCreditsPerson
     {
         return $this->person;
     }

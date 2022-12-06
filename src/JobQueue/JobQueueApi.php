@@ -34,9 +34,14 @@ class JobQueueApi
         $this->repository->addJob(JobType::createTmdbImageCache(), $jobStatus ?? JobStatus::createWaiting(), parameters: ['movieIds' => $movieIds]);
     }
 
-    public function addTmdbSyncJob(JobStatus $jobStatus) : void
+    public function addTmdbMovieSyncJob(JobStatus $jobStatus) : void
     {
-        $this->repository->addJob(JobType::createTmdbSync(), $jobStatus);
+        $this->repository->addJob(JobType::createTmdbMovieSync(), $jobStatus);
+    }
+
+    public function addTmdbPersonSyncJob(JobStatus $createDone) : void
+    {
+        $this->repository->addJob(JobType::addTmdbPersonSyncJob(), $createDone);
     }
 
     public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : void
@@ -79,7 +84,7 @@ class JobQueueApi
 
     public function findLastTmdbSync() : ?DateTime
     {
-        return $this->repository->findLastDateForJobByType(JobType::createTmdbSync());
+        return $this->repository->findLastDateForJobByType(JobType::createTmdbMovieSync());
     }
 
     public function findLastTraktSync(int $userId) : ?DateTime

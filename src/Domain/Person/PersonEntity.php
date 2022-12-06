@@ -2,6 +2,8 @@
 
 namespace Movary\Domain\Person;
 
+use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 
 class PersonEntity
@@ -14,6 +16,10 @@ class PersonEntity
         private readonly int $tmdbId,
         private readonly ?string $posterPath,
         private readonly ?string $tmdbPosterPath,
+        private readonly ?Date $birthDate,
+        private readonly ?Date $deathDate,
+        private readonly ?string $placeOfBirth,
+        private readonly ?DateTime $updatedAtTmdb,
     ) {
     }
 
@@ -27,7 +33,21 @@ class PersonEntity
             $data['tmdb_id'],
             $data['poster_path'],
             $data['tmdb_poster_path'],
+            empty($data['birth_date']) === true ? null : Date::createFromString($data['birth_date']),
+            empty($data['death_date']) === true ? null : Date::createFromString($data['death_date']),
+            $data['place_of_birth'],
+            empty($data['updated_at_tmdb']) === true ? null : DateTime::createFromString($data['updated_at_tmdb']),
         );
+    }
+
+    public function getBirthDate() : ?Date
+    {
+        return $this->birthDate;
+    }
+
+    public function getDeathDate() : ?Date
+    {
+        return $this->deathDate;
     }
 
     public function getGender() : Gender
@@ -50,6 +70,11 @@ class PersonEntity
         return $this->name;
     }
 
+    public function getPlaceOfBirth() : ?string
+    {
+        return $this->placeOfBirth;
+    }
+
     public function getPosterPath() : ?string
     {
         return $this->posterPath;
@@ -63,5 +88,10 @@ class PersonEntity
     public function getTmdbPosterPath() : ?string
     {
         return $this->tmdbPosterPath;
+    }
+
+    public function getUpdatedAtTmdb() : ?DateTime
+    {
+        return $this->updatedAtTmdb;
     }
 }
