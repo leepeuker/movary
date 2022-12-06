@@ -45,7 +45,7 @@ class PersonRepository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Iterator
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
         $query = 'SELECT * FROM `person` ORDER BY updated_at_tmdb ASC';
 

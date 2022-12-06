@@ -64,7 +64,7 @@ class PersonApi
         return $person;
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Iterator
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
         return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);
     }
