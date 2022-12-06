@@ -4,6 +4,7 @@ namespace Movary\Service\Tmdb;
 
 use Doctrine\DBAL;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\MovieEntity;
 use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -22,12 +23,8 @@ class SyncMovies
     {
         $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold);
 
-        $movieCountSynced = 0;
-
         foreach ($movies as $movie) {
-            if ($movieCountSyncThreshold !== null && $movieCountSynced >= $movieCountSyncThreshold) {
-                continue;
-            }
+            $movie = MovieEntity::createFromArray($movie);
 
             $updatedAtTmdb = $movie->getUpdatedAtTmdb();
             if ($maxAgeInHours !== null && $updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb, $maxAgeInHours) === false) {
@@ -44,8 +41,6 @@ class SyncMovies
             }
 
             $this->dbConnection->commit();
-
-            $movieCountSynced++;
         }
     }
 

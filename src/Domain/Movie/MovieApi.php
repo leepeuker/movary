@@ -114,7 +114,7 @@ class MovieApi
         return $this->movieRepository->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $limit);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : MovieEntityList
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
         return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);
     }
