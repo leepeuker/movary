@@ -4,6 +4,7 @@ namespace Movary\Service\Tmdb;
 
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Person\PersonApi;
+use Movary\JobQueue\JobQueueScheduler;
 use Movary\ValueObject\DateTime;
 
 class SyncPerson
@@ -11,6 +12,7 @@ class SyncPerson
     public function __construct(
         private readonly TmdbApi $tmdbApi,
         private readonly PersonApi $personApi,
+        private readonly JobQueueScheduler $jobScheduler,
     ) {
     }
 
@@ -21,7 +23,7 @@ class SyncPerson
         $person = $this->personApi->findByTmdbId($tmdbId);
 
         if ($person === null) {
-            $this->personApi->create(
+            $person = $this->personApi->create(
                 $tmdbPerson->getTmdbId(),
                 $tmdbPerson->getName(),
                 $tmdbPerson->getGender(),
@@ -33,10 +35,14 @@ class SyncPerson
                 updatedAtTmdb: DateTime::create(),
             );
 
+            $this->jobScheduler->storePersonIdForTmdbImageCacheJob($person->getId());
+
             return;
         }
 
-        $this->personApi->update(
+        $originalTmdbPosterPath = $person->getTmdbPosterPath();
+
+        $person = $this->personApi->update(
             $person->getId(),
             $tmdbPerson->getTmdbId(),
             $tmdbPerson->getName(),
@@ -48,5 +54,9 @@ class SyncPerson
             $tmdbPerson->getPlaceOfBirth(),
             DateTime::create(),
         );
+
+        if ($originalTmdbPosterPath !== $person->getTmdbPosterPath()) {
+            $this->jobScheduler->storePersonIdForTmdbImageCacheJob($person->getId());
+        }
     }
 }

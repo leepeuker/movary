@@ -92,7 +92,7 @@ class PersonRepository
         ?Date $deathDate = null,
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
-    ) : void {
+    ) : PersonEntity {
         $this->dbConnection->update(
             'person',
             [
@@ -110,6 +110,8 @@ class PersonRepository
                 'id' => $id,
             ],
         );
+
+        return $this->fetchById($id);
     }
 
     private function fetchById(int $id) : PersonEntity

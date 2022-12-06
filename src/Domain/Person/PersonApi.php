@@ -90,7 +90,7 @@ class PersonApi
         ?Date $deathDate = null,
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
-    ) : void {
-        $this->repository->update($id, $tmdbId, $name, $gender, $knownForDepartment, $tmdbPosterPath, $birthDate, $deathDate, $placeOfBirth, $updatedAtTmdb);
+    ) : PersonEntity {
+        return $this->repository->update($id, $tmdbId, $name, $gender, $knownForDepartment, $tmdbPosterPath, $birthDate, $deathDate, $placeOfBirth, $updatedAtTmdb);
     }
 }

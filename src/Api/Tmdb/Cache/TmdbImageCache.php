@@ -55,6 +55,11 @@ class TmdbImageCache
         return $this->cacheImages('person', $forceRefresh);
     }
 
+    public function cachePersonImagesByIds(array $personIds, bool $forceRefresh = false) : void
+    {
+        $this->cacheImages('person', $forceRefresh, $personIds);
+    }
+
     public function deleteCache() : void
     {
         $this->imageCacheService->deleteImages();
@@ -64,11 +69,11 @@ class TmdbImageCache
 
     public function executeJob(Job $job) : void
     {
-        $movieIds = $job->getParameters()['movieIds'] ?? [];
-
-        foreach ($movieIds as $movieId) {
+        foreach ($job->getParameters()['movieIds'] ?? [] as $movieId) {
             $this->cacheAllImagesByMovieId($movieId);
         }
+
+        $this->cachePersonImagesByIds($job->getParameters()['personIds']);
     }
 
     /**

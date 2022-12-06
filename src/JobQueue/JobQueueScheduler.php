@@ -4,30 +4,52 @@ namespace Movary\JobQueue;
 
 class JobQueueScheduler
 {
-    private const IMAGE_CACHE_MOVIE_ID_BATCH_LIMIT = 200;
+    private const IMAGE_CACHE_BATCH_LIMIT = 250;
 
     public function __construct(
         private readonly JobQueueApi $jobQueueApi,
-        private array $scheduledMovieIdsForImageCacheJob = [],
+        private array $movieIdsForImageCacheJob = [],
+        private array $personIdsForImageCacheJob = [],
     ) {
     }
 
     public function __destruct()
     {
-        if (count($this->scheduledMovieIdsForImageCacheJob) === 0) {
+        if ($this->getCountOfIdsForImageCacheJob() === 0) {
             return;
         }
 
-        $this->jobQueueApi->addTmdbImageCacheJob(array_keys($this->scheduledMovieIdsForImageCacheJob));
+        $this->addTmdbImageCacheJob();
     }
 
     public function storeMovieIdForTmdbImageCacheJob(int $movieId) : void
     {
-        if (count($this->scheduledMovieIdsForImageCacheJob) >= self::IMAGE_CACHE_MOVIE_ID_BATCH_LIMIT) {
-            $this->jobQueueApi->addTmdbImageCacheJob(array_keys($this->scheduledMovieIdsForImageCacheJob));
-            $this->scheduledMovieIdsForImageCacheJob = [];
+        if ($this->getCountOfIdsForImageCacheJob() >= self::IMAGE_CACHE_BATCH_LIMIT) {
+            $this->addTmdbImageCacheJob();
         }
 
-        $this->scheduledMovieIdsForImageCacheJob[$movieId] = true;
+        $this->movieIdsForImageCacheJob[$movieId] = true;
+    }
+
+    public function storePersonIdForTmdbImageCacheJob(int $personId) : void
+    {
+        if ($this->getCountOfIdsForImageCacheJob() >= self::IMAGE_CACHE_BATCH_LIMIT) {
+            $this->addTmdbImageCacheJob();
+        }
+
+        $this->personIdsForImageCacheJob[$personId] = true;
+    }
+
+    private function addTmdbImageCacheJob() : void
+    {
+        $this->jobQueueApi->addTmdbImageCacheJob(array_keys($this->movieIdsForImageCacheJob), array_keys($this->personIdsForImageCacheJob));
+
+        $this->personIdsForImageCacheJob = [];
+        $this->movieIdsForImageCacheJob = [];
+    }
+
+    private function getCountOfIdsForImageCacheJob() : int
+    {
+        return count($this->movieIdsForImageCacheJob) + count($this->personIdsForImageCacheJob);
     }
 }
