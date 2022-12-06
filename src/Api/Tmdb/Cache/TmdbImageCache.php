@@ -16,9 +16,41 @@ class TmdbImageCache
     ) {
     }
 
-    public function cacheAllImagesByMovieId(int $movieId, bool $forceRefresh = false) : void
+    /**
+     * @return int Count of newly cached images
+     */
+    public function cacheAllMovieImages(bool $forceRefresh = false) : int
     {
-        $this->cacheImages('movie', $forceRefresh, [$movieId]);
+        return $this->cacheImages('movie', $forceRefresh);
+    }
+
+    /**
+     * @return int Count of newly cached images
+     */
+    public function cacheAllPersonImages(bool $forceRefresh = false) : int
+    {
+        return $this->cacheImages('person', $forceRefresh);
+    }
+
+    public function deleteCache() : void
+    {
+        $this->imageCacheService->deleteImages();
+        $this->pdo->prepare('UPDATE movie SET poster_path = null')->execute();
+        $this->pdo->prepare('UPDATE person SET poster_path = null')->execute();
+    }
+
+    public function executeJob(Job $job) : void
+    {
+        foreach ($job->getParameters()['movieIds'] ?? [] as $movieId) {
+            $this->cacheAllImagesByMovieId($movieId);
+        }
+
+        $this->cachePersonImagesByIds($job->getParameters()['personIds']);
+    }
+
+    private function cacheAllImagesByMovieId(int $movieId) : void
+    {
+        $this->cacheImages('movie', false, [$movieId]);
 
         $statement = $this->pdo->prepare(
             "SELECT DISTINCT (id)
@@ -36,44 +68,7 @@ class TmdbImageCache
         );
         $statement->execute([$movieId, $movieId]);
 
-        $this->cacheImages('person', $forceRefresh, array_column($statement->fetchAll(), 'id'));
-    }
-
-    /**
-     * @return int Count of newly cached images
-     */
-    public function cacheAllMovieImages(bool $forceRefresh = false) : int
-    {
-        return $this->cacheImages('movie', $forceRefresh);
-    }
-
-    /**
-     * @return int Count of newly cached images
-     */
-    public function cacheAllPersonImages(bool $forceRefresh = false) : int
-    {
-        return $this->cacheImages('person', $forceRefresh);
-    }
-
-    public function cachePersonImagesByIds(array $personIds, bool $forceRefresh = false) : void
-    {
-        $this->cacheImages('person', $forceRefresh, $personIds);
-    }
-
-    public function deleteCache() : void
-    {
-        $this->imageCacheService->deleteImages();
-        $this->pdo->prepare('UPDATE movie SET poster_path = null')->execute();
-        $this->pdo->prepare('UPDATE person SET poster_path = null')->execute();
-    }
-
-    public function executeJob(Job $job) : void
-    {
-        foreach ($job->getParameters()['movieIds'] ?? [] as $movieId) {
-            $this->cacheAllImagesByMovieId($movieId);
-        }
-
-        $this->cachePersonImagesByIds($job->getParameters()['personIds']);
+        $this->cacheImages('person', false, array_column($statement->fetchAll(), 'id'));
     }
 
     /**
@@ -132,5 +127,10 @@ class TmdbImageCache
         }
 
         return $cachedImages;
+    }
+
+    private function cachePersonImagesByIds(array $personIds) : void
+    {
+        $this->cacheImages('person', false, $personIds);
     }
 }
