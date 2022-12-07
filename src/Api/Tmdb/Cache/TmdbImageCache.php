@@ -6,6 +6,7 @@ use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Service\ImageCacheService;
 use Movary\ValueObject\Job;
 use PDO;
+use Psr\Log\LoggerInterface;
 
 class TmdbImageCache
 {
@@ -13,6 +14,7 @@ class TmdbImageCache
         private readonly PDO $pdo,
         private readonly ImageCacheService $imageCacheService,
         private readonly TmdbUrlGenerator $tmdbUrlGenerator,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -76,14 +78,20 @@ class TmdbImageCache
      */
     private function cacheImageDataByTableName(array $data, string $tableName, bool $forceRefresh = false) : bool
     {
+        $cachedImagePublicPath = null;
+
         if ($data['tmdb_poster_path'] === null) {
             return false;
         }
 
-        $cachedImagePublicPath = $this->imageCacheService->cacheImage(
-            $this->tmdbUrlGenerator->generateImageUrl($data['tmdb_poster_path']),
-            $data['poster_path'] === null ? true : $forceRefresh,
-        );
+        try {
+            $cachedImagePublicPath = $this->imageCacheService->cacheImage(
+                $this->tmdbUrlGenerator->generateImageUrl($data['tmdb_poster_path']),
+                $data['poster_path'] === null ? true : $forceRefresh,
+            );
+        } catch (\Exception $e) {
+            $this->logger->warning('Could not cache ' . $tableName . 'image: ' . $data['tmdb_poster_path'], ['exception' => $e]);
+        }
 
         if ($cachedImagePublicPath === null) {
             return false;
