@@ -11,13 +11,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-class TmdbSync extends Command
+class TmdbMovieSync extends Command
 {
     private const OPTION_NAME_FORCE_HOURS = 'hours';
 
     private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
-    protected static $defaultName = 'tmdb:sync';
+    protected static $defaultName = 'tmdb:movie:sync';
 
     public function __construct(
         private readonly SyncMovies $syncMovieDetails,
@@ -48,7 +48,7 @@ class TmdbSync extends Command
 
             $this->syncMovieDetails->syncMovies($maxAgeInHours, $movieCountSyncThreshold);
 
-            $this->jobQueueApi->addTmdbSyncJob(JobStatus::createDone());
+            $this->jobQueueApi->addTmdbMovieSyncJob(JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing movie meta data done.');
         } catch (Throwable $t) {

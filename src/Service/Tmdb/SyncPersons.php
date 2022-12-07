@@ -3,30 +3,30 @@
 namespace Movary\Service\Tmdb;
 
 use Doctrine\DBAL;
-use Movary\Domain\Movie\MovieApi;
-use Movary\Domain\Movie\MovieEntity;
+use Movary\Domain\Person\PersonApi;
+use Movary\Domain\Person\PersonEntity;
 use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class SyncMovies
+class SyncPersons
 {
     public function __construct(
-        private readonly SyncMovie $syncMovieService,
-        private readonly MovieApi $movieApi,
+        private readonly SyncPerson $syncPerson,
+        private readonly PersonApi $personApi,
         private readonly DBAL\Connection $dbConnection,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
+    public function syncPersons(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
     {
-        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold);
+        $persons = $this->personApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold);
 
-        foreach ($movies as $movie) {
-            $movie = MovieEntity::createFromArray($movie);
+        foreach ($persons as $person) {
+            $person = PersonEntity::createFromArray($person);
 
-            $updatedAtTmdb = $movie->getUpdatedAtTmdb();
+            $updatedAtTmdb = $person->getUpdatedAtTmdb();
             if ($maxAgeInHours !== null && $updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb, $maxAgeInHours) === false) {
                 continue;
             }
@@ -34,10 +34,10 @@ class SyncMovies
             $this->dbConnection->beginTransaction();
 
             try {
-                $this->syncMovieService->syncMovie($movie->getTmdbId());
+                $this->syncPerson->syncPerson($person->getTmdbId());
             } catch (Throwable $t) {
                 $this->dbConnection->rollBack();
-                $this->logger->error('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+                $this->logger->error('Could not person with id "' . $person->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
 
             $this->dbConnection->commit();

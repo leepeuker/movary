@@ -5,7 +5,7 @@ namespace Movary\Api\Tmdb\Dto;
 class TmdbCrewMember
 {
     private function __construct(
-        private readonly TmdbPerson $person,
+        private readonly TmdbCreditsPerson $person,
         private readonly string $department,
         private readonly string $job,
     ) {
@@ -14,7 +14,7 @@ class TmdbCrewMember
     public static function createFromArray(array $data) : self
     {
         return new self(
-            TmdbPerson::createFromArray($data),
+            TmdbCreditsPerson::createFromArray($data),
             $data['department'],
             $data['job'],
         );
@@ -30,7 +30,7 @@ class TmdbCrewMember
         return $this->job;
     }
 
-    public function getPerson() : TmdbPerson
+    public function getPerson() : TmdbCreditsPerson
     {
         return $this->person;
     }

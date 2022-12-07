@@ -157,19 +157,22 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 
 ### tmdb sync
 
-Update movie (meta) data with themoviedb.org information.
+Update movie or person meta data with themoviedb.org information.
 Make sure you have added the variables `TMDB_API_KEY` to the environment.
 
-Example:
+Examples:
 
-`php bin/console.php tmdb:sync`
+`php bin/console.php tmdb:movie:sync`
+
+
+`php bin/console.php tmdb:person:sync`
 
 **Flags:**
 
 - `--hours`
-  Only movies which were last synced X hours or longer ago will be synced
+  Only update movies/persons which were last synced X hours or longer ago
 - `--threshold`
-  Maximum number of movies to sync
+  Maximum number of movies/person to sync for this run
 
 ### tmdb image cache
 

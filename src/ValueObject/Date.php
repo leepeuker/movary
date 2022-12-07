@@ -55,6 +55,11 @@ class Date implements JsonSerializable
         return $daysSince;
     }
 
+    public function getNumberOfYearsSince(Date $date) : int
+    {
+        return (new \DateTime($this->date))->diff((new \DateTime($date->date)))->y;
+    }
+
     public function jsonSerialize() : string
     {
         return $this->date;

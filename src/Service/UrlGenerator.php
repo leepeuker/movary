@@ -29,7 +29,10 @@ class UrlGenerator
     public function replacePosterPathWithImageSrcUrl(array $dbResults) : array
     {
         foreach ($dbResults as $index => $dbResult) {
-            $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters($dbResult['tmdb_poster_path'], $dbResult['poster_path']);
+            $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters(
+                $dbResult['tmdb_poster_path'] ?? null,
+                $dbResult['poster_path'] ?? null,
+            );
         }
 
         return $dbResults;

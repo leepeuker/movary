@@ -3,6 +3,8 @@
 namespace Movary\Domain\Person;
 
 use Doctrine\DBAL\Connection;
+use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use RuntimeException;
 
@@ -10,11 +12,21 @@ class PersonRepository
 {
     public function __construct(
         private readonly Connection $dbConnection,
+        private readonly \PDO $pdo,
     ) {
     }
 
-    public function create(string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : PersonEntity
-    {
+    public function create(
+        int $tmdbId,
+        string $name,
+        Gender $gender,
+        ?string $knownForDepartment,
+        ?string $tmdbPosterPath,
+        ?Date $birthDate = null,
+        ?Date $deathDate = null,
+        ?string $placeOfBirth = null,
+        ?DateTime $updatedAtTmdb = null,
+    ) : PersonEntity {
         $this->dbConnection->insert(
             'person',
             [
@@ -23,10 +35,28 @@ class PersonRepository
                 'known_for_department' => $knownForDepartment,
                 'tmdb_id' => $tmdbId,
                 'tmdb_poster_path' => $tmdbPosterPath,
+                'birth_date' => $birthDate === null ? null : (string)$birthDate,
+                'death_date' => $deathDate === null ? null : (string)$deathDate,
+                'place_of_birth' => $placeOfBirth,
+                'updated_at_tmdb' => $updatedAtTmdb === null ? null : (string)$updatedAtTmdb,
             ],
         );
 
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
+    }
+
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
+    {
+        $query = 'SELECT * FROM `person` ORDER BY updated_at_tmdb ASC';
+
+        if ($limit !== null) {
+            $query .= ' LIMIT ' . $limit;
+        }
+
+        $statement = $this->pdo->prepare($query);
+        $statement->execute();
+
+        return $statement->getIterator();
     }
 
     public function findByPersonId(int $personId) : ?PersonEntity
@@ -51,8 +81,18 @@ class PersonRepository
         return PersonEntity::createFromArray($data);
     }
 
-    public function update(int $id, string $name, Gender $gender, ?string $knownForDepartment, int $tmdbId, ?string $tmdbPosterPath) : void
-    {
+    public function update(
+        int $id,
+        int $tmdbId,
+        string $name,
+        Gender $gender,
+        ?string $knownForDepartment,
+        ?string $tmdbPosterPath,
+        ?Date $birthDate = null,
+        ?Date $deathDate = null,
+        ?string $placeOfBirth = null,
+        ?DateTime $updatedAtTmdb = null,
+    ) : PersonEntity {
         $this->dbConnection->update(
             'person',
             [
@@ -61,11 +101,17 @@ class PersonRepository
                 'known_for_department' => $knownForDepartment,
                 'tmdb_id' => $tmdbId,
                 'tmdb_poster_path' => $tmdbPosterPath,
+                'birth_date' => $birthDate === null ? null : (string)$birthDate,
+                'death_date' => $deathDate === null ? null : (string)$deathDate,
+                'place_of_birth' => $placeOfBirth,
+                'updated_at_tmdb' => $updatedAtTmdb === null ? null : (string)$updatedAtTmdb,
             ],
             [
                 'id' => $id,
             ],
         );
+
+        return $this->fetchById($id);
     }
 
     private function fetchById(int $id) : PersonEntity

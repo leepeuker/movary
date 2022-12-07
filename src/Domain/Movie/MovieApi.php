@@ -15,12 +15,10 @@ use Movary\Domain\Movie\Genre\MovieGenreApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Person\PersonApi;
-use Movary\Domain\Person\PersonEntity;
 use Movary\Service\UrlGenerator;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\Gender;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\Year;
 use RuntimeException;
@@ -116,9 +114,9 @@ class MovieApi
         return $this->movieRepository->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $limit);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : MovieEntityList
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
-        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc();
+        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);
     }
 
     public function fetchByTraktId(TraktId $traktId) : MovieEntity
@@ -307,7 +305,7 @@ class MovieApi
         $this->castApi->deleteByMovieId($movieId);
 
         foreach ($tmdbCast as $position => $castMember) {
-            $person = $this->createOrUpdatePersonByTmdbId(
+            $person = $this->personApi->createOrUpdatePersonByTmdbId(
                 $castMember->getPerson()->getTmdbId(),
                 $castMember->getPerson()->getName(),
                 $castMember->getPerson()->getGender(),
@@ -324,7 +322,7 @@ class MovieApi
         $this->crewApi->deleteByMovieId($movieId);
 
         foreach ($tmdbCrew as $position => $crewMember) {
-            $person = $this->createOrUpdatePersonByTmdbId(
+            $person = $this->personApi->createOrUpdatePersonByTmdbId(
                 $crewMember->getPerson()->getTmdbId(),
                 $crewMember->getPerson()->getName(),
                 $crewMember->getPerson()->getGender(),
@@ -404,30 +402,5 @@ class MovieApi
         }
 
         $this->repository->updateUserRating($movieId, $userId, $rating);
-    }
-
-    private function createOrUpdatePersonByTmdbId(int $tmdbId, string $name, Gender $gender, ?string $knownForDepartment, ?string $posterPath) : PersonEntity
-    {
-        $person = $this->personApi->findByTmdbId($tmdbId);
-
-        if ($person === null) {
-            return $this->personApi->create(
-                $name,
-                $gender,
-                $knownForDepartment,
-                $tmdbId,
-                $posterPath,
-            );
-        }
-
-        if ($person->getName() !== $name ||
-            $person->getGender() !== $gender ||
-            $person->getKnownForDepartment() !== $knownForDepartment ||
-            $person->getTmdbPosterPath() !== $posterPath
-        ) {
-            $this->personApi->update($person->getId(), $name, $gender, $knownForDepartment, $tmdbId, $posterPath);
-        }
-
-        return $person;
     }
 }

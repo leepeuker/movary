@@ -2,21 +2,20 @@
 
 namespace Movary\Api\Tmdb\Dto;
 
-use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
 
-class TmdbPerson
+class TmdbCreditsPerson
 {
     private function __construct(
         private readonly int $tmdbId,
         private readonly string $name,
-        private readonly ?Date $birthDate,
-        private readonly ?Date $deathDate,
+        private readonly string $originalName,
         private readonly Gender $gender,
         private readonly float $popularity,
         private readonly ?string $knownForDepartment,
         private readonly ?string $profilePath,
-        private readonly ?string $placeOfBirth,
+        private readonly string $creditId,
+        private readonly ?string $posterPath,
     ) {
     }
 
@@ -25,24 +24,19 @@ class TmdbPerson
         return new self(
             $data['id'],
             $data['name'],
-            empty($data['birthday']) === true ? null : Date::createFromString($data['birthday']),
-            empty($data['deathday']) === true ? null : Date::createFromString($data['deathday']),
+            $data['original_name'],
             Gender::createFromInt($data['gender']),
             $data['popularity'],
             empty($data['known_for_department']) === true ? null : $data['known_for_department'],
             $data['profile_path'],
-            empty($data['place_of_birth']) === true ? null : $data['place_of_birth'],
+            $data['credit_id'],
+            $data['profile_path'],
         );
     }
 
-    public function getBirthDate() : ?Date
+    public function getCreditId() : string
     {
-        return $this->birthDate;
-    }
-
-    public function getDeathDate() : ?Date
-    {
-        return $this->deathDate;
+        return $this->creditId;
     }
 
     public function getGender() : Gender
@@ -60,14 +54,19 @@ class TmdbPerson
         return $this->name;
     }
 
-    public function getPlaceOfBirth() : ?string
+    public function getOriginalName() : string
     {
-        return $this->placeOfBirth;
+        return $this->originalName;
     }
 
     public function getPopularity() : float
     {
         return $this->popularity;
+    }
+
+    public function getPosterPath() : ?string
+    {
+        return $this->posterPath;
     }
 
     public function getProfilePath() : ?string

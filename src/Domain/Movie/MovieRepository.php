@@ -15,6 +15,7 @@ class MovieRepository
 {
     public function __construct(
         private readonly Connection $dbConnection,
+        private readonly \PDO $pdo,
     ) {
     }
 
@@ -92,11 +93,18 @@ class MovieRepository
         return MovieEntityList::createFromArray($data);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc() : MovieEntityList
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
-        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie` ORDER BY updated_at_tmdb ASC');
+        $query = 'SELECT * FROM `movie` ORDER BY updated_at_tmdb ASC';
 
-        return MovieEntityList::createFromArray($data);
+        if ($limit !== null) {
+            $query .= ' LIMIT ' . $limit;
+        }
+
+        $statement = $this->pdo->prepare($query);
+        $statement->execute();
+
+        return $statement->getIterator();
     }
 
     public function fetchAverageRuntime(int $userId) : float

@@ -30,7 +30,7 @@ class JobProcessor
             $job->getType()->isOfTypeTmdbImageCache() => $this->tmdbImageCache->executeJob($job),
             $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
-            $job->getType()->isOfTypeTmdbSync() => $this->tmdbSyncMovies->syncMovies(),
+            $job->getType()->isOfTypeTmdbMovieSync() => $this->tmdbSyncMovies->syncMovies(),
 
             default => throw new RuntimeException('Job type not supported: ' . $job->getType()),
         };

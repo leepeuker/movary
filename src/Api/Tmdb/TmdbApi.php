@@ -6,6 +6,7 @@ use Movary\Api\Tmdb\Cache\TmdbIso6931Cache;
 use Movary\Api\Tmdb\Dto\TmdbCompany;
 use Movary\Api\Tmdb\Dto\TmdbCredits;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
+use Movary\Api\Tmdb\Dto\TmdbPerson;
 
 class TmdbApi
 {
@@ -34,6 +35,13 @@ class TmdbApi
         $data = $this->client->get('/movie/' . $movieId);
 
         return TmdbMovie::createFromArray($data);
+    }
+
+    public function fetchPersonDetails(int $personId) : TmdbPerson
+    {
+        $data = $this->client->get('/person/' . $personId);
+
+        return TmdbPerson::createFromArray($data);
     }
 
     public function getLanguageByCode(string $languageCode) : string

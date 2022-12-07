@@ -6,6 +6,8 @@ use RuntimeException;
 
 class JobType
 {
+    private const TYPE_TMDB_PERSON_SYNC = 'tmdb_person_sync';
+
     private const TYPE_IMDB_SYNC = 'imdb_sync';
 
     private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
@@ -14,7 +16,7 @@ class JobType
 
     private const TYPE_TMDB_IMAGE_CHACHE = 'tmdb_image_cache';
 
-    private const TYPE_TMDB_SYNC = 'tmdb_sync';
+    private const TYPE_TMDB_MOVIE_SYNC = 'tmdb_movie_sync';
 
     private const TYPE_TRAKT_IMPORT_HISTORY = 'trakt_import_history';
 
@@ -26,13 +28,19 @@ class JobType
                 self::TYPE_LETTERBOXD_IMPORT_HISTORY,
                 self::TYPE_LETTERBOXD_IMPORT_RATINGS,
                 self::TYPE_TMDB_IMAGE_CHACHE,
-                self::TYPE_TMDB_SYNC,
+                self::TYPE_TMDB_MOVIE_SYNC,
+                self::TYPE_TMDB_PERSON_SYNC,
                 self::TYPE_TRAKT_IMPORT_HISTORY,
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
             ]) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
+    }
+
+    public static function addTmdbPersonSyncJob() : self
+    {
+        return new self(self::TYPE_TMDB_PERSON_SYNC);
     }
 
     public static function createFromString(string $status) : self
@@ -60,9 +68,9 @@ class JobType
         return new self(self::TYPE_TMDB_IMAGE_CHACHE);
     }
 
-    public static function createTmdbSync() : self
+    public static function createTmdbMovieSync() : self
     {
-        return new self(self::TYPE_TMDB_SYNC);
+        return new self(self::TYPE_TMDB_MOVIE_SYNC);
     }
 
     public static function createTraktImportHistory() : self
@@ -95,9 +103,9 @@ class JobType
         return $this->type === self::TYPE_TMDB_IMAGE_CHACHE;
     }
 
-    public function isOfTypeTmdbSync() : bool
+    public function isOfTypeTmdbMovieSync() : bool
     {
-        return $this->type === self::TYPE_TMDB_SYNC;
+        return $this->type === self::TYPE_TMDB_MOVIE_SYNC;
     }
 
     public function isOfTypeTraktImportHistory() : bool
