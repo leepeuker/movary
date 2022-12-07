@@ -31,16 +31,15 @@ class SyncMovies
                 continue;
             }
 
-            $this->dbConnection->beginTransaction();
-
             try {
                 $this->syncMovieService->syncMovie($movie->getTmdbId());
             } catch (Throwable $t) {
-                $this->dbConnection->rollBack();
-                $this->logger->error('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
-            }
+                if ($this->dbConnection->isTransactionActive() === true) {
+                    $this->dbConnection->rollBack();
+                }
 
-            $this->dbConnection->commit();
+                $this->logger->warning('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+            }
         }
     }
 
