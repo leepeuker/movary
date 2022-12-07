@@ -14,7 +14,6 @@ class SyncPersons
     public function __construct(
         private readonly SyncPerson $syncPerson,
         private readonly PersonApi $personApi,
-        private readonly DBAL\Connection $dbConnection,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -31,16 +30,11 @@ class SyncPersons
                 continue;
             }
 
-            $this->dbConnection->beginTransaction();
-
             try {
                 $this->syncPerson->syncPerson($person->getTmdbId());
             } catch (Throwable $t) {
-                $this->dbConnection->rollBack();
-                $this->logger->error('Could not person with id "' . $person->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+                $this->logger->warning('Could not sync person with id "' . $person->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
-
-            $this->dbConnection->commit();
         }
     }
 
