@@ -2,14 +2,12 @@
 
 namespace Movary\Domain\Movie\Cast;
 
-use Movary\Domain\Person\PersonApi;
 use Movary\Service\UrlGenerator;
 
 class CastApi
 {
     public function __construct(
         private readonly CastRepository $repository,
-        private readonly PersonApi $personApi,
         private readonly UrlGenerator $urlGenerator,
     ) {
     }
@@ -28,13 +26,13 @@ class CastApi
     {
         $castMembers = [];
 
-        foreach ($this->repository->findByMovieId($movieId) as $movieGenre) {
-            $person = $this->personApi->findById($movieGenre->getPersonId());
+        foreach ($this->repository->findByMovieId($movieId) as $cast) {
+            $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters($cast['tmdb_poster_path'], $cast['poster_path']);
 
             $castMembers[] = [
-                'id' => $person?->getId(),
-                'name' => $person?->getName(),
-                'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person?->getTmdbPosterPath(), $person?->getPosterPath()),
+                'id' => $cast['id'],
+                'name' => $cast['name'],
+                'posterPath' => $posterPath,
             ];
         }
 

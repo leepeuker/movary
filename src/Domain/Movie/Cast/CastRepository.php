@@ -28,10 +28,15 @@ class CastRepository
         $this->dbConnection->delete('movie_cast', ['movie_id' => $movieId]);
     }
 
-    public function findByMovieId(int $movieId) : CastEntityList
+    public function findByMovieId(int $movieId) : array
     {
-        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie_cast` WHERE movie_id = ?', [$movieId]);
-
-        return CastEntityList::createFromArray($data);
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT p.id, p.name, p.poster_path, p.tmdb_poster_path
+            FROM movie_cast c
+            JOIN person p on c.person_id = p.id
+            WHERE c.movie_id = ?
+            ORDER BY c.position',
+            [$movieId],
+        );
     }
 }
