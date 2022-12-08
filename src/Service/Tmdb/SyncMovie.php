@@ -29,49 +29,55 @@ class SyncMovie
 
         $this->dbConnection->beginTransaction();
 
-        if ($movie === null) {
-            $movie = $this->movieApi->create(
-                title: $tmdbMovie->getTitle(),
-                tmdbId: $tmdbId,
-                tagline: $tmdbMovie->getTagline(),
-                overview: $tmdbMovie->getOverview(),
-                originalLanguage: $tmdbMovie->getOriginalLanguage(),
-                releaseDate: Date::createFromDateTime($tmdbMovie->getReleaseDate()),
-                runtime: $tmdbMovie->getRuntime(),
-                tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
-                tmdbVoteCount: $tmdbMovie->getVoteCount(),
-                tmdbPosterPath: $tmdbMovie->getPosterPath(),
-                imdbId: $tmdbMovie->getImdbId(),
-            );
+        try {
+            if ($movie === null) {
+                $movie = $this->movieApi->create(
+                    title: $tmdbMovie->getTitle(),
+                    tmdbId: $tmdbId,
+                    tagline: $tmdbMovie->getTagline(),
+                    overview: $tmdbMovie->getOverview(),
+                    originalLanguage: $tmdbMovie->getOriginalLanguage(),
+                    releaseDate: Date::createFromDateTime($tmdbMovie->getReleaseDate()),
+                    runtime: $tmdbMovie->getRuntime(),
+                    tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
+                    tmdbVoteCount: $tmdbMovie->getVoteCount(),
+                    tmdbPosterPath: $tmdbMovie->getPosterPath(),
+                    imdbId: $tmdbMovie->getImdbId(),
+                );
 
-            $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
-        } else {
-            $originalTmdbPosterPath = $movie->getTmdbPosterPath();
-
-            $movie = $this->movieApi->updateDetails(
-                movieId: $movie->getId(),
-                tagline: $tmdbMovie->getTagline(),
-                overview: $tmdbMovie->getOverview(),
-                originalLanguage: $tmdbMovie->getOriginalLanguage(),
-                releaseDate: $tmdbMovie->getReleaseDate(),
-                runtime: $tmdbMovie->getRuntime(),
-                tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
-                tmdbVoteCount: $tmdbMovie->getVoteCount(),
-                tmdbPosterPath: $tmdbMovie->getPosterPath(),
-                imdbId: $movie->getImdbId(),
-            );
-
-            if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()) {
                 $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
+            } else {
+                $originalTmdbPosterPath = $movie->getTmdbPosterPath();
+
+                $movie = $this->movieApi->updateDetails(
+                    movieId: $movie->getId(),
+                    tagline: $tmdbMovie->getTagline(),
+                    overview: $tmdbMovie->getOverview(),
+                    originalLanguage: $tmdbMovie->getOriginalLanguage(),
+                    releaseDate: $tmdbMovie->getReleaseDate(),
+                    runtime: $tmdbMovie->getRuntime(),
+                    tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
+                    tmdbVoteCount: $tmdbMovie->getVoteCount(),
+                    tmdbPosterPath: $tmdbMovie->getPosterPath(),
+                    imdbId: $movie->getImdbId(),
+                );
+
+                if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()) {
+                    $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
+                }
             }
+
+            $this->movieApi->updateGenres($movie->getId(), $this->genreConverter->getMovaryGenresFromTmdbMovie($tmdbMovie));
+            $this->movieApi->updateProductionCompanies($movie->getId(), $this->productionCompanyConverter->getMovaryProductionCompaniesFromTmdbMovie($tmdbMovie));
+
+            $this->updateCredits($movie->getId(), $tmdbId);
+
+            $this->dbConnection->commit();
+        } catch (\Exception $e) {
+            $this->dbConnection->rollBack();
+
+            throw $e;
         }
-
-        $this->movieApi->updateGenres($movie->getId(), $this->genreConverter->getMovaryGenresFromTmdbMovie($tmdbMovie));
-        $this->movieApi->updateProductionCompanies($movie->getId(), $this->productionCompanyConverter->getMovaryProductionCompaniesFromTmdbMovie($tmdbMovie));
-
-        $this->updateCredits($movie->getId(), $tmdbId);
-
-        $this->dbConnection->commit();
 
         return $movie;
     }
