@@ -2,7 +2,6 @@
 
 namespace Movary\Service\Tmdb;
 
-use Doctrine\DBAL;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\ValueObject\DateTime;
@@ -14,7 +13,6 @@ class SyncMovies
     public function __construct(
         private readonly SyncMovie $syncMovieService,
         private readonly MovieApi $movieApi,
-        private readonly DBAL\Connection $dbConnection,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -27,23 +25,21 @@ class SyncMovies
             $movie = MovieEntity::createFromArray($movie);
 
             $updatedAtTmdb = $movie->getUpdatedAtTmdb();
-            if ($maxAgeInHours !== null && $updatedAtTmdb !== null && $this->syncExpired($updatedAtTmdb, $maxAgeInHours) === false) {
+            if ($maxAgeInHours !== null &&
+                $updatedAtTmdb !== null &&
+                $this->syncExpired($updatedAtTmdb, $maxAgeInHours) === false) {
                 continue;
             }
 
             try {
                 $this->syncMovieService->syncMovie($movie->getTmdbId());
             } catch (Throwable $t) {
-                if ($this->dbConnection->isTransactionActive() === true) {
-                    $this->dbConnection->rollBack();
-                }
-
-                $this->logger->warning('Could not sync credits for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+                $this->logger->warning('Could not sync movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
         }
     }
 
-    private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays = null) : bool
+    private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays) : bool
     {
         return DateTime::create()->diffInHours($updatedAtTmdb) > $maxAgeInDays;
     }
