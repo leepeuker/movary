@@ -234,14 +234,14 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(*) as count, p.gender, p.tmdb_poster_path
+            SELECT p.id, p.name, COUNT(DISTINCT m.id) as count, p.gender, p.tmdb_poster_path
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
             JOIN movie_user_watch_dates muwd on mc.movie_id = muwd.movie_id
             WHERE muwd.user_id = ? AND p.name != "Stan Lee" {$genderQuery} {$searchTermQuery}
             GROUP BY mc.person_id
-            ORDER BY COUNT(*) DESC, p.name
+            ORDER BY COUNT(DISTINCT m.id) DESC, p.name
             {$limitQuery}
             SQL,
             $payload,
