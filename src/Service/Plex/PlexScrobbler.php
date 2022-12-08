@@ -75,6 +75,8 @@ class PlexScrobbler
         $rating = PersonalRating::create((int)$webHook['rating']);
 
         $this->movieApi->updateUserRating($movie->getId(), $user->getId(), $rating);
+
+        $this->logger->debug('Plex - Scrobbled rating [' . $rating . '] for movie: ' . $movie->getId());
     }
 
     private function logView(array $webHook, MovieEntity $movie, UserEntity $user) : void
@@ -91,5 +93,7 @@ class PlexScrobbler
         $watchDate = Date::createFromString($dateTime->format('Y-m-d'));
 
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $user->getId(), $watchDate);
+
+        $this->logger->debug('Plex - Scrobbled view [' . $watchDate . '] for movie: ' . $movie->getId());
     }
 }

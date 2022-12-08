@@ -32,7 +32,7 @@ class SyncMovies
 
                 $this->movieApi->updateImdbRating($movie->getId(), $imdbRating['average'], $imdbRating['voteCount']);
             } catch (Throwable $t) {
-                $this->logger->error('Could not sync imdb rating for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+                $this->logger->warning('Could not sync imdb rating for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }
 
             // Hacky way to prevent imdb rate limits
