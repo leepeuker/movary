@@ -16,8 +16,10 @@ class ImportRatingsFileValidator
             if (empty($watchDate['Rating']) === true || empty($watchDate['Letterboxd URI']) === true || empty($watchDate['Name']) === true) {
                 return false;
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

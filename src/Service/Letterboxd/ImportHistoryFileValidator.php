@@ -16,8 +16,10 @@ class ImportHistoryFileValidator
             if (empty($watchDate['Date']) === true || empty($watchDate['Letterboxd URI']) === true || empty($watchDate['Name']) === true) {
                 return false;
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

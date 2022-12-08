@@ -41,7 +41,7 @@
                         </div>
                     {% endif %}
                     {% if letterboxdHistoryImportFileInvalid == true %}
-                        <div class="alert alert-success alert-danger" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
                             Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Name".
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -66,7 +66,7 @@
                         </div>
                     {% endif %}
                     {% if letterboxdRatingsImportFileInvalid == true %}
-                        <div class="alert alert-success alert-danger" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
+                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
                             Csv file invalid: Must contain the columns "Rating", "Letterboxd URI" and "Name".
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
