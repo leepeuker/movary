@@ -43,17 +43,21 @@ class TmdbPersonSync extends Command
         $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
         $personCountSyncThreshold = $thresholdOption !== null ? (int)$thresholdOption : null;
 
+        $jobId = $this->jobQueueApi->addTmdbPersonSyncJob(JobStatus::createInProgress());
+
         try {
             $this->generateOutput($output, 'Syncing person meta data...');
 
             $this->syncPersons->syncPersons($maxAgeInHours, $personCountSyncThreshold);
 
-            $this->jobQueueApi->addTmdbPersonSyncJob(JobStatus::createDone());
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing person meta data done.');
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete tmdb person sync.');
             $this->logger->error('Could not complete tmdb person sync.', ['exception' => $t]);
+
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createFailed());
 
             return Command::FAILURE;
         }

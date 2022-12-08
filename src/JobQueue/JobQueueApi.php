@@ -14,9 +14,9 @@ class JobQueueApi
     ) {
     }
 
-    public function addImdbSyncJob(JobStatus $jobStatus) : void
+    public function addImdbSyncJob(JobStatus $jobStatus) : int
     {
-        $this->repository->addJob(JobType::createImdbSync(), $jobStatus);
+        return $this->repository->addJob(JobType::createImdbSync(), $jobStatus);
     }
 
     public function addLetterboxdImportHistoryJob(int $userId, string $importFile) : void
@@ -29,9 +29,9 @@ class JobQueueApi
         $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
     }
 
-    public function addTmdbImageCacheJob(array $movieIds = [], array $personIds = [], ?JobStatus $jobStatus = null) : void
+    public function addTmdbImageCacheJob(array $movieIds = [], array $personIds = [], ?JobStatus $jobStatus = null) : int
     {
-        $this->repository->addJob(
+        return $this->repository->addJob(
             JobType::createTmdbImageCache(),
             $jobStatus ?? JobStatus::createWaiting(),
             parameters: [
@@ -41,24 +41,24 @@ class JobQueueApi
         );
     }
 
-    public function addTmdbMovieSyncJob(JobStatus $jobStatus) : void
+    public function addTmdbMovieSyncJob(JobStatus $jobStatus) : int
     {
-        $this->repository->addJob(JobType::createTmdbMovieSync(), $jobStatus);
+        return $this->repository->addJob(JobType::createTmdbMovieSync(), $jobStatus);
     }
 
-    public function addTmdbPersonSyncJob(JobStatus $createDone) : void
+    public function addTmdbPersonSyncJob(JobStatus $createDone) : int
     {
-        $this->repository->addJob(JobType::addTmdbPersonSyncJob(), $createDone);
+        return $this->repository->addJob(JobType::addTmdbPersonSyncJob(), $createDone);
     }
 
-    public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : void
+    public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : int
     {
-        $this->repository->addJob(JobType::createTraktImportHistory(), $jobStatus ?? JobStatus::createWaiting(), $userId);
+        return $this->repository->addJob(JobType::createTraktImportHistory(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
-    public function addTraktImportRatingsJob(int $userId, ?JobStatus $jobStatus = null) : void
+    public function addTraktImportRatingsJob(int $userId, ?JobStatus $jobStatus = null) : int
     {
-        $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
+        return $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
     public function fetchJobsForStatusPage(int $limit) : array

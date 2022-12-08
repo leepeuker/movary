@@ -15,7 +15,7 @@ class JobQueueRepository
     {
     }
 
-    public function addJob(JobType $type, JobStatus $status, ?int $userId = null, ?array $parameters = null) : void
+    public function addJob(JobType $type, JobStatus $status, ?int $userId = null, ?array $parameters = null) : int
     {
         $this->dbConnection->insert(
             'job_queue',
@@ -26,6 +26,13 @@ class JobQueueRepository
                 'parameters' => $parameters !== null ? Json::encode($parameters) : null,
             ],
         );
+
+        $lastInsertId = $this->dbConnection->lastInsertId();
+        if ($lastInsertId === false) {
+            throw new \RuntimeException('Could not get last inserted id.');
+        }
+
+        return (int)$lastInsertId;
     }
 
     public function fetchJobs(int $limit) : array

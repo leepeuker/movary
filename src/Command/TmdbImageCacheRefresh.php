@@ -51,6 +51,8 @@ class TmdbImageCacheRefresh extends Command
         $imageType = $input->getOption(self::OPTION_NAME_TYPE);
         $forceRefresh = $input->getOption(self::OPTION_NAME_FORCE);
 
+        $jobId = $this->jobQueueApi->addTmdbImageCacheJob(jobStatus: JobStatus::createDone());
+
         try {
             switch ($imageType) {
                 case null:
@@ -69,12 +71,14 @@ class TmdbImageCacheRefresh extends Command
                     return Command::FAILURE;
             }
 
-            $this->jobQueueApi->addTmdbImageCacheJob(jobStatus: JobStatus::createDone());
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
             $this->generateOutput($output, 'Caching images done.');
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete tmdb image caching.');
             $this->logger->error('Could not complete tmdb image caching.', ['exception' => $t]);
+
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createFailed());
 
             return Command::FAILURE;
         }
