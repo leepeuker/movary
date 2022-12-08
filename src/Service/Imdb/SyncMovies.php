@@ -36,7 +36,7 @@ class SyncMovies
             }
 
             // Hacky way to prevent imdb rate limits
-            sleep(3);
+            sleep(6);
         }
     }
 }

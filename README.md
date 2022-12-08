@@ -1,12 +1,13 @@
 ## Movary
 
-Movary is a web application to track and rate your watched movies. 
+Movary is a web application to track and rate your watched movies.
 
 Open source and self hosted -> you should own your data!
 
 Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login with user `movary@movary.com` and password `movary123`)
 
-**Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues)!**
+**Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues) or visit
+the [official subreddit](https://www.reddit.com/r/movary/)!**
 
 1. [About](#about)
 2. [Install via docker](#install-via-docker)
@@ -24,24 +25,26 @@ Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login
 
 ## About
 
-This is a web application to track and rate your watched movies (like a digital movie diary).
+This is a web application to track and rate your movie history (like a digital movie diary).
 
-It was created because I wanted a self hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (-> no big social media features).
+It was created because I wanted a self-hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (->
+no big social media features).
 
-It has support for multiple users accounts if you want to share your instance with a few friends/family.
+It has support for multiple users accounts if you want to share your instance.
 
 **Features:**
 
-- add or update movie watch dates and ratings (only possible when logged in)
-- statistics about your watched movies (e.g. most watched actors, most watched directors, most watched genres etc)
-- PWA: can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
-- import watched movies and ratings from trakt.tv and letterboxd.com
-- connect with plex via webhook to automatically log watched movies (plex premium required)
-- uses themoviedb.org API for movie data
-- export your personal data
+- Movie tracking: Collect and manage your watch history and ratings
+- Statistics: Overview over your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
+- Third party support: Import your existing history and ratings from trakt.tv or letterboxd.com
+- Plex scrobbler: Automatically add new watches and/or ratings (plex premium required)
+- Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
+- Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
+- PWA: Can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
+- Completely free, no ads, no tracking and open source! :)
 
-**Disclaimer:** This project is still in an experimental (but imo usable) state. I am planning to add more and improve existing features before creating a 1.0 realease, which can
-lead to breaking changes until then, so keep the release notes in mind when updating.
+**Disclaimer:** This project is still in an experimental (but imo completely usable) state. I am planning to add more and improve existing features before creating a 1.0 realease,
+which can lead to sudden breaking changes until then, so keep the release notes in mind when updating.
 
 <a name="#link-install-via-docker"></a>
 
@@ -67,7 +70,7 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-Example with docker-compose.yml with a mysql server
+Example docker-compose.yml with a mysql server
 
 ```yml
 version: "3.5"
@@ -104,7 +107,7 @@ volumes:
 
 ## Important: First steps
 
-You can run commands in docker via e.g. `docker exec movary php bin/console.php`
+You can run commands in docker via e.g. `docker exec movary php bin/console.php` (this returns a list of all available movary cli commands)
 
 - Run database migrations, e.g.: `php bin/console.php database:migration:migrate` (on initial installation and after every update)
 - Create initial user:
@@ -148,6 +151,8 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 
 ## Features
 
+Use `php bin/console.php tmdb:movie:sync` to list all available cli commands
+
 ### tmdb sync
 
 Update movie or person meta data with themoviedb.org information.
@@ -156,7 +161,6 @@ Make sure you have added the variables `TMDB_API_KEY` to the environment.
 Examples:
 
 `php bin/console.php tmdb:movie:sync`
-
 
 `php bin/console.php tmdb:person:sync`
 
@@ -188,7 +192,7 @@ Automatically track movies watched in plex with movary.
 
 You can generate your plex webhook url on the plex settings page (`/setting/plex`).
 
-Add the generated url  as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/) to start scrobbling!
+Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/) to start scrobbling!
 
 You can select what you want movary to scrobble (movie views and/or ratings) via the "Scrobbler Options" checkboxes on the settings page.
 
