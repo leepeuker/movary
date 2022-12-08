@@ -29,7 +29,7 @@
 
                 {% if person.birthDate is not null %}
                     <h6 style="margin-bottom: 0.1rem">Birth date</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.birthDate }} ({{ person.age }} years old)</p>
+                    <p style="margin-bottom: 0.4rem">{{ person.birthDate }} ({{ person.age }}{% if person.deathDate is not null %}&#10013;{% endif %})</p>
                 {% endif %}
 
                 {% if person.deathDate is not null %}
