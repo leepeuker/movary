@@ -338,6 +338,20 @@ class UserRepository
         );
     }
 
+    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleViews, bool $scrobbleRatings) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_scrobble_views' => (int)$scrobbleViews,
+                'plex_scrobble_ratings' => (int)$scrobbleRatings,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
     {
         $this->dbConnection->update(
