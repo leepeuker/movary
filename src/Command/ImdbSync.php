@@ -43,17 +43,21 @@ class ImdbSync extends Command
         $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
         $movieCountSyncThreshold = $thresholdOption !== null ? (int)$thresholdOption : null;
 
+        $jobId = $this->jobQueueApi->addImdbSyncJob(JobStatus::createInProgress());
+
         try {
             $this->generateOutput($output, 'Syncing imdb movie ratings...');
 
             $this->syncMovieDetails->syncMovies($maxAgeInHours, $movieCountSyncThreshold);
 
-            $this->jobQueueApi->addImdbSyncJob(JobStatus::createDone());
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing imdb movie ratings done.');
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete imdb sync.');
             $this->logger->error('Could not complete imdb sync.', ['exception' => $t]);
+
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createFailed());
 
             return Command::FAILURE;
         }

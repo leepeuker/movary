@@ -43,17 +43,21 @@ class TmdbMovieSync extends Command
         $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
         $movieCountSyncThreshold = $thresholdOption !== null ? (int)$thresholdOption : null;
 
+        $jobId = $this->jobQueueApi->addTmdbMovieSyncJob(JobStatus::createInProgress());
+
         try {
             $this->generateOutput($output, 'Syncing movie meta data...');
 
             $this->syncMovieDetails->syncMovies($maxAgeInHours, $movieCountSyncThreshold);
 
-            $this->jobQueueApi->addTmdbMovieSyncJob(JobStatus::createDone());
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
             $this->generateOutput($output, 'Syncing movie meta data done.');
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete tmdb sync.');
             $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
+
+            $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createFailed());
 
             return Command::FAILURE;
         }
