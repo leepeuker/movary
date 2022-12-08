@@ -7,6 +7,8 @@ use Psr\Log\LoggerInterface;
 
 class ImdbWebScrapper
 {
+    private const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:107.0) Gecko/20100101 Firefox/107.0';
+
     public function __construct(
         private readonly Client $httpClient,
         private readonly ImdbUrlGenerator $urlGenerator,
@@ -19,7 +21,13 @@ class ImdbWebScrapper
     {
         $rating = ['average' => null, 'voteCount' => null];
 
-        $response = $this->httpClient->get($this->urlGenerator->buildUrl($imdbId));
+        $response = $this->httpClient->get(
+            $this->urlGenerator->buildUrl($imdbId),
+            [
+                'headers' => ['User-Agent' => self::USER_AGENT],
+            ],
+        );
+
         $responseBodyContent = $response->getBody()->getContents();
 
         preg_match('/sc-7ab21ed2-1 jGRxWM">(\d.\d)</', $responseBodyContent, $matchesAverage);
