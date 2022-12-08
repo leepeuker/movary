@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
@@ -14,6 +15,7 @@ class LandingPageController
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
+        private readonly SessionWrapper $sessionWrapper,
     ) {
     }
 
@@ -26,17 +28,12 @@ class LandingPageController
         }
 
         if ($this->userApi->hasUsers() === false) {
-            $errorPasswordTooShort = $_SESSION['errorPasswordTooShort'];
-            $errorPasswordNotEqual = $_SESSION['errorPasswordNotEqual'];
-            $errorUsernameInvalidFormat = $_SESSION['errorUsernameInvalidFormat'];
-            $errorGeneric = $_SESSION['errorGeneric'];
+            $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
+            $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
+            $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
+            $errorGeneric = $this->sessionWrapper->find('errorGeneric');
 
-            unset(
-                $_SESSION['errorPasswordTooShort'],
-                $_SESSION['errorPasswordNotEqual'],
-                $_SESSION['errorUsernameInvalidFormat'],
-                $_SESSION['errorGeneric'],
-            );
+            $this->sessionWrapper->unset('errorPasswordTooShort', 'errorPasswordNotEqual', 'errorUsernameInvalidFormat', 'errorGeneric');
 
             return Response::create(
                 StatusCode::createOk(),
@@ -49,15 +46,16 @@ class LandingPageController
             );
         }
 
-        $failedLogin = $_SESSION['failedLogin'] ?? null;
-        $deletedAccount = $_SESSION['deletedAccount'] ?? null;
-        unset($_SESSION['failedLogin'], $_SESSION['deletedAccount']);
+        $failedLogin = $this->sessionWrapper->has('failedLogin');
+        $deletedAccount = $this->sessionWrapper->has('deletedAccount');
+
+        $this->sessionWrapper->unset('failedLogin', 'deletedAccount');
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/login.html.twig', [
-                'failedLogin' => empty($failedLogin) === false,
-                'deletedAccount' => empty($deletedAccount) === false,
+                'failedLogin' => $failedLogin,
+                'deletedAccount' => $deletedAccount,
             ]),
         );
     }

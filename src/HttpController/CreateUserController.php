@@ -6,6 +6,7 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -17,6 +18,7 @@ class CreateUserController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
+        private readonly SessionWrapper $sessionWrapper,
     ) {
     }
 
@@ -34,7 +36,7 @@ class CreateUserController
         $repeatPassword = isset($postParameters['password']) === false ? null : (string)$postParameters['repeatPassword'];
 
         if ($email === null || $name === null || $password === null || $repeatPassword === null) {
-            $_SESSION['missingFormData'] = true;
+            $this->sessionWrapper->set('missingFormData', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -44,7 +46,7 @@ class CreateUserController
         }
 
         if ($password !== $repeatPassword) {
-            $_SESSION['errorPasswordNotEqual'] = true;
+            $this->sessionWrapper->set('errorPasswordNotEqual', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -58,11 +60,11 @@ class CreateUserController
 
             $this->authenticationService->login($email, $password, false);
         } catch (PasswordTooShort $e) {
-            $_SESSION['errorPasswordTooShort'] = true;
+            $this->sessionWrapper->set('errorPasswordTooShort', true);
         } catch (UsernameInvalidFormat $e) {
-            $_SESSION['errorUsernameInvalidFormat'] = true;
+            $this->sessionWrapper->set('errorUsernameInvalidFormat', true);
         } catch (Throwable $t) {
-            $_SESSION['errorGeneric'] = true;
+            $this->sessionWrapper->set('errorGeneric', true);
         }
 
         return Response::create(

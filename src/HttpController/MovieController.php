@@ -83,7 +83,7 @@ class MovieController
             $personalRating = PersonalRating::create((int)$postParameters['rating']);
         }
 
-        $this->movieApi->updateUserRating($movieId, $_SESSION['userId'], $personalRating);
+        $this->movieApi->updateUserRating($movieId, $this->authenticationService->getCurrentUserId(), $personalRating);
 
         return Response::create(StatusCode::createNoContent());
     }

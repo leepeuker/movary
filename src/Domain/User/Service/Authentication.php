@@ -7,6 +7,7 @@ use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use RuntimeException;
 
@@ -16,8 +17,11 @@ class Authentication
 
     private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
-    public function __construct(private readonly UserRepository $repository, private readonly UserApi $userApi)
-    {
+    public function __construct(
+        private readonly UserRepository $repository,
+        private readonly UserApi $userApi,
+        private readonly SessionWrapper $sessionWrapper,
+    ) {
     }
 
     public function deleteToken(string $token) : void
@@ -32,12 +36,12 @@ class Authentication
 
     public function getCurrentUserId() : int
     {
-        $userId = $_SESSION['userId'] ?? null;
+        $userId = $this->sessionWrapper->find('userId');
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
         if ($userId === null && $token !== null) {
             $userId = $this->repository->findUserIdByAuthToken($token);
-            $_SESSION['userId'] = $userId;
+            $this->sessionWrapper->set('userId', $userId);
         }
 
         if ($userId === null) {
@@ -109,7 +113,7 @@ class Authentication
         session_regenerate_id();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration);
 
-        $_SESSION['userId'] = $user->getId();
+        $this->sessionWrapper->set('userId', $user->getId());
     }
 
     public function logout() : void
@@ -122,8 +126,8 @@ class Authentication
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
         }
 
-        session_destroy();
-        session_start();
+        $this->sessionWrapper->destroy();
+        $this->sessionWrapper->start();
     }
 
     private function createExpirationDate(int $days = 1) : DateTime

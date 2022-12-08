@@ -26,6 +26,7 @@ use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\UrlGenerator;
 use Movary\Util\File;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
@@ -176,6 +177,7 @@ class Factory
             $container->get(UserApi::class),
             $container->get(MovieApi::class),
             $container->get(GithubApi::class),
+            $container->get(SessionWrapper::class),
             $applicationVersion
         );
     }

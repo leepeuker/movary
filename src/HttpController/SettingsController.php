@@ -8,6 +8,7 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -25,6 +26,7 @@ class SettingsController
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,
         private readonly GithubApi $githubApi,
+        private readonly SessionWrapper $sessionWrapper,
         private readonly ?string $currentApplicationVersion = null,
     ) {
     }
@@ -46,7 +48,7 @@ class SettingsController
 
         $this->authenticationService->logout();
 
-        $_SESSION['deletedAccount'] = true;
+        $this->sessionWrapper->set('deletedAccount', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -63,7 +65,7 @@ class SettingsController
 
         $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
 
-        $_SESSION['deletedUserHistory'] = true;
+        $this->sessionWrapper->set('deletedUserHistory', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -80,7 +82,7 @@ class SettingsController
 
         $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
 
-        $_SESSION['deletedUserRatings'] = true;
+        $this->sessionWrapper->set('deletedUserRatings', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -98,31 +100,32 @@ class SettingsController
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $passwordErrorNotEqual = empty($_SESSION['passwordErrorNotEqual']) === false ? true : null;
-        $passwordErrorMinLength = empty($_SESSION['passwordErrorMinLength']) === false ? $_SESSION['passwordErrorMinLength'] : null;
-        $passwordErrorCurrentInvalid = empty($_SESSION['passwordErrorCurrentInvalid']) === false ? $_SESSION['passwordErrorCurrentInvalid'] : null;
-        $passwordUpdated = empty($_SESSION['passwordUpdated']) === false ? $_SESSION['passwordUpdated'] : null;
-        $importHistorySuccessful = empty($_SESSION['importHistorySuccessful']) === false ? $_SESSION['importHistorySuccessful'] : null;
-        $importRatingsSuccessful = empty($_SESSION['importRatingsSuccessful']) === false ? $_SESSION['importRatingsSuccessful'] : null;
-        $importHistoryError = empty($_SESSION['importHistoryError']) === false ? $_SESSION['importHistoryError'] : null;
-        $deletedUserHistory = empty($_SESSION['deletedUserHistory']) === false ? $_SESSION['deletedUserHistory'] : null;
-        $deletedUserRatings = empty($_SESSION['deletedUserRatings']) === false ? $_SESSION['deletedUserRatings'] : null;
-        $generalUpdated = empty($_SESSION['generalUpdated']) === false ? $_SESSION['generalUpdated'] : null;
-        $generalErrorUsernameInvalidFormat = empty($_SESSION['generalErrorUsernameInvalidFormat']) === false ? $_SESSION['generalErrorUsernameInvalidFormat'] : null;
-        $generalErrorUsernameNotUnique = empty($_SESSION['generalErrorUsernameNotUnique']) === false ? $_SESSION['generalErrorUsernameNotUnique'] : null;
-        unset(
-            $_SESSION['passwordUpdated'],
-            $_SESSION['passwordErrorCurrentInvalid'],
-            $_SESSION['passwordErrorMinLength'],
-            $_SESSION['passwordErrorNotEqual'],
-            $_SESSION['importHistorySuccessful'],
-            $_SESSION['importRatingsSuccessful'],
-            $_SESSION['importHistoryError'],
-            $_SESSION['deletedUserHistory'],
-            $_SESSION['deletedUserRatings'],
-            $_SESSION['generalUpdated'],
-            $_SESSION['generalErrorUsernameInvalidFormat'],
-            $_SESSION['generalErrorUsernameNotUnique'],
+        $passwordErrorNotEqual = $this->sessionWrapper->find('passwordErrorNotEqual');
+        $passwordErrorMinLength = $this->sessionWrapper->find('passwordErrorMinLength');
+        $passwordErrorCurrentInvalid = $this->sessionWrapper->find('passwordErrorCurrentInvalid');
+        $passwordUpdated = $this->sessionWrapper->find('passwordUpdated');
+        $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
+        $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
+        $importHistoryError = $this->sessionWrapper->find('importHistoryError');
+        $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
+        $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
+        $generalUpdated = $this->sessionWrapper->find('generalUpdated');
+        $generalErrorUsernameInvalidFormat = $this->sessionWrapper->find('generalErrorUsernameInvalidFormat');
+        $generalErrorUsernameNotUnique = $this->sessionWrapper->find('generalErrorUsernameNotUnique');
+
+        $this->sessionWrapper->unset(
+            'passwordUpdated',
+            'passwordErrorCurrentInvalid',
+            'passwordErrorMinLength',
+            'passwordErrorNotEqual',
+            'importHistorySuccessful',
+            'importRatingsSuccessful',
+            'importHistoryError',
+            'deletedUserHistory',
+            'deletedUserRatings',
+            'generalUpdated',
+            'generalErrorUsernameInvalidFormat',
+            'generalErrorUsernameNotUnique',
         );
 
         $user = $this->userApi->fetchUser($userId);
@@ -177,15 +180,16 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $letterboxdHistorySyncSuccessful = empty($_SESSION['letterboxdHistorySyncSuccessful']) === false ? $_SESSION['letterboxdHistorySyncSuccessful'] : null;
-        $letterboxdRatingsSyncSuccessful = empty($_SESSION['letterboxdRatingsSyncSuccessful']) === false ? $_SESSION['letterboxdRatingsSyncSuccessful'] : null;
-        $letterboxdRatingsImportFileInvalid = empty($_SESSION['letterboxdRatingsImportFileInvalid']) === false ? $_SESSION['letterboxdRatingsImportFileInvalid'] : null;
-        $letterboxdHistoryImportFileInvalid = empty($_SESSION['letterboxdHistoryImportFileInvalid']) === false ? $_SESSION['letterboxdHistoryImportFileInvalid'] : null;
-        unset(
-            $_SESSION['letterboxdHistorySyncSuccessful'],
-            $_SESSION['letterboxdRatingsSyncSuccessful'],
-            $_SESSION['letterboxdRatingsImportFileInvalid'],
-            $_SESSION['letterboxdHistoryImportFileInvalid'],
+        $letterboxdHistorySyncSuccessful = $this->sessionWrapper->find('letterboxdHistorySyncSuccessful');
+        $letterboxdRatingsSyncSuccessful = $this->sessionWrapper->find('letterboxdRatingsSyncSuccessful');
+        $letterboxdRatingsImportFileInvalid = $this->sessionWrapper->find('letterboxdRatingsImportFileInvalid');
+        $letterboxdHistoryImportFileInvalid = $this->sessionWrapper->find('letterboxdHistoryImportFileInvalid');
+
+        $this->sessionWrapper->unset(
+            'letterboxdHistorySyncSuccessful',
+            'letterboxdRatingsSyncSuccessful',
+            'letterboxdRatingsImportFileInvalid',
+            'letterboxdHistoryImportFileInvalid',
         );
 
         return Response::create(
@@ -206,8 +210,8 @@ class SettingsController
             return Response::createFoundRedirect('/');
         }
 
-        $plexScrobblerOptionsUpdated = empty($_SESSION['plexScrobblerOptionsUpdated']) === false ? $_SESSION['plexScrobblerOptionsUpdated'] : null;
-        unset($_SESSION['plexScrobblerOptionsUpdated']);
+        $plexScrobblerOptionsUpdated = $this->sessionWrapper->find('plexScrobblerOptionsUpdated');
+        $this->sessionWrapper->unset('plexScrobblerOptionsUpdated');
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
@@ -228,14 +232,11 @@ class SettingsController
             return Response::createFoundRedirect('/');
         }
 
-        $traktCredentialsUpdated = empty($_SESSION['traktCredentialsUpdated']) === false ? $_SESSION['traktCredentialsUpdated'] : null;
-        $scheduledTraktHistoryImport = empty($_SESSION['scheduledTraktHistoryImport']) === false ? $_SESSION['scheduledTraktHistoryImport'] : null;
-        $scheduledTraktRatingsImport = empty($_SESSION['scheduledTraktRatingsImport']) === false ? $_SESSION['scheduledTraktRatingsImport'] : null;
-        unset(
-            $_SESSION['traktCredentialsUpdated'],
-            $_SESSION['scheduledTraktHistoryImport'],
-            $_SESSION['scheduledTraktRatingsImport'],
-        );
+        $traktCredentialsUpdated = $this->sessionWrapper->find('traktCredentialsUpdated');
+        $scheduledTraktHistoryImport = $this->sessionWrapper->find('scheduledTraktHistoryImport');
+        $scheduledTraktRatingsImport = $this->sessionWrapper->find('scheduledTraktRatingsImport');
+
+        $this->sessionWrapper->unset('traktCredentialsUpdated', 'scheduledTraktHistoryImport', 'scheduledTraktRatingsImport');
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
@@ -270,11 +271,11 @@ class SettingsController
             $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
             $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
 
-            $_SESSION['generalUpdated'] = true;
+            $this->sessionWrapper->set('generalUpdated', true);
         } catch (User\Exception\UsernameInvalidFormat $e) {
-            $_SESSION['generalErrorUsernameInvalidFormat'] = true;
+            $this->sessionWrapper->set('generalErrorUsernameInvalidFormat', true);
         } catch (User\Exception\UsernameNotUnique $e) {
-            $_SESSION['generalErrorUsernameNotUnique'] = true;
+            $this->sessionWrapper->set('generalErrorUsernameNotUnique', true);
         }
 
         return Response::create(
@@ -298,7 +299,7 @@ class SettingsController
         $currentPassword = $request->getPostParameters()['currentPassword'];
 
         if ($this->userApi->isValidPassword($userId, $currentPassword) === false) {
-            $_SESSION['passwordErrorCurrentInvalid'] = true;
+            $this->sessionWrapper->set('passwordErrorCurrentInvalid', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -308,7 +309,7 @@ class SettingsController
         }
 
         if ($newPassword !== $newPasswordRepeat) {
-            $_SESSION['passwordErrorNotEqual'] = true;
+            $this->sessionWrapper->set('passwordErrorNotEqual', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -318,7 +319,7 @@ class SettingsController
         }
 
         if (strlen($newPassword) < 8) {
-            $_SESSION['passwordErrorMinLength'] = 8;
+            $this->sessionWrapper->set('passwordErrorMinLength', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -333,7 +334,7 @@ class SettingsController
 
         $this->userApi->updatePassword($userId, $newPassword);
 
-        $_SESSION['passwordUpdated'] = true;
+        $this->sessionWrapper->set('passwordUpdated', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -356,7 +357,7 @@ class SettingsController
 
         $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleViews, $scrobbleRatings);
 
-        $_SESSION['plexScrobblerOptionsUpdated'] = true;
+        $this->sessionWrapper->set('plexScrobblerOptionsUpdated', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -387,7 +388,7 @@ class SettingsController
         $this->userApi->updateTraktClientId($userId, $traktClientId);
         $this->userApi->updateTraktUserName($userId, $traktUserName);
 
-        $_SESSION['traktCredentialsUpdated'] = true;
+        $this->sessionWrapper->set('traktCredentialsUpdated', true);
 
         return Response::create(
             StatusCode::createSeeOther(),

@@ -6,6 +6,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\ImportHistoryFileValidator;
 use Movary\Service\Letterboxd\ImportRatingsFileValidator;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -21,6 +22,7 @@ class JobController
         private readonly ImportHistoryFileValidator $letterboxdImportHistoryFileValidator,
         private readonly ImportRatingsFileValidator $letterboxdImportRatingsFileValidator,
         private readonly Environment $twig,
+        private readonly SessionWrapper $sessionWrapper,
     ) {
     }
 
@@ -83,7 +85,7 @@ class JobController
         move_uploaded_file($fileParameters['historyCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValid($targetFile) === false) {
-            $_SESSION['letterboxdHistoryImportFileInvalid'] = true;
+            $this->sessionWrapper->set('letterboxdHistoryImportFileInvalid', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -94,7 +96,7 @@ class JobController
 
         $this->jobQueueApi->addLetterboxdImportHistoryJob($userId, $targetFile);
 
-        $_SESSION['letterboxdHistorySyncSuccessful'] = true;
+        $this->sessionWrapper->set('letterboxdHistorySyncSuccessful', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -112,7 +114,7 @@ class JobController
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['ratingsCsv']['tmp_name']) === true) {
-            $_SESSION['letterboxdRatingsImportFileMissing'] = true;
+            $this->sessionWrapper->set('letterboxdRatingsImportFileMissing', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -127,7 +129,7 @@ class JobController
         move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportRatingsFileValidator->isValid($targetFile) === false) {
-            $_SESSION['letterboxdRatingsImportFileInvalid'] = true;
+            $this->sessionWrapper->set('letterboxdRatingsImportFileInvalid', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -138,7 +140,7 @@ class JobController
 
         $this->jobQueueApi->addLetterboxdImportRatingsJob($userId, $targetFile);
 
-        $_SESSION['letterboxdRatingsSyncSuccessful'] = true;
+        $this->sessionWrapper->set('letterboxdRatingsSyncSuccessful', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -155,7 +157,7 @@ class JobController
 
         $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
-        $_SESSION['scheduledTraktHistoryImport'] = true;
+        $this->sessionWrapper->set('scheduledTraktHistoryImport', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -172,7 +174,7 @@ class JobController
 
         $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
-        $_SESSION['scheduledTraktRatingsImport'] = true;
+        $this->sessionWrapper->set('scheduledTraktRatingsImport', true);
 
         return Response::create(
             StatusCode::createSeeOther(),

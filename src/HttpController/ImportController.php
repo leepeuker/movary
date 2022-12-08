@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Service\ImportService;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -18,6 +19,7 @@ class ImportController
         private readonly Authentication $authenticationService,
         private readonly ImportService $importService,
         private readonly LoggerInterface $logger,
+        private readonly SessionWrapper $sessionWrapper,
     ) {
     }
 
@@ -39,7 +41,7 @@ class ImportController
             };
         } catch (Throwable $t) {
             $this->logger->error('Could not import: ' . $exportType, ['exception' => $t]);
-            $_SESSION['importHistoryError'] = $exportType;
+            $this->sessionWrapper->set('importHistoryError', $exportType);
         }
 
         return Response::create(
@@ -57,7 +59,7 @@ class ImportController
 
         $this->importService->importHistory($userId, $fileParameter['history']['tmp_name']);
 
-        $_SESSION['importHistorySuccessful'] = true;
+        $this->sessionWrapper->set('importHistorySuccessful', true);
     }
 
     private function importRatings(int $userId, array $fileParameter) : void
@@ -68,6 +70,6 @@ class ImportController
 
         $this->importService->importRatings($userId, $fileParameter['ratings']['tmp_name']);
 
-        $_SESSION['importRatingsSuccessful'] = true;
+        $this->sessionWrapper->set('importRatingsSuccessful', true);
     }
 }

@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Domain\SessionService;
 use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Service;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -16,6 +17,7 @@ class AuthenticationController
     public function __construct(
         private readonly Environment $twig,
         private readonly Service\Authentication $authenticationService,
+        private readonly SessionWrapper $sessionWrapper,
     ) {
     }
 
@@ -30,7 +32,7 @@ class AuthenticationController
                 isset($postParameters['rememberMe']) === true,
             );
         } catch (InvalidCredentials) {
-            $_SESSION['failedLogin'] = true;
+            $this->sessionWrapper->set('failedLogin', true);
         }
 
         return Response::create(
@@ -61,9 +63,17 @@ class AuthenticationController
             );
         }
 
-        $renderedTemplate = $this->twig->render('page/login.html.twig', ['failedLogin' => empty($_SESSION['failedLogin']) === false]);
+        $failedLogin = $this->sessionWrapper->has('failedLogin');
+        $this->sessionWrapper->unset('failedLogin');
 
-        unset($_SESSION['failedLogin']);
+        $renderedTemplate = $this->twig->render(
+            'page/login.html.twig',
+            [
+                'failedLogin' => $failedLogin
+            ],
+        );
+
+        $this->sessionWrapper->unset('failedLogin');
 
         return Response::create(
             StatusCode::createOk(),
