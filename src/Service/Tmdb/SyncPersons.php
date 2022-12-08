@@ -2,7 +2,6 @@
 
 namespace Movary\Service\Tmdb;
 
-use Doctrine\DBAL;
 use Movary\Domain\Person\PersonApi;
 use Movary\Domain\Person\PersonEntity;
 use Movary\ValueObject\DateTime;
@@ -20,6 +19,8 @@ class SyncPersons
 
     public function syncPersons(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
     {
+        $this->personApi->deleteAllNotReferenced();
+
         $persons = $this->personApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold);
 
         foreach ($persons as $person) {

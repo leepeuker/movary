@@ -45,6 +45,19 @@ class PersonRepository
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
     }
 
+    public function deleteAllNotReferenced() : void
+    {
+        $this->dbConnection->executeQuery(
+            'DELETE
+            FROM person
+            WHERE id NOT IN (
+                SELECT person_id FROM movie_cast
+                UNION
+                SELECT person_id FROM movie_crew
+            )',
+        );
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
         $query = 'SELECT * FROM `person` ORDER BY updated_at_tmdb ASC';

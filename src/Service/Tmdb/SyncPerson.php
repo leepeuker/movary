@@ -2,10 +2,12 @@
 
 namespace Movary\Service\Tmdb;
 
+use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Person\PersonApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\ValueObject\DateTime;
+use Psr\Log\LoggerInterface;
 
 class SyncPerson
 {
@@ -13,12 +15,19 @@ class SyncPerson
         private readonly TmdbApi $tmdbApi,
         private readonly PersonApi $personApi,
         private readonly JobQueueScheduler $jobScheduler,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
     public function syncPerson(int $tmdbId) : void
     {
-        $tmdbPerson = $this->tmdbApi->fetchPersonDetails($tmdbId);
+        try {
+            $tmdbPerson = $this->tmdbApi->fetchPersonDetails($tmdbId);
+        } catch (TmdbResourceNotFound $e) {
+            $this->logger->debug('No person existing on tmdb with id: ' . $tmdbId);
+
+            return;
+        }
 
         $person = $this->personApi->findByTmdbId($tmdbId);
 
