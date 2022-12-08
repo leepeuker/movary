@@ -184,6 +184,11 @@ class UserApi
         $this->repository->updatePassword($userId, $passwordHash);
     }
 
+    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleViews, bool $scrobbleRatings) : void
+    {
+        $this->repository->updatePlexScrobblerOptions($userId, $scrobbleViews, $scrobbleRatings);
+    }
+
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
     {
         $this->repository->updatePrivacyLevel($userId, $privacyLevel);

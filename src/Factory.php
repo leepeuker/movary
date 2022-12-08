@@ -15,18 +15,15 @@ use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\TraktClient;
 use Movary\Command;
-use Movary\Domain\Movie;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
-use Movary\HttpController\PlexController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
-use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\UrlGenerator;
 use Movary\Util\File;
 use Movary\ValueObject\Config;
@@ -161,31 +158,6 @@ class Factory
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ],
-        );
-    }
-
-    public static function createPlexController(ContainerInterface $container, Config $config) : PlexController
-    {
-        try {
-            $plexEnableScrobbleWebhook = $config->getAsBool('PLEX_ENABLE_SCROBBLE');
-        } catch (OutOfBoundsException) {
-            $plexEnableScrobbleWebhook = true;
-        }
-
-        try {
-            $plexEnableRatingWebhook = $config->getAsBool('PLEX_ENABLE_RATING');
-        } catch (OutOfBoundsException) {
-            $plexEnableRatingWebhook = false;
-        }
-
-        return new PlexController(
-            $container->get(LoggerInterface::class),
-            $container->get(Movie\MovieApi::class),
-            $container->get(SyncMovie::class),
-            $container->get(User\UserApi::class),
-            $container->get(Authentication::class),
-            $plexEnableScrobbleWebhook,
-            $plexEnableRatingWebhook,
         );
     }
 

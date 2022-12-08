@@ -144,6 +144,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
+        '/user/plex',
+        [\Movary\HttpController\SettingsController::class, 'updatePlex'],
+    );
+    $routeCollector->addRoute(
+        'POST',
         '/user/password',
         [\Movary\HttpController\SettingsController::class, 'updatePassword'],
     );

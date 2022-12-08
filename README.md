@@ -137,13 +137,6 @@ TMDB_API_KEY=
 # Save and deliver movie/person posters locally
 TMDB_ENABLE_IMAGE_CACHING=0
 
-### Plex 
-# https://app.plex.tv/desktop/#!/settings/webhooks
-# Import new views watched via plex
-PLEX_ENABLE_SCROBBLE=1
-# Import new ratings set via plex
-PLEX_ENABLE_RATING=0
-
 ### Logging
 LOG_LEVEL=warning
 LOG_ENABLE_STACKTRACE=0
@@ -193,11 +186,11 @@ Helpful commands:
 
 Automatically track movies watched in plex with movary.
 
-You can generate your plex webhook url on the apps settings page (`/settings`).
+You can generate your plex webhook url on the plex settings page (`/setting/plex`).
 
-Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/).
+Add the generated url  as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/) to start scrobbling!
 
-As a default only your watches are tracked, but you can additionally enable the tracking of your movie ratings.
+You can select what you want movary to scrobble (movie views and/or ratings) via the "Scrobbler Options" checkboxes on the settings page.
 
 ### Trakt.tv Import
 

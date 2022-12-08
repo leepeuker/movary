@@ -14,7 +14,6 @@ $builder->addDefinitions(
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\HttpController\SettingsController::class => DI\factory([Factory::class, 'createSettingsController']),
-        \Movary\HttpController\PlexController::class => DI\factory([Factory::class, 'createPlexController']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),
         \Movary\Command\DatabaseMigrationStatus::class => DI\factory([Factory::class, 'createDatabaseMigrationStatusCommand']),
         \Movary\Command\DatabaseMigrationMigrate::class => DI\factory([Factory::class, 'createDatabaseMigrationMigrateCommand']),

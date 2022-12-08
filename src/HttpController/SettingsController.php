@@ -206,12 +206,18 @@ class SettingsController
             return Response::createFoundRedirect('/');
         }
 
+        $plexScrobblerOptionsUpdated = empty($_SESSION['plexScrobblerOptionsUpdated']) === false ? $_SESSION['plexScrobblerOptionsUpdated'] : null;
+        unset($_SESSION['plexScrobblerOptionsUpdated']);
+
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-plex.html.twig', [
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
+                'scrobbleViews' => $user->getPlexScrobbleViews(),
+                'scrobbleRatings' => $user->getPlexScrobbleRating(),
+                'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
             ]),
         );
     }
@@ -328,6 +334,29 @@ class SettingsController
         $this->userApi->updatePassword($userId, $newPassword);
 
         $_SESSION['passwordUpdated'] = true;
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function updatePlex(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createFoundRedirect('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = $request->getPostParameters();
+
+        $scrobbleViews = (bool)$postParameters['scrobbleViews'];
+        $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
+
+        $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleViews, $scrobbleRatings);
+
+        $_SESSION['plexScrobblerOptionsUpdated'] = true;
 
         return Response::create(
             StatusCode::createSeeOther(),

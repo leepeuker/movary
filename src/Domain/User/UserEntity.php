@@ -14,6 +14,8 @@ class UserEntity
         private readonly ?string $plexWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
+        private readonly bool $plexScrobbleViews,
+        private readonly bool $plexScrobbleRating,
     ) {
     }
 
@@ -29,6 +31,8 @@ class UserEntity
             $data['plex_webhook_uuid'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
+            (bool)$data['plex_scrobble_views'],
+            (bool)$data['plex_scrobble_ratings'],
         );
     }
 
@@ -55,6 +59,16 @@ class UserEntity
     public function getPasswordHash() : string
     {
         return $this->passwordHash;
+    }
+
+    public function getPlexScrobbleRating() : bool
+    {
+        return $this->plexScrobbleRating;
+    }
+
+    public function getPlexScrobbleViews() : bool
+    {
+        return $this->plexScrobbleViews;
     }
 
     public function getPlexWebhookId() : ?string

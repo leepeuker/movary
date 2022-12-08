@@ -39,6 +39,11 @@ class Response
         return new self(StatusCode::createNotFound());
     }
 
+    public static function createOk() : self
+    {
+        return new self(StatusCode::createOk());
+    }
+
     public function getBody() : ?string
     {
         return $this->body;

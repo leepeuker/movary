@@ -19,7 +19,7 @@
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
 
-            <div style="padding-bottom: 1rem;padding-top: 1rem">
+            <div style="padding-top: 1rem">
                 <h5>Plex webhook url</h5>
 
                 <p class="text-muted">Enter the following URL as a webhook to your plex account to automatically log movies watched via plex. <br>
@@ -28,9 +28,50 @@
                 <p id="plexWebhookUrl" class="overflow-auto text-nowrap plexWebhookUrl"
                    style="font-size:0.9rem;margin-left: 5%;margin-right: 5%;margin-top: 1rem;margin-bottom: 1rem">-</p>
 
-                <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger disabled" onclick="deletePlexWebhookId()">Delete url</button>
+                <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger {% if plexWebhookUrl == '-' %}disabled{% endif %}" onclick="deletePlexWebhookId()">
+                    Delete url
+                </button>
                 <button type="button" class="btn btn-primary " onclick="regeneratePlexWebhookId()">Regenerate url</button>
             </div>
+
+            <hr>
+
+            <h5>Scrobbler Options</h5>
+
+            <form action="/user/plex" method="POST">
+                <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="scrobbleViewsCheckbox"
+                           name="scrobbleViews"
+                           {% if plexWebhookUrl == '-' %}disabled{% endif %}
+                            {% if scrobbleViews == true %}checked{% endif %}
+                           style="margin-right: 0.2rem">
+                    <label class="form-check-label" for="scrobbleViewsCheckbox">Save views</label>
+                </div>
+                <div style="padding-bottom: 1rem;">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="scrobbleRatingsCheckbox"
+                           name="scrobbleRatings"
+                           {% if plexWebhookUrl == '-' %}disabled{% endif %}
+                            {% if scrobbleRatings == true %}checked{% endif %}
+                           style="margin-left: 0.5rem;margin-right: 0.2rem">
+                    <label class="form-check-label" for="scrobbleRatingsCheckbox">Save ratings</label>
+                </div>
+
+                {% if plexScrobblerOptionsUpdated == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                        Trakt credentials were updated.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary" {% if plexWebhookUrl == '-' %}disabled{% endif %} id="saveButton">Save</button>
+            </form>
+
         </div>
     </main>
 {% endblock %}
