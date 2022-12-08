@@ -238,7 +238,8 @@ class MovieRepository
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE mh.user_id = ?) AND p.name != "Stan Lee" {$genderQuery} {$searchTermQuery}
+            JOIN movie_user_watch_dates muwd on mc.movie_id = muwd.movie_id
+            WHERE muwd.user_id = ? AND p.name != "Stan Lee" {$genderQuery} {$searchTermQuery}
             GROUP BY mc.person_id
             ORDER BY COUNT(*) DESC, p.name
             {$limitQuery}
