@@ -8,9 +8,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-class TmdbImageCacheDelete extends Command
+class TmdbImageCacheCleanup extends Command
 {
-    protected static $defaultName = 'tmdb:imageCache:delete';
+    protected static $defaultName = 'tmdb:imageCache:cleanup';
 
     public function __construct(
         private readonly TmdbImageCache $imageCacheService,
@@ -21,21 +21,21 @@ class TmdbImageCacheDelete extends Command
 
     protected function configure() : void
     {
-        $this->setDescription('Delete cached images from themoviedb.org');
+        $this->setDescription('Delete outdated cached images which are not referenced anymore.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         try {
-            $this->generateOutput($output, 'Deleting cached images...');
+            $this->generateOutput($output, 'Cleaning up cached images...');
 
-            $this->imageCacheService->deleteCompleteCache();
+            $this->imageCacheService->deletedOutdatedCache();
 
-            $this->generateOutput($output, 'Deleting cached images done.');
+            $this->generateOutput($output, 'Cleaning up cached images done.');
         } catch (Throwable $t) {
-            $this->generateOutput($output, 'ERROR: Could not complete deleting image cache.');
-            $this->logger->error('Could not complete deleting image cache.', ['exception' => $t]);
+            $this->generateOutput($output, 'ERROR: Could not complete cleaning image cache up.');
+            $this->logger->error('Could not complete cleaning image cache up.', ['exception' => $t]);
 
             return Command::FAILURE;
         }
