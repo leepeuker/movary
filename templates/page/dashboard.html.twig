@@ -60,7 +60,7 @@
                                     <div class="position-relative">
                                         <img src="{{ lastPlay.poster_path }}"
                                              class="card-img-top"
-                                             alt="...">
+                                             alt="{{ lastPlay.title }} Poster">
 
                                     </div>
                                     <div class="card-footer" style="padding: 0.1rem">
@@ -93,7 +93,7 @@
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                                     </div>
                                     <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                                    <img src="{{ mostWatchedActor.poster_path }}" alt="...">
+                                    <img src="{{ mostWatchedActor.poster_path }}" alt="{{ mostWatchedActor.name }} Poster">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.count }}x</small>
                                     </div>
@@ -120,7 +120,7 @@
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
                                     </div>
                                     <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
-                                    <img src="{{ mostWatchedActress.poster_path }}" alt="...">
+                                    <img src="{{ mostWatchedActress.poster_path }}" alt="{{ mostWatchedActress.name }} Poster">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.count }}x</small>
                                     </div>
@@ -146,7 +146,7 @@
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                                     </div>
                                     <input id="directorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
-                                    <img src="{{ mostWatchedDirector.poster_path }}" alt="...">
+                                    <img src="{{ mostWatchedDirector.poster_path }}" alt="{{ mostWatchedDirector.name }} Poster">
                                     <div class="card-footer" style="padding: 0.1rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.count }}x</small>
                                     </div>
