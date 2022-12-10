@@ -73,9 +73,11 @@ class ImageCacheService
         $this->fileUtil->deleteDirectoryContent($this->generateStorageDirectory($resourceType));
     }
 
-    public function deleteOutdatedImagesByResourceType(ResourceType $resourceType) : void
+    public function deleteOutdatedImagesByResourceType(ResourceType $resourceType) : int
     {
         $iterator = new \DirectoryIterator($this->generateStorageDirectory($resourceType));
+
+        $deletionCounter = 0;
 
         foreach ($iterator as $file) {
             if ($file->isDir() === true) {
@@ -85,12 +87,16 @@ class ImageCacheService
 
             $result = $this->dbConnection->executeQuery("SELECT id FROM $resourceType WHERE id = ?", [$resourceId]);
 
-            if ($result->fetchOne() !== false) {
+            if (count($result->fetchAll()) > 0) {
                 continue;
             }
 
             $this->fileUtil->deleteFile($file->getPathname());
+
+            $deletionCounter++;
         }
+
+        return $deletionCounter;
     }
 
     public function posterPathExists(string $posterPath) : bool

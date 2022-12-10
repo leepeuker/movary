@@ -44,13 +44,17 @@ class TmdbImageCache
         $this->pdo->prepare('UPDATE person SET poster_path = null')->execute();
     }
 
-    public function deletedOutdatedCache() : void
+    public function deletedOutdatedCache() : int
     {
-        $this->imageCacheService->deleteOutdatedImagesByResourceType(ResourceType::createMovie());
+        $deletionCounter = 0;
+
+        $deletionCounter += $this->imageCacheService->deleteOutdatedImagesByResourceType(ResourceType::createMovie());
         $this->pdo->prepare('UPDATE movie SET poster_path = null')->execute();
 
-        $this->imageCacheService->deleteOutdatedImagesByResourceType(ResourceType::createPerson());
+        $deletionCounter += $this->imageCacheService->deleteOutdatedImagesByResourceType(ResourceType::createPerson());
         $this->pdo->prepare('UPDATE person SET poster_path = null')->execute();
+
+        return $deletionCounter;
     }
 
     public function executeJob(Job $job) : void

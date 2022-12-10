@@ -30,7 +30,9 @@ class TmdbImageCacheCleanup extends Command
         try {
             $this->generateOutput($output, 'Cleaning up cached images...');
 
-            $this->imageCacheService->deletedOutdatedCache();
+            $deletionCounter = $this->imageCacheService->deletedOutdatedCache();
+
+            $this->generateOutput($output, "Deleted [$deletionCounter] images from disk.");
 
             $this->generateOutput($output, 'Cleaning up cached images done.');
         } catch (Throwable $t) {
