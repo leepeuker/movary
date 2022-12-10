@@ -3,28 +3,24 @@
 namespace Movary\HttpController\Mapper;
 
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\HttpController\Dto\MoviesRequestDto;
+use Movary\HttpController\Dto\ActorsRequestDto;
+use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
-use Movary\ValueObject\Year;
 
-class MoviesRequestMapper
+class ActorsRequestMapper
 {
-    private const DEFAULT_GENRE = null;
-
-    private const DEFAULT_RELEASE_YEAR = null;
-
     private const DEFAULT_LIMIT = 24;
 
-    private const DEFAULT_SORT_BY = 'title';
+    private const DEFAULT_SORT_BY = 'uniqueAppearances';
 
-    private const DEFAULT_SORT_ORDER = 'ASC';
+    private const DEFAULT_SORT_ORDER = 'desc';
 
     public function __construct(
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
 
-    public function mapRenderPageRequest(Request $request) : MoviesRequestDto
+    public function mapRenderPageRequest(Request $request) : ActorsRequestDto
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
 
@@ -35,21 +31,16 @@ class MoviesRequestMapper
         $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sb'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $getParameters['so'] ?? self::DEFAULT_SORT_ORDER;
-        $releaseYear = $getParameters['ry'] ?? self::DEFAULT_RELEASE_YEAR;
-        $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
-        $language = $getParameters['la'] ?? null;
-        $genre = $getParameters['ge'] ?? self::DEFAULT_GENRE;
+        $gender = isset($getParameters['ge']) === false || $getParameters['ge'] === '' ? null : Gender::createFromInt((int)$getParameters['ge']);
 
-        return MoviesRequestDto::createFromParameters(
+        return ActorsRequestDto::createFromParameters(
             $userId,
             $searchTerm,
             (int)$page,
             (int)$limit,
             $sortBy,
             $sortOrder,
-            $releaseYear,
-            $language,
-            $genre,
+            $gender,
         );
     }
 }

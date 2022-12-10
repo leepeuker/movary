@@ -212,37 +212,43 @@ class MovieRepository
         )->fetchAllAssociative();
     }
 
-    public function fetchMostWatchedActors(int $userId, int $page = 1, ?int $limit = null, ?Gender $gender = null, ?string $searchTerm = null) : array
-    {
-        $payload = [$userId];
+    public function fetchMostWatchedActors(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm,
+        string $sortBy,
+        string $sortOrder,
+        ?Gender $gender,
+    ) : array {
+        $payload = [$userId, "%$searchTerm%"];
 
-        $limitQuery = '';
-        if ($limit !== null) {
-            $offset = ($limit * $page) - $limit;
-            $limitQuery = "LIMIT $offset, $limit";
-        }
-        $genderQuery = '';
-        if ($gender !== null) {
-            $genderQuery = 'AND p.gender = ?';
+        $offset = ($limit * $page) - $limit;
+
+        $sortBySanitized = match ($sortBy) {
+            'uniqueAppearances' => 'COUNT(DISTINCT m.id) ',
+            'totalAppearances' => 'COUNT(m.id) ',
+            default => 'name'
+        };
+
+        $whereQuery = 'WHERE p.name LIKE ? AND p.name != "Stan Lee" ';
+
+        if (empty($gender) === false) {
+            $whereQuery .= 'AND p.gender = ? ';
             $payload[] = $gender;
-        }
-        $searchTermQuery = '';
-        if ($searchTerm !== null) {
-            $searchTermQuery = 'AND p.name LIKE ?';
-            $payload[] = "%$searchTerm%";
         }
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(DISTINCT m.id) as count, p.gender, p.tmdb_poster_path
+            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.tmdb_poster_path
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
-            JOIN movie_user_watch_dates muwd on mc.movie_id = muwd.movie_id
-            WHERE muwd.user_id = ? AND p.name != "Stan Lee" {$genderQuery} {$searchTermQuery}
-            GROUP BY mc.person_id
-            ORDER BY COUNT(DISTINCT m.id) DESC, p.name
-            {$limitQuery}
+            JOIN movie_user_watch_dates muwd on mc.movie_id = muwd.movie_id and muwd.user_id = ?
+            $whereQuery
+            GROUP BY mc.person_id, name
+            ORDER BY $sortBySanitized $sortOrder, name asc
+            LIMIT $offset, $limit
             SQL,
             $payload,
         );
@@ -439,6 +445,22 @@ class MovieRepository
             WHERE mh.user_id = ?',
             [$userId],
         )->fetchFirstColumn()[0];
+    }
+
+    public function fetchUniqueActorGenders(int $userId) : array
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT p.gender
+            FROM movie_user_watch_dates mh
+            JOIN movie m on mh.movie_id = m.id
+            JOIN movie_cast mc on m.id = mc.movie_id
+            JOIN person p on mc.person_id = p.id
+            WHERE user_id = ?
+            ORDER BY p.gender
+            SQL,
+            [$userId],
+        );
     }
 
     public function fetchUniqueMovieGenres(int $userId) : array

@@ -95,13 +95,13 @@
                                     <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
                                     <img src="{{ mostWatchedActor.poster_path }}" alt="...">
                                     <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.count }}x</small>
+                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.uniqueCount }}x</small>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/most-watched-actors"
+                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
@@ -122,13 +122,13 @@
                                     <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
                                     <img src="{{ mostWatchedActress.poster_path }}" alt="...">
                                     <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.count }}x</small>
+                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.uniqueCount }}x</small>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/most-watched-actors"
+                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=1&pp=24"
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 

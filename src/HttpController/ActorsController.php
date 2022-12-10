@@ -2,21 +2,21 @@
 
 namespace Movary\HttpController;
 
-use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\HttpController\Mapper\MoviesRequestMapper;
+use Movary\HttpController\Mapper\ActorsRequestMapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
 
-class MoviesController
+class ActorsController
 {
     public function __construct(
+        private readonly MovieHistoryApi $movieHistoryApi,
         private readonly Environment $twig,
-        private readonly MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly MoviesRequestMapper $moviesRequestMapper,
+        private readonly ActorsRequestMapper $requestMapper,
     ) {
     }
 
@@ -27,31 +27,18 @@ class MoviesController
             return Response::createNotFound();
         }
 
-        $requestData = $this->moviesRequestMapper->mapRenderPageRequest($request);
+        $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
-        $userId = $requestData->getUserId();
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
-        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated(
+        $mostWatchedActors = $this->movieHistoryApi->fetchActors(
             $userId,
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
             $requestData->getSortBy(),
             $requestData->getSortOrder(),
-            $requestData->getReleaseYear(),
-            $requestData->getLanguage(),
-            $requestData->getGenre(),
+            $requestData->getGender(),
         );
-        $historyCount = $this->movieApi->fetchUniqueMoviesCount(
-            $userId,
-            $requestData->getSearchTerm(),
-            $requestData->getReleaseYear(),
-            $requestData->getLanguage(),
-            $requestData->getGenre(),
-        );
+        $historyCount = $this->movieHistoryApi->fetchMostWatchedActorsCount($userId, $requestData->getSearchTerm());
 
         $maxPage = (int)ceil($historyCount / $requestData->getLimit());
 
@@ -64,20 +51,16 @@ class MoviesController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/movies.html.twig', [
+            $this->twig->render('page/actors.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
-                'movies' => $uniqueMovies,
+                'mostWatchedActors' => $mostWatchedActors,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $requestData->getSearchTerm(),
                 'perPage' => $requestData->getLimit(),
                 'sortBy' => $requestData->getSortBy(),
                 'sortOrder' => $requestData->getSortOrder(),
-                'releaseYear' => (string)$requestData->getReleaseYear(),
-                'language' => (string)$requestData->getLanguage(),
-                'genre' => (string)$requestData->getGenre(),
-                'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
-                'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($userId),
-                'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($userId),
+                'filterGender' => (string)$requestData->getGender(),
+                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueActorGenders($userId)
             ]),
         );
     }

@@ -41,6 +41,32 @@ class MovieHistoryApi
         $this->repository->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);
     }
 
+    public function fetchActors(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm = null,
+        string $sortBy = 'uniqueAppearances',
+        string $sortOrder = 'DESC',
+        ?Gender $gender = null,
+    ) : array {
+        $mostWatchedActors = $this->movieRepository->fetchMostWatchedActors(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $gender,
+        );
+
+        foreach ($mostWatchedActors as $index => $mostWatchedActor) {
+            $mostWatchedActors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedActor['gender'])->getAbbreviation();
+        }
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($mostWatchedActors);
+    }
+
     public function fetchAveragePersonalRating(int $userId) : float
     {
         return round($this->movieRepository->fetchPersonalRating($userId), 1);
@@ -101,17 +127,6 @@ class MovieHistoryApi
         $lastPlays = $this->movieRepository->fetchLastPlays($userId);
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
-    }
-
-    public function fetchMostWatchedActors(int $userId, int $page = 1, ?int $limit = null, ?Gender $gender = null, ?string $searchTerm = null) : array
-    {
-        $mostWatchedActors = $this->movieRepository->fetchMostWatchedActors($userId, $page, $limit, $gender, $searchTerm);
-
-        foreach ($mostWatchedActors as $index => $mostWatchedActor) {
-            $mostWatchedActors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedActor['gender'])->getAbbreviation();
-        }
-
-        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($mostWatchedActors);
     }
 
     public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null) : int
@@ -183,6 +198,30 @@ class MovieHistoryApi
         $minutes = $this->movieRepository->fetchTotalMinutesWatched($userId);
 
         return (int)round($minutes / 60);
+    }
+
+    public function fetchUniqueActorGenders(int $userId) : array
+    {
+        $uniqueActorGenders = $this->movieRepository->fetchUniqueActorGenders($userId);
+
+        $uniqueActorGendersEnriched = [];
+        foreach ($uniqueActorGenders as $uniqueActorGender) {
+            if ($uniqueActorGender === '0') {
+                continue;
+            }
+
+            $uniqueActorGendersEnriched[] = [
+                'id' => $uniqueActorGender,
+                'name' => match ($uniqueActorGender) {
+                    '1' => 'Female',
+                    '2' => 'Male',
+                    '3' => 'Non binary',
+                    default => throw new \RuntimeException('Unknown gender: ' . $uniqueActorGender)
+                },
+            ];
+        }
+
+        return $uniqueActorGendersEnriched;
     }
 
     public function fetchUniqueMovieGenres(int $userId) : array

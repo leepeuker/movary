@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Most Watched Actors
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/userSelect.js"></script>
+    <script src="/js/topActors.js"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/user-select.html.twig') }}
+
+            <form action="/{{ routeUsername }}/actors" method="GET">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
+                    <button class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+                <div style="display: none;border: #aab0b3 1px;margin-top:1em;margin-bottom:1em" id="searchOptions">
+
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Sort by</span>
+                        <select class="form-control" name="sb" id="sort-by" style="width: 50%">
+                            <option value="uniqueAppearances" {{ sortBy == 'uniqueAppearances' ? 'selected' }}>Unique Appearances</option>
+                            <option value="totalAppearances" {{ sortBy == 'totalAppearances' ? 'selected' }}>Total Appearances</option>
+                            <option value="name" {{ sortBy == 'name' ? 'selected' }}>Name</option>
+                        </select>
+                        <select class="form-control" name="so" id="sort-order" style="width: 5%">
+                            <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>&uarr;</option>
+                            <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>&darr;</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Gender</span>
+                        <select class="form-control" name="ge" id="gender">
+                            <option value="" {{ filterGender is null ? 'selected' }}>All</option>
+                            {% for uniqueGender in uniqueGenders %}
+                                <option value="{{ uniqueGender.id }}" {{ uniqueGender.id == filterGender ? 'selected' }}>{{ uniqueGender.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Per page</span>
+                        <select class="form-control" name="pp" id="per-page">
+                            <option value="24" {{ perPage == 24 ? 'selected' }}>24</option>
+                            <option value="48" {{ perPage == 48 ? 'selected' }}>48</option>
+                            <option value="72" {{ perPage == 72 ? 'selected' }}>72</option>
+                            <option value="96" {{ perPage == 96 ? 'selected' }}>96</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+                {% for mostWatchedActor in mostWatchedActors %}
+                    <div class="col" style="padding-bottom: 1rem;">
+                        <div class="card h-100  position-relative" onclick="window.location='/{{ routeUsername }}/person/{{ mostWatchedActor.id }}'" style="cursor: pointer">
+                            <div class="card-header text-truncate" style="padding: 0.2rem">
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
+                            </div>
+                            <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
+                            <img src="{{ mostWatchedActor.poster_path }}" alt="...">
+                            {% if sortBy == 'uniqueAppearances' or sortBy == 'totalAppearances' %}
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 0.8rem">{% if sortBy == 'uniqueAppearances' %} {{ mostWatchedActor.uniqueCount }} {% else %} {{ mostWatchedActor.totalCount }} {% endif %}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% set searchTermQuery = (searchTerm is null) ? '' : "s=#{searchTerm}&" %}
+            {% set sortByQuery = (sortBy is null) ? '' : "sb=#{sortBy}&" %}
+            {% set sortOrderQuery = (sortOrder is null) ? '' : "so=#{sortOrder}&" %}
+            {% set perPageQuery = (perPage is null) ? '' : "pp=#{perPage}&" %}
+            {% set genderQuery = (filterGender is null) ? '' : "ge=#{genre}&" %}
+            {% set baseUrl = '/' ~ routeUsername ~ '/actors?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
+
+            <ul class="pagination justify-content-center">
+                {% if paginationElements.previous is null %}
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&laquo;</span></p></li>
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ baseUrl }}p=1">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ baseUrl }}p={{ paginationElements.previous }}">
+                            <span aria-hidden="true">&lsaquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="page-item active">
+                    <p class="page-link">{{ paginationElements.currentPage }} of {{ paginationElements.maxPage }}</p>
+                </li>
+                {% if paginationElements.next is null %}
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&rsaquo;</span></p></li>
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ baseUrl }}p={{ paginationElements.next }}">
+                            <span aria-hidden="true">&rsaquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="{{ baseUrl }}p={{ paginationElements.maxPage }}">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+        </div>
+    </main>
+{% endblock %}
