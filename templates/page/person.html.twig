@@ -69,7 +69,7 @@
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
-                                        <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="...">
+                                        <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
 
                                     {% if movieAsActor.userRating is not null %}
@@ -91,7 +91,7 @@
                         <div class="col position-relative" style="padding-bottom: 1rem">
                             <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
-                                    <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="...">
+                                    <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
                                 </div>
                                 {% if movieAsDirector.userRating is not null %}

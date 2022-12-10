@@ -72,7 +72,7 @@
                                 <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                             </div>
                             <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                            <img src="{{ mostWatchedActor.poster_path }}" alt="...">
+                            <img src="{{ mostWatchedActor.poster_path }}" alt="{{ mostWatchedActor.name }} Poster">
                             {% if sortBy == 'uniqueAppearances' or sortBy == 'totalAppearances' %}
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.8rem">{% if sortBy == 'uniqueAppearances' %} {{ mostWatchedActor.uniqueCount }} {% else %} {{ mostWatchedActor.totalCount }} {% endif %}</small>

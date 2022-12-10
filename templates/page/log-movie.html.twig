@@ -39,7 +39,7 @@
                 {% for movie in movies %}
                     <li class="list-group-item list-group-item-action" style="padding: 0.4rem">
                         <div class="col clearfix" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#watchDateModal" id="{{ movie.id }}">
-                            <img src="{{ 'https://image.tmdb.org/t/p/w342' ~ movie.poster_path }}" class="rounded float-start" alt="..." width="120rem">
+                            <img src="{{ 'https://image.tmdb.org/t/p/w342' ~ movie.poster_path }}" class="rounded float-start" alt="{{ movie.title }} Poster" width="120rem">
                             <h5 style="padding-left: 8rem">{{ movie.title }} ({{ movie.release_date|date("Y") }})</h5>
                             <p style="padding-left: 8rem;font-size: 0.8rem">{{ movie.overview }}</p>
                             <input type="hidden" id="{{ movie.id }}_movieTitle" value="{{ movie.title }}">
