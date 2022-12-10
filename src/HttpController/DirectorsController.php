@@ -10,7 +10,7 @@ use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
 
-class ActorsController
+class DirectorsController
 {
     public function __construct(
         private readonly MovieHistoryApi $movieHistoryApi,
@@ -29,7 +29,7 @@ class ActorsController
 
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
-        $actors = $this->movieHistoryApi->fetchActors(
+        $directors = $this->movieHistoryApi->fetchDirectors(
             $userId,
             $requestData->getLimit(),
             $requestData->getPage(),
@@ -38,9 +38,9 @@ class ActorsController
             $requestData->getSortOrder(),
             $requestData->getGender(),
         );
-        $actorsCount = $this->movieHistoryApi->fetchMostWatchedActorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());
+        $directorsCount = $this->movieHistoryApi->fetchDirectorsCount($userId, $requestData->getSearchTerm());
 
-        $maxPage = (int)ceil($actorsCount / $requestData->getLimit());
+        $maxPage = (int)ceil($directorsCount / $requestData->getLimit());
 
         $paginationElements = [
             'previous' => $requestData->getPage() > 1 ? $requestData->getPage() - 1 : null,
@@ -51,16 +51,16 @@ class ActorsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/actors.html.twig', [
+            $this->twig->render('page/directors.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
-                'mostWatchedActors' => $actors,
+                'mostWatchedDirectors' => $directors,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $requestData->getSearchTerm(),
                 'perPage' => $requestData->getLimit(),
                 'sortBy' => $requestData->getSortBy(),
                 'sortOrder' => $requestData->getSortOrder(),
                 'filterGender' => (string)$requestData->getGender(),
-                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueActorGenders($userId)
+                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueDirectorsGenders($userId)
             ]),
         );
     }

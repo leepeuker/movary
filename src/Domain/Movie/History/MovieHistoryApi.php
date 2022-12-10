@@ -50,7 +50,7 @@ class MovieHistoryApi
         string $sortOrder = 'DESC',
         ?Gender $gender = null,
     ) : array {
-        $mostWatchedActors = $this->movieRepository->fetchMostWatchedActors(
+        $actors = $this->movieRepository->fetchActors(
             $userId,
             $limit,
             $page,
@@ -60,11 +60,11 @@ class MovieHistoryApi
             $gender,
         );
 
-        foreach ($mostWatchedActors as $index => $mostWatchedActor) {
-            $mostWatchedActors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedActor['gender'])->getAbbreviation();
+        foreach ($actors as $index => $actor) {
+            $actors[$index]['gender'] = Gender::createFromInt((int)$actor['gender'])->getAbbreviation();
         }
 
-        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($mostWatchedActors);
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($actors);
     }
 
     public function fetchAveragePersonalRating(int $userId) : float
@@ -93,6 +93,37 @@ class MovieHistoryApi
     public function fetchAverageRuntime(int $userId) : int
     {
         return (int)round($this->movieRepository->fetchAverageRuntime($userId));
+    }
+
+    public function fetchDirectors(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm = null,
+        string $sortBy = 'uniqueAppearances',
+        string $sortOrder = 'DESC',
+        ?Gender $gender = null,
+    ) : array {
+        $directors = $this->movieRepository->fetchDirectors(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $gender,
+        );
+
+        foreach ($directors as $index => $director) {
+            $directors[$index]['gender'] = Gender::createFromInt((int)$director['gender'])->getAbbreviation();
+        }
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($directors);
+    }
+
+    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null) : int
+    {
+        return $this->movieRepository->fetchMostWatchedDirectorsCount($userId, $searchTerm);
     }
 
     public function fetchFirstHistoryWatchDate(int $userId) : ?Date
@@ -129,25 +160,9 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
     }
 
-    public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null) : int
+    public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null) : int
     {
-        return $this->movieRepository->fetchMostWatchedActorsCount($userId, $searchTerm);
-    }
-
-    public function fetchMostWatchedDirectors(int $userId, int $page = 1, ?int $limit = null, ?string $searchTerm = null) : array
-    {
-        $mostWatchedDirectors = $this->movieRepository->fetchMostWatchedDirectors($userId, $page, $limit, $searchTerm);
-
-        foreach ($mostWatchedDirectors as $index => $mostWatchedDirector) {
-            $mostWatchedDirectors[$index]['gender'] = Gender::createFromInt((int)$mostWatchedDirector['gender'])->getAbbreviation();
-        }
-
-        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($mostWatchedDirectors);
-    }
-
-    public function fetchMostWatchedDirectorsCount(int $userId, ?string $searchTerm = null) : int
-    {
-        return $this->movieRepository->fetchMostWatchedDirectorsCount($userId, $searchTerm);
+        return $this->movieRepository->fetchActorsCount($userId, $searchTerm, $gender);
     }
 
     public function fetchMostWatchedGenres(int $userId) : array
@@ -203,6 +218,30 @@ class MovieHistoryApi
     public function fetchUniqueActorGenders(int $userId) : array
     {
         $uniqueActorGenders = $this->movieRepository->fetchUniqueActorGenders($userId);
+
+        $uniqueActorGendersEnriched = [];
+        foreach ($uniqueActorGenders as $uniqueActorGender) {
+            if ($uniqueActorGender === '0') {
+                continue;
+            }
+
+            $uniqueActorGendersEnriched[] = [
+                'id' => $uniqueActorGender,
+                'name' => match ($uniqueActorGender) {
+                    '1' => 'Female',
+                    '2' => 'Male',
+                    '3' => 'Non binary',
+                    default => throw new \RuntimeException('Unknown gender: ' . $uniqueActorGender)
+                },
+            ];
+        }
+
+        return $uniqueActorGendersEnriched;
+    }
+
+    public function fetchUniqueDirectorsGenders(int $userId) : array
+    {
+        $uniqueActorGenders = $this->movieRepository->fetchUniqueDirectorsGenders($userId);
 
         $uniqueActorGendersEnriched = [];
         foreach ($uniqueActorGenders as $uniqueActorGender) {

@@ -69,8 +69,8 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:[a-zA-Z0-9]+}/most-watched-directors',
-        [\Movary\HttpController\MostWatchedDirectorsController::class, 'renderPage'],
+        '/{username:[a-zA-Z0-9]+}/directors',
+        [\Movary\HttpController\DirectorsController::class, 'renderPage'],
     );
     $routeCollector->addRoute(
         'GET',

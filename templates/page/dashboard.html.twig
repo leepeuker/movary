@@ -148,12 +148,12 @@
                                     <input id="directorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
                                     <img src="{{ mostWatchedDirector.poster_path }}" alt="{{ mostWatchedDirector.name }} Poster">
                                     <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.count }}x</small>
+                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.uniqueCount }}x</small>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
-                        <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/most-watched-directors"
+                        <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/directors"
                            style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                     </div>
                 </li>

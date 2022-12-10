@@ -42,7 +42,7 @@ class DashboardController
                 'lastPlays' => $this->movieHistoryApi->fetchLastPlays($userId),
                 'mostWatchedActors' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale()),
                 'mostWatchedActresses' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale()),
-                'mostWatchedDirectors' => $this->movieHistoryApi->fetchMostWatchedDirectors($userId, 1, 6),
+                'mostWatchedDirectors' => $this->movieHistoryApi->fetchDirectors($userId, 6, 1),
                 'mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($userId),
                 'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),
                 'mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12),
