@@ -41,7 +41,7 @@ class DashboardController
                 'firstDiaryEntry' => $this->movieHistoryApi->fetchFirstHistoryWatchDate($userId),
                 'lastPlays' => $this->movieHistoryApi->fetchLastPlays($userId),
                 'mostWatchedActors' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale()),
-                'mostWatchedActresses' => $this->movieHistoryApi->fetchActors($userId, 1, 6, gender: Gender::createFemale()),
+                'mostWatchedActresses' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale()),
                 'mostWatchedDirectors' => $this->movieHistoryApi->fetchMostWatchedDirectors($userId, 1, 6),
                 'mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($userId),
                 'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),
