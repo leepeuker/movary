@@ -103,6 +103,7 @@ class Factory
             $container->get(File::class),
             $container->get(LoggerInterface::class),
             $container->get(ClientInterface::class),
+            $container->get(DBAL\Connection::class),
             __DIR__ . '/../public/',
             '/images/cached/',
         );
