@@ -4,7 +4,6 @@ namespace Movary\Domain\Movie\History;
 
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt\ValueObject\TraktId;
-use Movary\Domain\Genre\GenreConverter;
 use Movary\Domain\Movie;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Service\UrlGenerator;
@@ -20,7 +19,6 @@ class MovieHistoryApi
         private readonly Movie\MovieRepository $movieRepository,
         private readonly Tmdb\TmdbApi $tmdbApi,
         private readonly UrlGenerator $urlGenerator,
-        private readonly GenreConverter $genreConverter,
     ) {
     }
 
@@ -238,7 +236,7 @@ class MovieHistoryApi
 
             $uniqueActorGendersEnriched[] = [
                 'id' => $uniqueActorGender,
-                'name' => $this->genreConverter->convertGenreIdToHumanReadableText($uniqueActorGender)
+                'name' => Gender::createFromInt((int)$uniqueActorGender)->getText()
             ];
         }
 
@@ -247,21 +245,21 @@ class MovieHistoryApi
 
     public function fetchUniqueDirectorsGenders(int $userId) : array
     {
-        $uniqueActorGenders = $this->movieRepository->fetchUniqueDirectorsGenders($userId);
+        $uniqueDirectorsGenders = $this->movieRepository->fetchUniqueDirectorsGenders($userId);
 
-        $uniqueActorGendersEnriched = [];
-        foreach ($uniqueActorGenders as $uniqueActorGender) {
-            if ($uniqueActorGender === '0') {
+        $uniqueDirectorsGendersEnriched = [];
+        foreach ($uniqueDirectorsGenders as $uniqueDirectorGender) {
+            if ($uniqueDirectorGender === '0') {
                 continue;
             }
 
-            $uniqueActorGendersEnriched[] = [
-                'id' => $uniqueActorGender,
-                'name' => $this->genreConverter->convertGenreIdToHumanReadableText($uniqueActorGender)
+            $uniqueDirectorsGendersEnriched[] = [
+                'id' => $uniqueDirectorGender,
+                'name' => Gender::createFromInt((int)$uniqueDirectorGender)->getText()
             ];
         }
 
-        return $uniqueActorGendersEnriched;
+        return $uniqueDirectorsGendersEnriched;
     }
 
     public function fetchUniqueMovieGenres(int $userId) : array
