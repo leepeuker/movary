@@ -4,7 +4,8 @@ namespace Movary\HttpController;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\HttpController\Mapper\ActorsRequestMapper;
+use Movary\HttpController\Mapper\PersonsRequestMapper;
+use Movary\Service\PaginationElementsCalculator;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -16,7 +17,8 @@ class ActorsController
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly ActorsRequestMapper $requestMapper,
+        private readonly PersonsRequestMapper $requestMapper,
+        private readonly PaginationElementsCalculator $paginationElementsCalculator,
     ) {
     }
 
@@ -38,16 +40,9 @@ class ActorsController
             $requestData->getSortOrder(),
             $requestData->getGender(),
         );
+
         $actorsCount = $this->movieHistoryApi->fetchMostWatchedActorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());
-
-        $maxPage = (int)ceil($actorsCount / $requestData->getLimit());
-
-        $paginationElements = [
-            'previous' => $requestData->getPage() > 1 ? $requestData->getPage() - 1 : null,
-            'next' => $requestData->getPage() < $maxPage ? $requestData->getPage() + 1 : null,
-            'currentPage' => $requestData->getPage(),
-            'maxPage' => $maxPage,
-        ];
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($actorsCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(
             StatusCode::createOk(),

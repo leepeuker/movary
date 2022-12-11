@@ -3,11 +3,11 @@
 namespace Movary\HttpController\Mapper;
 
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\HttpController\Dto\ActorsRequestDto;
+use Movary\HttpController\Dto\PersonsRequestDto;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 
-class ActorsRequestMapper
+class PersonsRequestMapper
 {
     private const DEFAULT_LIMIT = 24;
 
@@ -20,7 +20,7 @@ class ActorsRequestMapper
     ) {
     }
 
-    public function mapRenderPageRequest(Request $request) : ActorsRequestDto
+    public function mapRenderPageRequest(Request $request) : PersonsRequestDto
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
 
@@ -33,7 +33,7 @@ class ActorsRequestMapper
         $sortOrder = $getParameters['so'] ?? self::DEFAULT_SORT_ORDER;
         $gender = isset($getParameters['ge']) === false || $getParameters['ge'] === '' ? null : Gender::createFromInt((int)$getParameters['ge']);
 
-        return ActorsRequestDto::createFromParameters(
+        return PersonsRequestDto::createFromParameters(
             $userId,
             $searchTerm,
             (int)$page,

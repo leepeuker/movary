@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Mapper\MoviesRequestMapper;
+use Movary\Service\PaginationElementsCalculator;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -17,6 +18,7 @@ class MoviesController
         private readonly MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly MoviesRequestMapper $moviesRequestMapper,
+        private readonly PaginationElementsCalculator $paginationElementsCalculator,
     ) {
     }
 
@@ -45,6 +47,7 @@ class MoviesController
             $requestData->getLanguage(),
             $requestData->getGenre(),
         );
+
         $historyCount = $this->movieApi->fetchUniqueMoviesCount(
             $userId,
             $requestData->getSearchTerm(),
@@ -52,15 +55,7 @@ class MoviesController
             $requestData->getLanguage(),
             $requestData->getGenre(),
         );
-
-        $maxPage = (int)ceil($historyCount / $requestData->getLimit());
-
-        $paginationElements = [
-            'previous' => $requestData->getPage() > 1 ? $requestData->getPage() - 1 : null,
-            'next' => $requestData->getPage() < $maxPage ? $requestData->getPage() + 1 : null,
-            'currentPage' => $requestData->getPage(),
-            'maxPage' => $maxPage,
-        ];
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(
             StatusCode::createOk(),

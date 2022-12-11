@@ -4,7 +4,7 @@ namespace Movary\HttpController\Dto;
 
 use Movary\ValueObject\Gender;
 
-class ActorsRequestDto
+class PersonsRequestDto
 {
     private function __construct(
         private readonly ?int $userId,
