@@ -10,6 +10,7 @@ use Movary\Domain\Movie\MovieEntity;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 
 class MovieHistoryApi
@@ -49,9 +50,13 @@ class MovieHistoryApi
         int $page,
         ?string $searchTerm = null,
         string $sortBy = 'uniqueAppearances',
-        string $sortOrder = 'DESC',
+        ?SortOrder $sortOrder = null,
         ?Gender $gender = null,
     ) : array {
+        if ($sortOrder === null) {
+            $sortOrder = SortOrder::createDesc();
+        }
+
         $actors = $this->movieRepository->fetchActors(
             $userId,
             $limit,
@@ -103,9 +108,13 @@ class MovieHistoryApi
         int $page,
         ?string $searchTerm = null,
         string $sortBy = 'uniqueAppearances',
-        string $sortOrder = 'DESC',
+        ?SortOrder $sortOrder = null,
         ?Gender $gender = null,
     ) : array {
+        if ($sortOrder === null) {
+            $sortOrder = SortOrder::createDesc();
+        }
+
         $directors = $this->movieRepository->fetchDirectors(
             $userId,
             $limit,
@@ -292,11 +301,15 @@ class MovieHistoryApi
         int $page,
         ?string $searchTerm = null,
         string $sortBy = 'title',
-        string $sortOrder = 'ASC',
+        ?SortOrder $sortOrder = null,
         ?Year $releaseYear = null,
         ?string $language = null,
         ?string $genre = null,
     ) : array {
+        if ($sortOrder === null) {
+            $sortOrder = SortOrder::createAsc();
+        }
+
         $movies = $this->movieRepository->fetchUniqueMoviesPaginated(
             $userId,
             $limit,

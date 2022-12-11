@@ -5,6 +5,7 @@ namespace Movary\HttpController\Mapper;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Dto\MoviesRequestDto;
 use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 
 class MoviesRequestMapper
@@ -16,8 +17,6 @@ class MoviesRequestMapper
     private const DEFAULT_LIMIT = 24;
 
     private const DEFAULT_SORT_BY = 'title';
-
-    private const DEFAULT_SORT_ORDER = 'ASC';
 
     public function __construct(
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
@@ -34,7 +33,7 @@ class MoviesRequestMapper
         $page = $getParameters['p'] ?? 1;
         $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sb'] ?? self::DEFAULT_SORT_BY;
-        $sortOrder = $getParameters['so'] ?? self::DEFAULT_SORT_ORDER;
+        $sortOrder = $this->mapSortOrder($getParameters);
         $releaseYear = $getParameters['ry'] ?? self::DEFAULT_RELEASE_YEAR;
         $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
         $language = $getParameters['la'] ?? null;
@@ -51,5 +50,19 @@ class MoviesRequestMapper
             $language,
             $genre,
         );
+    }
+
+    private function mapSortOrder(array $getParameters) : SortOrder
+    {
+        if (isset($getParameters['so']) === false) {
+            return SortOrder::createAsc();
+        }
+
+        return match ($getParameters['so']) {
+            'asc' => SortOrder::createAsc(),
+            'desc' => SortOrder::createDesc(),
+
+            default => throw new \RuntimeException('Not supported sort order: ' . $getParameters['so'])
+        };
     }
 }

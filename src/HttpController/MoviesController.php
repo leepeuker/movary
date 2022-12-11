@@ -66,7 +66,7 @@ class MoviesController
                 'searchTerm' => $requestData->getSearchTerm(),
                 'perPage' => $requestData->getLimit(),
                 'sortBy' => $requestData->getSortBy(),
-                'sortOrder' => $requestData->getSortOrder(),
+                'sortOrder' => (string)$requestData->getSortOrder(),
                 'releaseYear' => (string)$requestData->getReleaseYear(),
                 'language' => (string)$requestData->getLanguage(),
                 'genre' => (string)$requestData->getGenre(),

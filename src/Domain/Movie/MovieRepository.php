@@ -8,6 +8,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 use RuntimeException;
 
@@ -74,7 +75,7 @@ class MovieRepository
         int $page,
         ?string $searchTerm,
         string $sortBy,
-        string $sortOrder,
+        SortOrder $sortOrder,
         ?Gender $gender,
     ) : array {
         $payload = [$userId, "%$searchTerm%"];
@@ -194,7 +195,7 @@ class MovieRepository
         int $page,
         ?string $searchTerm,
         string $sortBy,
-        string $sortOrder,
+        SortOrder $sortOrder,
         ?Gender $gender,
     ) : array {
         $payload = [$userId, "%$searchTerm%"];
@@ -577,7 +578,7 @@ class MovieRepository
         int $page,
         ?string $searchTerm,
         string $sortBy,
-        string $sortOrder,
+        SortOrder $sortOrder,
         ?Year $releaseYear,
         ?string $language,
         ?string $genre,

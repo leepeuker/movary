@@ -53,7 +53,7 @@ class DirectorsController
                 'searchTerm' => $requestData->getSearchTerm(),
                 'perPage' => $requestData->getLimit(),
                 'sortBy' => $requestData->getSortBy(),
-                'sortOrder' => $requestData->getSortOrder(),
+                'sortOrder' => (string)$requestData->getSortOrder(),
                 'filterGender' => (string)$requestData->getGender(),
                 'uniqueGenders' => $this->movieHistoryApi->fetchUniqueDirectorsGenders($userId)
             ]),

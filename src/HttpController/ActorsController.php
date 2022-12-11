@@ -53,7 +53,7 @@ class ActorsController
                 'searchTerm' => $requestData->getSearchTerm(),
                 'perPage' => $requestData->getLimit(),
                 'sortBy' => $requestData->getSortBy(),
-                'sortOrder' => $requestData->getSortOrder(),
+                'sortOrder' => (string)$requestData->getSortOrder(),
                 'filterGender' => (string)$requestData->getGender(),
                 'uniqueGenders' => $this->movieHistoryApi->fetchUniqueActorGenders($userId)
             ]),

@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Dto;
 
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\SortOrder;
 
 class PersonsRequestDto
 {
@@ -12,7 +13,7 @@ class PersonsRequestDto
         private readonly int $page,
         private readonly int $limit,
         private readonly string $sortBy,
-        private readonly string $sortOrder,
+        private readonly SortOrder $sortOrder,
         private readonly ?Gender $gender,
     ) {
     }
@@ -23,7 +24,7 @@ class PersonsRequestDto
         int $page,
         int $limit,
         string $sortBy,
-        string $sortOrder,
+        SortOrder $sortOrder,
         ?Gender $gender,
     ) : self {
         return new self(
@@ -62,7 +63,7 @@ class PersonsRequestDto
         return $this->sortBy;
     }
 
-    public function getSortOrder() : string
+    public function getSortOrder() : SortOrder
     {
         return $this->sortOrder;
     }

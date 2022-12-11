@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController\Dto;
 
+use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 
 class MoviesRequestDto
@@ -12,7 +13,7 @@ class MoviesRequestDto
         private readonly int $page,
         private readonly int $limit,
         private readonly string $sortBy,
-        private readonly string $sortOrder,
+        private readonly SortOrder $sortOrder,
         private readonly ?Year $releaseYear,
         private readonly ?string $language,
         private readonly ?string $genre,
@@ -25,7 +26,7 @@ class MoviesRequestDto
         int $page,
         int $limit,
         string $sortBy,
-        string $sortOrder,
+        SortOrder $sortOrder,
         ?Year $releaseYear,
         ?string $language,
         ?string $genre,
@@ -78,7 +79,7 @@ class MoviesRequestDto
         return $this->sortBy;
     }
 
-    public function getSortOrder() : string
+    public function getSortOrder() : SortOrder
     {
         return $this->sortOrder;
     }
