@@ -4,6 +4,7 @@ namespace Movary\Domain\Movie\History;
 
 use Movary\Api\Tmdb;
 use Movary\Api\Trakt\ValueObject\TraktId;
+use Movary\Domain\Genre\GenreConverter;
 use Movary\Domain\Movie;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Service\UrlGenerator;
@@ -18,6 +19,7 @@ class MovieHistoryApi
         private readonly Movie\MovieRepository $movieRepository,
         private readonly Tmdb\TmdbApi $tmdbApi,
         private readonly UrlGenerator $urlGenerator,
+        private readonly GenreConverter $genreConverter,
     ) {
     }
 
@@ -227,12 +229,7 @@ class MovieHistoryApi
 
             $uniqueActorGendersEnriched[] = [
                 'id' => $uniqueActorGender,
-                'name' => match ($uniqueActorGender) {
-                    '1' => 'Female',
-                    '2' => 'Male',
-                    '3' => 'Non binary',
-                    default => throw new \RuntimeException('Unknown gender: ' . $uniqueActorGender)
-                },
+                'name' => $this->genreConverter->convertGenreIdToHumanReadableText($uniqueActorGender)
             ];
         }
 
@@ -251,12 +248,7 @@ class MovieHistoryApi
 
             $uniqueActorGendersEnriched[] = [
                 'id' => $uniqueActorGender,
-                'name' => match ($uniqueActorGender) {
-                    '1' => 'Female',
-                    '2' => 'Male',
-                    '3' => 'Non binary',
-                    default => throw new \RuntimeException('Unknown gender: ' . $uniqueActorGender)
-                },
+                'name' => $this->genreConverter->convertGenreIdToHumanReadableText($uniqueActorGender)
             ];
         }
 
