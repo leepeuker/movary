@@ -3,27 +3,23 @@
 namespace Movary\HttpController\Mapper;
 
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\HttpController\Dto\MoviesRequestDto;
+use Movary\HttpController\Dto\PersonsRequestDto;
+use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
-use Movary\ValueObject\Year;
 
-class MoviesRequestMapper
+class PersonsRequestMapper
 {
-    private const DEFAULT_GENRE = null;
-
-    private const DEFAULT_RELEASE_YEAR = null;
-
     private const DEFAULT_LIMIT = 24;
 
-    private const DEFAULT_SORT_BY = 'title';
+    private const DEFAULT_SORT_BY = 'uniqueAppearances';
 
     public function __construct(
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
 
-    public function mapRenderPageRequest(Request $request) : MoviesRequestDto
+    public function mapRenderPageRequest(Request $request) : PersonsRequestDto
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
 
@@ -34,28 +30,23 @@ class MoviesRequestMapper
         $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sb'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $this->mapSortOrder($getParameters);
-        $releaseYear = $getParameters['ry'] ?? self::DEFAULT_RELEASE_YEAR;
-        $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
-        $language = $getParameters['la'] ?? null;
-        $genre = $getParameters['ge'] ?? self::DEFAULT_GENRE;
+        $gender = isset($getParameters['ge']) === false || $getParameters['ge'] === '' ? null : Gender::createFromInt((int)$getParameters['ge']);
 
-        return MoviesRequestDto::createFromParameters(
+        return PersonsRequestDto::createFromParameters(
             $userId,
             $searchTerm,
             (int)$page,
             (int)$limit,
             $sortBy,
             $sortOrder,
-            $releaseYear,
-            $language,
-            $genre,
+            $gender,
         );
     }
 
     private function mapSortOrder(array $getParameters) : SortOrder
     {
         if (isset($getParameters['so']) === false) {
-            return SortOrder::createAsc();
+            return SortOrder::createDesc();
         }
 
         return match ($getParameters['so']) {

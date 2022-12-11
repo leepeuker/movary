@@ -20,6 +20,7 @@ use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 use RuntimeException;
 
@@ -181,7 +182,7 @@ class MovieApi
         int $page,
         ?string $searchTerm,
         string $sortBy,
-        string $sortOrder,
+        SortOrder $sortOrder,
         ?Year $releaseYear,
         ?string $language,
         ?string $genre,

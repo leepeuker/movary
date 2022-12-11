@@ -2,10 +2,10 @@
 
 namespace Movary\HttpController\Dto;
 
+use Movary\ValueObject\Gender;
 use Movary\ValueObject\SortOrder;
-use Movary\ValueObject\Year;
 
-class MoviesRequestDto
+class PersonsRequestDto
 {
     private function __construct(
         private readonly ?int $userId,
@@ -14,9 +14,7 @@ class MoviesRequestDto
         private readonly int $limit,
         private readonly string $sortBy,
         private readonly SortOrder $sortOrder,
-        private readonly ?Year $releaseYear,
-        private readonly ?string $language,
-        private readonly ?string $genre,
+        private readonly ?Gender $gender,
     ) {
     }
 
@@ -27,9 +25,7 @@ class MoviesRequestDto
         int $limit,
         string $sortBy,
         SortOrder $sortOrder,
-        ?Year $releaseYear,
-        ?string $language,
-        ?string $genre,
+        ?Gender $gender,
     ) : self {
         return new self(
             $userId,
@@ -38,20 +34,13 @@ class MoviesRequestDto
             $limit,
             $sortBy,
             $sortOrder,
-            $releaseYear,
-            $language,
-            $genre,
+            $gender
         );
     }
 
-    public function getGenre() : ?string
+    public function getGender() : ?Gender
     {
-        return $this->genre;
-    }
-
-    public function getLanguage() : ?string
-    {
-        return $this->language;
+        return $this->gender;
     }
 
     public function getLimit() : int
@@ -62,11 +51,6 @@ class MoviesRequestDto
     public function getPage() : int
     {
         return $this->page;
-    }
-
-    public function getReleaseYear() : ?Year
-    {
-        return $this->releaseYear;
     }
 
     public function getSearchTerm() : ?string
