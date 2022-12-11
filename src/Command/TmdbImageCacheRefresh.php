@@ -51,7 +51,7 @@ class TmdbImageCacheRefresh extends Command
         $imageType = $input->getOption(self::OPTION_NAME_TYPE);
         $forceRefresh = $input->getOption(self::OPTION_NAME_FORCE);
 
-        $jobId = $this->jobQueueApi->addTmdbImageCacheJob(jobStatus: JobStatus::createDone());
+        $jobId = $this->jobQueueApi->addTmdbImageCacheJob(jobStatus: JobStatus::createInProgress());
 
         try {
             switch ($imageType) {
