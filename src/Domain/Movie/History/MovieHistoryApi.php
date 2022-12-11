@@ -132,9 +132,9 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($directors);
     }
 
-    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null) : int
+    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null) : int
     {
-        return $this->movieRepository->fetchMostWatchedDirectorsCount($userId, $searchTerm);
+        return $this->movieRepository->fetchDirectorsCount($userId, $searchTerm, $gender);
     }
 
     public function fetchFirstHistoryWatchDate(int $userId) : ?Date

@@ -41,7 +41,7 @@ class DirectorsController
             $requestData->getGender(),
         );
 
-        $directorsCount = $this->movieHistoryApi->fetchDirectorsCount($userId, $requestData->getSearchTerm());
+        $directorsCount = $this->movieHistoryApi->fetchDirectorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($directorsCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(

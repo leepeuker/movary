@@ -231,6 +231,36 @@ class MovieRepository
         );
     }
 
+    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null) : int
+    {
+        $payload = [$userId, "%$searchTerm%"];
+
+        $whereQuery = 'WHERE p.name LIKE ?';
+
+        if (empty($gender) === false) {
+            $whereQuery .= 'AND p.gender = ? ';
+            $payload[] = $gender;
+        }
+
+        $count = $this->dbConnection->fetchOne(
+            <<<SQL
+            SELECT COUNT(DISTINCT p.id)
+            FROM movie m
+            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
+            JOIN person p ON mc.person_id = p.id
+            JOIN movie_user_watch_dates muwd on mc.movie_id = muwd.movie_id and muwd.user_id = ?
+            $whereQuery
+            SQL,
+            $payload,
+        );
+
+        if ($count === false) {
+            throw new RuntimeException('Could not execute query.');
+        }
+
+        return (int)$count;
+    }
+
     public function fetchFirstHistoryWatchDate(int $userId) : ?Date
     {
         $stmt = $this->dbConnection->prepare(
@@ -324,34 +354,6 @@ class MovieRepository
             LIMIT 6',
             [$userId, $userId],
         )->fetchAllAssociative();
-    }
-
-    public function fetchMostWatchedDirectorsCount(int $userId, ?string $searchTerm = null) : int
-    {
-        $payload = [$userId];
-
-        $searchTermQuery = '';
-        if ($searchTerm !== null) {
-            $searchTermQuery = 'AND p.name LIKE ?';
-            $payload[] = "%$searchTerm%";
-        }
-
-        $count = $this->dbConnection->fetchOne(
-            <<<SQL
-            SELECT COUNT(DISTINCT p.id)
-            FROM movie m
-            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
-            JOIN person p ON mc.person_id = p.id
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?) {$searchTermQuery}
-            SQL,
-            $payload,
-        );
-
-        if ($count === false) {
-            throw new RuntimeException('Could not execute query.');
-        }
-
-        return (int)$count;
     }
 
     public function fetchMostWatchedGenres(int $userId) : array

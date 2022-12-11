@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Most Watched Directors
+    Watched Directors
 {% endblock %}
 
 {% block stylesheets %}
@@ -91,7 +91,7 @@
             {% set sortByQuery = (sortBy is null) ? '' : "sb=#{sortBy}&" %}
             {% set sortOrderQuery = (sortOrder is null) ? '' : "so=#{sortOrder}&" %}
             {% set perPageQuery = (perPage is null) ? '' : "pp=#{perPage}&" %}
-            {% set genderQuery = (filterGender is null) ? '' : "ge=#{genre}&" %}
+            {% set genderQuery = (filterGender is null) ? '' : "ge=#{filterGender}&" %}
             {% set baseUrl = '/' ~ routeUsername ~ '/directors?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
 
             <ul class="pagination justify-content-center">
