@@ -17,7 +17,7 @@ class Gender
         self::GENDER_FEMALE => 'Female',
         self::GENDER_MALE => 'Male',
         self::GENDER_NON_BINARY => 'Non Binary',
-        self::GENDER_UNKNOWN => null,
+        self::GENDER_UNKNOWN => 'Unknown',
     ];
 
     private const GENDER_FEMALE = 1;
@@ -72,8 +72,12 @@ class Gender
         return self::GENDER_ABBREVIATION[$this->asInt()];
     }
 
-    public function getText() : ?string
+    public function getText() : string
     {
+        if (isset(self::GENDER_TEXT[$this->asInt()]) === false) {
+            throw new \RuntimeException('Could not get text for gender with id: ' . $this->asInt());
+        }
+
         return self::GENDER_TEXT[$this->asInt()];
     }
 }
