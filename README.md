@@ -4,7 +4,7 @@ Movary is a web application to track and rate your watched movies.
 
 Open source and self hosted -> you should own your data!
 
-Demo installation can be found [here](https://movary-demo.leepeuker.dev/) (login with user `movary@movary.com` and password `movary123`)
+Demo installation can be found [here](https://demo.movary.org/testUser/dashboard) (login email `testUser@movary.org` and password `testUser`)
 
 **Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues) or visit
 the [official subreddit](https://www.reddit.com/r/movary/)!**
