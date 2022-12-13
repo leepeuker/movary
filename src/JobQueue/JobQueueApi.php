@@ -91,7 +91,18 @@ class JobQueueApi
 
     public function findLastTmdbSync() : ?DateTime
     {
-        return $this->repository->findLastDateForJobByType(JobType::createTmdbMovieSync());
+        $lastMovieSync = $this->repository->findLastDateForJobByType(JobType::createTmdbMovieSync());
+        $lastPersonSync = $this->repository->findLastDateForJobByType(JobType::createTmdbPersonSync());
+
+        if ($lastMovieSync === null) {
+            return $lastPersonSync;
+        }
+
+        if ($lastPersonSync === null) {
+            return $lastMovieSync;
+        }
+
+        return $lastMovieSync->isAfter($lastPersonSync) ? $lastMovieSync : $lastPersonSync;
     }
 
     public function findLastTraktSync(int $userId) : ?DateTime
