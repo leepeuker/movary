@@ -73,6 +73,11 @@ class JobType
         return new self(self::TYPE_TMDB_MOVIE_SYNC);
     }
 
+    public static function createTmdbPersonSync() : self
+    {
+        return new self(self::TYPE_TMDB_PERSON_SYNC);
+    }
+
     public static function createTraktImportHistory() : self
     {
         return new self(self::TYPE_TRAKT_IMPORT_HISTORY);
