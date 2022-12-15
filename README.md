@@ -7,7 +7,7 @@
 
 Movary is a self hosted web application to track and rate your watched movies (like a digitial movie diary). You can import/export your history and ratings from/to external sources like trakt.tv or letterboxd.com, track your watches automatically via plex and more.
 
-Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`)
+Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`).
 
 1. [About](#about)
 2. [Install via docker](#install-via-docker)
