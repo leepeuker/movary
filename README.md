@@ -160,10 +160,9 @@ Use `php bin/console.php tmdb:movie:sync` to list all available cli commands
 Update movie or person meta data with themoviedb.org information.
 Make sure you have added the variables `TMDB_API_KEY` to the environment.
 
-Examples:
+Helpful commands:
 
 `php bin/console.php tmdb:movie:sync`
-
 `php bin/console.php tmdb:person:sync`
 
 **Flags:**
@@ -202,7 +201,7 @@ You can select what you want movary to scrobble (movie views and/or ratings) via
 
 You can import your watch history and ratings from trakt.tv (exporting from movary to trakt not supported yet).
 
-The user used in the import process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
+The trakt account used in the import process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
 
 The import can be executed via the settings page `/settings/trakt` or via cli.
 
@@ -241,7 +240,7 @@ Visit the movary settings page `/settings/letterboxd` for more instructions
 
 ### IMDb Rating Sync
 
-Sync ratings from imdb.
+Sync ratings from imdb for local movies.
 
 Example:
 
