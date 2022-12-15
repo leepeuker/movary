@@ -5,7 +5,7 @@
 [![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 
-Movary is an self hosted web application to track and rate your watched movies (like a digitial movie diary).
+Movary is a self hosted web application to track and rate your watched movies (like a digitial movie diary).
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`)
 
