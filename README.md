@@ -5,7 +5,7 @@
 [![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 
-Movary is a self hosted web application to track and rate your watched movies (like a digitial movie diary).
+Movary is a self hosted web application to track and rate your watched movies (like a digitial movie diary). You can import/export your history and ratings from/to external sources like trakt.tv or letterboxd.com.
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`)
 
@@ -30,7 +30,7 @@ the [official subreddit](https://www.reddit.com/r/movary/)!
 
 ## About
 
-This project was started because I wanted a self-hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (-> no real social media features).
+This project was started because I wanted a self-hosted solution instead of using external providers like trakt.tv or letterboxd (or additionally to it to be honest) and I wanted the focus to be on my own personal watch history (-> no real social media features).
 
 Movary has support for multiple users accounts in case you want to share your instance, but was designed with only a small number of accounts in mind.
 
