@@ -2,7 +2,7 @@
 
 [![Docker pulls badge](https://img.shields.io/docker/pulls/leepeuker/movary)](https://hub.docker.com/repository/docker/leepeuker/movary)
 [![GitHub issues badge](https://img.shields.io/github/issues/leepeuker/movary)](https://github.com/leepeuker/movary/issues)
-[![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
+[![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://www.reddit.com/r/movary/)
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 
 Movary is a self hosted web application to track and rate your watched movies (like a digitial movie diary). You can import/export your history and ratings from/to external sources like trakt.tv or letterboxd.com, track your watches automatically via plex and more.
