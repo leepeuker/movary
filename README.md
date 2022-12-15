@@ -9,6 +9,8 @@ Movary is a self hosted web application to track and rate your watched movies (l
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`).
 
+![Movary Dashboard Example](https://i.imgur.com/690Rr80.png)
+
 1. [About](#about)
 2. [Install via docker](#install-via-docker)
 3. [Important: First steps](#important-first-steps)
