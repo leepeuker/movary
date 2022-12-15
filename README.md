@@ -1,13 +1,13 @@
-## Movary
+# Movary
 
-Movary is a web application to track and rate your watched movies.
+[![Docker pulls badge](https://img.shields.io/docker/pulls/leepeuker/movary)](https://hub.docker.com/repository/docker/leepeuker/movary)
+[![GitHub issues badge](https://img.shields.io/github/issues/leepeuker/movary)](https://github.com/leepeuker/movary/issues)
+[![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
+[![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 
-Open source and self hosted -> you should own your data!
+Movary is an open source web application to track and rate your watched movies (like a digitial movie diary) which you can host yourself.
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`)
-
-**Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues) or visit
-the [official subreddit](https://www.reddit.com/r/movary/)!**
 
 1. [About](#about)
 2. [Install via docker](#install-via-docker)
@@ -23,14 +23,16 @@ the [official subreddit](https://www.reddit.com/r/movary/)!**
 5. [Development](#development)
 6. [Support](#support)
 
+Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/) or visit
+the [official subreddit](https://www.reddit.com/r/movary/)!
+
+---
+
 ## About
 
-This is a web application to track and rate your movie history (like a digital movie diary).
+This project was started because I wanted a self-hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (-> no real social media features).
 
-It was created because I wanted a self-hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (->
-no big social media features).
-
-It has support for multiple users accounts if you want to share your instance.
+Movary has support for multiple users accounts in case you want to share your instance, but was designed with only a small number of accounts in mind.
 
 **Features:**
 
