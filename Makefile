@@ -41,6 +41,9 @@ composer_install:
 composer_update:
 	make exec_app_cmd CMD="composer update"
 
+composer_test:
+	make exec_app_cmd CMD="composer test"
+
 # Database
 ##########
 db_create_database:
@@ -57,7 +60,7 @@ db_import:
 db_export:
 	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_ROOT_PASSWORD) $(DATABASE_NAME) > /tmp/dump.sql'
 	docker cp movary_mysql_1:/tmp/dump.sql tmp/dump.sql
-	sudo chown $(USER_ID):$(USER_ID) tmp/dump.sql
+	chown $(USER_ID):$(USER_ID) tmp/dump.sql
 
 db_migration_create:
 	make exec_app_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
@@ -73,32 +76,22 @@ app_database_rollback:
 	make exec_app_cmd CMD="php bin/console.php database:migration:rollback"
 
 app_user_create_test:
-	make exec_app_cmd CMD="php bin/console.php user:create a@a aaaaaaaa a"
+	make exec_app_cmd CMD="php bin/console.php user:create testUser@movary.org password123 testUser"
 
 app_user_change_password_test:
-	make exec_app_cmd CMD="php bin/console.php user:update 2 --password=aaaaaaaa"
+	make exec_app_cmd CMD="php bin/console.php user:update 1 --password=password123"
 
-app_import_trakt:
+app_user_import_trakt:
 	make exec_app_cmd CMD="php bin/console.php trakt:import --overwrite --userId=1"
 
-app_sync_tmdb:
-	make exec_app_cmd CMD="php bin/console.php tmdb:sync"
+app_tmdb_sync_movie:
+	make exec_app_cmd CMD="php bin/console.php tmdb:movie:sync --threshold=100"
+
+app_tmdb_sync_person:
+	make exec_app_cmd CMD="php bin/console.php tmdb:movie:sync --threshold=100"
+
+app_imdb_sync_rating:
+	make exec_app_cmd CMD="php bin/console.php imdb:sync --threshold=1"
 
 app_jobs_process:
 	make exec_app_cmd CMD="php bin/console.php jobs:process"
-
-# Tests
-#######
-test: test_phpcs test_psalm test_phpstan test_phpunit
-
-test_phpcs:
-	make exec_app_cmd CMD="vendor/bin/phpcs --standard=./settings/phpcs.xml"
-
-test_phpstan:
-	make exec_app_cmd CMD="vendor/bin/phpstan analyse -c ./settings/phpstan.neon"
-
-test_psalm:
-	make exec_app_cmd CMD="vendor/bin/psalm -c ./settings/psalm.xml --show-info=false --no-cache"
-
-test_phpunit:
-	make exec_app_cmd CMD="vendor/bin/phpunit -c ./settings/phpunit.xml --testsuite unit"

@@ -29,14 +29,22 @@ class SyncMovies
 
             try {
                 $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
+            } catch (Throwable) {
+                sleep(4);
 
-                $this->movieApi->updateImdbRating($movie->getId(), $imdbRating['average'], $imdbRating['voteCount']);
-            } catch (Throwable $t) {
-                $this->logger->warning('Could not sync imdb rating for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+                try {
+                    $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
+                } catch (Throwable $t) {
+                    $this->logger->warning('Could not sync imdb rating for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+
+                    continue;
+                }
             }
 
+            $this->movieApi->updateImdbRating($movie->getId(), $imdbRating['average'], $imdbRating['voteCount']);
+
             // Hacky way to prevent imdb rate limits
-            sleep(6);
+            sleep(2);
         }
     }
 }

@@ -34,6 +34,18 @@
     "psalm/plugin-phpunit": "^0.16",
     "webmozarts/strict-phpunit": "^7.2"
   },
+  "scripts": {
+    "test": [
+      "@test-cs",
+      "@test-phpstan",
+      "@test-psalm",
+      "@test-unit"
+    ],
+    "test-cs": "phpcs --standard=./settings/phpcs.xml",
+    "test-phpstan": "phpstan analyse -c ./settings/phpstan.neon",
+    "test-psalm": "psalm -c ./settings/psalm.xml --show-info=false",
+    "test-unit": "phpunit -c ./settings/phpunit.xml --testsuite unit"
+  },
   "autoload": {
     "psr-4": {
       "Movary\\": "src/"
