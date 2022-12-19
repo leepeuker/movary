@@ -7,7 +7,7 @@
          convertWarningsToExceptions="true"
          failOnRisky="true"
          failOnWarning="true"
-         forceCoversAnnotation="false"
+         forceCoversAnnotation="true"
          beStrictAboutChangesToGlobalState="true"
          beStrictAboutTestsThatDoNotTestAnything="true"
          beStrictAboutOutputDuringTests="true"

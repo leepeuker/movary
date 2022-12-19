@@ -9,6 +9,7 @@ use Movary\ValueObject\Url;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+/** @covers \Movary\Service\UrlGenerator */
 class UrlGeneratorTest extends TestCase
 {
     private ImageCacheService|MockObject $imageCacheServiceMock;
