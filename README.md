@@ -1,13 +1,15 @@
-## Movary
+# Movary
 
-Movary is a web application to track and rate your watched movies.
+[![Docker pulls badge](https://img.shields.io/docker/pulls/leepeuker/movary)](https://hub.docker.com/repository/docker/leepeuker/movary)
+[![GitHub issues badge](https://img.shields.io/github/issues/leepeuker/movary)](https://github.com/leepeuker/movary/issues)
+[![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://www.reddit.com/r/movary/)
+[![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 
-Open source and self hosted -> you should own your data!
+Movary is a self hosted web application to track and rate your watched movies (like a digitial movie diary). You can import/export your history and ratings from/to external sources like trakt.tv or letterboxd.com, track your watches automatically via plex and more.
 
-Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`)
+Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`).
 
-**Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://github.com/leepeuker/movary/issues) or visit
-the [official subreddit](https://www.reddit.com/r/movary/)!**
+![Movary Dashboard Example](https://i.imgur.com/690Rr80.png)
 
 1. [About](#about)
 2. [Install via docker](#install-via-docker)
@@ -23,14 +25,14 @@ the [official subreddit](https://www.reddit.com/r/movary/)!**
 5. [Development](#development)
 6. [Support](#support)
 
+Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/) or visit
+the [official subreddit](https://www.reddit.com/r/movary/)!
+
+---
+
 ## About
 
-This is a web application to track and rate your movie history (like a digital movie diary).
-
-It was created because I wanted a self-hosted solution instead of using external providers like trakt.tv or letterboxd and I wanted the focus to be on my personal watch history (->
-no big social media features).
-
-It has support for multiple users accounts if you want to share your instance.
+This project started because I wanted a self-hosted solution for tracking my watched movies and their ratings, so that I can really own my data and do not have to solely rely on other providers like letterboxd or trakt to keep it safe (or decide what to do with it).  
 
 **Features:**
 
@@ -43,6 +45,8 @@ It has support for multiple users accounts if you want to share your instance.
 - PWA: Can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
 - Completely free, no ads, no tracking and open source! :)
 
+Movary has support for multiple users accounts in case you want to share your instance, but was designed with only a small number of accounts in mind.
+
 **Disclaimer:** This project is still in an experimental (but imo completely usable) state. I am planning to add more and improve existing features before creating a 1.0 realease,
 which can lead to sudden breaking changes until then, so keep the release notes in mind when updating.
 
@@ -52,9 +56,9 @@ which can lead to sudden breaking changes until then, so keep the release notes 
 
 This is the preferred and currently only tested way to run the app.
 
-You must provide a tmdb api key (see https://www.themoviedb.org/settings/api)
+You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)) to work correctly.
 
-Example with an existing mysql server:
+Example shell comamnds with an already existing mysql server:
 
 ```shell
 $ docker volume create movary-storage
@@ -70,7 +74,7 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-Example docker-compose.yml with a mysql server
+Example docker-compose.yml inlcuding a mysql server
 
 ```yml
 version: "3.5"
@@ -158,10 +162,9 @@ Use `php bin/console.php tmdb:movie:sync` to list all available cli commands
 Update movie or person meta data with themoviedb.org information.
 Make sure you have added the variables `TMDB_API_KEY` to the environment.
 
-Examples:
+Helpful commands:
 
 `php bin/console.php tmdb:movie:sync`
-
 `php bin/console.php tmdb:person:sync`
 
 **Flags:**
@@ -200,7 +203,7 @@ You can select what you want movary to scrobble (movie views and/or ratings) via
 
 You can import your watch history and ratings from trakt.tv (exporting from movary to trakt not supported yet).
 
-The user used in the import process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
+The trakt account used in the import process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
 
 The import can be executed via the settings page `/settings/trakt` or via cli.
 
@@ -239,7 +242,7 @@ Visit the movary settings page `/settings/letterboxd` for more instructions
 
 ### IMDb Rating Sync
 
-Sync ratings from imdb.
+Sync ratings from imdb for local movies.
 
 Example:
 
