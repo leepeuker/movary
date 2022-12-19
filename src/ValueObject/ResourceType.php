@@ -18,9 +18,9 @@ class ResourceType
         return new self('person');
     }
 
-    public function isEqual(self $resourceType) : bool
+    public function __toString() : string
     {
-        return $this->type === $resourceType->type;
+        return $this->type;
     }
 
     public function isMovie() : bool
@@ -33,8 +33,8 @@ class ResourceType
         return $this->isEqual(self::createPerson());
     }
 
-    public function __toString() : string
+    private function isEqual(self $resourceType) : bool
     {
-        return $this->type;
+        return $this->type === $resourceType->type;
     }
 }

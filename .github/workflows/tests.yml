@@ -13,17 +13,8 @@ jobs:
       - name: Build docker development image
         run: docker build --target development --tag movary ./build/php/
 
-      - name: Run phpcs
+      - name: Install dependencies
         run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
 
-      - name: Run phpcs
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml
-
-      - name: Run phpstan
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon
-
-      - name: Run psalm
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/psalm -c ./settings/psalm.xml --show-info=false
-
-      - name: Run phpunit
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpunit -c ./settings/phpunit.xml --testsuite unit
+      - name: Run all test tools/suites
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer test

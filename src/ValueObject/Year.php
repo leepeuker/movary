@@ -2,8 +2,8 @@
 
 namespace Movary\ValueObject;
 
-use InvalidArgumentException;
 use JsonSerializable;
+use RuntimeException;
 
 class Year implements JsonSerializable
 {
@@ -44,7 +44,7 @@ class Year implements JsonSerializable
     private function ensureValidRange(int $year) : void
     {
         if ($year < self::MIN_YEAR_ALLOWED || $year > self::MAX_YEAR_ALLOWED) {
-            throw new InvalidArgumentException('Year has to be between 1901 and 2155, invalid value: ' . $year);
+            throw new RuntimeException('Year has to be between 1901 and 2155, invalid value: ' . $year);
         }
     }
 }

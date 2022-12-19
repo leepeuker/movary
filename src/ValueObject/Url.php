@@ -2,7 +2,6 @@
 
 namespace Movary\ValueObject;
 
-use Exception;
 use RuntimeException;
 
 class Url
@@ -10,7 +9,7 @@ class Url
     private function __construct(private readonly string $url)
     {
         if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            throw new Exception('Invalid url: ' . $url);
+            throw new RuntimeException('Invalid url: ' . $url);
         }
     }
 
@@ -33,10 +32,5 @@ class Url
         }
 
         return $path;
-    }
-
-    public function getUrl() : string
-    {
-        return $this->url;
     }
 }
