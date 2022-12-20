@@ -576,7 +576,6 @@ class MovieRepository
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
         if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-
             return $this->dbConnection->fetchFirstColumn(
                 <<<SQL
                 SELECT DISTINCT strftime('%Y',release_date)
@@ -743,6 +742,19 @@ class MovieRepository
         return $userRating !== null ? PersonalRating::create($userRating) : null;
     }
 
+    public function insertUserRating(int $movieId, int $userId, PersonalRating $rating) : void
+    {
+        $this->dbConnection->insert(
+            'movie_user_rating',
+            [
+                'movie_id' => $movieId,
+                'user_id' => $userId,
+                'rating' => $rating->asInt(),
+                'created_at' => (string)DateTime::create(),
+            ],
+        );
+    }
+
     public function updateDetails(
         int $id,
         ?string $tagline,
@@ -768,6 +780,7 @@ class MovieRepository
                 'tmdb_poster_path' => $tmdbPosterPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
                 'imdb_id' => $imdbId,
+                'updated_at' => (string)DateTime::create(),
             ],
             ['id' => $id],
         );
@@ -781,24 +794,32 @@ class MovieRepository
             'imdb_rating_average' => $imdbRating,
             'imdb_rating_vote_count' => $imdbRatingVoteCount,
             'updated_at_imdb' => (string)DateTime::create(),
+            'updated_at' => (string)DateTime::create(),
         ], ['id' => $id]);
     }
 
     public function updateLetterboxdId(int $id, string $letterboxdId) : void
     {
-        $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId], ['id' => $id]);
+        $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId, 'updated_at' => (string)DateTime::create()], ['id' => $id]);
     }
 
     public function updateTraktId(int $id, TraktId $traktId) : void
     {
-        $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt()], ['id' => $id]);
+        $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt(), 'updated_at' => (string)DateTime::create()], ['id' => $id]);
     }
 
-    public function updateUserRating(int $id, int $userId, PersonalRating $personalRating) : void
+    public function updateUserRating(int $movieId, int $userId, PersonalRating $personalRating) : int
     {
-        $this->dbConnection->executeQuery(
-            'INSERT INTO movie_user_rating (movie_id, user_id, rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE rating=?',
-            [$id, $userId, $personalRating, $personalRating],
+        return (int)$this->dbConnection->update(
+            'movie_user_rating',
+            [
+                'rating' => $personalRating->asInt()
+            ],
+            [
+                'movie_id' => $movieId,
+                'user_id' => $userId,
+                'updated_at' => (string)DateTime::create(),
+            ],
         );
     }
 

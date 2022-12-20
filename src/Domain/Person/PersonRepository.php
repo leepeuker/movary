@@ -102,22 +102,24 @@ class PersonRepository
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
     ) : PersonEntity {
+        $payload = [
+            'name' => $name,
+            'gender' => $gender->asInt(),
+            'known_for_department' => $knownForDepartment,
+            'tmdb_id' => $tmdbId,
+            'tmdb_poster_path' => $tmdbPosterPath,
+            'birth_date' => $birthDate === null ? null : (string)$birthDate,
+            'death_date' => $deathDate === null ? null : (string)$deathDate,
+            'place_of_birth' => $placeOfBirth,
+            'updated_at' => (string)DateTime::create(),
+        ];
+
+        if ($updatedAtTmdb !== null) {
+            $payload[] = ['updated_at_tmdb' => (string)$updatedAtTmdb];
+        }
+
         $this->dbConnection->update(
-            'person',
-            [
-                'name' => $name,
-                'gender' => $gender->asInt(),
-                'known_for_department' => $knownForDepartment,
-                'tmdb_id' => $tmdbId,
-                'tmdb_poster_path' => $tmdbPosterPath,
-                'birth_date' => $birthDate === null ? null : (string)$birthDate,
-                'death_date' => $deathDate === null ? null : (string)$deathDate,
-                'place_of_birth' => $placeOfBirth,
-                'updated_at_tmdb' => $updatedAtTmdb === null ? null : (string)$updatedAtTmdb,
-            ],
-            [
-                'id' => $id,
-            ],
+            'person', $payload, ['id' => $id],
         );
 
         return $this->fetchById($id);
