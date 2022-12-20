@@ -78,15 +78,24 @@ class Factory
 
     public static function createDbConnection(Config $config) : DBAL\Connection
     {
+        if ($config->getAsBool('DATABASE_SQLITE_ENABLED') === true) {
+            return DBAL\DriverManager::getConnection(
+                [
+                    'driver' => 'sqlite3',
+                    'path' => __DIR__ . '/../' . $config->getAsString('DATABASE_SQLITE_FILE'),
+                ],
+            );
+        }
+
         return DBAL\DriverManager::getConnection(
             [
-                'charset' => $config->getAsString('DATABASE_CHARSET'),
-                'dbname' => $config->getAsString('DATABASE_NAME'),
-                'port' => $config->getAsInt('DATABASE_PORT'),
-                'user' => $config->getAsString('DATABASE_USER'),
-                'password' => $config->getAsString('DATABASE_PASSWORD'),
-                'host' => $config->getAsString('DATABASE_HOST'),
-                'driver' => $config->getAsString('DATABASE_DRIVER'),
+                'driver' => 'pdo_mysql',
+                'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
+                'port' => $config->getAsInt('DATABASE_MYSQL_PORT'),
+                'dbname' => $config->getAsString('DATABASE_MYSQL_NAME'),
+                'user' => $config->getAsString('DATABASE_MYSQL_USER'),
+                'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
+                'charset' => $config->getAsString('DATABASE_MYSQL_CHARSET'),
             ],
         );
     }
