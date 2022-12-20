@@ -78,17 +78,14 @@ class Factory
 
     public static function createDbConnection(Config $config) : DBAL\Connection
     {
-        if ($config->getAsBool('DATABASE_SQLITE_ENABLED') === true) {
-            return DBAL\DriverManager::getConnection(
-                [
-                    'driver' => 'sqlite3',
-                    'path' => __DIR__ . '/../' . $config->getAsString('DATABASE_SQLITE_FILE'),
-                ],
-            );
-        }
+        $databaseMode = self::getDatabaseMode($config);
 
-        return DBAL\DriverManager::getConnection(
-            [
+        $config = match ($databaseMode) {
+            'sqlite' => [
+                'driver' => 'sqlite3',
+                'path' => __DIR__ . '/../' . $config->getAsString('DATABASE_SQLITE'),
+            ],
+            'mysql' => [
                 'driver' => 'pdo_mysql',
                 'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
                 'port' => $config->getAsInt('DATABASE_MYSQL_PORT'),
@@ -97,7 +94,10 @@ class Factory
                 'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
                 'charset' => $config->getAsString('DATABASE_MYSQL_CHARSET'),
             ],
-        );
+            default => throw new \RuntimeException('Not supported database mode: ' . $databaseMode)
+        };
+
+        return DBAL\DriverManager::getConnection($config);
     }
 
     public static function createHttpClient() : ClientInterface
@@ -134,7 +134,14 @@ class Factory
     public static function createLineFormatter(Config $config) : LineFormatter
     {
         $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
-        $formatter->includeStacktraces($config->getAsBool('LOG_ENABLE_STACKTRACE'));
+
+        try {
+            $enableStackTrace = $config->getAsBool('LOG_ENABLE_STACKTRACE');
+        } catch (OutOfBoundsException) {
+            $enableStackTrace = false;
+        }
+
+        $formatter->includeStacktraces($enableStackTrace);
 
         return $formatter;
     }
@@ -145,7 +152,13 @@ class Factory
 
         $logger->pushHandler(self::createLoggerStreamHandlerStdout($container, $config));
 
-        if ($config->getAsBool('LOG_ENABLE_FILE_LOGGING') === true) {
+        try {
+            $enableFileLogging = $config->getAsBool('LOG_ENABLE_FILE_LOGGING');
+        } catch (OutOfBoundsException) {
+            $enableFileLogging = false;
+        }
+
+        if ($enableFileLogging === true) {
             $logger->pushHandler(self::createLoggerStreamHandlerFile($container, $config));
         }
 
@@ -239,6 +252,17 @@ class Factory
             $container->get(ImageCacheService::class),
             $enableImageCaching
         );
+    }
+
+    public static function getDatabaseMode(Config $config) : string
+    {
+        try {
+            $databaseMode = $config->getAsString('DATABASE_MODE');
+        } catch (OutOfBoundsException) {
+            $databaseMode = 'sqlite';
+        }
+
+        return $databaseMode;
     }
 
     private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler

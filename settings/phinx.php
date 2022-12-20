@@ -5,8 +5,15 @@ $container = require(__DIR__ . '/../bootstrap.php');
 
 $config = $container->get(Movary\ValueObject\Config::class);
 
-if ($config->getAsBool('DATABASE_SQLITE_ENABLED') === false) {
-    $databaseType = 'mysql';
+$databaseMode = \Movary\Factory::getDatabaseMode($config);
+if ($databaseMode === 'sqlite') {
+    $sqliteFile = pathinfo($config->getAsString('DATABASE_SQLITE'));
+    $databaseConfig = [
+        'adapter' => 'sqlite',
+        'name' => $sqliteFile['dirname'] . '/' . $sqliteFile['filename'],
+        'suffix' => $sqliteFile['extension'],
+    ];
+} elseif (\Movary\Factory::getDatabaseMode($config) === 'mysql') {
     $databaseConfig = [
         'adapter' => 'mysql',
         'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
@@ -18,19 +25,12 @@ if ($config->getAsBool('DATABASE_SQLITE_ENABLED') === false) {
         'collation' => 'utf8_unicode_ci',
     ];
 } else {
-    $databaseType = 'sqlite';
-    $sqliteFile = pathinfo($config->getAsString('DATABASE_SQLITE_FILE'));
-
-    $databaseConfig = [
-        'adapter' => 'sqlite',
-        'name' => $sqliteFile['dirname'] . '/' . $sqliteFile['filename'],
-        'suffix' => $sqliteFile['extension'],
-    ];
+    throw new \RuntimeException('Not supported database mode: ' . $databaseMode);
 }
 
 return [
     'paths' => [
-        'migrations' => __DIR__ . '/../db/migrations/' . $databaseType,
+        'migrations' => __DIR__ . '/../db/migrations/' . $databaseMode,
     ],
     'environments' => [
         'default_migration_table' => 'phinxlog',

@@ -115,7 +115,7 @@ class PersonRepository
         ];
 
         if ($updatedAtTmdb !== null) {
-            $payload[] = ['updated_at_tmdb' => (string)$updatedAtTmdb];
+            $payload['updated_at_tmdb'] = (string)$updatedAtTmdb;
         }
 
         $this->dbConnection->update(

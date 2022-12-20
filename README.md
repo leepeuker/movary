@@ -56,9 +56,9 @@ which can lead to sudden breaking changes until then, so keep the release notes 
 
 This is the preferred and currently only tested way to run the app.
 
-You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)) to work correctly.
+You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
-Example shell comamnds with an already existing mysql server:
+Example default (using sqlite):
 
 ```shell
 $ docker volume create movary-storage
@@ -66,15 +66,12 @@ $ docker volume create movary-storage
 $ docker run --rm -d \
   --name movary \
   -p 80:80 \
-  -e DATABASE_HOST="<host>" \
-  -e DATABASE_USER="<user>" \
-  -e DATABASE_PASSWORD="<password>" \
   -e TMDB_API_KEY="<tmdb_key>" \
   -v movary-storage:/app/storage
   leepeuker/movary:latest
 ```
 
-Example docker-compose.yml inlcuding a mysql server
+Example docker-compose.yml with a mysql server
 
 ```yml
 version: "3.5"
@@ -86,21 +83,23 @@ services:
     ports:
       - "80:80"
     environment:
-      DATABASE_HOST: "mysql"
-      DATABASE_NAME: "movary"
-      DATABASE_USER: ""
-      DATABASE_PASSWORD: ""
-      TMDB_API_KEY: ""
+      DATABASE_MODE: "mysql"
+      DATABASE_MYSQL_HOST: "mysql"
+      DATABASE_MYSQL_USER: "movary_user"
+      DATABASE_MYSQL_PASSWORD: "movary_password"
+      DATABASE_MYSQL_NAME: "movary"
+      TMDB_API_KEY: "XXX"
+      TMDB_ENABLE_IMAGE_CACHING: 1
     volumes:
       - movary-storage:/app/storage
 
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ROOT_PASSWORD: "XXX"
       MYSQL_DATABASE: "movary"
-      MYSQL_USER: ""
-      MYSQL_PASSWORD: ""
+      MYSQL_USER: "movary_user"
+      MYSQL_PASSWORD: "movary_password"
     volumes:
       - movary-db:/var/lib/mysql
 
@@ -130,13 +129,15 @@ TIMEZONE="Europe/Berlin"
 MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
 
 ### Database
-DATABASE_HOST=
-DATABASE_PORT=3306
-DATABASE_NAME=movary
-DATABASE_USER=
-DATABASE_PASSWORD=
-DATABASE_DRIVER=pdo_mysql
-DATABASE_CHARSET=utf8
+# Supported modes: sqlite or mysql
+DATABASE_MODE=sqlite
+DATABASE_SQLITE=storage/movary.sqlite
+DATABASE_MYSQL_HOST=
+DATABASE_MYSQL_PORT=
+DATABASE_MYSQL_NAME=
+DATABASE_MYSQL_USER=
+DATABASE_MYSQL_PASSWORD=
+DATABASE_MYSQL_CHARSET=utf8mb4
 
 ### TMDB 
 # Used for metda data collection, see: https://www.themoviedb.org/settings/api
@@ -145,7 +146,7 @@ TMDB_API_KEY=
 TMDB_ENABLE_IMAGE_CACHING=0
 
 ### Logging
-LOG_LEVEL=warning
+LOG_LEVEL=
 LOG_ENABLE_STACKTRACE=0
 LOG_ENABLE_FILE_LOGGING=0
 ``` 
