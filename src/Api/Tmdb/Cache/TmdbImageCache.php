@@ -2,17 +2,17 @@
 
 namespace Movary\Api\Tmdb\Cache;
 
+use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Service\ImageCacheService;
 use Movary\ValueObject\Job;
 use Movary\ValueObject\ResourceType;
-use PDO;
 use Psr\Log\LoggerInterface;
 
 class TmdbImageCache
 {
     public function __construct(
-        private readonly PDO $pdo,
+        private readonly Connection $dbConnection,
         private readonly ImageCacheService $imageCacheService,
         private readonly TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly LoggerInterface $logger,
@@ -38,10 +38,10 @@ class TmdbImageCache
     public function deleteCompleteCache() : void
     {
         $this->imageCacheService->deleteImagesByResourceType(ResourceType::createMovie());
-        $this->pdo->prepare('UPDATE movie SET poster_path = null')->execute();
+        $this->dbConnection->prepare('UPDATE movie SET poster_path = null')->executeQuery();
 
         $this->imageCacheService->deleteImagesByResourceType(ResourceType::createPerson());
-        $this->pdo->prepare('UPDATE person SET poster_path = null')->execute();
+        $this->dbConnection->prepare('UPDATE person SET poster_path = null')->executeQuery();
     }
 
     public function deletedOutdatedCache() : int
@@ -49,10 +49,10 @@ class TmdbImageCache
         $deletionCounter = 0;
 
         $deletionCounter += $this->imageCacheService->deleteOutdatedImagesByResourceType(ResourceType::createMovie());
-        $this->pdo->prepare('UPDATE movie SET poster_path = null')->execute();
+        $this->dbConnection->prepare('UPDATE movie SET poster_path = null')->executeQuery();
 
         $deletionCounter += $this->imageCacheService->deleteOutdatedImagesByResourceType(ResourceType::createPerson());
-        $this->pdo->prepare('UPDATE person SET poster_path = null')->execute();
+        $this->dbConnection->prepare('UPDATE person SET poster_path = null')->executeQuery();
 
         return $deletionCounter;
     }
@@ -63,14 +63,17 @@ class TmdbImageCache
             $this->cacheAllImagesByMovieId($movieId);
         }
 
-        $this->cachePersonImagesByIds($job->getParameters()['personIds']);
+        $personIds = $job->getParameters()['personIds'] ?? [];
+        if (count($personIds) > 0) {
+            $this->cachePersonImagesByIds($personIds);
+        }
     }
 
     private function cacheAllImagesByMovieId(int $movieId) : void
     {
         $this->cacheImages(ResourceType::createMovie(), false, [$movieId]);
 
-        $statement = $this->pdo->prepare(
+        $statement = $this->dbConnection->prepare(
             "SELECT DISTINCT (id)
             FROM (
                 SELECT id
@@ -84,9 +87,9 @@ class TmdbImageCache
                 WHERE crew.movie_id = ?
             ) personIdTable",
         );
-        $statement->execute([$movieId, $movieId]);
+        $dbResult = $statement->executeQuery([$movieId, $movieId]);
 
-        $this->cacheImages(ResourceType::createPerson(), false, array_column($statement->fetchAll(), 'id'));
+        $this->cacheImages(ResourceType::createPerson(), false, $dbResult->fetchFirstColumn());
     }
 
     /**
@@ -117,7 +120,7 @@ class TmdbImageCache
 
         $payload = [$cachedImagePublicPath, $data['id']];
 
-        return $this->pdo->prepare("UPDATE $resourceType SET poster_path = ? WHERE id = ?")->execute($payload);
+        return $this->dbConnection->prepare("UPDATE $resourceType SET poster_path = ? WHERE id = ?")->executeStatement($payload) === 1;
     }
 
     /**
@@ -133,17 +136,14 @@ class TmdbImageCache
             $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';
         }
 
-        $statement = $this->pdo->prepare($query);
-        $statement->execute($filerIds);
+        $queryResult = $this->dbConnection->prepare($query)->executeQuery($filerIds);
 
-        foreach ($statement as $imageDataBeforeUpdate) {
+        foreach ($queryResult->iterateAssociative() as $imageDataBeforeUpdate) {
             if ($this->cacheImageDataByTableName($imageDataBeforeUpdate, $resourceType, $forceRefresh) === true) {
                 if ($imageDataBeforeUpdate['poster_path'] !== null) {
-                    $statement = $this->pdo->prepare("SELECT poster_path FROM $resourceType WHERE id = ?");
-                    $statement->execute([$imageDataBeforeUpdate['id']]);
+                    $statement = $this->dbConnection->prepare("SELECT poster_path FROM $resourceType WHERE id = ?");
 
-                    $imageDataAfterUpdate = $statement->fetch();
-                    if ($imageDataAfterUpdate['poster_path'] !== $imageDataBeforeUpdate['poster_path']) {
+                    if ($statement->executeQuery([$imageDataBeforeUpdate['id']])->fetchOne() !== $imageDataBeforeUpdate['poster_path']) {
                         $this->imageCacheService->deleteImageByPosterPath($imageDataBeforeUpdate['poster_path']);
                     }
                 }

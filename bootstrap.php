@@ -21,7 +21,6 @@ $builder->addDefinitions(
         \Movary\Command\ProcessJobs::class => DI\factory([Factory::class, 'createProcessJobCommand']),
         \Psr\Http\Client\ClientInterface::class => DI\factory([Factory::class, 'createHttpClient']),
         \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createLogger']),
-        \PDO::class => DI\factory([Factory::class, 'createPdo']),
         \Doctrine\DBAL\Connection::class => DI\factory([Factory::class, 'createDbConnection']),
         \Twig\Loader\LoaderInterface::class => DI\factory([Factory::class, 'createTwigFilesystemLoader']),
         \Twig\Environment::class => DI\factory([Factory::class, 'createTwigEnvironment']),
