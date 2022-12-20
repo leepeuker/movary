@@ -3,6 +3,7 @@
 namespace Movary\Domain\Genre;
 
 use Doctrine\DBAL\Connection;
+use Movary\ValueObject\DateTime;
 use RuntimeException;
 
 class GenreRepository
@@ -18,6 +19,7 @@ class GenreRepository
             [
                 'name' => $name,
                 'tmdb_id' => $tmdbId,
+                'created_at' => (string)DateTime::create(),
             ],
         );
 

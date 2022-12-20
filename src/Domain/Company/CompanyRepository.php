@@ -3,6 +3,7 @@
 namespace Movary\Domain\Company;
 
 use Doctrine\DBAL\Connection;
+use Movary\ValueObject\DateTime;
 use RuntimeException;
 
 class CompanyRepository
@@ -19,6 +20,7 @@ class CompanyRepository
                 'name' => $name,
                 'origin_country' => $originCountry,
                 'tmdb_id' => $tmdbId,
+                'created_at' => (string)DateTime::create(),
             ],
         );
 

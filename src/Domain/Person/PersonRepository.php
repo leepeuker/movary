@@ -37,6 +37,7 @@ class PersonRepository
                 'death_date' => $deathDate === null ? null : (string)$deathDate,
                 'place_of_birth' => $placeOfBirth,
                 'updated_at_tmdb' => $updatedAtTmdb === null ? null : (string)$updatedAtTmdb,
+                'created_at' => (string)DateTime::create(),
             ],
         );
 
