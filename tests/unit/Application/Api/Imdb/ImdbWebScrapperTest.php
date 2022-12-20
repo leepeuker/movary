@@ -11,15 +11,16 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 
-class WebScrapperTest extends TestCase
+/** @covers \Movary\Api\Imdb\ImdbWebScrapper */
+class ImdbWebScrapperTest extends TestCase
 {
     private Client|MockObject $httpClientMock;
+
+    private LoggerInterface|MockObject $loggerMock;
 
     private ImdbWebScrapper $subject;
 
     private MockObject|ImdbUrlGenerator $urlGeneratorMock;
-
-    private LoggerInterface|MockObject $loggerMock;
 
     public function provideFindRatingData() : array
     {
@@ -97,7 +98,7 @@ class WebScrapperTest extends TestCase
 
         self::assertSame(
             $expectedResult,
-            $this->subject->findRating($imdbId)
+            $this->subject->findRating($imdbId),
         );
     }
 }

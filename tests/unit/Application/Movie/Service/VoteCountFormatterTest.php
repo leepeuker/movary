@@ -5,6 +5,7 @@ namespace unit\Application\Movie\Service;
 use Movary\Service\VoteCountFormatter;
 use PHPUnit\Framework\TestCase;
 
+/** @covers \Movary\Service\VoteCountFormatter */
 class VoteCountFormatterTest extends TestCase
 {
     private VoteCountFormatter $subject;

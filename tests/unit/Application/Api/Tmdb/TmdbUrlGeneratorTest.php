@@ -6,6 +6,7 @@ use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\ValueObject\Url;
 use PHPUnit\Framework\TestCase;
 
+/** @covers \Movary\Api\Tmdb\TmdbUrlGenerator */
 class TmdbUrlGeneratorTest extends TestCase
 {
     private TmdbUrlGenerator $subject;
@@ -19,7 +20,7 @@ class TmdbUrlGeneratorTest extends TestCase
     {
         self::assertEquals(
             Url::createFromString('https://image.tmdb.org/t/p/w342/foobar'),
-            $this->subject->generateImageUrl('foobar')
+            $this->subject->generateImageUrl('foobar'),
         );
     }
 
@@ -27,7 +28,7 @@ class TmdbUrlGeneratorTest extends TestCase
     {
         self::assertEquals(
             Url::createFromString('https://image.tmdb.org/t/p/size/foobar'),
-            $this->subject->generateImageUrl('foobar', 'size')
+            $this->subject->generateImageUrl('foobar', 'size'),
         );
     }
 
@@ -35,7 +36,7 @@ class TmdbUrlGeneratorTest extends TestCase
     {
         self::assertEquals(
             Url::createFromString('https://www.themoviedb.org/movie/10/'),
-            $this->subject->generateMovieUrl(10)
+            $this->subject->generateMovieUrl(10),
         );
     }
 }
