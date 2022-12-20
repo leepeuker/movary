@@ -96,7 +96,7 @@ final class InitialMigration extends AbstractMigration
                 `user_id` INTEGER DEFAULT NULL,
                 `parameters` TEXT,
                 `created_at` TEXT NOT NULL,
-                `updated_at` TEXT NOT NULL,
+                `updated_at` TEXT DEFAULT NULL,
                 PRIMARY KEY (`id`),
                 FOREIGN KEY (`user_id`) REFERENCES user (`id`) ON DELETE SET NULL 
             )

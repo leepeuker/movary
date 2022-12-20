@@ -24,6 +24,7 @@ class JobQueueRepository
                 'job_status' => $status,
                 'user_id' => $userId,
                 'parameters' => $parameters !== null ? Json::encode($parameters) : null,
+                'created_at' => (string)DateTime::create(),
             ],
         );
 
