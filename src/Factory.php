@@ -31,7 +31,6 @@ use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
 use OutOfBoundsException;
-use PDO;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -142,25 +141,6 @@ class Factory
         }
 
         return $logger;
-    }
-
-    public static function createPdo(Config $config) : PDO
-    {
-        $dbName = $config->getAsString('DATABASE_NAME');
-        $host = $config->getAsString('DATABASE_HOST');
-        $port = $config->getAsString('DATABASE_PORT');
-        $charset = $config->getAsString('DATABASE_CHARSET');
-
-        return new PDO(
-            "mysql:host={$host};dbname=$dbName;charset=$charset;port=$port",
-            $config->getAsString('DATABASE_USER'),
-            $config->getAsString('DATABASE_PASSWORD'),
-            [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ],
-        );
     }
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController

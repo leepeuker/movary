@@ -14,10 +14,8 @@ use RuntimeException;
 
 class MovieRepository
 {
-    public function __construct(
-        private readonly Connection $dbConnection,
-        private readonly \PDO $pdo,
-    ) {
+    public function __construct(private readonly Connection $dbConnection)
+    {
     }
 
     public function create(
@@ -173,10 +171,7 @@ class MovieRepository
             $query .= ' LIMIT ' . $limit;
         }
 
-        $statement = $this->pdo->prepare($query);
-        $statement->execute();
-
-        return $statement->getIterator();
+        return $this->dbConnection->prepare($query)->executeQuery()->iterateAssociative();
     }
 
     public function fetchAverageRuntime(int $userId) : float

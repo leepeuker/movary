@@ -10,10 +10,8 @@ use RuntimeException;
 
 class PersonRepository
 {
-    public function __construct(
-        private readonly Connection $dbConnection,
-        private readonly \PDO $pdo,
-    ) {
+    public function __construct(private readonly Connection $dbConnection)
+    {
     }
 
     public function create(
@@ -66,10 +64,7 @@ class PersonRepository
             $query .= ' LIMIT ' . $limit;
         }
 
-        $statement = $this->pdo->prepare($query);
-        $statement->execute();
-
-        return $statement->getIterator();
+        return $this->dbConnection->prepare($query)->executeQuery()->iterateAssociative();
     }
 
     public function findByPersonId(int $personId) : ?PersonEntity
