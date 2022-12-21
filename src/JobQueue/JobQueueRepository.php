@@ -108,7 +108,9 @@ class JobQueueRepository
                 'job_status' => (string)$status,
                 'updated_at' => (string)DateTime::create(),
             ],
-            ['id' => $id],
+            [
+                'id' => $id
+            ],
         );
     }
 }

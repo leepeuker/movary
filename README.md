@@ -62,21 +62,37 @@ This is the preferred and currently only tested way to run the app.
 
 You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
-Example default (using sqlite):
+Example using MySQL (recommended):
 
 ```shell
 $ docker volume create movary-storage
-
 $ docker run --rm -d \
   --name movary \
   -p 80:80 \
-  -e DATABASE_MODE="sqlite" \
   -e TMDB_API_KEY="<tmdb_key>" \
-  -v movary-storage:/app/storage
+  -e DATABASE_MODE="mysql" \
+  -e DATABASE_MYSQL_HOST="<host>" \
+  -e DATABASE_MYSQL_NAME="<db_name>" \
+  -e DATABASE_MYSQL_USER="<db_user>" \
+  -e DATABASE_MYSQL_PASSWORD="<db_password>" \
+  -v movary-storage:/app/storage \
   leepeuker/movary:latest
 ```
 
-Example docker-compose.yml with a mysql server
+Example using SQLite:
+
+```shell
+$ docker volume create movary-storage
+$ docker run --rm -d \
+  --name movary \
+  -p 80:80 \
+  -e TMDB_API_KEY="<tmdb_key>" \
+  -e DATABASE_MODE="sqlite" \
+  -v movary-storage:/app/storage \
+  leepeuker/movary:latest
+```
+
+Example docker-compose.yml with a MySQL server
 
 ```yml
 version: "3.5"
@@ -88,7 +104,7 @@ services:
     ports:
       - "80:80"
     environment:
-      TMDB_API_KEY: "XXX"
+      TMDB_API_KEY: "<tmdb_key>"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
       DATABASE_MYSQL_NAME: "movary"
@@ -103,7 +119,7 @@ services:
       MYSQL_DATABASE: "movary"
       MYSQL_USER: "movary_user"
       MYSQL_PASSWORD: "movary_password"
-      MYSQL_ROOT_PASSWORD: "XXX"
+      MYSQL_ROOT_PASSWORD: "<mysql_root_password>"
     volumes:
       - movary-db:/var/lib/mysql
 
@@ -116,7 +132,7 @@ volumes:
 
 You can run movary commands in docker via e.g. `docker exec movary php bin/console.php`
 
-1. Execute all missing database migrations, e.g. like this: `php bin/console.php database:migration:migrate` (on initial installation and after every update)
+1. Execute missing database migrations: `php bin/console.php database:migration:migrate` (on initial installation and ideally after every update)
 2. Create initial user
     - via web UI by visiting the movary lading page for the first time
     - via cli `php bin/console.php user:create email@example.com password username`
@@ -134,7 +150,7 @@ MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
 
 ### Database
 # Supported modes: sqlite or mysql
-DATABASE_MODE=sqlite
+DATABASE_MODE=
 DATABASE_SQLITE=storage/movary.sqlite
 DATABASE_MYSQL_HOST=
 DATABASE_MYSQL_PORT=
@@ -150,7 +166,7 @@ TMDB_API_KEY=
 TMDB_ENABLE_IMAGE_CACHING=0
 
 ### Logging
-LOG_LEVEL=
+LOG_LEVEL=warning
 LOG_ENABLE_STACKTRACE=0
 LOG_ENABLE_FILE_LOGGING=0
 ``` 

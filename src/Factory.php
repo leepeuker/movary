@@ -35,10 +35,13 @@ use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Twig;
 
 class Factory
 {
+    private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
+
     private const DEFAULT_APPLICATION_VERSION = null;
 
     private const DEFAULT_TMDB_IMAGE_CACHING = false;
@@ -46,8 +49,6 @@ class Factory
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
 
     private const DEFAULT_ENABLE_FILE_LOGGING = false;
-
-    private const DEFAULT_DATABASE_MODE = 'sqlite';
 
     public static function createConfig() : Config
     {
@@ -129,15 +130,9 @@ class Factory
 
     public static function createJobQueueScheduler(ContainerInterface $container, Config $config) : JobQueueScheduler
     {
-        try {
-            $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
-        } catch (OutOfBoundsException) {
-            $enableImageCaching = self::DEFAULT_TMDB_IMAGE_CACHING;
-        }
-
         return new JobQueueScheduler(
             $container->get(JobQueueApi::class),
-            $enableImageCaching
+            self::getTmdbEnabledImageCaching($config)
         );
     }
 
@@ -251,35 +246,23 @@ class Factory
 
     public static function createUrlGenerator(ContainerInterface $container, Config $config) : UrlGenerator
     {
-        try {
-            $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
-        } catch (OutOfBoundsException) {
-            $enableImageCaching = false;
-        }
-
         return new UrlGenerator(
             $container->get(TmdbUrlGenerator::class),
             $container->get(ImageCacheService::class),
-            $enableImageCaching
+            self::getTmdbEnabledImageCaching($config)
         );
     }
 
     public static function getDatabaseMode(Config $config) : string
     {
-        try {
-            $databaseMode = $config->getAsString('DATABASE_MODE');
-        } catch (OutOfBoundsException) {
-            $databaseMode = self::DEFAULT_DATABASE_MODE;
-        }
-
-        return $databaseMode;
+        return $config->getAsString('DATABASE_MODE');
     }
 
     private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler
     {
         $streamHandler = new StreamHandler(
             __DIR__ . '/../tmp/app.log',
-            $config->getAsString('LOG_LEVEL')
+            self::getLogLevel($config)
         );
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
@@ -288,10 +271,28 @@ class Factory
 
     private static function createLoggerStreamHandlerStdout(ContainerInterface $container, Config $config) : StreamHandler
     {
-        $streamHandler = new StreamHandler('php://stdout', $config->getAsString('LOG_LEVEL'));
+        $streamHandler = new StreamHandler('php://stdout', self::getLogLevel($config));
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
         return $streamHandler;
+    }
+
+    private static function getLogLevel(Config $config) : string
+    {
+        try {
+            return $config->getAsString('LOG_LEVEL');
+        } catch (OutOfBoundsException) {
+            return self::DEFAULT_LOG_LEVEL;
+        }
+    }
+
+    private static function getTmdbEnabledImageCaching(Config $config) : bool
+    {
+        try {
+            return $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
+        } catch (OutOfBoundsException) {
+            return self::DEFAULT_TMDB_IMAGE_CACHING;
+        }
     }
 
     public function createProcessJobCommand(ContainerInterface $container, Config $config) : Command\ProcessJobs
