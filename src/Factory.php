@@ -39,6 +39,16 @@ use Twig;
 
 class Factory
 {
+    private const DEFAULT_APPLICATION_VERSION = null;
+
+    private const DEFAULT_TMDB_IMAGE_CACHING = false;
+
+    private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
+
+    private const DEFAULT_ENABLE_FILE_LOGGING = false;
+
+    private const DEFAULT_DATABASE_MODE = 'sqlite';
+
     public static function createConfig() : Config
     {
         $dotenv = Dotenv::createMutable(__DIR__ . '/..');
@@ -122,7 +132,7 @@ class Factory
         try {
             $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
         } catch (OutOfBoundsException) {
-            $enableImageCaching = false;
+            $enableImageCaching = self::DEFAULT_TMDB_IMAGE_CACHING;
         }
 
         return new JobQueueScheduler(
@@ -138,7 +148,7 @@ class Factory
         try {
             $enableStackTrace = $config->getAsBool('LOG_ENABLE_STACKTRACE');
         } catch (OutOfBoundsException) {
-            $enableStackTrace = false;
+            $enableStackTrace = self::DEFAULT_LOG_ENABLE_STACKTRACE;
         }
 
         $formatter->includeStacktraces($enableStackTrace);
@@ -155,7 +165,7 @@ class Factory
         try {
             $enableFileLogging = $config->getAsBool('LOG_ENABLE_FILE_LOGGING');
         } catch (OutOfBoundsException) {
-            $enableFileLogging = false;
+            $enableFileLogging = self::DEFAULT_ENABLE_FILE_LOGGING;
         }
 
         if ($enableFileLogging === true) {
@@ -170,7 +180,7 @@ class Factory
         try {
             $applicationVersion = $config->getAsString('APPLICATION_VERSION');
         } catch (OutOfBoundsException) {
-            $applicationVersion = null;
+            $applicationVersion = self::DEFAULT_APPLICATION_VERSION;
         }
 
         return new SettingsController(
@@ -259,7 +269,7 @@ class Factory
         try {
             $databaseMode = $config->getAsString('DATABASE_MODE');
         } catch (OutOfBoundsException) {
-            $databaseMode = 'sqlite';
+            $databaseMode = self::DEFAULT_DATABASE_MODE;
         }
 
         return $databaseMode;
