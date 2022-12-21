@@ -17,11 +17,11 @@ if ($databaseMode === 'sqlite') {
     $databaseConfig = [
         'adapter' => 'mysql',
         'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
-        'port' => $config->getAsString('DATABASE_MYSQL_PORT'),
+        'port' => \Movary\Factory::getDatabaseMysqlPort($config),
         'name' => $config->getAsString('DATABASE_MYSQL_NAME'),
         'user' => $config->getAsString('DATABASE_MYSQL_USER'),
         'pass' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
-        'charset' => $config->getAsString('DATABASE_MYSQL_CHARSET'),
+        'charset' => \Movary\Factory::getDatabaseMysqlCharset($config),
         'collation' => 'utf8_unicode_ci',
     ];
 } else {

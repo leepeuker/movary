@@ -139,7 +139,7 @@ You can run movary commands in docker via e.g. `docker exec movary php bin/conso
 
 It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IMAGE_CACHING=1`).
 
-##### Available environment variables with defaults:
+##### Available environment variables with their default values:
 
 ```
 ### Enviroment
@@ -153,7 +153,7 @@ MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
 DATABASE_MODE=
 DATABASE_SQLITE=storage/movary.sqlite
 DATABASE_MYSQL_HOST=
-DATABASE_MYSQL_PORT=
+DATABASE_MYSQL_PORT=3306
 DATABASE_MYSQL_NAME=
 DATABASE_MYSQL_USER=
 DATABASE_MYSQL_PASSWORD=

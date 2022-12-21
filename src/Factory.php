@@ -40,6 +40,12 @@ use Twig;
 
 class Factory
 {
+    private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
+
+    private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
+
+    private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
+
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
 
     private const DEFAULT_APPLICATION_VERSION = null;
@@ -99,11 +105,11 @@ class Factory
             'mysql' => [
                 'driver' => 'pdo_mysql',
                 'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
-                'port' => $config->getAsInt('DATABASE_MYSQL_PORT'),
+                'port' => self::getDatabaseMysqlPort($config),
                 'dbname' => $config->getAsString('DATABASE_MYSQL_NAME'),
                 'user' => $config->getAsString('DATABASE_MYSQL_USER'),
                 'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
-                'charset' => $config->getAsString('DATABASE_MYSQL_CHARSET'),
+                'charset' => self::getDatabaseMysqlCharset($config),
             ],
             default => throw new \RuntimeException('Not supported database mode: ' . $databaseMode)
         };
@@ -258,6 +264,16 @@ class Factory
         return $config->getAsString('DATABASE_MODE');
     }
 
+    public static function getDatabaseMysqlCharset(mixed $config) : string
+    {
+        return $config->getAsString('DATABASE_MYSQL_CHARSET', self::DEFAULT_DATABASE_MYSQL_CHARSET);
+    }
+
+    public static function getDatabaseMysqlPort(Config $config) : int
+    {
+        return $config->getAsInt('DATABASE_MYSQL_PORT', self::DEFAULT_DATABASE_MYSQL_PORT);
+    }
+
     private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler
     {
         $streamHandler = new StreamHandler(
@@ -279,29 +295,17 @@ class Factory
 
     private static function getLogLevel(Config $config) : string
     {
-        try {
-            return $config->getAsString('LOG_LEVEL');
-        } catch (OutOfBoundsException) {
-            return self::DEFAULT_LOG_LEVEL;
-        }
+        return $config->getAsString('LOG_LEVEL', self::DEFAULT_LOG_LEVEL);
     }
 
     private static function getTmdbEnabledImageCaching(Config $config) : bool
     {
-        try {
-            return $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
-        } catch (OutOfBoundsException) {
-            return self::DEFAULT_TMDB_IMAGE_CACHING;
-        }
+        return $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING', self::DEFAULT_TMDB_IMAGE_CACHING);
     }
 
     public function createProcessJobCommand(ContainerInterface $container, Config $config) : Command\ProcessJobs
     {
-        try {
-            $minRuntimeInSeconds = $config->getAsInt('MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING');
-        } catch (OutOfBoundsException) {
-            $minRuntimeInSeconds = null;
-        }
+        $minRuntimeInSeconds = $config->getAsInt('MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING', self::DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING);
 
         return new Command\ProcessJobs(
             $container->get(JobQueueApi::class),
