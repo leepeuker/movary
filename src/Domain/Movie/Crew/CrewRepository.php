@@ -31,7 +31,7 @@ class CrewRepository
 
     public function findDirectorsByMovieId(int $movieId) : CrewEntityList
     {
-        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie_crew` WHERE movie_id = ? AND job = "director"', [$movieId]);
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie_crew` WHERE movie_id = ? AND job = "Director"', [$movieId]);
 
         return CrewEntityList::createFromArray($data);
     }

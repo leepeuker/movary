@@ -78,8 +78,8 @@ class TmdbImageCache
             FROM (
                 SELECT id
                 FROM person
-                JOIN movie_cast cast on person.id = cast.person_id
-                WHERE cast.movie_id = ?
+                JOIN movie_cast mcast on person.id = mcast.person_id
+                WHERE mcast.movie_id = ?
                 UNION
                 SELECT id
                 FROM person

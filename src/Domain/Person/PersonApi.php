@@ -24,7 +24,17 @@ class PersonApi
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
     ) : PersonEntity {
-        return $this->repository->create($tmdbId, $name, $gender, $knownForDepartment, $tmdbPosterPath, $birthDate, $deathDate, $placeOfBirth, $updatedAtTmdb);
+        return $this->repository->create(
+            $tmdbId,
+            $name,
+            $gender,
+            $knownForDepartment,
+            $tmdbPosterPath,
+            $birthDate,
+            $deathDate,
+            $placeOfBirth,
+            $updatedAtTmdb,
+        );
     }
 
     public function createOrUpdatePersonByTmdbId(
@@ -96,6 +106,17 @@ class PersonApi
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
     ) : PersonEntity {
-        return $this->repository->update($id, $tmdbId, $name, $gender, $knownForDepartment, $tmdbPosterPath, $birthDate, $deathDate, $placeOfBirth, $updatedAtTmdb);
+        return $this->repository->update(
+            $id,
+            $tmdbId,
+            $name,
+            $gender,
+            $knownForDepartment,
+            $tmdbPosterPath,
+            $birthDate,
+            $deathDate,
+            $placeOfBirth,
+            $updatedAtTmdb,
+        );
     }
 }

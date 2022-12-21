@@ -35,10 +35,27 @@ use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Twig;
 
 class Factory
 {
+    private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
+
+    private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
+
+    private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
+
+    private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
+
+    private const DEFAULT_APPLICATION_VERSION = null;
+
+    private const DEFAULT_TMDB_IMAGE_CACHING = false;
+
+    private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
+
+    private const DEFAULT_ENABLE_FILE_LOGGING = false;
+
     public static function createConfig() : Config
     {
         $dotenv = Dotenv::createMutable(__DIR__ . '/..');
@@ -78,17 +95,26 @@ class Factory
 
     public static function createDbConnection(Config $config) : DBAL\Connection
     {
-        return DBAL\DriverManager::getConnection(
-            [
-                'charset' => $config->getAsString('DATABASE_CHARSET'),
-                'dbname' => $config->getAsString('DATABASE_NAME'),
-                'port' => $config->getAsInt('DATABASE_PORT'),
-                'user' => $config->getAsString('DATABASE_USER'),
-                'password' => $config->getAsString('DATABASE_PASSWORD'),
-                'host' => $config->getAsString('DATABASE_HOST'),
-                'driver' => $config->getAsString('DATABASE_DRIVER'),
+        $databaseMode = self::getDatabaseMode($config);
+
+        $config = match ($databaseMode) {
+            'sqlite' => [
+                'driver' => 'sqlite3',
+                'path' => __DIR__ . '/../' . $config->getAsString('DATABASE_SQLITE'),
             ],
-        );
+            'mysql' => [
+                'driver' => 'pdo_mysql',
+                'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
+                'port' => self::getDatabaseMysqlPort($config),
+                'dbname' => $config->getAsString('DATABASE_MYSQL_NAME'),
+                'user' => $config->getAsString('DATABASE_MYSQL_USER'),
+                'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
+                'charset' => self::getDatabaseMysqlCharset($config),
+            ],
+            default => throw new \RuntimeException('Not supported database mode: ' . $databaseMode)
+        };
+
+        return DBAL\DriverManager::getConnection($config);
     }
 
     public static function createHttpClient() : ClientInterface
@@ -110,22 +136,23 @@ class Factory
 
     public static function createJobQueueScheduler(ContainerInterface $container, Config $config) : JobQueueScheduler
     {
-        try {
-            $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
-        } catch (OutOfBoundsException) {
-            $enableImageCaching = false;
-        }
-
         return new JobQueueScheduler(
             $container->get(JobQueueApi::class),
-            $enableImageCaching
+            self::getTmdbEnabledImageCaching($config)
         );
     }
 
     public static function createLineFormatter(Config $config) : LineFormatter
     {
         $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
-        $formatter->includeStacktraces($config->getAsBool('LOG_ENABLE_STACKTRACE'));
+
+        try {
+            $enableStackTrace = $config->getAsBool('LOG_ENABLE_STACKTRACE');
+        } catch (OutOfBoundsException) {
+            $enableStackTrace = self::DEFAULT_LOG_ENABLE_STACKTRACE;
+        }
+
+        $formatter->includeStacktraces($enableStackTrace);
 
         return $formatter;
     }
@@ -136,7 +163,13 @@ class Factory
 
         $logger->pushHandler(self::createLoggerStreamHandlerStdout($container, $config));
 
-        if ($config->getAsBool('LOG_ENABLE_FILE_LOGGING') === true) {
+        try {
+            $enableFileLogging = $config->getAsBool('LOG_ENABLE_FILE_LOGGING');
+        } catch (OutOfBoundsException) {
+            $enableFileLogging = self::DEFAULT_ENABLE_FILE_LOGGING;
+        }
+
+        if ($enableFileLogging === true) {
             $logger->pushHandler(self::createLoggerStreamHandlerFile($container, $config));
         }
 
@@ -148,7 +181,7 @@ class Factory
         try {
             $applicationVersion = $config->getAsString('APPLICATION_VERSION');
         } catch (OutOfBoundsException) {
-            $applicationVersion = null;
+            $applicationVersion = self::DEFAULT_APPLICATION_VERSION;
         }
 
         return new SettingsController(
@@ -219,24 +252,33 @@ class Factory
 
     public static function createUrlGenerator(ContainerInterface $container, Config $config) : UrlGenerator
     {
-        try {
-            $enableImageCaching = $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING');
-        } catch (OutOfBoundsException) {
-            $enableImageCaching = false;
-        }
-
         return new UrlGenerator(
             $container->get(TmdbUrlGenerator::class),
             $container->get(ImageCacheService::class),
-            $enableImageCaching
+            self::getTmdbEnabledImageCaching($config)
         );
+    }
+
+    public static function getDatabaseMode(Config $config) : string
+    {
+        return $config->getAsString('DATABASE_MODE');
+    }
+
+    public static function getDatabaseMysqlCharset(mixed $config) : string
+    {
+        return $config->getAsString('DATABASE_MYSQL_CHARSET', self::DEFAULT_DATABASE_MYSQL_CHARSET);
+    }
+
+    public static function getDatabaseMysqlPort(Config $config) : int
+    {
+        return $config->getAsInt('DATABASE_MYSQL_PORT', self::DEFAULT_DATABASE_MYSQL_PORT);
     }
 
     private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler
     {
         $streamHandler = new StreamHandler(
             __DIR__ . '/../tmp/app.log',
-            $config->getAsString('LOG_LEVEL')
+            self::getLogLevel($config)
         );
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
@@ -245,19 +287,25 @@ class Factory
 
     private static function createLoggerStreamHandlerStdout(ContainerInterface $container, Config $config) : StreamHandler
     {
-        $streamHandler = new StreamHandler('php://stdout', $config->getAsString('LOG_LEVEL'));
+        $streamHandler = new StreamHandler('php://stdout', self::getLogLevel($config));
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
         return $streamHandler;
     }
 
+    private static function getLogLevel(Config $config) : string
+    {
+        return $config->getAsString('LOG_LEVEL', self::DEFAULT_LOG_LEVEL);
+    }
+
+    private static function getTmdbEnabledImageCaching(Config $config) : bool
+    {
+        return $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING', self::DEFAULT_TMDB_IMAGE_CACHING);
+    }
+
     public function createProcessJobCommand(ContainerInterface $container, Config $config) : Command\ProcessJobs
     {
-        try {
-            $minRuntimeInSeconds = $config->getAsInt('MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING');
-        } catch (OutOfBoundsException) {
-            $minRuntimeInSeconds = null;
-        }
+        $minRuntimeInSeconds = $config->getAsInt('MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING', self::DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING);
 
         return new Command\ProcessJobs(
             $container->get(JobQueueApi::class),

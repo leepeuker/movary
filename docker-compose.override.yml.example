@@ -11,11 +11,13 @@ services:
       - "8080:80"
     environment:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
-      DATABASE_HOST: "mysql"
-      DATABASE_PORT: "${DATABASE_PORT_HOST}"
-      DATABASE_USER: "${DATABASE_USER}"
-      DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
       TMDB_API_KEY: "${TMDB_API_KEY}"
+      TMDB_ENABLE_IMAGE_CACHING: 1
+      DATABASE_MODE: "mysql"
+      DATABASE_MYSQL_HOST: "mysql"
+      DATABASE_MYSQL_NAME: "${DATABASE_MYSQL_NAME}"
+      DATABASE_MYSQL_USER: "${DATABASE_MYSQL_USER}"
+      DATABASE_MYSQL_PASSWORD: "${DATABASE_MYSQL_PASSWORD}"
     volumes:
       - movary-storage:/app/storage
 

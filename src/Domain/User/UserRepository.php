@@ -20,6 +20,7 @@ class UserRepository
                 'user_id' => $userId,
                 'token' => $token,
                 'expiration_date' => (string)$expirationDate,
+                'created_at' => (string)DateTime::create(),
             ],
         );
     }
@@ -32,6 +33,7 @@ class UserRepository
                 'email' => $email,
                 'password' => $passwordHash,
                 'name' => $name,
+                'created_at' => (string)DateTime::create(),
             ],
         );
     }

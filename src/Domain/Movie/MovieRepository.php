@@ -3,6 +3,7 @@
 namespace Movary\Domain\Movie;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
@@ -47,6 +48,7 @@ class MovieRepository
                 'trakt_id' => $traktId?->asInt(),
                 'imdb_id' => $imdbId,
                 'tmdb_id' => $tmdbId,
+                'created_at' => (string)Date::create(),
             ],
         );
 
@@ -401,13 +403,26 @@ class MovieRepository
 
     public function fetchMostWatchedReleaseYears(int $userId) : array
     {
-        return $this->dbConnection->fetchAllAssociative(
-            <<<SQL
-            SELECT year(release_date) as name, COUNT(*) as count
+        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return $this->dbConnection->fetchAllAssociative(
+                <<<SQL
+            SELECT strftime('%Y',release_date) as name, COUNT(*) as count
             FROM movie m
             WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)
-            GROUP BY year(release_date)
-            ORDER BY COUNT(*) DESC, year(release_date) DESC
+            GROUP BY strftime('%Y',release_date)
+            ORDER BY COUNT(*) DESC, strftime('%Y',release_date) DESC
+            SQL,
+                [$userId],
+            );
+        }
+
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT YEAR(release_date) as name, COUNT(*) as count
+            FROM movie m
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)
+            GROUP BY YEAR(release_date)
+            ORDER BY COUNT(*) DESC, YEAR(release_date) DESC
             SQL,
             [$userId],
         );
@@ -482,7 +497,7 @@ class MovieRepository
             SELECT DISTINCT p.gender
             FROM movie_user_watch_dates mh
             JOIN movie m on mh.movie_id = m.id
-            JOIN movary.movie_crew mc on m.id = mc.movie_id AND mc.job = "Director"
+            JOIN movie_crew mc on m.id = mc.movie_id AND mc.job = "Director"
             JOIN person p on mc.person_id = p.id
             WHERE user_id = ?
             ORDER BY p.gender
@@ -515,6 +530,9 @@ class MovieRepository
 
         if (empty($releaseYear) === false) {
             $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                $whereQuery .= 'AND strftime("%Y", m.release_date) = ? ';
+            }
             $payload[] = (string)$releaseYear;
         }
 
@@ -557,6 +575,19 @@ class MovieRepository
 
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return $this->dbConnection->fetchFirstColumn(
+                <<<SQL
+                SELECT DISTINCT strftime('%Y',release_date)
+                FROM movie_user_watch_dates mh
+                JOIN movie m on mh.movie_id = m.id
+                WHERE user_id = ?
+                ORDER BY strftime('%Y',release_date) DESC
+                SQL,
+                [$userId],
+            );
+        }
+
         return $this->dbConnection->fetchFirstColumn(
             <<<SQL
                 SELECT DISTINCT YEAR(m.release_date)
@@ -711,6 +742,19 @@ class MovieRepository
         return $userRating !== null ? PersonalRating::create($userRating) : null;
     }
 
+    public function insertUserRating(int $movieId, int $userId, PersonalRating $rating) : void
+    {
+        $this->dbConnection->insert(
+            'movie_user_rating',
+            [
+                'movie_id' => $movieId,
+                'user_id' => $userId,
+                'rating' => $rating->asInt(),
+                'created_at' => (string)DateTime::create(),
+            ],
+        );
+    }
+
     public function updateDetails(
         int $id,
         ?string $tagline,
@@ -736,6 +780,7 @@ class MovieRepository
                 'tmdb_poster_path' => $tmdbPosterPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
                 'imdb_id' => $imdbId,
+                'updated_at' => (string)DateTime::create(),
             ],
             ['id' => $id],
         );
@@ -749,24 +794,32 @@ class MovieRepository
             'imdb_rating_average' => $imdbRating,
             'imdb_rating_vote_count' => $imdbRatingVoteCount,
             'updated_at_imdb' => (string)DateTime::create(),
+            'updated_at' => (string)DateTime::create(),
         ], ['id' => $id]);
     }
 
     public function updateLetterboxdId(int $id, string $letterboxdId) : void
     {
-        $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId], ['id' => $id]);
+        $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId, 'updated_at' => (string)DateTime::create()], ['id' => $id]);
     }
 
     public function updateTraktId(int $id, TraktId $traktId) : void
     {
-        $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt()], ['id' => $id]);
+        $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt(), 'updated_at' => (string)DateTime::create()], ['id' => $id]);
     }
 
-    public function updateUserRating(int $id, int $userId, PersonalRating $personalRating) : void
+    public function updateUserRating(int $movieId, int $userId, PersonalRating $personalRating) : int
     {
-        $this->dbConnection->executeQuery(
-            'INSERT INTO movie_user_rating (movie_id, user_id, rating) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE rating=?',
-            [$id, $userId, $personalRating, $personalRating],
+        return (int)$this->dbConnection->update(
+            'movie_user_rating',
+            [
+                'rating' => $personalRating->asInt()
+            ],
+            [
+                'movie_id' => $movieId,
+                'user_id' => $userId,
+                'updated_at' => (string)DateTime::create(),
+            ],
         );
     }
 

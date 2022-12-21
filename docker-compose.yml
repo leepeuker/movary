@@ -17,12 +17,12 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
-      MYSQL_USER: ${DATABASE_USER}
-      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${DATABASE_MYSQL_USER}
+      MYSQL_PASSWORD: ${DATABASE_MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_MYSQL_NAME}
     volumes:
       - ./tmp/db/:/var/lib/mysql
       - ./tmp/:/tmp/host
     ports:
-      - "${DATABASE_PORT_HOST}:3306"
+      - "${DATABASE_MYSQL_PORT}:3306"

@@ -16,6 +16,7 @@ reup: down up
 build:
 	docker-compose build --no-cache
 	make up
+	make db_mysql_create_database
 	make composer_install
 	make app_database_migrate
 
@@ -28,10 +29,10 @@ exec_app_cmd:
 	docker-compose exec app bash -c "${CMD}"
 
 exec_mysql_cli:
-	docker-compose exec mysql sh -c "mysql -u${DB_USER} -p${DB_PASSWORD} ${DATABASE_NAME}"
+	docker-compose exec mysql sh -c "mysql -u${DB_USER} -p${DB_PASSWORD} ${DATABASE_MYSQL_NAME}"
 
 exec_mysql_query:
-	docker-compose exec mysql bash -c "mysql -uroot -p${DATABASE_ROOT_PASSWORD} -e \"$(QUERY)\""
+	docker-compose exec mysql bash -c "mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} -e \"$(QUERY)\""
 
 # Composer
 ##########
@@ -46,19 +47,19 @@ composer_test:
 
 # Database
 ##########
-db_create_database:
-	make exec_mysql_query QUERY="DROP DATABASE IF EXISTS $(DATABASE_NAME)"
-	make exec_mysql_query QUERY="CREATE DATABASE $(DATABASE_NAME)"
-	make exec_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DATABASE_NAME).* TO $(DATABASE_USER)@'%'"
+db_mysql_create_database:
+	make exec_mysql_query QUERY="DROP DATABASE IF EXISTS $(DATABASE_MYSQL_NAME)"
+	make exec_mysql_query QUERY="CREATE DATABASE $(DATABASE_MYSQL_NAME)"
+	make exec_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DATABASE_MYSQL_NAME).* TO $(DATABASE_MYSQL_USER)@'%'"
 	make exec_mysql_query QUERY="FLUSH PRIVILEGES;"
 	make app_database_migrate
 
-db_import:
+db_mysql_import:
 	docker cp tmp/dump.sql movary_mysql_1:/tmp/dump.sql
-	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_ROOT_PASSWORD} < /tmp/dump.sql'
+	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} < /tmp/dump.sql'
 
-db_export:
-	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_ROOT_PASSWORD) $(DATABASE_NAME) > /tmp/dump.sql'
+db_mysql_export:
+	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_MYSQL_ROOT_PASSWORD) $(DATABASE_MYSQL_NAME) > /tmp/dump.sql'
 	docker cp movary_mysql_1:/tmp/dump.sql tmp/dump.sql
 	chown $(USER_ID):$(USER_ID) tmp/dump.sql
 

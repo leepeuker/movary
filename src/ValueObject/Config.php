@@ -10,37 +10,51 @@ class Config
     {
     }
 
-    public static function createFromEnv() : self
+    public static function createFromEnv(array $additionalData = []) : self
     {
         $fpmEnvironment = $_ENV;
         $systemEnvironment = getenv();
 
-        return new self(array_merge($fpmEnvironment, $systemEnvironment));
+        return new self(array_merge($fpmEnvironment, $systemEnvironment, $additionalData));
     }
 
-    public function getAsArray(string $parameter) : array
+    public function getAsBool(string $parameter, ?bool $fallbackValue = null) : bool
     {
-        return (array)$this->get($parameter);
+        try {
+            return (bool)$this->get($parameter);
+        } catch (OutOfBoundsException $e) {
+            if ($fallbackValue === null) {
+                throw $e;
+            }
+
+            return $fallbackValue;
+        }
     }
 
-    public function getAsBool(string $parameter) : bool
+    public function getAsInt(string $parameter, ?int $fallbackValue = null) : int
     {
-        return (bool)$this->get($parameter);
+        try {
+            return (int)$this->get($parameter);
+        } catch (OutOfBoundsException $e) {
+            if ($fallbackValue === null) {
+                throw $e;
+            }
+
+            return $fallbackValue;
+        }
     }
 
-    public function getAsFloat(string $parameter) : float
+    public function getAsString(string $parameter, ?string $fallbackValue = null) : string
     {
-        return (float)$this->get($parameter);
-    }
+        try {
+            return (string)$this->get($parameter);
+        } catch (OutOfBoundsException $e) {
+            if ($fallbackValue === null) {
+                throw $e;
+            }
 
-    public function getAsInt(string $parameter) : int
-    {
-        return (int)$this->get($parameter);
-    }
-
-    public function getAsString(string $parameter) : string
-    {
-        return (string)$this->get($parameter);
+            return $fallbackValue;
+        }
     }
 
     private function ensureKeyExists(string $key) : void

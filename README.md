@@ -5,7 +5,9 @@
 [![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://www.reddit.com/r/movary/)
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 
-Movary is a self hosted web application to track and rate your watched movies (like a digitial movie diary). You can import/export your history and ratings from/to external sources like trakt.tv or letterboxd.com, track your watches automatically via plex and more.
+Movary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
+You can import/export your history and ratings from/to external sources like trakt.tv or letterboxd.com,
+track your watches automatically via plex and more.
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`).
 
@@ -25,21 +27,23 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
 5. [Development](#development)
 6. [Support](#support)
 
-Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/) or visit
-the [official subreddit](https://www.reddit.com/r/movary/)!
+Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
+or visit the [official subreddit](https://www.reddit.com/r/movary/)!
 
 ---
 
 ## About
 
-This project started because I wanted a self-hosted solution for tracking my watched movies and their ratings, so that I can really own my data and do not have to solely rely on other providers like letterboxd or trakt to keep it safe (or decide what to do with it).  
+This project started because I wanted a self-hosted solution for tracking my watched movies and their ratings,
+so that I can really own my data and do not have to solely rely on other providers like letterboxd
+or trakt to keep it safe (or decide what to do with it).
 
 **Features:**
 
 - Movie tracking: Collect and manage your watch history and ratings
 - Statistics: Overview over your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
-- Third party support: Import your existing history and ratings from trakt.tv or letterboxd.com
-- Plex scrobbler: Automatically add new watches and/or ratings (plex premium required)
+- Third party support: Import your existing history and ratings from e.g. trakt.tv or letterboxd.com
+- Plex scrobbler: Automatically add new plex watches and ratings (plex premium required)
 - Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
 - Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
 - PWA: Can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
@@ -56,25 +60,39 @@ which can lead to sudden breaking changes until then, so keep the release notes 
 
 This is the preferred and currently only tested way to run the app.
 
-You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)) to work correctly.
+You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
-Example shell comamnds with an already existing mysql server:
+Example using MySQL (recommended):
 
 ```shell
 $ docker volume create movary-storage
-
 $ docker run --rm -d \
   --name movary \
   -p 80:80 \
-  -e DATABASE_HOST="<host>" \
-  -e DATABASE_USER="<user>" \
-  -e DATABASE_PASSWORD="<password>" \
   -e TMDB_API_KEY="<tmdb_key>" \
-  -v movary-storage:/app/storage
+  -e DATABASE_MODE="mysql" \
+  -e DATABASE_MYSQL_HOST="<host>" \
+  -e DATABASE_MYSQL_NAME="<db_name>" \
+  -e DATABASE_MYSQL_USER="<db_user>" \
+  -e DATABASE_MYSQL_PASSWORD="<db_password>" \
+  -v movary-storage:/app/storage \
   leepeuker/movary:latest
 ```
 
-Example docker-compose.yml inlcuding a mysql server
+Example using SQLite:
+
+```shell
+$ docker volume create movary-storage
+$ docker run --rm -d \
+  --name movary \
+  -p 80:80 \
+  -e TMDB_API_KEY="<tmdb_key>" \
+  -e DATABASE_MODE="sqlite" \
+  -v movary-storage:/app/storage \
+  leepeuker/movary:latest
+```
+
+Example docker-compose.yml with a MySQL server
 
 ```yml
 version: "3.5"
@@ -86,21 +104,22 @@ services:
     ports:
       - "80:80"
     environment:
-      DATABASE_HOST: "mysql"
-      DATABASE_NAME: "movary"
-      DATABASE_USER: ""
-      DATABASE_PASSWORD: ""
-      TMDB_API_KEY: ""
+      TMDB_API_KEY: "<tmdb_key>"
+      DATABASE_MODE: "mysql"
+      DATABASE_MYSQL_HOST: "mysql"
+      DATABASE_MYSQL_NAME: "movary"
+      DATABASE_MYSQL_USER: "movary_user"
+      DATABASE_MYSQL_PASSWORD: "movary_password"
     volumes:
       - movary-storage:/app/storage
 
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ""
       MYSQL_DATABASE: "movary"
-      MYSQL_USER: ""
-      MYSQL_PASSWORD: ""
+      MYSQL_USER: "movary_user"
+      MYSQL_PASSWORD: "movary_password"
+      MYSQL_ROOT_PASSWORD: "<mysql_root_password>"
     volumes:
       - movary-db:/var/lib/mysql
 
@@ -111,16 +130,16 @@ volumes:
 
 ## Important: First steps
 
-You can run commands in docker via e.g. `docker exec movary php bin/console.php` (this returns a list of all available movary cli commands)
+You can run movary commands in docker via e.g. `docker exec movary php bin/console.php`
 
-- Run database migrations, e.g.: `php bin/console.php database:migration:migrate` (on initial installation and after every update)
-- Create initial user:
-    - via web ui by visiting movary landingpage `/`
+1. Execute missing database migrations: `php bin/console.php database:migration:migrate` (on initial installation and ideally after every update)
+2. Create initial user
+    - via web UI by visiting the movary lading page for the first time
     - via cli `php bin/console.php user:create email@example.com password username`
 
 It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IMAGE_CACHING=1`).
 
-##### Available environment variables with defaults:
+##### Available environment variables with their default values:
 
 ```
 ### Enviroment
@@ -130,13 +149,15 @@ TIMEZONE="Europe/Berlin"
 MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
 
 ### Database
-DATABASE_HOST=
-DATABASE_PORT=3306
-DATABASE_NAME=movary
-DATABASE_USER=
-DATABASE_PASSWORD=
-DATABASE_DRIVER=pdo_mysql
-DATABASE_CHARSET=utf8
+# Supported modes: sqlite or mysql
+DATABASE_MODE=
+DATABASE_SQLITE=storage/movary.sqlite
+DATABASE_MYSQL_HOST=
+DATABASE_MYSQL_PORT=3306
+DATABASE_MYSQL_NAME=
+DATABASE_MYSQL_USER=
+DATABASE_MYSQL_PASSWORD=
+DATABASE_MYSQL_CHARSET=utf8mb4
 
 ### TMDB 
 # Used for metda data collection, see: https://www.themoviedb.org/settings/api
@@ -155,7 +176,7 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 
 ## Features
 
-Use `php bin/console.php tmdb:movie:sync` to list all available cli commands
+Use `php bin/console.php` to list all available cli commands
 
 ### tmdb sync
 
@@ -164,10 +185,11 @@ Make sure you have added the variables `TMDB_API_KEY` to the environment.
 
 Helpful commands:
 
-`php bin/console.php tmdb:movie:sync`
-`php bin/console.php tmdb:person:sync`
+`php bin/console.php tmdb:movie:sync` -> Refresh local movie meta data
 
-**Flags:**
+`php bin/console.php tmdb:person:sync` -> Refresh local person meta data
+
+**Interesting flags:**
 
 - `--hours`
   Only update movies/persons which were last synced X hours or longer ago
@@ -186,8 +208,8 @@ Execute the cache refresh command regularly, e.g. via cronjob, to keep the cache
 
 Helpful commands:
 
-- Refresh image cache: `php bin/console.php tmdb:imageCache:refresh`
-- Delete cached images: `php bin/console.php tmdb:imageCache:delete`
+- `php bin/console.php tmdb:imageCache:refresh` -> Refresh local image cache
+- `php bin/console.php tmdb:imageCache:delete` -> Delete locally cached images
 
 ### Plex Scrobbler
 
@@ -207,13 +229,13 @@ The trakt account used in the import process must have a trakt username and clie
 
 The import can be executed via the settings page `/settings/trakt` or via cli.
 
-Example cli import (import history and ratings for user with id 1):
+Example cli import (import history and ratings for user with id 1 and overwrite locally existing data if needed):
 
-`php bin/console.php trakt:import --ratings --history --userId=1`
+`php bin/console.php trakt:import --userId=1 --ratings --history --overwrite`
 
 **Info:** Importing hundreds or thousands of movies for the first time can take a few minutes.
 
-**Flags:**
+**Interesting flags:**
 
 - `--userId`
   User to import data to
@@ -224,7 +246,7 @@ Example cli import (import history and ratings for user with id 1):
 - `--overwrite`
   Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
 - `--ignore-cache`
-  Use if you want to import everything from trakt regardless if there was a change since the last import.
+  Use if you want to force import everything regardless if there was a change since the last import
 
 ### Trakt.tv Export
 
