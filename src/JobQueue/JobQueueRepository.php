@@ -102,6 +102,13 @@ class JobQueueRepository
 
     public function updateJobStatus(int $id, JobStatus $status) : void
     {
-        $this->dbConnection->update('job_queue', ['job_status' => (string)$status], ['id' => $id]);
+        $this->dbConnection->update(
+            'job_queue',
+            [
+                'job_status' => (string)$status,
+                'updated_at' => (string)DateTime::create(),
+            ],
+            ['id' => $id],
+        );
     }
 }
