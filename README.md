@@ -205,9 +205,7 @@ Add the generated url as a [webhook to plex](https://support.plex.tv/articles/11
 
 You can select what you want movary to scrobble (movie views and/or ratings) via the "Scrobbler Options" checkboxes on the settings page.
 
-### Trakt.tv
-
-#### Import data
+### Trakt.tv Import
 
 You can import your watch history and ratings from trakt.tv (exporting from movary to trakt not supported yet).
 
@@ -234,7 +232,7 @@ Example cli import (import history and ratings for user with id 1 and overwrite 
 - `--ignore-cache`
   Use if you want to force import everything regardless if there was a change since the last import
 
-#### Export
+### Trakt.tv Export
 
 Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
 
