@@ -3,7 +3,6 @@
 namespace Movary\JobQueue;
 
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\Job;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 
@@ -79,7 +78,7 @@ class JobQueueApi
         return $jobsData;
     }
 
-    public function fetchOldestWaitingJob() : ?Job
+    public function fetchOldestWaitingJob() : ?JobEntity
     {
         return $this->repository->fetchOldestWaitingJob();
     }

@@ -6,10 +6,10 @@ use League\Csv\Reader;
 use Movary\Api\Letterboxd\LetterboxdWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\JobQueue\JobEntity;
 use Movary\Service\Letterboxd\ValueObject\CsvLineHistory;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\Trakt\PlaysPerDateDtoList;
-use Movary\ValueObject\Job;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -70,7 +70,7 @@ class ImportHistory
         unlink($historyCsvPath);
     }
 
-    public function executeJob(Job $job) : void
+    public function executeJob(JobEntity $job) : void
     {
         $userId = $job->getUserId();
         if ($userId === null) {

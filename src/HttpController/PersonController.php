@@ -44,9 +44,9 @@ class PersonController
         $age = null;
         if ($birthDate !== null) {
             if ($deathDate !== null) {
-                $age = $birthDate->getNumberOfYearsSince($deathDate);
+                $age = $birthDate->getDifferenceInYears($deathDate);
             } else {
-                $age = $birthDate->getNumberOfYearsSince(Date::create());
+                $age = $birthDate->getDifferenceInYears(Date::create());
             }
         }
 

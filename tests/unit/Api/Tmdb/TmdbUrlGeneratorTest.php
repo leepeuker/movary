@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Movary\Application\Api\Tmdb;
+namespace Tests\Unit\Movary\Api\Tmdb;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\ValueObject\Url;

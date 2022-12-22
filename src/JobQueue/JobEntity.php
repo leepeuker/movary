@@ -1,10 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Movary\ValueObject;
+namespace Movary\JobQueue;
 
 use Movary\Util\Json;
+use Movary\ValueObject\DateTime;
+use Movary\ValueObject\JobStatus;
+use Movary\ValueObject\JobType;
 
-class Job
+class JobEntity
 {
     private function __construct(
         private readonly int $id,

@@ -4,8 +4,8 @@ namespace Movary\Api\Tmdb\Cache;
 
 use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
+use Movary\JobQueue\JobEntity;
 use Movary\Service\ImageCacheService;
-use Movary\ValueObject\Job;
 use Movary\ValueObject\ResourceType;
 use Psr\Log\LoggerInterface;
 
@@ -57,7 +57,7 @@ class TmdbImageCache
         return $deletionCounter;
     }
 
-    public function executeJob(Job $job) : void
+    public function executeJob(JobEntity $job) : void
     {
         foreach ($job->getParameters()['movieIds'] ?? [] as $movieId) {
             $this->cacheAllImagesByMovieId($movieId);

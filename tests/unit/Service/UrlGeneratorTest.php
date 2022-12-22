@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Movary\Application\Service;
+namespace Tests\Unit\Movary\Service;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Service\ImageCacheService;

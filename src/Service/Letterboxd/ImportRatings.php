@@ -7,8 +7,8 @@ use Movary\Api;
 use Movary\Api\Letterboxd\LetterboxdWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\JobQueue\JobEntity;
 use Movary\Service\Letterboxd\ValueObject\CsvLineRating;
-use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -61,7 +61,7 @@ class ImportRatings
         unlink($ratingsCsvPath);
     }
 
-    public function executeJob(Job $job) : void
+    public function executeJob(JobEntity $job) : void
     {
         $userId = $job->getUserId();
         if ($userId === null) {
