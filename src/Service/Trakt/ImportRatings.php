@@ -6,9 +6,9 @@ use Movary\Api;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\UserApi;
+use Movary\JobQueue\JobEntity;
 use Movary\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
-use Movary\ValueObject\Job;
 use Movary\ValueObject\PersonalRating;
 use RuntimeException;
 
@@ -57,7 +57,7 @@ class ImportRatings
         }
     }
 
-    public function executeJob(Job $job) : void
+    public function executeJob(JobEntity $job) : void
     {
         $userId = $job->getUserId();
         if ($userId === null) {

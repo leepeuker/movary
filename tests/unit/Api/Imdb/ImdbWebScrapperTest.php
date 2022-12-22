@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Movary\Application\Api\Imdb;
+namespace Tests\Unit\Movary\Api\Imdb;
 
 use GuzzleHttp\Client;
 use Movary\Api\Imdb\ImdbUrlGenerator;

@@ -41,6 +41,6 @@ class SyncMovies
 
     private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays) : bool
     {
-        return DateTime::create()->diffInHours($updatedAtTmdb) > $maxAgeInDays;
+        return DateTime::create()->differenceInHours($updatedAtTmdb) > $maxAgeInDays;
     }
 }

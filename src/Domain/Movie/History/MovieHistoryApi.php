@@ -86,7 +86,7 @@ class MovieHistoryApi
             return 0.0;
         }
 
-        $totalNumberOfDays = $firstPlayDate->getNumberOfDaysSince(Date::create());
+        $totalNumberOfDays = $firstPlayDate->getDifferenceInDays(Date::create());
 
         if ($totalNumberOfDays === 0) {
             return $totalPlayCount;

@@ -5,7 +5,6 @@ namespace Movary\JobQueue;
 use Doctrine\DBAL\Connection;
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\Job;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 
@@ -47,7 +46,7 @@ class JobQueueRepository
         );
     }
 
-    public function fetchOldestWaitingJob() : ?Job
+    public function fetchOldestWaitingJob() : ?JobEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `job_queue` WHERE job_status = ? ORDER BY `created_at` LIMIT 1', [JobStatus::createWaiting()]);
 
@@ -55,7 +54,7 @@ class JobQueueRepository
             return null;
         }
 
-        return Job::createFromArray($data);
+        return JobEntity::createFromArray($data);
     }
 
     public function findLastDateForJobByType(JobType $jobType) : ?DateTime

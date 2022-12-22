@@ -8,11 +8,11 @@ use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\User\UserApi;
+use Movary\JobQueue\JobEntity;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\Trakt\Exception\TraktClientIdNotSet;
 use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\ValueObject\Date;
-use Movary\ValueObject\Job;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -70,7 +70,7 @@ class ImportWatchedMovies
         }
     }
 
-    public function executeJob(Job $job) : void
+    public function executeJob(JobEntity $job) : void
     {
         $userId = $job->getUserId();
         if ($userId === null) {

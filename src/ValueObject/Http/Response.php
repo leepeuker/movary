@@ -24,11 +24,6 @@ class Response
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
     }
 
-    public static function createForbidden() : self
-    {
-        return new self(StatusCode::createForbidden());
-    }
-
     public static function createFoundRedirect(string $targetUrl) : self
     {
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);

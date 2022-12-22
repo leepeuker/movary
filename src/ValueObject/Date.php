@@ -44,7 +44,7 @@ class Date implements JsonSerializable
         return $this->date;
     }
 
-    public function getNumberOfDaysSince(Date $date) : int
+    public function getDifferenceInDays(Date $date) : int
     {
         $daysSince = (new \DateTime($this->date))->diff((new \DateTime($date->date)))->days;
 
@@ -55,7 +55,7 @@ class Date implements JsonSerializable
         return $daysSince;
     }
 
-    public function getNumberOfYearsSince(Date $date) : int
+    public function getDifferenceInYears(Date $date) : int
     {
         return (new \DateTime($this->date))->diff((new \DateTime($date->date)))->y;
     }

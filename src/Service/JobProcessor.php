@@ -3,11 +3,11 @@
 namespace Movary\Service;
 
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
+use Movary\JobQueue\JobEntity;
 use Movary\Service\Letterboxd;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\Service\Trakt;
 use Movary\Service\Trakt\ImportWatchedMovies;
-use Movary\ValueObject\Job;
 use RuntimeException;
 
 class JobProcessor
@@ -22,7 +22,7 @@ class JobProcessor
     ) {
     }
 
-    public function processJob(Job $job) : void
+    public function processJob(JobEntity $job) : void
     {
         match (true) {
             $job->getType()->isOfTypeLetterboxdImportRankings() => $this->letterboxdImportRatings->executeJob($job),

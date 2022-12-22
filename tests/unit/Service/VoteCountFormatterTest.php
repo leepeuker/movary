@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace unit\Application\Movie\Service;
+namespace Tests\Unit\Movary\Service;
 
 use Movary\Service\VoteCountFormatter;
 use PHPUnit\Framework\TestCase;
