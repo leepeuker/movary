@@ -32,6 +32,17 @@ class PersonalRatingTest extends TestCase
         PersonalRating::create(0);
     }
 
+    public function testIsEqual() : void
+    {
+        $subject = PersonalRating::create(5);
+
+        $equalToSubject = PersonalRating::create(5);
+        $notEqualToSubject = PersonalRating::create(4);
+
+        self::assertTrue($subject->isEqual($equalToSubject));
+        self::assertFalse($subject->isEqual($notEqualToSubject));
+    }
+
     public function testToString() : void
     {
         $subject = PersonalRating::create(5);
