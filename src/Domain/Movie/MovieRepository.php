@@ -176,6 +176,16 @@ class MovieRepository
         return $this->dbConnection->prepare($query)->executeQuery()->iterateAssociative();
     }
 
+    public function fetchAveragePersonalRating(int $userId) : float
+    {
+        return (float)$this->dbConnection->fetchFirstColumn(
+            'SELECT AVG(rating)
+            FROM movie_user_rating
+            WHERE user_id = ?',
+            [$userId],
+        )[0];
+    }
+
     public function fetchAverageRuntime(int $userId) : float
     {
         return (float)$this->dbConnection->executeQuery(
@@ -437,16 +447,6 @@ class MovieRepository
             WHERE mpc.company_id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)',
             [$productionCompanyId, $userId],
         );
-    }
-
-    public function fetchPersonalRating(int $userId) : float
-    {
-        return (float)$this->dbConnection->fetchFirstColumn(
-            'SELECT AVG(rating)
-            FROM movie_user_rating
-            WHERE user_id = ?',
-            [$userId],
-        )[0];
     }
 
     public function fetchPlaysForMovieIdAtDate(int $movieId, int $userId, Date $watchedAt) : int
@@ -718,6 +718,16 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
+    public function findPersonalMovieRating(int $movieId, int $userId) : ?PersonalRating
+    {
+        $data = $this->dbConnection->fetchOne(
+            'SELECT * FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId],
+        );
+
+        return $data === false ? null : PersonalRating::create($data);
+    }
+
     public function findPlaysForMovieIdAndDate(int $movieId, int $userId, Date $watchedAt) : ?int
     {
         $result = $this->dbConnection->fetchFirstColumn(
@@ -744,14 +754,9 @@ class MovieRepository
 
     public function insertUserRating(int $movieId, int $userId, PersonalRating $rating) : void
     {
-        $this->dbConnection->insert(
-            'movie_user_rating',
-            [
-                'movie_id' => $movieId,
-                'user_id' => $userId,
-                'rating' => $rating->asInt(),
-                'created_at' => (string)DateTime::create(),
-            ],
+        $this->dbConnection->executeQuery(
+            'INSERT INTO movie_user_rating (movie_id, user_id, rating, created_at) VALUES (?, ?, ?, ?)',
+            [$movieId, $userId, $rating->asInt(), (string)DateTime::create()],
         );
     }
 
@@ -808,18 +813,11 @@ class MovieRepository
         $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt(), 'updated_at' => (string)DateTime::create()], ['id' => $id]);
     }
 
-    public function updateUserRating(int $movieId, int $userId, PersonalRating $personalRating) : int
+    public function updateUserRating(int $movieId, int $userId, PersonalRating $rating) : void
     {
-        return (int)$this->dbConnection->update(
-            'movie_user_rating',
-            [
-                'rating' => $personalRating->asInt()
-            ],
-            [
-                'movie_id' => $movieId,
-                'user_id' => $userId,
-                'updated_at' => (string)DateTime::create(),
-            ],
+        $this->dbConnection->executeQuery(
+            'UPDATE movie_user_rating SET rating = ?, updated_at = ? WHERE movie_id = ? AND user_id = ?',
+            [$rating->asInt(), (string)DateTime::create(), $movieId, $userId],
         );
     }
 

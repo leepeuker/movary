@@ -402,10 +402,18 @@ class MovieApi
             return;
         }
 
-        if ($this->repository->updateUserRating($movieId, $userId, $rating) > 0) {
+        $currentRating = $this->repository->findPersonalMovieRating($movieId, $userId);
+
+        if ($currentRating === null) {
+            $this->repository->insertUserRating($movieId, $userId, $rating);
+
             return;
         }
 
-        $this->repository->insertUserRating($movieId, $userId, $rating);
+        if ($currentRating->isEqual($rating) === true) {
+            return;
+        }
+
+        $this->repository->updateUserRating($movieId, $userId, $rating);
     }
 }

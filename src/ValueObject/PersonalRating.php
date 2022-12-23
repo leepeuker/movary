@@ -29,4 +29,9 @@ class PersonalRating
     {
         return $this->rating;
     }
+
+    public function isEqual(PersonalRating $personalRating) : bool
+    {
+        return $this->asInt() === $personalRating->asInt();
+    }
 }

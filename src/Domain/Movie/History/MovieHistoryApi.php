@@ -74,7 +74,7 @@ class MovieHistoryApi
 
     public function fetchAveragePersonalRating(int $userId) : float
     {
-        return round($this->movieRepository->fetchPersonalRating($userId), 1);
+        return round($this->movieRepository->fetchAveragePersonalRating($userId), 1);
     }
 
     public function fetchAveragePlaysPerDay(int $userId) : float
