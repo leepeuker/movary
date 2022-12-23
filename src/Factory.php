@@ -114,7 +114,13 @@ class Factory
             default => throw new \RuntimeException('Not supported database mode: ' . $databaseMode)
         };
 
-        return DBAL\DriverManager::getConnection($config);
+        $connection = DBAL\DriverManager::getConnection($config);
+
+        if ($databaseMode === 'sqlite') {
+            $connection->executeQuery('PRAGMA busy_timeout = 3000');
+        }
+
+        return $connection;
     }
 
     public static function createHttpClient() : ClientInterface
