@@ -752,11 +752,11 @@ class MovieRepository
         return $userRating !== null ? PersonalRating::create($userRating) : null;
     }
 
-    public function insertUserRating(int $movieId, int $userId, PersonalRating $newPersonalRating) : void
+    public function insertUserRating(int $movieId, int $userId, PersonalRating $rating) : void
     {
         $this->dbConnection->executeQuery(
             'INSERT INTO movie_user_rating (movie_id, user_id, rating, created_at) VALUES (?, ?, ?, ?)',
-            [$movieId, $userId, $newPersonalRating->asInt(), (string)DateTime::create()],
+            [$movieId, $userId, $rating->asInt(), (string)DateTime::create()],
         );
     }
 
@@ -813,11 +813,11 @@ class MovieRepository
         $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt(), 'updated_at' => (string)DateTime::create()], ['id' => $id]);
     }
 
-    public function updateUserRating(int $movieId, int $userId, PersonalRating $newPersonalRating) : void
+    public function updateUserRating(int $movieId, int $userId, PersonalRating $rating) : void
     {
         $this->dbConnection->executeQuery(
             'UPDATE movie_user_rating SET rating = ?, updated_at = ? WHERE movie_id = ? AND user_id = ?',
-            [$newPersonalRating->asInt(), (string)DateTime::create(), $movieId, $userId],
+            [$rating->asInt(), (string)DateTime::create(), $movieId, $userId],
         );
     }
 
