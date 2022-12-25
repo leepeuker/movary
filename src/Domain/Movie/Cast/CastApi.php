@@ -12,7 +12,7 @@ class CastApi
     ) {
     }
 
-    public function create(int $movieId, int $personId, string $character, int $position) : void
+    public function create(int $movieId, int $personId, ?string $character, int $position) : void
     {
         $this->repository->create($movieId, $personId, $character, $position);
     }
