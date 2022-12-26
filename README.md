@@ -24,8 +24,9 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
     5. [trakt.tv Export](#trakttv-export)
     6. [Letterboxd.com Import](#letterboxdcom-import)
     7. [IMDb Rating Sync](#imdb-rating-sync)
-5. [Development](#development)
-6. [Support](#support)
+5. [FAQ](#faq)
+6. [Development](#development)
+7. [Support](#support)
 
 Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
 or visit the [official subreddit](https://www.reddit.com/r/movary/)!
@@ -276,6 +277,12 @@ Example:
   Only sync movie ratings which were last synced at least X hours ago
 - `--threshold`
   Maximum number of movie ratings to sync
+
+## FAQ
+
+Q: Will Movary support tv shows or other media types?
+
+A: No, there are currently no plans for this. The limited time available for developing Movary is used to provide the best possible experience for movie fans.
 
 ## Development
 
