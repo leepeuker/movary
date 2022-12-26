@@ -14,14 +14,14 @@ class TmdbProductionCompanyList extends AbstractList
     {
         $list = new self();
 
-        foreach ($data as $genreDate) {
-            $list->add(TmdbProductionCompany::createFromArray($genreDate));
+        foreach ($data as $productionCompanyData) {
+            $list->add(TmdbProductionCompany::createFromArray($productionCompanyData));
         }
 
         return $list;
     }
 
-    public function add(TmdbProductionCompany $productionCompany) : void
+    private function add(TmdbProductionCompany $productionCompany) : void
     {
         $this->data[] = $productionCompany;
     }
