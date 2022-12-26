@@ -13,12 +13,12 @@ class TmdbMovie
         private readonly ?string $tagline,
         private readonly ?string $overview,
         private readonly DateTime $releaseDate,
-        private readonly int $runtime,
+        private readonly ?int $runtime,
         private readonly float $voteAverage,
         private readonly int $voteCount,
         private readonly TmdbGenreList $genres,
         private readonly TmdbProductionCompanyList $productionCompanies,
-        private readonly string $posterPath,
+        private readonly ?string $posterPath,
         private readonly ?string $imdbId,
     ) {
     }
@@ -67,7 +67,7 @@ class TmdbMovie
         return $this->overview;
     }
 
-    public function getPosterPath() : string
+    public function getPosterPath() : ?string
     {
         return $this->posterPath;
     }
@@ -82,7 +82,7 @@ class TmdbMovie
         return $this->releaseDate;
     }
 
-    public function getRuntime() : int
+    public function getRuntime() : ?int
     {
         return $this->runtime;
     }
