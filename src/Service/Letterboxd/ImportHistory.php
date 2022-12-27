@@ -35,7 +35,7 @@ class ImportHistory
         foreach ($watchDateRecords as $watchDateRecord) {
             $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDateRecord);
 
-            $movie = $this->getMovieFromWatchDateRecord($csvLineHistory);
+            $movie = $this->getMovieFromCsvLineRecord($csvLineHistory);
 
             if ($movie === null) {
                 continue;
@@ -51,7 +51,7 @@ class ImportHistory
         foreach ($watchDateRecords as $watchDateRecord) {
             $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDateRecord);
 
-            $movie = $this->getMovieFromWatchDateRecord($csvLineHistory);
+            $movie = $this->getMovieFromCsvLineRecord($csvLineHistory);
 
             if ($movie === null) {
                 continue;
@@ -93,7 +93,7 @@ class ImportHistory
         }
     }
 
-    private function getMovieFromWatchDateRecord(CsvLineHistory $csvLineHistory) : ?MovieEntity
+    private function getMovieFromCsvLineRecord(CsvLineHistory $csvLineHistory) : ?MovieEntity
     {
         $letterboxdUri = $csvLineHistory->getLetterboxdUri();
 

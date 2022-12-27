@@ -21,7 +21,7 @@ class ImportRatings
     ) {
     }
 
-    public function execute(int $userId, string $ratingsCsvPath, bool $verbose = false, bool $overwriteExistingData = false) : void
+    public function execute(int $userId, string $ratingsCsvPath, bool $overwriteExistingData = false) : void
     {
         $this->ensureValidCsvFile($ratingsCsvPath);
 
