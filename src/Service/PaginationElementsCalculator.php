@@ -12,6 +12,7 @@ class PaginationElementsCalculator
 
         return PaginationElements::create(
             $currentPage,
+            $maxPage,
             $currentPage > 1 ? $currentPage - 1 : null,
             $currentPage < $maxPage ? $currentPage + 1 : null,
         );
