@@ -48,7 +48,7 @@ class ImportRatings
                 continue;
             }
 
-            $this->logger->info("Updating {$movie->getTitle()} with rating: " . $personalRating);
+            $this->logger->info("Letterboxd import: Updating {$movie->getTitle()} with rating: " . $personalRating);
 
             $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         }
