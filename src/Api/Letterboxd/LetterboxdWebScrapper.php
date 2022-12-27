@@ -2,12 +2,12 @@
 
 namespace Movary\Api\Letterboxd;
 
-use GuzzleHttp\Client;
+use Psr\Http\Client\ClientInterface;
 use RuntimeException;
 
 class LetterboxdWebScrapper
 {
-    public function __construct(private readonly Client $httpClient)
+    public function __construct(private readonly ClientInterface $httpClient)
     {
     }
 

@@ -13,6 +13,8 @@ use RuntimeException;
 
 class ImportHistory
 {
+    private array $blacklistedLetterboxedUris = [];
+
     public function __construct(
         private readonly MovieApi $movieApi,
         private readonly LoggerInterface $logger,
@@ -21,7 +23,7 @@ class ImportHistory
     ) {
     }
 
-    public function execute(int $userId, string $historyCsvPath, bool $overwriteExistingData = false) : void
+    public function execute(int $userId, string $historyCsvPath) : void
     {
         $this->ensureValidCsvRow($historyCsvPath);
 
@@ -34,8 +36,9 @@ class ImportHistory
 
         foreach ($watchDateRecords as $watchDateRecord) {
             $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDateRecord);
+            $letterboxdUri = $csvLineHistory->getLetterboxdUri();
 
-            $movie = $this->getMovieFromCsvLineRecord($csvLineHistory);
+            $movie = $this->getMovieFromCsvLineRecord($letterboxdUri);
 
             if ($movie === null) {
                 continue;
@@ -50,15 +53,20 @@ class ImportHistory
 
         foreach ($watchDateRecords as $watchDateRecord) {
             $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDateRecord);
+            $letterboxdUri = $csvLineHistory->getLetterboxdUri();
+            $watchDate = $csvLineHistory->getDate();
 
-            $movie = $this->getMovieFromCsvLineRecord($csvLineHistory);
+            if (isset($this->blacklistedLetterboxedUris[$letterboxdUri]) === true) {
+                continue;
+            }
 
+            $movie = $this->getMovieFromCsvLineRecord($letterboxdUri);
             if ($movie === null) {
                 continue;
             }
 
-            if ($overwriteExistingData === false && $this->movieApi->fetchHistoryCount($movie->getId()) > 0) {
-                $this->logger->info('Letterboxd import: Ignoring already existing watch date for movie: ' . $movie->getTitle());
+            if ($this->movieApi->fetchHistoryMoviePlaysOnDate($movie->getId(), $userId, $watchDate) > 0) {
+                $this->logger->info('Letterboxd import: Ignoring movie watch date because it was already set: ' . $movie->getTitle());
 
                 continue;
             }
@@ -66,11 +74,11 @@ class ImportHistory
             $this->movieApi->replaceHistoryForMovieByDate(
                 $movie->getId(),
                 $userId,
-                $csvLineHistory->getDate(),
-                $watchDatesToImport[$movie->getId()]->getPlaysForDate($csvLineHistory->getDate()),
+                $watchDate,
+                $watchDatesToImport[$movie->getId()]->getPlaysForDate($watchDate),
             );
 
-            $this->logger->info(sprintf('Letterboxd import: Imported watch date for movie "%s": %s', $csvLineHistory->getName(), $csvLineHistory->getDate()));
+            $this->logger->info(sprintf('Letterboxd import: Imported watch date for movie "%s": %s', $csvLineHistory->getName(), $watchDate));
         }
 
         unlink($historyCsvPath);
@@ -93,14 +101,14 @@ class ImportHistory
         }
     }
 
-    private function getMovieFromCsvLineRecord(CsvLineHistory $csvLineHistory) : ?MovieEntity
+    private function getMovieFromCsvLineRecord(string $letterboxdUri) : ?MovieEntity
     {
-        $letterboxdUri = $csvLineHistory->getLetterboxdUri();
-
         try {
             return $this->letterboxdMovieImporter->importMovieByLetterboxdUri($letterboxdUri);
         } catch (\Exception $e) {
             $this->logger->warning('Letterboxd import: Could not import movie by uri: ' . $letterboxdUri, ['exception' => $e]);
+
+            $this->blacklistedLetterboxedUris[$letterboxdUri] = true;
         }
 
         return null;
