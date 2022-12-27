@@ -13,7 +13,10 @@ class ImportHistoryFileValidator
         $watchDates->setHeaderOffset(0);
 
         foreach ($watchDates->getRecords() as $watchDate) {
-            if (empty($watchDate['Date']) === true || empty($watchDate['Letterboxd URI']) === true || empty($watchDate['Name']) === true) {
+            if (empty($watchDate['Date']) === true ||
+                empty($watchDate['Letterboxd URI']) === true ||
+                empty($watchDate['Name']) === true ||
+                empty($watchDate['Rating']) === false) {
                 return false;
             }
 
