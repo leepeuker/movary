@@ -307,7 +307,7 @@ class MovieRepository
         }
 
         return $this->dbConnection->fetchFirstColumn(
-            'SELECT COUNT(*) FROM movie_user_watch_dates WHERE user_id = ?',
+            'SELECT COUNT(*) FROM movie_user_watch_dates JOIN movie m on movie_id = m.id WHERE user_id = ?',
             [$userId],
         )[0];
     }

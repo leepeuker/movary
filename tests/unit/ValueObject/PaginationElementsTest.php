@@ -12,7 +12,7 @@ class PaginationElementsTest extends TestCase
 
     public function setUp() : void
     {
-        $this->subject = PaginationElements::create(2, 1, 3);
+        $this->subject = PaginationElements::create(2, 5, 3, 4);
     }
 
     public function testGetCurrentPage() : void
@@ -20,13 +20,18 @@ class PaginationElementsTest extends TestCase
         self::assertSame(2, $this->subject->getCurrentPage());
     }
 
+    public function testGetMaxPage() : void
+    {
+        self::assertSame(5, $this->subject->getMaxPage());
+    }
+
     public function testGetNext() : void
     {
-        self::assertSame(3, $this->subject->getNext());
+        self::assertSame(4, $this->subject->getNext());
     }
 
     public function testGetPrevious() : void
     {
-        self::assertSame(1, $this->subject->getPrevious());
+        self::assertSame(3, $this->subject->getPrevious());
     }
 }
