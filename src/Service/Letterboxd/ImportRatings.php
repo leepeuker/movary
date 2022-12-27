@@ -4,7 +4,9 @@ namespace Movary\Service\Letterboxd;
 
 use League\Csv\Reader;
 use Movary\Api;
+use Movary\Api\Letterboxd\LetterboxdWebScrapper;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Letterboxd\ValueObject\CsvLineRating;
 use Movary\ValueObject\PersonalRating;
@@ -15,13 +17,13 @@ class ImportRatings
 {
     public function __construct(
         private readonly MovieApi $movieApi,
-        private readonly LetterboxdMovieImporter $letterboxdMovieImporter,
         private readonly LoggerInterface $logger,
         private readonly ImportRatingsFileValidator $fileValidator,
+        private readonly LetterboxdWebScrapper $webScrapper,
     ) {
     }
 
-    public function execute(int $userId, string $ratingsCsvPath, bool $overwriteExistingData = false) : void
+    public function execute(int $userId, string $ratingsCsvPath) : void
     {
         $this->ensureValidCsvFile($ratingsCsvPath);
 
@@ -30,11 +32,11 @@ class ImportRatings
 
         foreach ($ratings->getRecords() as $rating) {
             $csvLineRating = CsvLineRating::createFromCsvLine($rating);
+            $letterboxdUri = $csvLineRating->getLetterboxdUri();
 
-            try {
-                $movie = $this->letterboxdMovieImporter->importMovieByLetterboxdUri($csvLineRating->getLetterboxdUri());
-            } catch (\Exception $e) {
-                $this->logger->warning('Letterboxd import: Could not import movie by uri: ' . $csvLineRating->getLetterboxdUri(), ['exception' => $e]);
+            $movie = $this->findMovie($letterboxdUri);
+            if ($movie === null) {
+                $this->logger->info('Letterboxd import: Ignoring rating because movie cannot be found locally for uri: ' . $csvLineRating->getLetterboxdUri());
 
                 continue;
             }
@@ -42,8 +44,8 @@ class ImportRatings
             $userRating = $csvLineRating->getRating() * 2;
             $personalRating = PersonalRating::create((int)$userRating);
 
-            if ($overwriteExistingData === false && $this->movieApi->findUserRating($movie->getId(), $userId) !== null) {
-                $this->logger->info('Letterboxd import: Ignoring rating for movie, rating already set: ' . $movie->getTitle());
+            if ($this->movieApi->findUserRating($movie->getId(), $userId) !== null) {
+                $this->logger->info('Letterboxd import: Ignoring rating because movie already has one: ' . $movie->getTitle());
 
                 continue;
             }
@@ -64,6 +66,33 @@ class ImportRatings
         }
 
         $this->execute($userId, $job->getParameters()['importFile']);
+    }
+
+    public function findMovie(string $letterboxdUri) : ?MovieEntity
+    {
+        $letterboxdId = basename($letterboxdUri);
+
+        $movie = $this->movieApi->findByLetterboxdId($letterboxdId);
+
+        if ($movie !== null) {
+            return $movie;
+        }
+
+        try {
+            $tmdbId = $this->webScrapper->getProviderTmdbId($letterboxdUri);
+
+            $movie = $this->movieApi->findByTmdbId($tmdbId);
+        } catch (\Exception $e) {
+            $movie = null;
+        }
+
+        if ($movie === null) {
+            return null;
+        }
+
+        $this->movieApi->updateLetterboxdId($movie->getId(), $letterboxdId);
+
+        return $movie;
     }
 
     private function ensureValidCsvFile(string $ratingsCsvPath) : void
