@@ -17,13 +17,13 @@ class ImportRatings
 {
     public function __construct(
         private readonly MovieApi $movieApi,
-        private readonly LetterboxdWebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
         private readonly ImportRatingsFileValidator $fileValidator,
+        private readonly LetterboxdWebScrapper $webScrapper,
     ) {
     }
 
-    public function execute(int $userId, string $ratingsCsvPath, bool $verbose = false, bool $overwriteExistingData = false) : void
+    public function execute(int $userId, string $ratingsCsvPath) : void
     {
         $this->ensureValidCsvFile($ratingsCsvPath);
 
@@ -32,11 +32,11 @@ class ImportRatings
 
         foreach ($ratings->getRecords() as $rating) {
             $csvLineRating = CsvLineRating::createFromCsvLine($rating);
+            $letterboxdUri = $csvLineRating->getLetterboxdUri();
 
-            $movie = $this->findMovieByLetterboxdUri($csvLineRating->getLetterboxdUri());
-
+            $movie = $this->findMovie($letterboxdUri);
             if ($movie === null) {
-                $this->logger->info('Ignoring rating for movie which is not in history: ' . $csvLineRating->getName());
+                $this->logger->info('Letterboxd import: Ignoring rating because movie cannot be found locally for uri: ' . $csvLineRating->getLetterboxdUri());
 
                 continue;
             }
@@ -44,16 +44,13 @@ class ImportRatings
             $userRating = $csvLineRating->getRating() * 2;
             $personalRating = PersonalRating::create((int)$userRating);
 
-            if ($overwriteExistingData === false && $this->movieApi->findUserRating($movie->getId(), $userId) !== null) {
-                $this->logger->info('Ignoring rating for movie which already has one: ' . $movie->getTitle());
-
-                $this->outputMessage("Ignoring {$movie->getTitle()} rating: " . $personalRating . PHP_EOL, $verbose);
+            if ($this->movieApi->findUserRating($movie->getId(), $userId) !== null) {
+                $this->logger->info('Letterboxd import: Ignoring rating because movie already has one: ' . $movie->getTitle());
 
                 continue;
             }
 
-            $this->logger->info("Updating {$movie->getTitle()} with rating: " . $personalRating);
-            $this->outputMessage("Updating {$movie->getTitle()} with rating: " . $personalRating . PHP_EOL, $verbose);
+            $this->logger->info("Letterboxd import: Updating {$movie->getTitle()} with rating: " . $personalRating);
 
             $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         }
@@ -71,21 +68,29 @@ class ImportRatings
         $this->execute($userId, $job->getParameters()['importFile']);
     }
 
-    public function findMovieByLetterboxdUri(string $letterboxdUri) : ?MovieEntity
+    public function findMovie(string $letterboxdUri) : ?MovieEntity
     {
         $letterboxdId = basename($letterboxdUri);
+
         $movie = $this->movieApi->findByLetterboxdId($letterboxdId);
 
-        if ($movie === null) {
+        if ($movie !== null) {
+            return $movie;
+        }
+
+        try {
             $tmdbId = $this->webScrapper->getProviderTmdbId($letterboxdUri);
 
             $movie = $this->movieApi->findByTmdbId($tmdbId);
-            if ($movie === null) {
-                return null;
-            }
-
-            $this->movieApi->updateLetterboxdId($movie->getId(), $letterboxdId);
+        } catch (\Exception $e) {
+            $movie = null;
         }
+
+        if ($movie === null) {
+            return null;
+        }
+
+        $this->movieApi->updateLetterboxdId($movie->getId(), $letterboxdId);
 
         return $movie;
     }
@@ -94,13 +99,6 @@ class ImportRatings
     {
         if ($this->fileValidator->isValid($ratingsCsvPath) === false) {
             throw new RuntimeException('Invalid letterboxed ratings csv file.');
-        }
-    }
-
-    private function outputMessage(string $message, bool $verbose) : void
-    {
-        if ($verbose === true) {
-            echo $message;
         }
     }
 }

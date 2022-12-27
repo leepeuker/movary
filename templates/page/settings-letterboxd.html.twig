@@ -14,14 +14,20 @@
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 0.5rem">Import data</h5>
 
-                <p class="text-muted" style="margin-bottom: 0.5rem">
+                <p class="text-muted" style="margin-bottom: 0.8rem">
                     Export your data from <a href="https://letterboxd.com/settings/data/" target="_blank">letterboxd</a>.
                     <br>
                     The received zip archive contains .csv files with your data, which can be imported into movary.
-                    <br>
-                    <br>
-                    The import only adds data missing in movary, it will not overwrite existing data.
                 </p>
+
+                <div class="alert alert-warning" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
+                    <ul style="margin-bottom: 0">
+                        <li>Import only adds missing watch dates or ratings, it will not overwrite existing data</li>
+                        <li>Ratings are only imported for already existing movies (import history first!)</li>
+                        <li>Importing a big history for the first time can take a few minutes</li>
+                        <li>If movies are missing after a successful import check the logs to find out why</li>
+                    </ul>
+                </div>
 
                 <hr>
 
@@ -39,17 +45,17 @@
                             Watched movies import <a href="/job-queue">scheduled</a>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
+
                     {% endif %}
                     {% if letterboxdHistoryImportFileInvalid == true %}
                         <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Name".
+                            Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Name" and not the column "Rating".
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                 </form>
 
                 <hr>
-
                 <form action="/jobs/schedule/letterboxd-ratings-sync" method="post" enctype="multipart/form-data">
                     <h5 style="margin-bottom: 0.5rem">Ratings</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
