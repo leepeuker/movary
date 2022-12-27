@@ -3,12 +3,10 @@
 namespace Movary\Service\Letterboxd;
 
 use League\Csv\Reader;
-use Movary\Api\Letterboxd\LetterboxdWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Letterboxd\ValueObject\CsvLineHistory;
-use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\Trakt\PlaysPerDateDtoList;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -17,10 +15,9 @@ class ImportHistory
 {
     public function __construct(
         private readonly MovieApi $movieApi,
-        private readonly LetterboxdWebScrapper $webScrapper,
         private readonly LoggerInterface $logger,
-        private readonly SyncMovie $tmdbMovieSync,
         private readonly ImportHistoryFileValidator $fileValidator,
+        private readonly LetterboxdMovieImporter $letterboxdMovieImporter,
     ) {
     }
 
@@ -28,16 +25,21 @@ class ImportHistory
     {
         $this->ensureValidCsvRow($historyCsvPath);
 
-        $watchDates = Reader::createFromPath($historyCsvPath);
-        $watchDates->setHeaderOffset(0);
+        $watchDatesCsv = Reader::createFromPath($historyCsvPath);
+        $watchDatesCsv->setHeaderOffset(0);
+        $watchDateRecords = $watchDatesCsv->getRecords();
 
         /** @var array<int, PlaysPerDateDtoList> $watchDatesToImport */
         $watchDatesToImport = [];
 
-        foreach ($watchDates->getRecords() as $watchDate) {
-            $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDate);
+        foreach ($watchDateRecords as $watchDateRecord) {
+            $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDateRecord);
 
-            $movie = $this->fetchMovieByLetterboxdUri($csvLineHistory->getLetterboxdUri());
+            $movie = $this->getMovieFromWatchDateRecord($csvLineHistory);
+
+            if ($movie === null) {
+                continue;
+            }
 
             if (empty($watchDatesToImport[$movie->getId()]) === true) {
                 $watchDatesToImport[$movie->getId()] = PlaysPerDateDtoList::create();
@@ -46,13 +48,17 @@ class ImportHistory
             $watchDatesToImport[$movie->getId()]->incrementPlaysForDate($csvLineHistory->getDate());
         }
 
-        foreach ($watchDates->getRecords() as $watchDate) {
-            $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDate);
+        foreach ($watchDateRecords as $watchDateRecord) {
+            $csvLineHistory = CsvLineHistory::createFromCsvLine($watchDateRecord);
 
-            $movie = $this->fetchMovieByLetterboxdUri($csvLineHistory->getLetterboxdUri());
+            $movie = $this->getMovieFromWatchDateRecord($csvLineHistory);
+
+            if ($movie === null) {
+                continue;
+            }
 
             if ($overwriteExistingData === false && $this->movieApi->fetchHistoryCount($movie->getId()) > 0) {
-                $this->logger->info('Ignoring already existing watch date for movie: ' . $movie->getTitle());
+                $this->logger->info('Letterboxd import: Ignoring already existing watch date for movie: ' . $movie->getTitle());
 
                 continue;
             }
@@ -64,7 +70,7 @@ class ImportHistory
                 $watchDatesToImport[$movie->getId()]->getPlaysForDate($csvLineHistory->getDate()),
             );
 
-            $this->logger->info(sprintf('Imported watch date for movie "%s": %s', $csvLineHistory->getName(), $csvLineHistory->getDate()));
+            $this->logger->info(sprintf('Letterboxd import: Imported watch date for movie "%s": %s', $csvLineHistory->getName(), $csvLineHistory->getDate()));
         }
 
         unlink($historyCsvPath);
@@ -80,30 +86,23 @@ class ImportHistory
         $this->execute($userId, $job->getParameters()['importFile']);
     }
 
-    public function fetchMovieByLetterboxdUri(string $letterboxdUri) : MovieEntity
-    {
-        $letterboxdId = basename($letterboxdUri);
-        $movie = $this->movieApi->findByLetterboxdId($letterboxdId);
-
-        if ($movie === null) {
-            $tmdbId = $this->webScrapper->getProviderTmdbId($letterboxdUri);
-
-            $movie = $this->movieApi->findByTmdbId($tmdbId);
-
-            if ($movie === null) {
-                $movie = $this->tmdbMovieSync->syncMovie($tmdbId);
-            }
-
-            $this->movieApi->updateLetterboxdId($movie->getId(), $letterboxdId);
-        }
-
-        return $movie;
-    }
-
     private function ensureValidCsvRow(string $historyCsvPath) : void
     {
         if ($this->fileValidator->isValid($historyCsvPath) === false) {
             throw new RuntimeException('Invalid letterboxed watched csv file.');
         }
+    }
+
+    private function getMovieFromWatchDateRecord(CsvLineHistory $csvLineHistory) : ?MovieEntity
+    {
+        $letterboxdUri = $csvLineHistory->getLetterboxdUri();
+
+        try {
+            return $this->letterboxdMovieImporter->importMovieByLetterboxdUri($letterboxdUri);
+        } catch (\Exception $e) {
+            $this->logger->warning('Letterboxd import: Could not import movie by uri: ' . $letterboxdUri, ['exception' => $e]);
+        }
+
+        return null;
     }
 }
