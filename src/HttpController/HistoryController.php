@@ -7,6 +7,7 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
@@ -29,6 +30,7 @@ class HistoryController
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly PaginationElementsCalculator $paginationElementsCalculator,
     ) {
     }
 
@@ -95,14 +97,7 @@ class HistoryController
         $historyPaginated = $this->movieHistoryApi->fetchHistoryPaginated($userId, $limit, (int)$page, $searchTerm);
         $historyCount = $this->movieHistoryApi->fetchHistoryCount($userId, $searchTerm);
 
-        $maxPage = (int)ceil($historyCount / $limit);
-
-        $paginationElements = [
-            'previous' => $page > 1 ? $page - 1 : null,
-            'next' => $page < $maxPage ? $page + 1 : null,
-            'currentPage' => $page,
-            'maxPage' => $maxPage,
-        ];
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $limit, (int)$page);
 
         return Response::create(
             StatusCode::createOk(),
