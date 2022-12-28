@@ -721,7 +721,7 @@ class MovieRepository
     public function findPersonalMovieRating(int $movieId, int $userId) : ?PersonalRating
     {
         $data = $this->dbConnection->fetchOne(
-            'SELECT * FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
+            'SELECT rating FROM `movie_user_rating` WHERE movie_id = ? AND user_id = ?',
             [$movieId, $userId],
         );
 
