@@ -127,16 +127,18 @@ class ImportWatchedMovies
 
     private function removeWatchesNoLongerExistingInTrakt(int $userId, Api\Trakt\ValueObject\User\Movie\Watched\DtoList $traktWatchedMovies, bool $overwriteExistingData) : void
     {
+        if ($overwriteExistingData === false) {
+            $this->logger->debug('Trakt history import: Skipping removing outdated watch dates, no overwrite set');
+
+            exit;
+        }
+
         foreach ($this->traktApi->fetchUniqueCachedTraktIds($userId) as $cachedTraktId) {
             if ($traktWatchedMovies->containsTraktId($cachedTraktId) === true) {
                 continue;
             }
 
             $this->traktApi->removeWatchCacheByTraktId($userId, $cachedTraktId);
-
-            if ($overwriteExistingData === false) {
-                continue;
-            }
 
             $this->movieApi->deleteHistoryForUserByTraktId($userId, $cachedTraktId);
             $this->logger->info('Trakt history import: Removed outdated watch dates for movie with trakt id: ' . $cachedTraktId);
