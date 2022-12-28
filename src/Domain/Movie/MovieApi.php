@@ -103,7 +103,7 @@ class MovieApi
             return;
         }
 
-        $this->historyApi->deleteByMovieId($movie->getId(), $userId);
+        $this->historyApi->deleteByUserAndMovieId($movie->getId(), $userId);
     }
 
     public function deleteRatingsByUserId(int $userId) : void

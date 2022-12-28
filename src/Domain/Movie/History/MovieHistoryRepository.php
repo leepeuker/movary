@@ -24,7 +24,7 @@ class MovieHistoryRepository
         );
     }
 
-    public function deleteByMovieId(int $movieId, int $userId) : void
+    public function deleteByUserAndMovieId(int $userId, int $movieId) : void
     {
         $this->dbConnection->executeStatement(
             'DELETE FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ?',
