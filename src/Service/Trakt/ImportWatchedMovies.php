@@ -90,7 +90,6 @@ class ImportWatchedMovies
         MovieEntity $movie,
         bool $overwriteExistingData,
     ) : void {
-        //
         $latestTraktWatchDateToPlaysMap = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktClientId, $traktUserName, $traktId);
 
         $skipWatchDates = WatchDateToPlaysMap::create();
