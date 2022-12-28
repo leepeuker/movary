@@ -90,14 +90,20 @@ class MovieApi
         $this->historyApi->createOrUpdatePlaysForDate($id, $userId, $watchedAt, $currentPlays - $playsToDelete);
     }
 
-    public function deleteHistoryByTraktId(TraktId $traktId) : void
-    {
-        $this->historyApi->deleteByTraktId($traktId);
-    }
-
     public function deleteHistoryByUserId(int $userId) : void
     {
         $this->historyApi->deleteByUserId($userId);
+    }
+
+    public function deleteHistoryForUserByTraktId(int $userId, TraktId $traktId) : void
+    {
+        $movie = $this->findByTraktId($traktId);
+
+        if ($movie === null) {
+            return;
+        }
+
+        $this->historyApi->deleteByUserAndMovieId($movie->getId(), $userId);
     }
 
     public function deleteRatingsByUserId(int $userId) : void
