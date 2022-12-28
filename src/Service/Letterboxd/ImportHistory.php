@@ -7,7 +7,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Letterboxd\ValueObject\CsvLineHistory;
-use Movary\Service\Trakt\PlaysPerDateDtoList;
+use Movary\Service\Trakt\WatchDateToPlaysMap;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -31,7 +31,7 @@ class ImportHistory
         $watchDatesCsv->setHeaderOffset(0);
         $watchDateRecords = $watchDatesCsv->getRecords();
 
-        /** @var array<int, PlaysPerDateDtoList> $watchDatesToImport */
+        /** @var array<int, WatchDateToPlaysMap> $watchDatesToImport */
         $watchDatesToImport = [];
 
         foreach ($watchDateRecords as $watchDateRecord) {
@@ -45,7 +45,7 @@ class ImportHistory
             }
 
             if (empty($watchDatesToImport[$movie->getId()]) === true) {
-                $watchDatesToImport[$movie->getId()] = PlaysPerDateDtoList::create();
+                $watchDatesToImport[$movie->getId()] = WatchDateToPlaysMap::create();
             }
 
             $watchDatesToImport[$movie->getId()]->incrementPlaysForDate($csvLineHistory->getDate());

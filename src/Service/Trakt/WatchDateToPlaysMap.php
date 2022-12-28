@@ -10,11 +10,20 @@ use RuntimeException;
  * @method array<string, int> getIterator()
  * @psalm-suppress ImplementedReturnTypeMismatch
  */
-class PlaysPerDateDtoList extends AbstractList
+class WatchDateToPlaysMap extends AbstractList
 {
     public static function create() : self
     {
         return new self();
+    }
+
+    public function add(Date $watchDate, int $plays) : void
+    {
+        if ($this->containsDate($watchDate) === true) {
+            throw new \RuntimeException('Cannot add date date, date already exists.');
+        }
+
+        $this->data[(string)$watchDate] = $plays;
     }
 
     public function containsDate(Date $watchDate) : bool
@@ -42,8 +51,20 @@ class PlaysPerDateDtoList extends AbstractList
         $this->data[(string)$watchDate]++;
     }
 
-    public function removeDate(Date $watchDate) : void
+    public function removeWatchDates(WatchDateToPlaysMap $filteredWatchDateToPlayCountMap) : self
     {
-        unset($this->data[(string)$watchDate]);
+        $filteredList = self::create();
+
+        foreach ($this as $watchDate => $plays) {
+            $watchDate = Date::createFromString($watchDate);
+
+            if ($filteredWatchDateToPlayCountMap->containsDate($watchDate) === true) {
+                continue;
+            }
+
+            $filteredList->add($watchDate, $plays);
+        }
+
+        return $filteredList;
     }
 }
