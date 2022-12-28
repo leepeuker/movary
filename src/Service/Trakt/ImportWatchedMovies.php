@@ -71,17 +71,6 @@ class ImportWatchedMovies
         $this->execute($userId);
     }
 
-    private function deleteWatchDate(MovieEntity $movie, int $userId, Date $watchDate, bool $overwriteExistingData) : void
-    {
-        if ($overwriteExistingData === false) {
-            return;
-        }
-
-        $this->movieApi->deleteHistoryByIdAndDate($movie->getId(), $userId, $watchDate);
-
-        $this->logger->info(sprintf('Trakt history import: Deleted watch dates not existing in trakt for movie %s at %s', $movie->getTitle(), $watchDate));
-    }
-
     private function importMovieHistory(
         string $traktClientId,
         string $traktUserName,
@@ -98,8 +87,6 @@ class ImportWatchedMovies
             $localWatchDate = Date::createFromString($localHistoryEntry['watched_at']);
 
             if ($latestTraktWatchDateToPlaysMap->containsDate($localWatchDate) === false) {
-                $this->deleteWatchDate($movie, $userId, $localWatchDate, $overwriteExistingData);
-
                 continue;
             }
 

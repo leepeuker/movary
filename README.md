@@ -245,7 +245,7 @@ Example cli import (import history and ratings for user with id 1 and overwrite 
 - `--history`
   Import trakt watch history (plays)
 - `--overwrite`
-  Use if you want to overwrite the local state with the trakt state (deletes and overwrites local data)
+  Use if you want to overwrite the local data with the data coming from trakt
 - `--ignore-cache`
   Use if you want to force import everything regardless if there was a change since the last import
 
