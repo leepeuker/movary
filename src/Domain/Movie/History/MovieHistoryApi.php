@@ -27,9 +27,9 @@ class MovieHistoryApi
         $this->repository->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $plays);
     }
 
-    public function deleteByTraktId(TraktId $traktId) : void
+    public function deleteByMovieId(int $movieId, int $userId) : void
     {
-        $this->repository->deleteByTraktId($traktId);
+        $this->repository->deleteByMovieId($movieId, $userId);
     }
 
     public function deleteByUserId(int $userId) : void

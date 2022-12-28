@@ -60,7 +60,7 @@ class ImportWatchedMovies
         foreach ($this->traktApi->fetchUniqueCachedTraktIds($userId) as $traktId) {
             if ($watchedMovies->containsTraktId($traktId) === false) {
                 if ($overwriteExistingData === true) {
-                    $this->movieApi->deleteHistoryByTraktId($traktId);
+                    $this->movieApi->deleteHistoryForUserByTraktId($userId, $traktId);
 
                     $this->logger->info('Removed watch dates for movie with trakt id: ' . $traktId);
                 }
