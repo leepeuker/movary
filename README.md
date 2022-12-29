@@ -63,7 +63,20 @@ This is the preferred and currently only tested way to run the app.
 
 You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
-Example using MySQL (recommended):
+Example using SQLite:
+
+```shell
+$ docker volume create movary-storage
+$ docker run --rm -d \
+  --name movary \
+  -p 80:80 \
+  -e TMDB_API_KEY="<tmdb_key>" \
+  -e DATABASE_MODE="sqlite" \
+  -v movary-storage:/app/storage \
+  leepeuker/movary:latest
+```
+
+Example using MySQL:
 
 ```shell
 $ docker volume create movary-storage
@@ -76,19 +89,6 @@ $ docker run --rm -d \
   -e DATABASE_MYSQL_NAME="<db_name>" \
   -e DATABASE_MYSQL_USER="<db_user>" \
   -e DATABASE_MYSQL_PASSWORD="<db_password>" \
-  -v movary-storage:/app/storage \
-  leepeuker/movary:latest
-```
-
-Example using SQLite:
-
-```shell
-$ docker volume create movary-storage
-$ docker run --rm -d \
-  --name movary \
-  -p 80:80 \
-  -e TMDB_API_KEY="<tmdb_key>" \
-  -e DATABASE_MODE="sqlite" \
   -v movary-storage:/app/storage \
   leepeuker/movary:latest
 ```
