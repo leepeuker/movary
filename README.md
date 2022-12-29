@@ -142,35 +142,24 @@ It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IM
 
 ##### Available environment variables with their default values:
 
-```
-### Enviroment
-ENV=production
-TIMEZONE="Europe/Berlin"
-# Minimum number of seconds the job processing worker has to run => the smallest possible timeperiode between processing two jobs
-MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING=15
-
-### Database
-# Supported modes: sqlite or mysql
-DATABASE_MODE=
-DATABASE_SQLITE=storage/movary.sqlite
-DATABASE_MYSQL_HOST=
-DATABASE_MYSQL_PORT=3306
-DATABASE_MYSQL_NAME=
-DATABASE_MYSQL_USER=
-DATABASE_MYSQL_PASSWORD=
-DATABASE_MYSQL_CHARSET=utf8mb4
-
-### TMDB 
-# Used for metda data collection, see: https://www.themoviedb.org/settings/api
-TMDB_API_KEY= 
-# Save and deliver movie/person posters locally
-TMDB_ENABLE_IMAGE_CACHING=0
-
-### Logging
-LOG_LEVEL=warning
-LOG_ENABLE_STACKTRACE=0
-LOG_ENABLE_FILE_LOGGING=0
-``` 
+| NAME                                        |      DEFAULT VALUE      | INFO                                                                    |
+|:--------------------------------------------|:-----------------------:|:------------------------------------------------------------------------|
+| `ENV`                                       |      `production`       |                                                                         |
+| `TIMEZONE`                                  |    `"Europe/Berlin"`    | Supported timezones [here](https://www.php.net/manual/en/timezones.php) |
+| `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |          `15`           | Minimum time between job processings                                    |
+| `DATABASE_MODE`                             |                         | **Required** `sqlite` or `mysql`                                        |
+| `DATABASE_SQLITE`                           | `storage/movary.sqlite` |                                                                         |
+| `DATABASE_MYSQL_HOST`                       |                         | Required when mode is `mysql`                                           |
+| `DATABASE_MYSQL_PORT`                       |          3306           |                                                                         |
+| `DATABASE_MYSQL_NAME`                       |                         | Required when mode is `mysql`                                           |
+| `DATABASE_MYSQL_USER`                       |                         | Required when mode is `mysql`                                           |
+| `DATABASE_MYSQL_PASSWORD`                   |                         | Required when mode is `mysql`                                           |
+| `DATABASE_MYSQL_CHARSET`                    |        `utf8mb4`        |                                                                         |
+| `TMDB_API_KEY`                              |                         | **Required** (get key [here](https://www.themoviedb.org/settings/api))  |
+| `TMDB_ENABLE_IMAGE_CACHING`                 |           `0`           |                                                                         |
+| `LOG_LEVEL`                                 |        `warning`        |                                                                         |
+| `LOG_ENABLE_STACKTRACE`                     |           `0`           |                                                                         |
+| `LOG_ENABLE_FILE_LOGGING`                   |           `0`           |                                                                         |
 
 More configuration can be done via the base image webdevops/php-nginx, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
@@ -288,7 +277,8 @@ A: No, there are currently no plans for this. The limited time available for dev
 
 Q: Can I share my history and ratings publicly?
 
-A: Yes, you can set (e.g. via `/settings` page) your `Privacy` levels and decide who is allowed to view your data. All page urls starting with `/username/...` (= pages with a user selector at the top) can be set to be publicly visible.
+A: Yes, you can set (e.g. via `/settings` page) your `Privacy` levels and decide who is allowed to view your data. All page urls starting with `/username/...` (= pages with a user
+selector at the top) can be set to be publicly visible.
 
 ## Development
 
