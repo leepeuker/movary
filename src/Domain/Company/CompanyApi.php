@@ -11,7 +11,9 @@ class CompanyApi
 
     public function create(string $name, ?string $originCountry, int $tmdbId) : CompanyEntity
     {
-        return $this->repository->create($name, $originCountry, $tmdbId);
+        return CompanyEntity::createFromArray(
+            $this->repository->create($name, $originCountry, $tmdbId),
+        );
     }
 
     public function deleteByTmdbId(int $tmdbId) : void
@@ -21,16 +23,22 @@ class CompanyApi
 
     public function findByNameAndOriginCountry(string $name, ?string $originCountry) : ?CompanyEntity
     {
-        return $this->repository->findByNameAndOriginCountry($name, $originCountry);
+        $data = $this->repository->findByNameAndOriginCountry($name, $originCountry);
+
+        return $data === null ? null : CompanyEntity::createFromArray($data);
     }
 
     public function findByTmdbId(int $tmdbId) : ?CompanyEntity
     {
-        return $this->repository->findByTmdbId($tmdbId);
+        $data = $this->repository->findByTmdbId($tmdbId);
+
+        return $data === null ? null : CompanyEntity::createFromArray($data);
     }
 
     public function update(int $id, string $name, ?string $originCountry) : CompanyEntity
     {
-        return $this->repository->update($id, $name, $originCountry);
+        return CompanyEntity::createFromArray(
+            $this->repository->update($id, $name, $originCountry),
+        );
     }
 }

@@ -8,14 +8,16 @@ use RuntimeException;
 
 class CompanyRepository
 {
+    private const TABLE_NAME = 'company';
+
     public function __construct(private readonly Connection $dbConnection)
     {
     }
 
-    public function create(string $name, ?string $originCountry, int $tmdbId) : CompanyEntity
+    public function create(string $name, ?string $originCountry, int $tmdbId) : array
     {
         $this->dbConnection->insert(
-            'company',
+            self::TABLE_NAME,
             [
                 'name' => $name,
                 'origin_country' => $originCountry,
@@ -24,40 +26,34 @@ class CompanyRepository
             ],
         );
 
-        return $this->fetchById((int)$this->dbConnection->lastInsertId());
+        $lastInsertId = (int)$this->dbConnection->lastInsertId();
+
+        return $this->fetchById($lastInsertId);
     }
 
     public function delete(int $tmdbId) : void
     {
-        $this->dbConnection->delete('company', ['tmdb_id' => $tmdbId]);
+        $this->dbConnection->delete(self::TABLE_NAME, ['tmdb_id' => $tmdbId]);
     }
 
-    public function findByNameAndOriginCountry(string $name, ?string $originCountry) : ?CompanyEntity
+    public function findByNameAndOriginCountry(string $name, ?string $originCountry) : ?array
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `company` WHERE name = ? AND origin_country = ?', [$name, $originCountry]);
 
-        if ($data === false) {
-            return null;
-        }
-
-        return CompanyEntity::createFromArray($data);
+        return $data === false ? null : $data;
     }
 
-    public function findByTmdbId(int $tmdbId) : ?CompanyEntity
+    public function findByTmdbId(int $tmdbId) : ?array
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `company` WHERE tmdb_id = ?', [$tmdbId]);
 
-        if ($data === false) {
-            return null;
-        }
-
-        return CompanyEntity::createFromArray($data);
+        return $data === false ? null : $data;
     }
 
-    public function update(int $id, string $name, ?string $originCountry) : CompanyEntity
+    public function update(int $id, string $name, ?string $originCountry) : array
     {
         $this->dbConnection->update(
-            'company',
+            self::TABLE_NAME,
             [
                 'name' => $name,
                 'origin_country' => $originCountry,
@@ -70,7 +66,7 @@ class CompanyRepository
         return $this->fetchById($id);
     }
 
-    private function fetchById(int $id) : CompanyEntity
+    private function fetchById(int $id) : array
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `company` WHERE id = ?', [$id]);
 
@@ -78,6 +74,6 @@ class CompanyRepository
             throw new RuntimeException('No company found by id: ' . $id);
         }
 
-        return CompanyEntity::createFromArray($data);
+        return $data;
     }
 }

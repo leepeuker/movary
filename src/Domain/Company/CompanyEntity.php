@@ -7,7 +7,7 @@ class CompanyEntity
     private function __construct(
         private readonly int $id,
         private readonly string $name,
-        private readonly string $originCountry,
+        private readonly ?string $originCountry,
         private readonly int $tmdbId,
     ) {
     }
