@@ -286,7 +286,7 @@ A: No, there are currently no plans for this. The limited time available for dev
 
 ---
 
-Q: Can I share my profile publicly?
+Q: Can I share my history and ratings publicly?
 
 A: Yes, you can set (e.g. via `/settings` page) your `Privacy` levels and decide who is allowed to view your data. All page urls starting with `/username/...` (= pages with a user selector at the top) can be set to be publicly visible.
 
