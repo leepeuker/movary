@@ -18,7 +18,7 @@ class ExportController
     public function getCsvExport(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/login');
+            return Response::createSeeOther('/login');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();

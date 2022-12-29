@@ -37,7 +37,7 @@ class HistoryController
     public function deleteHistoryEntry(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -56,7 +56,7 @@ class HistoryController
     public function logMovie(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -113,7 +113,7 @@ class HistoryController
     public function renderLogMoviePage(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $searchTerm = $request->getGetParameters()['s'] ?? null;

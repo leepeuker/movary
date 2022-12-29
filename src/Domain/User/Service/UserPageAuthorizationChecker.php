@@ -3,6 +3,7 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 
 class UserPageAuthorizationChecker
 {
@@ -41,6 +42,11 @@ class UserPageAuthorizationChecker
 
     public function findUserIdIfCurrentVisitorIsAllowedToSeeUser(string $username) : ?int
     {
+        return $this->findUserIfCurrentVisitorIsAllowedToSeeUser($username)?->getId();
+    }
+
+    public function findUserIfCurrentVisitorIsAllowedToSeeUser(string $username) : ?UserEntity
+    {
         $user = $this->userApi->findUserByName($username);
         if ($user === null) {
             return null;
@@ -52,6 +58,6 @@ class UserPageAuthorizationChecker
             return null;
         }
 
-        return $user->getId();
+        return $user;
     }
 }

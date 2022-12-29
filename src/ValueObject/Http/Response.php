@@ -24,11 +24,6 @@ class Response
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
     }
 
-    public static function createFoundRedirect(string $targetUrl) : self
-    {
-        return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
-    }
-
     public static function createJson(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
@@ -42,6 +37,11 @@ class Response
     public static function createOk() : self
     {
         return new self(StatusCode::createOk());
+    }
+
+    public static function createSeeOther(string $targetUrl) : self
+    {
+        return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
     }
 
     public function getBody() : ?string

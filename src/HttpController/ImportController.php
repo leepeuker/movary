@@ -26,7 +26,7 @@ class ImportController
     public function handleCsvImport(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/login');
+            return Response::createSeeOther('/login');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
