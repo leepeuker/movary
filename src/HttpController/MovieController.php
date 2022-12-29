@@ -25,7 +25,7 @@ class MovieController
     public function fetchMovieRatingByTmdbdId(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -71,7 +71,7 @@ class MovieController
     public function updateRating(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $movieId = (int)$request->getRouteParameters()['id'];

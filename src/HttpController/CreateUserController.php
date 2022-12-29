@@ -25,7 +25,7 @@ class CreateUserController
     public function createUser(Request $request) : Response
     {
         if ($this->userApi->hasUsers() === true) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $postParameters = $request->getPostParameters();

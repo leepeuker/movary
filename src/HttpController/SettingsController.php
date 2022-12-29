@@ -34,7 +34,7 @@ class SettingsController
     public function deleteAccount() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -60,7 +60,7 @@ class SettingsController
     public function deleteHistory() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
@@ -77,7 +77,7 @@ class SettingsController
     public function deleteRatings() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
@@ -95,7 +95,7 @@ class SettingsController
     public function renderAccountPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -158,7 +158,7 @@ class SettingsController
     public function renderAppPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         return Response::create(
@@ -175,7 +175,7 @@ class SettingsController
     public function renderLetterboxdPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
@@ -207,7 +207,7 @@ class SettingsController
     public function renderPlexPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $plexScrobblerOptionsUpdated = $this->sessionWrapper->find('plexScrobblerOptionsUpdated');
@@ -229,7 +229,7 @@ class SettingsController
     public function renderTraktPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $traktCredentialsUpdated = $this->sessionWrapper->find('traktCredentialsUpdated');
@@ -257,7 +257,7 @@ class SettingsController
     public function updateGeneral(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $postParameters = $request->getPostParameters();
@@ -288,7 +288,7 @@ class SettingsController
     public function updatePassword(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -346,7 +346,7 @@ class SettingsController
     public function updatePlex(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -369,7 +369,7 @@ class SettingsController
     public function updateTrakt(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();

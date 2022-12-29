@@ -212,4 +212,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/user/import/csv/{exportType:.+}',
         [\Movary\HttpController\ImportController::class, 'handleCsvImport'],
     );
+
+    // Added last, so that more specific routes can be defined (possible username vs route collisions here!)
+    $routeCollector->addRoute(
+        'GET',
+        '/{username:[a-zA-Z0-9]+}[/]',
+        [\Movary\HttpController\DashboardController::class, 'redirectToDashboard'],
+    );
 };

@@ -24,7 +24,7 @@ class LandingPageController
         if ($this->authenticationService->isUserAuthenticated() === true) {
             $userName = $this->authenticationService->getCurrentUser()->getName();
 
-            return Response::createFoundRedirect("/$userName/dashboard");
+            return Response::createSeeOther("/$userName/dashboard");
         }
 
         if ($this->userApi->hasUsers() === false) {

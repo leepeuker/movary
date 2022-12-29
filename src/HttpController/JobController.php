@@ -29,29 +29,29 @@ class JobController
     public function purgeAllJobs() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $this->jobQueueApi->purgeAllJobs();
 
-        return Response::createFoundRedirect('/job-queue');
+        return Response::createSeeOther('/job-queue');
     }
 
     public function purgeProcessedJobs() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $this->jobQueueApi->purgeProcessedJobs();
 
-        return Response::createFoundRedirect('/job-queue');
+        return Response::createSeeOther('/job-queue');
     }
 
     public function renderQueuePage(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
@@ -70,7 +70,7 @@ class JobController
     public function scheduleLetterboxdHistoryImport(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $fileParameters = $request->getFileParameters();
@@ -108,7 +108,7 @@ class JobController
     public function scheduleLetterboxdRatingsImport(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $fileParameters = $request->getFileParameters();
@@ -152,7 +152,7 @@ class JobController
     public function scheduleTraktHistorySync() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
@@ -169,7 +169,7 @@ class JobController
     public function scheduleTraktRatingsSync() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createFoundRedirect('/');
+            return Response::createSeeOther('/');
         }
 
         $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
