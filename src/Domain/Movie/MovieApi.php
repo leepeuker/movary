@@ -126,6 +126,17 @@ class MovieApi
         return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);
     }
 
+    public function fetchById(int $movieId) : MovieEntity
+    {
+        $movie = $this->repository->findById($movieId);
+
+        if ($movie === null) {
+            throw new RuntimeException('Could not find movie with id: ' . $movieId);
+        }
+
+        return $movie;
+    }
+
     public function fetchByTraktId(TraktId $traktId) : MovieEntity
     {
         $movie = $this->findByTraktId($traktId);

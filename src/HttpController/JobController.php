@@ -4,8 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
-use Movary\Service\Letterboxd\ImportHistoryFileValidator;
-use Movary\Service\Letterboxd\ImportRatingsFileValidator;
+use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -19,8 +18,7 @@ class JobController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly JobQueueApi $jobQueueApi,
-        private readonly ImportHistoryFileValidator $letterboxdImportHistoryFileValidator,
-        private readonly ImportRatingsFileValidator $letterboxdImportRatingsFileValidator,
+        private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
         private readonly Environment $twig,
         private readonly SessionWrapper $sessionWrapper,
     ) {
@@ -67,7 +65,7 @@ class JobController
         );
     }
 
-    public function scheduleLetterboxdHistoryImport(Request $request) : Response
+    public function scheduleLetterboxdDiaryImport(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -75,17 +73,17 @@ class JobController
 
         $fileParameters = $request->getFileParameters();
 
-        if (empty($fileParameters['historyCsv']['tmp_name']) === true) {
+        if (empty($fileParameters['diaryCsv']['tmp_name']) === true) {
             throw new RuntimeException('Missing ratings csv file');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $targetFile = __DIR__ . '/../../tmp/letterboxd-history-' . $userId . '-' . time() . '.csv';
-        move_uploaded_file($fileParameters['historyCsv']['tmp_name'], $targetFile);
+        $targetFile = __DIR__ . '/../../tmp/letterboxd-diary-' . $userId . '-' . time() . '.csv';
+        move_uploaded_file($fileParameters['diaryCsv']['tmp_name'], $targetFile);
 
-        if ($this->letterboxdImportHistoryFileValidator->isValid($targetFile) === false) {
-            $this->sessionWrapper->set('letterboxdHistoryImportFileInvalid', true);
+        if ($this->letterboxdImportHistoryFileValidator->isValidDiaryCsv($targetFile) === false) {
+            $this->sessionWrapper->set('letterboxdDiaryImportFileInvalid', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -96,7 +94,7 @@ class JobController
 
         $this->jobQueueApi->addLetterboxdImportHistoryJob($userId, $targetFile);
 
-        $this->sessionWrapper->set('letterboxdHistorySyncSuccessful', true);
+        $this->sessionWrapper->set('letterboxdDiarySyncSuccessful', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -128,7 +126,7 @@ class JobController
         $targetFile = __DIR__ . '/../../tmp/letterboxd-ratings-' . $userId . '-' . time() . '.csv';
         move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
 
-        if ($this->letterboxdImportRatingsFileValidator->isValid($targetFile) === false) {
+        if ($this->letterboxdImportHistoryFileValidator->isValidRatingsCsv($targetFile) === false) {
             $this->sessionWrapper->set('letterboxdRatingsImportFileInvalid', true);
 
             return Response::create(

@@ -15,8 +15,8 @@ class JobProcessor
     public function __construct(
         private readonly ImportWatchedMovies $traktSyncWatchedMovies,
         private readonly Trakt\ImportRatings $traktSyncRatings,
-        private readonly Letterboxd\ImportRatings $letterboxdImportRatings,
-        private readonly Letterboxd\ImportHistory $letterboxdImportHistory,
+        private readonly Letterboxd\LetterboxdImportRatings $letterboxdImportRatings,
+        private readonly Letterboxd\LetterboxdImportDiary $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,
         private readonly TmdbImageCache $tmdbImageCache,
     ) {

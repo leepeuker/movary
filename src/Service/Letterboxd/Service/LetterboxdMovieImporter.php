@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Service\Letterboxd;
+namespace Movary\Service\Letterboxd\Service;
 
 use Movary\Api\Letterboxd\LetterboxdWebScrapper;
 use Movary\Domain\Movie\MovieApi;
@@ -10,19 +10,21 @@ use Movary\Service\Tmdb\SyncMovie;
 class LetterboxdMovieImporter
 {
     public function __construct(
+        private readonly LetterboxdMovieFinder $movieFinder,
         private readonly LetterboxdWebScrapper $webScrapper,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly MovieApi $movieApi,
     ) {
     }
 
-    public function importMovieByLetterboxdUri(string $letterboxdUri) : MovieEntity
+    public function importMovie(string $letterboxdDiaryUri) : MovieEntity
     {
-        $letterboxdId = basename($letterboxdUri);
-        $movie = $this->movieApi->findByLetterboxdId($letterboxdId);
+        $letterboxdId = $this->webScrapper->scrapeLetterboxIdByDiaryUri($letterboxdDiaryUri);
+
+        $movie = $this->movieFinder->findMovieLocally($letterboxdId);
 
         if ($movie === null) {
-            $movie = $this->createMovie($letterboxdUri);
+            $movie = $this->createMovie($letterboxdId);
 
             $this->movieApi->updateLetterboxdId($movie->getId(), $letterboxdId);
         }
@@ -30,9 +32,9 @@ class LetterboxdMovieImporter
         return $movie;
     }
 
-    private function createMovie(string $letterboxdUri) : MovieEntity
+    private function createMovie(string $letterboxdId) : MovieEntity
     {
-        $tmdbId = $this->webScrapper->getProviderTmdbId($letterboxdUri);
+        $tmdbId = $this->webScrapper->scrapeTmdbIdByLetterboxdId($letterboxdId);
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
