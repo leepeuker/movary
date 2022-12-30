@@ -96,6 +96,10 @@ class SettingsController
 
     public function generateLetterboxdExportData() : Response
     {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
         $options = new ZipStream\Option\Archive();
         $options->setSendHttpHeaders(true);
 
