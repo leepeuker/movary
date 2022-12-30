@@ -9,6 +9,8 @@ use Movary\ValueObject\DateTime;
 
 class LetterboxdExporter
 {
+    private const LIMIT_CSV_FILE_RECORDS = 1000;
+
     public function __construct(
         private readonly Connection $dbConnection,
         private readonly File $fileUtil,
@@ -31,7 +33,7 @@ class LetterboxdExporter
 
         $csvLineCounter = 0;
         foreach ($stmt->iterateAssociative() as $row) {
-            if ($csvLineCounter >= 500) {
+            if ($csvLineCounter >= self::LIMIT_CSV_FILE_RECORDS) {
                 yield $csvFilePath;
 
                 $csvFilePath = $this->fileUtil->createTmpFile();
