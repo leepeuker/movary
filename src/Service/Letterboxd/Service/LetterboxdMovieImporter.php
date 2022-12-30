@@ -12,14 +12,15 @@ class LetterboxdMovieImporter
     public function __construct(
         private readonly LetterboxdMovieFinder $movieFinder,
         private readonly LetterboxdWebScrapper $webScrapper,
+        private readonly LetterboxdDiaryCache $diaryCache,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly MovieApi $movieApi,
     ) {
     }
 
-    public function importMovie(string $letterboxdDiaryUri) : MovieEntity
+    public function importMovieByDiaryUri(string $letterboxdDiaryUri) : MovieEntity
     {
-        $letterboxdId = $this->webScrapper->scrapeLetterboxIdByDiaryUri($letterboxdDiaryUri);
+        $letterboxdId = $this->getLetterboxIdByDiaryUri($letterboxdDiaryUri);
 
         $movie = $this->movieFinder->findMovieLocally($letterboxdId);
 
@@ -43,5 +44,22 @@ class LetterboxdMovieImporter
         }
 
         return $movie;
+    }
+
+    private function getLetterboxIdByDiaryUri(string $letterboxdDiaryUri) : string
+    {
+        $diaryId = basename($letterboxdDiaryUri);
+
+        $letterboxdId = $this->diaryCache->findLetterboxdIdToDiaryUri($diaryId);
+
+        if ($letterboxdId !== null) {
+            return $letterboxdId;
+        }
+
+        $letterboxdId = $this->webScrapper->scrapeLetterboxIdByDiaryUri($letterboxdDiaryUri);
+
+        $this->diaryCache->setLetterboxdIdToDiaryUri($diaryId, $letterboxdId);
+
+        return $letterboxdId;
     }
 }

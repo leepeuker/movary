@@ -61,7 +61,7 @@ class LetterboxdImportDiary
             $csvLineHistory = CsvLineDiary::createFromCsvLine($watchDateRecord);
 
             try {
-                $movieId = $this->letterboxdMovieImporter->importMovie($csvLineHistory->getLetterboxdDiaryEntryUri())->getId();
+                $movieId = $this->letterboxdMovieImporter->importMovieByDiaryUri($csvLineHistory->getLetterboxdDiaryEntryUri())->getId();
             } catch (\Exception $e) {
                 $this->logger->warning('Letterboxd import: Could not import movie: ' . $csvLineHistory->getName(), ['exception' => $e]);
 
