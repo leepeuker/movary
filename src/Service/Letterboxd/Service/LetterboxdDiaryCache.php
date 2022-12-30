@@ -12,13 +12,13 @@ class LetterboxdDiaryCache
 
     public function findLetterboxdIdToDiaryUri(string $diaryId) : ?string
     {
-        $result = $this->dbConnection->fetchFirstColumn('SELECT letterboxd_id FROM cache_letterboxd_diary WHERE uri_id = ?', [$diaryId]);
+        $result = $this->dbConnection->fetchFirstColumn('SELECT letterboxd_id FROM cache_letterboxd_diary WHERE diary_id = ?', [$diaryId]);
 
         return empty($result) === true ? null : $result[0];
     }
 
     public function setLetterboxdIdToDiaryUri(string $diaryId, string $letterboxdId) : void
     {
-        $this->dbConnection->insert('cache_letterboxd_diary', ['uri_id' => $diaryId, 'letterboxd_id' => $letterboxdId]);
+        $this->dbConnection->insert('cache_letterboxd_diary', ['diary_id' => $diaryId, 'letterboxd_id' => $letterboxdId]);
     }
 }

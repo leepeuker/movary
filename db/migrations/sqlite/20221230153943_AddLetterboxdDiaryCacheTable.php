@@ -14,9 +14,9 @@ final class AddLetterboxdDiaryCacheTable extends AbstractMigration
         $this->execute(
             <<<SQL
             CREATE TABLE `cache_letterboxd_diary` (
-                `uri_id` TEXT NOT NULL,
+                `diary_id` TEXT NOT NULL,
                 `letterboxd_id` TEXT NOT NULL,
-                PRIMARY KEY (`uri_id`)
+                PRIMARY KEY (`diary_id`)
             )
             SQL,
         );
