@@ -184,8 +184,8 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/jobs/schedule/letterboxd-history-sync',
-        [\Movary\HttpController\JobController::class, 'scheduleLetterboxdHistoryImport'],
+        '/jobs/schedule/letterboxd-diary-sync',
+        [\Movary\HttpController\JobController::class, 'scheduleLetterboxdDiaryImport'],
     );
     $routeCollector->addRoute(
         'POST',

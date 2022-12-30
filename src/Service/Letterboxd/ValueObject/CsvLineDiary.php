@@ -4,7 +4,7 @@ namespace Movary\Service\Letterboxd\ValueObject;
 
 use Movary\ValueObject\Date;
 
-class CsvLineHistory
+class CsvLineDiary
 {
     private function __construct(
         private readonly string $name,
@@ -15,15 +15,10 @@ class CsvLineHistory
 
     public static function createFromCsvLine(array $csvLine) : self
     {
-        return new self($csvLine['Name'], $csvLine['Letterboxd URI'], Date::createFromString($csvLine['Date']));
+        return new self($csvLine['Name'], $csvLine['Letterboxd URI'], Date::createFromString($csvLine['Watched Date']));
     }
 
-    public function getDate() : Date
-    {
-        return $this->date;
-    }
-
-    public function getLetterboxdUri() : string
+    public function getLetterboxdDiaryEntryUri() : string
     {
         return $this->letterboxdUri;
     }
@@ -31,5 +26,10 @@ class CsvLineHistory
     public function getName() : string
     {
         return $this->name;
+    }
+
+    public function getWatchedDate() : Date
+    {
+        return $this->date;
     }
 }

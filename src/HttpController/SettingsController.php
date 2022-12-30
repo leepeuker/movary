@@ -180,26 +180,26 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $letterboxdHistorySyncSuccessful = $this->sessionWrapper->find('letterboxdHistorySyncSuccessful');
+        $letterboxdDiarySyncSuccessful = $this->sessionWrapper->find('letterboxdDiarySyncSuccessful');
         $letterboxdRatingsSyncSuccessful = $this->sessionWrapper->find('letterboxdRatingsSyncSuccessful');
         $letterboxdRatingsImportFileInvalid = $this->sessionWrapper->find('letterboxdRatingsImportFileInvalid');
-        $letterboxdHistoryImportFileInvalid = $this->sessionWrapper->find('letterboxdHistoryImportFileInvalid');
+        $letterboxdDiaryImportFileInvalid = $this->sessionWrapper->find('letterboxdDiaryImportFileInvalid');
 
         $this->sessionWrapper->unset(
-            'letterboxdHistorySyncSuccessful',
+            'letterboxdDiarySyncSuccessful',
             'letterboxdRatingsSyncSuccessful',
             'letterboxdRatingsImportFileInvalid',
-            'letterboxdHistoryImportFileInvalid',
+            'letterboxdDiaryImportFileInvalid',
         );
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-letterboxd.html.twig', [
                 'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
-                'letterboxdHistorySyncSuccessful' => $letterboxdHistorySyncSuccessful,
+                'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
-                'letterboxdHistoryImportFileInvalid' => $letterboxdHistoryImportFileInvalid,
+                'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
             ]),
         );
     }
