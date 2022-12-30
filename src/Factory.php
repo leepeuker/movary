@@ -283,7 +283,7 @@ class Factory
     private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler
     {
         $streamHandler = new StreamHandler(
-            __DIR__ . '/../tmp/app-1.log',
+            __DIR__ . '/../tmp/app.log',
             self::getLogLevel($config)
         );
         $streamHandler->setFormatter($container->get(LineFormatter::class));
