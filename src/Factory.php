@@ -24,6 +24,7 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
+use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\UrlGenerator;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
@@ -198,6 +199,7 @@ class Factory
             $container->get(MovieApi::class),
             $container->get(GithubApi::class),
             $container->get(SessionWrapper::class),
+            $container->get(LetterboxdExporter::class),
             $applicationVersion
         );
     }

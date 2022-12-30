@@ -29,6 +29,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/letterboxd-export',
+        [\Movary\HttpController\SettingsController::class, 'generateLetterboxdExportData'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/plex',
         [\Movary\HttpController\SettingsController::class, 'renderPlexPage'],
     );

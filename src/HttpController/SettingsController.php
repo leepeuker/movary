@@ -8,6 +8,7 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Header;
@@ -16,6 +17,7 @@ use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use RuntimeException;
 use Twig\Environment;
+use ZipStream;
 
 class SettingsController
 {
@@ -27,6 +29,7 @@ class SettingsController
         private readonly Movie\MovieApi $movieApi,
         private readonly GithubApi $githubApi,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly LetterboxdExporter $letterboxdExporter,
         private readonly ?string $currentApplicationVersion = null,
     ) {
     }
@@ -89,6 +92,28 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
+    }
+
+    public function generateLetterboxdExportData() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $options = new ZipStream\Option\Archive();
+        $options->setSendHttpHeaders(true);
+
+        $zip = new ZipStream\ZipStream('export-for-letterboxd.zip', $options);
+
+        foreach ($this->letterboxdExporter->generateCsvFiles() as $index => $csvFile) {
+            $zip->addFileFromPath('export-' . $index . '.csv', $csvFile);
+
+            unlink($csvFile);
+        }
+
+        $zip->finish();
+
+        return Response::createOk();
     }
 
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh

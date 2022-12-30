@@ -1,0 +1,65 @@
+<?php declare(strict_types=1);
+
+namespace Movary\Service\Letterboxd;
+
+use Doctrine\DBAL\Connection;
+use League\Csv\Writer;
+use Movary\Util\File;
+use Movary\ValueObject\DateTime;
+
+class LetterboxdExporter
+{
+    private const LIMIT_CSV_FILE_RECORDS = 1000;
+
+    public function __construct(
+        private readonly Connection $dbConnection,
+        private readonly File $fileUtil,
+    ) {
+    }
+
+    public function generateCsvFiles() : \Traversable
+    {
+        $stmt = $this->dbConnection->executeQuery(
+            'SELECT m.title, m.release_date, m.tmdb_id, mw.watched_at, mur.rating
+            FROM movie_user_watch_dates mw
+            JOIN movie m on mw.movie_id = m.id
+            LEFT JOIN movie_user_rating mur on m.id = mur.movie_id AND mur.user_id = 1',
+        );
+
+        $csvFilePath = $this->fileUtil->createTmpFile();
+        $csv = $this->createCsvWriter($csvFilePath);
+
+        $csv->insertOne(['Title', 'Year', 'tmdbID', 'WatchedDate', 'Rating10']);
+
+        $csvLineCounter = 0;
+        foreach ($stmt->iterateAssociative() as $row) {
+            if ($csvLineCounter >= self::LIMIT_CSV_FILE_RECORDS) {
+                yield $csvFilePath;
+
+                $csvFilePath = $this->fileUtil->createTmpFile();
+                $csv = $this->createCsvWriter($csvFilePath);
+
+                $csvLineCounter = 0;
+            }
+
+            $releaseYear = null;
+            if (empty($row['release_date']) === false) {
+                $releaseYear = DateTime::createFromString($row['release_date'])->format('Y');
+            }
+
+            $csv->insertOne([$row['title'], $releaseYear, $row['tmdb_id'], $row['watched_at'], $row['rating']]);
+
+            $csvLineCounter++;
+        }
+
+        yield $csvFilePath;
+    }
+
+    private function createCsvWriter(string $csvFilePath) : Writer
+    {
+        $csv = Writer::createFromPath($csvFilePath);
+        $csv->setDelimiter(',');
+
+        return $csv;
+    }
+}

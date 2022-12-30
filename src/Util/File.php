@@ -18,9 +18,20 @@ class File
         }
     }
 
-    public function createFile(string $filename, string $data) : void
+    public function createFile(string $filename, string $data = '') : void
     {
         file_put_contents($filename, $data);
+    }
+
+    public function createTmpFile() : string
+    {
+        $tempFileName = tempnam(sys_get_temp_dir(), 'movary');
+
+        if ($tempFileName === false) {
+            throw new \RuntimeException('Could not create tmp file.');
+        }
+
+        return $tempFileName;
     }
 
     public function deleteDirectoryContent(string $path) : void

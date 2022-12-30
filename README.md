@@ -23,7 +23,8 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
     4. [trakt.tv Import](#trakttv-import)
     5. [trakt.tv Export](#trakttv-export)
     6. [Letterboxd.com Import](#letterboxdcom-import)
-    7. [IMDb Rating Sync](#imdb-rating-sync)
+    7. [Letterboxd.com Export](#letterboxdcom-export)
+    8. [IMDb Rating Sync](#imdb-rating-sync)
 5. [FAQ](#faq)
 6. [Development](#development)
 7. [Support](#support)
@@ -247,9 +248,15 @@ Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
 
 You can import your watch history and ratings from letterboxd.com.
 
-Visit the movary settings page `/settings/letterboxd` for more instructions
+Visit the movary settings page `/settings/letterboxd` for more instructions.
 
 **Info:** Importing hundreds or thousands of movies for the first time can take a few minutes.
+
+### Letterboxd.com Export
+
+You can export your local watch history and ratings to letterboxd.com.
+
+Visit the movary settings page `/settings/letterboxd` for more instructions.
 
 <a name="#link-imdb-sync"></a>
 
