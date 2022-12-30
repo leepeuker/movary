@@ -17,13 +17,15 @@ class LetterboxdExporter
     ) {
     }
 
-    public function generateCsvFiles() : \Traversable
+    public function generateCsvFiles(int $userId) : \Traversable
     {
         $stmt = $this->dbConnection->executeQuery(
             'SELECT m.title, m.release_date, m.tmdb_id, mw.watched_at, mur.rating
             FROM movie_user_watch_dates mw
             JOIN movie m on mw.movie_id = m.id
-            LEFT JOIN movie_user_rating mur on m.id = mur.movie_id AND mur.user_id = 1',
+            LEFT JOIN movie_user_rating mur on m.id = mur.movie_id AND mur.user_id = ?
+            WHERE mw.user_id = ?',
+            [$userId, $userId],
         );
 
         $csvFilePath = $this->fileUtil->createTmpFile();
