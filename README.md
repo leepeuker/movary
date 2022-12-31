@@ -44,7 +44,7 @@ or trakt to keep it safe (or decide what to do with it).
 
 - Movie tracking: Collect and manage your watch history and ratings
 - Statistics: Overview over your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
-- Third party support: Import your existing history and ratings from e.g. trakt.tv or letterboxd.com
+- Third party support: Import and export your history and ratings from/to third partys like letterboxd.com or trakt.tv
 - Plex scrobbler: Automatically add new plex watches and ratings (plex premium required)
 - Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
 - Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
