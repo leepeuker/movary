@@ -57,7 +57,7 @@
                         {% endif %}
                     </div>
 
-                    <button class="btn btn-outline-primary" type="button" {% if coreAccountChangesDisabled == true %}disabled{% endif %} onclick="verifyTraktCredentials()">
+                    <button class="btn btn-outline-primary" type="button" {% if coreAccountChangesDisabled == true %}disabled{% endif %} onclick="verifyTraktCredentials()" id="verifyButton">
                         Verify
                     </button>
                     <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Save</button>

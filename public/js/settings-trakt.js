@@ -8,33 +8,31 @@ async function verifyTraktCredentials() {
         return
     }
 
+    document.getElementById('verifyButton').disabled = true;
     alertPlaceholder.innerHTML = ''
 
     const response = await fetch('/settings/trakt-verify', {
         method: 'post',
         headers: {
             'Content-type': 'application/json',
-        }, body: JSON.stringify({
+        },
+        body: JSON.stringify({
             'username': username,
             'clientId': clientId
         })
     })
 
-    if (response.status === 400) {
+    if (response.ok) {
+        addAlertMessage('Credentials are valid.', 'success')
+    } else if (response.status === 400) {
         addAlertMessage('Credentials are not valid.', 'danger')
-
-        return
-    }
-
-    if (!response.ok) {
-        console.log(`Api error on trakt credentials verification with status: ${response.status}`);
-
+    } else {
         addAlertMessage('Something went wrong...', 'warning')
 
-        return
+        console.log(`Api error on trakt credentials verification with status: ${response.status}`);
     }
 
-    addAlertMessage('Credentials are valid.', 'success')
+    document.getElementById('verifyButton').disabled = false;
 }
 
 const alertPlaceholder = document.getElementById('alerts')
