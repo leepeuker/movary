@@ -1,13 +1,14 @@
-async function verifyTraktCredentialsRequest() {
+async function verifyTraktCredentials() {
     const username = document.getElementById('traktUserName').value;
     const clientId = document.getElementById('traktClientId').value;
 
     if (username == false || clientId == false) {
-
         addAlertMessage('Username or client id missing.', 'warning')
 
         return
     }
+
+    alertPlaceholder.innerHTML = ''
 
     const response = await fetch('/settings/trakt-verify', {
         method: 'post',
@@ -20,7 +21,6 @@ async function verifyTraktCredentialsRequest() {
     })
 
     if (response.status === 400) {
-
         addAlertMessage('Credentials are not valid.', 'danger')
 
         return
