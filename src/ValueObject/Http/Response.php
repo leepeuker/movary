@@ -19,6 +19,11 @@ class Response
         return new self($statusCode, $body, $headers);
     }
 
+    public static function createBadRequest() : self
+    {
+        return new self(StatusCode::createBadRequest());
+    }
+
     public static function createCsv(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);

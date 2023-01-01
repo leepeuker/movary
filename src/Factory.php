@@ -200,6 +200,7 @@ class Factory
             $container->get(GithubApi::class),
             $container->get(SessionWrapper::class),
             $container->get(LetterboxdExporter::class),
+            $container->get(TraktApi::class),
             $applicationVersion
         );
     }

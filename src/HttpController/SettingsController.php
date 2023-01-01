@@ -3,12 +3,14 @@
 namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Header;
@@ -30,6 +32,7 @@ class SettingsController
         private readonly GithubApi $githubApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
+        private readonly TraktApi $traktApi,
         private readonly ?string $currentApplicationVersion = null,
     ) {
     }
@@ -279,6 +282,24 @@ class SettingsController
                 'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
             ]),
         );
+    }
+
+    public function traktVerifyCredentials(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $clientId = $requestData['clientId'] ?? '';
+        $username = $requestData['username'] ?? '';
+
+        if ($this->traktApi->verifyCredentials($clientId, $username) === false) {
+            return Response::createBadRequest();
+        }
+
+        return Response::createOk();
     }
 
     public function updateGeneral(Request $request) : Response

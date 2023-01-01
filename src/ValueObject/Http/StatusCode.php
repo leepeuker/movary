@@ -10,6 +10,11 @@ class StatusCode
     ) {
     }
 
+    public static function createBadRequest() : self
+    {
+        return new self(400, 'Bad Request');
+    }
+
     public static function createMethodNotAllowed() : self
     {
         return new self(405, 'Method Not Allowed');
