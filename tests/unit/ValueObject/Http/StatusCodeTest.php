@@ -8,6 +8,11 @@ use PHPUnit\Framework\TestCase;
 /** @covers \Movary\ValueObject\Http\StatusCode */
 class StatusCodeTest extends TestCase
 {
+    public function testCreateBadRequest() : void
+    {
+        self::assertSame('HTTP/1.1 400 Bad Request', (string)StatusCode::createBadRequest());
+    }
+
     public function testCreateMethodNotAllowed() : void
     {
         self::assertSame('HTTP/1.1 405 Method Not Allowed', (string)StatusCode::createMethodNotAllowed());

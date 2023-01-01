@@ -4,6 +4,10 @@
     Settings - Trakt.tv
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/settings-trakt.js"></script>
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
@@ -23,6 +27,7 @@
                         <input type="text"
                                class="form-control"
                                name="traktUserName"
+                               id="traktUserName"
                                placeholder="Enter username here"
                                value="{{ traktUserName }}"
                                style="margin-left: 5%;margin-right: 5%;text-align: center;"
@@ -35,20 +40,27 @@
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
                                class="form-control"
                                name="traktClientId"
+                               id="traktClientId"
                                placeholder="Enter client id here"
                                value="{{ traktClientId }}"
                                style="margin-left: 5%;margin-right: 5%;text-align: center;"
                                 {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
 
-                    {% if traktCredentialsUpdated == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
-                            Trakt credentials were updated.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
 
-                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Submit</button>
+                    <div id="alerts"  style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
+                        {% if traktCredentialsUpdated == true %}
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                Trakt credentials were updated.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button class="btn btn-outline-primary" type="button" {% if coreAccountChangesDisabled == true %}disabled{% endif %} onclick="verifyTraktCredentialsRequest()">
+                        Verify
+                    </button>
+                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Save</button>
                 </form>
 
                 <hr>

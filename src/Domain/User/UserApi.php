@@ -59,11 +59,6 @@ class UserApi
         return $this->repository->fetchAllHavingWatchedMovieWithPersonPublicVisibleUsernames($personId);
     }
 
-    public function fetchAllHavingWatchedMoviesWithPerson(int $personId) : array
-    {
-        return $this->repository->fetchAllHavingWatchedMovieWithPerson($personId);
-    }
-
     public function fetchAllInternVisibleUsernames() : array
     {
         return $this->repository->fetchAllInternVisibleUsernames();
@@ -72,17 +67,6 @@ class UserApi
     public function fetchAllPublicVisibleUsernames() : array
     {
         return $this->repository->fetchAllPublicVisibleUsernames();
-    }
-
-    public function fetchDateFormatId(int $userId) : int
-    {
-        $dateFormat = $this->repository->findDateFormatId($userId);
-
-        if ($dateFormat === null) {
-            throw new RuntimeException('Could not find date format for user.');
-        }
-
-        return $dateFormat;
     }
 
     public function fetchUser(int $userId) : UserEntity

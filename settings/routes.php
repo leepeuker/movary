@@ -23,6 +23,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderTraktPage'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/settings/trakt-verify',
+        [\Movary\HttpController\SettingsController::class, 'traktVerifyCredentials'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/settings/letterboxd',
         [\Movary\HttpController\SettingsController::class, 'renderLetterboxdPage'],

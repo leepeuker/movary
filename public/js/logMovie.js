@@ -154,7 +154,8 @@ function logMovie () {
 	}
 
 	fetch('/log-movie', {
-		method: 'post', headers: {
+		method: 'post',
+		headers: {
 			'Content-type': 'application/json',
 		}, body: JSON.stringify({
 			'tmdbId': tmdbId,

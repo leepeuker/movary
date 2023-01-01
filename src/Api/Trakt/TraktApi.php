@@ -44,4 +44,15 @@ class TraktApi
     {
         $this->cacheWatchedService->remove($userId, $traktId);
     }
+
+    public function verifyCredentials(string $clientId, string $username) : bool
+    {
+        try {
+            $this->client->get($clientId, sprintf('/users/%s/watched/movies', $username));
+        } catch (\Throwable $t) {
+            return false;
+        }
+
+        return true;
+    }
 }
