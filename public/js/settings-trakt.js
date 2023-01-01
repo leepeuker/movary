@@ -27,9 +27,9 @@ async function verifyTraktCredentialsRequest() {
     }
 
     if (!response.ok) {
-        console.log(`HTTP error! status: ${response.status}`);
+        console.log(`Api error on trakt credentials verification with status: ${response.status}`);
 
-        addAlertMessage('Something went wrong... :(', 'warning')
+        addAlertMessage('Something went wrong...', 'warning')
 
         return
     }
@@ -39,8 +39,5 @@ async function verifyTraktCredentialsRequest() {
 
 const alertPlaceholder = document.getElementById('alerts')
 const addAlertMessage = (message, type) => {
-    const wrapper = document.createElement('div')
-    wrapper.innerHTML = [`<div class="alert alert-${type} alert-dismissible" role="alert">`, `   <div>${message}</div>`, '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>', '</div>'].join('')
-
-    alertPlaceholder.append(wrapper)
+    alertPlaceholder.innerHTML = [`<div class="alert alert-${type} alert-dismissible" role="alert">`, `   <div>${message}</div>`, '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>', '</div>'].join('')
 }
