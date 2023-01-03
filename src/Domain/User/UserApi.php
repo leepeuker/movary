@@ -24,6 +24,11 @@ class UserApi
         $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name);
     }
 
+    public function deleteJellyfinWebhookId(int $userId) : void
+    {
+        $this->repository->setJellyfinWebhookId($userId, null);
+    }
+
     public function deletePlexWebhookId(int $userId) : void
     {
         $this->repository->setPlexWebhookId($userId, null);
@@ -80,6 +85,11 @@ class UserApi
         return $user;
     }
 
+    public function findJellyfinWebhookId(int $userId) : ?string
+    {
+        return $this->repository->findJellyfinWebhookId($userId);
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookId($userId);
@@ -98,6 +108,11 @@ class UserApi
     public function findUserByName(string $name) : ?UserEntity
     {
         return $this->repository->findUserByName($name);
+    }
+
+    public function findUserIdByJellyfinWebhookId(string $webhookId) : ?int
+    {
+        return $this->repository->findUserIdByJellyfinWebhookId($webhookId);
     }
 
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
@@ -119,6 +134,15 @@ class UserApi
         }
 
         return password_verify($password, $passwordHash) === true;
+    }
+
+    public function regenerateJellyfinWebhookId(int $userId) : string
+    {
+        $jellyfinWebhookId = Uuid::uuid4()->toString();
+
+        $this->repository->setJellyfinWebhookId($userId, $jellyfinWebhookId);
+
+        return $jellyfinWebhookId;
     }
 
     public function regeneratePlexWebhookId(int $userId) : string
@@ -145,6 +169,11 @@ class UserApi
         $this->userValidator->ensureEmailIsUnique($email, $userId);
 
         $this->repository->updateEmail($userId, $email);
+    }
+
+    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleViews) : void
+    {
+        $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleViews);
     }
 
     public function updateName(int $userId, string $name) : void

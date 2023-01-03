@@ -211,7 +211,7 @@ You can generate your plex webhook url on the plex settings page (`/setting/plex
 
 Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/) to start scrobbling!
 
-You can select what you want movary to scrobble (movie views and/or ratings) via the "Scrobbler Options" checkboxes on the settings page.
+You can select what you want movary to scrobble (movie views and/or ratings) via the "Scrobble Options" checkboxes on the settings page.
 
 ### Trakt.tv Import
 
