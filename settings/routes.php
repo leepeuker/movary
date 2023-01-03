@@ -44,6 +44,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/jellyfin',
+        [\Movary\HttpController\SettingsController::class, 'renderJellyfinPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/app',
         [\Movary\HttpController\SettingsController::class, 'renderAppPage'],
     );
@@ -148,6 +153,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\PlexController::class, 'regeneratePlexWebhookId'],
     );
     $routeCollector->addRoute(
+        'GET',
+        '/user/jellyfin-webhook-id',
+        [\Movary\HttpController\JellyfinController::class, 'getJellyfinWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/user/jellyfin-webhook-id',
+        [\Movary\HttpController\JellyfinController::class, 'regenerateJellyfinWebhookId'],
+    );
+    $routeCollector->addRoute(
         'POST',
         '/user/trakt',
         [\Movary\HttpController\SettingsController::class, 'updateTrakt'],
@@ -156,6 +171,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/user/plex',
         [\Movary\HttpController\SettingsController::class, 'updatePlex'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/user/jellyfin',
+        [\Movary\HttpController\SettingsController::class, 'updateJellyfin'],
     );
     $routeCollector->addRoute(
         'POST',
@@ -211,6 +231,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/plex/{id:.+}',
         [\Movary\HttpController\PlexController::class, 'handlePlexWebhook'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/user/jellyfin-webhook-id',
+        [\Movary\HttpController\JellyfinController::class, 'deleteJellyfinWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/jellyfin/{id:.+}',
+        [\Movary\HttpController\JellyfinController::class, 'handleJellyfinWebhook'],
     );
     $routeCollector->addRoute(
         'GET',

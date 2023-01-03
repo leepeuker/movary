@@ -163,6 +163,17 @@ class UserRepository
         return (int)$dateFormat;
     }
 
+    public function findJellyfinWebhookId(int $userId) : ?string
+    {
+        $jellyfinWebhookId = $this->dbConnection->fetchOne('SELECT `jellyfin_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($jellyfinWebhookId === false) {
+            return null;
+        }
+
+        return $jellyfinWebhookId;
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
@@ -240,6 +251,17 @@ class UserRepository
         return (int)$id;
     }
 
+    public function findUserIdByJellyfinWebhookId(string $webhookId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `jellyfin_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `plex_webhook_uuid` = ?', [$webhookId]);
@@ -260,6 +282,19 @@ class UserRepository
         }
 
         return $count;
+    }
+
+    public function setJellyfinWebhookId(int $userId, ?string $jellyfinWebhookId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_webhook_uuid' => $jellyfinWebhookId,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
     }
 
     public function setPlexWebhookId(int $userId, ?string $plexWebhookId) : void
@@ -307,6 +342,19 @@ class UserRepository
             'user',
             [
                 'email' => $email,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleViews) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_scrobble_views' => (int)$scrobbleViews,
             ],
             [
                 'id' => $userId,

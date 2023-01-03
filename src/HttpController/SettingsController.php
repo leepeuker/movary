@@ -202,6 +202,27 @@ class SettingsController
         );
     }
 
+    public function renderJellyfinPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $jellyfinScrobblerOptionsUpdated = $this->sessionWrapper->find('jellyfinScrobblerOptionsUpdated');
+        $this->sessionWrapper->unset('jellyfinScrobblerOptionsUpdated');
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-jellyfin.html.twig', [
+                'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
+                'scrobbleViews' => $user->getJellyfinScrobbleViews(),
+                'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
+            ]),
+        );
+    }
+
     public function renderLetterboxdPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -325,6 +346,28 @@ class SettingsController
         } catch (User\Exception\UsernameNotUnique $e) {
             $this->sessionWrapper->set('generalErrorUsernameNotUnique', true);
         }
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function updateJellyfin(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = $request->getPostParameters();
+
+        $scrobbleViews = (bool)$postParameters['scrobbleViews'];
+
+        $this->userApi->updateJellyfinScrobblerOptions($userId, $scrobbleViews);
+
+        $this->sessionWrapper->set('jellyfinScrobblerOptionsUpdated', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
