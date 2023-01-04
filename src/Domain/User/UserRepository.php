@@ -354,7 +354,7 @@ class UserRepository
         $this->dbConnection->update(
             'user',
             [
-                'jellyfin_scrobble_watches' => (int)$scrobbleWatches,
+                'jellyfin_scrobble_views' => (int)$scrobbleWatches,
             ],
             [
                 'id' => $userId,

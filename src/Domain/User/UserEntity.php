@@ -32,7 +32,7 @@ class UserEntity
             $data['plex_webhook_uuid'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
-            (bool)$data['jellyfin_scrobble_watches'],
+            (bool)$data['jellyfin_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
         );
