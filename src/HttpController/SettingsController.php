@@ -46,7 +46,7 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
 
-        if ($user->areCoreAccountChangesDisabled() === true) {
+        if ($user->hasCoreAccountChangesDisabled() === true) {
             throw new RuntimeException('Account deletion is disabled for user: ' . $userId);
         }
 
@@ -163,7 +163,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account.html.twig', [
-                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'dateFormats' => DateFormat::getFormats(),
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'privacyLevel' => $user->getPrivacyLevel(),
@@ -217,7 +217,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-jellyfin.html.twig', [
                 'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
-                'scrobbleViews' => $user->getJellyfinScrobbleViews(),
+                'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
                 'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
             ]),
         );
@@ -246,7 +246,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-letterboxd.html.twig', [
-                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
@@ -270,8 +270,8 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-plex.html.twig', [
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-                'scrobbleViews' => $user->getPlexScrobbleViews(),
-                'scrobbleRatings' => $user->getPlexScrobbleRating(),
+                'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
+                'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
             ]),
         );
@@ -296,7 +296,7 @@ class SettingsController
             $this->twig->render('page/settings-trakt.html.twig', [
                 'traktClientId' => $user->getTraktClientId(),
                 'traktUserName' => $user->getTraktUserName(),
-                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
@@ -363,9 +363,7 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 
-        $scrobbleViews = (bool)$postParameters['scrobbleViews'];
-
-        $this->userApi->updateJellyfinScrobblerOptions($userId, $scrobbleViews);
+        $this->userApi->updateJellyfinScrobblerOptions($userId, (bool)$postParameters['scrobbleWatches']);
 
         $this->sessionWrapper->set('jellyfinScrobblerOptionsUpdated', true);
 
@@ -419,7 +417,7 @@ class SettingsController
             );
         }
 
-        if ($user->areCoreAccountChangesDisabled() === true) {
+        if ($user->hasCoreAccountChangesDisabled() === true) {
             throw new RuntimeException('Password changes are disabled for user: ' . $userId);
         }
 
@@ -443,10 +441,10 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 
-        $scrobbleViews = (bool)$postParameters['scrobbleViews'];
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
         $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
 
-        $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleViews, $scrobbleRatings);
+        $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
 
         $this->sessionWrapper->set('plexScrobblerOptionsUpdated', true);
 

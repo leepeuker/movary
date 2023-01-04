@@ -171,9 +171,9 @@ class UserApi
         $this->repository->updateEmail($userId, $email);
     }
 
-    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleViews) : void
+    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
-        $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleViews);
+        $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
     }
 
     public function updateName(int $userId, string $name) : void
@@ -197,9 +197,9 @@ class UserApi
         $this->repository->updatePassword($userId, $passwordHash);
     }
 
-    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleViews, bool $scrobbleRatings) : void
+    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
-        $this->repository->updatePlexScrobblerOptions($userId, $scrobbleViews, $scrobbleRatings);
+        $this->repository->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
     }
 
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void

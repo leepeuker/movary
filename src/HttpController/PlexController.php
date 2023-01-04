@@ -56,7 +56,7 @@ class PlexController
             return Response::createOk();
         }
 
-        $this->logger->debug($requestPayload);
+        $this->logger->debug('Plex: Webhook triggered with payload: ' . $requestPayload);
 
         $this->plexScrobbler->processPlexWebhook($userId, Json::decode((string)$requestPayload));
 

@@ -9,14 +9,14 @@ class UserEntity
         private readonly string $name,
         private readonly string $passwordHash,
         private readonly int $privacyLevel,
-        private readonly bool $areCoreAccountChangesDisabled,
+        private readonly bool $coreAccountChangesDisabled,
         private readonly int $dateFormatId,
         private readonly ?string $plexWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
-        private readonly bool $jellyfinScrobbleViews,
-        private readonly bool $plexScrobbleViews,
-        private readonly bool $plexScrobbleRating,
+        private readonly bool $jellyfinScrobbleWatches,
+        private readonly bool $plexScrobbleWatches,
+        private readonly bool $plexScrobbleRatings,
     ) {
     }
 
@@ -38,11 +38,6 @@ class UserEntity
         );
     }
 
-    public function areCoreAccountChangesDisabled() : bool
-    {
-        return $this->areCoreAccountChangesDisabled;
-    }
-
     public function getDateFormatId() : int
     {
         return $this->dateFormatId;
@@ -51,11 +46,6 @@ class UserEntity
     public function getId() : int
     {
         return $this->id;
-    }
-
-    public function getJellyfinScrobbleViews() : bool
-    {
-        return $this->jellyfinScrobbleViews;
     }
 
     public function getJellyfinWebhookId() : ?string
@@ -71,16 +61,6 @@ class UserEntity
     public function getPasswordHash() : string
     {
         return $this->passwordHash;
-    }
-
-    public function getPlexScrobbleRating() : bool
-    {
-        return $this->plexScrobbleRating;
-    }
-
-    public function getPlexScrobbleViews() : bool
-    {
-        return $this->plexScrobbleViews;
     }
 
     public function getPlexWebhookId() : ?string
@@ -101,5 +81,25 @@ class UserEntity
     public function getTraktUserName() : ?string
     {
         return $this->traktUserName;
+    }
+
+    public function hasCoreAccountChangesDisabled() : bool
+    {
+        return $this->coreAccountChangesDisabled;
+    }
+
+    public function hasJellyfinScrobbleWatchesEnabled() : bool
+    {
+        return $this->jellyfinScrobbleWatches;
+    }
+
+    public function hasPlexScrobbleRatingsEnabled() : bool
+    {
+        return $this->plexScrobbleRatings;
+    }
+
+    public function hasPlexScrobbleWatchesEnabled() : bool
+    {
+        return $this->plexScrobbleWatches;
     }
 }

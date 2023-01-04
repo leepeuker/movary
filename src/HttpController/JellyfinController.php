@@ -51,14 +51,11 @@ class JellyfinController
             return Response::createNotFound();
         }
 
-        $requestPayload = $request->getPostParameters()['payload'] ?? null;
-        if ($requestPayload === null) {
-            return Response::createOk();
-        }
+        $requestPayload = $request->getBody();
 
-        $this->logger->debug($requestPayload);
+        $this->logger->debug('Jellyfin: Webhook triggered with payload: ' . $requestPayload);
 
-        $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode((string)$requestPayload));
+        $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode($requestPayload));
 
         return Response::createOk();
     }

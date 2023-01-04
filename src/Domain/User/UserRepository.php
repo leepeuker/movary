@@ -349,12 +349,12 @@ class UserRepository
         );
     }
 
-    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleViews) : void
+    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'jellyfin_scrobble_views' => (int)$scrobbleViews,
+                'jellyfin_scrobble_views' => (int)$scrobbleWatches,
             ],
             [
                 'id' => $userId,
@@ -388,12 +388,12 @@ class UserRepository
         );
     }
 
-    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleViews, bool $scrobbleRatings) : void
+    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'plex_scrobble_views' => (int)$scrobbleViews,
+                'plex_scrobble_views' => (int)$scrobbleWatches,
                 'plex_scrobble_ratings' => (int)$scrobbleRatings,
             ],
             [
