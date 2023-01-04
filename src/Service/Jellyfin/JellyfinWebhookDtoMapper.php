@@ -10,6 +10,10 @@ use RuntimeException;
 
 class JellyfinWebhookDtoMapper
 {
+    private const SUPPORTED_NOTIFICATION_TYPE = 'PlaybackStop';
+
+    private const SUPPORTED_ITEM_TYPE = 'Movie';
+
     public function __construct(private readonly LoggerInterface $logger)
     {
     }
@@ -19,13 +23,13 @@ class JellyfinWebhookDtoMapper
         $notificationType = $webhookPayload['NotificationType'] ?? null;
         $itemType = $webhookPayload['ItemType'] ?? null;
 
-        if ($itemType !== 'Movie') {
+        if ($itemType !== self::SUPPORTED_ITEM_TYPE) {
             $this->logger->debug('Jellyfin: Ignored webhook because item type is not supported', ['itemType' => $itemType]);
 
             return null;
         }
 
-        if ($notificationType !== 'PlaybackStop') {
+        if ($notificationType !== self::SUPPORTED_NOTIFICATION_TYPE) {
             $this->logger->debug('Jellyfin: Ignored webhook because notification type is not supported', ['notificationType' => $notificationType]);
 
             return null;
