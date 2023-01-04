@@ -64,7 +64,7 @@ class PlexScrobbler
 
     private function logRating(array $webHook, MovieEntity $movie, UserEntity $user) : void
     {
-        if ($user->getPlexScrobbleRating() === false) {
+        if ($user->hasPlexScrobbleRatingsEnabled() === false) {
             return;
         }
 
@@ -81,7 +81,7 @@ class PlexScrobbler
 
     private function logView(array $webHook, MovieEntity $movie, UserEntity $user) : void
     {
-        if ($user->getPlexScrobbleViews() === false) {
+        if ($user->hasPlexScrobbleWatchesEnabled() === false) {
             return;
         }
 

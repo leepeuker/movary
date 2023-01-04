@@ -9,14 +9,14 @@ class UserEntity
         private readonly string $name,
         private readonly string $passwordHash,
         private readonly int $privacyLevel,
-        private readonly bool $areCoreAccountChangesDisabled,
+        private readonly bool $coreAccountChangesDisabled,
         private readonly int $dateFormatId,
         private readonly ?string $plexWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
         private readonly bool $jellyfinScrobbleWatches,
-        private readonly bool $plexScrobbleViews,
-        private readonly bool $plexScrobbleRating,
+        private readonly bool $plexScrobbleWatches,
+        private readonly bool $plexScrobbleRatings,
     ) {
     }
 
@@ -36,11 +36,6 @@ class UserEntity
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
         );
-    }
-
-    public function areCoreAccountChangesDisabled() : bool
-    {
-        return $this->areCoreAccountChangesDisabled;
     }
 
     public function getDateFormatId() : int
@@ -68,16 +63,6 @@ class UserEntity
         return $this->passwordHash;
     }
 
-    public function getPlexScrobbleRating() : bool
-    {
-        return $this->plexScrobbleRating;
-    }
-
-    public function getPlexScrobbleViews() : bool
-    {
-        return $this->plexScrobbleViews;
-    }
-
     public function getPlexWebhookId() : ?string
     {
         return $this->plexWebhookUuid;
@@ -98,8 +83,23 @@ class UserEntity
         return $this->traktUserName;
     }
 
+    public function hasCoreAccountChangesDisabled() : bool
+    {
+        return $this->coreAccountChangesDisabled;
+    }
+
     public function hasJellyfinScrobbleWatchesEnabled() : bool
     {
         return $this->jellyfinScrobbleWatches;
+    }
+
+    public function hasPlexScrobbleRatingsEnabled() : bool
+    {
+        return $this->plexScrobbleRatings;
+    }
+
+    public function hasPlexScrobbleWatchesEnabled() : bool
+    {
+        return $this->plexScrobbleWatches;
     }
 }

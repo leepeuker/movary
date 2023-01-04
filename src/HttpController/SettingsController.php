@@ -46,7 +46,7 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
 
-        if ($user->areCoreAccountChangesDisabled() === true) {
+        if ($user->hasCoreAccountChangesDisabled() === true) {
             throw new RuntimeException('Account deletion is disabled for user: ' . $userId);
         }
 
@@ -163,7 +163,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account.html.twig', [
-                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'dateFormats' => DateFormat::getFormats(),
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'privacyLevel' => $user->getPrivacyLevel(),
@@ -246,7 +246,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-letterboxd.html.twig', [
-                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
@@ -270,8 +270,8 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-plex.html.twig', [
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-                'scrobbleWatches' => $user->getPlexScrobbleViews(),
-                'scrobbleRatings' => $user->getPlexScrobbleRating(),
+                'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
+                'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
             ]),
         );
@@ -296,7 +296,7 @@ class SettingsController
             $this->twig->render('page/settings-trakt.html.twig', [
                 'traktClientId' => $user->getTraktClientId(),
                 'traktUserName' => $user->getTraktUserName(),
-                'coreAccountChangesDisabled' => $user->areCoreAccountChangesDisabled(),
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
@@ -417,7 +417,7 @@ class SettingsController
             );
         }
 
-        if ($user->areCoreAccountChangesDisabled() === true) {
+        if ($user->hasCoreAccountChangesDisabled() === true) {
             throw new RuntimeException('Password changes are disabled for user: ' . $userId);
         }
 
