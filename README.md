@@ -6,8 +6,8 @@
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 
 Movary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
-You can import/export your history and ratings from/to external sources like trakt.tv or letterboxd.com,
-track your watches automatically via plex and more.
+You can import/export your history and ratings from/to third parties like trakt.tv or letterboxd.com,
+scrobble your watches via Plex and Jellyfin and more.
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`).
 
@@ -20,11 +20,12 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
     1. [Tmdb Sync](#tmdb-sync)
     2. [Tmdb Image Cache](#tmdb-image-cache)
     3. [Plex Scrobbler](#plex-scrobbler)
-    4. [trakt.tv Import](#trakttv-import)
-    5. [trakt.tv Export](#trakttv-export)
-    6. [Letterboxd.com Import](#letterboxdcom-import)
-    7. [Letterboxd.com Export](#letterboxdcom-export)
-    8. [IMDb Rating Sync](#imdb-rating-sync)
+    4. [Jellyfin Scrobbler](#jellyfin-scrobbler)
+    5. [trakt.tv Import](#trakttv-import)
+    6. [trakt.tv Export](#trakttv-export)
+    7. [Letterboxd.com Import](#letterboxdcom-import)
+    8. [Letterboxd.com Export](#letterboxdcom-export)
+    9. [IMDb Rating Sync](#imdb-rating-sync)
 5. [FAQ](#faq)
 6. [Development](#development)
 7. [Support](#support)
@@ -45,7 +46,7 @@ or trakt to keep it safe (or decide what to do with it).
 - Movie tracking: Collect and manage your watch history and ratings
 - Statistics: Overview over your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
 - Third party support: Import and export your history and ratings from/to third partys like letterboxd.com or trakt.tv
-- Plex scrobbler: Automatically add new plex watches and ratings (plex premium required)
+- Plex/Jellyfin scrobbler: Automatically add new watches and ratings (for plex premium membership is required)
 - Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
 - Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
 - PWA: Can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
@@ -205,13 +206,19 @@ Helpful commands:
 
 ### Plex Scrobbler
 
-Automatically track movies watched in plex with movary.
+Automatically track movies watched via Plex with Movary.
 
 You can generate your plex webhook url on the plex settings page (`/setting/plex`).
 
 Add the generated url as a [webhook to plex](https://support.plex.tv/articles/115002267687-webhooks/) to start scrobbling!
 
 You can select what you want movary to scrobble (movie views and/or ratings) via the "Scrobble Options" checkboxes on the settings page.
+
+### Jellyfin Scrobbler
+
+Automatically track movies watched via Jellyin with Movary. 
+
+You can generate your Jellyfin webhook url on the Jellyfin settings page (`/setting/jellyfin`) and configure it in Jellyfin via the [webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook).
 
 ### Trakt.tv Import
 
