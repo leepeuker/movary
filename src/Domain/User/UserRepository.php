@@ -388,12 +388,12 @@ class UserRepository
         );
     }
 
-    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleViews, bool $scrobbleRatings) : void
+    public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'plex_scrobble_views' => (int)$scrobbleViews,
+                'plex_scrobble_views' => (int)$scrobbleWatches,
                 'plex_scrobble_ratings' => (int)$scrobbleRatings,
             ],
             [

@@ -441,10 +441,10 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 
-        $scrobbleViews = (bool)$postParameters['scrobbleWatches'];
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
         $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
 
-        $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleViews, $scrobbleRatings);
+        $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
 
         $this->sessionWrapper->set('plexScrobblerOptionsUpdated', true);
 
