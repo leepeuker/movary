@@ -76,7 +76,7 @@ class PlexScrobbler
 
         $this->movieApi->updateUserRating($movie->getId(), $user->getId(), $rating);
 
-        $this->logger->debug('Plex - Scrobbled rating [' . $rating . '] for movie: ' . $movie->getId());
+        $this->logger->debug('Plex: Scrobbled rating [' . $rating . '] for movie: ' . $movie->getId());
     }
 
     private function logView(array $webHook, MovieEntity $movie, UserEntity $user) : void
@@ -94,6 +94,6 @@ class PlexScrobbler
 
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $user->getId(), $watchDate);
 
-        $this->logger->debug('Plex - Scrobbled view [' . $watchDate . '] for movie: ' . $movie->getId());
+        $this->logger->debug('Plex: Scrobbled view [' . $watchDate . '] for movie "' . $movie->getTitle() . '" with id: ' . $movie->getId());
     }
 }

@@ -22,8 +22,18 @@
             <div style="padding-top: 1rem">
                 <h5>Jellyfin webhook url</h5>
 
-                <p class="text-muted">Enter the following URL at your Movary Jellyfin <a href="https://github.com/leepeuker/jellyfin-plugin-movary" target="_blank">Plugin</a>
-                    configuration page.</p>
+                <p class="text-muted">
+                    Use jellyfin scrobbling to movary for keeping movary automatically up to date with your latest watches.
+                </p>
+                <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
+                    Install the <a href="https://github.com/jellyfin/jellyfin-plugin-webhook" target="_blank">webhook plugin</a> and add a "Generic" web hook with the url down below and <b>only enable</b>:
+                    <br>
+                    <ul style="margin-bottom: 0">
+                        <li>Notification Type => Playback Stop</li>
+                        <li>User Filter => Enable your user</li>
+                        <li>Item Type => Movies + Send All Properties (ignores template)</li>
+                    </ul>
+                </div>
 
                 <p id="jellyfinWebhookUrl" class="overflow-auto text-nowrap webhookUrl"
                    style="font-size:0.9rem;margin-left: 5%;margin-right: 5%;margin-top: 1rem;margin-bottom: 1rem">-</p>
@@ -44,12 +54,12 @@
                     <input class="form-check-input"
                            type="checkbox"
                            value="1"
-                           id="scrobbleViewsCheckbox"
-                           name="scrobbleViews"
+                           id="scrobbleWatchesCheckbox"
+                           name="scrobbleWatches"
                            {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}
-                            {% if scrobbleViews == true %}checked{% endif %}
+                            {% if scrobbleWatches == true %}checked{% endif %}
                            style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="scrobbleViewsCheckbox">Save views</label>
+                    <label class="form-check-label" for="scrobbleWatchesCheckbox">Save completed watches</label>
                 </div>
 
                 {% if jellyfinScrobblerOptionsUpdated == true %}

@@ -217,7 +217,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-jellyfin.html.twig', [
                 'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
-                'scrobbleViews' => $user->getJellyfinScrobbleViews(),
+                'scrobbleWatches' => $user->getJellyfinScrobbleViews(),
                 'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
             ]),
         );
@@ -363,7 +363,7 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 
-        $scrobbleViews = (bool)$postParameters['scrobbleViews'];
+        $scrobbleViews = (bool)$postParameters['scrobbleWatches'];
 
         $this->userApi->updateJellyfinScrobblerOptions($userId, $scrobbleViews);
 
