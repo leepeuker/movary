@@ -171,9 +171,9 @@ class UserApi
         $this->repository->updateEmail($userId, $email);
     }
 
-    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleViews) : void
+    public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
-        $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleViews);
+        $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
     }
 
     public function updateName(int $userId, string $name) : void

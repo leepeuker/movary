@@ -217,7 +217,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-jellyfin.html.twig', [
                 'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
-                'scrobbleWatches' => $user->getJellyfinScrobbleViews(),
+                'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
                 'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
             ]),
         );
@@ -270,7 +270,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-plex.html.twig', [
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-                'scrobbleViews' => $user->getPlexScrobbleViews(),
+                'scrobbleWatches' => $user->getPlexScrobbleViews(),
                 'scrobbleRatings' => $user->getPlexScrobbleRating(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
             ]),
@@ -363,9 +363,7 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 
-        $scrobbleViews = (bool)$postParameters['scrobbleWatches'];
-
-        $this->userApi->updateJellyfinScrobblerOptions($userId, $scrobbleViews);
+        $this->userApi->updateJellyfinScrobblerOptions($userId, (bool)$postParameters['scrobbleWatches']);
 
         $this->sessionWrapper->set('jellyfinScrobblerOptionsUpdated', true);
 
@@ -443,7 +441,7 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 
-        $scrobbleViews = (bool)$postParameters['scrobbleViews'];
+        $scrobbleViews = (bool)$postParameters['scrobbleWatches'];
         $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
 
         $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleViews, $scrobbleRatings);

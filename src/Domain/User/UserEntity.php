@@ -14,7 +14,7 @@ class UserEntity
         private readonly ?string $plexWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
-        private readonly bool $jellyfinScrobbleViews,
+        private readonly bool $jellyfinScrobbleWatches,
         private readonly bool $plexScrobbleViews,
         private readonly bool $plexScrobbleRating,
     ) {
@@ -32,7 +32,7 @@ class UserEntity
             $data['plex_webhook_uuid'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
-            (bool)$data['jellyfin_scrobble_views'],
+            (bool)$data['jellyfin_scrobble_watches'],
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
         );
@@ -51,11 +51,6 @@ class UserEntity
     public function getId() : int
     {
         return $this->id;
-    }
-
-    public function getJellyfinScrobbleViews() : bool
-    {
-        return $this->jellyfinScrobbleViews;
     }
 
     public function getJellyfinWebhookId() : ?string
@@ -101,5 +96,10 @@ class UserEntity
     public function getTraktUserName() : ?string
     {
         return $this->traktUserName;
+    }
+
+    public function hasJellyfinScrobbleWatchesEnabled() : bool
+    {
+        return $this->jellyfinScrobbleWatches;
     }
 }

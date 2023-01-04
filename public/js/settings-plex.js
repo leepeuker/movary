@@ -36,13 +36,13 @@ function setPlexWebhookUrl(webhookId) {
     if (webhookId) {
         document.getElementById('plexWebhookUrl').innerHTML = location.protocol + '//' + location.host + '/plex/' + webhookId
         document.getElementById('deletePlexWebhookIdButton').classList.remove('disabled')
-        document.getElementById('scrobbleViewsCheckbox').disabled = false
+        document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('scrobbleRatingsCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
         document.getElementById('plexWebhookUrl').innerHTML = '-'
         document.getElementById('deletePlexWebhookIdButton').classList.add('disabled')
-        document.getElementById('scrobbleViewsCheckbox').disabled = true
+        document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('scrobbleRatingsCheckbox').disabled = true
         document.getElementById('saveButton').disabled = true
     }

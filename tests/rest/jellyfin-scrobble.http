@@ -1,4 +1,4 @@
-POST http://127.0.0.1/jellyfin/a7a0b0ab-41aa-4641-a199-b784f88886f8
+POST http://127.0.0.1/jellyfin/8f119459-7373-4bf2-8a1c-998db16c24f7
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/x-www-form-urlencoded
