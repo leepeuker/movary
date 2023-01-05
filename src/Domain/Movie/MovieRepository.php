@@ -485,7 +485,7 @@ class MovieRepository
             return 0;
         }
 
-        return $result;
+        return (int)$result;
     }
 
     public function fetchUniqueActorGenders(int $userId) : array
