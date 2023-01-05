@@ -73,21 +73,9 @@ class MovieApi
         );
     }
 
-    public function deleteHistoryByIdAndDate(int $id, int $userId, Date $watchedAt, ?int $playsToDelete = null) : void
+    public function deleteHistoryByIdAndDate(int $id, int $userId, Date $watchedAt) : void
     {
-        $currentPlays = $this->historyApi->findHistoryPlaysByMovieIdAndDate($id, $userId, $watchedAt);
-
-        if ($currentPlays === null) {
-            return;
-        }
-
-        if ($currentPlays <= $playsToDelete || $playsToDelete === null) {
-            $this->historyApi->deleteHistoryByIdAndDate($id, $userId, $watchedAt);
-
-            return;
-        }
-
-        $this->historyApi->createOrUpdatePlaysForDate($id, $userId, $watchedAt, $currentPlays - $playsToDelete);
+        $this->historyApi->deleteHistoryByIdAndDate($id, $userId, $watchedAt);
     }
 
     public function deleteHistoryByUserId(int $userId) : void
@@ -166,6 +154,11 @@ class MovieApi
     public function fetchHistoryMoviePlaysOnDate(int $id, int $userId, Date $watchedAt) : int
     {
         return $this->historyApi->fetchPlaysForMovieIdOnDate($id, $userId, $watchedAt);
+    }
+
+    public function fetchHistoryMovieTotalPlays(int $movieId, int $userId) : int
+    {
+        return $this->historyApi->fetchTotalPlaysForMovieAndUserId($movieId, $userId);
     }
 
     public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array

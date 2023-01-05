@@ -34,6 +34,25 @@ class HistoryController
     ) {
     }
 
+    public function createHistoryEntry(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $requestBody = Json::decode($request->getBody());
+
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
+        $plays = (int)$requestBody['plays'];
+
+        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays);
+
+        return Response::create(StatusCode::createOk());
+    }
+
     public function deleteHistoryEntry(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -46,9 +65,8 @@ class HistoryController
 
         $movieId = (int)$request->getRouteParameters()['id'];
         $date = Date::createFromStringAndFormat($requestBody['date'], $requestBody['dateFormat']);
-        $count = $requestBody['count'] ?? 1;
 
-        $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date, $count);
+        $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date);
 
         return Response::create(StatusCode::createOk());
     }

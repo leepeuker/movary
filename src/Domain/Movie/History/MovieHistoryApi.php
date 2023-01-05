@@ -224,6 +224,11 @@ class MovieHistoryApi
         return (int)round($minutes / 60);
     }
 
+    public function fetchTotalPlaysForMovieAndUserId(int $movieId, int $userId) : int
+    {
+        return $this->movieRepository->fetchTotalPlaysForMovieAndUserId($movieId, $userId);
+    }
+
     public function fetchUniqueActorGenders(int $userId) : array
     {
         $uniqueActorGenders = $this->movieRepository->fetchUniqueActorGenders($userId);

@@ -63,6 +63,7 @@ class MovieController
                 'movieGenres' => $this->movieApi->findGenresByMovieId($movieId),
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),
                 'directors' => $this->movieApi->findDirectorsByMovieId($movieId),
+                'totalPlays' => $this->movieApi->fetchHistoryMovieTotalPlays($movieId, $userId),
                 'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
             ]),
         );

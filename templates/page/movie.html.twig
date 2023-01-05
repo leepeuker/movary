@@ -5,11 +5,13 @@
 {% endblock %}
 
 {% block stylesheets %}
+    <link rel="stylesheet" href="/css/datepicker-1.2.0.min.css">
     <link href="/css/movie.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/bootstrap-icons-1.10.2.css">
 {% endblock %}
 
 {% block scripts %}
+    <script src="/js/datepicker-full-1.2.0.min.js"></script>
     <script src="/js/movie.js"></script>
     <script src="/js/userSelect.js"></script>
 {% endblock %}
@@ -18,6 +20,9 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
+
+        <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
+        <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
 
         <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
 
@@ -95,10 +100,37 @@
             </div>
         </div>
 
+        <div class="container text-center" id="toggleWatchDatesButtonDiv" style="margin-bottom: 0.7rem">
+            <div class="row">
+                <button type="button" class="col-sm-3 btn btn-outline-dark" onclick="toggleWatchDates()" id="toggleWatchDatesButton" {% if totalPlays == 0 %}disabled{% endif %}>
+                    {{ totalPlays }}x Play{% if totalPlays == 0 or totalPlays > 1 %}s{% endif %} <span style="font-size: 0.8rem">- View all</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="container text-center" style="display: none;" id="watchDatesListDiv">
+            <div class="row">
+                <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
+                <ul class="list-group col-sm-3" style="padding-right: 0">
+                    {% for watchDate in watchDates|reverse %}
+                        <input value="{{ watchDate.watched_at|date(dateFormatPhp) }}" hidden id="inputDate-{{ loop.index }}">
+                        <input value="{{ watchDate.plays }}" hidden id="inputPlays-{{ loop.index }}">
+
+                        <li class="list-group-item {% if loggedIn == true %}list-group-item-action{% endif %}"
+                            style="text-align: center;cursor: pointer"
+                            onclick="loadWatchDateModal(this)"
+                            id="watchDate-{{ loop.index }}">
+                            {{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
         {% if movie.tagline is not null %}
-            <h6 style="margin-bottom: 0.3rem">Tagline</h6>
+            <h6 style="margin-bottom: 0.3rem;">Tagline</h6>
             <div class="carousel">
-                <p class="fw-lighter" style="margin-bottom: 0rem">
+                <p class="fw-lighter" style="margin-bottom: 0">
                     {{ movie.tagline }}
                 </p>
             </div>
@@ -146,28 +178,39 @@
             {% endfor %}
         </div>
 
-        <p style="margin-block-end:0">Watched at:</p>
-        <ul>
-            <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
-            {% for watchDate in watchDates|reverse %}
-                <li class="fw-light">{{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
-                    {% if loggedIn == true %}
-                        <button type="submit" class="btn btn-outline-danger btn-sm" style="margin-bottom: 0.5rem;margin-top: 0.2rem" onclick="deleteWatchDate(this)"
-                                id="delete-button-{{ loop.index }}">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 width="11"
-                                 height="11"
-                                 fill="currentColor"
-                                 class="bi bi-trash-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"></path>
-                            </svg>
-                        </button>
-                        <watchDate id="delete-button-{{ loop.index }}-watch-date" movie-id="{{ watchDate.movie_id }}"
-                                   date="{{ watchDate.watched_at|date(dateFormatPhp) }}"></watchDate>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+        <div class="modal fade" id="watchDateModal" tabindex="-1" aria-labelledby="watchDateModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="watchDateModalTitle">Edit Watch Date</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" value="" name="tmdbId" id="tmdbId" required>
+                        <input type="hidden" value="" name="tmdbId" id="originalWatchDate" required>
+                        <input type="hidden" value="" name="tmdbId" id="originalWatchDatePlays" required>
+                        <div class="input-group" id="watchDateGroup">
+                            <i class="bi bi-calendar-date input-group-text"></i>
+                            <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" name="watchDate" id="modalWatchDate"
+                                   required>
+                            <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
+                                Watch date is required!
+                            </div>
+                            <div class="invalid-feedback" id="watchDateValidationFormatErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
+                                Watch date format is invalid!
+                            </div>
+                        </div>
+                        <div class="input-group" style="margin-top: 1rem">
+                            <i class="input-group-text">Number of plays</i>
+                            <input type="number" class="datepicker_input form-control" placeholder="" aria-label="Plays" name="watchDatePlays" id="modalWatchDatePlays">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger" onclick="deleteWatchDate(this)">Delete</button>
+                        <button type="submit" class="btn btn-primary" onclick="editWatchDate(this)">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 {% endblock %}

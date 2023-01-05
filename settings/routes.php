@@ -134,6 +134,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
+        '/movie/{id:\d+}/history',
+        [\Movary\HttpController\HistoryController::class, 'createHistoryEntry'],
+    );
+    $routeCollector->addRoute(
+        'POST',
         '/movie/{id:\d+}/rating',
         [\Movary\HttpController\MovieController::class, 'updateRating'],
     );
