@@ -449,20 +449,6 @@ class MovieRepository
         );
     }
 
-    public function fetchTotalPlaysForMovieAndUserId(int $movieId, int $userId) : int
-    {
-        $result = $this->dbConnection->fetchOne(
-            'SELECT SUM(plays) FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ?',
-            [$movieId, $userId],
-        );
-
-        if ($result === false) {
-            return 0;
-        }
-
-        return $result;
-    }
-
     public function fetchPlaysForMovieIdAtDate(int $movieId, int $userId, Date $watchedAt) : int
     {
         $result = $this->dbConnection->fetchOne(
@@ -486,6 +472,20 @@ class MovieRepository
             WHERE mh.user_id = ?',
             [$userId],
         )->fetchFirstColumn()[0];
+    }
+
+    public function fetchTotalPlaysForMovieAndUserId(int $movieId, int $userId) : int
+    {
+        $result = $this->dbConnection->fetchOne(
+            'SELECT SUM(plays) FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ?',
+            [$movieId, $userId],
+        );
+
+        if (empty($result) === true) {
+            return 0;
+        }
+
+        return $result;
     }
 
     public function fetchUniqueActorGenders(int $userId) : array

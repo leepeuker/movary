@@ -187,24 +187,25 @@ function editWatchDate() {
             'date': originalWatchDate,
             'dateFormat': document.getElementById('dateFormatPhp').value
         }),
-        error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete original watch date.')
-        }
-    })
-
-    $.ajax({
-        url: apiUrl,
-        type: 'POST',
-        data: JSON.stringify({
-            'watchDate': newWatchDate,
-            'plays': newWatchDatePlays,
-            'dateFormat': document.getElementById('dateFormatPhp').value
-        }),
         success: function (data, textStatus, xhr) {
-            window.location.reload()
+            $.ajax({
+                url: apiUrl,
+                type: 'POST',
+                data: JSON.stringify({
+                    'watchDate': newWatchDate,
+                    'plays': newWatchDatePlays,
+                    'dateFormat': document.getElementById('dateFormatPhp').value
+                }),
+                success: function (data, textStatus, xhr) {
+                    window.location.reload()
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Could not update.')
+                }
+            })
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not update.')
+            alert('Could not delete original watch date.')
         }
     })
 }
