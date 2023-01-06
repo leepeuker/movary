@@ -246,7 +246,7 @@ class Factory
         }
 
         $twig->addGlobal('currentUsername', $user?->getName());
-        $twig->addGlobal('routeUsername', $routeUsername ?? $user?->getName());
+        $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
         $twig->addGlobal('requestUrlPath', self::createCurrentHttpRequest()->getPath());

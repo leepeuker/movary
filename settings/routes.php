@@ -129,17 +129,17 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'DELETE',
-        '/movie/{id:\d+}/history',
+        '/user/{username:[a-zA-Z0-9]+}/movie/{id:\d+}/history',
         [\Movary\HttpController\HistoryController::class, 'deleteHistoryEntry'],
     );
     $routeCollector->addRoute(
         'POST',
-        '/movie/{id:\d+}/history',
+        '/user/{username:[a-zA-Z0-9]+}/movie/{id:\d+}/history',
         [\Movary\HttpController\HistoryController::class, 'createHistoryEntry'],
     );
     $routeCollector->addRoute(
         'POST',
-        '/movie/{id:\d+}/rating',
+        '/user/{username:[a-zA-Z0-9]+}/movie/{id:\d+}/rating',
         [\Movary\HttpController\MovieController::class, 'updateRating'],
     );
     $routeCollector->addRoute(

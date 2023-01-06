@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -17,6 +18,7 @@ class MovieController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieApi $movieApi,
+        private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
@@ -72,7 +74,13 @@ class MovieController
     public function updateRating(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
+            return Response::createForbidden();
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
+            return Response::createForbidden();
         }
 
         $movieId = (int)$request->getRouteParameters()['id'];
