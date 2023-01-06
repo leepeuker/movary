@@ -8,8 +8,6 @@ function deleteWatchDate() {
         return
     }
 
-    const apiUrl = '/movie/' + getMovieId() + '/history'
-
     $.ajax({
         url: '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
         type: 'DELETE',
