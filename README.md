@@ -286,7 +286,7 @@ Example:
 
 Q: Will Movary support tv shows or other media types?
 
-A: No, there are currently no plans for this. The limited time available for developing Movary is used to provide the best possible experience for movie fans.
+A: Currently there is no active development for supporting more media types. Contributions in that directions are welcome!
 
 ---
 
