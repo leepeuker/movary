@@ -9,11 +9,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/{username:[a-zA-Z0-9]+}/dashboard',
-        [\Movary\HttpController\DashboardController::class, 'render'],
-    );
-    $routeCollector->addRoute(
-        'GET',
         '/settings/account',
         [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
     );
@@ -53,16 +48,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderAppPage'],
     );
     $routeCollector->addRoute(
-        'GET',
-        '/{username:[a-zA-Z0-9]+}/history',
-        [\Movary\HttpController\HistoryController::class, 'renderHistory'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/{username:[a-zA-Z0-9]+}/movies',
-        [\Movary\HttpController\MoviesController::class, 'renderPage'],
-    );
-    $routeCollector->addRoute(
         'POST',
         '/login',
         [\Movary\HttpController\AuthenticationController::class, 'login'],
@@ -76,16 +61,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/logout',
         [\Movary\HttpController\AuthenticationController::class, 'logout'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/{username:[a-zA-Z0-9]+}/actors',
-        [\Movary\HttpController\ActorsController::class, 'renderPage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/{username:[a-zA-Z0-9]+}/directors',
-        [\Movary\HttpController\DirectorsController::class, 'renderPage'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -121,31 +96,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/fetchMovieRatingByTmdbdId',
         [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/{username:[a-zA-Z0-9]+}/movie/{id:\d+}',
-        [\Movary\HttpController\MovieController::class, 'renderPage'],
-    );
-    $routeCollector->addRoute(
-        'DELETE',
-        '/user/{username:[a-zA-Z0-9]+}/movie/{id:\d+}/history',
-        [\Movary\HttpController\HistoryController::class, 'deleteHistoryEntry'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/user/{username:[a-zA-Z0-9]+}/movie/{id:\d+}/history',
-        [\Movary\HttpController\HistoryController::class, 'createHistoryEntry'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/user/{username:[a-zA-Z0-9]+}/movie/{id:\d+}/rating',
-        [\Movary\HttpController\MovieController::class, 'updateRating'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/{username:[a-zA-Z0-9]+}/person/{id:\d+}',
-        [\Movary\HttpController\PersonController::class, 'renderPage'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -256,6 +206,58 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/user/import/csv/{exportType:.+}',
         [\Movary\HttpController\ImportController::class, 'handleCsvImport'],
+    );
+
+    // User routes
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/dashboard',
+        [\Movary\HttpController\DashboardController::class, 'render'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/history',
+        [\Movary\HttpController\HistoryController::class, 'renderHistory'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/movies',
+        [\Movary\HttpController\MoviesController::class, 'renderPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/actors',
+        [\Movary\HttpController\ActorsController::class, 'renderPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/directors',
+        [\Movary\HttpController\DirectorsController::class, 'renderPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}',
+        [\Movary\HttpController\MovieController::class, 'renderPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}',
+        [\Movary\HttpController\PersonController::class, 'renderPage'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history',
+        [\Movary\HttpController\HistoryController::class, 'deleteHistoryEntry'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history',
+        [\Movary\HttpController\HistoryController::class, 'createHistoryEntry'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating',
+        [\Movary\HttpController\MovieController::class, 'updateRating'],
     );
 
     // Added last, so that more specific routes can be defined (possible username vs route collisions here!)

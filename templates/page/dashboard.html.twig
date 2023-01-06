@@ -56,7 +56,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for lastPlay in lastPlays %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100" style="cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ lastPlay.id }}'">
+                                <div class="card h-100" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ lastPlay.id }}'">
                                     <div style="height: 100%">
                                         <img src="{{ lastPlay.poster_path }}"
                                              class="card-img-top"
@@ -76,7 +76,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
                 <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
@@ -87,7 +87,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActor in mostWatchedActors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUsername }}/person/{{ mostWatchedActor.id }}'"
+                                <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}'"
                                      style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
@@ -101,7 +101,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
+                    <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
@@ -114,7 +114,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedActress in mostWatchedActresses %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUsername }}/person/{{ mostWatchedActress.id }}'"
+                                <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedActress.id }}'"
                                      style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
@@ -128,7 +128,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=1&pp=24"
+                    <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=1&pp=24"
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
@@ -140,7 +140,7 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                         {% for mostWatchedDirector in mostWatchedDirectors %}
                             <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/{{ routeUsername }}/person/{{ mostWatchedDirector.id }}'"
+                                <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedDirector.id }}'"
                                      style="cursor: pointer;">
                                     <div class="card-header text-truncate" style="padding: 0.2rem">
                                         <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
@@ -153,7 +153,7 @@
                                 </div>
                             </div>
                         {% endfor %}
-                        <a class="btn btn-outline-secondary btn-sm" href="/{{ routeUsername }}/directors"
+                        <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/directors"
                            style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                     </div>
                 </li>
@@ -169,7 +169,7 @@
                                 <div class="col" style="padding-bottom: 1rem;">
                                     <div class="card h-100 position-relative"
                                          style="cursor: pointer"
-                                         onclick="window.location='/{{ routeUsername }}/movies?ge={{ mostWatchedGenre.name }}'">
+                                         onclick="window.location='/users/{{ routeUsername }}/movies?ge={{ mostWatchedGenre.name }}'">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedGenre.name }}</small>
                                         </div>
@@ -194,7 +194,7 @@
                                 <div class="col" style="padding-bottom: 1rem;">
                                     <div class="card h-100 position-relative"
                                          style="cursor: pointer"
-                                         onclick="window.location='/{{ routeUsername }}/movies?la={{ mostWatchedLanguage.code }}'">
+                                         onclick="window.location='/users/{{ routeUsername }}/movies?la={{ mostWatchedLanguage.code }}'">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.name }}</small>
                                         </div>
@@ -242,7 +242,7 @@
                                 <div class="col" style="padding-bottom: 1rem;">
                                     <div class="card h-100 position-relative"
                                          style="cursor: pointer"
-                                         onclick="window.location='/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}'">
+                                         onclick="window.location='/users/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}'">
                                         <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                             <small class="text-muted" style="font-size: 0.9rem;font-weight: bold;">{{ mostWatchedReleaseYear.name }}</small>
                                         </div>

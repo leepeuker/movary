@@ -543,9 +543,10 @@ class MovieRepository
         $whereQuery = 'WHERE m.title LIKE ? ';
 
         if (empty($releaseYear) === false) {
-            $whereQuery .= 'AND YEAR(m.release_date) = ? ';
             if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-                $whereQuery .= 'AND strftime("%Y", m.release_date) = ? ';
+                $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
+            } else {
+                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
             }
             $payload[] = (string)$releaseYear;
         }
@@ -639,7 +640,12 @@ class MovieRepository
         $whereQuery = 'WHERE m.title LIKE ? ';
 
         if (empty($releaseYear) === false) {
-            $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                $whereQuery .= 'AND strftime("%Y",m.release_date) = ? ';
+            } else {
+                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            }
+
             $payload[] = (string)$releaseYear;
         }
 

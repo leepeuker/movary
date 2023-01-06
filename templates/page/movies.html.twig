@@ -20,7 +20,7 @@
         <div style="text-align: center">
             {{ include('component/user-select.html.twig') }}
 
-            <form action="/{{ routeUsername }}/movies" method="GET">
+            <form action="/users/{{ routeUsername }}/movies" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3">
@@ -85,7 +85,7 @@
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for movie in movies %}
-                    <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/{{ routeUsername }}/movie/{{ movie.id }}'">
+                    <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movie.id }}'">
                         <div class="card h-100  position-relative">
                             <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title }} Poster">
 
@@ -106,7 +106,7 @@
             {% set releaseYearQuery = (releaseYear is null) ? '' : "ry=#{releaseYear}&" %}
             {% set genreQuery = (genre is null) ? '' : "ge=#{genre}&" %}
             {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
-            {% set baseUrl = '/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery %}
+            {% set baseUrl = '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}
