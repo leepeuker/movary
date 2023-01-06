@@ -15,6 +15,11 @@ class StatusCode
         return new self(400, 'Bad Request');
     }
 
+    public static function createForbidden() : self
+    {
+        return new self(403, 'Forbidden');
+    }
+
     public static function createMethodNotAllowed() : self
     {
         return new self(405, 'Method Not Allowed');

@@ -7,6 +7,7 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
@@ -27,6 +28,7 @@ class HistoryController
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly TmdbApi $tmdbApi,
         private readonly MovieApi $movieApi,
+        private readonly UserApi $userApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
@@ -37,10 +39,14 @@ class HistoryController
     public function createHistoryEntry(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
+            return Response::createForbidden();
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
+
+        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
+            return Response::createForbidden();
+        }
 
         $requestBody = Json::decode($request->getBody());
 
@@ -50,16 +56,20 @@ class HistoryController
 
         $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays);
 
-        return Response::create(StatusCode::createOk());
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function deleteHistoryEntry(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
+            return Response::createForbidden();
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
+
+        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
+            return Response::createForbidden();
+        }
 
         $requestBody = Json::decode($request->getBody());
 
@@ -68,7 +78,7 @@ class HistoryController
 
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date);
 
-        return Response::create(StatusCode::createOk());
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function logMovie(Request $request) : Response

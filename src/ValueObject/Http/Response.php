@@ -29,6 +29,11 @@ class Response
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
     }
 
+    public static function createForbidden() : self
+    {
+        return new self(StatusCode::createForbidden());
+    }
+
     public static function createJson(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);

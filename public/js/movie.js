@@ -8,10 +8,8 @@ function deleteWatchDate() {
         return
     }
 
-    const apiUrl = '/movie/' + getMovieId() + '/history'
-
     $.ajax({
-        url: apiUrl,
+        url: '/user/' + getRouteUsername() + '/movie/' + getMovieId() + '/history',
         type: 'DELETE',
         data: JSON.stringify({
             'date': document.getElementById('originalWatchDate').value,
@@ -82,11 +80,14 @@ function getMovieId() {
     return document.getElementById('movieId').value
 }
 
+function getRouteUsername() {
+    return document.getElementById('username').value
+}
+
 function saveRating() {
     let newRating = getRatingFromStars()
-    let movieId = getMovieId()
 
-    fetch('/movie/' + movieId + '/rating', {
+    fetch('/user/' + getRouteUsername() + '/movie/' + getMovieId() + '/rating', {
         method: 'post',
         headers: {
             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -157,7 +158,7 @@ function loadWatchDateModal(e) {
     document.getElementById('originalWatchDate').value = originalDate;
     document.getElementById('originalWatchDatePlays').value = originalPlays;
 
-    const datepicker = new Datepicker(document.getElementById('modalWatchDate'), {
+    new Datepicker(document.getElementById('modalWatchDate'), {
         format: document.getElementById('dateFormatJavascript').value,
         title: 'Watch date',
     })
@@ -178,7 +179,7 @@ function editWatchDate() {
     const newWatchDate = document.getElementById('modalWatchDate').value;
     const newWatchDatePlays = document.getElementById('modalWatchDatePlays').value;
 
-    const apiUrl = '/movie/' + getMovieId() + '/history'
+    const apiUrl = '/user/' + getRouteUsername() + '/movie/' + getMovieId() + '/history'
 
     $.ajax({
         url: apiUrl,
@@ -200,12 +201,12 @@ function editWatchDate() {
                     window.location.reload()
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Could not update.')
+                    alert('Could not create new watch date.')
                 }
             })
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete original watch date.')
+            alert('Could not delete old watch date.')
         }
     })
 }

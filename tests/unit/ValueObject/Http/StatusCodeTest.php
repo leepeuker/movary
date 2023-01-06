@@ -18,6 +18,11 @@ class StatusCodeTest extends TestCase
         self::assertSame('HTTP/1.1 405 Method Not Allowed', (string)StatusCode::createMethodNotAllowed());
     }
 
+    public function testCreateForbidden() : void
+    {
+        self::assertSame('HTTP/1.1 403 Forbidden', (string)StatusCode::createForbidden());
+    }
+
     public function testCreateNoContent() : void
     {
         self::assertSame('HTTP/1.1 204 No Content', (string)StatusCode::createNoContent());

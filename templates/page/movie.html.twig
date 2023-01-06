@@ -27,19 +27,20 @@
         <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
 
         <input type="hidden" id="movieId" value="{{ movie.id }}">
+        <input type="hidden" id="username" value="{{ routeUsername }}">
 
         <div class="fw-light" id="ratingStars"
              style="color: rgb(255, 193, 7);
                      font-size: 1.5rem;
                      margin-bottom: 0.5rem;
-                     {% if loggedIn == true %}cursor:pointer;{% endif %}">
+                     {% if currentUsername == routeUsername %}cursor:pointer;{% endif %}">
 
             <span id="ratingStarsSpan">
                 {{ movie.personal_rating }}
                 {% for i in 1..10 %}
                     <i class="bi bi-star{% if movie.personalRating >= i %}-fill{% endif %}" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
                 {% endfor %}
-                {% if loggedIn == true %}
+                {% if currentUsername == routeUsername %}
                     <i class="bi bi-pencil-square" style="color: black;font-size: 1.3rem;cursor: pointer" onclick="editRating(this)" id="editRatingButton"></i>
                     <i class="bi bi-check-circle-fill" style="color: #198754;font-size: 1.3rem;cursor: pointer;display: none" onclick="saveRating(this)"
                        id="saveRatingButton"></i>
@@ -126,9 +127,9 @@
                         <input value="{{ watchDate.watched_at|date(dateFormatPhp) }}" hidden id="inputDate-{{ loop.index }}">
                         <input value="{{ watchDate.plays }}" hidden id="inputPlays-{{ loop.index }}">
 
-                        <li class="list-group-item {% if loggedIn == true %}list-group-item-action{% endif %}"
-                            style="text-align: center;cursor: pointer"
-                            onclick="loadWatchDateModal(this)"
+                        <li class="list-group-item {% if currentUsername == routeUsername %}list-group-item-action{% endif %}"
+                            style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer{% endif %}"
+                            {% if currentUsername == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
                             id="watchDate-{{ loop.index }}">
                             {{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
                         </li>
