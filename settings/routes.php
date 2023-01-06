@@ -8,46 +8,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\LandingPageController::class, 'render'],
     );
     $routeCollector->addRoute(
-        'GET',
-        '/settings/account',
-        [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/settings/trakt',
-        [\Movary\HttpController\SettingsController::class, 'renderTraktPage'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/settings/trakt-verify',
-        [\Movary\HttpController\SettingsController::class, 'traktVerifyCredentials'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/settings/letterboxd',
-        [\Movary\HttpController\SettingsController::class, 'renderLetterboxdPage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/settings/letterboxd-export',
-        [\Movary\HttpController\SettingsController::class, 'generateLetterboxdExportData'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/settings/plex',
-        [\Movary\HttpController\SettingsController::class, 'renderPlexPage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/settings/jellyfin',
-        [\Movary\HttpController\SettingsController::class, 'renderJellyfinPage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/settings/app',
-        [\Movary\HttpController\SettingsController::class, 'renderAppPage'],
-    );
-    $routeCollector->addRoute(
         'POST',
         '/login',
         [\Movary\HttpController\AuthenticationController::class, 'login'],
@@ -61,21 +21,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/logout',
         [\Movary\HttpController\AuthenticationController::class, 'logout'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/job-queue',
-        [\Movary\HttpController\JobController::class, 'renderQueuePage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/job-queue/purge-processed',
-        [\Movary\HttpController\JobController::class, 'purgeProcessedJobs'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/job-queue/purge-all',
-        [\Movary\HttpController\JobController::class, 'purgeAllJobs'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -206,6 +151,65 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/user/import/csv/{exportType:.+}',
         [\Movary\HttpController\ImportController::class, 'handleCsvImport'],
+    );
+
+    // Job Queue
+    $routeCollector->addRoute(
+        'GET',
+        '/job-queue',
+        [\Movary\HttpController\JobController::class, 'renderQueuePage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/job-queue/purge-processed',
+        [\Movary\HttpController\JobController::class, 'purgeProcessedJobs'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/job-queue/purge-all',
+        [\Movary\HttpController\JobController::class, 'purgeAllJobs'],
+    );
+
+    // Settings
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account',
+        [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/trakt',
+        [\Movary\HttpController\SettingsController::class, 'renderTraktPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/trakt-verify',
+        [\Movary\HttpController\SettingsController::class, 'traktVerifyCredentials'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/letterboxd',
+        [\Movary\HttpController\SettingsController::class, 'renderLetterboxdPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/letterboxd-export',
+        [\Movary\HttpController\SettingsController::class, 'generateLetterboxdExportData'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/plex',
+        [\Movary\HttpController\SettingsController::class, 'renderPlexPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/jellyfin',
+        [\Movary\HttpController\SettingsController::class, 'renderJellyfinPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/app',
+        [\Movary\HttpController\SettingsController::class, 'renderAppPage'],
     );
 
     // User routes
