@@ -153,7 +153,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\ImportController::class, 'handleCsvImport'],
     );
 
-    // Job Queue
+    // Job Queue routes
     $routeCollector->addRoute(
         'GET',
         '/job-queue',
@@ -170,7 +170,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\JobController::class, 'purgeAllJobs'],
     );
 
-    // Settings
+    // Setting routes
     $routeCollector->addRoute(
         'GET',
         '/settings/account',
