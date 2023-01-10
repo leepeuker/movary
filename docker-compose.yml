@@ -1,7 +1,10 @@
 version: "3.5"
+networks:
+  default:
 
 services:
   app:
+    container_name: movary
     build:
       context: ./
       dockerfile: ./build/php/Dockerfile
@@ -16,13 +19,13 @@ services:
 
   mysql:
     image: mysql:8.0
+    user: 1000:1000
     environment:
       MYSQL_ROOT_PASSWORD: ${DATABASE_MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${DATABASE_MYSQL_USER}
       MYSQL_PASSWORD: ${DATABASE_MYSQL_PASSWORD}
       MYSQL_DATABASE: ${DATABASE_MYSQL_NAME}
     volumes:
-      - ./tmp/db/:/var/lib/mysql
-      - ./tmp/:/tmp/host
+      - ./tmp/db/:/var/lib/mysql:rw
     ports:
       - "${DATABASE_MYSQL_PORT}:3306"

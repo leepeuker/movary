@@ -22,7 +22,7 @@ final class AddImdbRatingToMovie extends AbstractMigration
             <<<SQL
             ALTER TABLE movie ADD COLUMN imdb_rating_average DOUBLE(3,1) DEFAULT NULL AFTER tmdb_poster_path;
             ALTER TABLE movie ADD COLUMN imdb_rating_vote_count INT UNSIGNED DEFAULT NULL AFTER imdb_rating_average;
-            ALTER TABLE movie ADD COLUMN updated_at_imdb TIMESTAMP DEFAULT NULL AFTER updated_at_tmdb;
+            ALTER TABLE movie ADD COLUMN updated_at_imdb TIMESTAMP NULL AFTER updated_at_tmdb;
             ALTER TABLE movie MODIFY COLUMN tmdb_vote_count INT UNSIGNED DEFAULT NULL;
             SQL
         );

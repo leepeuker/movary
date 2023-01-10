@@ -14,6 +14,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings',
+        [\Movary\HttpController\SettingsController::class, 'renderSettingsPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/account',
         [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
     );

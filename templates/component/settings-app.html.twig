@@ -1,15 +1,4 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}
-    Settings - App
-{% endblock %}
-
-{% block body %}
-    <main role="main" class="container">
-        {{ include('component/navbar.html.twig') }}
-
         <div style="text-align: center;">
-            {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <p style="margin-bottom: 0.5rem">Last <a href="https://themoviedb.org/" target="_blank">TMDB</a> sync: <span class="fw-light">{{ lastSyncTmdb }}</span></p>
@@ -21,5 +10,3 @@
                 </p>
             </div>
         </div>
-    </main>
-{% endblock %}

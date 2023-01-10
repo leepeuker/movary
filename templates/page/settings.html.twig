@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-plex.js"></script>
+    <script src="/js/settings-trakt.js"></script>
+    <script src="/js/settings-jellyfin.js"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+        
+        <ul class="nav nav-pills nav-fill" style="margin-top: 1rem;">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#AccountPane" aria-current="page" href="#account">Account</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#PlexPane" href="#plex">Plex</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#JellyfinPane" href="#jellyfin">Jellyfin</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#TraktPane" href="#trakt">Trakt.tv</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#LetterboxdPane" href="#letterboxd">Letterboxd</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#AppPane" href="#app">App</a>
+            </li>
+        </ul>
+
+        <hr style="margin-bottom: 0">
+
+        <div class="tab-content" id="settingsTabs">
+            <div class="tab-pane show active fade" id="AccountPane" role="tabpanel" tabindex="0">
+                <h1 class="text-center">Account</h1>
+                {% include 'component/settings-account.html.twig' %}
+            </div>
+            <div class="tab-pane fade" id="PlexPane" role="tabpanel" tabindex="0">
+                <h1 class="text-center">Plex</h1>
+                {% include 'component/settings-plex.html.twig' %}
+            </div>
+            <div class="tab-pane fade" id="JellyfinPane" role="tabpanel" tabindex="0">
+                <h1 class="text-center">Jellyfin</h1>
+                {% include 'component/settings-jellyfin.html.twig' %}
+            </div>
+            <div class="tab-pane fade" id="TraktPane" role="tabpanel" aria-l tabindex="0">
+                <h1 class="text-center">Trakt.tv</h1>
+                {% include 'component/settings-trakt.html.twig' %}
+            </div>
+            <div class="tab-pane fade" id="LetterboxdPane" role="tabpanel" tabindex="0">
+                <h1 class="text-center">Letterboxd</h1>
+                {% include 'component/settings-letterboxd.html.twig' %}
+            </div>
+            <div class="tab-pane fade" id="AppPane" role="tabpanel" tabindex="0">
+                <h1 class="text-center">App</h1>
+                {% include 'component/settings-app.html.twig' %}
+            </div>
+
+        </div>
+
+    </main>
+{% endblock %}

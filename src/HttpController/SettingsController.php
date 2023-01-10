@@ -122,12 +122,8 @@ class SettingsController
     }
 
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-    public function renderAccountPage() : Response
+    private function loadAccountData() : Array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $passwordErrorNotEqual = $this->sessionWrapper->find('passwordErrorNotEqual');
@@ -160,75 +156,54 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($userId);
 
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-account.html.twig', [
-                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'dateFormats' => DateFormat::getFormats(),
-                'dateFormatSelected' => $user->getDateFormatId(),
-                'privacyLevel' => $user->getPrivacyLevel(),
-                'generalUpdated' => $generalUpdated,
-                'generalErrorUsernameInvalidFormat' => $generalErrorUsernameInvalidFormat,
-                'generalErrorUsernameNotUnique' => $generalErrorUsernameNotUnique,
-                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-                'passwordErrorNotEqual' => $passwordErrorNotEqual,
-                'passwordErrorMinLength' => $passwordErrorMinLength,
-                'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
-                'importHistorySuccessful' => $importHistorySuccessful,
-                'importRatingsSuccessful' => $importRatingsSuccessful,
-                'passwordUpdated' => $passwordUpdated,
-                'importHistoryError' => $importHistoryError,
-                'deletedUserHistory' => $deletedUserHistory,
-                'deletedUserRatings' => $deletedUserRatings,
-                'username' => $user->getName(),
-            ]),
-        );
+        return [
+            'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+            'dateFormats' => DateFormat::getFormats(),
+            'dateFormatSelected' => $user->getDateFormatId(),
+            'privacyLevel' => $user->getPrivacyLevel(),
+            'generalUpdated' => $generalUpdated,
+            'generalErrorUsernameInvalidFormat' => $generalErrorUsernameInvalidFormat,
+            'generalErrorUsernameNotUnique' => $generalErrorUsernameNotUnique,
+            'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
+            'passwordErrorNotEqual' => $passwordErrorNotEqual,
+            'passwordErrorMinLength' => $passwordErrorMinLength,
+            'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
+            'importHistorySuccessful' => $importHistorySuccessful,
+            'importRatingsSuccessful' => $importRatingsSuccessful,
+            'passwordUpdated' => $passwordUpdated,
+            'importHistoryError' => $importHistoryError,
+            'deletedUserHistory' => $deletedUserHistory,
+            'deletedUserRatings' => $deletedUserRatings,
+            'username' => $user->getName(),
+        ];
     }
 
-    public function renderAppPage() : Response
+    private function loadAppData() : Array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-app.html.twig', [
-                'currentApplicationVersion' => $this->currentApplicationVersion ?? '-',
-                'latestApplicationVersion' => $this->githubApi->findLatestApplicationLatestVersion(),
-                'lastSyncTmdb' => $this->workerService->findLastTmdbSync() ?? '-',
-                'lastSyncImdb' => $this->workerService->findLastImdbSync() ?? '-',
-            ]),
-        );
+        return [
+            'currentApplicationVersion' => $this->currentApplicationVersion ?? '-',
+            'latestApplicationVersion' => $this->githubApi->findLatestApplicationLatestVersion(),
+            'lastSyncTmdb' => $this->workerService->findLastTmdbSync() ?? '-',
+            'lastSyncImdb' => $this->workerService->findLastImdbSync() ?? '-',
+        ];
     }
 
-    public function renderJellyfinPage() : Response
+    private function loadJellyfinData() : Array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $jellyfinScrobblerOptionsUpdated = $this->sessionWrapper->find('jellyfinScrobblerOptionsUpdated');
         $this->sessionWrapper->unset('jellyfinScrobblerOptionsUpdated');
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-jellyfin.html.twig', [
-                'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
-                'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
-                'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
-            ]),
-        );
+        return [
+            'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
+            'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
+            'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
+        ];
     }
 
-    public function renderLetterboxdPage() : Response
+    private function loadLetterboxdData() : Array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         $letterboxdDiarySyncSuccessful = $this->sessionWrapper->find('letterboxdDiarySyncSuccessful');
@@ -243,46 +218,33 @@ class SettingsController
             'letterboxdDiaryImportFileInvalid',
         );
 
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-letterboxd.html.twig', [
-                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
-                'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
-                'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
-                'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
-            ]),
-        );
+        return [
+            'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+            'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
+            'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
+            'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
+            'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+        ];
     }
 
-    public function renderPlexPage() : Response
+    private function loadPlexData() : Array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
 
         $plexScrobblerOptionsUpdated = $this->sessionWrapper->find('plexScrobblerOptionsUpdated');
         $this->sessionWrapper->unset('plexScrobblerOptionsUpdated');
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-plex.html.twig', [
-                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-                'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
-                'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
-                'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
-            ]),
-        );
+        return  [
+            'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
+            'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
+            'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
+            'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
+        ];
     }
 
-    public function renderTraktPage() : Response
+    public function loadTraktData() : Array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $traktCredentialsUpdated = $this->sessionWrapper->find('traktCredentialsUpdated');
         $scheduledTraktHistoryImport = $this->sessionWrapper->find('scheduledTraktHistoryImport');
         $scheduledTraktRatingsImport = $this->sessionWrapper->find('scheduledTraktRatingsImport');
@@ -291,18 +253,15 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-trakt.html.twig', [
-                'traktClientId' => $user->getTraktClientId(),
-                'traktUserName' => $user->getTraktUserName(),
-                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'traktCredentialsUpdated' => $traktCredentialsUpdated,
-                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
-                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
-                'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
-            ]),
-        );
+        return [
+            'traktClientId' => $user->getTraktClientId(),
+            'traktUserName' => $user->getTraktUserName(),
+            'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+            'traktCredentialsUpdated' => $traktCredentialsUpdated,
+            'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
+            'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
+            'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
+        ];
     }
 
     public function traktVerifyCredentials(Request $request) : Response
@@ -483,6 +442,24 @@ class SettingsController
             StatusCode::createSeeOther(),
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function renderSettingsPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $accountdata = $this->loadAccountData();
+        $plexdata = $this->loadPlexData();
+        $jellyfindata = $this->loadJellyfinData();
+        $traktdata = $this->loadTraktData();
+        $letterboxddata = $this->loadLetterboxdData();
+        $appdata = $this->loadAppData();
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings.html.twig', $accountdata, $plexdata, $jellyfindata, $letterboxddata, $appdata),
         );
     }
 }

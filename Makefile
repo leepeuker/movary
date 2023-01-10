@@ -29,10 +29,10 @@ exec_app_cmd:
 	docker-compose exec app bash -c "${CMD}"
 
 exec_mysql_cli:
-	docker-compose exec mysql sh -c "mysql -u${DB_USER} -p${DB_PASSWORD} ${DATABASE_MYSQL_NAME}"
+	docker-compose exec mysql sh -c "mysql -u${DB_USER} -p\"${DB_PASSWORD}\" ${DATABASE_MYSQL_NAME}"
 
 exec_mysql_query:
-	docker-compose exec mysql bash -c "mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} -e \"$(QUERY)\""
+	docker-compose exec mysql bash -c "mysql -uroot -p\"${DATABASE_MYSQL_ROOT_PASSWORD}\" -e \"$(QUERY)\""
 
 # Composer
 ##########

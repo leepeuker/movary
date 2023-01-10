@@ -1,15 +1,4 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}
-    Settings - Letterboxd
-{% endblock %}
-
-{% block body %}
-    <main role="main" class="container">
-        {{ include('component/navbar.html.twig') }}
-
         <div style="text-align: center;">
-            {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h4 style="margin-bottom: 0.5rem">Import</h4>
@@ -89,5 +78,3 @@
                 <a class="btn btn-primary" href="/settings/letterboxd-export" target="_blank">Generate export data</a>
             </div>
         </div>
-    </main>
-{% endblock %}

@@ -18,7 +18,7 @@ final class ReplaceRating10AndRating5WithPersonalRating extends AbstractMigratio
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE movie RENAME COLUMN rating_10 TO personal_rating;
+            ALTER TABLE `movie` CHANGE `rating_10` `personal_rating` TINYINT(3) UNSIGNED NULL DEFAULT NULL; 
             ALTER TABLE movie DROP COLUMN rating_5;
             SQL
         );
