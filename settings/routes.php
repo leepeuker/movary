@@ -258,6 +258,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\MovieController::class, 'updateRating'],
     );
     $routeCollector->addRoute(
+        'GET',
+        '/log-movie',
+        [\Movary\HttpController\HistoryController::class, 'renderLogMoviePage'],
+    );
+    $routeCollector->addRoute(
         'POST',
         '/log-movie',
         [\Movary\HttpController\HistoryController::class, 'logMovie'],
