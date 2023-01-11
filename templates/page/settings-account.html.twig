@@ -14,7 +14,7 @@
             <br>
 
             <div style="margin-bottom: 1rem">
-                <form action="/user/general" method="post">
+                <form action="/settings/account" method="post">
                     <h5 style="margin-bottom: 1rem;">General settings</h5>
                     <div class="mb-3">
                         <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
@@ -81,7 +81,7 @@
             <div style="background-color: #F8F8F8;padding-top: 1rem;padding-bottom: 1rem">
                 <h5>Change password</h5>
                 <p class="text-muted">Must be at least 8 characters long.</p>
-                <form action="/user/password" method="post">
+                <form action="/settings/account/password" method="post">
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" name="currentPassword" placeholder="Current password" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}
@@ -136,10 +136,10 @@
 
                 <p class="text-muted">Export or import your movary history or ratings.</p>
 
-                <a class="btn btn-primary" target="_blank" href="/user/export/csv/history">Export: history.csv</a>
-                <a class="btn btn-primary" target="_blank" href="/user/export/csv/ratings">Export: ratings.csv</a>
+                <a class="btn btn-primary" target="_blank" href="/settings/account/export/csv/history">Export: history.csv</a>
+                <a class="btn btn-primary" target="_blank" href="/settings/account/export/csv/ratings">Export: ratings.csv</a>
 
-                <form action="/user/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1.2rem">
+                <form action="/settings/account/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1.2rem">
                     <div class="input-group">
                         <input type="file" class="form-control" name="history" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                         <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history.csv</button>
@@ -160,7 +160,7 @@
                     </div>
                 {% endif %}
 
-                <form action="/user/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
+                <form action="/settings/account/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
                     <div class="input-group">
                         <input type="file" class="form-control" name="ratings" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                         <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import rating.csv</button>
@@ -190,9 +190,9 @@
                 <p class="text-muted">This will irrecoverable delete your data, so be sure that this is really what you want.</p>
 
                 <div style="margin-bottom: 1rem">
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-history"
+                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-history"
                        onclick="return confirm('Are you sure you want to delete your watch history?')">Delete history</a>
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-ratings"
+                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-ratings"
                        onclick="return confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
                     {% if deletedUserHistory == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
@@ -208,7 +208,7 @@
                     {% endif %}
                 </div>
                 <div style="margin-bottom: 1rem">
-                    <a class="btn btn-danger {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/user/delete-account"
+                    <a class="btn btn-danger {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-account"
                        onclick="return confirm('Are you sure you want to delete your account with all your data?')">Delete
                         account</a>
                 </div>

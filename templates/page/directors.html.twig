@@ -21,7 +21,7 @@
         <div style="text-align: center;">
             {{ include('component/user-select.html.twig') }}
 
-            <form action="/{{ routeUsername }}/directors" method="GET">
+            <form action="/users/{{ routeUsername }}/directors" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3">
@@ -68,7 +68,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedDirector in mostWatchedDirectors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative" onclick="window.location='/{{ routeUsername }}/person/{{ mostWatchedDirector.id }}'" style="cursor: pointer">
+                        <div class="card h-100  position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedDirector.id }}'" style="cursor: pointer">
                             <div class="card-header text-truncate" style="padding: 0.2rem">
                                 <small class="text-muted" style="font-siz1e: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                             </div>
@@ -92,7 +92,7 @@
             {% set sortOrderQuery = (sortOrder is null) ? '' : "so=#{sortOrder}&" %}
             {% set perPageQuery = (perPage is null) ? '' : "pp=#{perPage}&" %}
             {% set genderQuery = (filterGender is null) ? '' : "ge=#{filterGender}&" %}
-            {% set baseUrl = '/' ~ routeUsername ~ '/directors?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
+            {% set baseUrl = '/users/' ~ routeUsername ~ '/directors?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

@@ -9,7 +9,7 @@ function deleteWatchDate() {
     }
 
     $.ajax({
-        url: '/user/' + getRouteUsername() + '/movie/' + getMovieId() + '/history',
+        url: '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
         type: 'DELETE',
         data: JSON.stringify({
             'date': document.getElementById('originalWatchDate').value,
@@ -87,7 +87,7 @@ function getRouteUsername() {
 function saveRating() {
     let newRating = getRatingFromStars()
 
-    fetch('/user/' + getRouteUsername() + '/movie/' + getMovieId() + '/rating', {
+    fetch('/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
         method: 'post',
         headers: {
             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -179,7 +179,7 @@ function editWatchDate() {
     const newWatchDate = document.getElementById('modalWatchDate').value;
     const newWatchDatePlays = document.getElementById('modalWatchDatePlays').value;
 
-    const apiUrl = '/user/' + getRouteUsername() + '/movie/' + getMovieId() + '/history'
+    const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
 
     $.ajax({
         url: apiUrl,

@@ -28,7 +28,7 @@ class DashboardController
             return Response::createSeeOther('/');
         }
 
-        return Response::createSeeOther('/' . $user->getName() . '/dashboard');
+        return Response::createSeeOther('/users/' . $user->getName() . '/dashboard');
     }
 
     public function render(Request $request) : Response

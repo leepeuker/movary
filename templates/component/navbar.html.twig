@@ -12,11 +12,11 @@
                         <hr class="dropdown-divider">
                     </li>
                 {% endif %}
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}" href="/{{ routeUsername }}/dashboard">Dashboard</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}" href="/{{ routeUsername }}/history">History</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}" href="/{{ routeUsername }}/movies">All Movies</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/actors#' %}active{% endif %}" href="/{{ routeUsername }}/actors">Top Actors</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/directors#' %}active{% endif %}" href="/{{ routeUsername }}/directors">Top Directors</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/dashboard">Dashboard</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/history">History</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/movies">All Movies</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/actors#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/actors">Top Actors</a></li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/directors#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/directors">Top Directors</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
