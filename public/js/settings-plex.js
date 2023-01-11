@@ -49,7 +49,7 @@ function setPlexWebhookUrl(webhookId) {
 }
 
 async function fetchPlexWebhookId() {
-    const response = await fetch('/user/plex-webhook-id')
+    const response = await fetch('/settings/plex/webhook-id')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -60,7 +60,7 @@ async function fetchPlexWebhookId() {
 }
 
 async function regeneratePlexWebhookIdRequest() {
-    const response = await fetch('/user/plex-webhook-id', {'method': 'put'})
+    const response = await fetch('/settings/plex/webhook-id', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -71,7 +71,7 @@ async function regeneratePlexWebhookIdRequest() {
 }
 
 async function deletePlexWebhookIdRequest() {
-    const response = await fetch('/user/plex-webhook-id', {'method': 'delete'})
+    const response = await fetch('/settings/plex/webhook-id', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

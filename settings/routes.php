@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 return static function (FastRoute\RouteCollector $routeCollector) {
-    ### Frontend
     $routeCollector->addRoute(
         'GET',
         '/',
@@ -23,84 +22,42 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\AuthenticationController::class, 'logout'],
     );
     $routeCollector->addRoute(
-        'GET',
-        '/log-movie',
-        [\Movary\HttpController\HistoryController::class, 'renderLogMoviePage'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/log-movie',
-        [\Movary\HttpController\HistoryController::class, 'logMovie'],
-    );
-    $routeCollector->addRoute(
         'POST',
         '/create-user',
         [\Movary\HttpController\CreateUserController::class, 'createUser'],
     );
+
+    #####################
+    # Webhook listeners #
+    #####################
     $routeCollector->addRoute(
-        'GET',
-        '/fetchMovieRatingByTmdbdId',
-        [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/user/plex-webhook-id',
-        [\Movary\HttpController\PlexController::class, 'getPlexWebhookId'],
-    );
-    $routeCollector->addRoute(
-        'PUT',
-        '/user/plex-webhook-id',
-        [\Movary\HttpController\PlexController::class, 'regeneratePlexWebhookId'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/user/jellyfin-webhook-id',
-        [\Movary\HttpController\JellyfinController::class, 'getJellyfinWebhookId'],
-    );
-    $routeCollector->addRoute(
-        'PUT',
-        '/user/jellyfin-webhook-id',
-        [\Movary\HttpController\JellyfinController::class, 'regenerateJellyfinWebhookId'],
+        'POST',
+        '/plex/{id:.+}',
+        [\Movary\HttpController\PlexController::class, 'handlePlexWebhook'],
     );
     $routeCollector->addRoute(
         'POST',
-        '/user/trakt',
-        [\Movary\HttpController\SettingsController::class, 'updateTrakt'],
+        '/jellyfin/{id:.+}',
+        [\Movary\HttpController\JellyfinController::class, 'handleJellyfinWebhook'],
     );
+
+    #############
+    # Job Queue #
+    #############
     $routeCollector->addRoute(
-        'POST',
-        '/user/plex',
-        [\Movary\HttpController\SettingsController::class, 'updatePlex'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/user/jellyfin',
-        [\Movary\HttpController\SettingsController::class, 'updateJellyfin'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/user/password',
-        [\Movary\HttpController\SettingsController::class, 'updatePassword'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/user/general',
-        [\Movary\HttpController\SettingsController::class, 'updateGeneral'],
+        'GET',
+        '/job-queue',
+        [\Movary\HttpController\JobController::class, 'renderQueuePage'],
     );
     $routeCollector->addRoute(
         'GET',
-        '/user/delete-ratings',
-        [\Movary\HttpController\SettingsController::class, 'deleteRatings'],
+        '/job-queue/purge-processed',
+        [\Movary\HttpController\JobController::class, 'purgeProcessedJobs'],
     );
     $routeCollector->addRoute(
         'GET',
-        '/user/delete-history',
-        [\Movary\HttpController\SettingsController::class, 'deleteHistory'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/user/delete-account',
-        [\Movary\HttpController\SettingsController::class, 'deleteAccount'],
+        '/job-queue/purge-all',
+        [\Movary\HttpController\JobController::class, 'purgeAllJobs'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -122,59 +79,49 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/jobs/schedule/letterboxd-ratings-sync',
         [\Movary\HttpController\JobController::class, 'scheduleLetterboxdRatingsImport'],
     );
-    $routeCollector->addRoute(
-        'DELETE',
-        '/user/plex-webhook-id',
-        [\Movary\HttpController\PlexController::class, 'deletePlexWebhookId'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/plex/{id:.+}',
-        [\Movary\HttpController\PlexController::class, 'handlePlexWebhook'],
-    );
-    $routeCollector->addRoute(
-        'DELETE',
-        '/user/jellyfin-webhook-id',
-        [\Movary\HttpController\JellyfinController::class, 'deleteJellyfinWebhookId'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/jellyfin/{id:.+}',
-        [\Movary\HttpController\JellyfinController::class, 'handleJellyfinWebhook'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/user/export/csv/{exportType:.+}',
-        [\Movary\HttpController\ExportController::class, 'getCsvExport'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/user/import/csv/{exportType:.+}',
-        [\Movary\HttpController\ImportController::class, 'handleCsvImport'],
-    );
 
-    // Job Queue routes
-    $routeCollector->addRoute(
-        'GET',
-        '/job-queue',
-        [\Movary\HttpController\JobController::class, 'renderQueuePage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/job-queue/purge-processed',
-        [\Movary\HttpController\JobController::class, 'purgeProcessedJobs'],
-    );
-    $routeCollector->addRoute(
-        'GET',
-        '/job-queue/purge-all',
-        [\Movary\HttpController\JobController::class, 'purgeAllJobs'],
-    );
-
-    // Setting routes
+    ############
+    # Settings #
+    ############
     $routeCollector->addRoute(
         'GET',
         '/settings/account',
         [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/account',
+        [\Movary\HttpController\SettingsController::class, 'updateGeneral'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/account/password',
+        [\Movary\HttpController\SettingsController::class, 'updatePassword'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/export/csv/{exportType:.+}',
+        [\Movary\HttpController\ExportController::class, 'getCsvExport'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/account/import/csv/{exportType:.+}',
+        [\Movary\HttpController\ImportController::class, 'handleCsvImport'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/delete-ratings',
+        [\Movary\HttpController\SettingsController::class, 'deleteRatings'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/delete-history',
+        [\Movary\HttpController\SettingsController::class, 'deleteHistory'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/delete-account',
+        [\Movary\HttpController\SettingsController::class, 'deleteAccount'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -183,7 +130,12 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/trakt-verify',
+        '/settings/trakt',
+        [\Movary\HttpController\SettingsController::class, 'updateTrakt'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/trakt/verify-credentials',
         [\Movary\HttpController\SettingsController::class, 'traktVerifyCredentials'],
     );
     $routeCollector->addRoute(
@@ -202,9 +154,49 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderPlexPage'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/settings/plex',
+        [\Movary\HttpController\SettingsController::class, 'updatePlex'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/plex/webhook-id',
+        [\Movary\HttpController\PlexController::class, 'getPlexWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/settings/plex/webhook-id',
+        [\Movary\HttpController\PlexController::class, 'regeneratePlexWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/settings/plex/webhook-id',
+        [\Movary\HttpController\PlexController::class, 'deletePlexWebhookId'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/settings/jellyfin',
         [\Movary\HttpController\SettingsController::class, 'renderJellyfinPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/jellyfin',
+        [\Movary\HttpController\SettingsController::class, 'updateJellyfin'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/jellyfin/webhook-id',
+        [\Movary\HttpController\JellyfinController::class, 'getJellyfinWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/settings/jellyfin/webhook-id',
+        [\Movary\HttpController\JellyfinController::class, 'regenerateJellyfinWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/settings/jellyfin/webhook-id',
+        [\Movary\HttpController\JellyfinController::class, 'deleteJellyfinWebhookId'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -212,7 +204,9 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderAppPage'],
     );
 
-    // User routes
+    ##############
+    # User media #
+    ##############
     $routeCollector->addRoute(
         'GET',
         '/users/{username:[a-zA-Z0-9]+}/dashboard',
@@ -262,6 +256,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating',
         [\Movary\HttpController\MovieController::class, 'updateRating'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/log-movie',
+        [\Movary\HttpController\HistoryController::class, 'logMovie'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/fetchMovieRatingByTmdbdId',
+        [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId'],
     );
 
     // Added last, so that more specific routes can be defined (possible username vs route collisions here!)

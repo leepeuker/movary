@@ -11,7 +11,7 @@ async function verifyTraktCredentials() {
     document.getElementById('verifyButton').disabled = true;
     alertPlaceholder.innerHTML = ''
 
-    const response = await fetch('/settings/trakt-verify', {
+    const response = await fetch('/settings/trakt/verify-credentials', {
         method: 'post',
         headers: {
             'Content-type': 'application/json',

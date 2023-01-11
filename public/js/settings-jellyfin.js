@@ -47,7 +47,7 @@ function setJellyfinWebhookUrl(webhookId) {
 }
 
 async function fetchJellyfinWebhookId() {
-    const response = await fetch('/user/jellyfin-webhook-id')
+    const response = await fetch('/settings/jellyfin/webhook-id')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -58,7 +58,7 @@ async function fetchJellyfinWebhookId() {
 }
 
 async function regenerateJellyfinWebhookIdRequest() {
-    const response = await fetch('/user/jellyfin-webhook-id', {'method': 'put'})
+    const response = await fetch('/settings/jellyfin/webhook-id', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -69,7 +69,7 @@ async function regenerateJellyfinWebhookIdRequest() {
 }
 
 async function deleteJellyfinWebhookIdRequest() {
-    const response = await fetch('/user/jellyfin-webhook-id', {'method': 'delete'})
+    const response = await fetch('/settings/jellyfin/webhook-id', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
