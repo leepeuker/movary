@@ -133,6 +133,8 @@ volumes:
   movary-storage:
 ```
 
+You can run movary commands in docker via e.g. `docker exec movary php bin/console.php`
+
 Continue with [Important: First steps](#important-first-steps)
 
 ### Install without docker
@@ -141,9 +143,9 @@ coming soon...
 
 ## Important: First steps
 
-You can run movary commands in docker via e.g. `docker exec movary php bin/console.php`
+You can execute movary commands via `php bin/console.php`
 
-1. Execute missing database migrations: `php bin/console.php database:migration:migrate` (on **initial installation** and ideally **after every update**)
+1. Execute database migrations: `php bin/console.php database:migration:migrate` (after **initial installation** and ideally **after every update**)
 2. Create initial user
     - via web UI by visiting the movary lading page for the first time
     - via cli `php bin/console.php user:create email@example.com password username`
