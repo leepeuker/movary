@@ -170,7 +170,7 @@ It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IM
 | `TMDB_ENABLE_IMAGE_CACHING`                 |           `0`           |                                                                         |
 | `LOG_LEVEL`                                 |        `warning`        |                                                                         |
 | `LOG_ENABLE_STACKTRACE`                     |           `0`           |                                                                         |
-| `LOG_ENABLE_FILE_LOGGING`                   |           `0`           |                                                                         |
+| `LOG_ENABLE_FILE_LOGGING`                   |           `1`           | Log directory is at `storage/logs`                                      |
 
 More configuration can be done via the base image webdevops/php-nginx, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
