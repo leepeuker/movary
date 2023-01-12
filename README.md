@@ -139,7 +139,18 @@ Continue with [Important: First steps](#important-first-steps)
 
 ### Install without docker
 
-coming soon...
+Requirements:
+- PHP 8.1
+- git
+- composer
+
+```
+git clone https://github.com/leepeuker/movary.git .
+cp .env.production.example .env
+composer install --no-dev
+php bin/console.php storage:link
+```
+
 
 ## Important: First steps
 
