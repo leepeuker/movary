@@ -11,3 +11,4 @@ COPY --chown=application ./ ./
 COPY .env.production.example .env
 COPY settings/supervisor/movary.conf /opt/docker/etc/supervisor.d/movary.conf
 RUN composer install --no-dev
+RUN php bin/console.php storage:link
