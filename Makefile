@@ -5,7 +5,6 @@ include .env
 # Container management
 ######################
 up:
-	mkdir -p tmp/db
 	docker-compose up -d
 
 down:
@@ -19,6 +18,7 @@ build:
 	make db_mysql_create_database
 	make composer_install
 	make app_database_migrate
+	make exec_app_cmd CMD="php bin/console.php storage:link"
 
 # Container interaction
 #######################
@@ -48,20 +48,19 @@ composer_test:
 # Database
 ##########
 db_mysql_create_database:
-	make exec_mysql_query QUERY="DROP DATABASE IF EXISTS $(DATABASE_MYSQL_NAME)"
-	make exec_mysql_query QUERY="CREATE DATABASE $(DATABASE_MYSQL_NAME)"
+	make exec_mysql_query QUERY="CREATE DATABASE IF NOT EXISTS $(DATABASE_MYSQL_NAME)"
 	make exec_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DATABASE_MYSQL_NAME).* TO $(DATABASE_MYSQL_USER)@'%'"
 	make exec_mysql_query QUERY="FLUSH PRIVILEGES;"
 	make app_database_migrate
 
 db_mysql_import:
-	docker cp tmp/dump.sql movary_mysql_1:/tmp/dump.sql
+	docker cp storage/dump.sql movary_mysql_1:/tmp/dump.sql
 	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} < /tmp/dump.sql'
 
 db_mysql_export:
 	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_MYSQL_ROOT_PASSWORD) $(DATABASE_MYSQL_NAME) > /tmp/dump.sql'
-	docker cp movary_mysql_1:/tmp/dump.sql tmp/dump.sql
-	chown $(USER_ID):$(USER_ID) tmp/dump.sql
+	docker cp movary_mysql_1:/tmp/dump.sql storage/dump.sql
+	chown $(USER_ID):$(USER_ID) storage/dump.sql
 
 db_migration_create:
 	make exec_app_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"

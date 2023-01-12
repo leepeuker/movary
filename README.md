@@ -14,7 +14,9 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
 ![Movary Dashboard Example](https://i.imgur.com/690Rr80.png)
 
 1. [About](#about)
-2. [Install via docker](#install-via-docker)
+2. [Install](#install)
+    1. [With Docker (recommended)](#install-with-docker)
+    2. [Without Docker](#install-without-docker)
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
     1. [Tmdb Sync](#tmdb-sync)
@@ -57,11 +59,11 @@ Movary has support for multiple users accounts in case you want to share your in
 **Disclaimer:** This project is still in an experimental (but imo completely usable) state. I am planning to add more and improve existing features before creating a 1.0 realease,
 which can lead to sudden breaking changes until then, so keep the release notes in mind when updating.
 
-<a name="#link-install-via-docker"></a>
+## Install
 
-## Install via docker
+### Install with docker
 
-This is the preferred and currently only tested way to run the app.
+This is the recommended way to run the app.
 
 You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
@@ -131,6 +133,12 @@ volumes:
   movary-storage:
 ```
 
+Continue with [Important: First steps](#important-first-steps)
+
+### Install without docker
+
+coming soon...
+
 ## Important: First steps
 
 You can run movary commands in docker via e.g. `docker exec movary php bin/console.php`
@@ -162,7 +170,7 @@ It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IM
 | `TMDB_ENABLE_IMAGE_CACHING`                 |           `0`           |                                                                         |
 | `LOG_LEVEL`                                 |        `warning`        |                                                                         |
 | `LOG_ENABLE_STACKTRACE`                     |           `0`           |                                                                         |
-| `LOG_ENABLE_FILE_LOGGING`                   |           `0`           |                                                                         |
+| `LOG_ENABLE_FILE_LOGGING`                   |           `1`           | Log directory is at `storage/logs`                                      |
 
 More configuration can be done via the base image webdevops/php-nginx, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.

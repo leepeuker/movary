@@ -21,6 +21,7 @@ class JobController
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
         private readonly Environment $twig,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly string $appStorageDirectory,
     ) {
     }
 
@@ -79,7 +80,7 @@ class JobController
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $targetFile = __DIR__ . '/../../tmp/letterboxd-diary-' . $userId . '-' . time() . '.csv';
+        $targetFile = $this->appStorageDirectory . 'letterboxd-diary-' . $userId . '-' . time() . '.csv';
         move_uploaded_file($fileParameters['diaryCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidDiaryCsv($targetFile) === false) {
@@ -123,7 +124,7 @@ class JobController
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $targetFile = __DIR__ . '/../../tmp/letterboxd-ratings-' . $userId . '-' . time() . '.csv';
+        $targetFile = $this->appStorageDirectory . 'letterboxd-ratings-' . $userId . '-' . time() . '.csv';
         move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidRatingsCsv($targetFile) === false) {
