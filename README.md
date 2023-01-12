@@ -137,10 +137,13 @@ Continue with [Important: First steps](#important-first-steps)
 
 ### Install without docker
 
-Requirements:
+**Software requirements:**
+
 - PHP 8.1
 - git
 - composer
+- web server 
+- supervisor (optional)
 
 ```
 git clone https://github.com/leepeuker/movary.git .
@@ -149,9 +152,17 @@ composer install --no-dev
 php bin/console.php storage:link
 ```
 
+- Use the `.env` file to set the environment variables
+- Setup web server host for php (`public` directory as document root)
+- Make sure that the permissions on the `storage` directory are set correctly (the php should be able to write to it)
+- Use supervisor to continuously process jobs, see `settings/supervisor/movary.conf` for an example config
+
+Continue with [Important: First steps](#important-first-steps)
+
+
 ## Important: First steps
 
-You can run movary commands in docker via e.g. `docker exec movary php bin/console.php`
+You can run movary commands via `php bin/console.php`
 
 1. Execute missing database migrations: `php bin/console.php database:migration:migrate` (on **initial installation** and ideally **after every update**)
 2. Create initial user
@@ -234,9 +245,10 @@ You can select what you want movary to scrobble (movie views and/or ratings) via
 
 ### Jellyfin Scrobbler
 
-Automatically track movies watched via Jellyin with Movary. 
+Automatically track movies watched via Jellyin with Movary.
 
-You can generate your Jellyfin webhook url on the Jellyfin settings page (`/setting/jellyfin`) and configure it in Jellyfin via the [webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook).
+You can generate your Jellyfin webhook url on the Jellyfin settings page (`/setting/jellyfin`) and configure it in Jellyfin via
+the [webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook).
 
 ### Trakt.tv Import
 
@@ -310,7 +322,8 @@ A: Currently there is no active development for supporting more media types. Con
 
 Q: Can I share my history and ratings publicly?
 
-A: Yes, you can set (e.g. via `/settings` page) your `Privacy` levels and decide who is allowed to view your data. All page urls starting with `/users/<username>/...` (= pages with a user selector at the top) can be set to be publicly visible.
+A: Yes, you can set (e.g. via `/settings` page) your `Privacy` levels and decide who is allowed to view your data. All page urls starting with `/users/<username>/...` (= pages with
+a user selector at the top) can be set to be publicly visible.
 
 ## Development
 
