@@ -44,6 +44,8 @@ use Twig;
 
 class Factory
 {
+    private const SRC_DIRECTORY_NAME = 'src';
+
     private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
 
     private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
@@ -68,7 +70,7 @@ class Factory
         return Config::createFromEnv();
     }
 
-    public static function createCreatePublicStorageLink(ContainerInterface $container, Config $config) : CreatePublicStorageLink
+    public static function createCreatePublicStorageLink(ContainerInterface $container) : CreatePublicStorageLink
     {
         return new CreatePublicStorageLink(
             $container->get(File::class),
@@ -309,7 +311,7 @@ class Factory
 
     private static function createDirectoryAppRoot() : string
     {
-        return preg_replace('/src$/', '', __DIR__);
+        return substr(__DIR__, 0, -strlen(self::SRC_DIRECTORY_NAME));
     }
 
     private static function createDirectoryStorage() : string
