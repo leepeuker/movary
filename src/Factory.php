@@ -15,16 +15,19 @@ use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\TraktClient;
 use Movary\Command;
+use Movary\Command\CreatePublicStorageLink;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\JobController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\UrlGenerator;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
@@ -41,6 +44,8 @@ use Twig;
 
 class Factory
 {
+    private const SRC_DIRECTORY_NAME = 'src';
+
     private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
 
     private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
@@ -55,14 +60,23 @@ class Factory
 
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
 
-    private const DEFAULT_ENABLE_FILE_LOGGING = false;
+    private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
     public static function createConfig() : Config
     {
-        $dotenv = Dotenv::createMutable(__DIR__ . '/..');
+        $dotenv = Dotenv::createMutable(self::createDirectoryAppRoot());
         $dotenv->safeLoad();
 
         return Config::createFromEnv();
+    }
+
+    public static function createCreatePublicStorageLink(ContainerInterface $container) : CreatePublicStorageLink
+    {
+        return new CreatePublicStorageLink(
+            $container->get(File::class),
+            self::createDirectoryStorageApp(),
+            self::createDirectoryAppRoot(),
+        );
     }
 
     public static function createCurrentHttpRequest() : Request
@@ -74,7 +88,7 @@ class Factory
     {
         return new Command\DatabaseMigrationMigrate(
             $container->get(PhinxApplication::class),
-            __DIR__ . '/../settings/phinx.php'
+            self::createDirectoryAppRoot() . 'settings/phinx.php'
         );
     }
 
@@ -82,7 +96,7 @@ class Factory
     {
         return new Command\DatabaseMigrationRollback(
             $container->get(PhinxApplication::class),
-            __DIR__ . '/../settings/phinx.php'
+            self::createDirectoryAppRoot() . 'settings/phinx.php'
         );
     }
 
@@ -90,7 +104,7 @@ class Factory
     {
         return new Command\DatabaseMigrationStatus(
             $container->get(PhinxApplication::class),
-            __DIR__ . '/../settings/phinx.php'
+            self::createDirectoryAppRoot() . 'settings/phinx.php'
         );
     }
 
@@ -101,7 +115,7 @@ class Factory
         $config = match ($databaseMode) {
             'sqlite' => [
                 'driver' => 'sqlite3',
-                'path' => __DIR__ . '/../' . $config->getAsString('DATABASE_SQLITE'),
+                'path' => self::createDirectoryAppRoot() . $config->getAsString('DATABASE_SQLITE'),
             ],
             'mysql' => [
                 'driver' => 'pdo_mysql',
@@ -136,8 +150,20 @@ class Factory
             $container->get(LoggerInterface::class),
             $container->get(ClientInterface::class),
             $container->get(DBAL\Connection::class),
-            __DIR__ . '/../public/',
-            '/images/cached/',
+            self::createDirectoryAppRoot() . 'public/',
+            '/storage/images/',
+        );
+    }
+
+    public static function createJobController(ContainerInterface $container) : JobController
+    {
+        return new JobController(
+            $container->get(Authentication::class),
+            $container->get(JobQueueApi::class),
+            $container->get(LetterboxdCsvValidator::class),
+            $container->get(Twig\Environment::class),
+            $container->get(SessionWrapper::class),
+            self::createDirectoryStorageApp()
         );
     }
 
@@ -256,7 +282,7 @@ class Factory
 
     public static function createTwigFilesystemLoader() : Twig\Loader\FilesystemLoader
     {
-        return new Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
+        return new Twig\Loader\FilesystemLoader(self::createDirectoryAppRoot() . 'templates');
     }
 
     public static function createUrlGenerator(ContainerInterface $container, Config $config) : UrlGenerator
@@ -283,10 +309,30 @@ class Factory
         return $config->getAsInt('DATABASE_MYSQL_PORT', self::DEFAULT_DATABASE_MYSQL_PORT);
     }
 
+    private static function createDirectoryAppRoot() : string
+    {
+        return substr(__DIR__, 0, -strlen(self::SRC_DIRECTORY_NAME));
+    }
+
+    private static function createDirectoryStorage() : string
+    {
+        return self::createDirectoryAppRoot() . 'storage/';
+    }
+
+    private static function createDirectoryStorageApp() : string
+    {
+        return self::createDirectoryStorage() . 'app/';
+    }
+
+    private static function createDirectoryStorageLogs() : string
+    {
+        return self::createDirectoryStorage() . 'logs/';
+    }
+
     private static function createLoggerStreamHandlerFile(ContainerInterface $container, Config $config) : StreamHandler
     {
         $streamHandler = new StreamHandler(
-            __DIR__ . '/../tmp/app.log',
+            self::createDirectoryStorageLogs() . 'app.log',
             self::getLogLevel($config)
         );
         $streamHandler->setFormatter($container->get(LineFormatter::class));

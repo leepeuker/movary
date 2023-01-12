@@ -23,6 +23,11 @@ class File
         file_put_contents($filename, $data);
     }
 
+    public function createSymlink(string $target, string $link) : void
+    {
+        symlink($target, $link);
+    }
+
     public function createTmpFile() : string
     {
         $tempFileName = tempnam(sys_get_temp_dir(), 'movary');

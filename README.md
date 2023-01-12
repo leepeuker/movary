@@ -14,7 +14,9 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
 ![Movary Dashboard Example](https://i.imgur.com/690Rr80.png)
 
 1. [About](#about)
-2. [Install via docker](#install-via-docker)
+2. [Install](#install)
+    1. [With Docker (recommended)](#install-with-docker-recommended)
+    2. [Without Docker](#install-without-docker)
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
     1. [Tmdb Sync](#tmdb-sync)
@@ -57,11 +59,11 @@ Movary has support for multiple users accounts in case you want to share your in
 **Disclaimer:** This project is still in an experimental (but imo completely usable) state. I am planning to add more and improve existing features before creating a 1.0 realease,
 which can lead to sudden breaking changes until then, so keep the release notes in mind when updating.
 
-<a name="#link-install-via-docker"></a>
+## Install
 
-## Install via docker
+### Install with docker (recommended)
 
-This is the preferred and currently only tested way to run the app.
+This is the recommended way to run the app.
 
 You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
@@ -131,9 +133,36 @@ volumes:
   movary-storage:
 ```
 
+Continue with [Important: First steps](#important-first-steps)
+
+### Install without docker
+
+**Software requirements:**
+
+- PHP 8.1
+- git
+- composer
+- web server 
+- supervisor (optional)
+
+```
+git clone https://github.com/leepeuker/movary.git .
+cp .env.production.example .env
+composer install --no-dev
+php bin/console.php storage:link
+```
+
+- Use the `.env` file to set the environment variables
+- Setup web server host for php (`public` directory as document root)
+- Make sure that the permissions on the `storage` directory are set correctly (the php should be able to write to it)
+- Use supervisor to continuously process jobs, see `settings/supervisor/movary.conf` for an example config
+
+Continue with [Important: First steps](#important-first-steps)
+
+
 ## Important: First steps
 
-You can run movary commands in docker via e.g. `docker exec movary php bin/console.php`
+You can run movary commands via `php bin/console.php`
 
 1. Execute missing database migrations: `php bin/console.php database:migration:migrate` (on **initial installation** and ideally **after every update**)
 2. Create initial user
@@ -162,7 +191,7 @@ It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IM
 | `TMDB_ENABLE_IMAGE_CACHING`                 |           `0`           |                                                                         |
 | `LOG_LEVEL`                                 |        `warning`        |                                                                         |
 | `LOG_ENABLE_STACKTRACE`                     |           `0`           |                                                                         |
-| `LOG_ENABLE_FILE_LOGGING`                   |           `0`           |                                                                         |
+| `LOG_ENABLE_FILE_LOGGING`                   |           `1`           | Log directory is at `storage/logs`                                      |
 
 More configuration can be done via the base image webdevops/php-nginx, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
@@ -216,9 +245,10 @@ You can select what you want movary to scrobble (movie views and/or ratings) via
 
 ### Jellyfin Scrobbler
 
-Automatically track movies watched via Jellyin with Movary. 
+Automatically track movies watched via Jellyin with Movary.
 
-You can generate your Jellyfin webhook url on the Jellyfin settings page (`/setting/jellyfin`) and configure it in Jellyfin via the [webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook).
+You can generate your Jellyfin webhook url on the Jellyfin settings page (`/setting/jellyfin`) and configure it in Jellyfin via
+the [webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook).
 
 ### Trakt.tv Import
 
@@ -292,7 +322,8 @@ A: Currently there is no active development for supporting more media types. Con
 
 Q: Can I share my history and ratings publicly?
 
-A: Yes, you can set (e.g. via `/settings` page) your `Privacy` levels and decide who is allowed to view your data. All page urls starting with `/users/<username>/...` (= pages with a user selector at the top) can be set to be publicly visible.
+A: Yes, you can set (e.g. via `/settings` page) your `Privacy` levels and decide who is allowed to view your data. All page urls starting with `/users/<username>/...` (= pages with
+a user selector at the top) can be set to be publicly visible.
 
 ## Development
 

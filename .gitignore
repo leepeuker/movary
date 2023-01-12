@@ -1,11 +1,15 @@
+.idea
+.phpunit.result.cache
 .env
-storage/*
-storage/.gitkeep
-tmp/*
-!tmp/.gitkeep
+/vendor
+/public/storage
 docker-compose.override.yml
 .phpunit.result.cache
 
 .idea/
 vendor/
 .vscode
+.env
+/vendor
+/public/storage
+docker-compose.override.yml
