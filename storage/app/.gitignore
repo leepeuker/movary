@@ -1,4 +1,3 @@
 *
-!app/
-!logs/
+!public/
 !.gitignore
