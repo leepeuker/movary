@@ -15,7 +15,7 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
 
 1. [About](#about)
 2. [Install](#install)
-    1. [With Docker (recommended)](#install-with-docker)
+    1. [With Docker (recommended)](#install-with-docker-recommended)
     2. [Without Docker](#install-without-docker)
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
@@ -61,7 +61,7 @@ which can lead to sudden breaking changes until then, so keep the release notes 
 
 ## Install
 
-### Install with docker
+### Install with docker (recommended)
 
 This is the recommended way to run the app.
 
