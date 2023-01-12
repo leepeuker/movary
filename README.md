@@ -14,7 +14,9 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
 ![Movary Dashboard Example](https://i.imgur.com/690Rr80.png)
 
 1. [About](#about)
-2. [Install via docker](#install-via-docker)
+2. [Install](#install)
+    1. [With Docker (recommended)](#install-with-docker)
+    2. [Without Docker](#install-without-docker)
 3. [Important: First steps](#important-first-steps)
 4. [Features](#features)
     1. [Tmdb Sync](#tmdb-sync)
@@ -57,11 +59,11 @@ Movary has support for multiple users accounts in case you want to share your in
 **Disclaimer:** This project is still in an experimental (but imo completely usable) state. I am planning to add more and improve existing features before creating a 1.0 realease,
 which can lead to sudden breaking changes until then, so keep the release notes in mind when updating.
 
-<a name="#link-install-via-docker"></a>
+## Install
 
-## Install via docker
+### Install with docker
 
-This is the preferred and currently only tested way to run the app.
+This is the recommended way to run the app.
 
 You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
@@ -130,6 +132,12 @@ volumes:
   movary-db:
   movary-storage:
 ```
+
+Continue with [Important: First steps](#important-first-steps)
+
+### Install without docker
+
+coming soon...
 
 ## Important: First steps
 
