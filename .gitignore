@@ -8,3 +8,4 @@ docker-compose.override.yml
 
 .idea/
 vendor/
+.vscode

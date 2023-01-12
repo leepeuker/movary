@@ -16,6 +16,7 @@ services:
 
   mysql:
     image: mysql:8.0
+    user: "${USER_ID}:${USER_ID}"
     environment:
       MYSQL_ROOT_PASSWORD: ${DATABASE_MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${DATABASE_MYSQL_USER}
