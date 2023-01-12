@@ -60,7 +60,7 @@ class Factory
 
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
 
-    private const DEFAULT_ENABLE_FILE_LOGGING = false;
+    private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
     public static function createConfig() : Config
     {
