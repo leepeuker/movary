@@ -46,22 +46,37 @@ async function createloader() {
 function processdata(data) {
     let keys = Object.keys(data);
     keys.forEach((key, index) => {
-         let row = document.createElement('tr');
-         let indexcell = document.createElement('td');
-         let netflix_name = document.createElement('td');
-         let tmdb = document.createElement('td');
-         let tmdb_cover = document.createElement('img');
-         let tmdb_link = document.createElement('a');
-         let date = document.createElement('td');
+        let row = document.createElement('tr');
+        let indexcell = document.createElement('td');
+        let netflix_name = document.createElement('td');
+        let tmdb = document.createElement('td');
+        let tmdb_div = document.createElement('div');
+        let tmdb_cover_div = document.createElement('div');
+        let tmdb_description_div = document.createElement('div');
+        let tmdb_cover = document.createElement('img');
+        let tmdb_cover_br = document.createElement('br');
+        let tmdb_link = document.createElement('a');
+        let description = document.createElement('b');
+        let date = document.createElement('td');
 
-         netflix_name.innerText = data[key]['originalname'];
-         indexcell.innerText = index + 1;
+        netflix_name.innerText = data[key]['originalname'];
+        indexcell.innerText = index + 1;
 
-        if(data[key]['result'] == 'Unknown') {
+        row.setAttribute('tmdbid', data[key]['result']['id']);
+
+        tmdb.className = 'w-50';
+        tmdb_div.className = "row";
+        tmdb_cover_div.className = 'col-md-3 justify-content-center';
+        tmdb_description_div.className = 'col-md-9 text-start';
+        tmdb_cover.style.width = '92px';
+        tmdb_cover.alt = 'Movie poster of ' + (data[key]['result']['title'] ?? 'missing item');
+
+
+
+        if(data[key]['result'] == 'Unknown' || data[key]['result']['poster_path'] == null) {
             tmdb_cover.src = window.location.protocol + "//" + window.location.host + '/images/placeholder-image.png';
             tmdb_cover.className = 'img-fluid';
-            tmdb_cover.style.width = '92px';
-            tmdb_link.innerText = 'Not found';
+            tmdb_link.innerText = 'Item not found on TMDB';
         } else {
             tmdb_cover.src = 'https://image.tmdb.org/t/p/w92' + data[key]['result']['poster_path'];
             tmdb_cover.className = 'img-fluid';
@@ -70,11 +85,27 @@ function processdata(data) {
             tmdb_link.innerText = data[key]['result']['title'];
         }
 
-         date.innerText = data[key]['date']['day'] + "/" + data[key]['date']['month'] + "/" + data[key]['date']['year'];
+        if(data[key]['result'] == 'Unknown' || data[key]['result']['overview'] == null) {
+            description.innerText = 'Description not found';
+            tmdb_description_div.append(description);
+        } else {
+            let br = document.createElement('br');
+            let paragraph = document.createElement('p');
+            let release_date = document.createElement('p');
+            
+            description.innerText = 'Description: ';
+            paragraph.innerText = data[key]['result']['overview'];
+            release_date.innerText = 'Release date: ' + data[key]['result']['release_date'];
+            tmdb_description_div.append(description, br, paragraph, release_date);
+        }
 
-         tmdb.append(tmdb_cover, tmdb_link);
-         row.append(indexcell, date, netflix_name, tmdb);
-         document.getElementById('netflixtbody').append(row);
+        date.innerText = data[key]['date']['day'] + "/" + data[key]['date']['month'] + "/" + data[key]['date']['year'];
+
+        tmdb_cover_div.append(tmdb_cover, tmdb_cover_br, tmdb_link);
+        tmdb_div.append(tmdb_cover_div, tmdb_description_div);
+        tmdb.append(tmdb_div);
+        row.append(indexcell, date, netflix_name, tmdb);
+        document.getElementById('netflixtbody').append(row);
     });
 }
 

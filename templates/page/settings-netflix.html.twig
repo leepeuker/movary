@@ -23,12 +23,13 @@
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
                     <b>Download your Netflix history</b>
                     <br/>
-                    Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the 'download all' link. 
-                    Import this .csv file
+                    Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the 'download all' link.
+                    <br/>
+                    Upload this CSV file down below.
                 </div>
                 <form>
                     <label class="form-label" for="file">Upload Your CSV File</label>
-                    <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" />
+                    <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
                     <button class="btn btn-success" name="submit" onclick="importNetflixHistory()" type="button"> Upload File </button>
                 </form>
                 <table class="table table-hover">
