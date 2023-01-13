@@ -30,8 +30,17 @@
                 <form>
                     <label class="form-label" for="file">Upload Your CSV File</label>
                     <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
-                    <button class="btn btn-success" name="submit" onclick="importNetflixHistory()" type="button"> Upload File </button>
+                    <button class="btn btn-primary" name="submit" onclick="importNetflixHistory()" type="button"> Upload File </button>
                 </form>
+                <br/>
+                <label for="amounttoshow">Number of items on one page:</label>
+                <select id="amounttoshow" class="form-select">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="all">All</option>
+                </select>
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -47,6 +56,13 @@
                         </tr>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end">
+                        <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Previous</a></li>
+                        <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">#</a></li>
+                        <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Next</a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </main>

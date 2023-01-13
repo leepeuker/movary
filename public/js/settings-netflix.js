@@ -8,16 +8,18 @@ async function importNetflixHistory() {
         body: filedata
     })
     .then(response => {
-        let spinner = document.querySelector('div.spinner-border');
-        spinner.remove();
+        document.querySelector('div.spinner-border').parentElement.remove();
         if(!response.ok) {
             processError(response.status);
+            return false;
         } else {
             return response.json();
         }
     })
     .then(data => {
-        processdata(data)
+        if(data != false) {
+            processdata(data)
+        }
     })
     .catch(function(error) {
         console.error(error);
@@ -43,12 +45,112 @@ async function createloader() {
     document.getElementById('netflixtbody').append(row);
 }
 
+function updatetable() {
+    let amount = document.getElementById('amounttoshow').value;
+    let rows = document.getElementById('netflixtbody').children;
+    if(amount == 'all') {
+        createpagenav(rows.length, rows.length);
+    } else {
+        createpagenav(amount, rows.length);
+    }
+    changepage(1);
+}
+
+function changepage(direction) {
+    let ul = document.getElementsByClassName('pagination')[0];
+    let amount = document.getElementById('amounttoshow').value;
+    let rows = document.getElementById('netflixtbody').children;
+    var targetpage = -1;
+    if(direction === 'previous') {
+        if(!ul.children[1].classList.contains('active')) {
+            document.getElementsByClassName('page-item active')[0].previousElementSibling.classList.add('active');
+            document.getElementsByClassName('page-item active')[1].classList.remove('active');
+            targetpage = parseInt(document.getElementsByClassName('page-item active')[0].innerText);
+        }
+    } else if(direction === 'next') {
+        if(!ul.children[ul.childElementCount - 2].classList.contains('active')) {
+            document.getElementsByClassName('page-item active')[0].nextElementSibling.classList.add('active');
+            document.getElementsByClassName('page-item active')[0].classList.remove('active');
+            targetpage = parseInt(document.getElementsByClassName('page-item active')[0].innerText);
+        }
+    } else if(!isNaN(parseInt(direction))) {
+        document.getElementsByClassName('page-item active')[0].classList.remove('active');
+        document.querySelectorAll('li.page-item:not(.active)').forEach((el) => {
+            if(el.innerText == direction) {
+                el.classList.add('active');
+            }
+        })
+        targetpage = parseInt(direction);
+    }
+
+    if(targetpage != -1) {
+        document.querySelectorAll("tr:not(.d-none)").forEach((el) => {
+            el.classList.add('d-none');
+        });
+        if(amount == 'all') {
+            for(let i = 0; i < rows.length; i++) {
+                rows[i].classList.remove('d-none');
+            }
+        } else {
+            for(let i = amount * targetpage - amount + 1; i < amount * targetpage + 1; i++) {
+                if(rows.length > i) {
+                    rows[i].classList.remove('d-none');
+                }
+            }
+        }
+    }
+}
+
+function createpagenav(amount, items) {
+    buttons_number = Math.ceil(items / amount);
+    let ul = document.getElementsByClassName('pagination')[0];
+    var lastchild = ul.children[ul.childElementCount - 1];
+
+    // remove all children except the first ('previous' button) and the last ('next' button)
+    while(ul.childElementCount > 2) {
+        lastchild.previousElementSibling.remove();
+    }
+
+    // Create nav buttons
+    for(let i = 0; i < buttons_number; i++) {
+        let li = document.createElement('li');
+        let link = document.createElement('a');
+        li.style.cursor = 'pointer';
+        li.className = i == 0 ? 'page-item active' : 'page-item';
+        link.className = 'page-link';
+        link.innerText = i + 1;
+        li.append(link);
+        // For some reason an event instantly runs if a parameter is passed directly to the callback function, so it has to be done this way
+        li.addEventListener("click", () => { changepage(link.innerText); });
+        lastchild.before(li);
+    }
+
+    if(ul.childElementCount == 3) {
+        lastchild.classList.add('disabled');
+        ul.children[0].classList.add('disabled');
+
+        lastchild.style.cursor = 'not-allowed';
+        ul.children[0].style.cursor = 'not-allowed';
+    } else {
+        lastchild.classList.remove('disabled');
+        ul.children[0].classList.remove('disabled');
+
+        lastchild.style.cursor = 'pointer';
+        ul.children[0].style.cursor = 'pointer';
+    }
+
+    lastchild.addEventListener("click", () => { changepage('next'); });
+    ul.children[0].addEventListener("click", () => { changepage('previous'); });
+}
+
 function processdata(data) {
     let keys = Object.keys(data);
+    let amount = document.getElementById('amounttoshow').value;
     keys.forEach((key, index) => {
         let row = document.createElement('tr');
         let indexcell = document.createElement('td');
         let netflix_name = document.createElement('td');
+
         let tmdb = document.createElement('td');
         let tmdb_div = document.createElement('div');
         let tmdb_cover_div = document.createElement('div');
@@ -59,8 +161,11 @@ function processdata(data) {
         let description = document.createElement('b');
         let date = document.createElement('td');
 
+
         netflix_name.innerText = data[key]['originalname'];
         indexcell.innerText = index + 1;
+
+        row.className = index + 1 > amount ?  'd-none' : '';
 
         row.setAttribute('tmdbid', data[key]['result']['id']);
 
@@ -70,8 +175,6 @@ function processdata(data) {
         tmdb_description_div.className = 'col-md-9 text-start';
         tmdb_cover.style.width = '92px';
         tmdb_cover.alt = 'Movie poster of ' + (data[key]['result']['title'] ?? 'missing item');
-
-
 
         if(data[key]['result'] == 'Unknown' || data[key]['result']['poster_path'] == null) {
             tmdb_cover.src = window.location.protocol + "//" + window.location.host + '/images/placeholder-image.png';
@@ -107,6 +210,8 @@ function processdata(data) {
         row.append(indexcell, date, netflix_name, tmdb);
         document.getElementById('netflixtbody').append(row);
     });
+    createpagenav(amount, keys.length);
+    document.getElementById('amounttoshow').addEventListener('change', updatetable);
 }
 
 function processError(errorcode) {
