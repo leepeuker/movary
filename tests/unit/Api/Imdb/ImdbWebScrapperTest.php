@@ -26,42 +26,84 @@ class ImdbWebScrapperTest extends TestCase
     {
         return [
             [
-                'sc-7ab21ed2-1 jGRxWM">8.3< sc-7ab21ed2-3 dPVcnq">321<',
+                '    <div class="allText">
+            <div class="allText">
+                229.240
+IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7.9 / 10
+
+
+
+            <br /><br />',
                 [
-                    'average' => 8.3,
-                    'voteCount' => 321,
+                    'average' => 7.9,
+                    'voteCount' => 229240,
                 ],
             ],
             [
-                'sc-7ab21ed2-1 jGRxWM">8.3< sc-7ab21ed2-3 dPVcnq">321K<',
+                '    <div class="allText">
+            <div class="allText">
+                229,240
+IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
+
+
+
+            <br /><br />',
                 [
-                    'average' => 8.3,
-                    'voteCount' => 321000,
+                    'average' => 7.9,
+                    'voteCount' => 229240,
                 ],
             ],
             [
-                'sc-7ab21ed2-1 jGRxWM">8.3< sc-7ab21ed2-3 dPVcnq">3.2K<',
+                '    <div class="allText">
+            <div class="allText">
+                1.229,240
+IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
+
+
+
+            <br /><br />',
                 [
-                    'average' => 8.3,
-                    'voteCount' => 3200,
+                    'average' => 7.9,
+                    'voteCount' => 1229240,
                 ],
             ],
             [
-                'sc-7ab21ed2-1 jGRxWM">8.3< sc-7ab21ed2-3 dPVcnq">3.2M<',
+                '    <div class="allText">
+            <div class="allText">
+                40
+IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
+
+
+
+            <br /><br />',
                 [
-                    'average' => 8.3,
-                    'voteCount' => 3200000,
+                    'average' => 7.9,
+                    'voteCount' => 40,
                 ],
             ],
             [
-                'sc-7ab21ed2-1 jGRxWM">8.3< sc-7ab21ed2-3 dPVcnq">32M<',
+                '    <div class="allText">
+            <div class="allText">
+                
+IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
+
+
+
+            <br /><br />',
                 [
-                    'average' => 8.3,
-                    'voteCount' => 32000000,
+                    'average' => 7.9,
+                    'voteCount' => null,
                 ],
             ],
             [
-                'sc-7ab21ed2-1 jGRxWM">< sc-7ab21ed2-3 dPVcnq"><',
+                '    <div class="allText">
+            <div class="allText">
+                
+IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                  / 10
+
+
+
+            <br /><br />',
                 [
                     'average' => null,
                     'voteCount' => null,

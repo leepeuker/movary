@@ -4,8 +4,8 @@ namespace Movary\Api\Imdb;
 
 class ImdbUrlGenerator
 {
-    public function buildUrl(string $imdbId) : string
+    public function buildMovieRatingsUrl(string $imdbId) : string
     {
-        return "https://www.imdb.com/title/$imdbId/";
+        return "https://www.imdb.com/title/$imdbId/ratings";
     }
 }
