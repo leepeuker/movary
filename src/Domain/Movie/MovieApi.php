@@ -254,7 +254,7 @@ class MovieApi
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
-            'imdbUrl' => $imdbId !== null ? $this->imdbUrlGenerator->buildUrl($imdbId) : null,
+            'imdbUrl' => $imdbId !== null ? $this->imdbUrlGenerator->buildMovieRatingsUrl($imdbId) : null,
             'imdbRatingAverage' => $entity->getImdbRatingAverage(),
             'imdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getImdbVoteCount()),
             'tmdbUrl' => (string)$this->tmdbUrlGenerator->generateMovieUrl($entity->getTmdbId()),
