@@ -9,6 +9,10 @@ use Throwable;
 
 class SyncMovies
 {
+    private const SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 4000000;
+
+    private const DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS = 2000000;
+
     public function __construct(
         private readonly ImdbWebScrapper $imdbWebScrapper,
         private readonly MovieApi $movieApi,
@@ -16,8 +20,11 @@ class SyncMovies
     ) {
     }
 
-    public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
-    {
+    public function syncMovies(
+        ?int $maxAgeInHours = null,
+        ?int $movieCountSyncThreshold = null,
+        int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
+    ) : void {
         $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $movieCountSyncThreshold);
 
         foreach ($movies as $movie) {
@@ -30,7 +37,8 @@ class SyncMovies
             try {
                 $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
             } catch (Throwable) {
-                sleep(4);
+                /** @psalm-suppress ArgumentTypeCoercion */
+                usleep(self::SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS);
 
                 try {
                     $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
@@ -40,11 +48,17 @@ class SyncMovies
                     continue;
                 }
             }
-
             $this->movieApi->updateImdbRating($movie->getId(), $imdbRating['average'], $imdbRating['voteCount']);
 
+            $this->logger->debug('Imdb sync: Updated imdb rating for movie', [
+                'movieTitle' => $movie->getTitle(),
+                'average' => $imdbRating['average'],
+                'voteCount' => $imdbRating['voteCount']
+            ]);
+
             // Hacky way to prevent imdb rate limits
-            sleep(2);
+            /** @psalm-suppress ArgumentTypeCoercion */
+            usleep($minDelayBetweenRequests);
         }
     }
 }
