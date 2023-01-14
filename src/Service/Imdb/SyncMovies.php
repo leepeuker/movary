@@ -23,7 +23,7 @@ class SyncMovies
     public function syncMovies(
         ?int $maxAgeInHours = null,
         ?int $movieCountSyncThreshold = null,
-        ?int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
+        int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
     ) : void {
         $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $movieCountSyncThreshold);
 
@@ -37,6 +37,7 @@ class SyncMovies
             try {
                 $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
             } catch (Throwable) {
+                /** @psalm-suppress ArgumentTypeCoercion */
                 usleep(self::SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS);
 
                 try {
@@ -57,6 +58,7 @@ class SyncMovies
             ]);
 
             // Hacky way to prevent imdb rate limits
+            /** @psalm-suppress ArgumentTypeCoercion */
             usleep($minDelayBetweenRequests);
         }
     }
