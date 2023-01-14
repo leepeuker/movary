@@ -65,7 +65,7 @@ class ImdbWebScrapper
     {
         preg_match('/weightedaverage<\/a>voteof(\d.\d)\/10</', $responseBodyContent, $matchesAverage);
         if (empty($matchesAverage[1]) === false) {
-            return (float)str_replace(['.', ','], ['', '.'], $matchesAverage[1]);
+            return (float)str_replace(',', '.', $matchesAverage[1]);
         }
 
         return null;

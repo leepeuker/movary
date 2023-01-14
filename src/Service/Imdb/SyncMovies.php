@@ -41,14 +41,13 @@ class SyncMovies
                 usleep(self::SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS);
 
                 try {
-                    $imdbRating = $this->imdbWebScrapper->findRating($imdbId);
+                    $imdbRating = $this->imdbWebScrapper->wfindRating($imdbId);
                 } catch (Throwable $t) {
                     $this->logger->warning('Could not sync imdb rating for movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
 
                     continue;
                 }
             }
-
             $this->movieApi->updateImdbRating($movie->getId(), $imdbRating['average'], $imdbRating['voteCount']);
 
             $this->logger->debug('Imdb sync: Updated imdb rating for movie', [

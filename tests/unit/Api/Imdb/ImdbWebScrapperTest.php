@@ -29,7 +29,7 @@ class ImdbWebScrapperTest extends TestCase
                 '    <div class="allText">
             <div class="allText">
                 229.240
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
+IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7.9 / 10
 
 
 
