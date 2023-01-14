@@ -64,20 +64,20 @@ class ImdbWebScrapper
     private function getRatingAverage(string $responseBodyContent) : ?float
     {
         preg_match('/weightedaverage<\/a>voteof(\d.\d)\/10</', $responseBodyContent, $matchesAverage);
-        if (empty($matchesAverage[1]) === false) {
-            return (float)str_replace(',', '.', $matchesAverage[1]);
+        if (empty($matchesAverage[1]) === true) {
+            return null;
         }
 
-        return null;
+        return (float)str_replace(',', '.', $matchesAverage[1]);
     }
 
     private function getRatingVoteCount(string $responseBodyContent) : ?int
     {
         preg_match('/([0-9]{1,3}([.,][0-9]{3})*)IMDbusershavegivena/', $responseBodyContent, $matchesAverage);
-        if (empty($matchesAverage[1]) === false) {
-            return (int)str_replace([',', '.'], '', $matchesAverage[1]);
+        if (empty($matchesAverage[1]) === true) {
+            return null;
         }
 
-        return null;
+        return (int)str_replace([',', '.'], '', $matchesAverage[1]);
     }
 }
