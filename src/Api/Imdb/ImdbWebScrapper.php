@@ -19,7 +19,9 @@ class ImdbWebScrapper
     public function findRating(string $imdbId) : array
     {
         $imdbMovieRatingPage = $this->fetchImdbMovieRatingPage($imdbId);
+        // Removing whitespaces & linebreaks makes the regular expressions needed later easier
         $imdbMovieRatingPage = preg_replace('/\s*/m', '', $imdbMovieRatingPage);
+
         if ($imdbMovieRatingPage === null) {
             $this->logger->info('Could not find valid imdb movie rating page for: ' . $this->urlGenerator->buildMovieRatingsUrl($imdbId));
 
