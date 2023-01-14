@@ -9,7 +9,3 @@ tmp/*
 .idea/
 vendor/
 .vscode
-.env
-/vendor
-/public/storage
-docker-compose.override.yml
