@@ -213,6 +213,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/settings/netflix',
         [\Movary\HttpController\NetflixController::class, 'importNetflixActivity'],
     );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/netflix/search',
+        [\Movary\HttpController\NetflixController::class, 'searchTMDB'],
+    );
 
     ##############
     # User media #

@@ -10,6 +10,7 @@
 
 {% block stylesheets %}
     <link href="/css/settings.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons-1.10.2.css" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -66,4 +67,30 @@
             </div>
         </div>
     </main>
+    <!-- Modal to search for other TMDB items -->
+    <div class="modal fade" id="tmdbmodal" tabindex="-1" role="dialog" aria-labelledby="TMDBModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TMDBModalTitle">Search for TMDB item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <label for="searchtmdb" class="form-label">Search for item on TMDB</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" name="searchtmdb" id="searchtmdb">
+                            <button class="btn btn-success" type="button" id="searchtmdbbtn" onclick="searchTMDB()" ><i class="bi bi-search"></i></button>
+                        </div>
+                        <div id="tmdbsearchresults"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

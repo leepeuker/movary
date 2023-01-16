@@ -8,7 +8,7 @@ use Movary\Domain\Movie\MovieApi;
 use Psr\Log\LoggerInterface;
 use Exception;
 
-class ImportActivity
+class ImportNetflixActivity
 {
     public function __construct(
         private readonly UserApi $userApi,

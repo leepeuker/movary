@@ -2,13 +2,13 @@ async function importNetflixHistory() {
     var input = document.getElementById('netflixfile');
     var filedata = new FormData();
     filedata.append('netflixviewactivity', input.files[0]);
-    await createloader();
+    await createloader(document.getElementById('netflixtbody'));
     await fetch('/settings/netflix', {
         method: 'POST',
         body: filedata
     })
     .then(response => {
-        document.querySelector('div.spinner-border').parentElement.remove();
+        document.getElementById('netflixtbody').querySelector('div.spinner-border').parentElement.remove();
         if(!response.ok) {
             processError(response.status);
             return false;
@@ -18,7 +18,7 @@ async function importNetflixHistory() {
     })
     .then(data => {
         if(data != false) {
-            processdata(data)
+            processNetflixData(data)
         }
     })
     .catch(function(error) {
@@ -26,8 +26,35 @@ async function importNetflixHistory() {
     });
 }
 
-async function createloader() {
-    document.getElementById('netflixtbody').innerHTML = '';
+async function searchTMDB() {
+    var query = document.getElementById('searchtmdb').value;
+    await createloader(document.getElementById('tmdbsearchresults'));
+    await fetch('/settings/netflix/search', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({
+            'query': query
+        })
+    }).then(response => {
+        document.getElementById('tmdbsearchresults').querySelector('div.spinner-border').parentElement.remove();
+        if(!response.ok) {
+            processError(response.status);
+            return false;
+        } else {
+            return response.json();
+        }
+    }).then(data => {
+        processTMDBData(data);
+    })
+    .catch(function(error) {
+        console.error(error);
+    });
+}
+
+async function createloader(parent) {
+    parent.innerHTML = '';
     let row = document.createElement('tr');
     let cell = document.createElement('td');
     let div = document.createElement('div');
@@ -42,7 +69,7 @@ async function createloader() {
     div.append(span);
     cell.append(div);
     row.append(cell);
-    document.getElementById('netflixtbody').append(row);
+    parent.append(row);
 }
 
 function updatetable() {
@@ -143,7 +170,11 @@ function createpagenav(amount, items) {
     ul.children[0].addEventListener("click", () => { changepage('previous'); });
 }
 
-function processdata(data) {
+function processTMDBData(data) {
+    console.log(data);
+}
+
+function processNetflixData(data) {
     let keys = Object.keys(data);
     let amount = document.getElementById('amounttoshow').value;
     keys.forEach((key, index) => {
@@ -159,6 +190,7 @@ function processdata(data) {
         let tmdb_cover_br = document.createElement('br');
         let tmdb_link = document.createElement('a');
         let description = document.createElement('b');
+        let editbtn = document.createElement('button');
         let date = document.createElement('td');
 
 
@@ -166,8 +198,12 @@ function processdata(data) {
         indexcell.innerText = index + 1;
 
         row.className = index + 1 > amount ?  'd-none' : '';
-
-        row.setAttribute('tmdbid', data[key]['result']['id']);
+        row.setAttribute('data-tmdbid', data[key]['result']['id']);
+        
+        editbtn.className = 'btn btn-success';
+        editbtn.innerHTML = '<i class="bi bi-pencil-square"></i>';
+        editbtn.setAttribute('data-bs-toggle', 'modal');
+        editbtn.setAttribute('data-bs-target', '#tmdbmodal');
 
         tmdb.className = 'w-50';
         tmdb_div.className = "row";
@@ -201,6 +237,7 @@ function processdata(data) {
             release_date.innerText = 'Release date: ' + data[key]['result']['release_date'];
             tmdb_description_div.append(description, br, paragraph, release_date);
         }
+        tmdb_description_div.append(editbtn);
 
         date.innerText = data[key]['date']['day'] + "/" + data[key]['date']['month'] + "/" + data[key]['date']['year'];
 
@@ -229,3 +266,14 @@ function processError(errorcode) {
     errorrow.append(errorcell);
     document.getElementById('netflixtbody').append(errorrow);
 }
+
+const TMDBModal = document.getElementById('tmdbmodal');
+
+TMDBModal.addEventListener('show.bs.modal', function (event) {
+    // Button that triggered the modal
+    let button = event.relatedTarget;
+    // Extract info from data-bs-* attributes
+    let tmdbid = button.getAttribute('data-tmdbid');
+    // Use above variables to manipulate the DOM
+    
+});

@@ -7,7 +7,8 @@ use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\Api\Tmdb\TmdbApi;
-use Movary\Service\Netflix\ImportActivity;
+use Movary\Util\Json;
+use Movary\Service\Netflix\ImportNetflixActivity;
 use Psr\Log\LoggerInterface;
 
 class NetflixController
@@ -17,7 +18,7 @@ class NetflixController
         private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
         private readonly TmdbApi $tmdbapi,
-        private readonly ImportActivity $importActivity
+        private readonly ImportNetflixActivity $importActivity
     ){}
 
     /**
@@ -74,5 +75,17 @@ class NetflixController
         } else {
             return Response::createBadRequest();
         }
+    }
+
+    public function searchTMDB(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+        $jsondata = $request->getBody();
+        $input = Json::decode($jsondata);
+        $tmdbresults = $this->tmdbapi->searchMovie($input['query']);
+        $response = Json::encode($tmdbresults);
+        return Response::createJson($response);
     }
 }
