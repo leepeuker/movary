@@ -14,9 +14,10 @@ reup: down up
 
 build:
 	docker-compose build --no-cache
+	make yarn_install
 	make up
-	make db_mysql_create_database
 	make composer_install
+	make db_mysql_create_database
 	make app_database_migrate
 	make exec_app_cmd CMD="php bin/console.php storage:link"
 
@@ -33,6 +34,12 @@ exec_mysql_cli:
 
 exec_mysql_query:
 	docker-compose exec mysql bash -c "mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} -e \"$(QUERY)\""
+
+exec_frontend_cmd:
+	docker-compose exec frontend bash -c "${CMD}"
+
+run_frontend_cmd:
+	docker-compose run --rm frontend bash -c "${CMD}"
 
 # Composer
 ##########
@@ -95,3 +102,11 @@ app_imdb_sync_rating:
 
 app_jobs_process:
 	make exec_app_cmd CMD="php bin/console.php jobs:process"
+
+# Yarn
+######
+yarn_install: 
+	make run_frontend_cmd CMD="yarn install"
+
+yarn_build: 
+	make exec_frontend_cmd CMD="yarn build"
