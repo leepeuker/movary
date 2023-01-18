@@ -1,0 +1,26 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    
+    {% if environment == 'development' %}
+        <script type="module">
+            import RefreshRuntime from 'http://localhost:5173/frontend/@react-refresh'
+            RefreshRuntime.injectIntoGlobalHook(window)
+            window.$RefreshReg$ = () => {}
+            window.$RefreshSig$ = () => (type) => type
+            window.__vite_plugin_react_preamble_installed__ = true
+        </script>
+        <script type="module" src="http://localhost:5173/frontend/@vite/client"></script>
+        <script type="module" src="http://localhost:5173/frontend/src/main.tsx"></script>
+    {% else %}
+        <link rel="stylesheet" href="/frontend/{{ frontendAssets.css|first }}" />
+        <script type="module" src="/frontend/{{ frontendAssets.file }}"></script>
+    {% endif %}
+  </body>
+</html>
