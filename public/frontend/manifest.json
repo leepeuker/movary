@@ -1,26 +1,7 @@
 {
-  "src/assets/react.svg": {
-    "file": "assets/react-35ef61ed.svg",
-    "src": "src/assets/react.svg"
-  },
-  "src/assets/vite.svg": {
-    "file": "assets/vite-4a748afd.svg",
-    "src": "src/assets/vite.svg"
-  },
-  "src/main.css": {
-    "file": "assets/main-3fce1f81.css",
-    "src": "src/main.css"
-  },
   "src/main.tsx": {
-    "file": "assets/main-fc4a38c5.js",
+    "file": "assets/main-81b6d462.js",
     "src": "src/main.tsx",
-    "isEntry": true,
-    "css": [
-      "assets/main-3fce1f81.css"
-    ],
-    "assets": [
-      "assets/react-35ef61ed.svg",
-      "assets/vite-4a748afd.svg"
-    ]
+    "isEntry": true
   }
 }
