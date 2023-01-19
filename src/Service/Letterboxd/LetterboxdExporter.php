@@ -31,6 +31,7 @@ class LetterboxdExporter
         $csvFilePath = $this->fileUtil->createTmpFile();
         $csv = $this->createCsvWriter($csvFilePath);
 
+        // csv format documentation here https://letterboxd.com/about/importing-data/
         $csv->insertOne(['WatchedDate', 'Title', 'tmdbID', 'Rating10', 'Year']);
 
         $csvLineCounter = 0;
