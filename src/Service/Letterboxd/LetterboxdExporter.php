@@ -33,7 +33,7 @@ class LetterboxdExporter
         $csv = $this->createCsvWriter($csvFilePath);
 
         // csv format documentation here https://letterboxd.com/about/importing-data/
-        $csv->insertOne(['WatchedDate', 'Title', 'tmdbID', 'Rating10', 'Year']);
+        $csv->insertOne(['WatchedDate', 'Title', 'Year', 'tmdbID', 'Rating10']);
 
         $csvLineCounter = 0;
         foreach ($stmt->iterateAssociative() as $row) {
@@ -51,7 +51,7 @@ class LetterboxdExporter
                 $releaseYear = DateTime::createFromString($row['release_date'])->format('Y');
             }
 
-            $csv->insertOne([$row['watched_at'], $row['title'], $row['tmdb_id'], $row['rating'], $releaseYear]);
+            $csv->insertOne([$row['watched_at'], $row['title'], $releaseYear, $row['tmdb_id'], $row['rating']]);
 
             $csvLineCounter++;
         }
