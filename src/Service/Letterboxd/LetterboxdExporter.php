@@ -24,7 +24,8 @@ class LetterboxdExporter
             FROM movie_user_watch_dates mw
             JOIN movie m on mw.movie_id = m.id
             LEFT JOIN movie_user_rating mur on m.id = mur.movie_id AND mur.user_id = ?
-            WHERE mw.user_id = ?',
+            WHERE mw.user_id = ?
+            ORDER BY mw.watched_at',
             [$userId, $userId],
         );
 
