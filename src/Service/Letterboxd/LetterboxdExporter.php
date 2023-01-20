@@ -24,14 +24,16 @@ class LetterboxdExporter
             FROM movie_user_watch_dates mw
             JOIN movie m on mw.movie_id = m.id
             LEFT JOIN movie_user_rating mur on m.id = mur.movie_id AND mur.user_id = ?
-            WHERE mw.user_id = ?',
+            WHERE mw.user_id = ?
+            ORDER BY mw.watched_at',
             [$userId, $userId],
         );
 
         $csvFilePath = $this->fileUtil->createTmpFile();
         $csv = $this->createCsvWriter($csvFilePath);
 
-        $csv->insertOne(['Title', 'Year', 'tmdbID', 'WatchedDate', 'Rating10']);
+        // csv format documentation here https://letterboxd.com/about/importing-data/
+        $csv->insertOne(['WatchedDate', 'Title', 'tmdbID', 'Rating10', 'Year']);
 
         $csvLineCounter = 0;
         foreach ($stmt->iterateAssociative() as $row) {
@@ -49,7 +51,7 @@ class LetterboxdExporter
                 $releaseYear = DateTime::createFromString($row['release_date'])->format('Y');
             }
 
-            $csv->insertOne([$row['title'], $releaseYear, $row['tmdb_id'], $row['watched_at'], $row['rating']]);
+            $csv->insertOne([$row['watched_at'], $row['title'], $row['tmdb_id'], $row['rating'], $releaseYear]);
 
             $csvLineCounter++;
         }
