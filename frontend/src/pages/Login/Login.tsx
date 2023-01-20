@@ -1,12 +1,14 @@
 import { Button, Checkbox, Stack, TextInput, Title } from "@mantine/core"
 import { useForm } from "@mantine/form";
+import { useMutation, useQueryClient } from "react-query";
+import { login } from "../../repositories/auth";
 
 const Login = () => {
     const form = useForm({
         initialValues: {
             email: '',
             password: '',
-            rememberme: false,
+            rememberMe: false,
         },
 
         validate: {
@@ -14,17 +16,24 @@ const Login = () => {
         },
     });
 
+    const queryClient = useQueryClient()
+    const mutation = useMutation(login, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('user')
+        },
+    })
+
     return (
-        <Stack style={{height: "100%"}} justify="center" align="center">
+        <Stack style={{ height: "100%" }} justify="center" align="center">
             <Title order={1}>Movary</Title>
-            <form onSubmit={form.onSubmit((values) => console.log(values))} style={{display: 'inline-block'}}>
+            <form onSubmit={form.onSubmit((values) => mutation.mutate(values))} style={{ display: 'inline-block' }}>
                 <TextInput
                     size="lg"
                     label="Email"
                     {...form.getInputProps('email')}
-                    />
+                />
                 <TextInput
-                    mt="lg" 
+                    mt="lg"
                     size="lg"
                     label="Password"
                     type="password"
