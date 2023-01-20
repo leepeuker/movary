@@ -34,7 +34,6 @@ class NetflixController
         }
 
         $searchresults = [];
-
         $files = $request->getFileParameters();
         if(empty($files)) {
             return Response::createBadRequest();
@@ -64,13 +63,10 @@ class NetflixController
                             'originalname' => $data['movieName']
                         ];
                         $this->logger->info('Item is a movie: ' . $data['movieName']);
-                    } else if($data['type'] == 'Show') {
-                        // Importing TV shows will be added after TV show support is added
-                        $this->logger->info('Item is a TV show, skipping...');
                     }
                 }
             }
-            $jsonresponse = json_encode($searchresults);
+            $jsonresponse = Json::encode($searchresults);
             return Response::createJson($jsonresponse);
         } else {
             return Response::createBadRequest();

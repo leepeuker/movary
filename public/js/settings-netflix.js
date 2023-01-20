@@ -2,7 +2,7 @@ async function importNetflixHistory() {
     var input = document.getElementById('netflixfile');
     var filedata = new FormData();
     filedata.append('netflixviewactivity', input.files[0]);
-    await createloader(document.getElementById('netflixtbody'));
+    await createloader(document.getElementById('netflixtbody'), 'netflix');
     await fetch('/settings/netflix', {
         method: 'POST',
         body: filedata
@@ -26,9 +26,10 @@ async function importNetflixHistory() {
     });
 }
 
-async function searchTMDB() {
+async function searchTMDB(event) {
+    event.preventDefault();
     var query = document.getElementById('searchtmdb').value;
-    await createloader(document.getElementById('tmdbsearchresults'));
+    await createloader(document.getElementById('tmdbsearchresults'), 'tmdb');
     await fetch('/settings/netflix/search', {
         method: 'POST',
         headers: {
@@ -38,7 +39,7 @@ async function searchTMDB() {
             'query': query
         })
     }).then(response => {
-        document.getElementById('tmdbsearchresults').querySelector('div.spinner-border').parentElement.remove();
+        document.getElementById('tmdbsearchresults').querySelector('div.spinner-border').remove();
         if(!response.ok) {
             processError(response.status);
             return false;
@@ -53,40 +54,60 @@ async function searchTMDB() {
     });
 }
 
-async function createloader(parent) {
+async function createloader(parent, target) {
     parent.innerHTML = '';
-    let row = document.createElement('tr');
-    let cell = document.createElement('td');
     let div = document.createElement('div');
     let span = document.createElement('span');
-    cell.colSpan = 4;
-
     div.className = 'spinner-border';
     span.className = 'visually-hidden';
-
     span.innerText = 'Loading...';
-    cell.innerText = "";
     div.append(span);
-    cell.append(div);
-    row.append(cell);
-    parent.append(row);
+    if(target == 'netflix') {
+        let row = document.createElement('tr');
+        let cell = document.createElement('td');
+        cell.colSpan = 4;
+        cell.innerText = "";
+        cell.append(div);
+        row.append(cell);
+        parent.append(row);
+    } else if(target == 'tmdb') {
+        parent.append(div);
+    }
 }
 
 function updatetable() {
     let amount = document.getElementById('amounttoshow').value;
     let rows = document.getElementById('netflixtbody').children;
-    if(amount == 'all') {
-        createpagenav(rows.length, rows.length);
+    let filter = document.getElementById('selectfilter').value;
+    if(filter == 'notfound') {
+        for(let i = 0; i < rows.length; i++) {
+            if(rows[i].dataset.tmdbid != 'undefined') {
+                rows[i].classList.add('d-none');
+            } else {
+                rows[i].classList.remove('d-none');
+            }
+        }
+        document.querySelector('label[for="amounttoshow"]').classList.add('d-none');
+        document.getElementById('amounttoshow').classList.add('d-none');
+        createpagenav(amount, amount);
+        changepage('all');
     } else {
-        createpagenav(amount, rows.length);
+        document.querySelector('label[for="amounttoshow"]').classList.remove('d-none');
+        document.getElementById('amounttoshow').classList.remove('d-none');
+        if(amount == 'all') {
+            createpagenav(rows.length, rows.length);
+        } else {
+            createpagenav(amount, rows.length);
+        }
+        changepage(1);
     }
-    changepage(1);
 }
 
 function changepage(direction) {
     let ul = document.getElementsByClassName('pagination')[0];
     let amount = document.getElementById('amounttoshow').value;
     let rows = document.getElementById('netflixtbody').children;
+    let notfoundrows = document.querySelectorAll("tr[data-tmdbid='undefined']");
     var targetpage = -1;
     if(direction === 'previous') {
         if(!ul.children[1].classList.contains('active')) {
@@ -111,21 +132,30 @@ function changepage(direction) {
     }
 
     if(targetpage != -1) {
-        document.querySelectorAll("tr:not(.d-none)").forEach((el) => {
+        var filter = document.getElementById('selectfilter').value;
+        let tbody = document.getElementById('netflixtbody');
+        tbody.querySelectorAll("tr:not(.d-none)").forEach((el) => {
             el.classList.add('d-none');
         });
         if(amount == 'all') {
             for(let i = 0; i < rows.length; i++) {
-                rows[i].classList.remove('d-none');
+                if(filter == 'notfound' && rows[i].dataset.tmdbid == 'undefined') {
+                    rows[i].classList.remove('d-none');
+                } else if(filter == 'all') {
+                    rows[i].classList.remove('d-none');
+                }
             }
         } else {
             for(let i = amount * targetpage - amount + 1; i < amount * targetpage + 1; i++) {
-                if(rows.length > i) {
+                if(rows.length > i && filter != 'notfound') {
                     rows[i].classList.remove('d-none');
+                } else if(notfoundrows.length > i && filter == 'notfound') {
+                    notfoundrows[i].classList.remove('d-none');
                 }
             }
         }
     }
+    window.scrollTo(0, 0);
 }
 
 function createpagenav(amount, items) {
@@ -171,7 +201,50 @@ function createpagenav(amount, items) {
 }
 
 function processTMDBData(data) {
-    console.log(data);
+    let parent = document.getElementById('tmdbsearchresults');
+    data.forEach((item) => {
+        let media_div = document.createElement('div');
+        let thumb_div = document.createElement('div');
+        let descr_div = document.createElement('div');
+        let radio_div = document.createElement('div');
+        let heading = document.createElement('h3');
+        let link = document.createElement('a');
+        let img = document.createElement('img');
+        let paragraph = document.createElement('p');
+        let release_date = document.createElement('p');
+        let radio = document.createElement('input');
+
+        media_div.className = 'd-flex flex-row mb-3 tmdbrow';
+        thumb_div.className = 'flex-shrink-0 align-self-start';
+        descr_div.className = 'flex-grow-1 ms-3 align-self-center';
+        radio_div.className = 'input-group-text';
+
+        media_div.setAttribute('data-tmdbid', item['id'])
+        
+        img.src = item['poster_path'] != null ? 'https://image.tmdb.org/t/p/w92' + item['poster_path'] : '/images/placeholder-image.png';
+        img.className = 'img-fluid';
+        img.alt = 'Cover of ' + item['title'];
+        img.style.width = '92px';
+
+        link.innerText = item['title'];
+        link.href = 'https://www.themoviedb.org/movie/' + item['id'];
+        link.target = '_blank';
+        heading.append(link);
+        paragraph.innerText = item['overview'];
+        release_date.innerText = "Release date: " + item['release_date'];
+
+        radio_div.style.height = 'fit-content';
+        radio.className = 'form-check-input tmdbradio';
+        radio.type = 'radio';
+
+        descr_div.append(heading, paragraph, release_date);
+        thumb_div.append(img);
+        radio_div.append(radio);
+        media_div.append(thumb_div, descr_div, radio_div);
+        media_div.addEventListener('click', selecttmdbitem);
+        parent.append(media_div);
+        return false;
+    });
 }
 
 function processNetflixData(data) {
@@ -192,15 +265,29 @@ function processNetflixData(data) {
         let description = document.createElement('b');
         let editbtn = document.createElement('button');
         let date = document.createElement('td');
+        let paragraph = document.createElement('p');
+        let release_date = document.createElement('p');
 
 
         netflix_name.innerText = data[key]['originalname'];
         indexcell.innerText = index + 1;
 
-        row.className = index + 1 > amount ?  'd-none' : '';
+        row.className = 'netflixrow';
+        if(document.getElementById('selectfilter').value == 'notfound') {
+            if(data[key]['result'] != 'Unknown') {
+                row.classList.add('d-none');
+            } else {
+                row.classList.remove('d-none');
+            }
+        } else if(index + 1 > amount) {
+            row.classList.add('d-none');
+        }
+        row.id = index + 1;
         row.setAttribute('data-tmdbid', data[key]['result']['id']);
         
-        editbtn.className = 'btn btn-success';
+        release_date.className = 'mb-auto pb-3';
+        
+        editbtn.className = 'btn btn-success align-self-start';
         editbtn.innerHTML = '<i class="bi bi-pencil-square"></i>';
         editbtn.setAttribute('data-bs-toggle', 'modal');
         editbtn.setAttribute('data-bs-target', '#tmdbmodal');
@@ -208,35 +295,29 @@ function processNetflixData(data) {
         tmdb.className = 'w-50';
         tmdb_div.className = "row";
         tmdb_cover_div.className = 'col-md-3 justify-content-center';
-        tmdb_description_div.className = 'col-md-9 text-start';
+        tmdb_description_div.className = 'col-md-9 text-start d-flex flex-column';
         tmdb_cover.style.width = '92px';
         tmdb_cover.alt = 'Movie poster of ' + (data[key]['result']['title'] ?? 'missing item');
 
+        tmdb_link.target = '__blank';
+        tmdb_cover.className = 'img-fluid';
         if(data[key]['result'] == 'Unknown' || data[key]['result']['poster_path'] == null) {
-            tmdb_cover.src = window.location.protocol + "//" + window.location.host + '/images/placeholder-image.png';
-            tmdb_cover.className = 'img-fluid';
-            tmdb_link.innerText = 'Item not found on TMDB';
+            tmdb_cover.src = '/images/placeholder-image.png';
+            tmdb_link.innerText = 'Image not found on TMDB';
         } else {
             tmdb_cover.src = 'https://image.tmdb.org/t/p/w92' + data[key]['result']['poster_path'];
-            tmdb_cover.className = 'img-fluid';
             tmdb_link.href = 'https://www.themoviedb.org/movie/' + data[key]['result']['id'];
-            tmdb_link.target = '__blank';
             tmdb_link.innerText = data[key]['result']['title'];
         }
 
         if(data[key]['result'] == 'Unknown' || data[key]['result']['overview'] == null) {
             description.innerText = 'Description not found';
-            tmdb_description_div.append(description);
-        } else {
-            let br = document.createElement('br');
-            let paragraph = document.createElement('p');
-            let release_date = document.createElement('p');
-            
+        } else {            
             description.innerText = 'Description: ';
             paragraph.innerText = data[key]['result']['overview'];
             release_date.innerText = 'Release date: ' + data[key]['result']['release_date'];
-            tmdb_description_div.append(description, br, paragraph, release_date);
         }
+        tmdb_description_div.append(description, paragraph, release_date);
         tmdb_description_div.append(editbtn);
 
         date.innerText = data[key]['date']['day'] + "/" + data[key]['date']['month'] + "/" + data[key]['date']['year'];
@@ -247,8 +328,11 @@ function processNetflixData(data) {
         row.append(indexcell, date, netflix_name, tmdb);
         document.getElementById('netflixtbody').append(row);
     });
-    createpagenav(amount, keys.length);
-    document.getElementById('amounttoshow').addEventListener('change', updatetable);
+    if(document.getElementById('selectfilter').value == 'notfound') {
+        createpagenav(amount, amount);
+    } else {
+        createpagenav(amount, keys.length);
+    }
 }
 
 function processError(errorcode) {
@@ -267,13 +351,30 @@ function processError(errorcode) {
     document.getElementById('netflixtbody').append(errorrow);
 }
 
-const TMDBModal = document.getElementById('tmdbmodal');
+function selecttmdbitem() {
+    let radios = document.getElementsByClassName('tmdbradio');
+    for(let i = 0; i < radios.length; i++) {
+        radios[i].checked = false;
+    }
+    this.getElementsByClassName('tmdbradio')[0].checked = true;
+}
 
-TMDBModal.addEventListener('show.bs.modal', function (event) {
-    // Button that triggered the modal
-    let button = event.relatedTarget;
-    // Extract info from data-bs-* attributes
-    let tmdbid = button.getAttribute('data-tmdbid');
-    // Use above variables to manipulate the DOM
-    
-});
+function savetmdbitem() {
+    let checkedrow = document.querySelector('input.tmdbradio:checked').closest('.tmdbrow');
+    let rowid = document.getElementById('tmdbmodal').dataset.rowid;
+    let targetrow = document.getElementById(rowid); 
+    targetrow.getElementsByClassName('img-fluid')[0].src = checkedrow.getElementsByClassName('img-fluid')[0].src;
+    targetrow.getElementsByTagName('a')[0].href = checkedrow.getElementsByTagName('a')[0].href;
+    targetrow.getElementsByTagName('a')[0].innerText = checkedrow.getElementsByTagName('a')[0].innerText;
+    targetrow.getElementsByTagName('p')[0].innerText = checkedrow.getElementsByTagName('p')[0].innerText;
+    targetrow.getElementsByTagName('p')[1].innerText = checkedrow.getElementsByTagName('p')[1].innerText;
+    targetrow.setAttribute('data-tmdbid', checkedrow.dataset.tmdbid);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('tmdbmodal'));
+    modal.hide();
+}
+
+document.getElementById('tmdbmodal').addEventListener('show.bs.modal', event => {
+  let button = event.relatedTarget;
+  let id = button.closest('.netflixrow').id;
+  document.getElementById('tmdbmodal').setAttribute('data-rowid', id);
+})

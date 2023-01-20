@@ -10,6 +10,7 @@
 
 {% block stylesheets %}
     <link href="/css/settings.css" rel="stylesheet">
+    <link href="/css/netflix.css" rel="stylesheet">
     <link href="/css/bootstrap-icons-1.10.2.css" rel="stylesheet">
 {% endblock %}
 
@@ -28,27 +29,33 @@
                     <br/>
                     Upload this CSV file down below.
                 </div>
-                <form>
+                <form class="mb-3">
                     <label class="form-label" for="file">Upload Your CSV File</label>
                     <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
                     <button class="btn btn-primary" name="submit" onclick="importNetflixHistory()" type="button"> Upload File </button>
                 </form>
-                <br/>
-                <label for="amounttoshow">Number of items on one page:</label>
-                <select id="amounttoshow" class="form-select">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="all">All</option>
-                </select>
+                <div class="input-group">
+                    <label for="selectfilter" class="input-group-text">Filter</label>
+                    <select id="selectfilter" onchange="updatetable()" class="form-select">
+                        <option value="all">All</option>
+                        <option value="notfound">Not found</option>
+                    </select>
+                    <label for="amounttoshow" class="input-group-text">Number of items on one page</label>
+                    <select id="amounttoshow" onchange="updatetable()" class="form-select">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">All</option>
+                    </select>
+                </div>
                 <table class="table table-hover">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Date watched</th>
                             <th scope="col">Netflix name</th>
-                            <th scope="col">Fetched TMDB</th>
+                            <th scope="col">TMDB item</th>
                         </tr>
                     </thead>
                     <tbody id="netflixtbody">
@@ -58,7 +65,7 @@
                     </tbody>
                 </table>
                 <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-end">
+                    <ul class="pagination justify-content-center">
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Previous</a></li>
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">#</a></li>
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Next</a></li>
@@ -68,7 +75,7 @@
         </div>
     </main>
     <!-- Modal to search for other TMDB items -->
-    <div class="modal fade" id="tmdbmodal" tabindex="-1" role="dialog" aria-labelledby="TMDBModalTitle" aria-hidden="true">
+    <div class="modal fade modal-lg" id="tmdbmodal" tabindex="-1" role="dialog" aria-labelledby="TMDBModalTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -78,16 +85,16 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <label for="searchtmdb" class="form-label">Search for item on TMDB</label>
-                        <div class="input-group mb-3">
+                        <form class="input-group mb-3">
                             <input type="text" class="form-control" name="searchtmdb" id="searchtmdb">
-                            <button class="btn btn-success" type="button" id="searchtmdbbtn" onclick="searchTMDB()" ><i class="bi bi-search"></i></button>
-                        </div>
-                        <div id="tmdbsearchresults"></div>
+                            <button class="btn btn-success" type="submit" id="searchtmdbbtn" onclick="searchTMDB(event)" ><i class="bi bi-search"></i></button>
+                        </form>
+                        <div id="tmdbsearchresults" class="row justify-content-center"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-primary" onclick="savetmdbitem()">Save</button>
                 </div>
             </div>
         </div>
