@@ -2,8 +2,6 @@
 
 namespace Movary\Command;
 
-use Movary\Service\Trakt\ImportRatings;
-use Movary\Service\Trakt\ImportWatchedMovies;
 use Movary\Service\Trakt\TraktCacheService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,8 +16,6 @@ class TraktCache extends Command
     protected static $defaultName = 'trakt:updateCache';
 
     public function __construct(
-        private readonly ImportRatings $importRatings,
-        private readonly ImportWatchedMovies $importWatchedMovies,
         private readonly TraktCacheService $traktCacheService,
         private readonly LoggerInterface $logger,
     ) {
