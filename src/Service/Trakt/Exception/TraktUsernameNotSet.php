@@ -4,6 +4,6 @@ namespace Movary\Service\Trakt\Exception;
 
 use Exception;
 
-class TraktUserNameNotSet extends Exception
+class TraktUsernameNotSet extends Exception
 {
 }

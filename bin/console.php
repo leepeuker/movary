@@ -4,6 +4,7 @@ $container = require(__DIR__ . '/../bootstrap.php');
 
 $application = $container->get(Symfony\Component\Console\Application::class);
 $application->add($container->get(Movary\Command\CreatePublicStorageLink::class));
+$application->add($container->get(Movary\Command\TraktCache::class));
 $application->add($container->get(Movary\Command\TraktImport::class));
 $application->add($container->get(Movary\Command\TmdbMovieSync::class));
 $application->add($container->get(Movary\Command\TmdbPersonSync::class));

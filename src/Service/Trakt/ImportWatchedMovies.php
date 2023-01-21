@@ -4,13 +4,13 @@ namespace Movary\Service\Trakt;
 
 use Movary\Api;
 use Movary\Api\Trakt\TraktApi;
+use Movary\Api\Trakt\ValueObject\TraktCredentials;
 use Movary\Api\Trakt\ValueObject\TraktId;
+use Movary\Api\Trakt\ValueObject\User\Movie\Watched\Dto;
+use Movary\Api\Trakt\ValueObject\User\Movie\Watched\DtoList;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
-use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobEntity;
-use Movary\Service\Trakt\Exception\TraktClientIdNotSet;
-use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
 use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -20,45 +20,43 @@ class ImportWatchedMovies
     public function __construct(
         private readonly MovieApi $movieApi,
         private readonly TraktApi $traktApi,
-        private readonly Api\Trakt\Cache\User\Movie\Watched\Service $traktApiCacheUserMovieWatchedService,
+        private readonly Api\Trakt\Cache\User\Movie\Watched\Service $traktApiWatchedMoviesCache,
         private readonly LoggerInterface $logger,
         private readonly PlaysPerDateFetcher $playsPerDateFetcher,
-        private readonly UserApi $userApi,
         private readonly MovieImporter $movieImporter,
+        private readonly TraktCredentialsProvider $credentialsProvider,
     ) {
+    }
+
+    public function deleteMovieWatchDate(MovieEntity $movie, int $userId, Date $localWatchDate) : void
+    {
+        $this->movieApi->deleteHistoryByIdAndDate($movie->getId(), $userId, $localWatchDate);
+
+        $this->logger->info('Trakt history import: Deleted "' . $movie->getTitle() . '" watch date "' . $localWatchDate . '" not exising in trakt');
     }
 
     public function execute(int $userId, bool $overwriteExistingData = false, bool $ignoreCache = false) : void
     {
-        $traktClientId = $this->userApi->findTraktClientId($userId);
-        if ($traktClientId === null) {
-            throw new TraktClientIdNotSet();
-        }
+        $traktCredentials = $this->credentialsProvider->fetchTraktCredentialsByUserId($userId);
 
-        $traktUserName = $this->userApi->findTraktUserName($userId);
-        if ($traktUserName === null) {
-            throw new TraktUserNameNotSet();
-        }
+        $traktWatchedMovies = $this->traktApi->fetchUserMoviesWatched($traktCredentials);
+        foreach ($traktWatchedMovies as $traktWatchedMovie) {
+            $movie = $this->movieImporter->importMovie($traktWatchedMovie->getMovie());
 
-        $traktWatchedMovies = $this->traktApi->fetchUserMoviesWatched($traktClientId, $traktUserName);
-
-        foreach ($this->traktApi->fetchUserMoviesWatched($traktClientId, $traktUserName) as $watchedMovie) {
-            $traktId = $watchedMovie->getMovie()->getTraktId();
-
-            $movie = $this->movieImporter->importMovie($watchedMovie->getMovie());
-
-            if ($ignoreCache === false && $this->isWatchedCacheUpToDate($userId, $watchedMovie) === true) {
+            if ($ignoreCache === false && $this->isTraktCacheUpToDate($userId, $traktWatchedMovie) === true) {
                 $this->logger->debug('Trakt history import: Skipped "' . $movie->getTitle() . '" because trakt cache is up to date');
 
                 continue;
             }
 
-            $this->importMovieHistory($traktClientId, $traktUserName, $userId, $traktId, $movie, $overwriteExistingData);
+            $traktId = $traktWatchedMovie->getMovie()->getTraktId();
 
-            $this->traktApiCacheUserMovieWatchedService->setOne($userId, $traktId, $watchedMovie->getLastUpdated());
+            $this->importMovieHistory($traktCredentials, $userId, $traktId, $movie, $overwriteExistingData);
+
+            $this->traktApiWatchedMoviesCache->setLastUpdated($userId, $traktId, $traktWatchedMovie->getLastUpdated());
         }
 
-        $this->removeWatchesNoLongerExistingInTrakt($userId, $traktWatchedMovies, $overwriteExistingData);
+        $this->cleanupCachedMoviesNoLongerExistingInTrakt($userId, $traktWatchedMovies, $overwriteExistingData);
     }
 
     public function executeJob(JobEntity $job) : void
@@ -71,32 +69,60 @@ class ImportWatchedMovies
         $this->execute($userId);
     }
 
+    private function cleanupCachedMoviesNoLongerExistingInTrakt(int $userId, DtoList $traktWatchedMovies, bool $overwriteExistingData) : void
+    {
+        foreach ($this->traktApi->fetchUniqueCachedTraktIds($userId) as $cachedTraktId) {
+            if ($traktWatchedMovies->containsTraktId($cachedTraktId) === true) {
+                continue;
+            }
+
+            $this->traktApi->removeWatchCacheByTraktId($userId, $cachedTraktId);
+
+            if ($overwriteExistingData === false) {
+                $this->logger->debug('Trakt history import: Skipped removing watch date(s) for movie no longer existing in trakt, no overwrite set', ['traktId' => $cachedTraktId]);
+
+                return;
+            }
+
+            $this->movieApi->deleteHistoryForUserByTraktId($userId, $cachedTraktId);
+            $this->logger->info('Trakt history import: Removed outdated watch date(s) for movie with trakt id: ' . $cachedTraktId);
+        }
+    }
+
     private function importMovieHistory(
-        string $traktClientId,
-        string $traktUserName,
+        TraktCredentials $traktCredentials,
         int $userId,
         TraktId $traktId,
         MovieEntity $movie,
         bool $overwriteExistingData,
     ) : void {
-        $latestTraktWatchDateToPlaysMap = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktClientId, $traktUserName, $traktId);
+        $traktMovieWatchDates = $this->playsPerDateFetcher->fetchTraktPlaysPerDate($traktCredentials, $traktId);
+        $skipTraktWatchDates = WatchDateToPlaysMap::create();
 
-        $skipWatchDates = WatchDateToPlaysMap::create();
+        $localMovieWatchDates = $this->movieApi->fetchHistoryByMovieId($movie->getId(), $userId);
 
-        foreach ($this->movieApi->fetchHistoryByMovieId($movie->getId(), $userId) as $localHistoryEntry) {
-            $localWatchDate = Date::createFromString($localHistoryEntry['watched_at']);
+        foreach ($localMovieWatchDates as $localMovieWatchDate) {
+            $localWatchDate = Date::createFromString($localMovieWatchDate['watched_at']);
 
-            if ($latestTraktWatchDateToPlaysMap->containsDate($localWatchDate) === false) {
+            if ($traktMovieWatchDates->containsDate($localWatchDate) === false) {
+                if ($overwriteExistingData === false) {
+                    $this->logger->debug('Trakt history import: Skipped deleting "' . $movie->getTitle() . '" watch date "' . $localWatchDate . '" not exising in trakt, overwrite not set');
+
+                    continue;
+                }
+
+                $this->deleteMovieWatchDate($movie, $userId, $localWatchDate);
+
                 continue;
             }
 
-            $localWatchDatePlays = $localHistoryEntry['plays'];
-            $latestTraktWatchDatePlays = $latestTraktWatchDateToPlaysMap->getPlaysForDate($localWatchDate);
+            $localWatchDatePlays = $localMovieWatchDate['plays'];
+            $traktWatchDatePlays = $traktMovieWatchDates->getPlaysForDate($localWatchDate);
 
-            if ($localWatchDatePlays === $latestTraktWatchDatePlays) {
+            if ($localWatchDatePlays === $traktWatchDatePlays) {
                 $this->logger->debug('Trakt history import: Skipped "' . $movie->getTitle() . '" watch date "' . $localWatchDate . '" plays update, already up to date');
 
-                $skipWatchDates->add($localWatchDate, $localWatchDatePlays);
+                $skipTraktWatchDates->add($localWatchDate, $localWatchDatePlays);
 
                 continue;
             }
@@ -104,12 +130,14 @@ class ImportWatchedMovies
             if ($overwriteExistingData === false) {
                 $this->logger->debug('Trakt history import: Skipped "' . $movie->getTitle() . '" watch date "' . $localWatchDate . '" plays update, overwrite not set');
 
-                $skipWatchDates->add($localWatchDate, $localWatchDatePlays);
+                $skipTraktWatchDates->add($localWatchDate, $localWatchDatePlays);
             }
         }
 
-        foreach ($latestTraktWatchDateToPlaysMap->removeWatchDates($skipWatchDates) as $watchedAt => $plays) {
-            $this->replacePlaysForMovieWatchDate(
+        $traktMovieWatchDatesWithoutSkipDates = $traktMovieWatchDates->removeWatchDates($skipTraktWatchDates);
+
+        foreach ($traktMovieWatchDatesWithoutSkipDates as $watchedAt => $plays) {
+            $this->replaceMovieWatchDate(
                 $movie,
                 $userId,
                 Date::createFromString($watchedAt),
@@ -118,34 +146,14 @@ class ImportWatchedMovies
         }
     }
 
-    private function isWatchedCacheUpToDate(int $userId, Api\Trakt\ValueObject\User\Movie\Watched\Dto $watchedMovie) : bool
+    private function isTraktCacheUpToDate(int $userId, Dto $watchedMovie) : bool
     {
-        $cacheLastUpdated = $this->traktApiCacheUserMovieWatchedService->findLastUpdatedByTraktId($userId, $watchedMovie->getMovie()->getTraktId());
+        $cacheLastUpdated = $this->traktApiWatchedMoviesCache->findLastUpdated($userId, $watchedMovie->getMovie()->getTraktId());
 
         return $cacheLastUpdated !== null && $watchedMovie->getLastUpdated()->isEqual($cacheLastUpdated) === true;
     }
 
-    private function removeWatchesNoLongerExistingInTrakt(int $userId, Api\Trakt\ValueObject\User\Movie\Watched\DtoList $traktWatchedMovies, bool $overwriteExistingData) : void
-    {
-        if ($overwriteExistingData === false) {
-            $this->logger->debug('Trakt history import: Skipping removing outdated watch dates, no overwrite set');
-
-            exit;
-        }
-
-        foreach ($this->traktApi->fetchUniqueCachedTraktIds($userId) as $cachedTraktId) {
-            if ($traktWatchedMovies->containsTraktId($cachedTraktId) === true) {
-                continue;
-            }
-
-            $this->traktApi->removeWatchCacheByTraktId($userId, $cachedTraktId);
-
-            $this->movieApi->deleteHistoryForUserByTraktId($userId, $cachedTraktId);
-            $this->logger->info('Trakt history import: Removed outdated watch dates for movie with trakt id: ' . $cachedTraktId);
-        }
-    }
-
-    private function replacePlaysForMovieWatchDate(MovieEntity $movie, int $userId, Date $watchedAt, int $plays) : void
+    private function replaceMovieWatchDate(MovieEntity $movie, int $userId, Date $watchedAt, int $plays) : void
     {
         $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $userId, $watchedAt, $plays);
 
