@@ -43,8 +43,8 @@ class TraktCache extends Command
         try {
             $this->traktCacheService->updateCache($userId);
         } catch (Throwable $t) {
-            $this->generateOutput($output, 'ERROR: Could not complete trakt import.');
-            $this->logger->error('Could not complete trakt mo.', ['exception' => $t]);
+            $this->generateOutput($output, 'ERROR: Could not complete trakt cache update.');
+            $this->logger->error('Could not complete trakt cache update.', ['exception' => $t]);
 
             return Command::FAILURE;
         }
