@@ -48,6 +48,7 @@ composer_test:
 # Database
 ##########
 db_mysql_create_database:
+	make exec_mysql_query QUERY="DROP DATABASE $(DATABASE_MYSQL_NAME)"
 	make exec_mysql_query QUERY="CREATE DATABASE IF NOT EXISTS $(DATABASE_MYSQL_NAME)"
 	make exec_mysql_query QUERY="GRANT ALL PRIVILEGES ON $(DATABASE_MYSQL_NAME).* TO $(DATABASE_MYSQL_USER)@'%'"
 	make exec_mysql_query QUERY="FLUSH PRIVILEGES;"

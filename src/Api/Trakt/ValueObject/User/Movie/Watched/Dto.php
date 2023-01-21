@@ -9,8 +9,6 @@ class Dto
 {
     private function __construct(
         private readonly TraktMovie $movie,
-        private readonly int $plays,
-        private readonly DateTime $lastWatched,
         private readonly DateTime $lastUpdated,
     ) {
     }
@@ -19,9 +17,7 @@ class Dto
     {
         return new self(
             TraktMovie::createFromArray($data['movie']),
-            $data['plays'],
-            DateTime::createFromString($data['last_watched_at']),
-            DateTime::createFromString($data['last_watched_at']),
+            DateTime::createFromString($data['last_updated_at']),
         );
     }
 
@@ -30,18 +26,8 @@ class Dto
         return $this->lastUpdated;
     }
 
-    public function getLastWatched() : DateTime
-    {
-        return $this->lastWatched;
-    }
-
     public function getMovie() : TraktMovie
     {
         return $this->movie;
-    }
-
-    public function getPlays() : int
-    {
-        return $this->plays;
     }
 }

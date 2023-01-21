@@ -4,7 +4,7 @@ namespace Movary\Command;
 
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Trakt\Exception\TraktClientIdNotSet;
-use Movary\Service\Trakt\Exception\TraktUserNameNotSet;
+use Movary\Service\Trakt\Exception\TraktUsernameNotSet;
 use Movary\Service\Trakt\ImportRatings;
 use Movary\Service\Trakt\ImportWatchedMovies;
 use Movary\ValueObject\JobStatus;
@@ -77,7 +77,7 @@ class TraktImport extends Command
             $this->generateOutput($output, 'ERROR: User as no trakt client id set.');
 
             return Command::FAILURE;
-        } catch (TraktUserNameNotSet $t) {
+        } catch (TraktUsernameNotSet $t) {
             $this->generateOutput($output, 'ERROR: User as no trakt user name set.');
 
             return Command::FAILURE;

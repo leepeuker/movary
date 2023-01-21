@@ -73,9 +73,9 @@ class MovieApi
         );
     }
 
-    public function deleteHistoryByIdAndDate(int $id, int $userId, Date $watchedAt) : void
+    public function deleteHistoryByIdAndDate(int $movieId, int $userId, Date $watchedAt) : void
     {
-        $this->historyApi->deleteHistoryByIdAndDate($id, $userId, $watchedAt);
+        $this->historyApi->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);
     }
 
     public function deleteHistoryByUserId(int $userId) : void

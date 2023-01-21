@@ -3,6 +3,7 @@
 namespace Movary\Api\Trakt;
 
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
+use Movary\Api\Trakt\ValueObject\TraktCredentials;
 use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\Api\Trakt\ValueObject\User;
 use RuntimeException;
@@ -20,30 +21,43 @@ class TraktApi
         return $this->cacheWatchedService->fetchAllUniqueTraktIds($userId);
     }
 
-    public function fetchUserMovieHistoryByMovieId(string $clientId, string $username, TraktId $traktId) : User\Movie\History\DtoList
+    public function fetchUserMovieHistoryByMovieId(TraktCredentials $traktCredentials, TraktId $traktId) : User\Movie\History\DtoList
     {
-        $responseData = $this->client->get($clientId, sprintf('/users/%s/history/movies/%d', $username, $traktId->asInt()));
+        $responseData = $this->client->get(
+            $traktCredentials->getClientId(),
+            sprintf(
+                '/users/%s/history/movies/%d',
+                $traktCredentials->getUsername(),
+                $traktId->asInt(),
+            ),
+        );
 
         return User\Movie\History\DtoList::createFromArray($responseData);
     }
 
-    public function fetchUserMoviesRatings(string $clientId, string $username) : User\Movie\Rating\DtoList
+    public function fetchUserMoviesRatings(TraktCredentials $traktCredentials) : User\Movie\Rating\DtoList
     {
-        $responseData = $this->client->get($clientId, sprintf('/users/%s/ratings/movies', $username));
+        $responseData = $this->client->get(
+            $traktCredentials->getClientId(),
+            sprintf('/users/%s/ratings/movies', $traktCredentials->getUsername()),
+        );
 
         return User\Movie\Rating\DtoList::createFromArray($responseData);
     }
 
-    public function fetchUserMoviesWatched(string $clientId, string $username) : User\Movie\Watched\DtoList
+    public function fetchUserMoviesWatched(TraktCredentials $traktCredentials) : User\Movie\Watched\DtoList
     {
-        $responseData = $this->client->get($clientId, sprintf('/users/%s/watched/movies', $username));
+        $responseData = $this->client->get(
+            $traktCredentials->getClientId(),
+            sprintf('/users/%s/watched/movies', $traktCredentials->getUsername()),
+        );
 
         return User\Movie\Watched\DtoList::createFromArray($responseData);
     }
 
     public function removeWatchCacheByTraktId(int $userId, TraktId $traktId) : void
     {
-        $this->cacheWatchedService->remove($userId, $traktId);
+        $this->cacheWatchedService->removeLastUpdated($userId, $traktId);
     }
 
     public function verifyCredentials(string $clientId, string $username) : bool

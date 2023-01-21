@@ -1,0 +1,7 @@
+GET https://api.trakt.tv/users/<username>/watched/movies
+Accept: */*
+Cache-Control: no-cache
+trakt-api-version: 2
+trakt-api-key: <key>
+
+####
