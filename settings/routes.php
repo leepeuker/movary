@@ -204,6 +204,20 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderAppPage'],
     );
 
+    ##########
+    # Movies #
+    ##########
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/refresh-tmdb',
+        [\Movary\HttpController\MovieController::class, 'refreshTmdbData'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/refresh-imdb',
+        [\Movary\HttpController\MovieController::class, 'refreshImdbRating'],
+    );
+
     ##############
     # User media #
     ##############

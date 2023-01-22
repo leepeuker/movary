@@ -8,9 +8,12 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\ValueObject\Date;
+use Throwable;
 
 class SyncMovie
 {
+    private const SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 1000000;
+
     public function __construct(
         private readonly TmdbApi $tmdbApi,
         private readonly MovieApi $movieApi,
@@ -23,7 +26,14 @@ class SyncMovie
 
     public function syncMovie(int $tmdbId) : MovieEntity
     {
-        $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);
+        try {
+            $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);
+        } catch (Throwable) {
+            /** @psalm-suppress ArgumentTypeCoercion */
+            usleep(self::SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS);
+
+            $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);
+        }
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 

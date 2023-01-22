@@ -2,10 +2,12 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
+use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -21,6 +23,8 @@ class MovieController
         private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly SyncMovie $tmdbMovieSync,
+        private readonly ImdbWebScrapper $imdbWebScrapper,
     ) {
     }
 
@@ -43,6 +47,48 @@ class MovieController
         return Response::createJson(
             Json::encode(['personalRating' => $userRating?->asInt()]),
         );
+    }
+
+    public function refreshImdbRating(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createForbidden();
+        }
+
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $movie = $this->movieApi->findById($movieId);
+
+        if ($movie === null) {
+            return Response::createNotFound();
+        }
+
+        $imdbRating = $this->imdbWebScrapper->findRating($movie['imdbId']);
+        $this->movieApi->updateImdbRating($movieId, $imdbRating['average'], $imdbRating['voteCount']);
+
+        return Response::createOk();
+    }
+
+    public function refreshTmdbData(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createForbidden();
+        }
+
+        $movieId = (int)$request->getRouteParameters()['id'];
+
+        $movie = $this->movieApi->findById($movieId);
+        if ($movie === null) {
+            return Response::createNotFound();
+        }
+
+        $tmdbId = $movie['tmdbId'] ?? null;
+        if ($tmdbId === null) {
+            return Response::createOk();
+        }
+
+        $this->tmdbMovieSync->syncMovie($tmdbId);
+
+        return Response::createOk();
     }
 
     public function renderPage(Request $request) : Response

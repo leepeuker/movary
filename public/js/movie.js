@@ -317,3 +317,49 @@ function getCurrentDate() {
 
     return yyyy + '-' + mm + '-' + dd
 }
+
+function refreshTmdbData() {
+    document.getElementById('refreshTmdbDataButton').disabled = true;
+    document.getElementById('refreshImdbRatingButton').disabled = true;
+
+    refreshTmdbDataRequest().then(() => {
+        location.reload()
+    }).catch(() => {
+        alert('Could not refresh tmdb data. Please try again.')
+        document.getElementById('refreshTmdbDataButton').disabled = false;
+        document.getElementById('refreshImdbRatingButton').disabled = false;
+    })
+}
+
+async function refreshTmdbDataRequest() {
+    const response = await fetch('/movies/303/refresh-tmdb')
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return true
+}
+
+function refreshImdbRating() {
+    document.getElementById('refreshTmdbDataButton').disabled = true;
+    document.getElementById('refreshImdbRatingButton').disabled = true;
+
+    refreshImdbRatingRequest().then(() => {
+        location.reload()
+    }).catch(() => {
+        alert('Could not refresh imdb rating. Please try again.')
+        document.getElementById('refreshTmdbDataButton').disabled = false;
+        document.getElementById('refreshImdbRatingButton').disabled = false;
+    })
+}
+
+async function refreshImdbRatingRequest() {
+    const response = await fetch('/movies/303/refresh-imdb')
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return true
+}
