@@ -1,9 +1,13 @@
 import { Button, Checkbox, Stack, TextInput, Title } from "@mantine/core"
 import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQueryClient } from "react-query";
 import { login } from "../../repositories/auth";
 
 const Login = () => {
+    const {i18n, t} = useTranslation('login');
+
     const form = useForm({
         initialValues: {
             email: '',
@@ -29,22 +33,22 @@ const Login = () => {
             <form onSubmit={form.onSubmit((values) => mutation.mutate(values))} style={{ display: 'inline-block' }}>
                 <TextInput
                     size="lg"
-                    label="Email"
+                    label={t('email')}
                     {...form.getInputProps('email')}
                 />
                 <TextInput
                     mt="lg"
                     size="lg"
-                    label="Password"
+                    label={t('password')}
                     type="password"
                     {...form.getInputProps('password')}
                 />
                 <Checkbox
                     mt="lg"
-                    label="Remember me"
+                    label={t('remember')}
                     {...form.getInputProps('rememberme', { type: 'checkbox' })}
                 />
-                <Button size="lg" mt="lg" fullWidth type="submit">Sign in</Button>
+                <Button size="lg" mt="lg" loading={mutation.isLoading} fullWidth type="submit">Sign in</Button>
             </form>
         </Stack>
     )

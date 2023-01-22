@@ -1,7 +1,15 @@
 {
+  "src/pages/login/locales/en.json": {
+    "file": "assets/en-e2d191c4.js",
+    "src": "src/pages/login/locales/en.json",
+    "isDynamicEntry": true
+  },
   "src/main.tsx": {
-    "file": "assets/main-6b869d3e.js",
+    "file": "assets/main-79c3b8a9.js",
     "src": "src/main.tsx",
-    "isEntry": true
+    "isEntry": true,
+    "dynamicImports": [
+      "src/pages/login/locales/en.json"
+    ]
   }
 }
