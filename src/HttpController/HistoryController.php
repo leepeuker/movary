@@ -102,7 +102,7 @@ class HistoryController
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
         if ($movie === null) {
-            $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
+            $movie = $this->tmdbMovieSyncService->syncMovieByTmdbId($tmdbId);
         }
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);

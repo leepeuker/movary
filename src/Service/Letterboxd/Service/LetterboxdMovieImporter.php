@@ -40,7 +40,7 @@ class LetterboxdMovieImporter
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
         if ($movie === null) {
-            $movie = $this->tmdbMovieSync->syncMovie($tmdbId);
+            $movie = $this->tmdbMovieSync->syncMovieByTmdbId($tmdbId);
         }
 
         return $movie;

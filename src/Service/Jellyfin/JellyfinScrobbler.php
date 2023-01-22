@@ -51,7 +51,7 @@ class JellyfinScrobbler
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
         if ($movie === null) {
-            $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
+            $movie = $this->tmdbMovieSyncService->syncMovieByTmdbId($tmdbId);
 
             $this->logger->debug('Jellyfin: Created not yet existing watched movie', ['movieId' => $movie->getId(), 'movieTitle' => $movie->getTitle()]);
         }

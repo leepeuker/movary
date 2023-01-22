@@ -146,7 +146,13 @@
                     <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#addWatchDateModal">Log play</button>
                 </div>
             </div>
+            <div class="container" style="margin-bottom: 0.5rem">
+                <div class="row">
+                    <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#moreModal">More</button>
+                </div>
+            </div>
 
+            {{ include('component/movie-modal-more.html.twig') }}
             {{ include('component/movie-modal-add-watch-date.html.twig') }}
             {{ include('component/movie-modal-edit-watch-date.html.twig') }}
         {% endif %}
