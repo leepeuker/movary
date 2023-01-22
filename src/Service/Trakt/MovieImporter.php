@@ -36,7 +36,7 @@ class MovieImporter
             return $this->movieApi->fetchByTraktId($traktId);
         }
 
-        $movie = $this->tmdbMovieSync->syncMovieByTmdbId($tmdbId);
+        $movie = $this->tmdbMovieSync->syncMovie($tmdbId);
         $this->movieApi->updateTraktId($movie->getId(), $traktId);
 
         $this->logger->info('Trakt history import: Added new movie: ' . $movie->getTitle());

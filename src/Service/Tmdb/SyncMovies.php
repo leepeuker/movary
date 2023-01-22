@@ -32,7 +32,7 @@ class SyncMovies
             }
 
             try {
-                $this->syncMovieService->syncMovieByTmdbId($movie->getTmdbId());
+                $this->syncMovieService->syncMovie($movie->getTmdbId());
             } catch (Throwable $t) {
                 $this->logger->warning('Could not sync movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
             }

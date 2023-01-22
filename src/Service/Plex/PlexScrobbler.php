@@ -53,7 +53,7 @@ class PlexScrobbler
         $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
 
         if ($movie === null) {
-            $movie = $this->tmdbMovieSyncService->syncMovieByTmdbId((int)$tmdbId);
+            $movie = $this->tmdbMovieSyncService->syncMovie((int)$tmdbId);
         }
 
         match (true) {

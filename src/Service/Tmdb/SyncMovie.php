@@ -24,7 +24,7 @@ class SyncMovie
     ) {
     }
 
-    public function syncMovieByTmdbId(int $tmdbId) : MovieEntity
+    public function syncMovie(int $tmdbId) : MovieEntity
     {
         try {
             $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);

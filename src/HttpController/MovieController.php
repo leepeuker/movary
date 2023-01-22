@@ -86,7 +86,7 @@ class MovieController
             return Response::createOk();
         }
 
-        $this->tmdbMovieSync->syncMovieByTmdbId($tmdbId);
+        $this->tmdbMovieSync->syncMovie($tmdbId);
 
         return Response::createOk();
     }
