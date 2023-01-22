@@ -159,4 +159,27 @@ class HistoryController
             ]),
         );
     }
+
+    public function updateHistoryEntry(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createForbidden();
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
+            return Response::createForbidden();
+        }
+
+        $requestBody = Json::decode($request->getBody());
+
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
+        $plays = (int)$requestBody['plays'];
+
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movieId, $userId, $watchDate, $plays);
+
+        return Response::create(StatusCode::createNoContent());
+    }
 }
