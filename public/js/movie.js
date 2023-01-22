@@ -143,13 +143,13 @@ function toggleWatchDates() {
     if (toggleWatchDatesButton.classList.contains('active') === true) {
         toggleWatchDatesButton.classList.remove('active')
         watchDatesListDiv.style.display = 'none';
-        toggleWatchDatesButtonDiv.style.marginBottom = '0.7rem';
+        toggleWatchDatesButtonDiv.style.marginBottom = '0.5rem';
         watchDatesListDiv.style.marginBottom = '0';
     } else {
         toggleWatchDatesButton.classList.add('active')
         watchDatesListDiv.style.display = 'block';
         toggleWatchDatesButtonDiv.style.marginBottom = '0';
-        watchDatesListDiv.style.marginBottom = '0.7rem';
+        watchDatesListDiv.style.marginBottom = '0.5rem';
     }
 }
 
