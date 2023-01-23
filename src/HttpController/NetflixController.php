@@ -22,12 +22,13 @@ class NetflixController
     ){}
 
     /**
-     * importNetflixActivity
+     * importNetflixActivity receives a CSV file with all the Netflix activity history and tries to process this. 
+     * It filters the movies out with regex patterns, and then compiles an array of all the movie items.
      *
-     * @param Request $request
-     * @return Response HTTP response with either an error code or JSON 
+     * @param Request $request the CSV file containing the Netflix data
+     * @return Response HTTP response with either an error code or JSON object containing the TMDB results 
      */
-    public function importNetflixActivity(Request $request) : Response
+    public function processNetflixActivity(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -73,6 +74,12 @@ class NetflixController
         }
     }
 
+    /**
+     * searchTMDB receives an HTTP POST request and searches for the TMDB item. It returns a JSON object with all the results from TMDB
+     *
+     * @param Request $request The HTTP POST request
+     * @return Response the JSON object with the TMDB data
+     */
     public function searchTMDB(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -83,5 +90,23 @@ class NetflixController
         $tmdbresults = $this->tmdbapi->searchMovie($input['query']);
         $response = Json::encode($tmdbresults);
         return Response::createJson($response);
+    }
+
+    /**
+     * importNetflixData receives an HTTP POST request containing an array with TMDB items matches with Netflix data. It imports this data with the importNetflixActivity service
+     *
+     * @param Request $request The HTTP POST request
+     * @return Response 
+     */
+    public function importNetflixData(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+        $userId = $this->authenticationService->getCurrentUserId();
+        $items = Json::decode($request->getBody());
+        foreach($items as $item) {
+
+        }
     }
 }

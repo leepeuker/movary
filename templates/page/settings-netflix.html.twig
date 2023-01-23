@@ -17,7 +17,7 @@
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
-
+        <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
             <div style="padding-top: 1rem">
@@ -32,22 +32,23 @@
                 <form class="mb-3">
                     <label class="form-label" for="file">Upload Your CSV File</label>
                     <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
-                    <button class="btn btn-primary" name="submit" onclick="importNetflixHistory()" type="button"> Upload File </button>
+                    <button class="btn btn-primary" name="submit" onclick="uploadNetflixHistory()" type="button"> Upload File </button>
                 </form>
                 <div class="input-group">
                     <label for="selectfilter" class="input-group-text">Filter</label>
-                    <select id="selectfilter" onchange="updatetable()" class="form-select">
+                    <select id="selectfilter" onchange="updateTable()" class="form-select">
                         <option value="all">All</option>
                         <option value="notfound">Not found</option>
                     </select>
                     <label for="amounttoshow" class="input-group-text">Number of items on one page</label>
-                    <select id="amounttoshow" onchange="updatetable()" class="form-select">
+                    <select id="amounttoshow" onchange="updateTable()" class="form-select">
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
                         <option value="all">All</option>
                     </select>
+                    <button type="button" class="btn btn-outline-secondary" onclick="scrollDown()">Go to the bottom</button>
                 </div>
                 <table class="table table-hover">
                     <thead>
@@ -65,11 +66,12 @@
                     </tbody>
                 </table>
                 <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
+                    <ul class="pagination align-self-center justify-content-center">
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Previous</a></li>
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">#</a></li>
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Next</a></li>
                     </ul>
+                    <button type="button" class="btn btn-primary disabled" id="importnetflixbtn" disabled onclick="importNetflixHistory();">Import Netflix data</button>
                 </nav>
             </div>
         </div>
@@ -94,7 +96,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="savetmdbitem()">Save</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTMDBItem()">Save</button>
                 </div>
             </div>
         </div>

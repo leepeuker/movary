@@ -1,8 +1,40 @@
+const dateformat = document.getElementById('dateFormatPhp').value;
 async function importNetflixHistory() {
+    var data = [];
+    let rows = document.querySelectorAll('tr.tmdbrow:not(data-tmdbid="undefined")');
+    for(let i = 0; i < rows.length; i++) {
+        data.push({
+            'watchDate': rows[i].querySelector('td.date-column').innerText,
+            'tmdbId': rows[i].dataset.tmdbid,
+            'dateFormat': dateformat
+        });
+    }
+    let jsondata = JSON.stringify(data);
+    await createSpinner(document.getElementById('netflixtbody'), 'netflix');
+    await fetch('/settings/netflix/import', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: jsondata
+    })
+    .then(response => {
+        if(!response.ok) {
+            processError(response.status);
+        } else {
+            console.log(response);
+        }
+    })
+    .catch(function(error) {
+        console.error(error);
+    });
+}
+
+async function uploadNetflixHistory() {
     var input = document.getElementById('netflixfile');
     var filedata = new FormData();
     filedata.append('netflixviewactivity', input.files[0]);
-    await createloader(document.getElementById('netflixtbody'), 'netflix');
+    await createSpinner(document.getElementById('netflixtbody'), 'netflix');
     await fetch('/settings/netflix', {
         method: 'POST',
         body: filedata
@@ -29,11 +61,11 @@ async function importNetflixHistory() {
 async function searchTMDB(event) {
     event.preventDefault();
     var query = document.getElementById('searchtmdb').value;
-    await createloader(document.getElementById('tmdbsearchresults'), 'tmdb');
+    await createSpinner(document.getElementById('tmdbsearchresults'), 'tmdb');
     await fetch('/settings/netflix/search', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json;charset=utf-8'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             'query': query
@@ -54,7 +86,7 @@ async function searchTMDB(event) {
     });
 }
 
-async function createloader(parent, target) {
+async function createSpinner(parent, target) {
     parent.innerHTML = '';
     let div = document.createElement('div');
     let span = document.createElement('span');
@@ -75,7 +107,7 @@ async function createloader(parent, target) {
     }
 }
 
-function updatetable() {
+function updateTable() {
     let amount = document.getElementById('amounttoshow').value;
     let rows = document.getElementById('netflixtbody').children;
     let filter = document.getElementById('selectfilter').value;
@@ -89,21 +121,21 @@ function updatetable() {
         }
         document.querySelector('label[for="amounttoshow"]').classList.add('d-none');
         document.getElementById('amounttoshow').classList.add('d-none');
-        createpagenav(amount, amount);
-        changepage('all');
+        createPageNavigation(amount, amount);
+        changePage('all');
     } else {
         document.querySelector('label[for="amounttoshow"]').classList.remove('d-none');
         document.getElementById('amounttoshow').classList.remove('d-none');
         if(amount == 'all') {
-            createpagenav(rows.length, rows.length);
+            createPageNavigation(rows.length, rows.length);
         } else {
-            createpagenav(amount, rows.length);
+            createPageNavigation(amount, rows.length);
         }
-        changepage(1);
+        changePage(1);
     }
 }
 
-function changepage(direction) {
+function changePage(direction) {
     let ul = document.getElementsByClassName('pagination')[0];
     let amount = document.getElementById('amounttoshow').value;
     let rows = document.getElementById('netflixtbody').children;
@@ -158,7 +190,7 @@ function changepage(direction) {
     window.scrollTo(0, 0);
 }
 
-function createpagenav(amount, items) {
+function createPageNavigation(amount, items) {
     buttons_number = Math.ceil(items / amount);
     let ul = document.getElementsByClassName('pagination')[0];
     var lastchild = ul.children[ul.childElementCount - 1];
@@ -178,7 +210,7 @@ function createpagenav(amount, items) {
         link.innerText = i + 1;
         li.append(link);
         // For some reason an event instantly runs if a parameter is passed directly to the callback function, so it has to be done this way
-        li.addEventListener("click", () => { changepage(link.innerText); });
+        li.addEventListener("click", () => { changePage(link.innerText); });
         lastchild.before(li);
     }
 
@@ -196,8 +228,8 @@ function createpagenav(amount, items) {
         ul.children[0].style.cursor = 'pointer';
     }
 
-    lastchild.addEventListener("click", () => { changepage('next'); });
-    ul.children[0].addEventListener("click", () => { changepage('previous'); });
+    lastchild.addEventListener("click", () => { changePage('next'); });
+    ul.children[0].addEventListener("click", () => { changePage('previous'); });
 }
 
 function processTMDBData(data) {
@@ -241,7 +273,7 @@ function processTMDBData(data) {
         thumb_div.append(img);
         radio_div.append(radio);
         media_div.append(thumb_div, descr_div, radio_div);
-        media_div.addEventListener('click', selecttmdbitem);
+        media_div.addEventListener('click', selectTMDBItem);
         parent.append(media_div);
         return false;
     });
@@ -259,6 +291,8 @@ function processNetflixData(data) {
         let tmdb_div = document.createElement('div');
         let tmdb_cover_div = document.createElement('div');
         let tmdb_description_div = document.createElement('div');
+        let tmdb_rating_div = document.createElement('div');
+        let tmdb_rating_span = document.createElement('span');
         let tmdb_cover = document.createElement('img');
         let tmdb_cover_br = document.createElement('br');
         let tmdb_link = document.createElement('a');
@@ -285,6 +319,7 @@ function processNetflixData(data) {
         row.id = index + 1;
         row.setAttribute('data-tmdbid', data[key]['result']['id']);
         
+        date.className = 'date-column';
         release_date.className = 'mb-auto pb-3';
         
         editbtn.className = 'btn btn-success align-self-start';
@@ -292,15 +327,31 @@ function processNetflixData(data) {
         editbtn.setAttribute('data-bs-toggle', 'modal');
         editbtn.setAttribute('data-bs-target', '#tmdbmodal');
 
-        tmdb.className = 'w-50';
+        tmdb.className = 'w-50 tmdb-column';
         tmdb_div.className = "row";
         tmdb_cover_div.className = 'col-md-3 justify-content-center';
         tmdb_description_div.className = 'col-md-9 text-start d-flex flex-column';
         tmdb_cover.style.width = '92px';
         tmdb_cover.alt = 'Movie poster of ' + (data[key]['result']['title'] ?? 'missing item');
 
+        tmdb_rating_div.className = 'fw-light mb-3 ratingStars';
+        tmdb_rating_div.style.color = 'rgb(255, 193, 7)';
+        tmdb_rating_div.style.fontSize = '1.5rem';
+        tmdb_rating_div.style.marginTop = '0.5rem';
+        tmdb_rating_span.style.cursor = 'pointer';
+        tmdb_rating_span.className = 'ratingSpan';
+
         tmdb_link.target = '__blank';
         tmdb_cover.className = 'img-fluid';
+
+        for(let i = 1; i < 11; i++) {
+            let tmdb_rating_icon = document.createElement('i');
+            tmdb_rating_icon.className = 'bi bi-star';
+            tmdb_rating_icon.addEventListener('click', updateRatingStars);
+            tmdb_rating_icon.id = 'ratingStar' + i;
+            tmdb_rating_span.appendChild(tmdb_rating_icon);
+        }
+                
         if(data[key]['result'] == 'Unknown' || data[key]['result']['poster_path'] == null) {
             tmdb_cover.src = '/images/placeholder-image.png';
             tmdb_link.innerText = 'Image not found on TMDB';
@@ -317,7 +368,8 @@ function processNetflixData(data) {
             paragraph.innerText = data[key]['result']['overview'];
             release_date.innerText = 'Release date: ' + data[key]['result']['release_date'];
         }
-        tmdb_description_div.append(description, paragraph, release_date);
+        tmdb_rating_div.append(tmdb_rating_span);
+        tmdb_description_div.append(description, paragraph, release_date, tmdb_rating_div);
         tmdb_description_div.append(editbtn);
 
         date.innerText = data[key]['date']['day'] + "/" + data[key]['date']['month'] + "/" + data[key]['date']['year'];
@@ -329,10 +381,12 @@ function processNetflixData(data) {
         document.getElementById('netflixtbody').append(row);
     });
     if(document.getElementById('selectfilter').value == 'notfound') {
-        createpagenav(amount, amount);
+        createPageNavigation(amount, amount);
     } else {
-        createpagenav(amount, keys.length);
+        createPageNavigation(amount, keys.length);
     }
+    document.getElementById('importnetflixbtn').classList.remove('disabled');
+    document.getElementById('importnetflixbtn').removeAttribute('disabled');
 }
 
 function processError(errorcode) {
@@ -351,15 +405,15 @@ function processError(errorcode) {
     document.getElementById('netflixtbody').append(errorrow);
 }
 
-function selecttmdbitem() {
-    let radios = document.getElementsByClassName('tmdbradio');
-    for(let i = 0; i < radios.length; i++) {
-        radios[i].checked = false;
+function selectTMDBItem() {
+    let radio = document.querySelector("input.tmdbradio:checked");
+    if(radio != null) {
+        radio.checked = false;
     }
     this.getElementsByClassName('tmdbradio')[0].checked = true;
 }
 
-function savetmdbitem() {
+function saveTMDBItem() {
     let checkedrow = document.querySelector('input.tmdbradio:checked').closest('.tmdbrow');
     let rowid = document.getElementById('tmdbmodal').dataset.rowid;
     let targetrow = document.getElementById(rowid); 
@@ -369,12 +423,72 @@ function savetmdbitem() {
     targetrow.getElementsByTagName('p')[0].innerText = checkedrow.getElementsByTagName('p')[0].innerText;
     targetrow.getElementsByTagName('p')[1].innerText = checkedrow.getElementsByTagName('p')[1].innerText;
     targetrow.setAttribute('data-tmdbid', checkedrow.dataset.tmdbid);
+    targetrow.getElementsByClassName('bi-star-fill')[targetrow.getElementsByClassName('bi-star-fill').length - 1].click();
     const modal = bootstrap.Modal.getInstance(document.getElementById('tmdbmodal'));
     modal.hide();
+}
+
+function scrollDown() {
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+
+function processDate(datestring) {
+    let date = datestring.split('/');
+    let day = "";
+    let month = "";
+    if(date[1] < 10) {
+        // Add leading zero if the number is less than 10.
+        month = "0" + date[1];
+    } else {
+        month = date[1];
+    }
+    if(date[0] < 10) {
+        // Add leading zero if the number is less than 10.
+        day = "0" + date[0];
+    } else {
+        day = date[0];
+    }
+    return new Date(date[2] + "-" + month + "-" + day);
+}
+
+function setRatingStars (newRating) {
+	if (getRatingFromStars() == newRating) {
+		newRating = null;
+	}
+
+	for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
+		document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star-fill');
+		document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star');
+
+		if (ratingStarNumber <= newRating) {
+			document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star-fill');
+		} else {
+			document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star');
+		}
+	}
+}
+
+function getRatingFromStars () {
+	let rating = 0;
+
+	for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
+		if (document.getElementById('ratingStar' + ratingStarNumber).classList.contains('bi-star') === true) {
+			break;
+		}
+
+		rating = ratingStarNumber;
+	}
+
+	return rating;
+}
+
+function updateRatingStars () {
+	setRatingStars(this.id.substring(20, 10));
 }
 
 document.getElementById('tmdbmodal').addEventListener('show.bs.modal', event => {
   let button = event.relatedTarget;
   let id = button.closest('.netflixrow').id;
   document.getElementById('tmdbmodal').setAttribute('data-rowid', id);
-})
+});

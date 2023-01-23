@@ -211,7 +211,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/settings/netflix',
-        [\Movary\HttpController\NetflixController::class, 'importNetflixActivity'],
+        [\Movary\HttpController\NetflixController::class, 'processNetflixActivity'],
     );
     $routeCollector->addRoute(
         'POST',
