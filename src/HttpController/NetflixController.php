@@ -3,7 +3,6 @@
 namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\Netflix\ImportNetflixActivity;
@@ -21,7 +20,6 @@ class NetflixController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly UserApi $userApi,
         private readonly MovieApi $movieApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly LoggerInterface $logger,
@@ -58,7 +56,7 @@ class NetflixController
             return Response::createUnsupportedMediaType();
         }
         $rows = $this->importActivity->parseNetflixCSV($csv['tmp_name']);
-        if($rows != false) {
+        if($rows != []) {
             foreach($rows as $row) {
                 $date = date_parse_from_format('d/m/Y', $row['Date']);
                 $data = $this->importActivity->checkMediaData($row['Title']);
