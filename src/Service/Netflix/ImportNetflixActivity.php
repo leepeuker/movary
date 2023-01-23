@@ -14,9 +14,9 @@ class ImportNetflixActivity
 
     /**
      * parseNetflixCSV receives the layout of a Netflix viewing history CSV file and returns them as an associative array
-     * @psalm-suppress PossiblyInvalidArgument
      * @param string $filepath the filepath to the CSV file
      * @return array
+     * @psalm-suppress PossiblyInvalidArgument
      */
     public function parseNetflixCSV(string $filepath) : Array
     {
