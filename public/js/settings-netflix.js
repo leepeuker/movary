@@ -149,7 +149,17 @@ function updateTable() {
     }
 }
 
-function changePage(direction) {
+function changePage() {
+    var direction = "";
+    if(this.nextElementSibling == null) {
+        // User clicked on the next button
+        direction = 'next';
+    } else if(this.previousElementSibling == null) {
+        // User clicked on the previous button
+        direction = 'previous'
+    } else {
+        direction = this.innerText;
+    }
     let ul = document.getElementsByClassName('pagination')[0];
     let amount = document.getElementById('amounttoshow').value;
     let rows = document.getElementById('netflixtbody').children;
@@ -234,8 +244,7 @@ function createPageNavigation(amount, items, reset = null) {
             link.className = 'page-link';
             link.innerText = i + 1;
             li.append(link);
-            // For some reason an event instantly runs if a parameter is passed directly to the callback function, so it has to be done this way
-            li.addEventListener("click", () => { changePage(link.innerText); });
+            li.addEventListener("click", changePage);
             lastchild.before(li);
         }
 
@@ -254,8 +263,8 @@ function createPageNavigation(amount, items, reset = null) {
         }
     }
 
-    lastchild.addEventListener("click", () => { changePage('next'); });
-    ul.firstElementChild.addEventListener("click", () => { changePage('previous'); });
+    lastchild.addEventListener("click", changePage);
+    ul.firstElementChild.addEventListener("click", changePage);
 }
 
 function processTMDBData(data) {
