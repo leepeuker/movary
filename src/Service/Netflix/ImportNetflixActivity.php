@@ -16,7 +16,6 @@ class ImportNetflixActivity
      * parseNetflixCSV receives the layout of a Netflix viewing history CSV file and returns them as an associative array
      * @param string $filepath the filepath to the CSV file
      * @return array
-     * @psalm-suppress PossiblyInvalidArgument
      */
     public function parseNetflixCSV(string $filepath) : Array
     {
@@ -29,6 +28,9 @@ class ImportNetflixActivity
             $rows = array_slice($rows, 1);
             $csv = [];
             foreach($rows as $row) {
+                /**
+                 * @psalm-suppress PossiblyInvalidArgument
+                 */
                 $csv[] = array_combine(['Title', 'Date'], $row);
             }
             return $csv;
