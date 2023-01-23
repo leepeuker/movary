@@ -217,6 +217,7 @@ function changePage() {
 function createPageNavigation(amount, items, reset = null) {
     let ul = document.getElementsByClassName('pagination')[0];
     var lastchild = ul.children[ul.childElementCount - 1];
+    var firstchild = ul.firstElementChild;
     // remove all children except the first ('previous' button) and the last ('next' button)
     while(ul.childElementCount > 2) {
         lastchild.previousElementSibling.remove();
@@ -232,7 +233,7 @@ function createPageNavigation(amount, items, reset = null) {
         lastchild.before(center);
         disable(center);
         disable(lastchild);
-        disable(ul.firstElementChild);
+        disable(firstchild);
     } else {
         buttons_number = Math.ceil(items / amount);
         // Create nav buttons
@@ -249,22 +250,16 @@ function createPageNavigation(amount, items, reset = null) {
         }
 
         if(ul.childElementCount == 3) {
-            lastchild.classList.add('disabled');
-            ul.children[0].classList.add('disabled');
-
-            lastchild.style.cursor = 'not-allowed';
-            ul.children[0].style.cursor = 'not-allowed';
+            disable(lastchild);
+            disable(firstchild);
         } else {
-            lastchild.classList.remove('disabled');
-            ul.children[0].classList.remove('disabled');
-
-            lastchild.style.cursor = 'pointer';
-            ul.children[0].style.cursor = 'pointer';
+            enable(lastchild);
+            enable(firstchild);
         }
     }
 
     lastchild.addEventListener("click", changePage);
-    ul.firstElementChild.addEventListener("click", changePage);
+    firstchild.addEventListener("click", changePage);
 }
 
 function processTMDBData(data) {
@@ -420,8 +415,7 @@ function processNetflixData(data) {
     } else {
         createPageNavigation(amount, keys.length);
     }
-    document.getElementById('importnetflixbtn').classList.remove('disabled');
-    document.getElementById('importnetflixbtn').removeAttribute('disabled');
+    enable(document.getElementById('importnetflixbtn'));
 }
 
 function processError(errorcode) {
@@ -504,6 +498,12 @@ function getRatingFromStars (row) {
 
 function updateRatingStars () {
 	setRatingStars(this);
+}
+
+function enable(el) {
+    el.classList.remove('disabled');
+    el.removeAttribute('disabled');
+    el.style.cursor = '';
 }
 
 function disable(el) {
