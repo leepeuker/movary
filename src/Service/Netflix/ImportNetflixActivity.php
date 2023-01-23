@@ -4,7 +4,6 @@ namespace Movary\Service\Netflix;
 
 use Movary\Domain\User\UserApi;
 use Movary\Api\Tmdb\TmdbApi;
-use Movary\Domain\Movie\MovieApi;
 use Psr\Log\LoggerInterface;
 use Exception;
 
@@ -108,16 +107,5 @@ class ImportNetflixActivity
         } else {
             return false;
         }
-    }
-
-    /**
-     * importData receives an array with the watched date and the TMDB ID and then imports this into the database
-     *
-     * @param Array $input the input array to import
-     * @return boolean
-     */
-    public function importData(Array $input) : bool
-    {
-        return false;
     }
 }

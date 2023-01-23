@@ -1,15 +1,19 @@
-const dateformat = document.getElementById('dateFormatPhp').value;
 async function importNetflixHistory() {
     var data = [];
-    let rows = document.querySelectorAll('tr.tmdbrow:not(data-tmdbid="undefined")');
+    let rows = document.getElementsByClassName('netflixrow');
     for(let i = 0; i < rows.length; i++) {
-        data.push({
-            'watchDate': rows[i].querySelector('td.date-column').innerText,
-            'tmdbId': rows[i].dataset.tmdbid,
-            'dateFormat': dateformat
-        });
+        if(rows[i].dataset.tmdbid != 'undefined') {
+            data.push({
+                'watchDate': rows[i].querySelector('td.date-column').innerText,
+                'tmdbId': rows[i].dataset.tmdbid,
+                'dateFormat': 'd/m/Y',
+                'personalRating': getRatingFromStars(rows[i])
+            });
+        }
     }
     let jsondata = JSON.stringify(data);
+    createPageNavigation(1, 1, true);
+    disable(document.getElementById('importnetflixbtn'));
     await createSpinner(document.getElementById('netflixtbody'), 'netflix');
     await fetch('/settings/netflix/import', {
         method: 'POST',
@@ -22,11 +26,18 @@ async function importNetflixHistory() {
         if(!response.ok) {
             processError(response.status);
         } else {
-            console.log(response);
+            let td = document.createElement('td');
+            let tr = document.createElement('tr');
+            td.colSpan = 4;
+            td.innerHTML = '<p class="text-success">The data has succesfully been imported!</p>';
+            tr.append(td);
+            document.getElementById('netflixtbody').append(tr);
+            document.getElementById('netflixtbody').getElementsByTagName('tr')[0].remove();
         }
     })
     .catch(function(error) {
         console.error(error);
+        processError(500);
     });
 }
 
@@ -34,6 +45,7 @@ async function uploadNetflixHistory() {
     var input = document.getElementById('netflixfile');
     var filedata = new FormData();
     filedata.append('netflixviewactivity', input.files[0]);
+    document.getElementById('netflixtbody').getElementsByTagName('tr')[0].remove();
     await createSpinner(document.getElementById('netflixtbody'), 'netflix');
     await fetch('/settings/netflix', {
         method: 'POST',
@@ -55,6 +67,7 @@ async function uploadNetflixHistory() {
     })
     .catch(function(error) {
         console.error(error);
+        processError(500);
     });
 }
 
@@ -83,11 +96,12 @@ async function searchTMDB(event) {
     })
     .catch(function(error) {
         console.error(error);
+        processError(500);
     });
 }
 
 async function createSpinner(parent, target) {
-    parent.innerHTML = '';
+    document.getElementById('netflixtbody').innerHTML = '';
     let div = document.createElement('div');
     let span = document.createElement('span');
     div.className = 'spinner-border';
@@ -190,46 +204,58 @@ function changePage(direction) {
     window.scrollTo(0, 0);
 }
 
-function createPageNavigation(amount, items) {
-    buttons_number = Math.ceil(items / amount);
+function createPageNavigation(amount, items, reset = null) {
     let ul = document.getElementsByClassName('pagination')[0];
     var lastchild = ul.children[ul.childElementCount - 1];
-
     // remove all children except the first ('previous' button) and the last ('next' button)
     while(ul.childElementCount > 2) {
         lastchild.previousElementSibling.remove();
     }
 
-    // Create nav buttons
-    for(let i = 0; i < buttons_number; i++) {
-        let li = document.createElement('li');
-        let link = document.createElement('a');
-        li.style.cursor = 'pointer';
-        li.className = i == 0 ? 'page-item active' : 'page-item';
-        link.className = 'page-link';
-        link.innerText = i + 1;
-        li.append(link);
-        // For some reason an event instantly runs if a parameter is passed directly to the callback function, so it has to be done this way
-        li.addEventListener("click", () => { changePage(link.innerText); });
-        lastchild.before(li);
-    }
-
-    if(ul.childElementCount == 3) {
-        lastchild.classList.add('disabled');
-        ul.children[0].classList.add('disabled');
-
-        lastchild.style.cursor = 'not-allowed';
-        ul.children[0].style.cursor = 'not-allowed';
+    if(reset != null) {
+        let center = document.createElement('li');
+        let a = document.createElement('a');
+        a.innerText = '#';
+        a.className = 'page-link';
+        center.className = 'page-item';
+        center.append(a);
+        lastchild.before(center);
+        disable(center);
+        disable(lastchild);
+        disable(ul.firstElementChild);
     } else {
-        lastchild.classList.remove('disabled');
-        ul.children[0].classList.remove('disabled');
+        buttons_number = Math.ceil(items / amount);
+        // Create nav buttons
+        for(let i = 0; i < buttons_number; i++) {
+            let li = document.createElement('li');
+            let link = document.createElement('a');
+            li.style.cursor = 'pointer';
+            li.className = i == 0 ? 'page-item active' : 'page-item';
+            link.className = 'page-link';
+            link.innerText = i + 1;
+            li.append(link);
+            // For some reason an event instantly runs if a parameter is passed directly to the callback function, so it has to be done this way
+            li.addEventListener("click", () => { changePage(link.innerText); });
+            lastchild.before(li);
+        }
 
-        lastchild.style.cursor = 'pointer';
-        ul.children[0].style.cursor = 'pointer';
+        if(ul.childElementCount == 3) {
+            lastchild.classList.add('disabled');
+            ul.children[0].classList.add('disabled');
+
+            lastchild.style.cursor = 'not-allowed';
+            ul.children[0].style.cursor = 'not-allowed';
+        } else {
+            lastchild.classList.remove('disabled');
+            ul.children[0].classList.remove('disabled');
+
+            lastchild.style.cursor = 'pointer';
+            ul.children[0].style.cursor = 'pointer';
+        }
     }
 
     lastchild.addEventListener("click", () => { changePage('next'); });
-    ul.children[0].addEventListener("click", () => { changePage('previous'); });
+    ul.firstElementChild.addEventListener("click", () => { changePage('previous'); });
 }
 
 function processTMDBData(data) {
@@ -344,11 +370,11 @@ function processNetflixData(data) {
         tmdb_link.target = '__blank';
         tmdb_cover.className = 'img-fluid';
 
-        for(let i = 1; i < 11; i++) {
+        for(let i = 1; i <= 10; i++) {
             let tmdb_rating_icon = document.createElement('i');
-            tmdb_rating_icon.className = 'bi bi-star';
+            tmdb_rating_icon.className = 'bi bi-star ratingIcon';
+            tmdb_rating_icon.dataset.rating = i;
             tmdb_rating_icon.addEventListener('click', updateRatingStars);
-            tmdb_rating_icon.id = 'ratingStar' + i;
             tmdb_rating_span.appendChild(tmdb_rating_icon);
         }
                 
@@ -399,6 +425,8 @@ function processError(errorcode) {
         errorcell.innerText = 'Error 400. Input file could not be processed. Please try again.';
     } else if(errorcode == 415) {
         errorcell.innerText = 'Error 415. Input file is the wrong type. Upload a CSV file from Netflix instead.';
+    } else if(errorcode == 500) {
+        errorcell.innerText = 'Error 500. Something has gone wrong. Please check your browser console log (F12 -> Console) or your Movary application logs and submit it to the Github issues, so this can be solved.';
     }
 
     errorrow.append(errorcell);
@@ -432,48 +460,30 @@ function scrollDown() {
     window.scrollTo(0, document.body.scrollHeight);
 }
 
-
-function processDate(datestring) {
-    let date = datestring.split('/');
-    let day = "";
-    let month = "";
-    if(date[1] < 10) {
-        // Add leading zero if the number is less than 10.
-        month = "0" + date[1];
-    } else {
-        month = date[1];
-    }
-    if(date[0] < 10) {
-        // Add leading zero if the number is less than 10.
-        day = "0" + date[0];
-    } else {
-        day = date[0];
-    }
-    return new Date(date[2] + "-" + month + "-" + day);
-}
-
-function setRatingStars (newRating) {
-	if (getRatingFromStars() == newRating) {
+function setRatingStars (star) {
+    let newRating = star.dataset.rating;
+    let row = star.closest('.netflixrow');
+	if (getRatingFromStars(row) == newRating) {
 		newRating = null;
 	}
 
 	for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-		document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star-fill');
-		document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star');
+		row.querySelector('i[data-rating="'+ratingStarNumber+'"]').classList.remove('bi-star-fill');
+		row.querySelector('i[data-rating="'+ratingStarNumber+'"]').classList.remove('bi-star');
 
 		if (ratingStarNumber <= newRating) {
-			document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star-fill');
+			row.querySelector('i[data-rating="'+ratingStarNumber+'"]').classList.add('bi-star-fill');
 		} else {
-			document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star');
+			row.querySelector('i[data-rating="'+ratingStarNumber+'"]').classList.add('bi-star');
 		}
 	}
 }
 
-function getRatingFromStars () {
+function getRatingFromStars (row) {
 	let rating = 0;
 
 	for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-		if (document.getElementById('ratingStar' + ratingStarNumber).classList.contains('bi-star') === true) {
+		if (row.querySelector('i[data-rating="'+ratingStarNumber+'"]').classList.contains('bi-star') === true) {
 			break;
 		}
 
@@ -484,7 +494,13 @@ function getRatingFromStars () {
 }
 
 function updateRatingStars () {
-	setRatingStars(this.id.substring(20, 10));
+	setRatingStars(this);
+}
+
+function disable(el) {
+    el.classList.add('disabled');
+    el.setAttribute('disabled', '');
+    el.style.cursor = 'not-allowed';
 }
 
 document.getElementById('tmdbmodal').addEventListener('show.bs.modal', event => {

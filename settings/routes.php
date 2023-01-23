@@ -215,6 +215,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
+        '/settings/netflix/import',
+        [\Movary\HttpController\NetflixController::class, 'importNetflixData'],
+    );
+    $routeCollector->addRoute(
+        'POST',
         '/settings/netflix/search',
         [\Movary\HttpController\NetflixController::class, 'searchTMDB'],
     );

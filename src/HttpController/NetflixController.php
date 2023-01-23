@@ -4,11 +4,17 @@ namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\Domain\Movie\MovieApi;
+use Movary\Service\Tmdb\SyncMovie;
+use Movary\Service\Netflix\ImportNetflixActivity;
+use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\PersonalRating;
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Util\Json;
-use Movary\Service\Netflix\ImportNetflixActivity;
+use RuntimeException;
 use Psr\Log\LoggerInterface;
 
 class NetflixController
@@ -16,6 +22,8 @@ class NetflixController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
+        private readonly MovieApi $movieApi,
+        private readonly SyncMovie $tmdbMovieSyncService,
         private readonly LoggerInterface $logger,
         private readonly TmdbApi $tmdbapi,
         private readonly ImportNetflixActivity $importActivity
@@ -93,7 +101,7 @@ class NetflixController
     }
 
     /**
-     * importNetflixData receives an HTTP POST request containing an array with TMDB items matches with Netflix data. It imports this data with the importNetflixActivity service
+     * importNetflixData receives an HTTP POST request containing a JSON object with TMDB items matches with Netflix data. It converts the JSON object to an array and loops through this.
      *
      * @param Request $request The HTTP POST request
      * @return Response 
@@ -106,7 +114,25 @@ class NetflixController
         $userId = $this->authenticationService->getCurrentUserId();
         $items = Json::decode($request->getBody());
         foreach($items as $item) {
-
+            if(isset($item['watchDate'], $item['tmdbId'], $item['dateFormat']) === false) {
+                throw new RuntimeException('Missing parameters');
+            }
+            $watchDate = Date::createFromStringAndFormat($item['watchDate'], $item['dateFormat']);
+            
+            $tmdbId = (int)$item['tmdbId'];
+            $personalRating = $item['personalRating'] === 0 ? null : PersonalRating::create((int)$item['personalRating']);
+    
+            $movie = $this->movieApi->findByTmdbId($tmdbId);
+    
+            if ($movie === null) {
+                $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
+            }
+    
+            $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
+            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+            $this->logger->info('Movie has been logged: '. $tmdbId);
         }
+        $this->logger->info('All the movies from Netflix have been imported');
+        return Response::create(StatusCode::createOk());
     }
 }
