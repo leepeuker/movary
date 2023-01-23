@@ -219,6 +219,20 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\NetflixController::class, 'searchTMDB'],
     );
 
+    ##########
+    # Movies #
+    ##########
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/refresh-tmdb',
+        [\Movary\HttpController\MovieController::class, 'refreshTmdbData'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/refresh-imdb',
+        [\Movary\HttpController\MovieController::class, 'refreshImdbRating'],
+    );
+
     ##############
     # User media #
     ##############
@@ -266,6 +280,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history',
         [\Movary\HttpController\HistoryController::class, 'createHistoryEntry'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history',
+        [\Movary\HttpController\HistoryController::class, 'updateHistoryEntry'],
     );
     $routeCollector->addRoute(
         'POST',

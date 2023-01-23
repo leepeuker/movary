@@ -16,17 +16,17 @@ class Service
         return $this->repository->fetchAllUniqueTraktIds($userId);
     }
 
-    public function findLastUpdatedByTraktId(int $userId, TraktId $traktId) : ?DateTime
+    public function findLastUpdated(int $userId, TraktId $traktId) : ?DateTime
     {
         return $this->repository->findLastUpdatedByTraktId($userId, $traktId);
     }
 
-    public function remove(int $userId, TraktId $traktId) : void
+    public function removeLastUpdated(int $userId, TraktId $traktId) : void
     {
         $this->repository->remove($userId, $traktId);
     }
 
-    public function setOne(int $userId, TraktId $traktId, DateTime $lastUpdated) : void
+    public function setLastUpdated(int $userId, TraktId $traktId, DateTime $lastUpdated) : void
     {
         $this->repository->set($userId, $traktId, $lastUpdated);
     }

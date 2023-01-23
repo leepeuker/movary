@@ -1,6 +1,16 @@
 let ratingEditMode = false
 let originalRating
 
+const addWatchDateModal = document.getElementById('addWatchDateModal')
+addWatchDateModal.addEventListener('show.bs.modal', async function () {
+    const datepicker = new Datepicker(document.getElementById('addWatchDateModalInput'), {
+        format: document.getElementById('dateFormatJavascript').value,
+        title: 'Watch date',
+    })
+
+    document.getElementById('addWatchDateModalInput').value = getCurrentDate()
+})
+
 function deleteWatchDate() {
     const confirmed = confirm('Are you sure?')
 
@@ -133,18 +143,18 @@ function toggleWatchDates() {
     if (toggleWatchDatesButton.classList.contains('active') === true) {
         toggleWatchDatesButton.classList.remove('active')
         watchDatesListDiv.style.display = 'none';
-        toggleWatchDatesButtonDiv.style.marginBottom = '0.7rem';
+        toggleWatchDatesButtonDiv.style.marginBottom = '0.5rem';
         watchDatesListDiv.style.marginBottom = '0';
     } else {
         toggleWatchDatesButton.classList.add('active')
         watchDatesListDiv.style.display = 'block';
         toggleWatchDatesButtonDiv.style.marginBottom = '0';
-        watchDatesListDiv.style.marginBottom = '0.7rem';
+        watchDatesListDiv.style.marginBottom = '0.5rem';
     }
 }
 
 function loadWatchDateModal(e) {
-    const modal = new bootstrap.Modal('#watchDateModal', {
+    const modal = new bootstrap.Modal('#editWatchDateModal', {
         keyboard: false
     })
 
@@ -153,12 +163,12 @@ function loadWatchDateModal(e) {
     const originalDate = document.getElementById('inputDate-' + watchDateIndex).value;
     const originalPlays = document.getElementById('inputPlays-' + watchDateIndex).value;
 
-    document.getElementById('modalWatchDate').value = originalDate;
-    document.getElementById('modalWatchDatePlays').value = originalPlays;
+    document.getElementById('editWatchDateModalInput').value = originalDate;
+    document.getElementById('editWatchDateModalPlaysInput').value = originalPlays;
     document.getElementById('originalWatchDate').value = originalDate;
     document.getElementById('originalWatchDatePlays').value = originalPlays;
 
-    new Datepicker(document.getElementById('modalWatchDate'), {
+    new Datepicker(document.getElementById('editWatchDateModalInput'), {
         format: document.getElementById('dateFormatJavascript').value,
         title: 'Watch date',
     })
@@ -176,8 +186,8 @@ function getWatchDateIndexNumber(e) {
 function editWatchDate() {
     const originalWatchDate = document.getElementById('originalWatchDate').value;
 
-    const newWatchDate = document.getElementById('modalWatchDate').value;
-    const newWatchDatePlays = document.getElementById('modalWatchDatePlays').value;
+    const newWatchDate = document.getElementById('editWatchDateModalInput').value;
+    const newWatchDatePlays = document.getElementById('editWatchDateModalPlaysInput').value;
 
     const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
 
@@ -209,4 +219,147 @@ function editWatchDate() {
             alert('Could not delete old watch date.')
         }
     })
+}
+
+function addWatchDate() {
+    const watchDate = document.getElementById('addWatchDateModalInput').value;
+
+    if (validateWatchDate(watchDate) === false) {
+        return;
+    }
+
+    const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
+
+    $.ajax({
+        url: apiUrl,
+        type: 'PUT',
+        data: JSON.stringify({
+            'watchDate': watchDate,
+            'plays': 1,
+            'dateFormat': document.getElementById('dateFormatPhp').value
+        }),
+        success: function (data, textStatus, xhr) {
+            window.location.reload()
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            alert('Could not create new watch date.')
+        }
+    })
+}
+
+function validateWatchDate(watchDate) {
+    document.getElementById('addWatchDateModalValidationRequiredErrorMessage').classList.remove('d-block')
+    document.getElementById('addWatchDateModalValidationFormatErrorMessage').classList.remove('d-block')
+
+    if (!watchDate) {
+        document.getElementById('addWatchDateModalInput').style.borderStyle = 'solid'
+        document.getElementById('addWatchDateModalInput').style.borderColor = '#dc3545'
+        document.getElementById('addWatchDateModalValidationRequiredErrorMessage').classList.add('d-block')
+
+        return false
+    }
+
+    if (isValidDate(watchDate) === false) {
+        document.getElementById('addWatchDateModalInput').style.borderStyle = 'solid'
+        document.getElementById('addWatchDateModalInput').style.borderColor = '#dc3545'
+        document.getElementById('addWatchDateModalValidationFormatErrorMessage').classList.add('d-block')
+
+        return false
+    }
+
+    document.getElementById('addWatchDateModalInput').style.borderStyle = ''
+    document.getElementById('addWatchDateModalInput').style.borderColor = ''
+
+    return true
+}
+
+function isValidDate(dateString) {
+    return true
+
+    // First check for the pattern
+    if (!/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(dateString)) {
+        return false
+    }
+
+    // Parse the date parts to integers
+    var parts = dateString.split('.')
+    var day = parseInt(parts[0], 10)
+    var month = parseInt(parts[1], 10)
+    var year = parseInt(parts[2], 10)
+
+    // Check the ranges of month and year
+    if (year < 1000 || year > 3000 || month == 0 || month > 12) return false
+
+    var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    // Adjust for leap years
+    if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) monthLength[1] = 29
+
+    // Check the range of the day
+    return day > 0 && day <= monthLength[month - 1]
+}
+
+function getCurrentDate() {
+    const today = new Date()
+    const dd = String(today.getDate()).padStart(2, '0')
+    const mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
+    const yyyy = today.getFullYear()
+
+    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yyyy') {
+        return dd + '.' + mm + '.' + yyyy
+    }
+    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yy') {
+        return dd + '.' + mm + '.' + yyyy.toString().slice(-2)
+    }
+    if (document.getElementById('dateFormatJavascript').value === 'yy-mm-dd') {
+        return yyyy.toString().slice(-2) + '-' + mm + '-' + dd
+    }
+
+    return yyyy + '-' + mm + '-' + dd
+}
+
+function refreshTmdbData() {
+    document.getElementById('refreshTmdbDataButton').disabled = true;
+    document.getElementById('refreshImdbRatingButton').disabled = true;
+
+    refreshTmdbDataRequest().then(() => {
+        location.reload()
+    }).catch(() => {
+        alert('Could not refresh tmdb data. Please try again.')
+        document.getElementById('refreshTmdbDataButton').disabled = false;
+        document.getElementById('refreshImdbRatingButton').disabled = false;
+    })
+}
+
+async function refreshTmdbDataRequest() {
+    const response = await fetch('/movies/303/refresh-tmdb')
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return true
+}
+
+function refreshImdbRating() {
+    document.getElementById('refreshTmdbDataButton').disabled = true;
+    document.getElementById('refreshImdbRatingButton').disabled = true;
+
+    refreshImdbRatingRequest().then(() => {
+        location.reload()
+    }).catch(() => {
+        alert('Could not refresh imdb rating. Please try again.')
+        document.getElementById('refreshTmdbDataButton').disabled = false;
+        document.getElementById('refreshImdbRatingButton').disabled = false;
+    })
+}
+
+async function refreshImdbRatingRequest() {
+    const response = await fetch('/movies/303/refresh-imdb')
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return true
 }
