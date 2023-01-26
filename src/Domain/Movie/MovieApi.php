@@ -162,9 +162,9 @@ class MovieApi
         return $this->historyApi->fetchHistoryOrderedByWatchedAtDesc($userId);
     }
 
-    public function fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdateAt(?int $maxAgeInHours = null, ?int $limit = null) : array
+    public function fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null) : array
     {
-        return $this->movieRepository->fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdateAt($maxAgeInHours, $limit);
+        return $this->movieRepository->fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit);
     }
 
     public function fetchUniqueMovieGenres(int $userId) : array
