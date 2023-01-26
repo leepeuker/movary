@@ -34,6 +34,10 @@
                     <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
                     <button class="btn btn-primary" name="submit" onclick="uploadNetflixHistory()" type="button"> Upload File </button>
                 </form>
+                <div class="input-group mb-3">
+                    <label for="searchinput" class="input-group-text">Search for item</label>
+                    <input type="text" class="form-control disabled" onkeyup="searchTable()" style="cursor: not-allowed" id="searchinput" disabled/>
+                </div>
                 <div class="input-group">
                     <label for="selectfilter" class="input-group-text">Filter</label>
                     <select id="selectfilter" onchange="updateTable()" class="form-select">

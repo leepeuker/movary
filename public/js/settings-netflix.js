@@ -14,6 +14,7 @@ async function importNetflixHistory() {
     let jsondata = JSON.stringify(data);
     createPageNavigation(1, 1, true);
     disable(document.getElementById('importnetflixbtn'));
+    disable(document.getElementById('searchinput'));
     await createSpinner(document.getElementById('netflixtbody'), 'netflix');
     await fetch('/settings/netflix/import', {
         method: 'POST',
@@ -46,6 +47,8 @@ async function uploadNetflixHistory() {
     var filedata = new FormData();
     filedata.append('netflixviewactivity', input.files[0]);
     document.getElementById('netflixtbody').getElementsByTagName('tr')[0].remove();
+    disable(document.getElementById('importnetflixbtn'));
+    disable(document.getElementById('searchinput'));
     await createSpinner(document.getElementById('netflixtbody'), 'netflix');
     await fetch('/settings/netflix', {
         method: 'POST',
@@ -338,6 +341,7 @@ function processNetflixData(data) {
 
 
         netflix_name.innerText = data[key]['originalname'];
+        netflix_name.className = 'netflixcolumn';
         indexcell.innerText = index + 1;
 
         row.className = 'netflixrow';
@@ -420,6 +424,7 @@ function processNetflixData(data) {
         createPageNavigation(amount, keys.length);
     }
     enable(document.getElementById('importnetflixbtn'), 'pointer');
+    enable(document.getElementById('searchinput'));
 }
 
 function processError(errorcode) {
@@ -461,6 +466,29 @@ function saveTMDBItem() {
     targetrow.getElementsByClassName('bi-star-fill')[targetrow.getElementsByClassName('bi-star-fill').length - 1].click();
     const modal = bootstrap.Modal.getInstance(document.getElementById('tmdbmodal'));
     modal.hide();
+}
+
+function searchTable() {
+    let query = document.getElementById('searchinput').value.toUpperCase();
+    let rows = document.getElementsByClassName('netflixrow');
+
+    if(query.length > 2) {
+        for(let i = 0; i < rows.length; i++) {
+            if(rows[i].getElementsByClassName('netflixcolumn')[0].innerText.toUpperCase().indexOf(query) > -1) {
+                rows[i].classList.remove('d-none');
+            } else {
+                rows[i].classList.add('d-none');
+            }
+        }
+        createPageNavigation(1, 1);
+        disable(document.getElementById('selectfilter'));
+        disable(document.getElementById('amounttoshow'));
+    } else {
+        changePage(1);
+        createPageNavigation(document.getElementById('amounttoshow').value, rows.length);
+        enable(document.getElementById('selectfilter'));
+        enable(document.getElementById('amounttoshow'));
+    }
 }
 
 function scrollDown() {
