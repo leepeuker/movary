@@ -2,11 +2,11 @@
 
 namespace Movary\HttpController;
 
-use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
+use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -24,7 +24,7 @@ class MovieController
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
-        private readonly ImdbWebScrapper $imdbWebScrapper,
+        private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
     ) {
     }
 
@@ -56,14 +56,13 @@ class MovieController
         }
 
         $movieId = (int)$request->getRouteParameters()['id'];
-        $movie = $this->movieApi->findById($movieId);
+        $movie = $this->movieApi->findByIdFormatted($movieId);
 
         if ($movie === null) {
             return Response::createNotFound();
         }
 
-        $imdbRating = $this->imdbWebScrapper->findRating($movie['imdbId']);
-        $this->movieApi->updateImdbRating($movieId, $imdbRating['average'], $imdbRating['voteCount']);
+        $this->imdbMovieRatingSync->syncMovieRating($movieId);
 
         return Response::createOk();
     }
@@ -76,7 +75,7 @@ class MovieController
 
         $movieId = (int)$request->getRouteParameters()['id'];
 
-        $movie = $this->movieApi->findById($movieId);
+        $movie = $this->movieApi->findByIdFormatted($movieId);
         if ($movie === null) {
             return Response::createNotFound();
         }
@@ -100,7 +99,7 @@ class MovieController
 
         $movieId = (int)$request->getRouteParameters()['id'];
 
-        $movie = $this->movieApi->findById($movieId);
+        $movie = $this->movieApi->findByIdFormatted($movieId);
         $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
         return Response::create(

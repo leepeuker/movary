@@ -3,6 +3,7 @@
 namespace Movary\Domain\Movie;
 
 use Movary\Api\Imdb;
+use Movary\Api\Imdb\ValueObject\ImdbRating;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\Dto\TmdbCast;
 use Movary\Api\Tmdb\Dto\TmdbCrew;
@@ -104,11 +105,6 @@ class MovieApi
         return $this->repository->fetchAll();
     }
 
-    public function fetchAllOrderedByLastUpdatedAtImdbAsc(?int $maxAgeInHours = null, ?int $limit = null) : MovieEntityList
-    {
-        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $limit);
-    }
-
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
         return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);
@@ -164,6 +160,11 @@ class MovieApi
     public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->historyApi->fetchHistoryOrderedByWatchedAtDesc($userId);
+    }
+
+    public function fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdateAt(?int $maxAgeInHours = null, ?int $limit = null) : array
+    {
+        return $this->movieRepository->fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdateAt($maxAgeInHours, $limit);
     }
 
     public function fetchUniqueMovieGenres(int $userId) : array
@@ -224,7 +225,12 @@ class MovieApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
     }
 
-    public function findById(int $movieId) : ?array
+    public function findById(int $movieId) : ?MovieEntity
+    {
+        return $this->repository->findById($movieId);
+    }
+
+    public function findByIdFormatted(int $movieId) : ?array
     {
         $entity = $this->repository->findById($movieId);
 
@@ -382,9 +388,9 @@ class MovieApi
         }
     }
 
-    public function updateImdbRating(int $movieId, ?float $imdbRating, ?int $imdbRatingVoteCount) : void
+    public function updateImdbRating(int $movieId, ?ImdbRating $imdbRating) : void
     {
-        $this->repository->updateImdbRating($movieId, $imdbRating, $imdbRatingVoteCount);
+        $this->repository->updateImdbRating($movieId, $imdbRating);
     }
 
     public function updateLetterboxdId(int $movieId, string $letterboxdId) : void

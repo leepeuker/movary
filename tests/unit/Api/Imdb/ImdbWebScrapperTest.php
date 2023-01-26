@@ -5,6 +5,7 @@ namespace Tests\Unit\Movary\Api\Imdb;
 use GuzzleHttp\Client;
 use Movary\Api\Imdb\ImdbUrlGenerator;
 use Movary\Api\Imdb\ImdbWebScrapper;
+use Movary\Api\Imdb\ValueObject\ImdbRating;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -34,10 +35,7 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
 
 
             <br /><br />',
-                [
-                    'average' => 7.9,
-                    'voteCount' => 229240,
-                ],
+                ImdbRating::create(7.9, 229240)
             ],
             [
                 '    <div class="allText">
@@ -48,10 +46,7 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
 
 
             <br /><br />',
-                [
-                    'average' => 7.9,
-                    'voteCount' => 229240,
-                ],
+                ImdbRating::create(7.9, 229240)
             ],
             [
                 '    <div class="allText">
@@ -62,10 +57,7 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
 
 
             <br /><br />',
-                [
-                    'average' => 7.9,
-                    'voteCount' => 1229240,
-                ],
+                ImdbRating::create(7.9, 1229240)
             ],
             [
                 '    <div class="allText">
@@ -76,10 +68,7 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
 
 
             <br /><br />',
-                [
-                    'average' => 7.9,
-                    'voteCount' => 40,
-                ],
+                ImdbRating::create(7.9, 40)
             ],
             [
                 '    <div class="allText">
@@ -90,10 +79,7 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
 
 
             <br /><br />',
-                [
-                    'average' => 7.9,
-                    'voteCount' => null,
-                ],
+                null
             ],
             [
                 '    <div class="allText">
@@ -104,10 +90,7 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
 
 
             <br /><br />',
-                [
-                    'average' => null,
-                    'voteCount' => null,
-                ],
+                null
             ],
         ];
     }
@@ -124,7 +107,7 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
     /**
      * @dataProvider provideFindRatingData
      */
-    public function testFindRating(string $responseContent, array $expectedResult) : void
+    public function testFindRating(string $responseContent, ?ImdbRating $expectedResult) : void
     {
         $imdbId = 'imdb-id';
 
@@ -133,12 +116,13 @@ IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies
         /** @var StreamInterface|MockObject $streamInterfaceMock */
         $streamInterfaceMock = $this->createMock(StreamInterface::class);
 
+        $responseMock->expects(self::once())->method('getStatusCode')->willReturn(200);
         $responseMock->expects(self::once())->method('getBody')->willReturn($streamInterfaceMock);
         $streamInterfaceMock->expects(self::once())->method('getContents')->willReturn($responseContent);
 
         $this->httpClientMock->expects(self::once())->method('get')->willReturn($responseMock);
 
-        self::assertSame(
+        self::assertEquals(
             $expectedResult,
             $this->subject->findRating($imdbId),
         );
