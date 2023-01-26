@@ -149,9 +149,13 @@ function updateTable() {
     }
 }
 
-function changePage() {
+function changePage(pageNumber = null) {
     var direction = "";
-    if(this.nextElementSibling == null) {
+    if (!isNaN(parseInt(pageNumber))) {
+        // The function was manually triggered by JS code
+        direction = pageNumber;
+    }
+    else if(this.nextElementSibling == null) {
         // User clicked on the next button
         direction = 'next';
     } else if(this.previousElementSibling == null) {
@@ -253,8 +257,8 @@ function createPageNavigation(amount, items, reset = null) {
             disable(lastchild);
             disable(firstchild);
         } else {
-            enable(lastchild);
-            enable(firstchild);
+            enable(lastchild, 'pointer');
+            enable(firstchild, 'pointer');
         }
     }
 
@@ -415,7 +419,7 @@ function processNetflixData(data) {
     } else {
         createPageNavigation(amount, keys.length);
     }
-    enable(document.getElementById('importnetflixbtn'));
+    enable(document.getElementById('importnetflixbtn'), 'pointer');
 }
 
 function processError(errorcode) {
@@ -500,10 +504,10 @@ function updateRatingStars () {
 	setRatingStars(this);
 }
 
-function enable(el) {
+function enable(el, cursor = '') {
     el.classList.remove('disabled');
     el.removeAttribute('disabled');
-    el.style.cursor = '';
+    el.style.cursor = cursor;
 }
 
 function disable(el) {
