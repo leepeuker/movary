@@ -8,6 +8,7 @@ use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -143,24 +144,6 @@ class MovieRepository
     public function fetchAll() : MovieEntityList
     {
         $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie`');
-
-        return MovieEntityList::createFromArray($data);
-    }
-
-    public function fetchAllOrderedByLastUpdatedAtImdbAsc(?int $maxAgeInHours = null, ?int $limit = null) : MovieEntityList
-    {
-        $limitQuery = '';
-        if ($limit !== null) {
-            $limitQuery = " LIMIT $limit";
-        }
-
-        $data = $this->dbConnection->fetchAllAssociative(
-            'SELECT * 
-                FROM `movie` 
-                WHERE updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR)
-                ORDER BY updated_at_imdb ASC' . $limitQuery,
-            [(int)$maxAgeInHours],
-        );
 
         return MovieEntityList::createFromArray($data);
     }
@@ -435,6 +418,22 @@ class MovieRepository
             ORDER BY COUNT(*) DESC, YEAR(release_date) DESC
             SQL,
             [$userId],
+        );
+    }
+
+    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null) : array
+    {
+        $limitQuery = '';
+        if ($limit !== null) {
+            $limitQuery = " LIMIT $limit";
+        }
+
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT movie.id
+                FROM `movie` 
+                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR))
+                ORDER BY updated_at_imdb ASC' . $limitQuery,
+            [(int)$maxAgeInHours],
         );
     }
 
@@ -813,11 +812,11 @@ class MovieRepository
         return $this->fetchById($id);
     }
 
-    public function updateImdbRating(int $id, ?float $imdbRating, ?int $imdbRatingVoteCount) : void
+    public function updateImdbRating(int $id, ?ImdbRating $imdbRating) : void
     {
         $this->dbConnection->update('movie', [
-            'imdb_rating_average' => $imdbRating,
-            'imdb_rating_vote_count' => $imdbRatingVoteCount,
+            'imdb_rating_average' => $imdbRating?->getRating(),
+            'imdb_rating_vote_count' => $imdbRating?->getVotesCount(),
             'updated_at_imdb' => (string)DateTime::create(),
             'updated_at' => (string)DateTime::create(),
         ], ['id' => $id]);

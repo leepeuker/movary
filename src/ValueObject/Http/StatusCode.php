@@ -49,4 +49,9 @@ class StatusCode
     {
         return sprintf('HTTP/1.1 %d %s', $this->code, $this->string);
     }
+
+    public function getCode() : int
+    {
+        return $this->code;
+    }
 }
