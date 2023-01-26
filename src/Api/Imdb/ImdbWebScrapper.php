@@ -3,8 +3,8 @@
 namespace Movary\Api\Imdb;
 
 use GuzzleHttp\Client;
-use Movary\Api\Imdb\ValueObject\ImdbRating;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
 class ImdbWebScrapper

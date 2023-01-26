@@ -5,7 +5,7 @@ namespace Tests\Unit\Movary\Api\Imdb;
 use GuzzleHttp\Client;
 use Movary\Api\Imdb\ImdbUrlGenerator;
 use Movary\Api\Imdb\ImdbWebScrapper;
-use Movary\Api\Imdb\ValueObject\ImdbRating;
+use Movary\ValueObject\ImdbRating;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;

@@ -4,11 +4,11 @@ namespace Movary\Domain\Movie;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
-use Movary\Api\Imdb\ValueObject\ImdbRating;
 use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;

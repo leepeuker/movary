@@ -4,9 +4,9 @@ namespace Movary\Service\Imdb;
 
 use Exception;
 use Movary\Api\Imdb\ImdbWebScrapper;
-use Movary\Api\Imdb\ValueObject\ImdbRating;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
 class ImdbMovieRatingSync

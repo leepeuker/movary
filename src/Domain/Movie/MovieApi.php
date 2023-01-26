@@ -3,7 +3,6 @@
 namespace Movary\Domain\Movie;
 
 use Movary\Api\Imdb;
-use Movary\Api\Imdb\ValueObject\ImdbRating;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\Dto\TmdbCast;
 use Movary\Api\Tmdb\Dto\TmdbCrew;
@@ -20,6 +19,7 @@ use Movary\Service\UrlGenerator;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;

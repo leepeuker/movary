@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Api\Imdb\ValueObject;
+namespace Movary\ValueObject;
 
 class ImdbRating
 {
