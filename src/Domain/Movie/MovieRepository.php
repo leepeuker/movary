@@ -421,7 +421,7 @@ class MovieRepository
         );
     }
 
-    public function fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null) : array
+    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null) : array
     {
         $limitQuery = '';
         if ($limit !== null) {

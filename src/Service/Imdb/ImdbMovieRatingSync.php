@@ -67,7 +67,7 @@ class ImdbMovieRatingSync
         ?int $movieCountSyncThreshold = null,
         int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
     ) : void {
-        $movieIds = $this->movieApi->fetchMovieIdsWithImdbIdsOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold);
+        $movieIds = $this->movieApi->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold);
 
         foreach ($movieIds as $index => $movieId) {
             $this->syncMovieRating($movieId);
