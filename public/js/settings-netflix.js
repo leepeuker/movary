@@ -385,7 +385,7 @@ function processNetflixData(data) {
             let tmdb_rating_icon = document.createElement('i');
             tmdb_rating_icon.className = 'bi bi-star ratingIcon';
             tmdb_rating_icon.dataset.rating = i;
-            tmdb_rating_icon.addEventListener('click', updateRatingStars);
+            tmdb_rating_icon.addEventListener('click', setRatingStars);
             tmdb_rating_span.appendChild(tmdb_rating_icon);
         }
                 
@@ -527,10 +527,6 @@ function getRatingFromStars (row) {
 	}
 
 	return rating;
-}
-
-function updateRatingStars () {
-	setRatingStars(this);
 }
 
 function enable(el, cursor = '') {
