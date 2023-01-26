@@ -104,7 +104,7 @@ async function searchTMDB(event) {
 }
 
 async function createSpinner(parent, target) {
-    document.getElementById('netflixtbody').innerHTML = '';
+    parent.innerHTML = '';
     let div = document.createElement('div');
     let span = document.createElement('span');
     div.className = 'spinner-border';
@@ -312,7 +312,6 @@ function processTMDBData(data) {
         media_div.append(thumb_div, descr_div, radio_div);
         media_div.addEventListener('click', selectTMDBItem);
         parent.append(media_div);
-        return false;
     });
 }
 
@@ -463,7 +462,9 @@ function saveTMDBItem() {
     targetrow.getElementsByTagName('p')[0].innerText = checkedrow.getElementsByTagName('p')[0].innerText;
     targetrow.getElementsByTagName('p')[1].innerText = checkedrow.getElementsByTagName('p')[1].innerText;
     targetrow.setAttribute('data-tmdbid', checkedrow.dataset.tmdbid);
-    targetrow.getElementsByClassName('bi-star-fill')[targetrow.getElementsByClassName('bi-star-fill').length - 1].click();
+    if(targetrow.getElementsByClassName('bi-star-fill').length > 0) {
+        targetrow.getElementsByClassName('bi-star-fill')[targetrow.getElementsByClassName('bi-star-fill').length - 1].click();
+    }
     const modal = bootstrap.Modal.getInstance(document.getElementById('tmdbmodal'));
     modal.hide();
 }
