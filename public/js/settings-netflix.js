@@ -369,7 +369,7 @@ function processNetflixData(data) {
         tmdb_cover_div.className = 'col-md-3 justify-content-center';
         tmdb_description_div.className = 'col-md-9 text-start d-flex flex-column';
         tmdb_cover.style.width = '92px';
-        tmdb_cover.alt = 'Movie poster of ' + (data[key]['result']['title'] ?? 'missing item');
+        tmdb_cover.alt = 'Cover of ' + (data[key]['result']['title'] ?? 'missing item');
 
         tmdb_rating_div.className = 'fw-light mb-3 ratingStars';
         tmdb_rating_div.style.color = 'rgb(255, 193, 7)';
@@ -457,6 +457,7 @@ function saveTMDBItem() {
     let rowid = document.getElementById('tmdbmodal').dataset.rowid;
     let targetrow = document.getElementById(rowid); 
     targetrow.getElementsByClassName('img-fluid')[0].src = checkedrow.getElementsByClassName('img-fluid')[0].src;
+    targetrow.getElementsByClassName('img-fluid')[0].alt = checkedrow.getElementsByClassName('img-fluid')[0].alt;
     targetrow.getElementsByTagName('a')[0].href = checkedrow.getElementsByTagName('a')[0].href;
     targetrow.getElementsByTagName('a')[0].innerText = checkedrow.getElementsByTagName('a')[0].innerText;
     targetrow.getElementsByTagName('p')[0].innerText = checkedrow.getElementsByTagName('p')[0].innerText;
@@ -496,9 +497,9 @@ function scrollDown() {
     window.scrollTo(0, document.body.scrollHeight);
 }
 
-function setRatingStars (star) {
-    let newRating = star.dataset.rating;
-    let row = star.closest('.netflixrow');
+function setRatingStars () {
+    let newRating = this.dataset.rating;
+    let row = this.closest('.netflixrow');
 	if (getRatingFromStars(row) == newRating) {
 		newRating = null;
 	}
