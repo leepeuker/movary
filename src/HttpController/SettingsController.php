@@ -228,12 +228,9 @@ class SettingsController
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
-        $dateFormatPhp = DateFormat::getPhpDefault();
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-netflix.html.twig', [
-                'dateFormatPhp' => $dateFormatPhp
-            ])
+            $this->twig->render('page/settings-netflix.html.twig')
         );
     }
 
