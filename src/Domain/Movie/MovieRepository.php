@@ -31,6 +31,7 @@ class MovieRepository
         ?float $tmdbVoteAverage = null,
         ?int $tmdbVoteCount = null,
         ?string $tmdbPosterPath = null,
+        ?string $tmdbBackdropPath = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
     ) : MovieEntity {
@@ -46,10 +47,11 @@ class MovieRepository
                 'tmdb_vote_average' => $tmdbVoteAverage,
                 'tmdb_vote_count' => $tmdbVoteCount,
                 'tmdb_poster_path' => $tmdbPosterPath,
+                'tmdb_backdrop_path' => $tmdbBackdropPath,
                 'trakt_id' => $traktId?->asInt(),
                 'imdb_id' => $imdbId,
                 'tmdb_id' => $tmdbId,
-                'created_at' => (string)Date::create(),
+                'created_at' => (string)DateTime::create(),
             ],
         );
 
@@ -789,6 +791,7 @@ class MovieRepository
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
+        ?string $tmdbBackdropPath,
         ?string $imdbId,
     ) : MovieEntity {
         $this->dbConnection->update(
@@ -802,6 +805,7 @@ class MovieRepository
                 'tmdb_vote_average' => $tmdbVoteAverage,
                 'tmdb_vote_count' => $tmdbVoteCount,
                 'tmdb_poster_path' => $tmdbPosterPath,
+                'tmdb_backdrop_path' => $tmdbBackdropPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
                 'imdb_id' => $imdbId,
                 'updated_at' => (string)DateTime::create(),
