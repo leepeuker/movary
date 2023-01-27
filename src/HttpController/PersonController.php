@@ -56,7 +56,7 @@ class PersonController
                 'users' => $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieWithPersonVisibleUsernamesForCurrentVisitor($personId),
                 'person' => [
                     'name' => $person->getName(),
-                    'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
+                    'posterPath' => $this->urlGenerator->generateImagePosterSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
                     'knownForDepartment' => $person->getKnownForDepartment(),
                     'gender' => $person->getGender(),
                     'age' => $age,

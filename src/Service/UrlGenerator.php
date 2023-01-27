@@ -13,7 +13,16 @@ class UrlGenerator
     ) {
     }
 
-    public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath) : string
+    public function generateImageBackdropSrcUrlFromParameters(?string $tmdbBackdropPath) : string
+    {
+        if (empty($tmdbBackdropPath) === false) {
+            return (string)$this->tmdbUrlGenerator->generateImageUrl($tmdbBackdropPath, 'w1280');
+        }
+
+        return '/images/placeholder-image.png';
+    }
+
+    public function generateImagePosterSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath = null) : string
     {
         if ($this->enableImageCaching === true && empty($posterPath) === false && $this->imageCacheService->posterPathExists($posterPath) === true) {
             return '/' . trim($posterPath, '/');
@@ -29,7 +38,7 @@ class UrlGenerator
     public function replacePosterPathWithImageSrcUrl(array $dbResults) : array
     {
         foreach ($dbResults as $index => $dbResult) {
-            $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters(
+            $dbResults[$index]['poster_path'] = $this->generateImagePosterSrcUrlFromParameters(
                 $dbResult['tmdb_poster_path'] ?? null,
                 $dbResult['poster_path'] ?? null,
             );

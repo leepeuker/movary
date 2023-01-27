@@ -13,3 +13,19 @@
     border: black solid;
     border-width: 0.1rem;
 }
+
+.hero {
+    height: 20rem;
+    background-position: center;
+    background-size: cover;
+}
+
+.covered-img {
+    background:url('/images/backdrop.jpg');
+    opacity: .25;
+
+    background-size:cover; /* cover will scale the image so that the smallest dimension = the widest dimension of the box */
+    background-position:center; /* vs the top-left that is default */
+
+    position:absolute; /* take me out of the render context! let me define my own positioning */
+}
