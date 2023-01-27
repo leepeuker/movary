@@ -52,6 +52,7 @@ class SyncMovie
                     tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
                     tmdbVoteCount: $tmdbMovie->getVoteCount(),
                     tmdbPosterPath: $tmdbMovie->getPosterPath(),
+                    tmdbBackdropPath: $tmdbMovie->getBackdropPath(),
                     imdbId: $tmdbMovie->getImdbId(),
                 );
 
@@ -69,6 +70,7 @@ class SyncMovie
                     tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
                     tmdbVoteCount: $tmdbMovie->getVoteCount(),
                     tmdbPosterPath: $tmdbMovie->getPosterPath(),
+                    tmdbBackdropPath: $tmdbMovie->getBackdropPath(),
                     imdbId: $movie->getImdbId(),
                 );
 

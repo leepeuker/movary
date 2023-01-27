@@ -55,6 +55,7 @@ class MovieApi
         ?float $tmdbVoteAverage = null,
         ?int $tmdbVoteCount = null,
         ?string $tmdbPosterPath = null,
+        ?string $tmdbBackdropPath = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
     ) : MovieEntity {
@@ -69,6 +70,7 @@ class MovieApi
             $tmdbVoteAverage,
             $tmdbVoteCount,
             $tmdbPosterPath,
+            $tmdbBackdropPath,
             $traktId,
             $imdbId,
         );
@@ -363,6 +365,7 @@ class MovieApi
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
+        ?string $tmdbBackdropPath,
         ?string $imdbId,
     ) : MovieEntity {
         return $this->repository->updateDetails(
@@ -375,6 +378,7 @@ class MovieApi
             $tmdbVoteAverage,
             $tmdbVoteCount,
             $tmdbPosterPath,
+            $tmdbBackdropPath,
             $imdbId,
         );
     }

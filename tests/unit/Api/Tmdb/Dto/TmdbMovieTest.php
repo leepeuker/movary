@@ -26,6 +26,7 @@ class TmdbMovieTest extends TestCase
             'genres' => [],
             'production_companies' => [],
             'poster_path' => null,
+            'backdrop_path' => null,
             'imdb_id' => null,
         ];
 
@@ -40,6 +41,7 @@ class TmdbMovieTest extends TestCase
         self::assertNull($subject->getRuntime());
         self::assertNull($subject->getTagline());
         self::assertNull($subject->getPosterPath());
+        self::assertNull($subject->getBackdropPath());
         self::assertNull($subject->getImdbId());
     }
 
@@ -69,6 +71,7 @@ class TmdbMovieTest extends TestCase
                 ]
             ],
             'poster_path' => 'posterPath',
+            'backdrop_path' => 'backdropPath',
             'imdb_id' => 'tt1234567',
         ];
 
@@ -83,6 +86,7 @@ class TmdbMovieTest extends TestCase
         self::assertSame(90, $subject->getRuntime());
         self::assertSame('tagline...', $subject->getTagline());
         self::assertSame('posterPath', $subject->getPosterPath());
+        self::assertSame('backdropPath', $subject->getBackdropPath());
         self::assertSame('tt1234567', $subject->getImdbId());
     }
 
