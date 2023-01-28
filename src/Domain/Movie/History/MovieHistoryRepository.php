@@ -11,15 +11,16 @@ class MovieHistoryRepository
     {
     }
 
-    public function createOrUpdatePlaysForDate(int $movieId, int $userId, Date $watchedAt, int $plays) : void
+    public function createOrUpdatePlaysForDate(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment) : void
     {
         $this->dbConnection->executeStatement(
-            'REPLACE INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays) VALUES (?, ?, ?, ?)',
+            'REPLACE INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`) VALUES (?, ?, ?, ?, ?)',
             [
                 $movieId,
                 $userId,
                 (string)$watchedAt,
                 (string)$plays,
+                $comment,
             ],
         );
     }
@@ -44,6 +45,19 @@ class MovieHistoryRepository
             FROM movie_user_watch_dates
             WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
             [$movieId, (string)$watchedAt, $userId],
+        );
+    }
+
+    public function updateHistoryComment(int $movieId, int $userId, Date $watchedAt, ?string $comment) : void
+    {
+        $this->dbConnection->executeStatement(
+            'UPDATE movie_user_watch_dates SET `comment` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
+            [
+                $comment,
+                $movieId,
+                $userId,
+                (string)$watchedAt,
+            ],
         );
     }
 }

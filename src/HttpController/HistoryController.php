@@ -53,8 +53,9 @@ class HistoryController
         $movieId = (int)$request->getRouteParameters()['id'];
         $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
         $plays = (int)$requestBody['plays'];
+        $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
-        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays);
+        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }
@@ -177,8 +178,10 @@ class HistoryController
         $movieId = (int)$request->getRouteParameters()['id'];
         $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
         $plays = (int)$requestBody['plays'];
+        $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movieId, $userId, $watchDate, $plays);
+        $this->movieApi->updateHistoryComment($movieId, $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }

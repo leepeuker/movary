@@ -5,6 +5,7 @@ namespace Movary\Domain\Movie;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\Api\Trakt\ValueObject\TraktId;
+use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
@@ -450,20 +451,6 @@ class MovieRepository
         );
     }
 
-    public function fetchPlaysForMovieIdAtDate(int $movieId, int $userId, Date $watchedAt) : int
-    {
-        $result = $this->dbConnection->fetchOne(
-            'SELECT plays FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
-            [$movieId, $watchedAt, $userId],
-        );
-
-        if ($result === false) {
-            return 0;
-        }
-
-        return $result;
-    }
-
     public function fetchTotalMinutesWatched(int $userId) : int
     {
         return (int)$this->dbConnection->executeQuery(
@@ -737,6 +724,20 @@ class MovieRepository
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE trakt_id = ?', [$traktId->asInt()]);
 
         return $data === false ? null : MovieEntity::createFromArray($data);
+    }
+
+    public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, Date $watchedAt) : ?MovieHistoryEntity
+    {
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
+            [$movieId, $watchedAt, $userId],
+        );
+
+        if ($result === false) {
+            return null;
+        }
+
+        return MovieHistoryEntity::createFromArray($result);
     }
 
     public function findPersonalMovieRating(int $movieId, int $userId) : ?PersonalRating

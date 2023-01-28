@@ -130,10 +130,10 @@
                         <li class="list-group-item {% if currentUsername == routeUsername %}list-group-item-action{% endif %}"
                             style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer{% endif %}"
                             {% if currentUsername == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
-                            id="watchDate-{{ loop.index }}">
+                            data-watch-date="{{ watchDate.watched_at|date(dateFormatPhp) }}"
+                            data-plays="{{ watchDate.plays }}"
+                            data-comment="{{ watchDate.comment }}">
                             {{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
-                            <input value="{{ watchDate.watched_at|date(dateFormatPhp) }}" hidden id="inputDate-{{ loop.index }}">
-                            <input value="{{ watchDate.plays }}" hidden id="inputPlays-{{ loop.index }}">
                         </li>
                     {% endfor %}
                 </ul>
