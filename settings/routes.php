@@ -26,6 +26,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/create-user',
         [\Movary\HttpController\CreateUserController::class, 'createUser'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/create-user',
+        [\Movary\HttpController\CreateUserController::class, 'render'],
+    );
 
     #####################
     # Webhook listeners #

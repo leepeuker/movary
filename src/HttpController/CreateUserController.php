@@ -11,20 +11,48 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\Config;
+use Twig\Environment;
 use Throwable;
 
 class CreateUserController
 {
     public function __construct(
+        private readonly Environment $twig,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
+        private readonly Config $config,
         private readonly SessionWrapper $sessionWrapper,
     ) {
     }
 
+    public function render() : Response
+    {
+        if ($this->userApi->hasUsers() === true && strtolower($this->config->getAsString('REGISTRATION', 'false')) == 'false' || $this->authenticationService->isUserAuthenticated() === true) {
+            return Response::createSeeOther('/');
+        }
+
+        $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
+        $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
+        $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
+        $errorGeneric = $this->sessionWrapper->find('errorGeneric');
+
+        $this->sessionWrapper->unset('errorPasswordTooShort', 'errorPasswordNotEqual', 'errorUsernameInvalidFormat', 'errorGeneric');
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/create-user.html.twig', [
+                'errorPasswordTooShort' => $errorPasswordTooShort,
+                'errorPasswordNotEqual' => $errorPasswordNotEqual,
+                'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
+                'errorGeneric' => $errorGeneric,
+            ]),
+        );
+    }
+
     public function createUser(Request $request) : Response
     {
-        if ($this->userApi->hasUsers() === true) {
+        if ($this->userApi->hasUsers() === true && strtolower($this->config->getAsString('REGISTRATION', 'false')) == 'false') {
             return Response::createSeeOther('/');
         }
 
@@ -59,6 +87,7 @@ class CreateUserController
             $this->userApi->createUser($email, $password, $name);
 
             $this->authenticationService->login($email, $password, false);
+
         } catch (PasswordTooShort $e) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
         } catch (UsernameInvalidFormat $e) {

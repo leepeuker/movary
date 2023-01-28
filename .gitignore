@@ -1,6 +1,6 @@
 .idea
 .phpunit.result.cache
-
+.vscode
 .env
 /vendor
 /public/storage
