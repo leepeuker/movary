@@ -208,6 +208,26 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/settings/app',
         [\Movary\HttpController\SettingsController::class, 'renderAppPage'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/netflix',
+        [\Movary\HttpController\SettingsController::class, 'renderNetflixPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/netflix',
+        [\Movary\HttpController\NetflixController::class, 'processNetflixActivity'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/netflix/import',
+        [\Movary\HttpController\NetflixController::class, 'importNetflixData'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/netflix/search',
+        [\Movary\HttpController\NetflixController::class, 'searchTMDB'],
+    );
 
     ##########
     # Movies #

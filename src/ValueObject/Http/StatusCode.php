@@ -15,6 +15,13 @@ class StatusCode
         return new self(400, 'Bad Request');
     }
 
+    public static function createUnsupportedMediaType() : self
+    {
+        // Returns HTTP code 415: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415
+        // Used for processing file upload
+        return new self(415, 'Unsupported Media Type');
+    }
+
     public static function createForbidden() : self
     {
         return new self(403, 'Forbidden');
