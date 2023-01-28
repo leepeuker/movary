@@ -528,13 +528,11 @@ function getRatingFromStars(row) {
 function enable(el, cursor = '') {
     el.classList.remove('disabled');
     el.removeAttribute('disabled');
-    el.style.cursor = cursor;
 }
 
 function disable(el) {
     el.classList.add('disabled');
     el.setAttribute('disabled', '');
-    el.style.cursor = 'not-allowed';
 }
 
 document.getElementById('tmdbmodal').addEventListener('show.bs.modal', event => {
