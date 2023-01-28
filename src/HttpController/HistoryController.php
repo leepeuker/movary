@@ -99,6 +99,7 @@ class HistoryController
         $watchDate = Date::createFromStringAndFormat($requestData['watchDate'], $requestData['dateFormat']);
         $tmdbId = (int)$requestData['tmdbId'];
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
+        $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -108,6 +109,7 @@ class HistoryController
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+        $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createOk());
     }

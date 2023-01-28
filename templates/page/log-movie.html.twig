@@ -74,14 +74,20 @@
                         </div>
                         <div class="fw-light" id="ratingStars"
                              style="color: rgb(255, 193, 7);
-                                     font-size: 1.5rem;
-                                     margin-top: 0.5rem;
-                                     cursor:pointer;">
+                                    font-size: 1.5rem;
+                                    margin-top: 0.5rem;
+                                    cursor:pointer;
+                                    border-top-right-radius: .375rem!important;
+                                    border-bottom-right-radius: .375rem">
                             <span id="ratingStarsSpan">
                                 {% for i in 1..10 %}
                                     <i class="bi bi-star" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
                                 {% endfor %}
                             </span>
+                        </div>
+                        <div class="input-group" style="margin-top: 0.5rem;margin-bottom: 0.5rem">
+                            <i class="input-group-text">Comment</i>
+                            <textarea class="form-control" rows="1" aria-label="Comment" id="comment"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
