@@ -24,7 +24,8 @@
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
                     <b>Download your Netflix history</b>
                     <br/>
-                    Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the 'download all' link.
+                    Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the
+                    'download all' link.
                     <br/>
                     Upload this CSV file down below. This can take a while for big histories.
                     <br>
@@ -33,42 +34,41 @@
                 <div class="mb-3">
                     <label class="form-label" for="file">Upload Your CSV File</label>
                     <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
-                    <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button"  style="margin-top: 1rem"> Upload File </button>
+                    <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" style="margin-top: 1rem"> Upload File</button>
                 </div>
                 <hr>
                 <div class="input-group mb-3">
-                    <label for="searchinput" class="input-group-text">Search table</label>
-                    <input type="text" class="form-control disabled" onkeyup="searchTable()" style="cursor: not-allowed" id="searchinput" disabled/>
-                </div>
-                <div class="input-group">
                     <label for="selectfilter" class="input-group-text">Filter</label>
-                    <select id="selectfilter" onchange="updateTable()" class="form-select">
+                    <select id="selectfilter" onchange="updateTable()" class="form-select" disabled>
                         <option value="all">All</option>
                         <option value="notfound">Not found</option>
                     </select>
-                    <label for="amounttoshow" class="input-group-text">Number of items on one page</label>
-                    <select id="amounttoshow" onchange="updateTable()" class="form-select">
+                    <label for="amounttoshow" class="input-group-text">Per page</label>
+                    <select id="amounttoshow" onchange="updateTable()" class="form-select" disabled>
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
                         <option value="all">All</option>
                     </select>
-                    <button type="button" class="btn btn-outline-secondary" onclick="scrollDown()">Go to the bottom</button>
+                </div>
+                <div class="input-group mb-3">
+                    <label for="searchinput" class="input-group-text">Search table</label>
+                    <input type="text" class="form-control disabled" onkeyup="searchTable()" style="cursor: not-allowed" id="searchinput" disabled/>
                 </div>
                 <table class="table table-hover">
                     <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Date watched</th>
-                            <th scope="col">Netflix name</th>
-                            <th scope="col">TMDB item</th>
-                        </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Date watched</th>
+                        <th scope="col">Netflix name</th>
+                        <th scope="col">TMDB item</th>
+                    </tr>
                     </thead>
                     <tbody id="netflixtbody">
-                        <tr>
-                            <td colspan="4">All your uploaded Netflix data will appear here</td>
-                        </tr>
+                    <tr>
+                        <td colspan="4">All your uploaded Netflix data will appear here</td>
+                    </tr>
                     </tbody>
                 </table>
                 <nav aria-label="Page navigation">
@@ -77,7 +77,13 @@
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">#</a></li>
                         <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Next</a></li>
                     </ul>
-                    <button type="button" class="btn btn-primary disabled mb-3" style="cursor: not-allowed" id="importnetflixbtn" disabled onclick="importNetflixHistory();">Import Netflix data</button>
+                    <button type="button"
+                            class="btn btn-primary disabled mb-3"
+                            style="cursor: not-allowed" id="importnetflixbtn"
+                            onclick="importNetflixHistory();"
+                            disabled>Import
+                        data
+                    </button>
                 </nav>
             </div>
         </div>
@@ -96,7 +102,7 @@
                         <label for="searchtmdb" class="form-label">Search for better match on TMDB</label>
                         <form class="input-group mb-3">
                             <input type="text" class="form-control" name="searchtmdb" id="searchtmdb">
-                            <button class="btn btn-success" type="submit" id="searchtmdbbtn" onclick="searchTMDB(event)" ><i class="bi bi-search"></i></button>
+                            <button class="btn btn-success" type="submit" id="searchtmdbbtn" onclick="searchTMDB(event)"><i class="bi bi-search"></i></button>
                         </form>
                         <div id="tmdbsearchresults" class="row justify-content-center"></div>
                     </div>
