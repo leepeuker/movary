@@ -13,12 +13,14 @@ use Movary\Domain\Movie\Cast\CastApi;
 use Movary\Domain\Movie\Crew\CrewApi;
 use Movary\Domain\Movie\Genre\MovieGenreApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Person\PersonApi;
 use Movary\Service\UrlGenerator;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -54,6 +56,7 @@ class MovieApi
         ?float $tmdbVoteAverage = null,
         ?int $tmdbVoteCount = null,
         ?string $tmdbPosterPath = null,
+        ?string $tmdbBackdropPath = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
     ) : MovieEntity {
@@ -68,6 +71,7 @@ class MovieApi
             $tmdbVoteAverage,
             $tmdbVoteCount,
             $tmdbPosterPath,
+            $tmdbBackdropPath,
             $traktId,
             $imdbId,
         );
@@ -102,11 +106,6 @@ class MovieApi
     public function fetchAll() : MovieEntityList
     {
         return $this->repository->fetchAll();
-    }
-
-    public function fetchAllOrderedByLastUpdatedAtImdbAsc(?int $maxAgeInHours = null, ?int $limit = null) : MovieEntityList
-    {
-        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtImdbAsc($maxAgeInHours, $limit);
     }
 
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
@@ -151,11 +150,6 @@ class MovieApi
         return $this->historyApi->fetchUniqueMovieInHistoryCount($userId);
     }
 
-    public function fetchHistoryMoviePlaysOnDate(int $id, int $userId, Date $watchedAt) : int
-    {
-        return $this->historyApi->fetchPlaysForMovieIdOnDate($id, $userId, $watchedAt);
-    }
-
     public function fetchHistoryMovieTotalPlays(int $movieId, int $userId) : int
     {
         return $this->historyApi->fetchTotalPlaysForMovieAndUserId($movieId, $userId);
@@ -164,6 +158,11 @@ class MovieApi
     public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->historyApi->fetchHistoryOrderedByWatchedAtDesc($userId);
+    }
+
+    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null) : array
+    {
+        return $this->movieRepository->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit);
     }
 
     public function fetchUniqueMovieGenres(int $userId) : array
@@ -224,7 +223,12 @@ class MovieApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
     }
 
-    public function findById(int $movieId) : ?array
+    public function findById(int $movieId) : ?MovieEntity
+    {
+        return $this->repository->findById($movieId);
+    }
+
+    public function findByIdFormatted(int $movieId) : ?array
     {
         $entity = $this->repository->findById($movieId);
 
@@ -256,7 +260,7 @@ class MovieApi
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
-            'imdbUrl' => $imdbId !== null ? $this->imdbUrlGenerator->buildMovieRatingsUrl($imdbId) : null,
+            'imdbUrl' => $imdbId !== null ? $this->imdbUrlGenerator->buildMovieUrl($imdbId) : null,
             'imdbRatingAverage' => $entity->getImdbRatingAverage(),
             'imdbRatingVoteCount' => $this->voteCountFormatter->formatVoteCount($entity->getImdbVoteCount()),
             'tmdbUrl' => (string)$this->tmdbUrlGenerator->generateMovieUrl($entity->getTmdbId()),
@@ -296,21 +300,32 @@ class MovieApi
         return $this->movieGenreApi->findByMovieId($movieId);
     }
 
+    public function findHistoryEntryForMovieByUserOnDate(int $id, int $userId, Date $watchedAt) : ?MovieHistoryEntity
+    {
+        return $this->historyApi->findHistoryEntryForMovieByUserOnDate($id, $userId, $watchedAt);
+    }
+
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         return $this->repository->findUserRating($movieId, $userId);
     }
 
-    public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedAt, int $playsToAdd = 1) : void
+    public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedDate, int $playsToAdd = 1) : void
     {
-        $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $userId, $watchedAt);
+        $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
 
-        $this->historyApi->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate + $playsToAdd);
+        $this->historyApi->createOrUpdatePlaysForDate(
+            $movieId,
+            $userId,
+            $watchedDate,
+            (int)$historyEntry?->getPlays() + $playsToAdd,
+            $historyEntry?->getComment(),
+        );
     }
 
-    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate) : void
+    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate, ?string $comment = null) : void
     {
-        $this->historyApi->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate);
+        $this->historyApi->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate, $comment);
     }
 
     public function updateCast(int $movieId, TmdbCast $tmdbCast) : void
@@ -357,6 +372,7 @@ class MovieApi
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
+        ?string $tmdbBackdropPath,
         ?string $imdbId,
     ) : MovieEntity {
         return $this->repository->updateDetails(
@@ -369,6 +385,7 @@ class MovieApi
             $tmdbVoteAverage,
             $tmdbVoteCount,
             $tmdbPosterPath,
+            $tmdbBackdropPath,
             $imdbId,
         );
     }
@@ -382,9 +399,19 @@ class MovieApi
         }
     }
 
-    public function updateImdbRating(int $movieId, ?float $imdbRating, ?int $imdbRatingVoteCount) : void
+    public function updateHistoryComment(int $movieId, int $userId, Date $watchDate, ?string $comment) : void
     {
-        $this->repository->updateImdbRating($movieId, $imdbRating, $imdbRatingVoteCount);
+        $this->historyApi->updateHistoryComment(
+            $movieId,
+            $userId,
+            $watchDate,
+            $comment,
+        );
+    }
+
+    public function updateImdbRating(int $movieId, ?ImdbRating $imdbRating) : void
+    {
+        $this->repository->updateImdbRating($movieId, $imdbRating);
     }
 
     public function updateLetterboxdId(int $movieId, string $letterboxdId) : void

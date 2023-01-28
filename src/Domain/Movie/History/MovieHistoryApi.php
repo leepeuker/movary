@@ -3,9 +3,7 @@
 namespace Movary\Domain\Movie\History;
 
 use Movary\Api\Tmdb;
-use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\Domain\Movie;
-use Movary\Domain\Movie\MovieEntity;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
@@ -22,9 +20,9 @@ class MovieHistoryApi
     ) {
     }
 
-    public function createOrUpdatePlaysForDate(int $movieId, int $userId, Date $watchedAt, int $plays) : void
+    public function createOrUpdatePlaysForDate(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment) : void
     {
-        $this->repository->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $plays);
+        $this->repository->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $plays, $comment);
     }
 
     public function deleteByUserAndMovieId(int $userId, int $movieId) : void
@@ -212,11 +210,6 @@ class MovieHistoryApi
         return $this->movieRepository->fetchMostWatchedReleaseYears($userId);
     }
 
-    public function fetchPlaysForMovieIdOnDate(int $movieId, int $userId, Date $watchedAt) : int
-    {
-        return $this->movieRepository->fetchPlaysForMovieIdAtDate($movieId, $userId, $watchedAt);
-    }
-
     public function fetchTotalHoursWatched(int $userId) : int
     {
         $minutes = $this->movieRepository->fetchTotalMinutesWatched($userId);
@@ -328,13 +321,13 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
     }
 
-    public function findByTraktId(TraktId $traktId) : ?MovieEntity
+    public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, Date $watchedAt) : ?MovieHistoryEntity
     {
-        return $this->movieRepository->findByTraktId($traktId);
+        return $this->movieRepository->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
     }
 
-    public function findHistoryPlaysByMovieIdAndDate(int $movieId, int $userId, Date $watchedAt) : ?int
+    public function updateHistoryComment(int $movieId, int $userId, Date $watchAt, ?string $comment) : void
     {
-        return $this->movieRepository->findPlaysForMovieIdAndDate($movieId, $userId, $watchedAt);
+        $this->repository->updateHistoryComment($movieId, $userId, $watchAt, $comment);
     }
 }

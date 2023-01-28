@@ -5,9 +5,11 @@ namespace Movary\Domain\Movie;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\Api\Trakt\ValueObject\TraktId;
+use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -30,6 +32,7 @@ class MovieRepository
         ?float $tmdbVoteAverage = null,
         ?int $tmdbVoteCount = null,
         ?string $tmdbPosterPath = null,
+        ?string $tmdbBackdropPath = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
     ) : MovieEntity {
@@ -45,10 +48,11 @@ class MovieRepository
                 'tmdb_vote_average' => $tmdbVoteAverage,
                 'tmdb_vote_count' => $tmdbVoteCount,
                 'tmdb_poster_path' => $tmdbPosterPath,
+                'tmdb_backdrop_path' => $tmdbBackdropPath,
                 'trakt_id' => $traktId?->asInt(),
                 'imdb_id' => $imdbId,
                 'tmdb_id' => $tmdbId,
-                'created_at' => (string)Date::create(),
+                'created_at' => (string)DateTime::create(),
             ],
         );
 
@@ -143,24 +147,6 @@ class MovieRepository
     public function fetchAll() : MovieEntityList
     {
         $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `movie`');
-
-        return MovieEntityList::createFromArray($data);
-    }
-
-    public function fetchAllOrderedByLastUpdatedAtImdbAsc(?int $maxAgeInHours = null, ?int $limit = null) : MovieEntityList
-    {
-        $limitQuery = '';
-        if ($limit !== null) {
-            $limitQuery = " LIMIT $limit";
-        }
-
-        $data = $this->dbConnection->fetchAllAssociative(
-            'SELECT * 
-                FROM `movie` 
-                WHERE updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR)
-                ORDER BY updated_at_imdb ASC' . $limitQuery,
-            [(int)$maxAgeInHours],
-        );
 
         return MovieEntityList::createFromArray($data);
     }
@@ -438,6 +424,22 @@ class MovieRepository
         );
     }
 
+    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null) : array
+    {
+        $limitQuery = '';
+        if ($limit !== null) {
+            $limitQuery = " LIMIT $limit";
+        }
+
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT movie.id
+                FROM `movie` 
+                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR))
+                ORDER BY updated_at_imdb ASC' . $limitQuery,
+            [(int)$maxAgeInHours],
+        );
+    }
+
     public function fetchMoviesByProductionCompany(int $productionCompanyId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
@@ -447,20 +449,6 @@ class MovieRepository
             WHERE mpc.company_id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)',
             [$productionCompanyId, $userId],
         );
-    }
-
-    public function fetchPlaysForMovieIdAtDate(int $movieId, int $userId, Date $watchedAt) : int
-    {
-        $result = $this->dbConnection->fetchOne(
-            'SELECT plays FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
-            [$movieId, $watchedAt, $userId],
-        );
-
-        if ($result === false) {
-            return 0;
-        }
-
-        return $result;
     }
 
     public function fetchTotalMinutesWatched(int $userId) : int
@@ -738,6 +726,20 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
+    public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, Date $watchedAt) : ?MovieHistoryEntity
+    {
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
+            [$movieId, $watchedAt, $userId],
+        );
+
+        if ($result === false) {
+            return null;
+        }
+
+        return MovieHistoryEntity::createFromArray($result);
+    }
+
     public function findPersonalMovieRating(int $movieId, int $userId) : ?PersonalRating
     {
         $data = $this->dbConnection->fetchOne(
@@ -790,6 +792,7 @@ class MovieRepository
         ?float $tmdbVoteAverage,
         ?int $tmdbVoteCount,
         ?string $tmdbPosterPath,
+        ?string $tmdbBackdropPath,
         ?string $imdbId,
     ) : MovieEntity {
         $this->dbConnection->update(
@@ -803,6 +806,7 @@ class MovieRepository
                 'tmdb_vote_average' => $tmdbVoteAverage,
                 'tmdb_vote_count' => $tmdbVoteCount,
                 'tmdb_poster_path' => $tmdbPosterPath,
+                'tmdb_backdrop_path' => $tmdbBackdropPath,
                 'updated_at_tmdb' => (string)DateTime::create(),
                 'imdb_id' => $imdbId,
                 'updated_at' => (string)DateTime::create(),
@@ -813,11 +817,11 @@ class MovieRepository
         return $this->fetchById($id);
     }
 
-    public function updateImdbRating(int $id, ?float $imdbRating, ?int $imdbRatingVoteCount) : void
+    public function updateImdbRating(int $id, ?ImdbRating $imdbRating) : void
     {
         $this->dbConnection->update('movie', [
-            'imdb_rating_average' => $imdbRating,
-            'imdb_rating_vote_count' => $imdbRatingVoteCount,
+            'imdb_rating_average' => $imdbRating?->getRating(),
+            'imdb_rating_vote_count' => $imdbRating?->getVotesCount(),
             'updated_at_imdb' => (string)DateTime::create(),
             'updated_at' => (string)DateTime::create(),
         ], ['id' => $id]);

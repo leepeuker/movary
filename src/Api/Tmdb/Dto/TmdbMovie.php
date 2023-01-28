@@ -19,6 +19,7 @@ class TmdbMovie
         private readonly TmdbGenreList $genres,
         private readonly TmdbProductionCompanyList $productionCompanies,
         private readonly ?string $posterPath,
+        private readonly ?string $backdropPath,
         private readonly ?string $imdbId,
     ) {
     }
@@ -38,8 +39,14 @@ class TmdbMovie
             TmdbGenreList::createFromArray($data['genres']),
             TmdbProductionCompanyList::createFromArray($data['production_companies']),
             $data['poster_path'],
+            $data['backdrop_path'],
             empty($data['imdb_id']) === true ? null : $data['imdb_id'],
         );
+    }
+
+    public function getBackdropPath() : ?string
+    {
+        return $this->backdropPath;
     }
 
     public function getGenres() : TmdbGenreList
