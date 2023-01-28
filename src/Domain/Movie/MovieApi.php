@@ -13,6 +13,7 @@ use Movary\Domain\Movie\Cast\CastApi;
 use Movary\Domain\Movie\Crew\CrewApi;
 use Movary\Domain\Movie\Genre\MovieGenreApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Person\PersonApi;
 use Movary\Service\UrlGenerator;
@@ -147,11 +148,6 @@ class MovieApi
     public function fetchHistoryCountUnique(int $userId) : int
     {
         return $this->historyApi->fetchUniqueMovieInHistoryCount($userId);
-    }
-
-    public function fetchHistoryMoviePlaysOnDate(int $id, int $userId, Date $watchedAt) : int
-    {
-        return $this->historyApi->fetchPlaysForMovieIdOnDate($id, $userId, $watchedAt);
     }
 
     public function fetchHistoryMovieTotalPlays(int $movieId, int $userId) : int
@@ -304,21 +300,32 @@ class MovieApi
         return $this->movieGenreApi->findByMovieId($movieId);
     }
 
+    public function findHistoryEntryForMovieByUserOnDate(int $id, int $userId, Date $watchedAt) : ?MovieHistoryEntity
+    {
+        return $this->historyApi->findHistoryEntryForMovieByUserOnDate($id, $userId, $watchedAt);
+    }
+
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         return $this->repository->findUserRating($movieId, $userId);
     }
 
-    public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedAt, int $playsToAdd = 1) : void
+    public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, Date $watchedDate, int $playsToAdd = 1) : void
     {
-        $playsPerDate = $this->fetchHistoryMoviePlaysOnDate($movieId, $userId, $watchedAt);
+        $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
 
-        $this->historyApi->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate + $playsToAdd);
+        $this->historyApi->createOrUpdatePlaysForDate(
+            $movieId,
+            $userId,
+            $watchedDate,
+            (int)$historyEntry?->getPlays() + $playsToAdd,
+            $historyEntry?->getComment(),
+        );
     }
 
-    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate) : void
+    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate, ?string $comment = null) : void
     {
-        $this->historyApi->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate);
+        $this->historyApi->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate, $comment);
     }
 
     public function updateCast(int $movieId, TmdbCast $tmdbCast) : void
@@ -390,6 +397,16 @@ class MovieApi
         foreach ($genres as $position => $genre) {
             $this->movieGenreApi->create($movieId, $genre->getId(), (int)$position);
         }
+    }
+
+    public function updateHistoryComment(int $movieId, int $userId, Date $watchDate, ?string $comment) : void
+    {
+        $this->historyApi->updateHistoryComment(
+            $movieId,
+            $userId,
+            $watchDate,
+            $comment,
+        );
     }
 
     public function updateImdbRating(int $movieId, ?ImdbRating $imdbRating) : void

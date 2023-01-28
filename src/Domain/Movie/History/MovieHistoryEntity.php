@@ -7,8 +7,10 @@ use Movary\ValueObject\Date;
 class MovieHistoryEntity
 {
     private function __construct(
-        private readonly int $id,
+        private readonly int $movieIde,
         private readonly Date $watchedAt,
+        private readonly int $plays,
+        private readonly ?string $comment,
     ) {
     }
 
@@ -16,13 +18,25 @@ class MovieHistoryEntity
     {
         return new self(
             (int)$data['id'],
-            Date::createFromString($data['watched_at'])
+            Date::createFromString($data['watched_at']),
+            $data['plays'],
+            $data['comment'],
         );
     }
 
-    public function getId() : int
+    public function getComment() : ?string
     {
-        return $this->id;
+        return $this->comment;
+    }
+
+    public function getMovieIde() : int
+    {
+        return $this->movieIde;
+    }
+
+    public function getPlays() : int
+    {
+        return $this->plays;
     }
 
     public function getWatchedAt() : Date

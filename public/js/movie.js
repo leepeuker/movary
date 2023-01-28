@@ -153,20 +153,19 @@ function toggleWatchDates() {
     }
 }
 
-function loadWatchDateModal(e) {
+function loadWatchDateModal(watchDateListElement) {
     const modal = new bootstrap.Modal('#editWatchDateModal', {
         keyboard: false
     })
 
-    const watchDateIndex = getWatchDateIndexNumber(e);
+    document.getElementById('editWatchDateModalInput').value = watchDateListElement.dataset.watchDate;
+    document.getElementById('editWatchDateModalPlaysInput').value = watchDateListElement.dataset.plays;
+    document.getElementById('editWatchDateModalCommentInput').value = watchDateListElement.dataset.comment;
 
-    const originalDate = document.getElementById('inputDate-' + watchDateIndex).value;
-    const originalPlays = document.getElementById('inputPlays-' + watchDateIndex).value;
+    console.log(document.getElementById('editWatchDateModalCommentInput').value)
 
-    document.getElementById('editWatchDateModalInput').value = originalDate;
-    document.getElementById('editWatchDateModalPlaysInput').value = originalPlays;
-    document.getElementById('originalWatchDate').value = originalDate;
-    document.getElementById('originalWatchDatePlays').value = originalPlays;
+    document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
+    document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
 
     new Datepicker(document.getElementById('editWatchDateModalInput'), {
         format: document.getElementById('dateFormatJavascript').value,
@@ -176,18 +175,12 @@ function loadWatchDateModal(e) {
     modal.show()
 }
 
-function getWatchDateIndexNumber(e) {
-    const paragraph = e.id;
-    const regex = /watchDate-(\d+)/;
-
-    return paragraph.match(regex)[1];
-}
-
 function editWatchDate() {
     const originalWatchDate = document.getElementById('originalWatchDate').value;
 
     const newWatchDate = document.getElementById('editWatchDateModalInput').value;
     const newWatchDatePlays = document.getElementById('editWatchDateModalPlaysInput').value;
+    const comment = document.getElementById('editWatchDateModalCommentInput').value;
 
     const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
 
@@ -205,6 +198,7 @@ function editWatchDate() {
                 data: JSON.stringify({
                     'watchDate': newWatchDate,
                     'plays': newWatchDatePlays,
+                    'comment': comment,
                     'dateFormat': document.getElementById('dateFormatPhp').value
                 }),
                 success: function (data, textStatus, xhr) {
@@ -223,6 +217,7 @@ function editWatchDate() {
 
 function addWatchDate() {
     const watchDate = document.getElementById('addWatchDateModalInput').value;
+    const comment = document.getElementById('addWatchDateModalCommentInput').value;
 
     if (validateWatchDate(watchDate) === false) {
         return;
@@ -236,6 +231,7 @@ function addWatchDate() {
         data: JSON.stringify({
             'watchDate': watchDate,
             'plays': 1,
+            'comment': comment,
             'dateFormat': document.getElementById('dateFormatPhp').value
         }),
         success: function (data, textStatus, xhr) {

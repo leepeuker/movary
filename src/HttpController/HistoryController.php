@@ -53,8 +53,9 @@ class HistoryController
         $movieId = (int)$request->getRouteParameters()['id'];
         $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
         $plays = (int)$requestBody['plays'];
+        $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
-        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays);
+        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }
@@ -98,6 +99,7 @@ class HistoryController
         $watchDate = Date::createFromStringAndFormat($requestData['watchDate'], $requestData['dateFormat']);
         $tmdbId = (int)$requestData['tmdbId'];
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
+        $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -107,6 +109,7 @@ class HistoryController
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+        $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createOk());
     }
@@ -177,8 +180,10 @@ class HistoryController
         $movieId = (int)$request->getRouteParameters()['id'];
         $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
         $plays = (int)$requestBody['plays'];
+        $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movieId, $userId, $watchDate, $plays);
+        $this->movieApi->updateHistoryComment($movieId, $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }
