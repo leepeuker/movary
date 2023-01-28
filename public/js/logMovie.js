@@ -167,8 +167,7 @@ function logMovie() {
             'dateFormat': dateFormatPhp,
             'personalRating': rating,
         })
-    })
-    .then(function (response) {
+    }).then(function (response) {
         if (response.status === 200) {
             addAlertMessage('Added: ' + movieTitle + ' at ' + watchDate, 'success')
         } else {
@@ -176,8 +175,7 @@ function logMovie() {
         }
 
         bootstrap.Modal.getInstance(watchModal).hide()
-    })
-    .catch(function (error) {
+    }).catch(function (error) {
         console.log(error)
         addAlertMessage('Could not add: ' + movieTitle + ' at ' + watchDate, 'danger')
 
