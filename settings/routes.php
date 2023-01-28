@@ -221,7 +221,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/settings/netflix/search',
-        [\Movary\HttpController\NetflixController::class, 'searchTMDB'],
+        [\Movary\HttpController\NetflixController::class, 'searchTmbd'],
     );
 
     ##########

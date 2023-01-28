@@ -26,15 +26,18 @@
                     <br/>
                     Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the 'download all' link.
                     <br/>
-                    Upload this CSV file down below.
+                    Upload this CSV file down below. This can take a while for big histories.
+                    <br>
+                    Check/fix the auto generated import list in the table and press the import button.
                 </div>
-                <form class="mb-3">
+                <div class="mb-3">
                     <label class="form-label" for="file">Upload Your CSV File</label>
                     <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
-                    <button class="btn btn-primary" name="submit" onclick="uploadNetflixHistory()" type="button"> Upload File </button>
-                </form>
+                    <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button"  style="margin-top: 1rem"> Upload File </button>
+                </div>
+                <hr>
                 <div class="input-group mb-3">
-                    <label for="searchinput" class="input-group-text">Search for item</label>
+                    <label for="searchinput" class="input-group-text">Search table</label>
                     <input type="text" class="form-control disabled" onkeyup="searchTable()" style="cursor: not-allowed" id="searchinput" disabled/>
                 </div>
                 <div class="input-group">
@@ -79,17 +82,18 @@
             </div>
         </div>
     </main>
+
     <!-- Modal to search for other TMDB items -->
     <div class="modal fade modal-lg" id="tmdbmodal" tabindex="-1" role="dialog" aria-labelledby="TMDBModalTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="TMDBModalTitle">Search for TMDB item</h5>
+                    <h5 class="modal-title" id="TMDBModalTitle">Replace matched movie</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <label for="searchtmdb" class="form-label">Search for item on TMDB</label>
+                        <label for="searchtmdb" class="form-label">Search for better match on TMDB</label>
                         <form class="input-group mb-3">
                             <input type="text" class="form-control" name="searchtmdb" id="searchtmdb">
                             <button class="btn btn-success" type="submit" id="searchtmdbbtn" onclick="searchTMDB(event)" ><i class="bi bi-search"></i></button>

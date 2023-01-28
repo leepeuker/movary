@@ -2,113 +2,96 @@
 
 namespace Movary\Service\Netflix;
 
-use Psr\Log\LoggerInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 
 class ImportNetflixActivity
 {
+    private const SHOW_PATTERNS = [
+        // Check for TvShow: Season 1: EpisodeTitle
+        "(.+): .+ (\d{1,2}): (.*)",
+        // Check for TvShow: Season 1 - Part A: EpisodeTitle
+        "(.+): .+ (\d{1,2}) - .+: (.*)",
+        // Check for TvShow: TvShow : Miniseries : EpisodeTitle
+        "(.+): \w+: (.+)",
+        // Check for TvShow: SeasonName : EpisodeTitle
+        "(.+): (.+): (.+)",
+        // Check for TvShow: EpisodeTitle
+        "(.+): (.+)"
+    ];
+
     public function __construct(
         private readonly LoggerInterface $logger,
-    ){}
+    ) {
+    }
 
-
-    /**
-     * parseNetflixCSV receives the layout of a Netflix viewing history CSV file and returns them as an associative array
-     * @param string $filepath the filepath to the CSV file
-     * @return array
-     */
-    public function parseNetflixCSV(string $filepath) : Array
+    public function extractMediaDataFromTitle(string $title) : ?array
     {
+        if (trim($title) === "") {
+            return null;
+        }
+
+        foreach (self::SHOW_PATTERNS as $showPattern) {
+            $showData = $this->extractShowDataFromTitleByPattern($title, $showPattern);
+
+            if ($showData !== null) {
+                return $showData;
+            }
+        }
+
+        return [
+            'movieName' => $title,
+            'type' => 'Movie'
+        ];
+    }
+
+    public function extractShowDataFromTitleByPattern(string $title, string $pattern) : ?array
+    {
+        $result = preg_match_all("/$pattern/m", $title, $matches);
+        if ((int)$result < 1) {
+            return null;
+        }
+
+        $showName = $matches[1];
+        if (count($matches) > 3) {
+            $seasonNumber = $matches[2];
+            $episodeTitle = $matches[3];
+        } else {
+            $seasonNumber = 1;
+            $episodeTitle = $matches[2];
+        }
+
+        return [
+            'showName' => $showName,
+            'seasonNumber' => $seasonNumber,
+            'episodeTitle' => $episodeTitle,
+            'type' => 'Show'
+        ];
+    }
+
+    public function parseNetflixCsv(string $csvFilepath) : array
+    {
+        $csvData = [];
+
         try {
-            if(is_bool(file($filepath))) {
+            $csvLinesAsStrings = file($csvFilepath);
+
+            if ($csvLinesAsStrings === false) {
                 $this->logger->error('The file could not be opened');
+
                 return [];
             }
-            $rows = array_map('str_getcsv', file($filepath));
-            $rows = array_slice($rows, 1);
-            $csv = [];
-            foreach($rows as $row) {
-                /**
-                 * @psalm-suppress PossiblyInvalidArgument
-                 */
-                $csv[] = array_combine(['Title', 'Date'], $row);
+
+            $csvLinesAsArray = array_map('str_getcsv', $csvLinesAsStrings);
+            $csvLinesAsArray = array_slice($csvLinesAsArray, 1);
+
+            foreach ($csvLinesAsArray as $csvLine) {
+                $csvData[] = array_combine(['Title', 'Date'], $csvLine);
             }
-            return $csv;
         } catch (Exception $e) {
             $this->logger->warning('Netflix Viewing Activity not readable', ['exception' => $e]);
-            return [];
         }
-    }
 
-    /**
-     * checkMediaData receives the title from the Netflix CSV file and tries to find out whether it's a show or a movie and what the show's name, season and episode is
-     * 
-     * @param  string $title The title to parse
-     * @return array
-     */
-    public function checkMediaData(string $title) : Array
-    {
-        $mediadata = [];        
-        $tvpatterns = [
-            // check for a pattern TvShow : Season 1: EpisodeTitle
-            // Example: Wednesday: Season 1: A Murder of Woes
-            "(.+): .+ (\d{1,2}): (.*)",
-            // Check for TvShow : Season 1 - Part A: EpisodeTitle
-            "(.+): .+ (\d{1,2}) - .+: (.*)",
-            // Check for TvShow : TvShow : Miniseries : EpisodeTitle
-            "(.+): \w+: (.+)",
-            // Check for TvShow: SeasonName : EpisodeTitle
-            "(.+): (.+): (.+)",
-            // Check for TvShow: EpisodeTitle
-            "(.+): (.+)"
-        ];
-
-        for($i = 0; $i < count($tvpatterns); $i++) {
-            if(($result = $this->checkpattern($tvpatterns[$i], $title)) != []) {
-                $mediadata = $result;
-                break;
-            }
-        }
-        // The item is a movie
-        if($mediadata == null && trim($title) != "") {
-            $mediadata = [
-                'movieName' => $title,
-                'type' => 'Movie'
-            ];
-        } elseif(trim($title) == "") {
-            return [];
-        }
-        return $mediadata;
-    }
-
-    /**
-     * checkpattern receives a pattern to match and tries to parse the show name, season and episode title
-     * 
-     * @param string $pattern the pattern to use
-     * @param string $input the input to match it with
-     * @return array
-     * 
-     */
-    public function checkpattern(string $pattern, string $input) : Array
-    {
-        $result = preg_match_all("/$pattern/m", $input, $matches);
-        if($result != 0) {
-            $showName = $matches[1];
-            if(count($matches) > 3) {
-                $seasonNumber = $matches[2];
-                $episodeTitle = $matches[3];
-            } else {
-                $seasonNumber = 1;
-                $episodeTitle = $matches[2];
-            }
-            return [
-                'showName' => $showName,
-                'seasonNumber' => $seasonNumber,
-                'episodeTitle' => $episodeTitle,
-                'type' => 'Show'
-            ];
-        } else {
-            return [];
-        }
+        return $csvData;
     }
 }
