@@ -1,0 +1,6 @@
+.tmdbrow:hover {
+    filter: brightness(50%);
+}
+.tmdbrow {
+    cursor: pointer;
+}

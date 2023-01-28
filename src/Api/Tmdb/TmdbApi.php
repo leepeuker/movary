@@ -51,7 +51,7 @@ class TmdbApi
 
     public function searchMovie(string $searchTerm) : array
     {
-        $data = $this->client->get('/search/movie', ['query' => $searchTerm]);
+        $data = $this->client->get('/search/movie', ['query' => urlencode($searchTerm)]);
 
         return $data['results'];
     }

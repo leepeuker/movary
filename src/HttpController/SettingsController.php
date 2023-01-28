@@ -223,6 +223,17 @@ class SettingsController
         );
     }
 
+    public function renderNetflixPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-netflix.html.twig')
+        );
+    }
+
     public function renderLetterboxdPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
