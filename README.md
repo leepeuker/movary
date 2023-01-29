@@ -24,9 +24,9 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
     3. [Plex Scrobbler](#plex-scrobbler)
     4. [Jellyfin Scrobbler](#jellyfin-scrobbler)
     5. [trakt.tv Import](#trakttv-import)
-    6. [trakt.tv Export](#trakttv-export)
-    7. [Letterboxd.com Import](#letterboxdcom-import)
-    8. [Letterboxd.com Export](#letterboxdcom-export)
+    6. [Letterboxd.com Import](#letterboxdcom-import)
+    7. [Letterboxd.com Export](#letterboxdcom-export)
+    8. [Netflix Import](#netflix-import)
     9. [IMDb Rating Sync](#imdb-rating-sync)
 5. [FAQ](#faq)
 6. [Development](#development)
@@ -277,10 +277,6 @@ Example cli import (import history and ratings for user with id 1 and overwrite 
 - `--ignore-cache`
   Use if you want to force import everything regardless if there was a change since the last import
 
-### Trakt.tv Export
-
-Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
-
 ### Letterboxd.com Import
 
 You can import your watch history and ratings from letterboxd.com.
@@ -295,7 +291,11 @@ You can export your local watch history and ratings to letterboxd.com.
 
 Visit the movary settings page `/settings/letterboxd` for more instructions.
 
-<a name="#link-imdb-sync"></a>
+### Netflix Import
+
+You can import your watch history from netflix.
+
+Visit the movary settings page `/settings/netflix` for more instructions.
 
 ### IMDb Rating Sync
 
