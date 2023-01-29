@@ -19,82 +19,101 @@
         {{ include('component/navbar.html.twig') }}
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
+
+            <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
+            <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
+
             <div style="padding-top: 1rem">
                 <h5>Import Netflix activity</h5>
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
                     <b>Download your Netflix history</b>
                     <br/>
-                    Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the 'download all' link.
+                    Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the
+                    'download all' link.
                     <br/>
-                    Upload this CSV file down below.
+                    Upload this CSV file down below. This can take a while for big histories.
+                    <br>
+                    Check/fix the auto generated import list in the table and press the import button.
                 </div>
-                <form class="mb-3">
-                    <label class="form-label" for="file">Upload Your CSV File</label>
-                    <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
-                    <button class="btn btn-primary" name="submit" onclick="uploadNetflixHistory()" type="button"> Upload File </button>
-                </form>
+
+                <div class="mb-3">
+                    <label class="form-label" for="netflixCsvInput">Upload Your CSV File</label>
+                    <input id="netflixCsvInput" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
+                    <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" style="margin-top: 1rem"> Upload File</button>
+                </div>
+
+                <hr>
+
                 <div class="input-group mb-3">
-                    <label for="searchinput" class="input-group-text">Search for item</label>
-                    <input type="text" class="form-control disabled" onkeyup="searchTable()" style="cursor: not-allowed" id="searchinput" disabled/>
-                </div>
-                <div class="input-group">
-                    <label for="selectfilter" class="input-group-text">Filter</label>
-                    <select id="selectfilter" onchange="updateTable()" class="form-select">
+                    <label for="selectFilterInput" class="input-group-text">Filter</label>
+                    <select id="selectFilterInput" onchange="updateTable()" class="form-select" disabled>
                         <option value="all">All</option>
                         <option value="notfound">Not found</option>
                     </select>
-                    <label for="amounttoshow" class="input-group-text">Number of items on one page</label>
-                    <select id="amounttoshow" onchange="updateTable()" class="form-select">
+                    <label for="amountToShowInput" class="input-group-text">Per page</label>
+                    <select id="amountToShowInput" onchange="updateTable()" class="form-select" disabled>
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
                         <option value="all">All</option>
                     </select>
-                    <button type="button" class="btn btn-outline-secondary" onclick="scrollDown()">Go to the bottom</button>
                 </div>
+                <div class="input-group mb-3">
+                    <label for="searchInput" class="input-group-text">Search table</label>
+                    <input type="text" class="form-control disabled" onkeyup="searchTable()" id="searchInput" disabled/>
+                </div>
+
                 <table class="table table-hover">
                     <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Date watched</th>
-                            <th scope="col">Netflix name</th>
-                            <th scope="col">TMDB item</th>
-                        </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Date watched</th>
+                        <th scope="col">Netflix name</th>
+                        <th scope="col">TMDB item</th>
+                    </tr>
                     </thead>
-                    <tbody id="netflixtbody">
-                        <tr>
-                            <td colspan="4">All your uploaded Netflix data will appear here</td>
-                        </tr>
+                    <tbody id="netflixTableBody">
+                    <tr>
+                        <td colspan="4">All your uploaded Netflix data will appear here</td>
+                    </tr>
                     </tbody>
                 </table>
+
                 <nav aria-label="Page navigation">
                     <ul class="pagination align-self-center justify-content-center">
-                        <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Previous</a></li>
-                        <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">#</a></li>
-                        <li class="page-item disabled" style="cursor: not-allowed"><a class="page-link">Next</a></li>
+                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                        <li class="page-item disabled"><a class="page-link">#</a></li>
+                        <li class="page-item disabled"><a class="page-link">Next</a></li>
                     </ul>
-                    <button type="button" class="btn btn-primary disabled mb-3" style="cursor: not-allowed" id="importnetflixbtn" disabled onclick="importNetflixHistory();">Import Netflix data</button>
+                    <button type="button"
+                            class="btn btn-primary disabled mb-3"
+                            id="importNetflixButton"
+                            onclick="importNetflixHistory();"
+                            disabled>
+                        Import data
+                    </button>
                 </nav>
             </div>
         </div>
     </main>
+
     <!-- Modal to search for other TMDB items -->
-    <div class="modal fade modal-lg" id="tmdbmodal" tabindex="-1" role="dialog" aria-labelledby="TMDBModalTitle" aria-hidden="true">
+    <div class="modal fade modal-lg" id="tmdbSearchModal" tabindex="-1" role="dialog" aria-labelledby="tmdbSearchModalTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="TMDBModalTitle">Search for TMDB item</h5>
+                    <h5 class="modal-title" id="tmdbSearchModalTitle">Replace matched movie</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <label for="searchtmdb" class="form-label">Search for item on TMDB</label>
-                        <form class="input-group mb-3">
-                            <input type="text" class="form-control" name="searchtmdb" id="searchtmdb">
-                            <button class="btn btn-success" type="submit" id="searchtmdbbtn" onclick="searchTMDB(event)" ><i class="bi bi-search"></i></button>
-                        </form>
-                        <div id="tmdbsearchresults" class="row justify-content-center"></div>
+                        <label for="searchtmdb" class="form-label">Search for better match on TMDB</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" name="searchtmdb" id="tmdbSearchModalInput">
+                            <button class="btn btn-success" type="button" onclick="searchTMDB(event)"><i class="bi bi-search"></i></button>
+                        </div>
+                        <div id="tmdbSearchResultsDiv" class="row justify-content-center"></div>
                     </div>
                 </div>
                 <div class="modal-footer">

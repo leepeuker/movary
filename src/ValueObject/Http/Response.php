@@ -24,12 +24,6 @@ class Response
         return new self(StatusCode::createBadRequest());
     }
 
-    public static function createUnsupportedMediaType() : self
-    {
-        return new self(StatusCode::createUnsupportedMediaType());
-    }
-
-
     public static function createCsv(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
@@ -58,6 +52,11 @@ class Response
     public static function createSeeOther(string $targetUrl) : self
     {
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
+    }
+
+    public static function createUnsupportedMediaType() : self
+    {
+        return new self(StatusCode::createUnsupportedMediaType());
     }
 
     public function getBody() : ?string
