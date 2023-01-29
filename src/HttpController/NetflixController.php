@@ -3,28 +3,23 @@
 namespace Movary\HttpController;
 
 use Movary\Api\Tmdb\TmdbApi;
-use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Service\Netflix\ImportNetflixActivity;
-use Movary\Service\Tmdb\SyncMovie;
+use Movary\Service\Netflix\NetflixActivityCsvParser;
+use Movary\Service\Netflix\NetflixActivityItemsConverter;
+use Movary\Service\Netflix\NetflixMovieImporter;
 use Movary\Util\Json;
-use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\ValueObject\PersonalRating;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class NetflixController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly MovieApi $movieApi,
-        private readonly SyncMovie $tmdbMovieSyncService,
-        private readonly LoggerInterface $logger,
         private readonly TmdbApi $tmdbApi,
-        private readonly ImportNetflixActivity $importActivity,
+        private readonly NetflixActivityCsvParser $netflixCsvParser,
+        private readonly NetflixActivityItemsConverter $netflixActivityConverter,
+        private readonly NetflixMovieImporter $netflixMovieImporter,
     ) {
     }
 
@@ -37,28 +32,7 @@ class NetflixController
         $userId = $this->authenticationService->getCurrentUserId();
         $items = Json::decode($request->getBody());
 
-        foreach ($items as $item) {
-            if (isset($item['watchDate'], $item['tmdbId'], $item['dateFormat']) === false) {
-                throw new RuntimeException('Missing parameters');
-            }
-            $watchDate = Date::createFromStringAndFormat($item['watchDate'], $item['dateFormat']);
-
-            $tmdbId = (int)$item['tmdbId'];
-            $personalRating = $item['personalRating'] === 0 ? null : PersonalRating::create((int)$item['personalRating']);
-
-            $movie = $this->movieApi->findByTmdbId($tmdbId);
-
-            if ($movie === null) {
-                $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
-            }
-
-            $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
-
-            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
-            $this->logger->info('Movie has been logged: ' . $tmdbId);
-        }
-
-        $this->logger->info('All the movies from Netflix have been imported');
+        $this->netflixMovieImporter->importWatchDates($userId, $items);
 
         return Response::create(StatusCode::createOk());
     }
@@ -74,11 +48,11 @@ class NetflixController
         }
 
         $files = $request->getFileParameters();
-        if (empty($files['netflixviewactivity']) === true) {
+        if (empty($files['netflixActivityCsv']) === true) {
             return Response::createBadRequest();
         }
 
-        $csv = $files['netflixviewactivity'];
+        $csv = $files['netflixActivityCsv'];
         if ($csv['size'] == 0) {
             return Response::createBadRequest();
         }
@@ -87,33 +61,14 @@ class NetflixController
             return Response::createUnsupportedMediaType();
         }
 
-        $rows = $this->importActivity->parseNetflixCsv($csv['tmp_name']);
+        $activityItems = $this->netflixCsvParser->parseNetflixActivityCsv($csv['tmp_name']);
+        $tmdbMatches = $this->netflixActivityConverter->convertActivityItemsToTmdbMatches($activityItems);
 
-        if (count($rows) === 0) {
+        if (count($activityItems) === 0) {
             return Response::createBadRequest();
         }
 
-        $tmdbSearchResults = [];
-        foreach ($rows as $row) {
-            $mediaData = $this->importActivity->extractMediaDataFromTitle($row['Title']);
-
-            if ($mediaData === null || $mediaData['type'] !== 'Movie') {
-                continue;
-            }
-
-            $movieName = $mediaData['movieName'];
-
-            $search = $this->tmdbApi->searchMovie($movieName);
-            $tmdbSearchResults[$movieName] = [
-                'result' => $search[0] ?? 'Unknown',
-                'date' => date_parse_from_format('d/m/Y', $row['Date']),
-                'originalname' => $movieName
-            ];
-
-            $this->logger->info('Item is a movie: ' . $movieName);
-        }
-
-        return Response::createJson(Json::encode($tmdbSearchResults));
+        return Response::createJson(Json::encode($tmdbMatches));
     }
 
     public function searchTmbd(Request $request) : Response

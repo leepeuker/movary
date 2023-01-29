@@ -31,20 +31,23 @@
                     <br>
                     Check/fix the auto generated import list in the table and press the import button.
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label" for="file">Upload Your CSV File</label>
-                    <input id="netflixfile" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
+                    <label class="form-label" for="netflixCsvInput">Upload Your CSV File</label>
+                    <input id="netflixCsvInput" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
                     <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" style="margin-top: 1rem"> Upload File</button>
                 </div>
+
                 <hr>
+
                 <div class="input-group mb-3">
-                    <label for="selectfilter" class="input-group-text">Filter</label>
-                    <select id="selectfilter" onchange="updateTable()" class="form-select" disabled>
+                    <label for="selectFilterInput" class="input-group-text">Filter</label>
+                    <select id="selectFilterInput" onchange="updateTable()" class="form-select" disabled>
                         <option value="all">All</option>
                         <option value="notfound">Not found</option>
                     </select>
-                    <label for="amounttoshow" class="input-group-text">Per page</label>
-                    <select id="amounttoshow" onchange="updateTable()" class="form-select" disabled>
+                    <label for="amountToShowInput" class="input-group-text">Per page</label>
+                    <select id="amountToShowInput" onchange="updateTable()" class="form-select" disabled>
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
@@ -53,9 +56,10 @@
                     </select>
                 </div>
                 <div class="input-group mb-3">
-                    <label for="searchinput" class="input-group-text">Search table</label>
-                    <input type="text" class="form-control disabled" onkeyup="searchTable()" id="searchinput" disabled/>
+                    <label for="searchInput" class="input-group-text">Search table</label>
+                    <input type="text" class="form-control disabled" onkeyup="searchTable()" id="searchInput" disabled/>
                 </div>
+
                 <table class="table table-hover">
                     <thead>
                     <tr>
@@ -65,12 +69,13 @@
                         <th scope="col">TMDB item</th>
                     </tr>
                     </thead>
-                    <tbody id="netflixtbody">
+                    <tbody id="netflixTableBody">
                     <tr>
                         <td colspan="4">All your uploaded Netflix data will appear here</td>
                     </tr>
                     </tbody>
                 </table>
+
                 <nav aria-label="Page navigation">
                     <ul class="pagination align-self-center justify-content-center">
                         <li class="page-item disabled"><a class="page-link">Previous</a></li>
@@ -79,7 +84,7 @@
                     </ul>
                     <button type="button"
                             class="btn btn-primary disabled mb-3"
-                            id="importnetflixbtn"
+                            id="importNetflixButton"
                             onclick="importNetflixHistory();"
                             disabled>
                         Import data
