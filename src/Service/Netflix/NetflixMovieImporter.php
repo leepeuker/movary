@@ -50,6 +50,18 @@ class NetflixMovieImporter
             $this->logger->debug('Netflix: Missing movie created during import', ['movieId' => $movie->getId(), 'moveTitle' => $movie->getTitle()]);
         }
 
+        $historyEntry = $this->movieApi->findHistoryEntryForMovieByUserOnDate($movie->getId(), $userId, $watchDate);
+        if ($historyEntry !== null) {
+            $this->logger->info('Netflix: Movie watch date ignored because it was already set.', [
+                'movieId' => $movie->getId(),
+                'movieTitle' => $movie->getTitle(),
+                'watchDate' => $watchDate,
+                'personalRating' => $personalRating,
+            ]);
+
+            return;
+        }
+
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
 
