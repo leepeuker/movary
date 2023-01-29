@@ -19,6 +19,10 @@
         {{ include('component/navbar.html.twig') }}
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
+
+            <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
+            <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
+
             <div style="padding-top: 1rem">
                 <h5>Import Netflix activity</h5>
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
@@ -95,11 +99,11 @@
     </main>
 
     <!-- Modal to search for other TMDB items -->
-    <div class="modal fade modal-lg" id="tmdbmodal" tabindex="-1" role="dialog" aria-labelledby="TMDBModalTitle" aria-hidden="true">
+    <div class="modal fade modal-lg" id="tmdbSearchModal" tabindex="-1" role="dialog" aria-labelledby="tmdbSearchModalTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="TMDBModalTitle">Replace matched movie</h5>
+                    <h5 class="modal-title" id="tmdbSearchModalTitle">Replace matched movie</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

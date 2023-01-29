@@ -9,7 +9,7 @@ async function importNetflixHistory() {
             importData.push({
                 'watchDate': currentRow.querySelector('td.date-column').innerText,
                 'tmdbId': currentRow.dataset.tmdbid,
-                'dateFormat': 'd/m/Y',
+                'dateFormat': document.getElementById('dateFormatPhp').value,
                 'personalRating': getRatingFromStars(currentRow)
             });
         }
@@ -365,7 +365,7 @@ function processNetflixData(netflixActivityItems) {
         editbtn.className = 'btn btn-success align-self-start';
         editbtn.innerHTML = '<i class="bi bi-pencil-square"></i>';
         editbtn.setAttribute('data-bs-toggle', 'modal');
-        editbtn.setAttribute('data-bs-target', '#tmdbmodal');
+        editbtn.setAttribute('data-bs-target', '#tmdbSearchModal');
 
         tmdb.className = 'w-50 tmdb-column';
         tmdb_div.className = "row";
@@ -421,7 +421,7 @@ function processNetflixData(netflixActivityItems) {
         tmdb_description_div.append(description, paragraph, release_date, tmdb_rating_div);
         tmdb_description_div.append(editbtn);
 
-        date.innerText = netflixActivityItem.netflixWatchDate;
+        date.innerText = formatDate(netflixActivityItem.netflixWatchDate);
 
         tmdb_cover_div.append(tmdb_cover, tmdb_cover_br, tmdb_link);
         tmdb_div.append(tmdb_cover_div, tmdb_description_div);
@@ -441,6 +441,25 @@ function processNetflixData(netflixActivityItems) {
     enable(document.getElementById('searchInput'));
     enable(document.getElementById('selectFilterInput'));
     enable(document.getElementById('amountToShowInput'));
+}
+
+function formatDate(date) {
+    const today = new Date(date)
+    const dd = String(today.getDate()).padStart(2, '0')
+    const mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
+    const yyyy = today.getFullYear()
+
+    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yyyy') {
+        return dd + '.' + mm + '.' + yyyy
+    }
+    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yy') {
+        return dd + '.' + mm + '.' + yyyy.toString().slice(-2)
+    }
+    if (document.getElementById('dateFormatJavascript').value === 'yy-mm-dd') {
+        return yyyy.toString().slice(-2) + '-' + mm + '-' + dd
+    }
+
+    return yyyy + '-' + mm + '-' + dd
 }
 
 function processError(errorcode) {
@@ -471,7 +490,7 @@ function selectTMDBItem() {
 
 function saveTMDBItem() {
     let checkedrow = document.querySelector('input.tmdbradio:checked').closest('.tmdbrow');
-    let rowid = document.getElementById('tmdbmodal').dataset.rowid;
+    let rowid = document.getElementById('tmdbSearchModal').dataset.rowid;
     let targetrow = document.getElementById(rowid);
     targetrow.getElementsByClassName('img-fluid')[0].src = checkedrow.getElementsByClassName('img-fluid')[0].src;
     targetrow.getElementsByClassName('img-fluid')[0].alt = checkedrow.getElementsByClassName('img-fluid')[0].alt;
@@ -484,7 +503,7 @@ function saveTMDBItem() {
     if (targetrow.getElementsByClassName('bi-star-fill').length > 0) {
         targetrow.getElementsByClassName('bi-star-fill')[targetrow.getElementsByClassName('bi-star-fill').length - 1].click();
     }
-    const modal = bootstrap.Modal.getInstance(document.getElementById('tmdbmodal'));
+    const modal = bootstrap.Modal.getInstance(document.getElementById('tmdbSearchModal'));
     modal.hide();
 }
 
@@ -558,13 +577,13 @@ function disable(el) {
     el.setAttribute('disabled', '');
 }
 
-document.getElementById('tmdbmodal').addEventListener('show.bs.modal', event => {
+document.getElementById('tmdbSearchModal').addEventListener('show.bs.modal', event => {
     let button = event.relatedTarget;
     let id = button.closest('.netflixrow').id;
-    document.getElementById('tmdbmodal').setAttribute('data-rowid', id);
-    document.getElementById('tmdbmodal').setAttribute('data-rowid', id);
+    document.getElementById('tmdbSearchModal').setAttribute('data-rowid', id);
+    document.getElementById('tmdbSearchModal').setAttribute('data-rowid', id);
 });
 
-document.getElementById('tmdbmodal').addEventListener('hidden.bs.modal', event => {
+document.getElementById('tmdbSearchModal').addEventListener('hidden.bs.modal', event => {
     document.getElementById('tmdbsearchresults').innerHTML = '';
 });

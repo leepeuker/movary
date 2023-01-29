@@ -8,8 +8,6 @@ use Psr\Log\LoggerInterface;
 
 class NetflixActivityItemsConverter
 {
-    const MISSING_TMDB_RESULT_IDENTIFIER = 'Unknown';
-
     private const SHOW_PATTERNS = [
         // Check for TvShow: Season 1: EpisodeTitle
         "(.+): .+ (\d{1,2}): (.*)",
@@ -46,7 +44,7 @@ class NetflixActivityItemsConverter
             $search = $this->tmdbApi->searchMovie($movieName);
             $tmdbSearchResults[] = [
                 'tmdbMatch' => $search[0] ?? null,
-                'netflixWatchDate' => $activityItem->getDate()->format('d/m/Y'),
+                'netflixWatchDate' => (string)$activityItem->getDate(),
                 'netflixMovieName' => $movieName
             ];
 
