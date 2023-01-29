@@ -336,7 +336,9 @@ function processNetflixData(netflixActivityItems) {
         let tmdb_cover_br = document.createElement('br');
         let tmdb_link = document.createElement('a');
         let description = document.createElement('b');
+        let btngroup = document.createElement('div');
         let editbtn = document.createElement('button');
+        let removebtn = document.createElement('button');
         let date = document.createElement('td');
         let paragraph = document.createElement('p');
         let release_date = document.createElement('p');
@@ -356,15 +358,21 @@ function processNetflixData(netflixActivityItems) {
             row.classList.add('d-none');
         }
 
-        row.id = index + 1;
+        row.id = "row_" + index + 1;
 
         date.className = 'date-column';
         release_date.className = 'mb-auto pb-3';
 
-        editbtn.className = 'btn btn-success align-self-start';
+        btngroup.className = 'btn-group align-self-start';
+
+        editbtn.className = 'btn btn-success';
         editbtn.innerHTML = '<i class="bi bi-pencil-square"></i>';
         editbtn.setAttribute('data-bs-toggle', 'modal');
         editbtn.setAttribute('data-bs-target', '#tmdbSearchModal');
+
+        removebtn.className = 'btn btn-danger';
+        removebtn.innerHTML = '<i class="bi bi-trash-fill"></i>';
+        removebtn.addEventListener('click', triggerRemoveNetflixModal);
 
         tmdb.className = 'w-50 tmdb-column';
         tmdb_div.className = "row";
@@ -417,8 +425,8 @@ function processNetflixData(netflixActivityItems) {
             release_date.innerText = 'Release date: ' + netflixActivityItem.tmdbMatch.release_date;
         }
         tmdb_rating_div.append(tmdb_rating_span);
-        tmdb_description_div.append(description, paragraph, release_date, tmdb_rating_div);
-        tmdb_description_div.append(editbtn);
+        btngroup.append(editbtn, removebtn);
+        tmdb_description_div.append(description, paragraph, release_date, tmdb_rating_div, btngroup);
 
         date.innerText = formatDate(netflixActivityItem.netflixWatchDate);
 
@@ -566,7 +574,20 @@ function getRatingFromStars(row) {
     return rating;
 }
 
-function enable(el, cursor = '') {
+function triggerRemoveNetflixModal() {
+    const removeNetflixModal = new bootstrap.Modal('#removeNetflixItemModal');
+    document.getElementById('removeNetflixItemModal').setAttribute('data-NetflixRowId', this.closest('.netflixrow').id);
+    removeNetflixModal.show();
+}
+
+function removeNetflixItem() {
+    const removeNetflixModal = bootstrap.Modal.getInstance(document.getElementById('removeNetflixItemModal'));
+    let NetflixRowId = document.getElementById('removeNetflixItemModal').dataset.netflixrowid;
+    document.querySelector('tr#' + NetflixRowId).remove();
+    removeNetflixModal.hide();
+}
+
+function enable(el) {
     el.classList.remove('disabled');
     el.removeAttribute('disabled');
 }
