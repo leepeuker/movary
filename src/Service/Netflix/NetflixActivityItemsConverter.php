@@ -3,7 +3,7 @@
 namespace Movary\Service\Netflix;
 
 use Movary\Api\Tmdb\TmdbApi;
-use Movary\Service\Netflix\ValueObject\NetflixActivityItemList;
+use Movary\Service\Netflix\Dto\NetflixActivityItemList;
 use Psr\Log\LoggerInterface;
 
 class NetflixActivityItemsConverter

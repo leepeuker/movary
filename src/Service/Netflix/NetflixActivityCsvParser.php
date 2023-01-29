@@ -4,8 +4,8 @@ namespace Movary\Service\Netflix;
 
 use Exception;
 use League\Csv\Reader;
-use Movary\Service\Netflix\ValueObject\NetflixActivityItem;
-use Movary\Service\Netflix\ValueObject\NetflixActivityItemList;
+use Movary\Service\Netflix\Dto\NetflixActivityItem;
+use Movary\Service\Netflix\Dto\NetflixActivityItemList;
 use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
 

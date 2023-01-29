@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\Service\Netflix\ValueObject;
+namespace Movary\Service\Netflix\Dto;
 
 use Movary\ValueObject\Date;
 
