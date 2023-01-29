@@ -78,20 +78,20 @@ async function uploadNetflixHistory() {
     });
 }
 
-async function searchTMDB(event) {
-    event.preventDefault();
-    var query = document.getElementById('searchtmdb').value;
-    await createSpinner(document.getElementById('tmdbsearchresults'), 'tmdb');
+async function searchTMDB() {
+    let searchQuery = document.getElementById('tmdbSearchModalInput').value;
+
+    await createSpinner(document.getElementById('tmdbSearchResultsDiv'), 'tmdb');
     await fetch('/settings/netflix/search', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'query': query
+            'query': searchQuery
         })
     }).then(response => {
-        document.getElementById('tmdbsearchresults').querySelector('div.spinner-border').remove();
+        document.getElementById('tmdbSearchResultsDiv').querySelector('div.spinner-border').remove();
         if (!response.ok) {
             processError(response.status);
             return false;
@@ -100,11 +100,10 @@ async function searchTMDB(event) {
         }
     }).then(data => {
         processTMDBData(data);
-    })
-        .catch(function (error) {
-            console.error(error);
-            processError(500);
-        });
+    }).catch(function (error) {
+        console.error(error);
+        processError(500);
+    });
 }
 
 async function createSpinner(parent, target) {
@@ -274,7 +273,7 @@ function createPageNavigation(amount, items, reset = null) {
 }
 
 function processTMDBData(data) {
-    let parent = document.getElementById('tmdbsearchresults');
+    let parent = document.getElementById('tmdbSearchResultsDiv');
     data.forEach((item) => {
         let media_div = document.createElement('div');
         let thumb_div = document.createElement('div');
@@ -585,5 +584,5 @@ document.getElementById('tmdbSearchModal').addEventListener('show.bs.modal', eve
 });
 
 document.getElementById('tmdbSearchModal').addEventListener('hidden.bs.modal', event => {
-    document.getElementById('tmdbsearchresults').innerHTML = '';
+    document.getElementById('tmdbSearchResultsDiv').innerHTML = '';
 });

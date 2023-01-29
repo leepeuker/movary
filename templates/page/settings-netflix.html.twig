@@ -109,11 +109,11 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <label for="searchtmdb" class="form-label">Search for better match on TMDB</label>
-                        <form class="input-group mb-3">
-                            <input type="text" class="form-control" name="searchtmdb" id="searchtmdb">
-                            <button class="btn btn-success" type="submit" id="searchtmdbbtn" onclick="searchTMDB(event)"><i class="bi bi-search"></i></button>
-                        </form>
-                        <div id="tmdbsearchresults" class="row justify-content-center"></div>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" name="searchtmdb" id="tmdbSearchModalInput">
+                            <button class="btn btn-success" type="button" onclick="searchTMDB(event)"><i class="bi bi-search"></i></button>
+                        </div>
+                        <div id="tmdbSearchResultsDiv" class="row justify-content-center"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
