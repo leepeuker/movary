@@ -31,6 +31,7 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
 5. [FAQ](#faq)
 6. [Development](#development)
 7. [Support](#support)
+8. [Contributors](#contributors)
 
 Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
 or visit the [official subreddit](https://www.reddit.com/r/movary/)!
@@ -346,3 +347,9 @@ The application should be up-to-date and running locally now.
 
 - Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
 - Ask questions or discuss movary related topics in the [official subreddit](https://www.reddit.com/r/movary/)
+
+
+## Contributors
+
+* [@leepeuker](https://github.com/leepeuker) as Lee Peuker
+* [@JVT038](https://github.com/JVT038) as JVT038
