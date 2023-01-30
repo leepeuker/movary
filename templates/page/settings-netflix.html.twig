@@ -38,9 +38,14 @@
 
                 <div class="mb-3">
                     <label class="form-label" for="netflixCsvInput">Upload Your CSV File</label>
-                    <input id="netflixCsvInput" class="form-control" accept="text/csv" name="csvinput" type="file" required="true"/>
-                    <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" style="margin-top: 1rem"> Upload File</button>
+                    <input id="netflixCsvInput" class="form-control" accept="text/csv" name="csvinput" type="file" required="required"/>
                 </div>
+                <div class="input-group">
+                    <span class="input-group-text">CSV Date Format</span>
+                    <input id="netflixCsvDateFormatInput" class="form-control" placeholder="dd/mm/yy" name="csvDateFormat" type="text" required="required"/>
+                    <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#csvDateFormatHelpModal">Help</button>
+                </div>
+                <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" style="margin-top: 1rem"> Upload File</button>
 
                 <hr>
 
@@ -131,7 +136,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="removeNetflixItemModalTitle">Remove Netflix item</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                 </div>
+                </div>
                 <div class="modal-body">
                     <div class="container-fluid">
                         <p>Are you sure to delete this item? You can later import this item again</p>
@@ -140,6 +145,58 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-danger" id="removeNetflixItemBtn" onclick="removeNetflixItem()">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal to display help text for csv date format -->
+    <div class="modal fade" id="csvDateFormatHelpModal" tabindex="-1" role="dialog" aria-labelledby="csvDateFormatHelpModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="csvDateFormatHelpModalTitle">How to find out the Netflix CSV date format</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p>
+                            Open the Netflix CSV file to see how your watch dates look like and translate this into a date format.
+                            To represent the day, month and year you have the following options:
+                        </p>
+                        <ul>
+                            <li><b>d</b> => Day of the month (two digits)</li>
+                            <li><b>m</b> => Month of the year (two digits)</li>
+                            <li><b>y</b> => Year (two digits)</li>
+                            <li><b>Y</b> => Year (four digits)</li>
+                        </ul>
+                        <p> More format characters can be found
+                            <a href="https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters" target="_blank">here</a>.
+                        </p>
+                        <h5>Examples: </h5>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Watch Date in CSV</th>
+                                <th scope="col">CSV Date Format</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>24.01.23</td>
+                                <td>d.m.y</td>
+                            </tr>
+                            <tr>
+                                <td>2022/01/24</td>
+                                <td>Y/m/d</td>
+                            </tr>
+                            <tr>
+                                <td>24-01-2022</td>
+                                <td>d-m-Y</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
