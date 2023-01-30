@@ -124,4 +124,24 @@
         </div>
     </div>
 
+    <!-- Modal to delete Netflix item -->
+    <div class="modal fade" id="removeNetflixItemModal" tabindex="-1" role="dialog" aria-labelledby="removeNetflixItemModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="removeNetflixItemModalTitle">Remove Netflix item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                 </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <p>Are you sure to delete this item? You can later import this item again</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="removeNetflixItemBtn" onclick="removeNetflixItem()">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
