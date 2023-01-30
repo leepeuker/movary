@@ -408,7 +408,7 @@ function processNetflixData(netflixActivityItems) {
             row.classList.add('bg-warning')
         }
 
-        if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.posterPath === null) {
+        if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.poster_path === null) {
             tmdb_cover.src = '/images/placeholder-image.png';
             tmdb_link.innerText = 'Image not found on TMDB';
         } else {
