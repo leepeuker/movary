@@ -41,14 +41,15 @@ class NetflixController
      * Receives a CSV file with all the Netflix activity history and tries to process this.
      * It filters the movies out with regex patterns, and then compiles an array of all the movie items.
      */
-    public function processNetflixActivity(Request $request) : Response
+    public function matchNetflixActivityCsvWithTmdbMovies(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
 
         $files = $request->getFileParameters();
-        if (empty($files['netflixActivityCsv']) === true) {
+        $postParameters = $request->getPostParameters();
+        if (empty($files['netflixActivityCsv']) === true || empty($postParameters['netflixActivityCsvDateFormat']) === true) {
             return Response::createBadRequest();
         }
 
@@ -61,7 +62,7 @@ class NetflixController
             return Response::createUnsupportedMediaType();
         }
 
-        $activityItems = $this->netflixCsvParser->parseNetflixActivityCsv($csv['tmp_name']);
+        $activityItems = $this->netflixCsvParser->parseNetflixActivityCsv($csv['tmp_name'], $postParameters['netflixActivityCsvDateFormat']);
         $tmdbMatches = $this->netflixActivityConverter->convertActivityItemsToTmdbMatches($activityItems);
 
         if (count($activityItems) === 0) {
