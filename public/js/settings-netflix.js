@@ -163,7 +163,7 @@ function updateTable() {
         createPageNavigation(itemsPerPage, itemsPerPage);
         changePage('all');
 
-        return
+        return;
     }
 
     document.querySelector('label[for="amountToShowInput"]').classList.remove('d-none');
@@ -195,7 +195,8 @@ function changePage(pageNumber = null) {
         // User clicked on the previous button
         direction = 'previous'
     } else {
-        direction = this.innerText;
+        // User clicked on a page number
+        direction = parseInt(this.innerText);
     }
 
     const activePaginationElements = document.getElementsByClassName('page-item active');
@@ -210,7 +211,7 @@ function changePage(pageNumber = null) {
     } else if (isNaN(parseInt(direction)) === false) {
         activePaginationElements[0].classList.remove('active');
         document.querySelectorAll('li.page-item:not(.active)').forEach((el) => {
-            if (el.innerText === direction) {
+            if (parseInt(el.innerText) === direction) {
                 el.classList.add('active');
             }
         })
@@ -575,8 +576,8 @@ function searchTable() {
         }
         createPageNavigation(1, 1);
     } else {
-        changePage(1);
         createPageNavigation(document.getElementById('amountToShowInput').value, rows.length);
+        changePage(1);
     }
 }
 
