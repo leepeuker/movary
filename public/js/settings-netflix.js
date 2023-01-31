@@ -160,7 +160,7 @@ function updateTable() {
 
         document.querySelector('label[for="amountToShowInput"]').classList.add('d-none');
         document.getElementById('amountToShowInput').classList.add('d-none');
-        createPageNavigation(itemsPerPage, itemsPerPage);
+        createPageNavigation(itemsPerPage, itemsPerPage, true);
         changePage('all');
 
         return;
