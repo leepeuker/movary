@@ -498,11 +498,11 @@ function processCsvFileUploadError(statusCode) {
     let text;
 
     if (statusCode === 400) {
-        text = 'Error 400. User input invalid. Please make sure you have chosen the correct CSV file and entered a valid CSV Date Format, than try again.';
+        text = 'Error: User input invalid. Please make sure you have chosen the correct CSV file and CSV Date Format, than try again.';
     } else if (statusCode === 415) {
-        text = 'Error 415. Input file is the wrong type. Upload the correct CSV file from Netflix.';
+        text = 'Error: Input file is the wrong type. Upload the correct CSV file from Netflix.';
     } else {
-        text = 'Error 500. Something has gone wrong. Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.';
+        text = 'Error: Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.';
     }
 
     setAlert('netflixCsvUploadAlert', text, 'danger')
@@ -511,7 +511,7 @@ function processCsvFileUploadError(statusCode) {
 function setImportAlertError() {
     setAlert(
         'importAlert',
-        'Something has gone wrong. Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.',
+        'Error: Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.',
         'danger'
     )
 }
