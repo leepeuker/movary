@@ -31,21 +31,27 @@
                     Go to <a href="https://www.netflix.com/settings/viewed">https://www.netflix.com/settings/viewed</a> to view your Netflix history and scroll down to click on the
                     'download all' link.
                     <br/>
-                    Upload this CSV file down below. This can take a while for big histories.
+                    Below select the downloaded CSV file and enter the used date format, then press upload (can take a while for big histories).
                     <br>
-                    Check/fix the auto generated import list in the table and press the import button.
+                    This will populate a table with the movie watch dates and the auto generated Netflix to TMDB matches to import.
+                    <br>
+                    Press the import button at the end of the page when you are ready to import watch dates from the table.
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="netflixCsvInput">Upload Your CSV File</label>
                     <input id="netflixCsvInput" class="form-control" accept="text/csv" name="csvinput" type="file" required="required"/>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="margin-bottom: 1rem">
                     <span class="input-group-text">CSV Date Format</span>
-                    <input id="netflixCsvDateFormatInput" class="form-control" placeholder="dd/mm/yy" name="csvDateFormat" type="text" required="required"/>
+                    <input id="netflixCsvDateFormatInput" class="form-control" placeholder="e.g. d/m/y" name="csvDateFormat" type="text" required="required"/>
                     <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#csvDateFormatHelpModal">Help</button>
                 </div>
-                <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" style="margin-top: 1rem"> Upload File</button>
+
+                <div class="d-none" role="alert" id="netflixCsvUploadAlert"></div>
+                <button class="btn btn-primary" name="button" onclick="uploadNetflixHistory()" type="button" id="netflixCsvUploadButton" disabled>
+                    Upload CSV
+                </button>
 
                 <hr>
 
@@ -80,25 +86,28 @@
                     </thead>
                     <tbody id="netflixTableBody">
                     <tr>
-                        <td colspan="4">All your uploaded Netflix data will appear here</td>
+                        <td colspan="4">Waiting for Netflix CSV to be uploaded...</td>
                     </tr>
                     </tbody>
                 </table>
 
                 <nav aria-label="Page navigation">
                     <ul class="pagination align-self-center justify-content-center">
-                        <li class="page-item disabled"><a class="page-link">Previous</a></li>
+                        <li class="page-item disabled"><a class="page-link" style="cursor: pointer">Previous</a></li>
                         <li class="page-item disabled"><a class="page-link">#</a></li>
-                        <li class="page-item disabled"><a class="page-link">Next</a></li>
+                        <li class="page-item disabled"><a class="page-link" style="cursor: pointer">Next</a></li>
                     </ul>
-                    <button type="button"
-                            class="btn btn-primary disabled mb-3"
-                            id="importNetflixButton"
-                            onclick="importNetflixHistory();"
-                            disabled>
-                        Import data
-                    </button>
                 </nav>
+
+                <div class="d-none" role="alert" id="importAlert"></div>
+
+                <button type="button"
+                        class="btn btn-primary disabled mb-3"
+                        id="importNetflixButton"
+                        onclick="importNetflixHistory();"
+                        disabled>
+                    Import data
+                </button>
             </div>
         </div>
     </main>
@@ -118,6 +127,7 @@
                             <input type="text" class="form-control" name="searchtmdb" id="tmdbSearchModalInput">
                             <button class="btn btn-success" type="button" onclick="searchTMDB(event)"><i class="bi bi-search"></i></button>
                         </div>
+                        <div class="d-none" role="alert" id="tmdbSearchModalAlert"></div>
                         <div id="tmdbSearchResultsDiv" class="row justify-content-center"></div>
                     </div>
                 </div>
@@ -161,19 +171,8 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <p>
-                            Open the Netflix CSV file to see how your watch dates look like and translate this into a date format.
-                            To represent the day, month and year you have the following options:
+                            Open the Netflix CSV file to see how your watch dates look like and translate this into a date format. Examples:
                         </p>
-                        <ul>
-                            <li><b>d</b> => Day of the month (two digits)</li>
-                            <li><b>m</b> => Month of the year (two digits)</li>
-                            <li><b>y</b> => Year (two digits)</li>
-                            <li><b>Y</b> => Year (four digits)</li>
-                        </ul>
-                        <p> More format characters can be found
-                            <a href="https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters" target="_blank">here</a>.
-                        </p>
-                        <h5>Examples: </h5>
                         <table class="table">
                             <thead>
                             <tr>
@@ -196,6 +195,16 @@
                             </tr>
                             </tbody>
                         </table>
+                        <p> To represent the day, month and year you have the following options</p>
+                        <ul>
+                            <li><b>d</b> => Day of the month with two digits</li>
+                            <li><b>m</b> => Month of the year with two digits</li>
+                            <li><b>y</b> => Year with two digits</li>
+                            <li><b>Y</b> => Year with four digits</li>
+                        </ul>
+                        <p> More format characters can be found
+                            <a href="https://www.php.net/manual/en/datetime.format.php#refsect1-datetime.format-parameters" target="_blank">here</a>.
+                        </p>
                     </div>
                 </div>
             </div>

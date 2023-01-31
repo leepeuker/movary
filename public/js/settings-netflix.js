@@ -29,43 +29,41 @@ async function importNetflixHistory() {
         body: importDataAsJson
     }).then(response => {
         if (!response.ok) {
-            processError(response.status);
+            console.log(response)
+            setImportAlertError();
 
             return
         }
-        let td = document.createElement('td');
-        let tr = document.createElement('tr');
 
-        td.colSpan = 4;
-        td.innerHTML = '<p class="text-success">The data has succesfully been imported!</p>';
-        tr.append(td);
-        document.getElementById('netflixTableBody').append(tr);
-        document.getElementById('netflixTableBody').getElementsByTagName('tr')[0].remove();
+        setAlert('importAlert', 'The data has been successfully imported!', 'success')
+        setDefaultTableContent()
     }).catch(function (error) {
-        console.error(error);
-        processError(500);
+        console.log(error)
+        setImportAlertError();
     });
 }
 
 async function uploadNetflixHistory() {
-
     let requestFormData = new FormData();
     requestFormData.append('netflixActivityCsv', document.getElementById('netflixCsvInput').files[0]);
+    requestFormData.append('netflixActivityCsvDateFormat', document.getElementById('netflixCsvDateFormatInput').value);
 
     document.getElementById('netflixTableBody').getElementsByTagName('tr')[0].remove();
-    disable(document.getElementById('importNetflixButton'));
-    disable(document.getElementById('searchInput'));
+    setDefaultTableContent()
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
     await fetch('/settings/netflix', {
-        method: 'POST',
-        body: requestFormData
+        method: 'POST', body: requestFormData
     }).then(response => {
         document.getElementById('netflixTableBody').querySelector('div.spinner-border').parentElement.remove();
         if (!response.ok) {
-            processError(response.status);
+            processCsvFileUploadError(response.status);
+
             return false;
         } else {
+            enableTableElements()
+            hideAlert('netflixCsvUploadAlert')
+
             return response.json();
         }
     }).then(data => {
@@ -74,7 +72,7 @@ async function uploadNetflixHistory() {
         }
     }).catch(function (error) {
         console.error(error);
-        processError(500);
+        processCsvFileUploadError(500);
     });
 }
 
@@ -92,17 +90,19 @@ async function searchTMDB() {
         })
     }).then(response => {
         document.getElementById('tmdbSearchResultsDiv').querySelector('div.spinner-border').remove();
+
         if (!response.ok) {
-            processError(response.status);
+            setAlert('tmdbSearchModalAlert', 'Could not fetch search results', 'danger')
+
             return false;
-        } else {
-            return response.json();
         }
+
+        return response.json();
     }).then(data => {
         processTMDBData(data);
     }).catch(function (error) {
         console.error(error);
-        processError(500);
+        setAlert('tmdbSearchModalAlert', 'Could not ??', 'danger')
     });
 }
 
@@ -127,10 +127,28 @@ async function createSpinner(parent, target) {
     }
 }
 
+function setDefaultTableContent() {
+    let div = document.createElement('div');
+    let row = document.createElement('tr');
+    let cell = document.createElement('td');
+    cell.colSpan = 4;
+    cell.innerText = 'Waiting for Netflix CSV to be uploaded...';
+    cell.append(div);
+    row.append(cell);
+    document.getElementById('netflixTableBody').innerHTML = ''
+    document.getElementById('netflixTableBody').append(row);
+
+    disable(document.getElementById('searchInput'));
+    disable(document.getElementById('selectFilterInput'));
+    disable(document.getElementById('amountToShowInput'));
+    disable(document.getElementById('importNetflixButton'));
+}
+
 function updateTable() {
-    let amount = document.getElementById('amountToShowInput').value;
+    let itemsPerPage = document.getElementById('amountToShowInput').value;
     let rows = document.getElementById('netflixTableBody').children;
     let filter = document.getElementById('selectFilterInput').value;
+
     if (filter === 'notfound') {
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].dataset.tmdbid !== 'undefined') {
@@ -139,24 +157,34 @@ function updateTable() {
                 rows[i].classList.remove('d-none');
             }
         }
+
         document.querySelector('label[for="amountToShowInput"]').classList.add('d-none');
         document.getElementById('amountToShowInput').classList.add('d-none');
-        createPageNavigation(amount, amount);
+        createPageNavigation(itemsPerPage, itemsPerPage);
         changePage('all');
-    } else {
-        document.querySelector('label[for="amountToShowInput"]').classList.remove('d-none');
-        document.getElementById('amountToShowInput').classList.remove('d-none');
-        if (amount === 'all') {
-            createPageNavigation(rows.length, rows.length);
-        } else {
-            createPageNavigation(amount, rows.length);
-        }
-        changePage(1);
+
+        return
     }
+
+    document.querySelector('label[for="amountToShowInput"]').classList.remove('d-none');
+    document.getElementById('amountToShowInput').classList.remove('d-none');
+    if (itemsPerPage === 'all') {
+        createPageNavigation(rows.length, rows.length);
+    } else {
+        createPageNavigation(itemsPerPage, rows.length);
+    }
+
+    changePage(1);
 }
 
 function changePage(pageNumber = null) {
-    var direction = "";
+    let paginationUl = document.getElementsByClassName('pagination')[0];
+    let itemsPerPage = document.getElementById('amountToShowInput').value;
+    let netflixTableRows = document.getElementById('netflixTableBody').children;
+    let netflixTableRowsWithoutTmdbMatch = document.querySelectorAll("tr[data-tmdbid='undefined']");
+    let targetPageNumber = -1;
+
+    let direction = '';
     if (!isNaN(parseInt(pageNumber))) {
         // The function was manually triggered by JS code
         direction = pageNumber;
@@ -169,64 +197,59 @@ function changePage(pageNumber = null) {
     } else {
         direction = this.innerText;
     }
-    let ul = document.getElementsByClassName('pagination')[0];
-    let amount = document.getElementById('amountToShowInput').value;
-    let rows = document.getElementById('netflixTableBody').children;
-    let notfoundrows = document.querySelectorAll("tr[data-tmdbid='undefined']");
-    var targetpage = -1;
-    if (direction === 'previous') {
-        if (!ul.children[1].classList.contains('active')) {
-            document.getElementsByClassName('page-item active')[0].previousElementSibling.classList.add('active');
-            document.getElementsByClassName('page-item active')[1].classList.remove('active');
-            targetpage = parseInt(document.getElementsByClassName('page-item active')[0].innerText);
-        }
-    } else if (direction === 'next') {
-        if (!ul.children[ul.childElementCount - 2].classList.contains('active')) {
-            document.getElementsByClassName('page-item active')[0].nextElementSibling.classList.add('active');
-            document.getElementsByClassName('page-item active')[0].classList.remove('active');
-            targetpage = parseInt(document.getElementsByClassName('page-item active')[0].innerText);
-        }
-    } else if (!isNaN(parseInt(direction))) {
-        document.getElementsByClassName('page-item active')[0].classList.remove('active');
+
+    const activePaginationElements = document.getElementsByClassName('page-item active');
+    if (direction === 'previous' && paginationUl.children[1].classList.contains('active') === false) {
+        activePaginationElements[0].previousElementSibling.classList.add('active');
+        activePaginationElements[1].classList.remove('active');
+        targetPageNumber = parseInt(activePaginationElements[0].innerText);
+    } else if (direction === 'next' && paginationUl.children[paginationUl.childElementCount - 2].classList.contains('active') === false) {
+        activePaginationElements[0].nextElementSibling.classList.add('active');
+        activePaginationElements[0].classList.remove('active');
+        targetPageNumber = parseInt(activePaginationElements[0].innerText);
+    } else if (isNaN(parseInt(direction)) === false) {
+        activePaginationElements[0].classList.remove('active');
         document.querySelectorAll('li.page-item:not(.active)').forEach((el) => {
             if (el.innerText === direction) {
                 el.classList.add('active');
             }
         })
-        targetpage = parseInt(direction);
+        targetPageNumber = parseInt(direction);
     }
 
-    if (targetpage !== -1) {
-        var filter = document.getElementById('selectFilterInput').value;
+    if (targetPageNumber !== -1) {
+        let filter = document.getElementById('selectFilterInput').value;
         let tbody = document.getElementById('netflixTableBody');
         tbody.querySelectorAll("tr:not(.d-none)").forEach((el) => {
             el.classList.add('d-none');
         });
-        if (amount === 'all') {
-            for (let i = 0; i < rows.length; i++) {
-                if (filter === 'notfound' && rows[i].dataset.tmdbid === 'undefined') {
-                    rows[i].classList.remove('d-none');
+        if (itemsPerPage === 'all') {
+            for (let i = 0; i < netflixTableRows.length; i++) {
+                if (filter === 'notfound' && netflixTableRows[i].dataset.tmdbid === 'undefined') {
+                    netflixTableRows[i].classList.remove('d-none');
                 } else if (filter === 'all') {
-                    rows[i].classList.remove('d-none');
+                    netflixTableRows[i].classList.remove('d-none');
                 }
             }
         } else {
-            for (let i = amount * targetpage - amount + 1; i < amount * targetpage + 1; i++) {
-                if (rows.length > i && filter != 'notfound') {
-                    rows[i].classList.remove('d-none');
-                } else if (notfoundrows.length > i && filter == 'notfound') {
-                    notfoundrows[i].classList.remove('d-none');
+            for (let i = itemsPerPage * targetPageNumber - itemsPerPage + 1; i < itemsPerPage * targetPageNumber + 1; i++) {
+                if (netflixTableRows.length > i && filter != 'notfound') {
+                    netflixTableRows[i].classList.remove('d-none');
+                } else if (netflixTableRowsWithoutTmdbMatch.length > i && filter == 'notfound') {
+                    netflixTableRowsWithoutTmdbMatch[i].classList.remove('d-none');
                 }
             }
         }
     }
+
     window.scrollTo(0, 0);
 }
 
-function createPageNavigation(amount, items, reset = null) {
+function createPageNavigation(itemsPerPage, totalItemsCount, reset = null) {
     let ul = document.getElementsByClassName('pagination')[0];
     let lastChild = ul.children[ul.childElementCount - 1];
     let firstChild = ul.firstElementChild;
+
     // remove all children except the first ('previous' button) and the last ('next' button)
     while (ul.childElementCount > 2) {
         lastChild.previousElementSibling.remove();
@@ -244,7 +267,7 @@ function createPageNavigation(amount, items, reset = null) {
         disable(lastChild);
         disable(firstChild);
     } else {
-        const buttonsNumber = Math.ceil(items / amount);
+        const buttonsNumber = Math.ceil(totalItemsCount / itemsPerPage);
 
         // Create nav buttons
         for (let i = 0; i < buttonsNumber; i++) {
@@ -443,11 +466,13 @@ function processNetflixData(netflixActivityItems) {
     } else {
         createPageNavigation(amount, netflixActivityItems.length);
     }
+}
 
-    enable(document.getElementById('importNetflixButton'), 'pointer');
+function enableTableElements() {
     enable(document.getElementById('searchInput'));
     enable(document.getElementById('selectFilterInput'));
     enable(document.getElementById('amountToShowInput'));
+    enable(document.getElementById('importNetflixButton'));
 }
 
 function formatDate(date) {
@@ -469,22 +494,42 @@ function formatDate(date) {
     return yyyy + '-' + mm + '-' + dd
 }
 
-function processError(errorcode) {
-    document.getElementById('netflixTableBody').innerHTML = '';
-    let errorrow = document.createElement('tr');
-    let errorcell = document.createElement('td');
-    errorcell.colSpan = 4;
+function processCsvFileUploadError(statusCode) {
+    let text;
 
-    if (errorcode == 400) {
-        errorcell.innerText = 'Error 400. Input file could not be processed. Please try again.';
-    } else if (errorcode == 415) {
-        errorcell.innerText = 'Error 415. Input file is the wrong type. Upload a CSV file from Netflix instead.';
-    } else if (errorcode == 500) {
-        errorcell.innerText = 'Error 500. Something has gone wrong. Please check your browser console log (F12 -> Console) or your Movary application logs and submit it to the Github issues, so this can be solved.';
+    if (statusCode === 400) {
+        text = 'Error 400. User input invalid. Please make sure you have chosen the correct CSV file and entered a valid CSV Date Format, than try again.';
+    } else if (statusCode === 415) {
+        text = 'Error 415. Input file is the wrong type. Upload the correct CSV file from Netflix.';
+    } else {
+        text = 'Error 500. Something has gone wrong. Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.';
     }
 
-    errorrow.append(errorcell);
-    document.getElementById('netflixTableBody').append(errorrow);
+    setAlert('netflixCsvUploadAlert', text, 'danger')
+}
+
+function setImportAlertError() {
+    setAlert(
+        'importAlert',
+        'Something has gone wrong. Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.',
+        'danger'
+    )
+}
+
+function setAlert(alertElementId, alertText, alertType) {
+    const alertElement = document.getElementById(alertElementId);
+
+    alertElement.className = ''
+    alertElement.classList.add('alert')
+    alertElement.classList.add('alert-' + alertType)
+    alertElement.innerHTML = alertText
+}
+
+function hideAlert(alertElementId) {
+    const importAlert = document.getElementById(alertElementId);
+
+    importAlert.classList.remove('d-none')
+    importAlert.classList.add('d-none')
 }
 
 function selectTMDBItem() {
@@ -499,6 +544,7 @@ function saveTMDBItem() {
     let checkedrow = document.querySelector('input.tmdbradio:checked').closest('.tmdbrow');
     let rowid = document.getElementById('tmdbSearchModal').dataset.rowid;
     let targetrow = document.getElementById(rowid);
+
     targetrow.getElementsByClassName('img-fluid')[0].src = checkedrow.getElementsByClassName('img-fluid')[0].src;
     targetrow.getElementsByClassName('img-fluid')[0].alt = checkedrow.getElementsByClassName('img-fluid')[0].alt;
     targetrow.getElementsByTagName('a')[0].href = checkedrow.getElementsByTagName('a')[0].href;
@@ -510,8 +556,8 @@ function saveTMDBItem() {
     if (targetrow.getElementsByClassName('bi-star-fill').length > 0) {
         targetrow.getElementsByClassName('bi-star-fill')[targetrow.getElementsByClassName('bi-star-fill').length - 1].click();
     }
-    const modal = bootstrap.Modal.getInstance(document.getElementById('tmdbSearchModal'));
-    modal.hide();
+
+    bootstrap.Modal.getInstance(document.getElementById('tmdbSearchModal')).hide();
 }
 
 function searchTable() {
@@ -527,18 +573,10 @@ function searchTable() {
             }
         }
         createPageNavigation(1, 1);
-        disable(document.getElementById('selectFilterInput'));
-        disable(document.getElementById('amountToShowInput'));
     } else {
         changePage(1);
         createPageNavigation(document.getElementById('amountToShowInput').value, rows.length);
-        enable(document.getElementById('selectFilterInput'));
-        enable(document.getElementById('amountToShowInput'));
     }
-}
-
-function scrollDown() {
-    window.scrollTo(0, document.body.scrollHeight);
 }
 
 function setRatingStars() {
@@ -607,3 +645,17 @@ document.getElementById('tmdbSearchModal').addEventListener('show.bs.modal', eve
 document.getElementById('tmdbSearchModal').addEventListener('hidden.bs.modal', event => {
     document.getElementById('tmdbSearchResultsDiv').innerHTML = '';
 });
+
+document.getElementById('netflixCsvInput').addEventListener('change', updateCsvUploadButtonState);
+document.getElementById('netflixCsvDateFormatInput').addEventListener('change', updateCsvUploadButtonState);
+document.getElementById('netflixCsvDateFormatInput').addEventListener('input', updateCsvUploadButtonState);
+
+function updateCsvUploadButtonState() {
+    if (document.getElementById('netflixCsvDateFormatInput').value !== '' && typeof document.getElementById('netflixCsvInput').files[0] !== 'undefined') {
+        document.getElementById('netflixCsvUploadButton').disabled = false;
+
+        return
+    }
+
+    document.getElementById('netflixCsvUploadButton').disabled = true;
+}

@@ -16,7 +16,7 @@ class NetflixActivityCsvParser
     ) {
     }
 
-    public function parseNetflixActivityCsv(string $csvFilepath) : NetflixActivityItemList
+    public function parseNetflixActivityCsv(string $csvFilepath, string $netflixWatchDateFormat) : NetflixActivityItemList
     {
         $items = NetflixActivityItemList::create();
 
@@ -29,7 +29,7 @@ class NetflixActivityCsvParser
                     continue;
                 }
 
-                $items->add(NetflixActivityItem::create($csvRecord['Title'], Date::createFromString($csvRecord['Date'])));
+                $items->add(NetflixActivityItem::create($csvRecord['Title'], Date::createFromStringAndFormat($csvRecord['Date'], $netflixWatchDateFormat)));
             }
         } catch (Exception $e) {
             $this->logger->warning('Netflix: Could not parse activity csv', ['exception' => $e]);
