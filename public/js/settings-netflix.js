@@ -36,7 +36,7 @@ async function importNetflixHistory() {
         }
 
         setAlert('importAlert', 'The data has been successfully imported!', 'success')
-        setDefaultTableContent()
+        setDefaultTable()
     }).catch(function (error) {
         console.log(error)
         setImportAlertError();
@@ -49,7 +49,7 @@ async function uploadNetflixHistory() {
     requestFormData.append('netflixActivityCsvDateFormat', document.getElementById('netflixCsvDateFormatInput').value);
 
     document.getElementById('netflixTableBody').getElementsByTagName('tr')[0].remove();
-    setDefaultTableContent()
+    setDefaultTable()
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
     await fetch('/settings/netflix', {
@@ -127,7 +127,7 @@ async function createSpinner(parent, target) {
     }
 }
 
-function setDefaultTableContent() {
+function setDefaultTable() {
     let div = document.createElement('div');
     let row = document.createElement('tr');
     let cell = document.createElement('td');
@@ -505,6 +505,7 @@ function processCsvFileUploadError(statusCode) {
         text = 'Error: Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.';
     }
 
+    setDefaultTable()
     setAlert('netflixCsvUploadAlert', text, 'danger')
 }
 
