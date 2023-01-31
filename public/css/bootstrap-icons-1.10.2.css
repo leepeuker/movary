@@ -28,7 +28,7 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-pencil-square::before { content: "\f4ca"; }
 .bi-search::before { content: "\f52a"; }
 .bi-star::before { content: "\f588"; }
-.bi-star-fill::before { content: "\f586"; }
+.bi-chat-square-text::before { content: "\f264"; }
 .bi-star-half::before { content: "\f587"; }
 .bi-trash-fill::before { content: "\f5dd"; }
 .bi-x-circle-fill::before { content: "\f622"; }
