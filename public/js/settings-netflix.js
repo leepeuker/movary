@@ -158,8 +158,9 @@ function updateTable() {
             }
         }
 
-        document.querySelector('label[for="amountToShowInput"]').classList.add('d-none');
-        document.getElementById('amountToShowInput').classList.add('d-none');
+        disable(document.querySelector('label[for="amountToShowInput"]'));
+        disable(document.getElementById('amountToShowInput'));
+        disable(document.getElementById('searchInput'));
         createPageNavigation(itemsPerPage, itemsPerPage, true);
         changePage('all');
 
