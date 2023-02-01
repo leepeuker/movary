@@ -550,6 +550,12 @@ function saveTMDBItem() {
     let rowid = document.getElementById('tmdbSearchModal').dataset.rowid;
     let targetrow = document.getElementById(rowid);
 
+    if(targetrow.dataset.tmdbid === "undefined") {
+        targetrow.getElementsByTagName('b')[0].innerText = 'Description: ';
+        if(document.getElementById('selectFilterInput').value === "notfound") {
+            targetrow.classList.add('d-none');
+        }
+    }
     targetrow.getElementsByClassName('img-fluid')[0].src = checkedrow.getElementsByClassName('img-fluid')[0].src;
     targetrow.getElementsByClassName('img-fluid')[0].alt = checkedrow.getElementsByClassName('img-fluid')[0].alt;
     targetrow.getElementsByTagName('a')[0].href = checkedrow.getElementsByTagName('a')[0].href;
