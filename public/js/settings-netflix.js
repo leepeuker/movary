@@ -167,8 +167,10 @@ function updateTable() {
         return;
     }
 
-    document.querySelector('label[for="amountToShowInput"]').classList.remove('d-none');
-    document.getElementById('amountToShowInput').classList.remove('d-none');
+    
+    enable(document.querySelector('label[for="amountToShowInput"]'));
+    enable(document.getElementById('amountToShowInput'));
+    enable(document.getElementById('searchInput'));
     if (itemsPerPage === 'all') {
         createPageNavigation(rows.length, rows.length);
     } else {
