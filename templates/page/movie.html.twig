@@ -127,12 +127,13 @@
                 <ul class="list-group col-lg-5 col-xl-4 col-xxl-3 " style="padding-right: 0">
                     {% for watchDate in watchDates|reverse %}
                         <li class="list-group-item {% if currentUsername == routeUsername %}list-group-item-action{% endif %}"
-                            style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer{% endif %}"
+                            style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer;{% endif %}position:relative;"
                             {% if currentUsername == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
                             data-watch-date="{{ watchDate.watched_at|date(dateFormatPhp) }}"
                             data-plays="{{ watchDate.plays }}"
                             data-comment="{{ watchDate.comment }}">
                             {{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
+                            {% if watchDate.comment != '' %}<i class="bi bi-chat-square-text" style="position: absolute; right:.7rem; top:25%;">{% endif %}</i>
                         </li>
                     {% endfor %}
                 </ul>
