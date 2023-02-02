@@ -328,7 +328,7 @@ function refreshTmdbData() {
 }
 
 async function refreshTmdbDataRequest() {
-    const response = await fetch('/movies/303/refresh-tmdb')
+    const response = await fetch('/movies/' + getMovieId() + '/refresh-tmdb')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -351,7 +351,7 @@ function refreshImdbRating() {
 }
 
 async function refreshImdbRatingRequest() {
-    const response = await fetch('/movies/303/refresh-imdb')
+    const response = await fetch('/movies/' + getMovieId() + '/refresh-imdb')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
