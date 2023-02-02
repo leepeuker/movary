@@ -26,7 +26,8 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
     5. [trakt.tv Import](#trakttv-import)
     6. [Letterboxd.com Import](#letterboxdcom-import)
     7. [Letterboxd.com Export](#letterboxdcom-export)
-    8. [IMDb Rating Sync](#imdb-rating-sync)
+    8. [Netflix Import](#netflix-import)
+    9. [IMDb Rating Sync](#imdb-rating-sync)
 5. [FAQ](#faq)
 6. [Development](#development)
 7. [Support](#support)
@@ -290,6 +291,12 @@ Visit the movary settings page `/settings/letterboxd` for more instructions.
 You can export your local watch history and ratings to letterboxd.com.
 
 Visit the movary settings page `/settings/letterboxd` for more instructions.
+
+### Netflix Import
+
+You can import your watch history from netflix.
+
+Visit the movary settings page `/settings/netflix` for more instructions.
 
 ### IMDb Rating Sync
 
