@@ -1,17 +1,16 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/">Movary</a>
         <div class="btn-group">
-            <button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="/images/icon-menu.png" height="20rem" style="color: white">
+            {% if loggedIn == true %}
+            <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#logPlayModal" style="border-color: #9d9d9d">
+                Log play
+            </button>
+            {% endif %}
+            <button type="button" class="btn btn-outline-light" data-bs-toggle="dropdown" aria-expanded="false" style="border-color: #9d9d9d;">
+                <i class="bi bi-three-dots-vertical"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-                {% if loggedIn == true %}
-                    <li><a class="dropdown-item {% if requestUrlPath starts with '/log-movie' %}active{% endif %}" href="/log-movie">Log movie</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                {% endif %}
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/dashboard">Dashboard</a></li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/history">History</a></li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/movies">All Movies</a></li>
@@ -31,3 +30,22 @@
         </div>
     </div>
 </nav>
+
+{% if loggedIn == true %}
+<div class="modal fade" id="logPlayModal" tabindex="-1" role="dialog" aria-labelledby="logPlayModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeNetflixItemModalTitle">Log play</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Magic is missing here
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Log</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
