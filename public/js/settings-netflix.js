@@ -158,16 +158,19 @@ function updateTable() {
             }
         }
 
-        document.querySelector('label[for="amountToShowInput"]').classList.add('d-none');
-        document.getElementById('amountToShowInput').classList.add('d-none');
-        createPageNavigation(itemsPerPage, itemsPerPage);
+        disable(document.querySelector('label[for="amountToShowInput"]'));
+        disable(document.getElementById('amountToShowInput'));
+        disable(document.getElementById('searchInput'));
+        createPageNavigation(itemsPerPage, itemsPerPage, true);
         changePage('all');
 
-        return
+        return;
     }
 
-    document.querySelector('label[for="amountToShowInput"]').classList.remove('d-none');
-    document.getElementById('amountToShowInput').classList.remove('d-none');
+    
+    enable(document.querySelector('label[for="amountToShowInput"]'));
+    enable(document.getElementById('amountToShowInput'));
+    enable(document.getElementById('searchInput'));
     if (itemsPerPage === 'all') {
         createPageNavigation(rows.length, rows.length);
     } else {
@@ -195,7 +198,8 @@ function changePage(pageNumber = null) {
         // User clicked on the previous button
         direction = 'previous'
     } else {
-        direction = this.innerText;
+        // User clicked on a page number
+        direction = parseInt(this.innerText);
     }
 
     const activePaginationElements = document.getElementsByClassName('page-item active');
@@ -210,7 +214,7 @@ function changePage(pageNumber = null) {
     } else if (isNaN(parseInt(direction)) === false) {
         activePaginationElements[0].classList.remove('active');
         document.querySelectorAll('li.page-item:not(.active)').forEach((el) => {
-            if (el.innerText === direction) {
+            if (parseInt(el.innerText) === direction) {
                 el.classList.add('active');
             }
         })
@@ -546,6 +550,12 @@ function saveTMDBItem() {
     let rowid = document.getElementById('tmdbSearchModal').dataset.rowid;
     let targetrow = document.getElementById(rowid);
 
+    if(targetrow.dataset.tmdbid === "undefined") {
+        targetrow.getElementsByTagName('b')[0].innerText = 'Description: ';
+        if(document.getElementById('selectFilterInput').value === "notfound") {
+            targetrow.classList.add('d-none');
+        }
+    }
     targetrow.getElementsByClassName('img-fluid')[0].src = checkedrow.getElementsByClassName('img-fluid')[0].src;
     targetrow.getElementsByClassName('img-fluid')[0].alt = checkedrow.getElementsByClassName('img-fluid')[0].alt;
     targetrow.getElementsByTagName('a')[0].href = checkedrow.getElementsByTagName('a')[0].href;
@@ -575,8 +585,8 @@ function searchTable() {
         }
         createPageNavigation(1, 1);
     } else {
-        changePage(1);
         createPageNavigation(document.getElementById('amountToShowInput').value, rows.length);
+        changePage(1);
     }
 }
 
