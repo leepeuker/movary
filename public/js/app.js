@@ -21,7 +21,7 @@ async function searchTmdbWithLogModalSearchInput() {
         if (!response.ok) {
             console.error(response);
             document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
-            displayTmdbSearchError()
+            displayLogModalTmdbSearchError()
 
             return null;
         }
@@ -31,7 +31,7 @@ async function searchTmdbWithLogModalSearchInput() {
         console.error(error);
 
         document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
-        displayTmdbSearchError()
+        displayLogModalTmdbSearchError()
     });
 
     if (data !== null) {
@@ -40,7 +40,7 @@ async function searchTmdbWithLogModalSearchInput() {
     }
 }
 
-function displayTmdbSearchError() {
+function displayLogModalTmdbSearchError() {
     document.getElementById('logPlayModalSearchErrorAlert').classList.remove('d-none')
 }
 
@@ -78,7 +78,7 @@ function loadLogModalSearchResults(data) {
         listElement.dataset.title = item.title
         listElement.dataset.releaseYear = releaseYear
 
-        listElement.addEventListener('click', selectTmdbItemForLogging);
+        listElement.addEventListener('click', selectLogModalTmdbItemForLogging);
 
         searchResultList.append(listElement);
     });
@@ -106,7 +106,7 @@ function backToLogModalSearchResults() {
     setRatingStars('logPlayModal', 0)
 }
 
-async function selectTmdbItemForLogging(event) {
+async function selectLogModalTmdbItemForLogging(event) {
     const item = event.target.closest(".list-group-item")
 
     document.getElementById('logPlayModalTitle').innerHTML = item.dataset.title + ' (' + item.dataset.releaseYear + ')'
