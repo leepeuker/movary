@@ -1,21 +1,43 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="/">Movary</a>
+        {% if loggedIn == true %}
         <div class="btn-group">
+            {% endif %}
             {% if loggedIn == true %}
-            <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#logPlayModal" style="border-color: #9d9d9d">
-                Log play
-            </button>
+                <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#logPlayModal" style="border-color: #9d9d9d">
+                    Log play
+                </button>
             {% endif %}
             <button type="button" class="btn btn-outline-light" data-bs-toggle="dropdown" aria-expanded="false" style="border-color: #9d9d9d;">
                 <i class="bi bi-three-dots-vertical"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/dashboard">Dashboard</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/history">History</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/movies">All Movies</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/actors#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/actors">Top Actors</a></li>
-                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/directors#' %}active{% endif %}" href="/users/{{ routeUsername ?: currentUsername }}/directors">Top Directors</a></li>
+                <li>
+                    <a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}"
+                       href="/users/{{ routeUsername ?: currentUsername }}/dashboard">
+                        Dashboard
+                    </a>
+                </li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}"
+                       href="/users/{{ routeUsername ?: currentUsername }}/history">
+                        History
+                    </a>
+                </li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}"
+                       href="/users/{{ routeUsername ?: currentUsername }}/movies">
+                        All Movies</a>
+                </li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/actors#' %}active{% endif %}"
+                       href="/users/{{ routeUsername ?: currentUsername }}/actors">
+                        Top Actors
+                    </a>
+                </li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/directors#' %}active{% endif %}"
+                       href="/users/{{ routeUsername ?: currentUsername }}/directors">
+                        Top Directors
+                    </a>
+                </li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
@@ -27,25 +49,59 @@
                     <li><a class="dropdown-item" href="/login">Login</a></li>
                 {% endif %}
             </ul>
-        </div>
+            {% if loggedIn == true %}</div>{% endif %}
     </div>
 </nav>
 
 {% if loggedIn == true %}
-<div class="modal fade" id="logPlayModal" tabindex="-1" role="dialog" aria-labelledby="logPlayModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="removeNetflixItemModalTitle">Log play</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Magic is missing here
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Log</button>
+    <div class="modal fade" id="logPlayModal" tabindex="-1" role="dialog" aria-labelledby="logPlayModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logPlayModalTitle">Log play</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="logPlayModalSearchDiv">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}" id="logPlayModalSearchInput">
+                            <button class="btn btn-primary"
+                                    type="submit"
+                                    onclick="searchTmdbWithLogModalSearchInput()"
+                                    id="logPlayModalSearchButton"
+                                    disabled>
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+
+                        <ul class="list-group" id="logPlayModalSearchResultList"></ul>
+                    </div>
+
+                    <div class="d-none" id="logPlayModalWatchDateDiv">
+                        <div class="fw-light" id="ratingStars"
+                             style="color: rgb(255, 193, 7);
+                                    font-size: 1.5rem;
+                                    margin-top: 0.5rem;
+                                    cursor:pointer;
+                                    border-top-right-radius: .375rem!important;
+                                    border-bottom-right-radius: .375rem">
+                            <span id="ratingStarsSpan">
+                                {% for i in 1..10 %}
+                                    <i class="bi bi-star" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <div class="input-group" style="margin-top: 0.5rem;">
+                            <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
+                            <textarea class="form-control" rows="1" aria-label="Comment" id="comment" placeholder="Comment"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-none" id="logPlayModalFooter">
+                    <button type="submit" class="btn btn-secondary" onclick="backToLogModalSearchResults()">Back</button>
+                    <button type="submit" class="btn btn-primary">Log play</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endif %}
