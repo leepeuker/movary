@@ -9,6 +9,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Plex;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -227,7 +228,16 @@ class Factory
             $container->get(SessionWrapper::class),
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),
+            $container->get(Plex\PlexApi::class),
             $applicationVersion
+        );
+    }
+
+    public static function createPlexApiClient(ContainerInterface $container) : Plex\PlexClient
+    {
+        return new Plex\PlexClient(
+            $container->get(ClientInterface::class),
+            $container->get(Config::class)
         );
     }
 

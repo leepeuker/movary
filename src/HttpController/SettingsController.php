@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Trakt\TraktApi;
+use Movary\Api\Plex\PlexApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
@@ -33,6 +34,7 @@ class SettingsController
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
+        private readonly PlexApi $plexApi,
         private readonly ?string $currentApplicationVersion = null,
     ) {
     }
@@ -271,6 +273,7 @@ class SettingsController
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
+        $plexAuthUrl = $this->plexApi->generateAuthUrl();
 
         $plexScrobblerOptionsUpdated = $this->sessionWrapper->find('plexScrobblerOptionsUpdated');
         $this->sessionWrapper->unset('plexScrobblerOptionsUpdated');
@@ -284,6 +287,7 @@ class SettingsController
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
+                'plexAuthUrl' => $plexAuthUrl
             ]),
         );
     }

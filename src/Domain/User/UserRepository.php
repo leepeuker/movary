@@ -440,4 +440,30 @@ class UserRepository
             ],
         );
     }
+
+    public function updatePlexAccessToken(int $userId, ?string $accessToken) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_access_token' => $accessToken
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
+    public function updatePlexClientId(int $userId, ?int $plexClientId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_access_token' => $plexClientId
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
 }

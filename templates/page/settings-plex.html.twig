@@ -72,6 +72,13 @@
                 <button type="submit" class="btn btn-primary" {% if plexWebhookUrl == '-' %}disabled{% endif %} id="saveButton">Save</button>
             </form>
 
+            <hr>
+
+            <div style="padding-top: 1rem;">
+                <h5>Import Plex history</h5>
+                <p class="text-muted">Click on the Login button below to login with Plex. After logging in, you'll have to authorize Movary as an application that can access your account. When you've authorized it, you'll be returned to Movary and be able to import your Plex history</p>
+            </div>
+            <a class="btn btn-primary {% if plexAuthUrl == '' %} disabled {% endif %}" {% if plexAuthUrl == '' %} disabled {% else %} href="{{ plexAuthUrl }}" {% endif %}>Login with Plex</a>
         </div>
     </main>
 {% endblock %}
