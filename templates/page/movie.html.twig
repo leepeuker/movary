@@ -5,12 +5,10 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/css/datepicker-1.2.0.min.css">
     <link href="/css/movie.css" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/datepicker-full-1.2.0.min.js"></script>
     <script src="/js/movie.js"></script>
     <script src="/js/userSelect.js"></script>
 {% endblock %}
@@ -19,9 +17,6 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
-
-        <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
-        <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
 
         <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
 

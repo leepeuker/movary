@@ -78,9 +78,17 @@
                     </div>
 
                     <div class="d-none" id="logPlayModalWatchDateDiv">
+                        <input id="logPlayModalTmdbIdInput" hidden>
+
                         <div class="input-group" id="watchDateGroup">
                             <i class="bi bi-calendar-date input-group-text"></i>
-                            <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" name="watchDate" id="watchDate" required
+                            <input type="text"
+                                   class="datepicker_input form-control"
+                                   placeholder="Watch date"
+                                   aria-label="Watch date"
+                                   name="watchDate"
+                                   id="logPlayModalWatchDateInput"
+                                   required
                                    onfocusout="validateWatchDate(this.value)">
                             <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
                                 Watch date is required!
@@ -89,7 +97,7 @@
                                 Watch date format is invalid!
                             </div>
                         </div>
-                        <div class="fw-light" id="ratingStars"
+                        <div class="fw-light" id="logPlayModalRatingStars"
                              style="color: rgb(255, 193, 7);
                                     font-size: 1.5rem;
                                     margin-top: 0.5rem;
@@ -104,13 +112,13 @@
                         </div>
                         <div class="input-group" style="margin-top: 0.5rem;">
                             <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
-                            <textarea class="form-control" rows="1" aria-label="Comment" id="comment" placeholder="Comment"></textarea>
+                            <textarea class="form-control" rows="1" aria-label="Comment" id="logPlayModalCommentInput" placeholder="Comment"></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer d-none" id="logPlayModalFooter">
                     <button type="submit" class="btn btn-secondary" onclick="backToLogModalSearchResults()">Back</button>
-                    <button type="submit" class="btn btn-primary">Log play</button>
+                    <button type="submit" class="btn btn-primary" onclick="logMovie()">Log play</button>
                 </div>
             </div>
         </div>
