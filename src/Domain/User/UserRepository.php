@@ -173,6 +173,16 @@ class UserRepository
 
         return $jellyfinWebhookId;
     }
+    public function findPlexAccessToken(int $userId) : ?string
+    {
+        $plexAccessToken = $this->dbConnection->fetchOne('SELECT `plex_access_token` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexAccessToken === false) {
+            return null;
+        }
+
+        return $plexAccessToken;
+    }
 
     public function findPlexWebhookId(int $userId) : ?string
     {
@@ -441,7 +451,7 @@ class UserRepository
         );
     }
 
-    public function updatePlexAccessToken(int $userId, ?string $accessToken) : void
+    public function updatePlexAccessToken(int $userId, ?int $accessToken) : void
     {
         $this->dbConnection->update(
             'user',

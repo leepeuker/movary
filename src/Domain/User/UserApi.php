@@ -90,6 +90,11 @@ class UserApi
         return $this->repository->findJellyfinWebhookId($userId);
     }
 
+    public function findPlexAccessToken(int $userId) : ?string
+    {
+        return $this->repository->findPlexAccessToken($userId);
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookId($userId);
@@ -217,7 +222,7 @@ class UserApi
         $this->repository->updateTraktUserName($userId, $traktUserName);
     }
 
-    public function updatePlexAccessToken(int $userId, string $plexAccessToken) : void
+    public function updatePlexAccessToken(int $userId, int $plexAccessToken) : void
     {
         $this->repository->updatePlexAccessToken($userId, $plexAccessToken);
     }

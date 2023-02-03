@@ -79,7 +79,6 @@ class PlexController
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
-
         return Response::createSeeOther('/settings/plex');
     }
 }

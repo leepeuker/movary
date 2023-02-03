@@ -273,7 +273,16 @@ class SettingsController
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
-        $plexAuthUrl = $this->plexApi->generateAuthUrl();
+        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+        if($plexAccessToken === null) {
+            $plexAuth = $this->plexApi->generatePlexAuth();
+        } else {
+            if($this->plexApi->verifyPlexAccessToken($plexAccessToken)) {
+                $plexAuth = 'true';
+            } else {
+                $plexAuth = $this->plexApi->generateplexAuth();
+            }
+        }
 
         $plexScrobblerOptionsUpdated = $this->sessionWrapper->find('plexScrobblerOptionsUpdated');
         $this->sessionWrapper->unset('plexScrobblerOptionsUpdated');
@@ -287,7 +296,7 @@ class SettingsController
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
-                'plexAuthUrl' => $plexAuthUrl
+                'plexAuth' => $plexAuth
             ]),
         );
     }
