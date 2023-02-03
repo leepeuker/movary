@@ -141,28 +141,6 @@ class HistoryController
         );
     }
 
-    public function renderLogMoviePage(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-
-        $movies = [];
-        if ($searchTerm !== null) {
-            $movies = $this->tmdbApi->searchMovie($searchTerm);
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/log-movie.html.twig', [
-                'movies' => $movies,
-                'searchTerm' => $searchTerm,
-            ]),
-        );
-    }
-
     public function updateHistoryEntry(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
