@@ -12,7 +12,7 @@ use RuntimeException;
 class PlexClient
 {
     private const BASE_URL = "https://plex.tv/api/v2";
-    private const APP_NAME = 'Plex Web';
+    private const APP_NAME = 'Movary';
     private $defaultHeaders;
 
     public function __construct(private readonly ClientInterface $httpClient, private readonly Config $config)
