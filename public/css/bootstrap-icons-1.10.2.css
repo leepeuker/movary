@@ -32,4 +32,5 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-star-fill::before { content: "\f586"; }
 .bi-star-half::before { content: "\f587"; }
 .bi-trash-fill::before { content: "\f5dd"; }
+.bi-three-dots-vertical::before { content: "\f5d3"; }
 .bi-x-circle-fill::before { content: "\f622"; }

@@ -1,16 +1,6 @@
 let ratingEditMode = false
 let originalRating
 
-const addWatchDateModal = document.getElementById('addWatchDateModal')
-addWatchDateModal.addEventListener('show.bs.modal', async function () {
-    const datepicker = new Datepicker(document.getElementById('addWatchDateModalInput'), {
-        format: document.getElementById('dateFormatJavascript').value,
-        title: 'Watch date',
-    })
-
-    document.getElementById('addWatchDateModalInput').value = getCurrentDate()
-})
-
 function deleteWatchDate() {
     const confirmed = confirm('Are you sure?')
 
@@ -38,52 +28,13 @@ function editRating(e) {
     ratingEditMode = true
 
     if (originalRating === undefined) {
-        originalRating = getRatingFromStars()
+        originalRating = getRatingFromStars('movie')
     }
 
     document.getElementById('ratingStarsSpan').classList.add('rating-edit-active')
     document.getElementById('editRatingButton').style.display = 'none'
     document.getElementById('saveRatingButton').style.display = 'inline'
     document.getElementById('resetRatingButton').style.display = 'inline'
-}
-
-function getRatingFromStars() {
-    let rating = 0
-
-    for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-        if (document.getElementById('ratingStar' + ratingStarNumber).classList.contains('bi-star') === true) {
-            break
-        }
-
-        rating = ratingStarNumber
-    }
-
-    return rating
-}
-
-function setRatingStars(newRating) {
-    if (getRatingFromStars() == newRating) {
-        newRating = null
-    }
-
-    for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-        document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star-fill')
-        document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star')
-
-        if (ratingStarNumber <= newRating) {
-            document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star-fill')
-        } else {
-            document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star')
-        }
-    }
-}
-
-function updateRatingStars(e) {
-    if (ratingEditMode === false) {
-        return
-    }
-
-    setRatingStars(e.id.substring(20, 10))
 }
 
 function getMovieId() {
@@ -95,7 +46,7 @@ function getRouteUsername() {
 }
 
 function saveRating() {
-    let newRating = getRatingFromStars()
+    let newRating = getRatingFromStars('movie')
 
     fetch('/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
         method: 'post',
@@ -124,7 +75,7 @@ function saveRating() {
 function resetRating(e) {
     ratingEditMode = true
 
-    setRatingStars(null)
+    setRatingStars('logPlayModal', 0)
     saveRating(e)
 
     ratingEditMode = false
@@ -213,105 +164,6 @@ function editWatchDate() {
             alert('Could not delete old watch date.')
         }
     })
-}
-
-function addWatchDate() {
-    const watchDate = document.getElementById('addWatchDateModalInput').value;
-    const comment = document.getElementById('addWatchDateModalCommentInput').value;
-
-    if (validateWatchDate(watchDate) === false) {
-        return;
-    }
-
-    const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
-
-    $.ajax({
-        url: apiUrl,
-        type: 'PUT',
-        data: JSON.stringify({
-            'watchDate': watchDate,
-            'plays': 1,
-            'comment': comment,
-            'dateFormat': document.getElementById('dateFormatPhp').value
-        }),
-        success: function (data, textStatus, xhr) {
-            window.location.reload()
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            alert('Could not create new watch date.')
-        }
-    })
-}
-
-function validateWatchDate(watchDate) {
-    document.getElementById('addWatchDateModalValidationRequiredErrorMessage').classList.remove('d-block')
-    document.getElementById('addWatchDateModalValidationFormatErrorMessage').classList.remove('d-block')
-
-    if (!watchDate) {
-        document.getElementById('addWatchDateModalInput').style.borderStyle = 'solid'
-        document.getElementById('addWatchDateModalInput').style.borderColor = '#dc3545'
-        document.getElementById('addWatchDateModalValidationRequiredErrorMessage').classList.add('d-block')
-
-        return false
-    }
-
-    if (isValidDate(watchDate) === false) {
-        document.getElementById('addWatchDateModalInput').style.borderStyle = 'solid'
-        document.getElementById('addWatchDateModalInput').style.borderColor = '#dc3545'
-        document.getElementById('addWatchDateModalValidationFormatErrorMessage').classList.add('d-block')
-
-        return false
-    }
-
-    document.getElementById('addWatchDateModalInput').style.borderStyle = ''
-    document.getElementById('addWatchDateModalInput').style.borderColor = ''
-
-    return true
-}
-
-function isValidDate(dateString) {
-    return true
-
-    // First check for the pattern
-    if (!/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(dateString)) {
-        return false
-    }
-
-    // Parse the date parts to integers
-    var parts = dateString.split('.')
-    var day = parseInt(parts[0], 10)
-    var month = parseInt(parts[1], 10)
-    var year = parseInt(parts[2], 10)
-
-    // Check the ranges of month and year
-    if (year < 1000 || year > 3000 || month == 0 || month > 12) return false
-
-    var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-    // Adjust for leap years
-    if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) monthLength[1] = 29
-
-    // Check the range of the day
-    return day > 0 && day <= monthLength[month - 1]
-}
-
-function getCurrentDate() {
-    const today = new Date()
-    const dd = String(today.getDate()).padStart(2, '0')
-    const mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
-    const yyyy = today.getFullYear()
-
-    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yyyy') {
-        return dd + '.' + mm + '.' + yyyy
-    }
-    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yy') {
-        return dd + '.' + mm + '.' + yyyy.toString().slice(-2)
-    }
-    if (document.getElementById('dateFormatJavascript').value === 'yy-mm-dd') {
-        return yyyy.toString().slice(-2) + '-' + mm + '-' + dd
-    }
-
-    return yyyy + '-' + mm + '-' + dd
 }
 
 function refreshTmdbData() {
