@@ -50,7 +50,6 @@ class MovieHistoryRepository
 
     public function update(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment) : void
     {
-        file_put_contents(__DIR__ . '/txt', "$movieId $userId, $watchedAt, $plays, $comment");
         $this->dbConnection->executeStatement(
             'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
             [
