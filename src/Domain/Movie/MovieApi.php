@@ -314,18 +314,49 @@ class MovieApi
     {
         $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
 
-        $this->historyApi->createOrUpdatePlaysForDate(
+        if ($historyEntry === null) {
+            $this->historyApi->create(
+                $movieId,
+                $userId,
+                $watchedDate,
+                $playsToAdd,
+            );
+
+            return;
+        }
+
+        $this->historyApi->update(
             $movieId,
             $userId,
             $watchedDate,
-            (int)$historyEntry?->getPlays() + $playsToAdd,
-            $historyEntry?->getComment(),
+            $historyEntry->getPlays() + $playsToAdd,
+            $historyEntry->getComment(),
         );
     }
 
     public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate, ?string $comment = null) : void
     {
-        $this->historyApi->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $playsPerDate, $comment);
+        $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
+
+        if ($historyEntry === null) {
+            $this->historyApi->create(
+                $movieId,
+                $userId,
+                $watchedAt,
+                $playsPerDate,
+                $comment
+            );
+
+            return;
+        }
+
+        $this->historyApi->update(
+            $movieId,
+            $userId,
+            $watchedAt,
+            $playsPerDate,
+            $comment,
+        );
     }
 
     public function updateCast(int $movieId, TmdbCast $tmdbCast) : void
