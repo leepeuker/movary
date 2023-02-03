@@ -74,6 +74,18 @@
                             </button>
                         </div>
 
+
+                        <div class="alert alert-danger d-none" role="alert" id="logPlayModalSearchErrorAlert" style="margin-top: 1rem;margin-bottom: 0">
+                            Something went wrong. Please try again.
+                        </div>
+                        <div class="alert alert-secondary d-none" role="alert" id="logPlayModalSearchNoResultAlert" style="margin-top: 1rem;margin-bottom: 0">
+                            No search results...
+                        </div>
+                        <div class="text-center d-none" style="margin-top: 1rem;margin-bottom: 0" id="logPlayModalSearchSpinner">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                         <ul class="list-group" id="logPlayModalSearchResultList"></ul>
                     </div>
 
@@ -114,6 +126,10 @@
                             <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
                             <textarea class="form-control" rows="1" aria-label="Comment" id="logPlayModalCommentInput" placeholder="Comment"></textarea>
                         </div>
+                    </div>
+
+                    <div class="alert alert-danger d-none" role="alert" id="logPlayModalLogErrorAlert" style="margin-top: 1rem;margin-bottom: 0">
+                        Could not log play. Please try again.
                     </div>
                 </div>
                 <div class="modal-footer d-none" id="logPlayModalFooter">

@@ -9,8 +9,9 @@ if ('serviceWorker' in navigator) {
 
 async function searchTmdbWithLogModalSearchInput() {
     resetLogModalSearchResults()
+    document.getElementById('logPlayModalSearchSpinner').classList.remove('d-none')
 
-    await fetch('/settings/netflix/search', {
+    const data = await fetch('/settings/netflix/search', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({
@@ -19,22 +20,37 @@ async function searchTmdbWithLogModalSearchInput() {
     }).then(response => {
         if (!response.ok) {
             console.error(response);
-            alert('error')
+            document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
+            displayTmdbSearchError()
 
-            return false;
+            return null;
         }
 
         return response.json()
-    }).then(data => {
-        loadLogModalSearchResults(data)
     }).catch(function (error) {
         console.error(error);
-        alert('error')
+
+        document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
+        displayTmdbSearchError()
     });
+
+    if (data !== null) {
+        document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
+        loadLogModalSearchResults(data)
+    }
+}
+
+function displayTmdbSearchError() {
+    document.getElementById('logPlayModalSearchErrorAlert').classList.remove('d-none')
 }
 
 function loadLogModalSearchResults(data) {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
+
+    if (data.length == 0) {
+        document.getElementById('logPlayModalSearchNoResultAlert').classList.remove('d-none')
+        return
+    }
 
     searchResultList.style.marginTop = '1rem'
 
@@ -66,13 +82,15 @@ function loadLogModalSearchResults(data) {
 
         searchResultList.append(listElement);
     });
-    console.log(data)
 }
 
 function resetLogModalSearchResults() {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
     searchResultList.style.marginTop = ''
     searchResultList.innerHTML = ''
+
+    document.getElementById('logPlayModalSearchErrorAlert').classList.add('d-none')
+    document.getElementById('logPlayModalSearchNoResultAlert').classList.add('d-none')
 }
 
 function backToLogModalSearchResults() {
@@ -82,6 +100,7 @@ function backToLogModalSearchResults() {
     document.getElementById('logPlayModalFooter').classList.add('d-none')
     document.getElementById('logPlayModalTitle').innerHTML = 'Log play'
 
+    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
     setRatingStars('logPlayModal', 0)
@@ -138,6 +157,7 @@ function resetLogModalLogInputs() {
     document.getElementById('logPlayModalTmdbIdInput').value = ''
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
+    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
 }
 
 function logMovie(context) {
@@ -146,6 +166,7 @@ function logMovie(context) {
     const watchDate = document.getElementById(context + 'WatchDateInput').value
     const comment = document.getElementById(context + 'CommentInput').value
     const dateFormatPhp = document.getElementById('dateFormatPhp').value
+    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
 
     if (validateWatchDate(context, watchDate) === false) {
         return
@@ -164,13 +185,14 @@ function logMovie(context) {
     }).then(function (response) {
         if (response.status === 200) {
             location.reload();
-        } else {
-            console.log(response)
-            alert('Could not log movie: ')
+
+            return
         }
+
+        document.getElementById('logPlayModalLogErrorAlert').classList.remove('d-none')
     }).catch(function (error) {
         console.log(error)
-        alert('Could not log movie: ')
+        document.getElementById('logPlayModalLogErrorAlert').classList.remove('d-none')
     })
 }
 
