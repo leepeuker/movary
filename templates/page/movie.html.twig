@@ -32,7 +32,10 @@
             <span id="ratingStarsSpan">
                 {{ movie.personal_rating }}
                 {% for i in 1..10 %}
-                    <i class="bi bi-star{% if movie.personalRating >= i %}-fill{% endif %}" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
+                    <i class="bi bi-star{% if movie.personalRating >= i %}-fill{% endif %}"
+                       id="movieRatingStar{{ i }}"
+                       data-value="{{ i }}"
+                       onclick="updateRatingStars('movie', this)"></i>
                 {% endfor %}
                 {% if currentUsername == routeUsername %}
                     <i class="bi bi-pencil-square" style="color: black;font-size: 1.3rem;cursor: pointer" onclick="editRating(this)" id="editRatingButton"></i>
@@ -137,7 +140,9 @@
         {% if currentUsername == routeUsername %}
             <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
-                    <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#addWatchDateModal">Log play</button>
+                    <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-outline-dark"
+                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, '{{ movie.title }}')">Log play
+                    </button>
                 </div>
             </div>
             <div class="container" style="margin-bottom: 0.5rem">
@@ -147,7 +152,6 @@
             </div>
 
             {{ include('component/movie-modal-more.html.twig') }}
-            {{ include('component/movie-modal-add-watch-date.html.twig') }}
             {{ include('component/movie-modal-edit-watch-date.html.twig') }}
         {% endif %}
 

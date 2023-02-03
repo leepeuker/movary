@@ -89,7 +89,7 @@
                                    name="watchDate"
                                    id="logPlayModalWatchDateInput"
                                    required
-                                   onfocusout="validateWatchDate(this.value)">
+                                   onfocusout="validateWatchDate('logPlayModal', this.value)">
                             <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
                                 Watch date is required!
                             </div>
@@ -106,7 +106,7 @@
                                     border-bottom-right-radius: .375rem">
                             <span id="ratingStarsSpan">
                                 {% for i in 1..10 %}
-                                    <i class="bi bi-star" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
+                                    <i class="bi bi-star" data-value="{{ i }}" id="logPlayModalRatingStar{{ i }}" onclick="updateRatingStars('logPlayModal', this)"></i>
                                 {% endfor %}
                             </span>
                         </div>
@@ -118,7 +118,7 @@
                 </div>
                 <div class="modal-footer d-none" id="logPlayModalFooter">
                     <button type="submit" class="btn btn-secondary" onclick="backToLogModalSearchResults()">Back</button>
-                    <button type="submit" class="btn btn-primary" onclick="logMovie()">Log play</button>
+                    <button type="submit" class="btn btn-primary" onclick="logMovie('logPlayModal')">Log play</button>
                 </div>
             </div>
         </div>

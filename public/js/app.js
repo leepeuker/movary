@@ -84,21 +84,22 @@ function backToLogModalSearchResults() {
 
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
-    setRatingStars(0)
+    setRatingStars('logPlayModal', 0)
 }
 
-function selectTmdbItemForLogging(event) {
+async function selectTmdbItemForLogging(event) {
     const item = event.target.closest(".list-group-item")
 
     document.getElementById('logPlayModalTitle').innerHTML = item.dataset.title + ' (' + item.dataset.releaseYear + ')'
     document.getElementById('logPlayModalTmdbIdInput').value = item.dataset.tmdbId
 
+    const rating = await fetchRating(item.dataset.tmdbId)
+    setRatingStars('logPlayModal', rating)
+
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
-
-    console.log(document.getElementById('logPlayModalFooter').classList)
 }
 
 document.getElementById('logPlayModalSearchInput').addEventListener('change', updateLogPlayModalButtonState);
@@ -122,13 +123,15 @@ function loadLogModalSearchResultsOnEnterPress(event) {
     }
 }
 
+document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
+    document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
+})
+
 document.getElementById('logPlayModal').addEventListener('hidden.bs.modal', function () {
     document.getElementById('logPlayModalSearchInput').value = ''
+    resetLogModalLogInputs()
     resetLogModalSearchResults()
     backToLogModalSearchResults()
-})
-document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
-    resetLogModalLogInputs()
 })
 
 function resetLogModalLogInputs() {
@@ -137,20 +140,19 @@ function resetLogModalLogInputs() {
     document.getElementById('logPlayModalCommentInput').value = ''
 }
 
-function logMovie() {
-    let rating = getRatingFromStars()
-    let tmdbId = document.getElementById('logPlayModalTmdbIdInput').value
-    let watchDate = document.getElementById('logPlayModalWatchDateInput').value
-    let comment = document.getElementById('logPlayModalCommentInput').value
-    let dateFormatPhp = document.getElementById('dateFormatPhp').value
+function logMovie(context) {
+    const rating = getRatingFromStars(context)
+    const tmdbId = document.getElementById(context + 'TmdbIdInput').value
+    const watchDate = document.getElementById(context + 'WatchDateInput').value
+    const comment = document.getElementById(context + 'CommentInput').value
+    const dateFormatPhp = document.getElementById('dateFormatPhp').value
 
-    if (validateWatchDate(watchDate) === false) {
+    if (validateWatchDate(context, watchDate) === false) {
         return
     }
 
     fetch('/log-movie', {
-        method: 'post',
-        headers: {
+        method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
             'tmdbId': tmdbId,
@@ -161,7 +163,7 @@ function logMovie() {
         })
     }).then(function (response) {
         if (response.status === 200) {
-            alert('Added watch date')
+            location.reload();
         } else {
             console.log(response)
             alert('Could not log movie: ')
@@ -172,34 +174,49 @@ function logMovie() {
     })
 }
 
-/**
- * Log movie modal: Watch date logic starting here
- */
-new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
-    format: document.getElementById('dateFormatJavascript').value,
-    title: 'Watch date',
-})
+async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle) {
+    var myModal = new bootstrap.Modal(document.getElementById('logPlayModal'), {
+        keyboard: false
+    })
 
-function validateWatchDate(watchDate) {
+    const rating = await fetchRating(tmdbId)
+    setRatingStars('logPlayModal', rating)
+
+    document.getElementById('logPlayModalTmdbIdInput').value = tmdbId
+    document.getElementById('logPlayModalTitle').innerHTML = movieTitle
+
+    document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
+    document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
+    document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
+    document.getElementById('logPlayModalFooter').classList.remove('d-none')
+
+    myModal.show()
+}
+
+/**
+ * Watch date logic starting here
+ */
+function validateWatchDate(context, watchDate) {
     if (!watchDate) {
-        document.getElementById('logPlayModalWatchDateInput').style.borderStyle = 'solid'
-        document.getElementById('logPlayModalWatchDateInput').style.borderColor = '#dc3545'
-        document.getElementById('logPlayModalRatingStars').style.marginTop = '0'
+        document.getElementById(context + 'WatchDateInput').style.borderStyle = 'solid'
+        document.getElementById(context + 'WatchDateInput').style.borderColor = '#dc3545'
+        document.getElementById(context + 'RatingStars').style.marginTop = '0'
 
         return false
     }
 
     if (isValidDate(watchDate) === false) {
-        document.getElementById('logPlayModalWatchDateInput').style.borderStyle = 'solid'
-        document.getElementById('logPlayModalWatchDateInput').style.borderColor = '#dc3545'
-        document.getElementById('logPlayModalRatingStars').style.marginTop = '0'
+        document.getElementById(context + 'WatchDateInput').style.borderStyle = 'solid'
+        document.getElementById(context + 'WatchDateInput').style.borderColor = '#dc3545'
+        document.getElementById(context + 'ratingStars').style.marginTop = '0'
 
         return false
     }
 
-    document.getElementById('logPlayModalWatchDateInput').style.borderStyle = ''
-    document.getElementById('logPlayModalWatchDateInput').style.borderColor = ''
-    document.getElementById('logPlayModalRatingStars').style.marginTop = '0.5rem'
+    console.log(context + 'watchDateInput')
+    document.getElementById(context + 'WatchDateInput').style.borderStyle = ''
+    document.getElementById(context + 'WatchDateInput').style.borderColor = ''
+    document.getElementById(context + 'RatingStars').style.marginTop = '0.5rem'
 
     return true
 }
@@ -250,7 +267,7 @@ function getCurrentDate() {
 }
 
 /**
- * Log movie modal: Rating star logic starting here
+ * Rating star logic starting here
  */
 async function fetchRating(tmdbId) {
     const response = await fetch('/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
@@ -264,28 +281,24 @@ async function fetchRating(tmdbId) {
     return data.personalRating
 }
 
-function setRatingStars(newRating) {
-    if (getRatingFromStars() == newRating) {
-        newRating = null
+function setRatingStars(context, newRating) {
+    if (getRatingFromStars(context) == newRating) {
+        newRating = 0
     }
 
     for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-        document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star-fill')
-        document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star')
+        const ratingStarElement = document.getElementById(context + 'RatingStar' + ratingStarNumber);
 
-        if (ratingStarNumber <= newRating) {
-            document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star-fill')
-        } else {
-            document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star')
-        }
+        ratingStarElement.classList.remove('bi-star-fill', 'bi-star')
+        ratingStarElement.classList.add(ratingStarNumber <= newRating ? 'bi-star-fill' : ratingStarElement.classList.add('bi-star'))
     }
 }
 
-function getRatingFromStars() {
+function getRatingFromStars(context) {
     let rating = 0
 
     for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-        if (document.getElementById('ratingStar' + ratingStarNumber).classList.contains('bi-star') === true) {
+        if (document.getElementById(context + 'RatingStar' + ratingStarNumber).classList.contains('bi-star') === true) {
             break
         }
 
@@ -295,6 +308,11 @@ function getRatingFromStars() {
     return rating
 }
 
-function updateRatingStars(e) {
-    setRatingStars(e.id.substring(20, 10))
+function updateRatingStars(context, e) {
+    setRatingStars(context, e.dataset.value)
 }
+
+new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
+    format: document.getElementById('dateFormatJavascript').value,
+    title: 'Watch date',
+})
