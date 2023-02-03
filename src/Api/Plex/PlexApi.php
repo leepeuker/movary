@@ -32,7 +32,7 @@ class PlexApi
             $plexClientIdentifier = $plexJsonPayload['clientIdentifier'];
             $plexAuthCode = $plexJsonPayload['code'];
             $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'https://' : 'http://';
-            $urlCallback = $protocol . $_SERVER['HTTP_HOST'] . '/settings/plex/callback';
+            $urlCallback = $protocol . $_SERVER['HTTP_HOST'] . '/settings/plex';
             $response =  $base_url . 'clientID=' . urlencode($plexClientIdentifier) . '&code=' . urlencode((string)$plexAuthCode) . '&' . urlencode('context[device][product]') . '=' . urlencode($plexAppName) . '&forwardUrl=' . urlencode($urlCallback);
         }
         return $response;

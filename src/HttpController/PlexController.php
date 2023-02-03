@@ -73,12 +73,4 @@ class PlexController
 
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
-
-    public function handlePlexCallback(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-        return Response::createSeeOther('/settings/plex');
-    }
 }
