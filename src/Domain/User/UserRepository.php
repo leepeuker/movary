@@ -184,6 +184,28 @@ class UserRepository
         return $plexAccessToken;
     }
 
+    public function findPlexClientId(int $userId) : ?string
+    {
+        $plexClientId = $this->dbConnection->fetchOne('SELECT `plex_client_id` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexClientId === false) {
+            return null;
+        }
+
+        return $plexClientId;
+    }
+
+    public function findTemporaryPlexCode(int $userId) : ?string
+    {
+        $plexCode = $this->dbConnection->fetchOne('SELECT `plex_client_temporary_code` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexCode === false) {
+            return null;
+        }
+
+        return $plexCode;
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
@@ -451,7 +473,7 @@ class UserRepository
         );
     }
 
-    public function updatePlexAccessToken(int $userId, ?int $accessToken) : void
+    public function updatePlexAccessToken(int $userId, ?string $accessToken) : void
     {
         $this->dbConnection->update(
             'user',
@@ -469,7 +491,20 @@ class UserRepository
         $this->dbConnection->update(
             'user',
             [
-                'plex_access_token' => $plexClientId
+                'plex_client_id' => $plexClientId
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
+    public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_client_temporary_code' => $plexClientCode
             ],
             [
                 'id' => $userId

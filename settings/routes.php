@@ -160,6 +160,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/plex/callback',
+        [\Movary\HttpController\PlexController::class, 'processPlexCallback'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/plex/webhook-id',
         [\Movary\HttpController\PlexController::class, 'getPlexWebhookId'],
     );

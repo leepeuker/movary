@@ -2,6 +2,8 @@
 
 namespace Movary\Api\Plex;
 
+use Movary\Api\Plex\Exception\PlexNotFoundError;
+use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use RuntimeException;
@@ -24,29 +26,44 @@ class PlexApi
     public function generatePlexAuth() : string
     {
         $response = '';
-        $base_url = 'https://app.plex.tv/auth#!?';
-        $plexJsonPayload = $this->client->sendPostRequest('/pins');
-        if($plexJsonPayload !== []) {
-            $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), $plexJsonPayload['id']);
-            $plexAppName = $plexJsonPayload['product'];
-            $plexClientIdentifier = $plexJsonPayload['clientIdentifier'];
-            $plexAuthCode = $plexJsonPayload['code'];
+        $base_url = 'https://app.plex.tv/auth#?';
+        $plexAuthenticationData = $this->client->sendPostRequest('/pins');
+        if($plexAuthenticationData !== []) {
+            $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['id']);
+            $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['code']);
+            $plexAppName = $plexAuthenticationData['product'];
+            $plexClientIdentifier = $plexAuthenticationData['clientIdentifier'];
+            $plexTemporaryClientCode = $plexAuthenticationData['code'];
             $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'https://' : 'http://';
-            $urlCallback = $protocol . $_SERVER['HTTP_HOST'] . '/settings/plex';
-            $response =  $base_url . 'clientID=' . urlencode($plexClientIdentifier) . '&code=' . urlencode((string)$plexAuthCode) . '&' . urlencode('context[device][product]') . '=' . urlencode($plexAppName) . '&forwardUrl=' . urlencode($urlCallback);
+            $urlCallback = $protocol . $_SERVER['HTTP_HOST'] . '/settings/plex/callback';
+            $response =  $base_url . 'clientID=' . urlencode($plexClientIdentifier) . '&code=' . urlencode((string)$plexTemporaryClientCode) . '&' . urlencode('context[device][product]') . '=' . urlencode($plexAppName) . '&forwardUrl=' . urlencode($urlCallback);
         }
         return $response;
     }
 
+    public function fetchPlexAccessToken(string $plexPinId, string $temporaryPlexClientCode) : ?PlexAccessToken
+    {
+        $query = [
+            'code' => $temporaryPlexClientCode,
+        ];
+        try {
+            $plexRequest = $this->client->sendGetRequest('/pins/' . $plexPinId, $query);
+            $plexAccessCode = PlexAccessToken::createPlexAccessToken($plexRequest['authToken']);
+            return $plexAccessCode;
+        } catch (PlexNotFoundError) {
+            return null;
+        }
+    }
+
     public function verifyPlexAccessToken(string $plexAccessToken) : bool
     {
-        $headers = [
+        $query = [
             'X-Plex-Token' => $plexAccessToken
         ];
         try {
-            $this->client->sendGetRequest('/user', $headers);
+            $this->client->sendGetRequest('/user', $query);
             return true;
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             return false;
         }
     }

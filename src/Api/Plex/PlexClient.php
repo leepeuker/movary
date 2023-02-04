@@ -6,6 +6,8 @@ use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Util\Json;
 use Movary\ValueObject\Config;
 use GuzzleHttp\Client as httpClient;
+use GuzzleHttp\Psr7\Request;
+use Movary\Api\Plex\Exception\PlexNotFoundError;
 use RuntimeException;
 
 class PlexClient
@@ -31,7 +33,10 @@ class PlexClient
         ];
     }
 
-
+    /**
+     * @throws PlexNotFoundError
+     * @throws PlexAuthenticationError
+     */
     public function sendGetRequest(string $relativeUrl, ?array $customGetData = [], ?array $customGetHeaders = []) : Array
     {
         if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
@@ -41,16 +46,17 @@ class PlexClient
         $data = array_merge($this->defaultPostAndGetData, $customGetData);
         $httpHeaders = array_merge($this->defaultPostAndGetHeaders, $customGetHeaders);
         $options = [
-            'query' => $data,
+            'form_params' => $data,
             'headers' => $httpHeaders
         ];
-        $response = $this->httpClient->request('get', $url, $options);
+        $response = @$this->httpClient->request('get', $url, $options);
         $statusCode = $response->getStatusCode();
-        // match(true) {
-        //     $statusCode === 401 => throw PlexAuthenticationError::create(),
-        //     $statusCode !== 200 && $statusCode !== 201 => throw new RuntimeException('Plex API error. Response status code: '. $statusCode),
-        //     default => true
-        // };
+        match(true) {
+            $statusCode === 401 => throw PlexAuthenticationError::create(),
+            $statusCode === 404 => throw PlexNotFoundError::create($url),
+            $statusCode !== 200 && $statusCode !== 201 && $statusCode !== 204 => throw new RuntimeException('Plex API error. Response status code: '. $statusCode),
+            default => true
+        };
         return Json::decode((string)$response->getBody());
     }
 
@@ -66,11 +72,12 @@ class PlexClient
             'form_params' => $postData,
             'headers' => $httpHeaders
         ];
-        $response = $this->httpClient->request('post', $url, $options);
+        $response = @$this->httpClient->request('post', $url, $options);
         $statusCode = $response->getStatusCode();
         match(true) {            
             $statusCode === 401 => throw PlexAuthenticationError::create(),
-            $statusCode !== 200 && $statusCode !== 201 => throw new RuntimeException('Plex API error. Response status code: '. $statusCode),
+            $statusCode === 404 => throw PlexNotFoundError::create($url),
+            $statusCode !== 200 && $statusCode !== 201 && $statusCode !== 204 => throw new RuntimeException('Plex API error. Response status code: '. $statusCode),
             default => true
         };
 

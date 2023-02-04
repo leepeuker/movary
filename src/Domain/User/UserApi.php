@@ -95,6 +95,16 @@ class UserApi
         return $this->repository->findPlexAccessToken($userId);
     }
 
+    public function findPlexClientId(int $userId) : ?string
+    {
+        return $this->repository->findPlexClientId($userId);
+    }
+
+    public function findTemporaryPlexCode(int $userId) : ?string
+    {
+        return $this->repository->findTemporaryPlexCode($userId);
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookId($userId);
@@ -222,7 +232,7 @@ class UserApi
         $this->repository->updateTraktUserName($userId, $traktUserName);
     }
 
-    public function updatePlexAccessToken(int $userId, int $plexAccessToken) : void
+    public function updatePlexAccessToken(int $userId, string $plexAccessToken) : void
     {
         $this->repository->updatePlexAccessToken($userId, $plexAccessToken);
     }
@@ -230,5 +240,10 @@ class UserApi
     public function updatePlexClientId(int $userId, int $plexClientId) : void
     {
         $this->repository->updatePlexClientId($userId, $plexClientId);
+    }
+
+    public function updateTemporaryPlexClientCode(int $userId, string $plexClientCode) : void
+    {
+        $this->repository->updateTemporaryPlexClientCode($userId, $plexClientCode);
     }
 }

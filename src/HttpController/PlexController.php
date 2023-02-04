@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Plex\PlexScrobbler;
@@ -15,6 +16,7 @@ class PlexController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
+        private readonly PlexApi $plexApi,
         private readonly PlexScrobbler $plexScrobbler,
         private readonly LoggerInterface $logger,
     ) {
@@ -72,5 +74,26 @@ class PlexController
         $plexWebhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
+    }
+
+    public function processPlexCallback() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $plexClientId = $this->userApi->findPlexClientId($this->authenticationService->getCurrentUserId());
+        $plexClientCode = $this->userApi->findTemporaryPlexCode($this->authenticationService->getCurrentUserId());
+        if($plexClientId === null || $plexClientCode === null) {
+            return Response::createSeeOther('/');
+        }
+        
+        $plexAccessToken = $this->plexApi->fetchPlexAccessToken($plexClientId, $plexClientCode);
+        if($plexAccessToken === null) {
+            return Response::createSeeOther('/');
+        }
+        $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), $plexAccessToken->getPlexAccessTokenAsString());
+
+        return Response::createSeeOther('/settings/plex');
     }
 }
