@@ -236,7 +236,7 @@ class Factory
     public static function createPlexApiClient(ContainerInterface $container) : Plex\PlexClient
     {
         return new Plex\PlexClient(
-            $container->get(ClientInterface::class),
+            $container->get(GuzzleHttp\Client::class),
             $container->get(Config::class)
         );
     }
