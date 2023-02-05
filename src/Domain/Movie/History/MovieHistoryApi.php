@@ -20,9 +20,9 @@ class MovieHistoryApi
     ) {
     }
 
-    public function createOrUpdatePlaysForDate(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment) : void
+    public function create(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment = null) : void
     {
-        $this->repository->createOrUpdatePlaysForDate($movieId, $userId, $watchedAt, $plays, $comment);
+        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment);
     }
 
     public function deleteByUserAndMovieId(int $userId, int $movieId) : void
@@ -324,6 +324,11 @@ class MovieHistoryApi
     public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, Date $watchedAt) : ?MovieHistoryEntity
     {
         return $this->movieRepository->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
+    }
+
+    public function update(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment = null) : void
+    {
+        $this->repository->update($movieId, $userId, $watchedAt, $plays, $comment);
     }
 
     public function updateHistoryComment(int $movieId, int $userId, Date $watchAt, ?string $comment) : void

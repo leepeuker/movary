@@ -10,7 +10,7 @@ async function importNetflixHistory() {
                 'watchDate': currentRow.querySelector('td.date-column').innerText,
                 'tmdbId': currentRow.dataset.tmdbid,
                 'dateFormat': document.getElementById('dateFormatPhp').value,
-                'personalRating': getRatingFromStars(currentRow)
+                'personalRating': getNetflixRatingFromStars(currentRow)
             });
         }
     }
@@ -421,7 +421,7 @@ function processNetflixData(netflixActivityItems) {
             let tmdb_rating_icon = document.createElement('i');
             tmdb_rating_icon.className = 'bi bi-star ratingIcon';
             tmdb_rating_icon.dataset.rating = i;
-            tmdb_rating_icon.addEventListener('click', setRatingStars);
+            tmdb_rating_icon.addEventListener('click', setNetflixRatingStars);
             tmdb_rating_span.appendChild(tmdb_rating_icon);
         }
 
@@ -590,10 +590,10 @@ function searchTable() {
     }
 }
 
-function setRatingStars() {
+function setNetflixRatingStars() {
     let newRating = this.dataset.rating;
     let row = this.closest('.netflixrow');
-    if (getRatingFromStars(row) == newRating) {
+    if (getNetflixRatingFromStars(row) == newRating) {
         newRating = null;
     }
 
@@ -609,7 +609,7 @@ function setRatingStars() {
     }
 }
 
-function getRatingFromStars(row) {
+function getNetflixRatingFromStars(row) {
     let rating = 0;
 
     for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
