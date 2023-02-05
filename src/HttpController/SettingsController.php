@@ -275,12 +275,12 @@ class SettingsController
         }
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
         if($plexAccessToken === null) {
-            $plexAuth = $this->plexApi->generatePlexAuth();
+            $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
         } else {
             if($this->plexApi->verifyPlexAccessToken($plexAccessToken)) {
                 $plexAuth = 'true';
             } else {
-                $plexAuth = $this->plexApi->generateplexAuth();
+                $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
             }
         }
 

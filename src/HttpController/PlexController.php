@@ -75,7 +75,7 @@ class PlexController
 
         return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
-
+    
     public function processPlexCallback() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
