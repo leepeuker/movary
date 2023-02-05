@@ -2,7 +2,6 @@
 
 namespace Movary\HttpController;
 
-use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
@@ -26,7 +25,6 @@ class HistoryController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly TmdbApi $tmdbApi,
         private readonly MovieApi $movieApi,
         private readonly UserApi $userApi,
         private readonly SyncMovie $tmdbMovieSyncService,
