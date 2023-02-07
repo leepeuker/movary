@@ -105,6 +105,11 @@ class UserApi
         return $this->repository->findTemporaryPlexCode($userId);
     }
 
+    public function findPlexServerUrl(int $userId) : ?string
+    {
+        return $this->repository->findPlexServerUrl($userId);
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookId($userId);
@@ -245,5 +250,10 @@ class UserApi
     public function updateTemporaryPlexClientCode(int $userId, string $plexClientCode) : void
     {
         $this->repository->updateTemporaryPlexClientCode($userId, $plexClientCode);
+    }
+
+    public function updatePlexServerurl(int $userId, string $plexServerUrl) : void
+    {
+        $this->repository->updatePlexServerurl($userId, $plexServerUrl);
     }
 }

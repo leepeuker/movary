@@ -9,7 +9,7 @@ use GuzzleHttp\Client as httpClient;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use RuntimeException;
 
-class PlexClient
+class PlexAuthenticationClient
 {
     private const BASE_URL = "https://plex.tv/api/v2";
     private const APP_NAME = 'Movary';
@@ -36,13 +36,12 @@ class PlexClient
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
      */
-    public function sendGetRequest(string $relativeUrl, ?array $customGetData = [], ?array $customGetHeaders = [], ?string $customBaseUrl = null) : Array
+    public function sendGetRequest(string $relativeUrl, ?array $customGetData = [], ?array $customGetHeaders = []) : Array
     {
         if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
             return [];
         }
-        $baseUrl = $customBaseUrl ?? self::BASE_URL;
-        $url = $baseUrl . $relativeUrl;
+        $url = self::BASE_URL . $relativeUrl;
         $data = array_merge($this->defaultPostAndGetData, $customGetData);
         $httpHeaders = array_merge($this->defaultPostAndGetHeaders, $customGetHeaders);
         $options = [
@@ -64,13 +63,12 @@ class PlexClient
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
      */
-    public function sendPostRequest(string $relativeUrl, ?array $customPostData = [], ?array $customPostHeaders = [], ?string $customBaseUrl = null) : Array
+    public function sendPostRequest(string $relativeUrl, ?array $customPostData = [], ?array $customPostHeaders = []) : Array
     {
         if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
             return [];
         }
-        $baseUrl = $customBaseUrl ?? self::BASE_URL;
-        $url = $baseUrl . $relativeUrl;
+        $url = self::BASE_URL . $relativeUrl;
         $postData = array_merge($this->defaultPostAndGetData, $customPostData);
         $httpHeaders = array_merge($this->defaultPostAndGetHeaders, $customPostHeaders);
         $options = [

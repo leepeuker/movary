@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Plex\PlexApi;
+use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
@@ -274,11 +275,14 @@ class SettingsController
             return Response::createSeeOther('/');
         }
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+        $plexAuth = "";
         if($plexAccessToken === null) {
             $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
         } else {
-            if($this->plexApi->verifyPlexAccessToken($plexAccessToken)) {
-                $plexAuth = 'true';
+            if($this->plexApi->verifyPlexAccessToken(plexAccessToken::createPlexAccessToken($plexAccessToken))) {
+                if(($plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId())) == null) {
+                    $plexServerUrl = "";
+                }
             } else {
                 $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
             }
@@ -296,7 +300,8 @@ class SettingsController
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
-                'plexAuth' => $plexAuth
+                'plexAuth' => $plexAuth,
+                'plexServerUrl' => $plexServerUrl
             ]),
         );
     }

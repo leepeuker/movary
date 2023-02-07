@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -95,5 +96,24 @@ class PlexController
         $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), $plexAccessToken->getPlexAccessTokenAsString());
 
         return Response::createSeeOther('/settings/plex');
+    }
+
+    public function savePlexServerUrl(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+        if($plexAccessToken === null) {
+            return Response::createSeeOther('/');
+        }
+
+        $plexServerUrl = $request->getPostParameters()['plexServerUrlInput'];
+        if(!$this->plexApi->verifyPlexUrl($plexServerUrl, PlexAccessToken::createPlexAccessToken($plexAccessToken))) {
+            return Response::createBadRequest();
+        }
+        $this->userApi->updatePlexServerurl($this->authenticationService->getCurrentUserId(), $plexServerUrl);
+        return Response::createOk();
     }
 }

@@ -26,7 +26,8 @@ class PlexApi
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly PlexClient $client,
+        private readonly PlexAuthenticationClient $authenticationClient,
+        private readonly PlexLocalServerClient $localClient
     ) {
     }
 
@@ -40,7 +41,7 @@ class PlexApi
     {
         $response = '';
         $base_url = 'https://app.plex.tv/auth#?';
-        $plexAuthenticationData = $this->client->sendPostRequest('/pins');
+        $plexAuthenticationData = $this->authenticationClient->sendPostRequest('/pins');
         if($plexAuthenticationData !== []) {
             $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['id']);
             $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['code']);
@@ -60,7 +61,7 @@ class PlexApi
             'code' => $temporaryPlexClientCode,
         ];
         try {
-            $plexRequest = $this->client->sendGetRequest('/pins/' . $plexPinId, $query);
+            $plexRequest = $this->authenticationClient->sendGetRequest('/pins/' . $plexPinId, $query);
             $plexAccessCode = PlexAccessToken::createPlexAccessToken($plexRequest['authToken']);
             return $plexAccessCode;
         } catch (PlexNotFoundError) {
@@ -68,14 +69,67 @@ class PlexApi
         }
     }
 
-    public function verifyPlexAccessToken(string $plexAccessToken) : bool
+    public function verifyPlexAccessToken(PlexAccessToken $plexAccessToken) : bool
     {
         $query = [
-            'X-Plex-Token' => $plexAccessToken
+            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
         ];
         try {
-            $this->client->sendGetRequest('/user', $query);
+            $this->authenticationClient->sendGetRequest('/user', $query);
             return true;
+        } catch (RuntimeException) {
+            return false;
+        }
+    }
+
+    public function verifyPlexUrl(string $url, PlexAccessToken $plexAccessToken) : bool
+    {
+        $query = [
+            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
+        ];
+        try {
+            $this->localClient->sendGetRequest('', $query, [], $url);
+        } catch (RuntimeException) {
+            return false;
+        }
+    }
+
+    public function fetchPlexLibraries(PlexAccessToken $plexAccessToken) : bool
+    {
+        $query = [
+            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
+        ];
+        try {
+            $this->localClient->sendGetRequest('/library/sections', $query);
+            return true;
+        } catch (RuntimeException) {
+            return false;
+        }
+    }
+
+    public function fetchWatchedPlexItems(PlexAccessToken $plexAccessToken, int $libraryId) : Array
+    {
+        $query = [
+            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString(),
+            'viewCount' => '!=0'
+        ];
+        try {
+            $response = $this->localClient->sendGetRequest('/library/sections/' . $libraryId . '/all', $query);
+            return $response;
+        } catch (RuntimeException) {
+            return false;
+        }
+    }
+
+    public function fetchPlexWatchHistory(PlexAccessToken $plexAccessToken) : Array
+    {
+        $query = [
+            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString(),
+            'viewCount' => '!=0'
+        ];
+        try {
+            $response = $this->localClient->sendGetRequest('/status/sessions/history/all', $query);
+            return $response;
         } catch (RuntimeException) {
             return false;
         }

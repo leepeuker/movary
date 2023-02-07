@@ -206,6 +206,17 @@ class UserRepository
         return $plexCode;
     }
 
+    public function findPlexServerUrl(int $userId) : ?string
+    {
+        $plexServerUrl = $this->dbConnection->fetchOne('SELECT `plex_server_url` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexServerUrl === false) {
+            return null;
+        }
+
+        return $plexServerUrl;
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
@@ -505,6 +516,19 @@ class UserRepository
             'user',
             [
                 'plex_client_temporary_code' => $plexClientCode
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
+    public function updatePlexServerUrl(int $userId, ?string $plexServerUrl) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_server_url' => $plexServerUrl
             ],
             [
                 'id' => $userId

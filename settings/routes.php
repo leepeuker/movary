@@ -159,6 +159,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'updatePlex'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/settings/plex/saveserverurl',
+        [\Movary\HttpController\PlexController::class, 'savePlexServerUrl'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/settings/plex/callback',
         [\Movary\HttpController\PlexController::class, 'processPlexCallback'],

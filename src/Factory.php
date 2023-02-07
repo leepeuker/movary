@@ -233,11 +233,20 @@ class Factory
         );
     }
 
-    public static function createPlexApiClient(ContainerInterface $container) : Plex\PlexClient
+    public static function createPlexAuthenticationClient(ContainerInterface $container) : Plex\PlexAuthenticationClient
     {
-        return new Plex\PlexClient(
+        return new Plex\PlexAuthenticationClient(
             $container->get(GuzzleHttp\Client::class),
             $container->get(Config::class)
+        );
+    }
+
+    public static function createPlexLocalServerClient(ContainerInterface $container) : Plex\PlexLocalServerClient
+    {
+        return new Plex\PlexLocalServerClient(
+            $container->get(GuzzleHttp\Client::class),
+            $container->get(Config::class),
+            $container->get(Plex\Dto\PlexServerUrl::class)
         );
     }
 
