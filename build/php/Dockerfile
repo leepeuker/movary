@@ -1,4 +1,4 @@
-FROM webdevops/php-nginx:8.1-alpine AS development
+FROM webdevops/php-nginx:8.2-alpine AS development
 ENV WEB_DOCUMENT_ROOT="/app/public"
 RUN apk add --no-cache make nano
 USER application
