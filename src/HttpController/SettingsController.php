@@ -283,6 +283,8 @@ class SettingsController
             if($this->plexApi->verifyPlexAccessToken(plexAccessToken::createPlexAccessToken($plexAccessToken))) {
                 if(($plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId())) == null) {
                     $plexServerUrl = "";
+                } else {
+                    
                 }
             } else {
                 $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
@@ -294,8 +296,10 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $invalidServerUrl = $this->sessionWrapper->has('InvalidServerUrl');
-        $this->sessionWrapper->unset('InvalidServerUrl');
+        $serverUrlStatus = $this->sessionWrapper->find('serverUrlStatus');
+        if(!$this->sessionWrapper->find('serverUrlStatus')) {
+            $this->sessionWrapper->unset('serverUrlStatus');
+        }
 
         return Response::create(
             StatusCode::createOk(),
@@ -306,7 +310,7 @@ class SettingsController
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
                 'plexAuth' => $plexAuth,
                 'plexServerUrl' => $plexServerUrl,
-                'invalidServerUrl' => $invalidServerUrl
+                'serverUrlStatus' => $serverUrlStatus
             ]),
         );
     }

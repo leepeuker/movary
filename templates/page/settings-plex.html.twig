@@ -87,10 +87,17 @@
                 </div>
                 <button type="submit" class="btn btn-primary mb-3 {% if plexAuth != '' %} disabled {% endif %}" id="submitServerUrlBtn" {% if plexAuth != '' %} disabled {% endif %}>Save server URL</button>
             </form>
-            {% if invalidServerUrl == true %}
-                <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
-                    Server could not be reached. Check if the server is on and if you have access to this server with your Plex account.
-                </div>
+            {% if serverUrlStatus is not null %}
+                {% if serverUrlStatus == false %}
+                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
+                    {{ serverUrlStatus }}
+                        Server could not be reached. Check if the server is on and if you have access to this server with your Plex account.
+                    </div>
+                {% elseif serverUrlStatus == true %}
+                    <div class="alert alert-success" role="alert" style="margin-bottom: 0.7rem!important;">
+                        Server url has succesfully been added!
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </main>

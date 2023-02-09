@@ -115,8 +115,9 @@ class PlexController
 
         $plexServerUrl = $request->getPostParameters()['plexServerUrlInput'];
         if(!$this->plexApi->verifyPlexUrl($plexServerUrl, PlexAccessToken::createPlexAccessToken($plexAccessToken))) {
-            $this->sessionWrapper->set('InvalidServerUrl', true);
+            $this->sessionWrapper->set('serverUrlStatus', false);
         } else {
+            $this->sessionWrapper->set('serverUrlStatus', true);
             $this->userApi->updatePlexServerurl($this->authenticationService->getCurrentUserId(), $plexServerUrl);
         }
         return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);
