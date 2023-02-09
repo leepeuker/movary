@@ -135,9 +135,9 @@ function updateLogPlayModalButtonState() {
 }
 
 document.getElementById('logPlayModalSearchInput').addEventListener('keypress', loadLogModalSearchResultsOnEnterPress);
-
 function loadLogModalSearchResultsOnEnterPress(event) {
-    if (event.key === "Enter") {
+    // 13=enter, works better to check the key code because the key is named differently on mobile
+    if (event.keyCode === 13) {
         searchTmdbWithLogModalSearchInput()
     }
 }
@@ -197,9 +197,9 @@ function logMovie(context) {
 }
 
 async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle) {
-    var myModal = new bootstrap.Modal(document.getElementById('logPlayModal'), {
+    const myModal = new bootstrap.Modal(document.getElementById('logPlayModal'), {
         keyboard: false
-    })
+    });
 
     const rating = await fetchRating(tmdbId)
     setRatingStars('logPlayModal', rating)
