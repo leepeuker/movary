@@ -9,11 +9,19 @@
                 <div class="modal-body">
                     <div id="logPlayModalSearchDiv">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}" id="logPlayModalSearchInput">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Search"
+                                   value="{{ (searchTerm is null) ? '' : searchTerm }}"
+                                   id="logPlayModalSearchInput"
+                                   tabindex="0"
+                                   style="order:1">
                             <button class="btn btn-primary"
                                     type="submit"
                                     onclick="searchTmdbWithLogModalSearchInput()"
                                     id="logPlayModalSearchButton"
+                                    tabindex="0"
+                                    style="order:2"
                                     disabled>
                                 <i class="bi bi-search"></i>
                             </button>
