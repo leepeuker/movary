@@ -52,10 +52,10 @@ class PlexLocalServerClient
         $response = @$this->httpClient->request('get', $url, $options);
         $statusCode = $response->getStatusCode();
         match(true) {
+            $statusCode === 200 || $statusCode === 201 || $statusCode || 204 => true,
             $statusCode === 401 => throw PlexAuthenticationError::create(),
             $statusCode === 404 => throw PlexNotFoundError::create($url),
-            $statusCode !== 200 && $statusCode !== 201 && $statusCode !== 204 => throw new RuntimeException('Plex API error. Response status code: '. $statusCode),
-            default => true
+            default => throw new RuntimeException('Plex API error. Response status code: '. $statusCode),
         };
         return Json::decode((string)$response->getBody());
     }
