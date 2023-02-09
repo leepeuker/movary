@@ -14,7 +14,9 @@ class PlexAuthenticationClient
     private const BASE_URL = "https://plex.tv/api/v2";
     private const APP_NAME = 'Movary';
     private $defaultPostAndGetData;
-    private $defaultPostAndGetHeaders;
+    private const DEFAULTPOSTANDGETHEADERS = [
+        'accept' => 'application/json'
+    ];
 
     public function __construct(private readonly httpClient $httpClient, private readonly Config $config)
     {
@@ -26,9 +28,6 @@ class PlexAuthenticationClient
             'X-Plex-Platform-Version' => php_uname('v'),
             'X-Plex-Provides' => 'Controller',
             'strong' => 'true'
-        ];
-        $this->defaultPostAndGetHeaders = [
-            'accept' => 'application/json'
         ];
     }
 
@@ -43,7 +42,7 @@ class PlexAuthenticationClient
         }
         $url = self::BASE_URL . $relativeUrl;
         $data = array_merge($this->defaultPostAndGetData, $customGetData);
-        $httpHeaders = array_merge($this->defaultPostAndGetHeaders, $customGetHeaders);
+        $httpHeaders = array_merge(self::DEFAULTPOSTANDGETHEADERS, $customGetHeaders);
         $options = [
             'form_params' => $data,
             'headers' => $httpHeaders
@@ -70,7 +69,7 @@ class PlexAuthenticationClient
         }
         $url = self::BASE_URL . $relativeUrl;
         $postData = array_merge($this->defaultPostAndGetData, $customPostData);
-        $httpHeaders = array_merge($this->defaultPostAndGetHeaders, $customPostHeaders);
+        $httpHeaders = array_merge(self::DEFAULTPOSTANDGETHEADERS, $customPostHeaders);
         $options = [
             'form_params' => $postData,
             'headers' => $httpHeaders
