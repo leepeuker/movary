@@ -276,6 +276,7 @@ class SettingsController
         }
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
         $plexAuth = "";
+        $plexServerUrl = "";
         if($plexAccessToken === null) {
             $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
         } else {
@@ -293,6 +294,9 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
+        $invalidServerUrl = $this->sessionWrapper->has('InvalidServerUrl');
+        $this->sessionWrapper->unset('InvalidServerUrl');
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-plex.html.twig', [
@@ -301,7 +305,8 @@ class SettingsController
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
                 'plexAuth' => $plexAuth,
-                'plexServerUrl' => $plexServerUrl
+                'plexServerUrl' => $plexServerUrl,
+                'invalidServerUrl' => $invalidServerUrl
             ]),
         );
     }

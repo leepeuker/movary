@@ -87,9 +87,10 @@ class PlexApi
         $query = [
             'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
         ];
-        try {
-            $this->localClient->sendGetRequest('', $query, [], $url);
-        } catch (RuntimeException) {
+        $request = $this->localClient->sendGetRequest('', [], $query, [], $url);
+        if(is_array($request)) {
+            return true;
+        } else {
             return false;
         }
     }
@@ -99,12 +100,11 @@ class PlexApi
         $query = [
             'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
         ];
-        try {
-            $this->localClient->sendGetRequest('/library/sections', $query);
-            return true;
-        } catch (RuntimeException) {
-            return false;
+        $libraries = $this->localClient->sendGetRequest('/library/sections', $query);
+        if(is_array($libraries)) {
+            return $libraries;
         }
+        return false;
     }
 
     public function fetchWatchedPlexItems(PlexAccessToken $plexAccessToken, int $libraryId) : Array

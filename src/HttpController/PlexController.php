@@ -8,8 +8,11 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Plex\PlexScrobbler;
 use Movary\Util\Json;
+use Movary\Util\SessionWrapper;
+use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 use Psr\Log\LoggerInterface;
 
 class PlexController
@@ -20,6 +23,7 @@ class PlexController
         private readonly PlexApi $plexApi,
         private readonly PlexScrobbler $plexScrobbler,
         private readonly LoggerInterface $logger,
+        private readonly SessionWrapper $sessionWrapper
     ) {
     }
 
@@ -111,9 +115,9 @@ class PlexController
 
         $plexServerUrl = $request->getPostParameters()['plexServerUrlInput'];
         if(!$this->plexApi->verifyPlexUrl($plexServerUrl, PlexAccessToken::createPlexAccessToken($plexAccessToken))) {
-            return Response::createBadRequest();
+            $this->sessionWrapper->set('InvalidServerUrl', true);
         }
         $this->userApi->updatePlexServerurl($this->authenticationService->getCurrentUserId(), $plexServerUrl);
-        return Response::createOk();
+        return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);
     }
 }

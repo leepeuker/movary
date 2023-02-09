@@ -237,7 +237,8 @@ class Factory
     {
         return new Plex\PlexAuthenticationClient(
             $container->get(GuzzleHttp\Client::class),
-            $container->get(Config::class)
+            $container->get(Config::class),
+            $container->get(LoggerInterface::class)
         );
     }
 
@@ -246,7 +247,8 @@ class Factory
         return new Plex\PlexLocalServerClient(
             $container->get(GuzzleHttp\Client::class),
             $container->get(Config::class),
-            $container->get(Plex\Dto\PlexServerUrl::class)
+            $container->get(Plex\Dto\PlexServerUrl::class),
+            $container->get(LoggerInterface::class)
         );
     }
 
