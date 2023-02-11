@@ -4,7 +4,6 @@ namespace Movary\Api\Plex;
 
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Util\Json;
-use Movary\ValueObject\Config;
 use GuzzleHttp\Client as httpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use Movary\Api\Plex\Dto\PlexServerUrl;
@@ -15,18 +14,23 @@ use RuntimeException;
 class PlexLocalServerClient
 {
     private const APP_NAME = 'Movary';
-    private $defaultPostAndGetData;
     private const DEFAULTPOSTANDGETHEADERS = [
         'accept' => 'application/json',
         'Content-Type' => 'application/json'
     ];
+    private $defaultPostAndGetData;
 
-    public function __construct(private readonly httpClient $httpClient, private readonly Config $config, private readonly PlexServerUrl $plexServerUrl, private readonly LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly httpClient $httpClient,
+        private readonly string $plexIdentifier,
+        private readonly string $application_version,
+        private readonly string $plexServerUrl,
+        private readonly LoggerInterface $logger
+    ) {
         $this->defaultPostAndGetData = [
-            'X-Plex-Client-Identifier' => $this->config->getAsString('PLEX_IDENTIFIER'),
+            'X-Plex-Client-Identifier' => $this->plexIdentifier,
             'X-Plex-Product' => self::APP_NAME,
-            'X-Plex-Product-Version' => $this->config->getAsString('APPLICATION_VERSION'),
+            'X-Plex-Product-Version' => $this->application_version,
             'X-Plex-Platform' => php_uname('s'),
             'X-Plex-Platform-Version' => php_uname('v'),
             'X-Plex-Provides' => 'Controller',
@@ -37,13 +41,14 @@ class PlexLocalServerClient
     /**
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
+     * @throws RuntimeException
      */
-    public function sendGetRequest(string $relativeUrl, ?array $customGetData = [], ?array $customGetQuery = [], ?array $customGetHeaders = [], ?string $customBaseUrl = null) : ?Array
+    public function sendGetRequest(string $relativeUrl, ?array $customGetQuery = [], ?array $customGetData = [], ?array $customGetHeaders = [], ?string $customBaseUrl = null) : ?Array
     {
-        if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
+        if ($this->plexIdentifier === '') {
             return [];
         }
-        $baseUrl = $customBaseUrl ?? $this->plexServerUrl->getPlexServerUrl();
+        $baseUrl = $customBaseUrl ?? $this->plexServerUrl;
         $url = $baseUrl . $relativeUrl;
         $data = array_merge($this->defaultPostAndGetData, $customGetData);
         $httpHeaders = array_merge(self::DEFAULTPOSTANDGETHEADERS, $customGetHeaders);
@@ -71,13 +76,14 @@ class PlexLocalServerClient
     /**
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
+     * @throws RuntimeException
      */
     public function sendPostRequest(string $relativeUrl, ?array $customPostData = [], ?array $customPostHeaders = [], ?string $customBaseUrl = null) : ?Array
     {
-        if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
+        if ($this->plexIdentifier === '') {
             return [];
         }
-        $baseUrl = $customBaseUrl ?? $this->plexServerUrl->getPlexServerUrl();
+        $baseUrl = $customBaseUrl ?? $this->plexServerUrl;
         $url = $baseUrl . $relativeUrl;
         $postData = array_merge($this->defaultPostAndGetData, $customPostData);
         $httpHeaders = array_merge(self::DEFAULTPOSTANDGETHEADERS, $customPostHeaders);
@@ -86,7 +92,7 @@ class PlexLocalServerClient
             'headers' => $httpHeaders
         ];
         try {
-            $response = $this->httpClient->request('get', $url, $options);
+            $response = $this->httpClient->request('post', $url, $options);
             $statusCode = $response->getStatusCode();
             match(true) {
                 $statusCode === 200 || $statusCode === 201 || $statusCode || 204 => true,

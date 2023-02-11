@@ -3,9 +3,11 @@
 namespace Movary\HttpController;
 
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Api\Plex\Dto\PlexItemList;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\Service\Plex\PlexHistoryImporter;
 use Movary\Service\Plex\PlexScrobbler;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
@@ -23,7 +25,8 @@ class PlexController
         private readonly PlexApi $plexApi,
         private readonly PlexScrobbler $plexScrobbler,
         private readonly LoggerInterface $logger,
-        private readonly SessionWrapper $sessionWrapper
+        private readonly SessionWrapper $sessionWrapper,
+        private readonly PlexHistoryImporter $plexHistoryImporter
     ) {
     }
 
@@ -121,5 +124,29 @@ class PlexController
             $this->userApi->updatePlexServerurl($this->authenticationService->getCurrentUserId(), $plexServerUrl);
         }
         return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);
+    }
+
+    public function removePlexAccessTokens() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), null);
+        $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), null);
+        $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), null);
+        return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);
+    }
+
+    public function importPlexHistory() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+        $userId = $this->authenticationService->getCurrentUserId();
+        $plexAccessToken = PlexAccessToken::createPlexAccessToken($this->userApi->findPlexAccessToken($userId));
+        $plexHistory = $this->plexApi->fetchPlexWatchHistory($plexAccessToken);
+        $plexHistoryData = $plexHistory['MediaContainer']['Metadata'];
+        $this->plexHistoryImporter->importPlexData($userId, $plexHistoryData);
     }
 }

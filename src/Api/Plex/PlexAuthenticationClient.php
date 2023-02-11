@@ -36,6 +36,7 @@ class PlexAuthenticationClient
     /**
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
+     * @throws RuntimeException
      */
     public function sendGetRequest(string $relativeUrl, ?array $customGetData = [], ?array $customGetHeaders = []) : ?Array
     {
@@ -50,7 +51,7 @@ class PlexAuthenticationClient
             'headers' => $httpHeaders
         ];
         try {
-            $response = @$this->httpClient->request('get', $url, $options);
+            $response = $this->httpClient->request('get', $url, $options);
             $statusCode = $response->getStatusCode();
             match(true) {
                 $statusCode === 200 || $statusCode === 201 || $statusCode || 204 => true,
@@ -82,7 +83,7 @@ class PlexAuthenticationClient
             'headers' => $httpHeaders
         ];
         try {
-            $response = @$this->httpClient->request('get', $url, $options);
+            $response = $this->httpClient->request('post', $url, $options);
             $statusCode = $response->getStatusCode();
             match(true) {
                 $statusCode === 200 || $statusCode === 201 || $statusCode || 204 => true,

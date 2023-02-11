@@ -4,9 +4,11 @@ namespace Movary\Api\Plex;
 
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Api\Plex\Dto\PlexItem;
+use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
-use RuntimeException;
+use Psr\Log\LoggerInterface;
 
 /**
  * @link https://github.com/Arcanemagus/plex-api/wiki Comprehensive documentation of the Plex API 
@@ -25,9 +27,11 @@ class PlexApi
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly UserApi $userApi,
+        private readonly LoggerInterface $logger,
         private readonly PlexAuthenticationClient $authenticationClient,
-        private readonly PlexLocalServerClient $localClient
+        private readonly PlexLocalServerClient $localClient,
+        private readonly PlexAccessToken $plexAccessToken,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -65,6 +69,7 @@ class PlexApi
             $plexAccessCode = PlexAccessToken::createPlexAccessToken($plexRequest['authToken']);
             return $plexAccessCode;
         } catch (PlexNotFoundError) {
+            $this->logger->error('Plex pin does not exist');
             return null;
         }
     }
@@ -77,60 +82,91 @@ class PlexApi
         try {
             $this->authenticationClient->sendGetRequest('/user', $query);
             return true;
-        } catch (RuntimeException) {
+        } catch (PlexAuthenticationError) {
+            $this->logger->error('Plex access token is invalid');
             return false;
         }
     }
 
-    public function verifyPlexUrl(string $url, PlexAccessToken $plexAccessToken) : bool
+    public function verifyPlexUrl(string $url) : bool
     {
         $query = [
-            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
+            'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString()
         ];
-        $request = $this->localClient->sendGetRequest('', [], $query, [], $url);
-        if(is_array($request)) {
-            return true;
-        } else {
+        try {
+            $request = $this->localClient->sendGetRequest('', $query, [], [], $url);
+            if(is_array($request)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch(PlexAuthenticationError) {
+            $this->logger->error('Plex access token is invalid');
             return false;
         }
     }
 
-    public function fetchPlexLibraries(PlexAccessToken $plexAccessToken) : bool
+    public function fetchPlexItem(int $itemId) : ?PlexItem
     {
         $query = [
-            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
+            'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString()
         ];
-        $libraries = $this->localClient->sendGetRequest('/library/sections', $query);
-        if(is_array($libraries)) {
-            return $libraries;
+        try {
+            $item = $this->localClient->sendGetRequest('/library/metadata/' . $itemId, $query);
+            $plexItem = PlexItem::createPlexItem($itemId, $item['type']);
+            return $plexItem;
+        } catch (PlexNotFoundError) {
+            $this->logger->error('Plex item does not exist', ['itemId' => $itemId]);
+            return null;
+        } catch (PlexAuthenticationError) {
+            $this->logger->error('Plex access token is invalid');
+            return null;
         }
-        return false;
     }
 
-    public function fetchWatchedPlexItems(PlexAccessToken $plexAccessToken, int $libraryId) : Array
+    public function fetchPlexLibraries() : ? Array
     {
         $query = [
-            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString(),
+            'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString()
+        ];
+        try {
+            $libraries = $this->localClient->sendGetRequest('/library/sections', $query);
+            if(is_array($libraries)) {
+                return $libraries;
+            }
+            return null;            
+        } catch (PlexAuthenticationError) {
+            $this->logger->error('Plex access token is invalid');
+            return null;
+        }
+    }
+
+    public function fetchWatchedPlexItems(int $libraryId) : ?Array
+    {
+        $query = [
+            'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString(),
             'viewCount' => '!=0'
         ];
         try {
             $response = $this->localClient->sendGetRequest('/library/sections/' . $libraryId . '/all', $query);
             return $response;
-        } catch (RuntimeException) {
+        } catch (PlexAuthenticationError) {
+            $this->logger->error('Plex access token is invalid');
             return false;
         }
     }
 
-    public function fetchPlexWatchHistory(PlexAccessToken $plexAccessToken) : Array
+    public function fetchPlexWatchHistory() : ?Array
     {
         $query = [
-            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString(),
-            'viewCount' => '!=0'
+            'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString(),
+            'type' => '=movie'
         ];
         try {
-            $response = $this->localClient->sendGetRequest('/status/sessions/history/all', $query);
-            return $response;
-        } catch (RuntimeException) {
+            return $this->localClient->sendGetRequest('/status/sessions/history/all', $query);
+            
+        } catch (PlexAuthenticationError) {
+            $this->logger->error('Plex access token is invalid');
             return false;
         }
     }

@@ -12,6 +12,8 @@ $builder->addDefinitions(
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
+        \Movary\Api\Plex\PlexLocalServerClient::class => DI\factory([Factory::class, 'createPlexLocalServerClient']),
+        \Movary\Api\Plex\PlexApi::class => DI\factory([Factory::class, 'createPlexApi']),
         \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\HttpController\JobController::class => DI\factory([Factory::class, 'createJobController']),
         \Movary\HttpController\SettingsController::class => DI\factory([Factory::class, 'createSettingsController']),

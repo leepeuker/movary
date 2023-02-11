@@ -10,6 +10,9 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Plex;
+use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Api\Plex\PlexAuthenticationClient;
+use Movary\Api\Plex\PlexLocalServerClient;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -233,22 +236,30 @@ class Factory
         );
     }
 
-    public static function createPlexAuthenticationClient(ContainerInterface $container) : Plex\PlexAuthenticationClient
+    public static function createPlexLocalServerClient(ContainerInterface $container, Config $config) : Plex\PlexLocalServerClient
     {
-        return new Plex\PlexAuthenticationClient(
+        $userId = $container->get(Authentication::class)->getCurrentUserId();
+        $plexServerUrl = $container->get(UserApi::class)->findPlexServerUrl($userId) ?? '';
+        return new Plex\PlexLocalServerClient(
             $container->get(GuzzleHttp\Client::class),
-            $container->get(Config::class),
+            $config->getAsString('PLEX_IDENTIFIER'),
+            $config->getAsString('APPLICATION_VERSION'),
+            $plexServerUrl,
             $container->get(LoggerInterface::class)
         );
     }
 
-    public static function createPlexLocalServerClient(ContainerInterface $container) : Plex\PlexLocalServerClient
+    public static function createPlexApi(ContainerInterface $container) : Plex\PlexApi
     {
-        return new Plex\PlexLocalServerClient(
-            $container->get(GuzzleHttp\Client::class),
-            $container->get(Config::class),
-            $container->get(Plex\Dto\PlexServerUrl::class),
-            $container->get(LoggerInterface::class)
+        $userId = $container->get(Authentication::class)->getCurrentUserId();
+        $plexAccessToken = $container->get((UserApi::class))->findPlexAccessToken($userId) ?? '';
+        return new Plex\PlexApi(
+            $container->get(Authentication::class),
+            $container->get(LoggerInterface::class),
+            $container->get(PlexAuthenticationClient::class),
+            $container->get(PlexLocalServerClient::class),
+            PlexAccessToken::createPlexAccessToken($plexAccessToken),
+            $container->get(UserApi::class)
         );
     }
 

@@ -154,6 +154,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderPlexPage'],
     );
     $routeCollector->addRoute(
+        'GET',
+        '/settings/plex/logout',
+        [\Movary\HttpController\PlexController::class, 'removePlexAccessTokens'],
+    );
+    $routeCollector->addRoute(
         'POST',
         '/settings/plex',
         [\Movary\HttpController\SettingsController::class, 'updatePlex'],
@@ -162,6 +167,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/settings/plex/saveserverurl',
         [\Movary\HttpController\PlexController::class, 'savePlexServerUrl'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/plex/importplexhistory',
+        [\Movary\HttpController\PlexController::class, 'importPlexHistory'],
     );
     $routeCollector->addRoute(
         'GET',

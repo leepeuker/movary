@@ -237,17 +237,17 @@ class UserApi
         $this->repository->updateTraktUserName($userId, $traktUserName);
     }
 
-    public function updatePlexAccessToken(int $userId, string $plexAccessToken) : void
+    public function updatePlexAccessToken(int $userId, ?string $plexAccessToken) : void
     {
         $this->repository->updatePlexAccessToken($userId, $plexAccessToken);
     }
 
-    public function updatePlexClientId(int $userId, int $plexClientId) : void
+    public function updatePlexClientId(int $userId, ?int $plexClientId) : void
     {
         $this->repository->updatePlexClientId($userId, $plexClientId);
     }
 
-    public function updateTemporaryPlexClientCode(int $userId, string $plexClientCode) : void
+    public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void
     {
         $this->repository->updateTemporaryPlexClientCode($userId, $plexClientCode);
     }
