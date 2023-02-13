@@ -156,11 +156,12 @@ class PlexApi
         }
     }
 
-    public function fetchPlexWatchHistory() : ?Array
+    public function fetchPlexWatchHistoryOfUser(int $userId) : ?Array
     {
         $query = [
             'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString(),
-            'type' => '=movie'
+            'type' => '=movie',
+            'accountID' => '='.(string)$userId
         ];
         try {
             return $this->localClient->sendGetRequest('/status/sessions/history/all', $query);
