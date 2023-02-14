@@ -523,6 +523,19 @@ class UserRepository
         );
     }
 
+    public function updatePlexAccountId(int $userId, ?string $accountId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_account_id' => $accountId
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
     public function updatePlexServerUrl(int $userId, ?string $plexServerUrl) : void
     {
         $this->dbConnection->update(

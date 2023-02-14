@@ -283,8 +283,6 @@ class SettingsController
             if($this->plexApi->verifyPlexAccessToken(plexAccessToken::createPlexAccessToken($plexAccessToken))) {
                 if(($plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId())) == null) {
                     $plexServerUrl = "";
-                } else {
-                    
                 }
             } else {
                 $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();

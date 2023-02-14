@@ -11,7 +11,7 @@ use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Plex;
 use Movary\Api\Plex\Dto\PlexAccessToken;
-use Movary\Api\Plex\PlexAuthenticationClient;
+use Movary\Api\Plex\PlexTvClient;
 use Movary\Api\Plex\PlexLocalServerClient;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
@@ -256,7 +256,7 @@ class Factory
         return new Plex\PlexApi(
             $container->get(Authentication::class),
             $container->get(LoggerInterface::class),
-            $container->get(PlexAuthenticationClient::class),
+            $container->get(PlexTvClient::class),
             $container->get(PlexLocalServerClient::class),
             PlexAccessToken::createPlexAccessToken($plexAccessToken),
             $container->get(UserApi::class)

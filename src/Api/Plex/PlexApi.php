@@ -6,6 +6,7 @@ use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\Dto\PlexItem;
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
+use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
@@ -28,7 +29,7 @@ class PlexApi
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly LoggerInterface $logger,
-        private readonly PlexAuthenticationClient $authenticationClient,
+        private readonly PlexTvClient $plexTvClient,
         private readonly PlexLocalServerClient $localClient,
         private readonly PlexAccessToken $plexAccessToken,
         private readonly UserApi $userApi,
@@ -41,12 +42,11 @@ class PlexApi
      * 3. Based on the info returned by the Plex API, a new url will be generated, which looks like this: `https://app.plex.tv/auth#?clientID=<clientIdentifier>&code=<clientCode>&context[device][product]=<AppName>&forwardUrl=<urlCallback>`
      * 4. The URL is returned to the settingsController
      */
-    public function generatePlexAuthenticationUrl() : string
+    public function generatePlexAuthenticationUrl() : ?string
     {
-        $response = '';
-        $base_url = 'https://app.plex.tv/auth#?';
-        $plexAuthenticationData = $this->authenticationClient->sendPostRequest('/pins');
-        if($plexAuthenticationData !== []) {
+        try {
+            $base_url = 'https://app.plex.tv/auth#?';
+            $plexAuthenticationData = $this->plexTvClient->sendPostRequest('/pins');
             $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['id']);
             $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['code']);
             $plexAppName = $plexAuthenticationData['product'];
@@ -55,8 +55,10 @@ class PlexApi
             $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'https://' : 'http://';
             $urlCallback = $protocol . $_SERVER['HTTP_HOST'] . '/settings/plex/callback';
             $response =  $base_url . 'clientID=' . urlencode($plexClientIdentifier) . '&code=' . urlencode((string)$plexTemporaryClientCode) . '&' . urlencode('context[device][product]') . '=' . urlencode($plexAppName) . '&forwardUrl=' . urlencode($urlCallback);
+            return $response;
+        } catch (PlexNoClientIdentifier) {
+            return null;
         }
-        return $response;
     }
 
     public function fetchPlexAccessToken(string $plexPinId, string $temporaryPlexClientCode) : ?PlexAccessToken
@@ -65,7 +67,7 @@ class PlexApi
             'code' => $temporaryPlexClientCode,
         ];
         try {
-            $plexRequest = $this->authenticationClient->sendGetRequest('/pins/' . $plexPinId, $query);
+            $plexRequest = $this->plexTvClient->sendGetRequest('/pins/' . $plexPinId, [], $query);
             $plexAccessCode = PlexAccessToken::createPlexAccessToken($plexRequest['authToken']);
             return $plexAccessCode;
         } catch (PlexNotFoundError) {
@@ -80,7 +82,7 @@ class PlexApi
             'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
         ];
         try {
-            $this->authenticationClient->sendGetRequest('/user', $query);
+            $this->plexTvClient->sendGetRequest('/user', [], $query);
             return true;
         } catch (PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
@@ -103,6 +105,20 @@ class PlexApi
         } catch(PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
             return false;
+        }
+    }
+
+    public function fetchPlexLocalAccountId(PlexAccessToken $plexAccessToken) : ?int
+    {
+        $query = [
+            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
+        ];
+        try {
+            $accountData = $this->plexTvClient->sendGetRequest('/users', $query);
+            return (int)$accountData['id'];
+        } catch (PlexAuthenticationError) {
+            $this->logger->error('Plex access token is invalid');
+            return null;
         }
     }
 
@@ -156,12 +172,12 @@ class PlexApi
         }
     }
 
-    public function fetchPlexWatchHistoryOfUser(int $userId) : ?Array
+    public function fetchPlexWatchHistoryOfUser(int $accountId) : ?Array
     {
         $query = [
             'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString(),
             'type' => '=movie',
-            'accountID' => '='.(string)$userId
+            'accountID' => '='.(string)$accountId
         ];
         try {
             return $this->localClient->sendGetRequest('/status/sessions/history/all', $query);

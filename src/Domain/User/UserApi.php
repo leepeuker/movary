@@ -252,6 +252,11 @@ class UserApi
         $this->repository->updateTemporaryPlexClientCode($userId, $plexClientCode);
     }
 
+    public function updatePlexAccountId(int $userId, ?string $plexAccountId) : void
+    {
+        $this->repository->updatePlexAccountId($userId, $plexAccountId);
+    }
+
     public function updatePlexServerurl(int $userId, string $plexServerUrl) : void
     {
         $this->repository->updatePlexServerurl($userId, $plexServerUrl);
