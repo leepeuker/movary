@@ -95,6 +95,7 @@ function resetLogModalSearchResults() {
 
 function backToLogModalSearchResults() {
     document.getElementById('logPlayModalWatchDateDiv').classList.add('d-none')
+    document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.remove('d-none')
     document.getElementById('logPlayModalFooter').classList.add('d-none')
@@ -116,6 +117,7 @@ async function selectLogModalTmdbItemForLogging(event) {
     setRatingStars('logPlayModal', rating)
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
@@ -211,6 +213,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle) {
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterBackButton').classList.add('d-none')
 
     myModal.show()
 }
