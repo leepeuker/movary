@@ -7,6 +7,8 @@ if ('serviceWorker' in navigator) {
     })
 }
 
+let ratingEditMode = false
+
 async function searchTmdbWithLogModalSearchInput() {
     resetLogModalSearchResults()
     document.getElementById('logPlayModalSearchSpinner').classList.remove('d-none')
@@ -137,6 +139,7 @@ function updateLogPlayModalButtonState() {
 }
 
 document.getElementById('logPlayModalSearchInput').addEventListener('keypress', loadLogModalSearchResultsOnEnterPress);
+
 function loadLogModalSearchResultsOnEnterPress(event) {
     // 13=enter, works better to check the key code because the key is named differently on mobile
     if (event.keyCode === 13) {
@@ -307,6 +310,10 @@ async function fetchRating(tmdbId) {
 }
 
 function setRatingStars(context, newRating) {
+    if (context === 'movie' && ratingEditMode === false) {
+        return
+    }
+
     if (getRatingFromStars(context) == newRating) {
         newRating = 0
     }
