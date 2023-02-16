@@ -348,3 +348,36 @@ new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
     format: document.getElementById('dateFormatJavascript').value,
     title: 'Watch date',
 })
+
+setTheme(window.localStorage.getItem('theme') ?? 'light', true)
+function setTheme(theme, force = false) {
+    if (force === false && document.getElementById('html').dataset.bsTheme === theme) {
+        return
+    }
+
+    window.localStorage.setItem('theme', theme);
+
+    document.getElementById('html').dataset.bsTheme = theme
+
+    if (theme === 'light') {
+        document.getElementById('themeLightButton').classList.add('active')
+        document.getElementById('themeLightButton').classList.add('bg-light')
+        document.getElementById('themeLightButton').classList.add('text-bg-light')
+        document.getElementById('themeLightButton').style.cursor = 'default'
+
+        document.getElementById('themeDarkButton').classList.remove('active')
+        document.getElementById('themeDarkButton').classList.add('bg-dark')
+        document.getElementById('themeDarkButton').classList.add('text-bg-dark')
+        document.getElementById('themeDarkButton').style.cursor = 'pointer'
+    } else {
+        document.getElementById('themeLightButton').classList.remove('active')
+        document.getElementById('themeLightButton').classList.add('bg-light')
+        document.getElementById('themeLightButton').classList.add('text-bg-light')
+        document.getElementById('themeLightButton').style.cursor = 'pointer'
+
+        document.getElementById('themeDarkButton').classList.add('active')
+        document.getElementById('themeDarkButton').classList.remove('bg-dark')
+        document.getElementById('themeDarkButton').classList.remove('text-bg-dark')
+        document.getElementById('themeDarkButton').style.cursor = 'default'
+    }
+}

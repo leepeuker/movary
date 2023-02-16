@@ -13,12 +13,11 @@
 
 .activeItemButton {
     cursor: pointer;
-    background-color: #e9ecef;
+    background-color: rgba(33, 37, 41, 0.02);
 }
 
 .inactiveItemButton {
     cursor: pointer;
-    background-color: #fff;
 }
 
 .activeItem {
