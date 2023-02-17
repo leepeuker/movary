@@ -20,7 +20,7 @@
             {{ include('component/user-select.html.twig') }}
 
             <h2 style="padding-bottom: 0.5rem">Overview</h2>
-            <div class="row justify-content-md-center">
+            <div class="row justify-content-md-center" id="playStatsDiv1">
                 <div class="col ">
                     <span class="stat-value">{{ totalPlayCount }}</span><br><span class="stat-description">TOTAL PLAYS</span>
                 </div>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <br>
-            <div class="row justify-content-md-center">
+            <div class="row justify-content-md-center" id="playStatsDiv2">
                 <div class="col ">
                     <span class="stat-value">{{ averagePlaysPerDay }}</span><br><span class="stat-description">PLAYS PER DAY</span>
                 </div>

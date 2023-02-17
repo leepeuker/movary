@@ -350,6 +350,7 @@ new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
 })
 
 setTheme(window.localStorage.getItem('theme') ?? 'light', true)
+
 function setTheme(theme, force = false) {
     if (force === false && document.getElementById('html').dataset.bsTheme === theme) {
         return
@@ -359,25 +360,61 @@ function setTheme(theme, force = false) {
 
     document.getElementById('html').dataset.bsTheme = theme
 
+    const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
+    const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
+    const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
+
+    const playStatsDiv1 = document.getElementById('playStatsDiv1');
+    const playStatsDiv2 = document.getElementById('playStatsDiv2');
+
     if (theme === 'light') {
         document.getElementById('themeLightButton').classList.add('active')
         document.getElementById('themeLightButton').classList.add('bg-light')
         document.getElementById('themeLightButton').classList.add('text-bg-light')
-        document.getElementById('themeLightButton').style.cursor = 'default'
+        document.getElementById('themeLightButton').classList.add('disabled')
 
         document.getElementById('themeDarkButton').classList.remove('active')
         document.getElementById('themeDarkButton').classList.add('bg-dark')
         document.getElementById('themeDarkButton').classList.add('text-bg-dark')
-        document.getElementById('themeDarkButton').style.cursor = 'pointer'
+        document.getElementById('themeDarkButton').classList.remove('disabled')
+
+        if (logSpecificMovieButton != null) {
+            toggleWatchDatesButton.classList.remove('btn-light')
+            toggleWatchDatesButton.classList.add('btn-dark')
+            logSpecificMovieButton.classList.remove('btn-outline-light')
+            logSpecificMovieButton.classList.add('btn-outline-dark')
+            moreSpecificMovieButton.classList.remove('btn-outline-light')
+            moreSpecificMovieButton.classList.add('btn-outline-dark')
+        }
+
+        if (playStatsDiv1 != null) {
+            playStatsDiv1.classList.remove('text-white')
+            playStatsDiv2.classList.remove('text-white')
+        }
     } else {
         document.getElementById('themeLightButton').classList.remove('active')
         document.getElementById('themeLightButton').classList.add('bg-light')
         document.getElementById('themeLightButton').classList.add('text-bg-light')
-        document.getElementById('themeLightButton').style.cursor = 'pointer'
+        document.getElementById('themeLightButton').classList.remove('disabled')
 
         document.getElementById('themeDarkButton').classList.add('active')
         document.getElementById('themeDarkButton').classList.remove('bg-dark')
         document.getElementById('themeDarkButton').classList.remove('text-bg-dark')
-        document.getElementById('themeDarkButton').style.cursor = 'default'
+        document.getElementById('themeDarkButton').classList.add('disabled')
+
+
+        if (logSpecificMovieButton != null) {
+            toggleWatchDatesButton.classList.add('btn-light')
+            toggleWatchDatesButton.classList.remove('btn-dark')
+            logSpecificMovieButton.classList.add('btn-outline-light')
+            logSpecificMovieButton.classList.remove('btn-outline-dark')
+            moreSpecificMovieButton.classList.add('btn-outline-light')
+            moreSpecificMovieButton.classList.remove('btn-outline-dark')
+        }
+
+        if (playStatsDiv1 != null) {
+            playStatsDiv1.classList.add('text-white')
+            playStatsDiv2.classList.add('text-white')
+        }
     }
 }
