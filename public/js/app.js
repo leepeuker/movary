@@ -357,64 +357,50 @@ function setTheme(theme, force = false) {
     }
 
     window.localStorage.setItem('theme', theme);
-
     document.getElementById('html').dataset.bsTheme = theme
 
+    let mainColor
+    let secondaryColor
+
+    if (theme === 'light') {
+        document.getElementById('themeLightButton').classList.add('bg-light', 'text-bg-light', 'active', 'disabled')
+
+        document.getElementById('themeDarkButton').classList.remove('active', 'disabled')
+        document.getElementById('themeDarkButton').classList.add('bg-dark', 'text-bg-dark')
+
+        mainColor = 'light'
+        secondaryColor = 'dark'
+    } else {
+        document.getElementById('themeLightButton').classList.remove('active', 'disabled')
+        document.getElementById('themeLightButton').classList.add('bg-light', 'text-bg-light')
+
+        document.getElementById('themeDarkButton').classList.add('active', 'disabled')
+        document.getElementById('themeDarkButton').classList.remove('bg-dark', 'text-bg-dark')
+
+        mainColor = 'dark'
+        secondaryColor = 'light'
+    }
+
+    updateHtmlThemeColors(mainColor, secondaryColor)
+}
+
+function updateHtmlThemeColors(mainColor, secondaryColor) {
     const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
     const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
+    if (logSpecificMovieButton != null) {
+        toggleWatchDatesButton.classList.add('btn-' + secondaryColor)
+        toggleWatchDatesButton.classList.remove('btn-' + mainColor)
+        logSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
+        logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+        moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
+        moreSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+    }
 
     const playStatsDiv1 = document.getElementById('playStatsDiv1');
     const playStatsDiv2 = document.getElementById('playStatsDiv2');
-
-    if (theme === 'light') {
-        document.getElementById('themeLightButton').classList.add('active')
-        document.getElementById('themeLightButton').classList.add('bg-light')
-        document.getElementById('themeLightButton').classList.add('text-bg-light')
-        document.getElementById('themeLightButton').classList.add('disabled')
-
-        document.getElementById('themeDarkButton').classList.remove('active')
-        document.getElementById('themeDarkButton').classList.add('bg-dark')
-        document.getElementById('themeDarkButton').classList.add('text-bg-dark')
-        document.getElementById('themeDarkButton').classList.remove('disabled')
-
-        if (logSpecificMovieButton != null) {
-            toggleWatchDatesButton.classList.remove('btn-light')
-            toggleWatchDatesButton.classList.add('btn-dark')
-            logSpecificMovieButton.classList.remove('btn-outline-light')
-            logSpecificMovieButton.classList.add('btn-outline-dark')
-            moreSpecificMovieButton.classList.remove('btn-outline-light')
-            moreSpecificMovieButton.classList.add('btn-outline-dark')
-        }
-
-        if (playStatsDiv1 != null) {
-            playStatsDiv1.classList.remove('text-white')
-            playStatsDiv2.classList.remove('text-white')
-        }
-    } else {
-        document.getElementById('themeLightButton').classList.remove('active')
-        document.getElementById('themeLightButton').classList.add('bg-light')
-        document.getElementById('themeLightButton').classList.add('text-bg-light')
-        document.getElementById('themeLightButton').classList.remove('disabled')
-
-        document.getElementById('themeDarkButton').classList.add('active')
-        document.getElementById('themeDarkButton').classList.remove('bg-dark')
-        document.getElementById('themeDarkButton').classList.remove('text-bg-dark')
-        document.getElementById('themeDarkButton').classList.add('disabled')
-
-
-        if (logSpecificMovieButton != null) {
-            toggleWatchDatesButton.classList.add('btn-light')
-            toggleWatchDatesButton.classList.remove('btn-dark')
-            logSpecificMovieButton.classList.add('btn-outline-light')
-            logSpecificMovieButton.classList.remove('btn-outline-dark')
-            moreSpecificMovieButton.classList.add('btn-outline-light')
-            moreSpecificMovieButton.classList.remove('btn-outline-dark')
-        }
-
-        if (playStatsDiv1 != null) {
-            playStatsDiv1.classList.add('text-white')
-            playStatsDiv2.classList.add('text-white')
-        }
+    if (playStatsDiv1 != null) {
+        playStatsDiv1.classList.add('text-' + secondaryColor)
+        playStatsDiv2.classList.add('text-' + secondaryColor)
     }
 }
