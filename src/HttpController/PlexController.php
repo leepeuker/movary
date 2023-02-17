@@ -101,7 +101,7 @@ class PlexController
             return Response::createSeeOther('/');
         }
         $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), $plexAccessToken->getPlexAccessTokenAsString());
-        $plexAccountId = $this->plexApi->fetchPlexLocalAccountId($plexAccessToken);
+        $plexAccountId = $this->plexApi->fetchPlexAccount($plexAccessToken)->getPlexId();
         $this->userApi->updatePlexAccountId($this->authenticationService->getCurrentUserId(), (string)$plexAccountId);
 
         return Response::createSeeOther('/settings/plex');
@@ -146,8 +146,7 @@ class PlexController
             return Response::createSeeOther('/');
         }
         $userId = $this->authenticationService->getCurrentUserId();
-        $plexHistory = $this->plexApi->fetchPlexWatchHistoryOfUser($userId);
-        $plexHistoryData = $plexHistory['MediaContainer']['Metadata'];
-        $this->plexHistoryImporter->importPlexData($userId, $plexHistoryData);
+        $unknownPlexItems = $this->plexHistoryImporter->importPlexData($userId);
+        return Response::createJson($unknownPlexItems);
     }
 }

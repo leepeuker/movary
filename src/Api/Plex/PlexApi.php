@@ -4,6 +4,7 @@ namespace Movary\Api\Plex;
 
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Api\Plex\Dto\PlexAccount;
 use Movary\Api\Plex\Dto\PlexItem;
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
@@ -76,14 +77,15 @@ class PlexApi
         }
     }
 
-    public function verifyPlexAccessToken(PlexAccessToken $plexAccessToken) : bool
+    public function fetchPlexAccount(PlexAccessToken $plexAccessToken) : PlexAccount
     {
         $query = [
             'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
         ];
         try {
-            $this->plexTvClient->sendGetRequest('/user', [], $query);
-            return true;
+            $accountData = $this->plexTvClient->sendGetRequest('/user', [], $query);
+            $plexAccount = PlexAccount::createplexAccount((int)$accountData['id'], $accountData['username'], $accountData['email']);
+            return $plexAccount;
         } catch (PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
             return false;
@@ -108,28 +110,19 @@ class PlexApi
         }
     }
 
-    public function fetchPlexLocalAccountId(PlexAccessToken $plexAccessToken) : ?int
-    {
-        $query = [
-            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
-        ];
-        try {
-            $accountData = $this->plexTvClient->sendGetRequest('/users', $query);
-            return (int)$accountData['id'];
-        } catch (PlexAuthenticationError) {
-            $this->logger->error('Plex access token is invalid');
-            return null;
-        }
-    }
-
     public function fetchPlexItem(int $itemId) : ?PlexItem
     {
         $query = [
             'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString()
         ];
         try {
-            $item = $this->localClient->sendGetRequest('/library/metadata/' . $itemId, $query);
-            $plexItem = PlexItem::createPlexItem($itemId, $item['type']);
+            $request = $this->localClient->sendGetRequest('/library/metadata/' . $itemId, $query);
+            $item = $request['MediaContainer']['Metadata'][0];
+            $imdbId = is_string($item['Guid'][0]['id']) ? substr($item['Guid'][0]['id'], 7) : null;
+            $tmdbId = is_string($item['Guid'][1]['id']) ? (int)substr($item['Guid'][1]['id'], 7) : null;
+            $lastViewedAt = (string)$item['lastViewedAt'] ?? null;
+            $userRating = (float)$item['userRating'] ?? null;
+            $plexItem = PlexItem::createPlexItem($itemId, $item['title'], $item['type'], $userRating, $tmdbId, $imdbId, $lastViewedAt);
             return $plexItem;
         } catch (PlexNotFoundError) {
             $this->logger->error('Plex item does not exist', ['itemId' => $itemId]);
@@ -148,27 +141,26 @@ class PlexApi
         try {
             $libraries = $this->localClient->sendGetRequest('/library/sections', $query);
             if(is_array($libraries)) {
-                return $libraries;
+                return $libraries['MediaContainer']['Directory'];
             }
-            return null;            
+            return null;
         } catch (PlexAuthenticationError) {
-            $this->logger->error('Plex access token is invalid');
             return null;
         }
     }
 
-    public function fetchWatchedPlexItems(int $libraryId) : ?Array
+    public function fetchPlexLibraryWatchedHistory(int $libraryId) : ?Array
     {
         $query = [
             'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString(),
-            'viewCount' => '!=0'
+            'unwatched' => '=0'
         ];
         try {
             $response = $this->localClient->sendGetRequest('/library/sections/' . $libraryId . '/all', $query);
-            return $response;
+            return $response['MediaContainer']['Metadata'];
         } catch (PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
-            return false;
+            return null;
         }
     }
 

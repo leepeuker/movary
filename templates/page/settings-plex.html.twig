@@ -88,6 +88,7 @@
                 <a class="btn btn-primary mb-3" href="{{ plexAuth }}">Log in with Plex</a>
             {% else %}
                 <a class="btn btn-primary mb-3" href="/settings/plex/logout">Log out with Plex.</a>
+                <p>Username: {{ plexUsername }}</p>
             {% endif %}
             <p class="text-muted">After authenticating, you can enter your Plex server URL. This can be a local URL (e.g. http://localhost:32400) or a reverse proxy URL (e.g. https://plex.mydomain.com). If Movary is running in Docker on the same Docker network as Plex, you can also use your plex container name, instead of IP address.</p>
             <form action="/settings/plex/saveserverurl" method="POST">

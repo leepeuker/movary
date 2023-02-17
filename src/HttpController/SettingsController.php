@@ -6,6 +6,7 @@ use Movary\Api\Github\GithubApi;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Plex\PlexApi;
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Api\Plex\Dto\PlexAccount;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
@@ -275,12 +276,12 @@ class SettingsController
             return Response::createSeeOther('/');
         }
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
-        $plexAuth = "";
-        $plexServerUrl = "";
         if($plexAccessToken === null) {
             $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
         } else {
-            if($this->plexApi->verifyPlexAccessToken(plexAccessToken::createPlexAccessToken($plexAccessToken))) {
+            $plexAccount = $this->plexApi->fetchPlexAccount(PlexAccessToken::createPlexAccessToken($plexAccessToken));
+            if($plexAccount instanceof PlexAccount) {
+                $plexUsername = $plexAccount->getPlexUsername();
                 if(($plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId())) == null) {
                     $plexServerUrl = "";
                 }
@@ -295,7 +296,7 @@ class SettingsController
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         $serverUrlStatus = $this->sessionWrapper->find('serverUrlStatus');
-        if(!$this->sessionWrapper->find('serverUrlStatus')) {
+        if($serverUrlStatus) {
             $this->sessionWrapper->unset('serverUrlStatus');
         }
 
@@ -306,8 +307,9 @@ class SettingsController
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
-                'plexAuth' => $plexAuth,
-                'plexServerUrl' => $plexServerUrl,
+                'plexAuth' => $plexAuth ?? "",
+                'plexServerUrl' => $plexServerUrl ?? "",
+                'plexUsername' => $plexUsername ?? "",
                 'serverUrlStatus' => $serverUrlStatus
             ]),
         );
