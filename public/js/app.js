@@ -349,6 +349,18 @@ new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
     title: 'Watch date',
 })
 
+function toggleThemeSwitch() {
+    const darkModeInput = document.getElementById('darkModeInput');
+
+    if (darkModeInput.checked === true) {
+        setTheme('dark')
+
+        return
+    }
+
+    setTheme('light')
+}
+
 setTheme(window.localStorage.getItem('theme') ?? 'light', true)
 
 function setTheme(theme, force = false) {
@@ -363,20 +375,9 @@ function setTheme(theme, force = false) {
     let secondaryColor
 
     if (theme === 'light') {
-        document.getElementById('themeLightButton').classList.add('bg-light', 'text-bg-light', 'active', 'disabled')
-
-        document.getElementById('themeDarkButton').classList.remove('active', 'disabled')
-        document.getElementById('themeDarkButton').classList.add('bg-dark', 'text-bg-dark')
-
         mainColor = 'light'
         secondaryColor = 'dark'
     } else {
-        document.getElementById('themeLightButton').classList.remove('active', 'disabled')
-        document.getElementById('themeLightButton').classList.add('bg-light', 'text-bg-light')
-
-        document.getElementById('themeDarkButton').classList.add('active', 'disabled')
-        document.getElementById('themeDarkButton').classList.remove('bg-dark', 'text-bg-dark')
-
         mainColor = 'dark'
         secondaryColor = 'light'
     }
@@ -385,6 +386,8 @@ function setTheme(theme, force = false) {
 }
 
 function updateHtmlThemeColors(mainColor, secondaryColor) {
+    document.getElementById('darkModeInput').checked = mainColor === "dark"
+
     const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
     const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');

@@ -51,9 +51,9 @@
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <div class="text-center">
-                    <button class="btn" onclick="setTheme('light')" id="themeLightButton" style="margin-right: .2rem"><i class="bi bi-sun"></i></button>
-                    <button class="btn" onclick="setTheme('dark')" id="themeDarkButton"><i class="bi bi-moon-fill"></i></button>
+                <div class="form-check form-switch" style="margin-left: 1rem">
+                    <input class="form-check-input" type="checkbox" onclick="toggleThemeSwitch()" role="switch" id="darkModeInput">
+                    <label class="form-check-label" for="darkModeInput">Dark Mode</label>
                 </div>
             </ul>
             {% if loggedIn == true %}</div>{% endif %}
