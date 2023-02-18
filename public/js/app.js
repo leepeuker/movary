@@ -350,9 +350,7 @@ new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
 })
 
 function toggleThemeSwitch() {
-    const darkModeInput = document.getElementById('darkModeInput');
-
-    if (darkModeInput.checked === true) {
+    if (document.getElementById('darkModeInput').checked === true) {
         setTheme('dark')
 
         return
