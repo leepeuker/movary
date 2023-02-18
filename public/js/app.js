@@ -400,5 +400,15 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
         playStatsDiv1.classList.remove('text-' + mainColor)
         playStatsDiv2.classList.add('text-' + secondaryColor)
         playStatsDiv2.classList.remove('text-' + mainColor)
+
+        document.querySelectorAll('.activeItemButton').forEach((element) => {
+            if (mainColor === 'dark') {
+                element.classList.add('text-white');
+                element.classList.remove('activeItemButtonActiveLight');
+            } else {
+                element.classList.remove('text-white');
+                element.classList.add('activeItemButtonActiveLight');
+            }
+        });
     }
 }
