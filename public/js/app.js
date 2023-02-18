@@ -371,18 +371,13 @@ function setTheme(theme, force = false) {
     window.localStorage.setItem('theme', theme);
     document.getElementById('html').dataset.bsTheme = theme
 
-    let mainColor
-    let secondaryColor
-
     if (theme === 'light') {
-        mainColor = 'light'
-        secondaryColor = 'dark'
-    } else {
-        mainColor = 'dark'
-        secondaryColor = 'light'
+        updateHtmlThemeColors('light', 'dark')
+
+        return;
     }
 
-    updateHtmlThemeColors(mainColor, secondaryColor)
+    updateHtmlThemeColors('dark', 'light')
 }
 
 function updateHtmlThemeColors(mainColor, secondaryColor) {
