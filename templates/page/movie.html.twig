@@ -121,7 +121,7 @@
 
         <div class="container text-center" style="display: none;" id="watchDatesListDiv">
             <div class="row">
-                <ul class="list-group col-lg-5 col-xl-4 col-xxl-3 " style="padding-right: 0">
+                <ul class="list-group col-lg-5 col-xl-4 col-xxl-3" style="padding-right: 0">
                     {% for watchDate in watchDates|reverse %}
                         <li class="list-group-item {% if currentUsername == routeUsername %}list-group-item-action{% endif %}"
                             style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer;{% endif %}position:relative;"
@@ -140,14 +140,22 @@
         {% if currentUsername == routeUsername %}
             <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
-                    <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-outline-dark"
+                    <button type="button"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-outline-dark"
+                            id="logSpecificMovieButton"
                             onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, '{{ movie.title }}')">Log play
                     </button>
                 </div>
             </div>
             <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
-                    <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#moreModal">More</button>
+                    <button type="button"
+                            id="moreSpecificMovieButton"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm btn-outline-dark"
+                            data-bs-toggle="modal"
+                            data-bs-target="#moreModal">
+                        More
+                    </button>
                 </div>
             </div>
 

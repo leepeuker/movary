@@ -48,6 +48,13 @@
                 {% else %}
                     <li><a class="dropdown-item" href="/login">Login</a></li>
                 {% endif %}
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <div class="form-check form-switch" style="margin-left: 1rem">
+                    <input class="form-check-input" type="checkbox" onclick="toggleThemeSwitch()" role="switch" id="darkModeInput">
+                    <label class="form-check-label" for="darkModeInput">Dark Mode</label>
+                </div>
             </ul>
             {% if loggedIn == true %}</div>{% endif %}
     </div>

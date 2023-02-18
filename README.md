@@ -11,7 +11,7 @@ scrobble your watches via Plex and Jellyfin and more.
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`).
 
-![Movary Dashboard Example](https://i.imgur.com/690Rr80.png)
+![Movary Dashboard Example](https://i.imgur.com/1qvhWFh.png)
 
 1. [About](#about)
 2. [Install](#install)

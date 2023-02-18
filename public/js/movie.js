@@ -1,4 +1,3 @@
-let ratingEditMode = false
 let originalRating
 
 function deleteWatchDate() {
@@ -75,7 +74,7 @@ function saveRating() {
 function resetRating(e) {
     ratingEditMode = true
 
-    setRatingStars('logPlayModal', 0)
+    setRatingStars('movie', 0)
     saveRating(e)
 
     ratingEditMode = false
