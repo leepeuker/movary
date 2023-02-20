@@ -40,6 +40,7 @@ class PlexHistoryImporter
                 $plexItem = $this->plexApi->fetchPlexItem($key);
                 if($plexItem->getTmdbId() === null) {
                     $unknownPlexItems->add($plexItem);
+                    continue;
                 }
                 $this->importPlexMovie($plexItem, $userId);
             }
@@ -49,9 +50,15 @@ class PlexHistoryImporter
 
     private function importPlexMovie(PlexItem $plexItem, int $userId) : void
     {
+        $movie = $this->movieApi->findByTmdbId($plexItem->getTmdbId());
+        if($movie === null) {
+            $movie = $this->tmdbMovieSyncService->syncMovie($plexItem->getTmdbId());
+
+            $this->logger->debug('Plex: Missing movie created during import', ['movieId' => $movie->getId(), 'moveTitle' => $movie->getTitle()]);
+        }
         $historyEntry = $this->movieApi->findHistoryEntryForMovieByUserOnDate($plexItem->getTmdbId(), $userId, $plexItem->getLastViewedAt());
         if ($historyEntry !== null) {
-            $this->logger->info('Netflix: Movie watch date ignored because it was already set.', [
+            $this->logger->info('Plex: Movie ignored because it was already imported.', [
                 'movieId' => $plexItem->getTmdbId(),
                 'movieTitle' => $plexItem->getTitle(),
                 'watchDate' => $plexItem->getLastViewedAt(),
@@ -60,11 +67,10 @@ class PlexHistoryImporter
 
             return;
         }
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $plexItem->getLastViewedAt());
+        $this->movieApi->updateUserRating($movie->getId(), $userId, $plexItem->getUserRating());
 
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($plexItem->getTmdbId(), $userId, $plexItem->getLastViewedAt());
-        $this->movieApi->updateUserRating($plexItem->getTmdbId(), $userId, $plexItem->getUserRating());
-
-        $this->logger->info('Netflix: Movie watch date imported', [
+        $this->logger->info('Plex: Movie watch date imported', [
             'movieId' => $plexItem->getTmdbId(),
             'moveTitle' => $plexItem->getTitle(),
             'watchDate' => $plexItem->getLastViewedAt(),

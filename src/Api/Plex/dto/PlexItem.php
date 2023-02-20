@@ -4,6 +4,7 @@ namespace Movary\Api\Plex\Dto;
 
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\PersonalRating;
 
 class PlexItem
 {
@@ -11,14 +12,14 @@ class PlexItem
         private readonly int $itemId,
         private readonly string $type,
         private readonly string $title,
-        private readonly float $userRating,
+        private readonly ?PersonalRating $userRating,
         private readonly ?int $tmdbId,
         private readonly ?string $imdbId,
         private readonly ?string $lastViewedTimestamp
     ){
     }
 
-    public static function createPlexItem(int $itemId, string $title, string $type, ?float $userRating = null, ?int $tmdbId = null, ?string $imdbId = null, ?string $lastViewedTimestamp = null) : self
+    public static function createPlexItem(int $itemId, string $title, string $type, ?PersonalRating $userRating = null, ?int $tmdbId = null, ?string $imdbId = null, ?string $lastViewedTimestamp = null) : self
     {
         return new self($itemId, $title, $type, $userRating, $tmdbId, $imdbId, $lastViewedTimestamp);
     }
@@ -38,7 +39,7 @@ class PlexItem
         return $this->title;
     }
 
-    public function getUserRating() : ?float
+    public function getUserRating() : ?PersonalRating
     {
         return $this->userRating;
     }

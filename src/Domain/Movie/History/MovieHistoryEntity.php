@@ -16,8 +16,9 @@ class MovieHistoryEntity
 
     public static function createFromArray(array $data) : self
     {
+        $id = $data['id'] ?? $data['movie_id'];
         return new self(
-            (int)$data['id'],
+            (int)$id,
             Date::createFromString($data['watched_at']),
             $data['plays'],
             $data['comment'],

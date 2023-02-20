@@ -10,6 +10,7 @@ use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -118,11 +119,11 @@ class PlexApi
         try {
             $request = $this->localClient->sendGetRequest('/library/metadata/' . $itemId, $query);
             $item = $request['MediaContainer']['Metadata'][0];
-            $imdbId = is_string($item['Guid'][0]['id']) ? substr($item['Guid'][0]['id'], 7) : null;
-            $tmdbId = is_string($item['Guid'][1]['id']) ? (int)substr($item['Guid'][1]['id'], 7) : null;
-            $lastViewedAt = (string)$item['lastViewedAt'] ?? null;
-            $userRating = (float)$item['userRating'] ?? null;
-            $plexItem = PlexItem::createPlexItem($itemId, $item['title'], $item['type'], $userRating, $tmdbId, $imdbId, $lastViewedAt);
+            $imdbId = isset($item['Guid'][0]['id']) ? substr($item['Guid'][0]['id'], 7) : null;
+            $tmdbId = isset($item['Guid'][1]['id']) ? (int)substr($item['Guid'][1]['id'], 7) : null;
+            $lastViewedAt = $item['lastViewedAt'] ?? null;
+            $userRating = isset($item['userRating']) ? PersonalRating::create((int)$item['userRating']) : null;
+            $plexItem = PlexItem::createPlexItem($itemId, $item['title'], $item['type'], $userRating, $tmdbId, $imdbId, (string)$lastViewedAt);
             return $plexItem;
         } catch (PlexNotFoundError) {
             $this->logger->error('Plex item does not exist', ['itemId' => $itemId]);
