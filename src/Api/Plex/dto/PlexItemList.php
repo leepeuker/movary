@@ -11,7 +11,7 @@ class PlexItemList extends AbstractList
         return new self();
     }
 
-    public function add(PlexItem $plexItem)
+    public function add(PlexItem $plexItem) : void
     {
         $this->data[] = $plexItem;
     }

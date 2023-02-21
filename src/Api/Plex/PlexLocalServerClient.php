@@ -6,6 +6,7 @@ use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Util\Json;
 use GuzzleHttp\Client as httpClient;
 use GuzzleHttp\Exception\ClientException;
+use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -17,14 +18,13 @@ class PlexLocalServerClient
         'accept' => 'application/json',
         'Content-Type' => 'application/json'
     ];
-    private $defaultPostAndGetData;
+    private array $defaultPostAndGetData;
 
     public function __construct(
         private readonly httpClient $httpClient,
         private readonly string $plexIdentifier,
         private readonly string $application_version,
-        private readonly string $plexServerUrl,
-        private readonly LoggerInterface $logger
+        private readonly string $plexServerUrl
     ) {
         $this->defaultPostAndGetData = [
             'X-Plex-Client-Identifier' => $this->plexIdentifier,
@@ -40,12 +40,13 @@ class PlexLocalServerClient
     /**
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
+     * @throws PlexNoClientIdentifier
      * @throws RuntimeException
      */
-    public function sendGetRequest(string $relativeUrl, ?array $customGetQuery = [], ?array $customGetData = [], ?array $customGetHeaders = [], ?string $customBaseUrl = null) : ?Array
+    public function sendGetRequest(string $relativeUrl, ?array $customGetQuery = [], array $customGetData = [], array $customGetHeaders = [], ?string $customBaseUrl = null) : Array
     {
         if ($this->plexIdentifier === '') {
-            return [];
+            throw PlexNoClientIdentifier::create();
         }
         $baseUrl = $customBaseUrl ?? $this->plexServerUrl;
         $url = $baseUrl . $relativeUrl;
@@ -71,12 +72,13 @@ class PlexLocalServerClient
     /**
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
+     * @throws PlexNoClientIdentifier
      * @throws RuntimeException
      */
-    public function sendPostRequest(string $relativeUrl, ?array $customPostData = [], ?array $customPostHeaders = [], ?string $customBaseUrl = null) : ?Array
+    public function sendPostRequest(string $relativeUrl, array $customPostData = [], array $customPostHeaders = [], string $customBaseUrl = null) : Array
     {
         if ($this->plexIdentifier === '') {
-            return [];
+            throw PlexNoClientIdentifier::create();
         }
         $baseUrl = $customBaseUrl ?? $this->plexServerUrl;
         $url = $baseUrl . $relativeUrl;

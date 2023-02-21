@@ -9,7 +9,7 @@ class PlexAccessToken
     ){
     }
 
-    public static function createPlexAccessToken(string $plexAccessToken)
+    public static function createPlexAccessToken(string $plexAccessToken) : self
     {
         return new self($plexAccessToken);
     }

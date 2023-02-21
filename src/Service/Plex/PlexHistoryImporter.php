@@ -4,6 +4,7 @@ namespace Movary\Service\Plex;
 
 use Movary\Api\Plex\Dto\PlexItem;
 use Movary\Api\Plex\Dto\PlexItemList;
+use Movary\Api\Plex\Exception\PlexNoLibrariesAvailable;
 use Movary\Api\Plex\PlexApi;
 use Psr\Log\LoggerInterface;
 use Movary\Domain\Movie\MovieApi;
@@ -16,16 +17,21 @@ class PlexHistoryImporter
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly MovieApi $movieApi,
-        private readonly UserApi $userApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly PlexApi $plexApi
     ) {
     }
 
+    /**
+     * @throws PlexNoLibrariesAvailable
+     */
     public function importPlexData(int $userId) : string
     {
         $unknownPlexItems = PlexItemList::create();
         $plexLibraries = $this->plexApi->fetchPlexLibraries();
+        if($plexLibraries === null) {
+            throw PlexNoLibrariesAvailable::create($userId);
+        }
         foreach($plexLibraries as $library) {
             if($library['type'] !== 'movie') {
                 continue;
@@ -38,7 +44,9 @@ class PlexHistoryImporter
             foreach($libraryWatchHistory as $watchedItem) {
                 $key = (int)$watchedItem['ratingKey'];
                 $plexItem = $this->plexApi->fetchPlexItem($key);
-                if($plexItem->getTmdbId() === null) {
+                if($plexItem === null) {
+                    continue;
+                } else if($plexItem->getImdbId() === null) {
                     $unknownPlexItems->add($plexItem);
                     continue;
                 }
@@ -50,12 +58,18 @@ class PlexHistoryImporter
 
     private function importPlexMovie(PlexItem $plexItem, int $userId) : void
     {
+        if($plexItem->getImdbId() === null || $plexItem->getLastViewedAt() === null) {
+            return;
+        }
+        /** @phpstan-ignore-next-line */
         $movie = $this->movieApi->findByTmdbId($plexItem->getTmdbId());
         if($movie === null) {
+            /** @phpstan-ignore-next-line */
             $movie = $this->tmdbMovieSyncService->syncMovie($plexItem->getTmdbId());
 
             $this->logger->debug('Plex: Missing movie created during import', ['movieId' => $movie->getId(), 'moveTitle' => $movie->getTitle()]);
         }
+        /** @phpstan-ignore-next-line */
         $historyEntry = $this->movieApi->findHistoryEntryForMovieByUserOnDate($plexItem->getTmdbId(), $userId, $plexItem->getLastViewedAt());
         if ($historyEntry !== null) {
             $this->logger->info('Plex: Movie ignored because it was already imported.', [

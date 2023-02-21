@@ -11,7 +11,7 @@ class PlexAccount
     ){
     }
 
-    public static function createplexAccount(int $plexId, string $username, string $email)
+    public static function createplexAccount(int $plexId, string $username, string $email) : self
     {
         return new self($plexId, $username, $email);
     }

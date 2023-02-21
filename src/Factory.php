@@ -244,8 +244,7 @@ class Factory
             $container->get(GuzzleHttp\Client::class),
             $config->getAsString('PLEX_IDENTIFIER'),
             $config->getAsString('APPLICATION_VERSION'),
-            $plexServerUrl,
-            $container->get(LoggerInterface::class)
+            $plexServerUrl
         );
     }
 

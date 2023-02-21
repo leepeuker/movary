@@ -16,13 +16,15 @@ class PlexTvClient
 {
     private const BASE_URL = "https://plex.tv/api/v2";
     private const APP_NAME = 'Movary';
-    private $defaultPostAndGetData;
+    private array $defaultPostAndGetData;
     private const DEFAULTPOSTANDGETHEADERS = [
         'accept' => 'application/json'
     ];
 
-    public function __construct(private readonly httpClient $httpClient, private readonly Config $config, private readonly LoggerInterface $logger)
-    {
+    public function __construct(
+        private readonly httpClient $httpClient,
+        private readonly Config $config
+    ) {
         $this->defaultPostAndGetData = [
             'X-Plex-Client-Identifier' => $this->config->getAsString('PLEX_IDENTIFIER'),
             'X-Plex-Product' => self::APP_NAME,
@@ -37,12 +39,13 @@ class PlexTvClient
     /**
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
+     * @throws PlexNoClientIdentifier
      * @throws RuntimeException
      */
-    public function sendGetRequest(string $relativeUrl, ?array $customGetData = [], ?array $customGetHeaders = [], ?string $customBaseUrl = null) : ?Array
+    public function sendGetRequest(string $relativeUrl, array $customGetData = [], array $customGetHeaders = [], ?string $customBaseUrl = null) : Array
     {
         if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
-            return [];
+            throw PlexNoClientIdentifier::create();
         }
         $baseurl = $customBaseUrl ?? self::BASE_URL;
         $url = $baseurl . $relativeUrl;
@@ -68,7 +71,7 @@ class PlexTvClient
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
      */
-    public function sendPostRequest(string $relativeUrl, ?array $customPostData = [], ?array $customPostHeaders = []) : ?Array
+    public function sendPostRequest(string $relativeUrl, array $customPostData = [], array $customPostHeaders = []) : Array
     {
         if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
             throw PlexNoClientIdentifier::create();

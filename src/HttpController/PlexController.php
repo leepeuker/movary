@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\Dto\PlexItemList;
+use Movary\Api\Plex\Exception\PlexNoLibrariesAvailable;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -101,8 +102,11 @@ class PlexController
             return Response::createSeeOther('/');
         }
         $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), $plexAccessToken->getPlexAccessTokenAsString());
-        $plexAccountId = $this->plexApi->fetchPlexAccount($plexAccessToken)->getPlexId();
-        $this->userApi->updatePlexAccountId($this->authenticationService->getCurrentUserId(), (string)$plexAccountId);
+        $plexAccount = $this->plexApi->fetchPlexAccount($plexAccessToken);
+        if($plexAccount !== null) {
+            $plexAccountId = $plexAccount->getPlexId();
+            $this->userApi->updatePlexAccountId($this->authenticationService->getCurrentUserId(), (string)$plexAccountId);
+        }
 
         return Response::createSeeOther('/settings/plex');
     }
@@ -119,7 +123,7 @@ class PlexController
         }
 
         $plexServerUrl = $request->getPostParameters()['plexServerUrlInput'];
-        if(!$this->plexApi->verifyPlexUrl($plexServerUrl, PlexAccessToken::createPlexAccessToken($plexAccessToken))) {
+        if(!$this->plexApi->verifyPlexUrl($plexServerUrl)) {
             $this->sessionWrapper->set('serverUrlStatus', false);
         } else {
             $this->sessionWrapper->set('serverUrlStatus', true);
@@ -146,7 +150,11 @@ class PlexController
             return Response::createSeeOther('/');
         }
         $userId = $this->authenticationService->getCurrentUserId();
-        $unknownPlexItems = $this->plexHistoryImporter->importPlexData($userId);
-        return Response::createJson($unknownPlexItems);
+        try {
+            $unknownPlexItems = $this->plexHistoryImporter->importPlexData($userId);
+            return Response::createJson($unknownPlexItems);
+        } catch (PlexNoLibrariesAvailable) {
+            return Response::createNotFound();
+        }
     }
 }

@@ -37,6 +37,7 @@ class DateTime implements JsonSerializable
 
     public static function createFromFormatAndTimestamp(string $format, string $timestamp) : self
     {
+        /** @phpstan-ignore-next-line */
         return new self(\DateTime::createFromFormat($format, $timestamp));
     }
 

@@ -33,6 +33,11 @@ class PlexItem
     {
         return $this->tmdbId;
     }
+
+    public function getImdbId() : ?string
+    {
+        return $this->imdbId;
+    }
     
     public function getTitle() : ?string
     {
@@ -46,7 +51,16 @@ class PlexItem
 
     public function getLastViewedAt() : ?Date
     {
-        $dateTime = DateTime::createFromFormatAndTimestamp('U', $this->lastViewedTimestamp);
-        return Date::createFromDateTime($dateTime);
+        if($this->lastViewedTimestamp === null) {
+            return null;
+        } else {
+            $dateTime = DateTime::createFromFormatAndTimestamp('U', $this->lastViewedTimestamp);
+            return Date::createFromDateTime($dateTime);
+        }
+    }
+
+    public function getType() : string
+    {
+        return $this->type;
     }
 }

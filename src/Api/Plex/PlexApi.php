@@ -78,7 +78,7 @@ class PlexApi
         }
     }
 
-    public function fetchPlexAccount(PlexAccessToken $plexAccessToken) : PlexAccount
+    public function fetchPlexAccount(PlexAccessToken $plexAccessToken) : ?PlexAccount
     {
         $query = [
             'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
@@ -89,7 +89,7 @@ class PlexApi
             return $plexAccount;
         } catch (PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
-            return false;
+            return null;
         }
     }
 
@@ -99,12 +99,8 @@ class PlexApi
             'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString()
         ];
         try {
-            $request = $this->localClient->sendGetRequest('', $query, [], [], $url);
-            if(is_array($request)) {
-                return true;
-            } else {
-                return false;
-            }
+            $this->localClient->sendGetRequest('', $query, [], [], $url);
+            return true;
         } catch(PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
             return false;
@@ -141,10 +137,7 @@ class PlexApi
         ];
         try {
             $libraries = $this->localClient->sendGetRequest('/library/sections', $query);
-            if(is_array($libraries)) {
-                return $libraries['MediaContainer']['Directory'];
-            }
-            return null;
+            return $libraries['MediaContainer']['Directory'];
         } catch (PlexAuthenticationError) {
             return null;
         }
@@ -177,7 +170,7 @@ class PlexApi
             
         } catch (PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
-            return false;
+            return null;
         }
     }
 }
