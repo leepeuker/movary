@@ -38,7 +38,10 @@
                        onclick="updateRatingStars('movie', this)"></i>
                 {% endfor %}
                 {% if currentUsername == routeUsername %}
-                    <i class="bi bi-pencil-square" style="color: black;font-size: 1.3rem;cursor: pointer" onclick="editRating(this)" id="editRatingButton"></i>
+                    <i class="bi bi-pencil-square {{ theme == 'dark' ? 'text-light' : 'text-dark' }}"
+                       style="font-size: 1.3rem;cursor: pointer"
+                       onclick="editRating(this)"
+                       id="editRatingButton"></i>
                     <i class="bi bi-check-circle-fill" style="color: #198754;font-size: 1.3rem;cursor: pointer;display: none" onclick="saveRating(this)"
                        id="saveRatingButton"></i>
                     <i class="bi bi-x-circle-fill" style="color: #dc3545;font-size: 1.3rem;cursor: pointer;display: none" onclick="resetRating(this)"

@@ -63,6 +63,7 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
     const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
     const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
+    const editRatingButton = document.getElementById('editRatingButton');
     if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
         toggleWatchDatesButton.classList.add('btn-' + secondaryColor)
         toggleWatchDatesButton.classList.remove('btn-' + mainColor)
@@ -70,6 +71,8 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
         logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
         moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         moreSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+        editRatingButton.classList.add('text-' + secondaryColor)
+        editRatingButton.classList.remove('text-' + mainColor)
     }
 
     const playStatsDiv1 = document.getElementById('playStatsDiv1');
