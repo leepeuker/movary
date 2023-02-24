@@ -9,6 +9,89 @@ if ('serviceWorker' in navigator) {
 
 let ratingEditMode = false
 
+document.addEventListener('DOMContentLoaded', function () {
+    const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
+    document.getElementById('darkModeInput').checked = theme !== 'light'
+
+    const logPlayModalSearchInput = document.getElementById('logPlayModalSearchInput');
+    if (logPlayModalSearchInput != null) {
+        logPlayModalSearchInput.addEventListener('change', updateLogPlayModalButtonState);
+        document.getElementById('logPlayModalSearchInput').addEventListener('input', updateLogPlayModalButtonState);
+        document.getElementById('logPlayModalSearchInput').addEventListener('keypress', loadLogModalSearchResultsOnEnterPress);
+
+        new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
+            format: document.getElementById('dateFormatJavascript').value,
+            title: 'Watch date',
+        })
+
+        document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
+            document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
+        })
+
+        document.getElementById('logPlayModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('logPlayModalSearchInput').value = ''
+            resetLogModalLogInputs()
+            resetLogModalSearchResults()
+            backToLogModalSearchResults()
+        })
+    }
+});
+
+function setTheme(theme, force = false) {
+    const htmlTag = document.getElementById('html');
+
+    if (force === false && htmlTag.dataset.bsTheme === theme) {
+        return
+    }
+
+    let cookieDate = new Date;
+    cookieDate.setFullYear(cookieDate.getFullYear() + 1);
+    document.cookie = 'theme=' + theme + ';path=/;expires=' + cookieDate.toUTCString() + ';'
+
+    htmlTag.dataset.bsTheme = theme
+
+    if (theme === 'light') {
+        updateHtmlThemeColors('light', 'dark')
+
+        return;
+    }
+
+    updateHtmlThemeColors('dark', 'light')
+}
+
+function updateHtmlThemeColors(mainColor, secondaryColor) {
+    const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
+    const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
+    const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
+    if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
+        toggleWatchDatesButton.classList.add('btn-' + secondaryColor)
+        toggleWatchDatesButton.classList.remove('btn-' + mainColor)
+        logSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
+        logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+        moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
+        moreSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+    }
+
+    const playStatsDiv1 = document.getElementById('playStatsDiv1');
+    const playStatsDiv2 = document.getElementById('playStatsDiv2');
+    if (playStatsDiv1 != null && playStatsDiv2 != null) {
+        playStatsDiv1.classList.add('text-' + secondaryColor)
+        playStatsDiv1.classList.remove('text-' + mainColor)
+        playStatsDiv2.classList.add('text-' + secondaryColor)
+        playStatsDiv2.classList.remove('text-' + mainColor)
+
+        document.querySelectorAll('.activeItemButton').forEach((element) => {
+            if (mainColor === 'dark') {
+                element.classList.add('text-white');
+                element.classList.remove('activeItemButtonActiveLight');
+            } else {
+                element.classList.remove('text-white');
+                element.classList.add('activeItemButtonActiveLight');
+            }
+        });
+    }
+}
+
 async function searchTmdbWithLogModalSearchInput() {
     resetLogModalSearchResults()
     document.getElementById('logPlayModalSearchSpinner').classList.remove('d-none')
@@ -146,17 +229,6 @@ function loadLogModalSearchResultsOnEnterPress(event) {
         searchTmdbWithLogModalSearchInput()
     }
 }
-
-document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
-    document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
-})
-
-document.getElementById('logPlayModal').addEventListener('hidden.bs.modal', function () {
-    document.getElementById('logPlayModalSearchInput').value = ''
-    resetLogModalLogInputs()
-    resetLogModalSearchResults()
-    backToLogModalSearchResults()
-})
 
 function resetLogModalLogInputs() {
     document.getElementById('logPlayModalTmdbIdInput').value = ''
@@ -357,58 +429,4 @@ function toggleThemeSwitch() {
     }
 
     setTheme('light')
-}
-
-setTheme(window.localStorage.getItem('theme') ?? 'light', true)
-
-function setTheme(theme, force = false) {
-    if (force === false && document.getElementById('html').dataset.bsTheme === theme) {
-        return
-    }
-
-    window.localStorage.setItem('theme', theme);
-    document.getElementById('html').dataset.bsTheme = theme
-
-    if (theme === 'light') {
-        updateHtmlThemeColors('light', 'dark')
-
-        return;
-    }
-
-    updateHtmlThemeColors('dark', 'light')
-}
-
-function updateHtmlThemeColors(mainColor, secondaryColor) {
-    document.getElementById('darkModeInput').checked = mainColor === "dark"
-
-    const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
-    const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
-    const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
-    if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
-        toggleWatchDatesButton.classList.add('btn-' + secondaryColor)
-        toggleWatchDatesButton.classList.remove('btn-' + mainColor)
-        logSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
-        logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
-        moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
-        moreSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
-    }
-
-    const playStatsDiv1 = document.getElementById('playStatsDiv1');
-    const playStatsDiv2 = document.getElementById('playStatsDiv2');
-    if (playStatsDiv1 != null && playStatsDiv2 != null) {
-        playStatsDiv1.classList.add('text-' + secondaryColor)
-        playStatsDiv1.classList.remove('text-' + mainColor)
-        playStatsDiv2.classList.add('text-' + secondaryColor)
-        playStatsDiv2.classList.remove('text-' + mainColor)
-
-        document.querySelectorAll('.activeItemButton').forEach((element) => {
-            if (mainColor === 'dark') {
-                element.classList.add('text-white');
-                element.classList.remove('activeItemButtonActiveLight');
-            } else {
-                element.classList.remove('text-white');
-                element.classList.add('activeItemButtonActiveLight');
-            }
-        });
-    }
 }
