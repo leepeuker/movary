@@ -38,7 +38,10 @@
                        onclick="updateRatingStars('movie', this)"></i>
                 {% endfor %}
                 {% if currentUsername == routeUsername %}
-                    <i class="bi bi-pencil-square" style="color: black;font-size: 1.3rem;cursor: pointer" onclick="editRating(this)" id="editRatingButton"></i>
+                    <i class="bi bi-pencil-square {{ theme == 'dark' ? 'text-light' : 'text-dark' }}"
+                       style="font-size: 1.3rem;cursor: pointer"
+                       onclick="editRating(this)"
+                       id="editRatingButton"></i>
                     <i class="bi bi-check-circle-fill" style="color: #198754;font-size: 1.3rem;cursor: pointer;display: none" onclick="saveRating(this)"
                        id="saveRatingButton"></i>
                     <i class="bi bi-x-circle-fill" style="color: #dc3545;font-size: 1.3rem;cursor: pointer;display: none" onclick="resetRating(this)"
@@ -112,7 +115,9 @@
 
         <div class="container text-center" id="toggleWatchDatesButtonDiv" style="margin-bottom: 0.5rem">
             <div class="row">
-                <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-dark" onclick="toggleWatchDates()" id="toggleWatchDatesButton"
+                <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-light' : 'btn-dark' }}"
+                        onclick="toggleWatchDates()"
+                        id="toggleWatchDatesButton"
                         {% if totalPlays == 0 %}disabled{% endif %}>
                     {{ totalPlays }}x Play{% if totalPlays == 0 or totalPlays > 1 %}s{% endif %} <span style="font-size: 0.8rem">- View all</span>
                 </button>
@@ -141,7 +146,7 @@
             <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
                     <button type="button"
-                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-outline-dark"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="logSpecificMovieButton"
                             onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, '{{ movie.title }}')">Log play
                     </button>
@@ -151,7 +156,7 @@
                 <div class="row">
                     <button type="button"
                             id="moreSpecificMovieButton"
-                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm btn-outline-dark"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             data-bs-toggle="modal"
                             data-bs-target="#moreModal">
                         More

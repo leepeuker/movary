@@ -307,6 +307,7 @@ class Factory
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
         $twig->addGlobal('requestUrlPath', self::createCurrentHttpRequest()->getPath());
+        $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
 
         return $twig;
     }
