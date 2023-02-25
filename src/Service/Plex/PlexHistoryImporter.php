@@ -58,37 +58,40 @@ class PlexHistoryImporter
 
     private function importPlexMovie(PlexItem $plexItem, int $userId) : void
     {
-        if($plexItem->getImdbId() === null || $plexItem->getLastViewedAt() === null) {
+        $tmdbId = $plexItem->getTmdbId();
+        $lastViewedAt = $plexItem->getLastViewedAt();
+        $userRating = $plexItem->getUserRating();
+        if($tmdbId === null || $lastViewedAt === null) {
+            $this->logger->info('Plex: Movie ignored because it did not contain a TMDB ID.', ['movieTitle' => $plexItem->getTitle()]);
             return;
         }
-        /** @phpstan-ignore-next-line */
-        $movie = $this->movieApi->findByTmdbId($plexItem->getTmdbId());
+        $movie = $this->movieApi->findByTmdbId($tmdbId);
         if($movie === null) {
-            /** @phpstan-ignore-next-line */
-            $movie = $this->tmdbMovieSyncService->syncMovie($plexItem->getTmdbId());
+            $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
 
             $this->logger->debug('Plex: Missing movie created during import', ['movieId' => $movie->getId(), 'moveTitle' => $movie->getTitle()]);
         }
-        /** @phpstan-ignore-next-line */
-        $historyEntry = $this->movieApi->findHistoryEntryForMovieByUserOnDate($plexItem->getTmdbId(), $userId, $plexItem->getLastViewedAt());
+        $historyEntry = $this->movieApi->findHistoryEntryForMovieByUserOnDate($tmdbId, $userId, $lastViewedAt);
         if ($historyEntry !== null) {
             $this->logger->info('Plex: Movie ignored because it was already imported.', [
-                'movieId' => $plexItem->getTmdbId(),
+                'movieId' => $tmdbId,
                 'movieTitle' => $plexItem->getTitle(),
-                'watchDate' => $plexItem->getLastViewedAt(),
-                'personalRating' => $plexItem->getUserRating(),
+                'watchDate' => $lastViewedAt,
+                'personalRating' => $userRating,
             ]);
 
             return;
         }
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $plexItem->getLastViewedAt());
-        $this->movieApi->updateUserRating($movie->getId(), $userId, $plexItem->getUserRating());
+        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $lastViewedAt);
+        if($userRating !== null) {
+            $this->movieApi->updateUserRating($movie->getId(), $userId, $userRating);
+        }
 
         $this->logger->info('Plex: Movie watch date imported', [
-            'movieId' => $plexItem->getTmdbId(),
+            'movieId' => $tmdbId,
             'moveTitle' => $plexItem->getTitle(),
-            'watchDate' => $plexItem->getLastViewedAt(),
-            'personalRating' => $plexItem->getUserRating(),
+            'watchDate' => $lastViewedAt,
+            'personalRating' => $userRating,
         ]);
     }
 }

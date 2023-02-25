@@ -41,8 +41,9 @@ class PlexTvClient
      * @throws PlexAuthenticationError
      * @throws PlexNoClientIdentifier
      * @throws RuntimeException
+     * @psalm-suppress InvalidReturnType
      */
-    public function sendGetRequest(string $relativeUrl, array $customGetData = [], array $customGetHeaders = [], ?string $customBaseUrl = null) : Array
+    public function sendGetRequest(string $relativeUrl, array $customGetData = [], array $customGetHeaders = [], ?string $customBaseUrl = null) : array
     {
         if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
             throw PlexNoClientIdentifier::create();
@@ -70,8 +71,11 @@ class PlexTvClient
     /**
      * @throws PlexNotFoundError
      * @throws PlexAuthenticationError
+     * @throws PlexNoClientIdentifier
+     * @throws RuntimeException
+     * @psalm-suppress InvalidReturnType
      */
-    public function sendPostRequest(string $relativeUrl, array $customPostData = [], array $customPostHeaders = []) : Array
+    public function sendPostRequest(string $relativeUrl, array $customPostData = [], array $customPostHeaders = []) : array
     {
         if ($this->config->getAsString('PLEX_IDENTIFIER', '') === '') {
             throw PlexNoClientIdentifier::create();
