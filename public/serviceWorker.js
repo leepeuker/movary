@@ -2,7 +2,6 @@ var staticDevCoffee = 'movary';
 var assets = [
   '/',
   '/index.php',
-  '/css/app.css',
   '/js/style.js'
 ];
 

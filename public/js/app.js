@@ -11,13 +11,16 @@ let ratingEditMode = false
 
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
-    document.getElementById('darkModeInput').checked = theme !== 'light'
+    const darkModeInput = document.getElementById('darkModeInput');
+    if (darkModeInput != null) {
+        darkModeInput.checked = theme !== 'light'
+    }
 
     const logPlayModalSearchInput = document.getElementById('logPlayModalSearchInput');
     if (logPlayModalSearchInput != null) {
         logPlayModalSearchInput.addEventListener('change', updateLogPlayModalButtonState);
-        document.getElementById('logPlayModalSearchInput').addEventListener('input', updateLogPlayModalButtonState);
-        document.getElementById('logPlayModalSearchInput').addEventListener('keypress', loadLogModalSearchResultsOnEnterPress);
+        logPlayModalSearchInput.addEventListener('input', updateLogPlayModalButtonState);
+        logPlayModalSearchInput.addEventListener('keypress', loadLogModalSearchResultsOnEnterPress);
 
         new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
             format: document.getElementById('dateFormatJavascript').value,
@@ -29,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
         document.getElementById('logPlayModal').addEventListener('hidden.bs.modal', function () {
-            document.getElementById('logPlayModalSearchInput').value = ''
+            logPlayModalSearchInput.value = ''
             resetLogModalLogInputs()
             resetLogModalSearchResults()
             backToLogModalSearchResults()
@@ -153,7 +156,6 @@ function loadLogModalSearchResults(data) {
 
         let releaseYear = '?'
         if (item.release_date != null && item.release_date.length > 4) {
-            console.log(item.release_date)
             releaseYear = item.release_date.substring(0, 4)
         }
 
@@ -211,9 +213,6 @@ async function selectLogModalTmdbItemForLogging(event) {
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
 }
 
-document.getElementById('logPlayModalSearchInput').addEventListener('change', updateLogPlayModalButtonState);
-document.getElementById('logPlayModalSearchInput').addEventListener('input', updateLogPlayModalButtonState);
-
 function updateLogPlayModalButtonState() {
     if (document.getElementById('logPlayModalSearchInput').value !== '') {
         document.getElementById('logPlayModalSearchButton').disabled = false;
@@ -223,8 +222,6 @@ function updateLogPlayModalButtonState() {
 
     document.getElementById('logPlayModalSearchButton').disabled = true;
 }
-
-document.getElementById('logPlayModalSearchInput').addEventListener('keypress', loadLogModalSearchResultsOnEnterPress);
 
 function loadLogModalSearchResultsOnEnterPress(event) {
     // 13=enter, works better to check the key code because the key is named differently on mobile
@@ -316,7 +313,6 @@ function validateWatchDate(context, watchDate) {
         return false
     }
 
-    console.log(context + 'watchDateInput')
     document.getElementById(context + 'WatchDateInput').style.borderStyle = ''
     document.getElementById(context + 'WatchDateInput').style.borderColor = ''
     document.getElementById(context + 'RatingStars').style.marginTop = '0.5rem'
@@ -418,11 +414,6 @@ function getRatingFromStars(context) {
 function updateRatingStars(context, e) {
     setRatingStars(context, e.dataset.value)
 }
-
-new Datepicker(document.getElementById('logPlayModalWatchDateInput'), {
-    format: document.getElementById('dateFormatJavascript').value,
-    title: 'Watch date',
-})
 
 function toggleThemeSwitch() {
     if (document.getElementById('darkModeInput').checked === true) {
