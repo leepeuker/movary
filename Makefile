@@ -33,10 +33,10 @@ build:
 # Container interaction
 #######################
 exec_app_bash:
-	docker-compose exec app bash
+	docker-compose exec app sh
 
 exec_app_cmd:
-	docker-compose exec app bash -c "${CMD}"
+	docker-compose exec app sh -c "${CMD}"
 
 exec_mysql_cli:
 	docker-compose exec mysql sh -c "mysql -u${DB_USER} -p${DB_PASSWORD} ${DATABASE_MYSQL_NAME}"
