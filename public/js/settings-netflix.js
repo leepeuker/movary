@@ -420,6 +420,9 @@ function processNetflixData(netflixActivityItems) {
         for (let i = 1; i <= 10; i++) {
             let tmdb_rating_icon = document.createElement('i');
             tmdb_rating_icon.className = 'bi bi-star ratingIcon';
+            if(netflixActivityItem.tmdbMatch === null) {
+                tmdb_rating_icon.classList.add('text-dark');
+            }
             tmdb_rating_icon.dataset.rating = i;
             tmdb_rating_icon.addEventListener('click', setNetflixRatingStars);
             tmdb_rating_span.appendChild(tmdb_rating_icon);
@@ -432,7 +435,7 @@ function processNetflixData(netflixActivityItems) {
         } else {
             tmdb_cover.alt = 'Cover of missing item';
             row.setAttribute('data-tmdbid', 'undefined');
-            row.classList.add('bg-warning')
+            row.classList.add('bg-warning', 'text-dark');
         }
 
         if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.poster_path === null) {
