@@ -4,13 +4,13 @@ services:
   app:
     build:
       context: ./
-      dockerfile: ./build/php/Dockerfile
-      target: development
+      dockerfile: Dockerfile
+      target: base
     user: "${USER_ID}:${USER_ID}"
     ports:
       - "${HTTP_PORT}:80"
     volumes:
-      - ./:/app
+      - ./:/var/www/movary
     environment:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
 
