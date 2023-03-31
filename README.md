@@ -4,6 +4,7 @@
 [![GitHub issues badge](https://img.shields.io/github/issues/leepeuker/movary)](https://github.com/leepeuker/movary/issues)
 [![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://www.reddit.com/r/movary/)
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
+[![Matrix](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Matrix_icon.svg//18px-Matrix_icon.svg.png)](https://matrix.to/#/#movary:leepeuker.dev)
 
 Movary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
 You can import/export your history and ratings from/to third parties like trakt.tv or letterboxd.com,
@@ -345,6 +346,7 @@ The application should be up-to-date and running locally now.
 
 ## Support
 
+- Join the matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
 - Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
 - Ask questions or discuss movary related topics in the [official subreddit](https://www.reddit.com/r/movary/)
 
