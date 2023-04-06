@@ -194,7 +194,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
-                'currentApplicationVersion' => $this->currentApplicationVersion ?? '0.47.2',
+                'currentApplicationVersion' => $this->currentApplicationVersion ?? '???',
                 'latestApplicationVersion' => $this->githubApi->findLatestApplicationLatestVersion(),
                 'timeZone' => date_default_timezone_get(),
             ]),
