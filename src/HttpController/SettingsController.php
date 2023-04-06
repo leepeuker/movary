@@ -194,10 +194,9 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
-                'currentApplicationVersion' => $this->currentApplicationVersion ?? '-',
+                'currentApplicationVersion' => $this->currentApplicationVersion ?? '0.47.2',
                 'latestApplicationVersion' => $this->githubApi->findLatestApplicationLatestVersion(),
-                'lastSyncTmdb' => $this->workerService->findLastTmdbSync() ?? '-',
-                'lastSyncImdb' => $this->workerService->findLastImdbSync() ?? '-',
+                'timeZone' => date_default_timezone_get(),
             ]),
         );
     }
