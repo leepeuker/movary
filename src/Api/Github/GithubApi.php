@@ -18,27 +18,35 @@ class GithubApi
     ) {
     }
 
-    public function findLatestApplicationLatestVersion() : ?ReleaseDto
+    public function fetchMovaryReleases() : ?ReleaseDtoList
     {
+        $releases = ReleaseDtoList::create();
+
         try {
             $response = $this->httpClient->get(self::GITHUB_RELEASES_URL);
         } catch (Exception $e) {
             $this->logger->warning('Could not send request to fetch github releases.', ['exception' => $e]);
 
-            return null;
+            return $releases;
         }
 
         if ($response->getStatusCode() !== 200) {
             $this->logger->warning('Request to fetch github releases failed with status code: ' . $response->getStatusCode());
 
-            return null;
+            return $releases;
         }
 
-        $releases = Json::decode($response->getBody()->getContents());
+        $responseReleases = Json::decode($response->getBody()->getContents());
 
-        return ReleaseDto::create(
-            $releases[0]['name'],
-            Url::createFromString($releases[0]['html_url']),
-        );
+        foreach ($responseReleases as $responseRelease) {
+            $releases->add(
+                ReleaseDto::create(
+                    $responseRelease['name'],
+                    Url::createFromString($responseRelease['html_url']),
+                ),
+            );
+        }
+
+        return $releases;
     }
 }

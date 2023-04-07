@@ -12,36 +12,38 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h4 style="margin-bottom: 1rem">About</h4>
-                <p>Version: <span class="fw-light">{{ currentApplicationVersion }}</span>
-
-                    {% set badgeStyle = (latestApplicationVersion is not null and currentApplicationVersion != latestApplicationVersion.name) ? 'text-bg-warning' : 'text-bg-success' %}
-                    {% set badgeText = (latestApplicationVersion is not null and currentApplicationVersion != latestApplicationVersion.name) ? 'Update available' : 'Up to date' %}
-
-                    <span
-                            onclick="window.open('{{ latestApplicationVersion.url }}','_blank')"
-                            class="badge rounded-pill {{ badgeStyle }}"
-                            target="_blank"
-                            style="cursor: pointer">
+                <h5 style="margin-bottom: 1rem;">About</h5>
+                <p>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Version:</span> <span class="fw-light">{{ currentApplicationVersion }}</span>
+                    {% set badgeStyle = (releases is empty or currentApplicationVersion != releases|first.name) ? 'text-bg-warning' : 'text-bg-success' %}
+                    {% set badgeText = (releases is empty or currentApplicationVersion != releases|first.name) ? 'Update available' : 'Up to date' %}
+                    <a
+                        href="https://github.com/leepeuker/movary/releases"
+                        class="badge rounded-pill {{ badgeStyle }}"
+                        target="_blank"
+                        style="text-decoration-line:none">
                         {{ badgeText }}
-                    </span>
+                    </a>
                 </p>
                 <p>
-                    Timezone: <span class="fw-light">{{ timeZone }}</span>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Timezone:</span>
+                    <span class="fw-light">{{ timeZone }}</span>
                 </p>
 
                 <hr>
 
-                <h4 style="margin-bottom: 1rem;padding-top: 0.5rem">Getting Support</h4>
+                <h5 style="margin-bottom: 1rem;padding-top: 0.5rem">Getting Support</h5>
                 <p>
-                    Github: <span class="fw-light"><a href="https://github.com/leepeuker/movary/issues" target="_blank">leepeuker/movary</a></span>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Github:</span>
+                    <a class="fw-light" href="https://github.com/leepeuker/movary/issues" target="_blank">leepeuker/movary</a>
                 </p>
                 <p>
-                    Matrix: <span class="fw-light"><a href="https://element.leepeuker.dev/#/room/#movary-support:leepeuker.dev"
-                                                      target="_blank">#movary-support:leepeuker.dev</a></span>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Matrix:</span>
+                    <a class="fw-light" href="https://element.leepeuker.dev/#/room/#movary-support:leepeuker.dev" target="_blank">#movary-support:leepeuker.dev</a>
                 </p>
                 <p>
-                    Reddit: <span class="fw-light"><a href="https://www.reddit.com/r/movary/" target="_blank">/r/movary</a></span>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Reddit:</span>
+                    <a class="fw-light" href="https://www.reddit.com/r/movary/" target="_blank">/r/movary</a>
                 </p>
             </div>
         </div>
