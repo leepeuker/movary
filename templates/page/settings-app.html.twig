@@ -45,6 +45,22 @@
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Reddit:</span>
                     <a class="fw-light" href="https://www.reddit.com/r/movary/" target="_blank">/r/movary</a>
                 </p>
+
+                <hr>
+
+                <h5 style="margin-bottom: 1rem;padding-top: 0.5rem">Latest Releases</h5>
+                <ul class="list-group">
+                    {% set hastLatest = false %}
+                    {% for release in releases %}
+                        <li class="list-group-item">
+                            <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" >{{ release.name }}</span>
+                            {% if hastLatest == false %}<span class="badge rounded-pill text-bg-success">Latest</span>{% endif %}
+                            {% if (releases is not empty and currentApplicationVersion == release.name) %}<span class="badge rounded-pill text-bg-primary">Current</span>{% endif %}
+
+                            {% set hastLatest = true %}
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </main>
