@@ -15,7 +15,7 @@
                 <h4 style="margin-bottom: 1rem">About</h4>
                 <p>Version: <span class="fw-light">{{ currentApplicationVersion }}</span>
 
-                    {% set badgeStyle = (latestApplicationVersion is not null and currentApplicationVersion != latestApplicationVersion.name) ? 'text-bg-success' : 'text-bg-success' %}
+                    {% set badgeStyle = (latestApplicationVersion is not null and currentApplicationVersion != latestApplicationVersion.name) ? 'text-bg-warning' : 'text-bg-success' %}
                     {% set badgeText = (latestApplicationVersion is not null and currentApplicationVersion != latestApplicationVersion.name) ? 'Update available' : 'Up to date' %}
 
                     <span
@@ -29,6 +29,8 @@
                 <p>
                     Timezone: <span class="fw-light">{{ timeZone }}</span>
                 </p>
+
+                <hr>
 
                 <h4 style="margin-bottom: 1rem;padding-top: 0.5rem">Getting Support</h4>
                 <p>
