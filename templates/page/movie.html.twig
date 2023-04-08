@@ -38,7 +38,7 @@
                        onclick="updateRatingStars('movie', this)"></i>
                 {% endfor %}
                 {% if currentUsername == routeUsername %}
-                    <i class="bi bi-pencil-square {{ theme == 'dark' ? 'text-light' : 'text-dark' }}"
+                    <i class="bi bi-pencil-square {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color"
                        style="font-size: 1.3rem;cursor: pointer"
                        onclick="editRating(this)"
                        id="editRatingButton"></i>

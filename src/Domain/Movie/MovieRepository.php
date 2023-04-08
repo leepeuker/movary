@@ -431,6 +431,15 @@ class MovieRepository
             $limitQuery = " LIMIT $limit";
         }
 
+        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return $this->dbConnection->fetchFirstColumn(
+                'SELECT movie.id
+                FROM `movie` 
+                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= datetime("now","-' . $maxAgeInHours . ' hours"))
+                ORDER BY updated_at_imdb ASC' . $limitQuery,
+            );
+        }
+
         return $this->dbConnection->fetchFirstColumn(
             'SELECT movie.id
                 FROM `movie` 
