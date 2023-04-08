@@ -85,6 +85,15 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
         }
     });
 
+    const darkModeNavHr = document.getElementById('darkModeNavHr');
+    if (darkModeNavHr != null) {
+        if (mainColor === 'dark') {
+            darkModeNavHr.classList.remove('d-none')
+        } else {
+            darkModeNavHr.classList.add('d-none')
+        }
+    }
+
     // Add "theme-text-color" as a css class for text which should change main color when theme is updated
     document.querySelectorAll(".theme-text-color").forEach(elementWithThemeTextClass => {
         elementWithThemeTextClass.classList.add('text-' + secondaryColor)
