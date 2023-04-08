@@ -27,69 +27,36 @@ class ImdbWebScrapperTest extends TestCase
     {
         return [
             [
-                '    <div class="allText">
-            <div class="allText">
-                229.240
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7.9 / 10
-
-
-
-            <br /><br />',
+                '<spanclass="sc-5931bdee-1jUnWeS">7.9</span>
+                <div class="sc-5931bdee-3 dWymrF">229.240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                229,240
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
+                <div class="sc-5931bdee-3 dWymrF">229,240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                1.229,240
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
+                <div class="sc-5931bdee-3 dWymrF">229240</div>',
+                ImdbRating::create(7.9, 229240)
+            ],
+            [
+                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
+                <div class="sc-5931bdee-3 dWymrF">1.229,240</div>',
                 ImdbRating::create(7.9, 1229240)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                40
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
+                <div class="sc-5931bdee-3 dWymrF">40</div>',
                 ImdbRating::create(7.9, 40)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>',
                 null
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                  / 10
-
-
-
-            <br /><br />',
+                '',
                 null
             ],
         ];

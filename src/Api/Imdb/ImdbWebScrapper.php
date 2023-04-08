@@ -11,7 +11,7 @@ class ImdbWebScrapper
 {
     private const REQUEST_HEADERS = ['headers' => ['User-Agent' => self::USER_AGENT]];
 
-    private const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:107.0) Gecko/20100101 Firefox/107.0';
+    private const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:111.0) Gecko/20100101 Firefox/111.0';
 
     public function __construct(
         private readonly Client $httpClient,
@@ -50,7 +50,7 @@ class ImdbWebScrapper
 
     private function extractRatingAverage(string $imdbRatingPage, string $imdbId) : ?float
     {
-        preg_match('/weightedaverage<\/a>voteof(\d.\d)\/10</', $imdbRatingPage, $averageRatingMatches);
+        preg_match('/jUnWeS">(\d([.,])\d)/', $imdbRatingPage, $averageRatingMatches);
         if (empty($averageRatingMatches[1]) === true) {
             $this->logger->warning('IMDb: Could not extract rating average.', ['url' => $this->urlGenerator->buildMovieRatingsUrl($imdbId)]);
 
@@ -62,7 +62,7 @@ class ImdbWebScrapper
 
     private function extractRatingVoteCount(string $imdbRatingPage, string $imdbId) : ?int
     {
-        preg_match('/([0-9]{1,3}([.,][0-9]{3})*)IMDbusershavegivena/', $imdbRatingPage, $voteCountMatches);
+        preg_match('/dWymrF">([0-9]{1,3}([.,]?[0-9]{3})*)/', $imdbRatingPage, $voteCountMatches);
         if (empty($voteCountMatches[1]) === true) {
             $this->logger->warning('IMDb: Could not extract imdb rating vote count.', ['url' => $this->urlGenerator->buildMovieRatingsUrl($imdbId)]);
 
