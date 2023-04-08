@@ -7,9 +7,9 @@ use JsonSerializable;
 
 class DateTime implements JsonSerializable
 {
-    private const DEFAULT_STRING_FORMAT = 'Y-m-d H:i:s';
+    public const DEFAULT_TIME_ZONE = 'UTC';
 
-    private const DEFAULT_TIME_ZONE = 'UTC';
+    private const DEFAULT_STRING_FORMAT = 'Y-m-d H:i:s';
 
     private const STATE_FORMAT = 'Y-m-d H:i:s.u';
 
