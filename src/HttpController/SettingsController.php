@@ -23,6 +23,8 @@ use ZipStream;
 
 class SettingsController
 {
+    private const VERSION_PLACEHOLDER = 'dev';
+
     public function __construct(
         private readonly Environment $twig,
         private readonly JobQueueApi $workerService,
@@ -194,10 +196,9 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
-                'currentApplicationVersion' => $this->currentApplicationVersion ?? '-',
-                'latestApplicationVersion' => $this->githubApi->findLatestApplicationLatestVersion(),
-                'lastSyncTmdb' => $this->workerService->findLastTmdbSync() ?? '-',
-                'lastSyncImdb' => $this->workerService->findLastImdbSync() ?? '-',
+                'currentApplicationVersion' => $this->currentApplicationVersion ?? self::VERSION_PLACEHOLDER,
+                'releases' => $this->githubApi->fetchMovaryReleases(),
+                'timeZone' => date_default_timezone_get(),
             ]),
         );
     }
@@ -220,17 +221,6 @@ class SettingsController
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
                 'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
             ]),
-        );
-    }
-
-    public function renderNetflixPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-netflix.html.twig')
         );
     }
 
@@ -263,6 +253,18 @@ class SettingsController
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
                 'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
             ]),
+        );
+    }
+
+    public function renderNetflixPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-netflix.html.twig'),
         );
     }
 
