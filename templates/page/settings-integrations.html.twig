@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - App
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-bottom: 1rem;padding-top: 1rem">
+                <h5 style="margin-bottom: 1rem;">About</h5>
+                <p>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Version:</span> <span class="fw-light">{{ currentApplicationVersion }}</span>
+                    {% set badgeStyle = (releases is empty or currentApplicationVersion != releases|first.name) ? 'text-bg-warning' : 'text-bg-success' %}
+                    {% set badgeText = (releases is empty or currentApplicationVersion != releases|first.name) ? 'Update available' : 'Up to date' %}
+                    <a
+                            href="https://github.com/leepeuker/movary/releases"
+                            class="badge rounded-pill {{ badgeStyle }}"
+                            target="_blank"
+                            style="text-decoration-line:none">
+                        {{ badgeText }}
+                    </a>
+                </p>
+                <p>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Timezone:</span>
+                    <span class="fw-light">{{ timeZone }}</span>
+                </p>
+
+                <hr>
+
+                <h5 style="margin-bottom: 1rem;padding-top: 0.5rem">Getting Support</h5>
+                <p>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Github:</span>
+                    <a class="fw-light" href="https://github.com/leepeuker/movary/issues" target="_blank">leepeuker/movary</a>
+                </p>
+                <p>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Matrix:</span>
+                    <a class="fw-light" href="https://element.leepeuker.dev/#/room/#movary-support:leepeuker.dev" target="_blank">#movary-support:leepeuker.dev</a>
+                </p>
+                <p>
+                    <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Reddit:</span>
+                    <a class="fw-light" href="https://www.reddit.com/r/movary/" target="_blank">/r/movary</a>
+                </p>
+            </div>
+        </div>
+    </main>
+{% endblock %}

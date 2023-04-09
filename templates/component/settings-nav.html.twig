@@ -3,23 +3,30 @@
         <a class="nav-link {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" aria-current="page" href="/settings/account">Account</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/plex' %}active{% endif %}" href="/settings/plex">Plex</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/jellyfin' %}active{% endif %}" href="/settings/jellyfin">Jellyfin</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/trakt' %}active{% endif %}" href="/settings/trakt">Trakt.tv</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/letterboxd' %}active{% endif %}" href="/settings/letterboxd">Letterboxd</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/netflix' %}active{% endif %}" href="/settings/netflix">Netflix</a>
+        <button class="nav-link {% if requestUrlPath starts with '/settings/integrations' %}active{% endif %}" id="navItemIntegrations">Integrations</button>
     </li>
     <li class="nav-item">
         <a class="nav-link {% if requestUrlPath starts with '/settings/app' %}active{% endif %}" href="/settings/app">App</a>
     </li>
 </ul>
-
 <hr style="margin-bottom: 0">
+
+<ul class="nav nav-pills nav-fill {% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}" style="margin-top: 1rem;" id="navIntegrations">
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/plex' %}active{% endif %}" href="/settings/integrations/plex">Plex</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/jellyfin' %}active{% endif %}" href="/settings/integrations/jellyfin">Jellyfin</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/trakt' %}active{% endif %}" href="/settings/integrations/trakt">Trakt.tv</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/letterboxd' %}active{% endif %}" href="/settings/integrations/letterboxd">Letterboxd</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/netflix' %}active{% endif %}" href="/settings/integrations/netflix">Netflix</a>
+    </li>
+</ul>
+
+<hr style="margin-bottom: 0" class="{% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}" id="navIntegrationsHr">

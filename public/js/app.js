@@ -38,6 +38,28 @@ document.addEventListener('DOMContentLoaded', function () {
             backToLogModalSearchResults()
         })
     }
+
+    const toggleWatchDatesButton = document.getElementById('navItemIntegrations');
+    if (toggleWatchDatesButton != null) {
+        const navIntegrations = document.getElementById('navIntegrations');
+
+        if (toggleWatchDatesButton.classList.contains('active')) {
+            navIntegrations.classList.remove('d-none')
+        }
+
+        const navItemIntegrations = document.getElementById('navItemIntegrations');
+        navItemIntegrations.addEventListener('click', () => {
+            const navIntegrationsHr = document.getElementById('navIntegrationsHr');
+            navIntegrations.blur()
+            if (navIntegrations.classList.contains('d-none')) {
+                navIntegrations.classList.remove('d-none')
+                navIntegrationsHr.classList.remove('d-none')
+            } else {
+                navIntegrations.classList.add('d-none')
+                navIntegrationsHr.classList.add('d-none')
+            }
+        });
+    }
 });
 
 function setTheme(theme, force = false) {
