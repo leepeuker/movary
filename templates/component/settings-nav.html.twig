@@ -1,4 +1,4 @@
-<ul class="nav nav-pills nav-fill" style="margin-top: 1rem;">
+<ul class="nav nav-pills nav-fill" style="margin-top: .5rem;">
     <li class="nav-item">
         <a class="nav-link {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" aria-current="page" href="/settings/account">Account</a>
     </li>
@@ -11,9 +11,9 @@
         <a class="nav-link {% if requestUrlPath starts with '/settings/app' %}active{% endif %}" href="/settings/app">App</a>
     </li>
 </ul>
-<hr style="margin-bottom: 0">
+<hr style="margin-bottom: 0;margin-top: .5rem">
 
-<ul class="nav nav-pills nav-fill {% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}" style="margin-top: 1rem;" id="navIntegrations">
+<ul class="nav nav-pills nav-fill {% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}" style="margin-top: .5rem;" id="navIntegrations">
     <li class="nav-item">
         <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/plex' %}active{% endif %}" href="/settings/integrations/plex">Plex</a>
     </li>
@@ -31,4 +31,4 @@
     </li>
 </ul>
 
-<hr style="margin-bottom: 0" class="{% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}" id="navIntegrationsHr">
+<hr style="margin-bottom: 0;margin-top: .5rem" class="{% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}" id="navIntegrationsHr">
