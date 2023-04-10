@@ -4,49 +4,35 @@ namespace Movary\Api\Github;
 
 use Exception;
 use GuzzleHttp\Client;
-use Movary\Util\Json;
-use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
 
 class GithubApi
 {
-    private const GITHUB_RELEASES_URL = 'https://api.github.com/repos/leepeuker/movary/releases';
+    private const GITHUB_LATEST_RELEASES_URL = 'https://api.github.com/repos/leepeuker/movary/releases/latest';
 
     public function __construct(
         private readonly Client $httpClient,
+        private readonly GithubReleaseMapper $releaseMapper,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function fetchMovaryReleases() : ?ReleaseDtoList
+    public function fetchLatestMovaryRelease() : ?GithubReleaseDto
     {
-        $releases = ReleaseDtoList::create();
-
         try {
-            $response = $this->httpClient->get(self::GITHUB_RELEASES_URL);
+            $response = $this->httpClient->get(self::GITHUB_LATEST_RELEASES_URL);
         } catch (Exception $e) {
-            $this->logger->warning('Could not send request to fetch github releases.', ['exception' => $e]);
+            $this->logger->warning('Could not send request to fetch latest github releases.', ['exception' => $e]);
 
-            return $releases;
+            return null;
         }
 
         if ($response->getStatusCode() !== 200) {
-            $this->logger->warning('Request to fetch github releases failed with status code: ' . $response->getStatusCode());
+            $this->logger->warning('Request to fetch latest github releases failed with status code: ' . $response->getStatusCode());
 
-            return $releases;
+            return null;
         }
 
-        $responseReleases = Json::decode($response->getBody()->getContents());
-
-        foreach ($responseReleases as $responseRelease) {
-            $releases->add(
-                ReleaseDto::create(
-                    $responseRelease['name'],
-                    Url::createFromString($responseRelease['html_url']),
-                ),
-            );
-        }
-
-        return $releases;
+        return $this->releaseMapper->mapFromApiJsonResponse($response->getBody()->getContents());
     }
 }
