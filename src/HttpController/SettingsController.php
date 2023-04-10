@@ -23,7 +23,7 @@ use ZipStream;
 
 class SettingsController
 {
-    private const VERSION_PLACEHOLDER = 'dev';
+    private const VERSION_PLACEHOLDER = '0.47.4';
 
     public function __construct(
         private readonly Environment $twig,
@@ -197,7 +197,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
                 'currentApplicationVersion' => $this->currentApplicationVersion ?? self::VERSION_PLACEHOLDER,
-                'releases' => $this->githubApi->fetchMovaryReleases(),
+                'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
                 'timeZone' => date_default_timezone_get(),
             ]),
         );

@@ -7,19 +7,13 @@ use Movary\ValueObject\Url;
 
 class ReleaseMapper
 {
-    public function mapFromApiJsonResponse(string $releasesData) : ReleaseDtoList
+    public function mapFromApiJsonResponse(string $releasesData) : ReleaseDto
     {
-        $releases = ReleaseDtoList::create();
+        $releasesDataDecoded = Json::decode($releasesData);
 
-        foreach (Json::decode($releasesData) as $releaseData) {
-            $releases->add(
-                ReleaseDto::create(
-                    $releaseData['name'],
-                    Url::createFromString($releaseData['html_url']),
-                ),
-            );
-        }
-
-        return $releases;
+        return ReleaseDto::create(
+            $releasesDataDecoded['name'],
+            Url::createFromString($releasesDataDecoded['html_url']),
+        );
     }
 }
