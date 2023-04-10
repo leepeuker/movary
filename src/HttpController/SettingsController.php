@@ -23,7 +23,7 @@ use ZipStream;
 
 class SettingsController
 {
-    private const VERSION_PLACEHOLDER = '0.47.4';
+    private const VERSION_PLACEHOLDER = 'dev';
 
     public function __construct(
         private readonly Environment $twig,
