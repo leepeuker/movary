@@ -12,12 +12,12 @@ class GithubApi
 
     public function __construct(
         private readonly Client $httpClient,
-        private readonly ReleaseMapper $releaseMapper,
+        private readonly GithubReleaseMapper $releaseMapper,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function fetchLatestMovaryRelease() : ?ReleaseDto
+    public function fetchLatestMovaryRelease() : ?GithubReleaseDto
     {
         try {
             $response = $this->httpClient->get(self::GITHUB_LATEST_RELEASES_URL);
