@@ -70,6 +70,13 @@ class UserUpdate extends Command
                 $this->userApi->updatePassword($userId, $password);
             }
 
+            $traktUserName = $input->getOption('traktUserName');
+            if ($traktUserName !== null) {
+                $traktUserName = $traktUserName === '' ? null : $traktUserName;
+
+                $this->userApi->updateTraktUserName($userId, $traktUserName);
+            }
+
             $isAdmin = $input->getOption('isAdmin');
             if ($isAdmin !== null) {
                 $isAdmin = $isAdmin === '' ? null : $isAdmin;
