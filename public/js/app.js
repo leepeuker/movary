@@ -50,13 +50,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const navItemIntegrations = document.getElementById('navItemIntegrations');
         navItemIntegrations.addEventListener('click', () => {
             const navIntegrationsHr = document.getElementById('navIntegrationsHr');
-            navIntegrations.blur()
+            const navItemIntegrationsIcon = document.getElementById('navItemIntegrationsIcon');
+
             if (navIntegrations.classList.contains('d-none')) {
                 navIntegrations.classList.remove('d-none')
                 navIntegrationsHr.classList.remove('d-none')
+                navItemIntegrationsIcon.classList.remove('bi-chevron-down')
+                navItemIntegrationsIcon.classList.add('bi-chevron-up')
             } else {
                 navIntegrations.classList.add('d-none')
                 navIntegrationsHr.classList.add('d-none')
+                navItemIntegrationsIcon.classList.add('bi-chevron-down')
+                navItemIntegrationsIcon.classList.remove('bi-chevron-up')
             }
         });
     }
