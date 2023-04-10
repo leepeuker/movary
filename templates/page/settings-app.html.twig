@@ -15,8 +15,15 @@
                 <h5 style="margin-bottom: 1rem;">About</h5>
                 <p>
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Version:</span> <span class="fw-light">{{ currentApplicationVersion }}</span>
-                    {% set badgeStyle = (releases is empty or currentApplicationVersion != releases|first.name) ? 'text-bg-warning' : 'text-bg-success' %}
-                    {% set badgeText = (releases is empty or currentApplicationVersion != releases|first.name) ? 'Update available' : 'Up to date' %}
+
+                    {% if latestRelease is empty %}
+                        {% set badgeStyle = 'text-bg-secondary' %}
+                        {% set badgeText = 'Latest version unkown' %}
+                    {% else %}
+                        {% set badgeStyle = (currentApplicationVersion != latestRelease.name) ? 'text-bg-warning' : 'text-bg-success' %}
+                        {% set badgeText = (currentApplicationVersion != latestRelease.name) ? 'Update available' : 'Up to date' %}
+                    {% endif %}
+
                     <a
                             href="https://github.com/leepeuker/movary/releases"
                             class="badge rounded-pill {{ badgeStyle }}"

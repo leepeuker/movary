@@ -197,7 +197,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
                 'currentApplicationVersion' => $this->currentApplicationVersion ?? self::VERSION_PLACEHOLDER,
-                'releases' => $this->githubApi->fetchMovaryReleases(),
+                'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
                 'timeZone' => date_default_timezone_get(),
             ]),
         );
