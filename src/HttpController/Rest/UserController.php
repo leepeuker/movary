@@ -53,6 +53,16 @@ class UserController
         return Response::createOk();
     }
 
+    public function fetchUsers() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        return Response::createJson(Json::encode($this->userApi->fetchAll()));
+    }
+
     public function updateUser(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {

@@ -323,6 +323,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     # REST Api #
     ############
     $routeCollector->addRoute(
+        'GET',
+        '/api/users',
+        [\Movary\HttpController\Rest\UserController::class, 'fetchUsers'],
+    );
+    $routeCollector->addRoute(
         'POST',
         '/api/users',
         [\Movary\HttpController\Rest\UserController::class, 'createUser'],

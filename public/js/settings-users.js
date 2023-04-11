@@ -3,19 +3,23 @@ const userModal = new bootstrap.Modal('#userModal', {keyboard: false})
 const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');
 
-for (let i = 0; i < rows.length; i++) {
-    if (i === 0) continue
+reloadTable()
 
-    rows[i].onclick = function () {
-        prepareEditUserModal()
+function registerTableRowClickEvent() {
+    for (let i = 0; i < rows.length; i++) {
+        if (i === 0) continue
 
-        document.getElementById('userModalIdInput').value = this.cells[0].innerHTML
-        document.getElementById('userModalNameInput').value = this.cells[1].innerHTML
-        document.getElementById('userModalEmailInput').value = this.cells[2].innerHTML
-        document.getElementById('userModalIsAdminInput').checked = this.cells[3].innerHTML === '1'
+        rows[i].onclick = function () {
+            prepareEditUserModal(
+                this.cells[0].innerHTML,
+                this.cells[1].innerHTML,
+                this.cells[2].innerHTML,
+                this.cells[3].innerHTML === '1'
+            )
 
-        userModal.show()
-    };
+            userModal.show()
+        };
+    }
 }
 
 function showCreateUserModal() {
@@ -42,7 +46,7 @@ function prepareCreateUserModal(name) {
     document.getElementById('userModalIsAdminInput').checked = ''
 }
 
-function prepareEditUserModal() {
+function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword) {
     document.getElementById('userModalHeaderTitle').innerHTML = 'Edit user'
 
     document.getElementById('userModalPasswordInput').required = false
@@ -52,6 +56,13 @@ function prepareEditUserModal() {
     document.getElementById('userModalRepeatPasswordInputRequiredStar').classList.add('d-none')
     document.getElementById('userModalFooterCreateButton').classList.add('d-none')
     document.getElementById('userModalFooterButtons').classList.remove('d-none')
+
+    document.getElementById('userModalIdInput').value = id
+    document.getElementById('userModalNameInput').value = name
+    document.getElementById('userModalEmailInput').value = email
+    document.getElementById('userModalIsAdminInput').checked = isAdmin
+    document.getElementById('userModalPasswordInput').value = ''
+    document.getElementById('userModalRepeatPasswordInput').value = ''
 }
 
 function validateCreateUserInput() {
@@ -127,7 +138,10 @@ document.getElementById('createUserButton').addEventListener('click', async () =
         return
     }
 
-    location.href = '/settings/users'
+    setUserManagementAlert('User was created: ' + document.getElementById('userModalNameInput').value)
+
+    reloadTable()
+    userModal.hide()
 })
 
 document.getElementById('updateUserButton').addEventListener('click', async () => {
@@ -153,7 +167,11 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
         return
     }
 
-    location.href = '/settings/users'
+
+    setUserManagementAlert('User was updated: ' + document.getElementById('userModalNameInput').value)
+
+    reloadTable()
+    userModal.hide()
 })
 
 document.getElementById('deleteUserButton').addEventListener('click', async () => {
@@ -171,5 +189,46 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
         return
     }
 
-    location.href = '/settings/users'
+    setUserManagementAlert('User was deleted: ' + document.getElementById('userModalNameInput').value)
+
+    reloadTable()
+    userModal.hide()
 })
+
+function setUserManagementAlert(message, type = 'success') {
+    const userManagementAlerts = document.getElementById('userManagementAlerts');
+    userManagementAlerts.classList.remove('d-none')
+    userManagementAlerts.innerHTML = ''
+    userManagementAlerts.innerHTML = '<div class="alert alert-'+type+' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    userManagementAlerts.style.textAlign = 'center'
+}
+
+async function reloadTable() {
+    table.rows = []
+
+    table.getElementsByTagName('tbody')[0].innerHTML = ''
+    // TODO at loading spinner
+
+
+
+    const response = await fetch('/api/users');
+
+    if (response.status !== 200) {
+        setUserManagementAlert('Could not load users', 'danger')
+    }
+
+    const users = await response.json();
+
+    users.forEach((user) => {
+        let row = document.createElement('tr');
+        row.innerHTML = '<td>' + user.id + '</td>';
+        row.innerHTML += '<td>' + user.name + '</td>';
+        row.innerHTML += '<td>' + user.email + '</td>';
+        row.innerHTML += '<td>' + user.isAdmin + '</td>';
+        row.style.cursor = 'pointer'
+
+        table.getElementsByTagName('tbody')[0].appendChild(row);
+    })
+
+    registerTableRowClickEvent()
+}

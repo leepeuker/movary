@@ -23,6 +23,8 @@
 
                 <p class="text-muted">List of all users. Click on user to edit.</p>
 
+                <div id="userManagementAlerts"></div>
+
                 <div class="table-responsive">
                     <table class="table table-hover" id="usersTable">
                         <thead>
@@ -33,16 +35,7 @@
                             <th scope="col">Admin</th>
                         </tr>
                         </thead>
-                        <tbody
-                        {% for user in users %}
-                            <tr style="cursor: pointer">
-                                <td>{{ user.id }}</td>
-                                <td>{{ user.name }}</td>
-                                <td>{{ user.email }}</td>
-                                <td>{{ user.is_admin }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
