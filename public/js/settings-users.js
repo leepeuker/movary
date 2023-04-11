@@ -44,6 +44,9 @@ function prepareCreateUserModal(name) {
     document.getElementById('userModalPasswordInput').value = ''
     document.getElementById('userModalRepeatPasswordInput').value = ''
     document.getElementById('userModalIsAdminInput').checked = ''
+
+    // Remove class invalid-input from all (input) elements
+    Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
 
 function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword) {
@@ -63,6 +66,9 @@ function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword
     document.getElementById('userModalIsAdminInput').checked = isAdmin
     document.getElementById('userModalPasswordInput').value = ''
     document.getElementById('userModalRepeatPasswordInput').value = ''
+
+    // Remove class invalid-input from all (input) elements
+    Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
 
 function validateCreateUserInput() {
