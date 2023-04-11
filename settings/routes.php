@@ -89,16 +89,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
     );
     $routeCollector->addRoute(
-        'DELETE',
-        '/settings/users/{userId:\d+}',
-        [\Movary\HttpController\SettingsController::class, 'deleteUser'],
-    );
-    $routeCollector->addRoute(
-        'POST',
-        '/settings/users/{userId:\d+}',
-        [\Movary\HttpController\SettingsController::class, 'updateUser'],
-    );
-    $routeCollector->addRoute(
         'GET',
         '/settings/users',
         [\Movary\HttpController\SettingsController::class, 'renderUsersPage'],
@@ -327,5 +317,24 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/{username:[a-zA-Z0-9]+}[/]',
         [\Movary\HttpController\DashboardController::class, 'redirectToDashboard'],
+    );
+
+    ############
+    # REST Api #
+    ############
+    $routeCollector->addRoute(
+        'POST',
+        '/api/users',
+        [\Movary\HttpController\Rest\UserController::class, 'createUser'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/api/users/{userId:\d+}',
+        [\Movary\HttpController\Rest\UserController::class, 'updateUser'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/api/users/{userId:\d+}',
+        [\Movary\HttpController\Rest\UserController::class, 'deleteUser'],
     );
 };

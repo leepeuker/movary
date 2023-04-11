@@ -99,21 +99,6 @@ class SettingsController
         );
     }
 
-    public function deleteUser(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $this->userApi->deleteUser((int)$request->getRouteParameters()['userId']);
-
-        return Response::createOk();
-    }
-
     public function generateLetterboxdExportData() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -532,25 +517,5 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
-    }
-
-    public function updateUser(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $userId = (int)$request->getRouteParameters()['userId'];
-        $requestUserData = Json::decode($request->getBody());
-
-        $this->userApi->updateName($userId, $requestUserData['name']);
-        $this->userApi->updateEmail($userId, $requestUserData['email']);
-        $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
-
-        return Response::createOk();
     }
 }

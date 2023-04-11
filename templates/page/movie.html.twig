@@ -27,7 +27,7 @@
              style="color: rgb(255, 193, 7);
                      font-size: 1.5rem;
                      margin-bottom: 0.5rem;
-                     {% if currentUsername == routeUsername %}cursor:pointer;{% endif %}">
+                     {% if currentUserName == routeUsername %}cursor:pointer;{% endif %}">
 
             <span id="ratingStarsSpan">
                 {{ movie.personal_rating }}
@@ -37,7 +37,7 @@
                        data-value="{{ i }}"
                        onclick="updateRatingStars('movie', this)"></i>
                 {% endfor %}
-                {% if currentUsername == routeUsername %}
+                {% if currentUserName == routeUsername %}
                     <i class="bi bi-pencil-square {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color"
                        style="font-size: 1.3rem;cursor: pointer"
                        onclick="editRating(this)"
@@ -128,9 +128,9 @@
             <div class="row">
                 <ul class="list-group col-lg-5 col-xl-4 col-xxl-3" style="padding-right: 0">
                     {% for watchDate in watchDates|reverse %}
-                        <li class="list-group-item {% if currentUsername == routeUsername %}list-group-item-action{% endif %}"
-                            style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer;{% endif %}position:relative;"
-                            {% if currentUsername == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
+                        <li class="list-group-item {% if currentUserName == routeUsername %}list-group-item-action{% endif %}"
+                            style="text-align: center;{% if currentUserName == routeUsername %}cursor: pointer;{% endif %}position:relative;"
+                            {% if currentUserName == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
                             data-watch-date="{{ watchDate.watched_at|date(dateFormatPhp) }}"
                             data-plays="{{ watchDate.plays }}"
                             data-comment="{{ watchDate.comment }}">
@@ -142,7 +142,7 @@
             </div>
         </div>
 
-        {% if currentUsername == routeUsername %}
+        {% if currentUserName == routeUsername %}
             <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
                     <button type="button"
