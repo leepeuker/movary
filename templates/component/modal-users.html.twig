@@ -7,6 +7,8 @@
             </div>
             <div class="modal-body">
                 <form>
+                    <input type="hidden" id="idInput">
+
                     <div class="mb-3">
                         <label for="nameInput" class="form-label">Name</label>
                         <input type="text" class="form-control" id="nameInput">
@@ -15,7 +17,7 @@
                         <label for="emailInput" class="form-label">Email</label>
                         <input type="email" class="form-control" id="emailInput">
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" style="margin-bottom: 0!important;">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="adminInput">
                             <label class="form-check-label" for="adminInput">Admin</label>
@@ -24,8 +26,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-danger float-start" onclick="deleteUser()">Delete</button>
-                <button type="submit" class="btn btn-primary float-end" onclick="saveUser()">Save</button>
+                <button type="button" class="btn btn-danger" onclick="deleteUser()">Delete</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">Save</button>
             </div>
         </div>
     </div>
