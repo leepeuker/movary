@@ -187,8 +187,6 @@ class SettingsController
         );
     }
 
-    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-
     public function renderAppPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
