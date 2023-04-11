@@ -82,6 +82,10 @@ class UserController
         $this->userApi->updateEmail($userId, $requestUserData['email']);
         $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
 
+        if ($requestUserData['password'] !== null) {
+            $this->userApi->updatePassword($userId, $requestUserData['password']);
+        }
+
         return Response::createOk();
     }
 }

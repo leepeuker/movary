@@ -149,6 +149,11 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
         return;
     }
 
+    let password = document.getElementById('userModalPasswordInput').value;
+    if (password === '') {
+        password = null
+    }
+
     const response = await fetch('/api/users/' + document.getElementById('userModalIdInput').value, {
         method: 'PUT',
         headers: {
@@ -158,6 +163,7 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
             'name': document.getElementById('userModalNameInput').value,
             'email': document.getElementById('userModalEmailInput').value,
             'isAdmin': document.getElementById('userModalIsAdminInput').checked,
+            'password': password,
         })
     })
 
@@ -199,7 +205,7 @@ function setUserManagementAlert(message, type = 'success') {
     const userManagementAlerts = document.getElementById('userManagementAlerts');
     userManagementAlerts.classList.remove('d-none')
     userManagementAlerts.innerHTML = ''
-    userManagementAlerts.innerHTML = '<div class="alert alert-'+type+' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    userManagementAlerts.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
     userManagementAlerts.style.textAlign = 'center'
 }
 
@@ -207,9 +213,6 @@ async function reloadTable() {
     table.rows = []
 
     table.getElementsByTagName('tbody')[0].innerHTML = ''
-    // TODO at loading spinner
-
-
 
     const response = await fetch('/api/users');
 
