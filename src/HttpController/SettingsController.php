@@ -202,6 +202,8 @@ class SettingsController
         );
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
     public function renderAppPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -336,6 +338,10 @@ class SettingsController
     public function renderUsersPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
             return Response::createSeeOther('/');
         }
 
