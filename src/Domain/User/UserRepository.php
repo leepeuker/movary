@@ -56,7 +56,7 @@ class UserRepository
 
     public function fetchAll() : array
     {
-        return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user` ORDER BY name');
+        return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user` ORDER BY id');
     }
 
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array

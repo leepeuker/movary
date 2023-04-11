@@ -318,6 +318,20 @@ class SettingsController
         );
     }
 
+    public function renderUsersPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-users.html.twig', [
+                'users' => $this->userApi->fetchAll()
+            ]),
+        );
+    }
+
     public function traktVerifyCredentials(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
