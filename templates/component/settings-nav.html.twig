@@ -1,6 +1,6 @@
 <ul class="nav nav-pills nav-fill" style="margin-top: .5rem;">
     <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" aria-current="page" href="/settings/account">Account</a>
+        <a class="nav-link {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" href="/settings/account" id="navItemApp">Account</a>
     </li>
     <li class="nav-item">
         <button class="nav-link {% if requestUrlPath starts with '/settings/integrations' %}active{% endif %}" id="navItemIntegrations">
@@ -8,7 +8,7 @@
         </button>
     </li>
     <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/app' %}active{% endif %}" href="/settings/app">App</a>
+        <a class="nav-link {% if requestUrlPath starts with '/settings/app' %}active{% endif %}" href="/settings/app" id="navItemApp">App</a>
     </li>
 </ul>
 <hr style="margin-bottom: 0;margin-top: .5rem">
@@ -31,4 +31,7 @@
     </li>
 </ul>
 
-<hr style="margin-bottom: 0;margin-top: .5rem" class="{% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}" id="navIntegrationsHr">
+<hr style="margin-bottom: 0;margin-top: .5rem"
+    class="{% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}"
+    id="navSecondLevelHr"
+>

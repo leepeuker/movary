@@ -216,7 +216,7 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-jellyfin.html.twig', [
+            $this->twig->render('page/settings-integration-jellyfin.html.twig', [
                 'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
                 'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
@@ -246,7 +246,7 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-letterboxd.html.twig', [
+            $this->twig->render('page/settings-integration-letterboxd.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
@@ -264,7 +264,7 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-netflix.html.twig'),
+            $this->twig->render('page/settings-integration-netflix.html.twig'),
         );
     }
 
@@ -281,7 +281,7 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-plex.html.twig', [
+            $this->twig->render('page/settings-integration-plex.html.twig', [
                 'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
@@ -306,7 +306,7 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-trakt.html.twig', [
+            $this->twig->render('page/settings-integration-trakt.html.twig', [
                 'traktClientId' => $user->getTraktClientId(),
                 'traktUserName' => $user->getTraktUserName(),
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
