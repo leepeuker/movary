@@ -45,6 +45,8 @@ function prepareCreateUserModal(name) {
     document.getElementById('userModalRepeatPasswordInput').value = ''
     document.getElementById('userModalIsAdminInput').checked = ''
 
+    document.getElementById('userModalAlerts').innerHTML = ''
+
     // Remove class invalid-input from all (input) elements
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
@@ -66,6 +68,8 @@ function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword
     document.getElementById('userModalIsAdminInput').checked = isAdmin
     document.getElementById('userModalPasswordInput').value = ''
     document.getElementById('userModalRepeatPasswordInput').value = ''
+
+    document.getElementById('userModalAlerts').innerHTML = ''
 
     // Remove class invalid-input from all (input) elements
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
@@ -139,7 +143,7 @@ document.getElementById('createUserButton').addEventListener('click', async () =
     })
 
     if (response.status !== 200) {
-        setUserModalAlertServerError()
+        setUserModalAlertServerError(await response.text())
         return
     }
 
@@ -149,8 +153,8 @@ document.getElementById('createUserButton').addEventListener('click', async () =
     userModal.hide()
 })
 
-function setUserModalAlertServerError() {
-    document.getElementById('userModalAlerts').innerHTML = '<div class="alert alert-danger alert-dismissible" role="alert">Server error, please try again.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+function setUserModalAlertServerError(message = "Server error, please try again.") {
+    document.getElementById('userModalAlerts').innerHTML = '<div class="alert alert-danger alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
 }
 
 document.getElementById('updateUserButton').addEventListener('click', async () => {
@@ -177,7 +181,8 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
     })
 
     if (response.status !== 200) {
-        setUserModalAlertServerError()
+        setUserModalAlertServerError(await response.text())
+
         return
     }
 

@@ -2,6 +2,10 @@
 
 namespace Movary\HttpController\Rest;
 
+use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordTooShort;
+use Movary\Domain\User\Exception\UsernameInvalidFormat;
+use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
@@ -25,12 +29,22 @@ class UserController
 
         $requestUserData = Json::decode($request->getBody());
 
-        $this->userApi->createUser(
-            $requestUserData['email'],
-            $requestUserData['password'],
-            $requestUserData['name'],
-            $requestUserData['isAdmin'],
-        );
+        try {
+            $this->userApi->createUser(
+                $requestUserData['email'],
+                $requestUserData['password'],
+                $requestUserData['name'],
+                $requestUserData['isAdmin'],
+            );
+        } catch (EmailNotUnique) {
+            return Response::createBadRequest('Email already in use.');
+        } catch (UsernameNotUnique) {
+            return Response::createBadRequest('Name already in use.');
+        } catch (PasswordTooShort) {
+            return Response::createBadRequest('Password too short.');
+        } catch (UsernameInvalidFormat) {
+            return Response::createBadRequest('Name is not in a valid format.');
+        }
 
         return Response::createOk();
     }
@@ -78,12 +92,22 @@ class UserController
 
         $requestUserData = Json::decode($request->getBody());
 
-        $this->userApi->updateName($userId, $requestUserData['name']);
-        $this->userApi->updateEmail($userId, $requestUserData['email']);
-        $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
+        try {
+            $this->userApi->updateName($userId, $requestUserData['name']);
+            $this->userApi->updateEmail($userId, $requestUserData['email']);
+            $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
 
-        if ($requestUserData['password'] !== null) {
-            $this->userApi->updatePassword($userId, $requestUserData['password']);
+            if ($requestUserData['password'] !== null) {
+                $this->userApi->updatePassword($userId, $requestUserData['password']);
+            }
+        } catch (EmailNotUnique) {
+            return Response::createBadRequest('Email already in use.');
+        } catch (UsernameNotUnique) {
+            return Response::createBadRequest('Name already in use.');
+        } catch (PasswordTooShort) {
+            return Response::createBadRequest('Password too short.');
+        } catch (UsernameInvalidFormat) {
+            return Response::createBadRequest('Name is not in a valid format.');
         }
 
         return Response::createOk();
