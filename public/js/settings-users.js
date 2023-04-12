@@ -216,17 +216,21 @@ function setUserManagementAlert(message, type = 'success') {
 }
 
 async function reloadTable() {
-    table.rows = []
-
     table.getElementsByTagName('tbody')[0].innerHTML = ''
+    document.getElementById('userTableLoadingSpinner').classList.remove('d-none')
 
     const response = await fetch('/api/users');
 
     if (response.status !== 200) {
         setUserManagementAlert('Could not load users', 'danger')
+        document.getElementById('userTableLoadingSpinner').classList.add('d-none')
+
+        return
     }
 
     const users = await response.json();
+
+    document.getElementById('userTableLoadingSpinner').classList.add('d-none')
 
     users.forEach((user) => {
         let row = document.createElement('tr');
