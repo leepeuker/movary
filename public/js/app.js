@@ -38,6 +38,30 @@ document.addEventListener('DOMContentLoaded', function () {
             backToLogModalSearchResults()
         })
     }
+
+    const navItemIntegrations = document.getElementById('navItemIntegrations');
+    if (navItemIntegrations != null) {
+        const navIntegrations = document.getElementById('navIntegrations');
+
+        const navSecondLevelHr = document.getElementById('navSecondLevelHr');
+        const navItemIntegrationsIcon = document.getElementById('navItemIntegrationsIcon');
+
+        navItemIntegrations.addEventListener('click', () => {
+            if (navIntegrations.classList.contains('d-none')) {
+                navIntegrations.classList.remove('d-none')
+                navSecondLevelHr.classList.remove('d-none')
+                navItemIntegrationsIcon.classList.remove('bi-chevron-down')
+                navItemIntegrationsIcon.classList.add('bi-chevron-up')
+
+                return
+            }
+
+            navIntegrations.classList.add('d-none')
+            navSecondLevelHr.classList.add('d-none')
+            navItemIntegrationsIcon.classList.add('bi-chevron-down')
+            navItemIntegrationsIcon.classList.remove('bi-chevron-up')
+        });
+    }
 });
 
 function setTheme(theme, force = false) {
@@ -66,7 +90,6 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
     const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
     const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
-    const editRatingButton = document.getElementById('editRatingButton');
     if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
         toggleWatchDatesButton.classList.add('btn-' + secondaryColor)
         toggleWatchDatesButton.classList.remove('btn-' + mainColor)
@@ -74,28 +97,32 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
         logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
         moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         moreSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
-        editRatingButton.classList.add('text-' + secondaryColor)
-        editRatingButton.classList.remove('text-' + mainColor)
     }
 
-    const playStatsDiv1 = document.getElementById('playStatsDiv1');
-    const playStatsDiv2 = document.getElementById('playStatsDiv2');
-    if (playStatsDiv1 != null && playStatsDiv2 != null) {
-        playStatsDiv1.classList.add('text-' + secondaryColor)
-        playStatsDiv1.classList.remove('text-' + mainColor)
-        playStatsDiv2.classList.add('text-' + secondaryColor)
-        playStatsDiv2.classList.remove('text-' + mainColor)
+    document.querySelectorAll('.activeItemButton').forEach((element) => {
+        if (mainColor === 'dark') {
+            element.classList.add('text-white');
+            element.classList.remove('activeItemButtonActiveLight');
+        } else {
+            element.classList.remove('text-white');
+            element.classList.add('activeItemButtonActiveLight');
+        }
+    });
 
-        document.querySelectorAll('.activeItemButton').forEach((element) => {
-            if (mainColor === 'dark') {
-                element.classList.add('text-white');
-                element.classList.remove('activeItemButtonActiveLight');
-            } else {
-                element.classList.remove('text-white');
-                element.classList.add('activeItemButtonActiveLight');
-            }
-        });
+    const darkModeNavHr = document.getElementById('darkModeNavHr');
+    if (darkModeNavHr != null) {
+        if (mainColor === 'dark') {
+            darkModeNavHr.classList.remove('d-none')
+        } else {
+            darkModeNavHr.classList.add('d-none')
+        }
     }
+
+    // Add "theme-text-color" as a css class for text which should change main color when theme is updated
+    document.querySelectorAll(".theme-text-color").forEach(elementWithThemeTextClass => {
+        elementWithThemeTextClass.classList.add('text-' + secondaryColor)
+        elementWithThemeTextClass.classList.remove('text-' + mainColor)
+    });
 }
 
 async function searchTmdbWithLogModalSearchInput() {

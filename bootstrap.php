@@ -32,4 +32,9 @@ $builder->addDefinitions(
     ],
 );
 
-return $builder->build();
+$container = $builder->build();
+
+$timezone = $container->get(\Movary\ValueObject\Config::class)->getAsString('TIMEZONE', \Movary\ValueObject\DateTime::DEFAULT_TIME_ZONE);
+date_default_timezone_set($timezone);
+
+return $container;

@@ -56,14 +56,14 @@ class CreateUserController
         }
 
         try {
-            $this->userApi->createUser($email, $password, $name);
+            $this->userApi->createAdminUser($email, $password, $name);
 
             $this->authenticationService->login($email, $password, false);
-        } catch (PasswordTooShort $e) {
+        } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
-        } catch (UsernameInvalidFormat $e) {
+        } catch (UsernameInvalidFormat) {
             $this->sessionWrapper->set('errorUsernameInvalidFormat', true);
-        } catch (Throwable $t) {
+        } catch (Throwable) {
             $this->sessionWrapper->set('errorGeneric', true);
         }
 

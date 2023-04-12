@@ -125,7 +125,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/trakt',
+        '/settings/integrations/trakt',
         [\Movary\HttpController\SettingsController::class, 'renderTraktPage'],
     );
     $routeCollector->addRoute(
@@ -140,7 +140,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/letterboxd',
+        '/settings/integrations/letterboxd',
         [\Movary\HttpController\SettingsController::class, 'renderLetterboxdPage'],
     );
     $routeCollector->addRoute(
@@ -150,7 +150,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/plex',
+        '/settings/integrations/plex',
         [\Movary\HttpController\SettingsController::class, 'renderPlexPage'],
     );
     $routeCollector->addRoute(
@@ -195,7 +195,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/jellyfin',
+        '/settings/integrations/jellyfin',
         [\Movary\HttpController\SettingsController::class, 'renderJellyfinPage'],
     );
     $routeCollector->addRoute(
@@ -225,7 +225,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/netflix',
+        '/settings/integrations/netflix',
         [\Movary\HttpController\SettingsController::class, 'renderNetflixPage'],
     );
     $routeCollector->addRoute(
