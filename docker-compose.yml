@@ -27,5 +27,15 @@ services:
     ports:
       - "${DATABASE_MYSQL_PORT}:3306"
 
+  frontend:
+    image: node:18.3.0
+    user: "${USER_ID}:${USER_ID}"
+    working_dir: /app/frontend
+    command: sh -c "yarn && yarn dev"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/app
+
 volumes:
   movary-database:

@@ -5,8 +5,11 @@ namespace Movary\HttpController;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Util\SessionWrapper;
+use Movary\ValueObject\Config;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
+use Throwable;
 use Twig\Environment;
 
 class LandingPageController
@@ -16,11 +19,24 @@ class LandingPageController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly Config $config,
     ) {
     }
 
     public function render() : Response
     {
+        if ($this->config->getAsBool('NEW_FRONTEND', false) === true) {
+            $frontendAssets = json_decode(file_get_contents(getcwd() . '/frontend/manifest.json'), true)['src/main.tsx'];
+
+            return Response::create(
+                StatusCode::createOk(),
+                $this->twig->render('frontend-bootstrap.html.twig', [
+                    'environment' => $this->config->getAsString('ENV'),
+                    'frontendAssets' => $frontendAssets,
+                ]),
+            );
+        }
+
         if ($this->authenticationService->isUserAuthenticated() === true) {
             $userName = $this->authenticationService->getCurrentUser()->getName();
 
