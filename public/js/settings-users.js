@@ -139,8 +139,7 @@ document.getElementById('createUserButton').addEventListener('click', async () =
     })
 
     if (response.status !== 200) {
-        document.getElementById('userModalAlerts').innerHTML = '<div class="alert alert-danger" role="alert">Server error.</div>'
-
+        setUserModalAlertServerError()
         return
     }
 
@@ -149,6 +148,10 @@ document.getElementById('createUserButton').addEventListener('click', async () =
     reloadTable()
     userModal.hide()
 })
+
+function setUserModalAlertServerError() {
+    document.getElementById('userModalAlerts').innerHTML = '<div class="alert alert-danger alert-dismissible" role="alert">Server error, please try again.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+}
 
 document.getElementById('updateUserButton').addEventListener('click', async () => {
     if (validateCreateUserInput() === true) {
@@ -174,11 +177,9 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
     })
 
     if (response.status !== 200) {
-        document.getElementById('userModalAlerts').innerHTML = '<div class="alert alert-danger" role="alert">Server error.</div>'
-
+        setUserModalAlertServerError()
         return
     }
-
 
     setUserManagementAlert('User was updated: ' + document.getElementById('userModalNameInput').value)
 
@@ -196,8 +197,7 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
     });
 
     if (response.status !== 200) {
-        document.getElementById('userModalAlerts').innerHTML = '<div class="alert alert-danger" role="alert">Server error.</div>'
-
+        setUserModalAlertServerError()
         return
     }
 
