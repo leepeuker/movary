@@ -16,7 +16,7 @@ function regenerateJellyfinWebhookId() {
     setJellyfinWebhookUrlLoadingSpinner()
 
     regenerateJellyfinWebhookIdRequest().then(webhookId => {
-        addAlert('alertWebhookUrlDiv', 'Generate Jellyfin webhook url', 'success')
+        addAlert('alertWebhookUrlDiv', 'Generated Jellyfin webhook url', 'success')
         setJellyfinWebhookUrl(webhookId)
     }).catch(() => {
         addAlert('alertWebhookUrlDiv', 'Could not generate Jellyfin webhook url', 'danger')
@@ -31,6 +31,7 @@ function deleteJellyfinWebhookId() {
     setJellyfinWebhookUrlLoadingSpinner()
 
     deleteJellyfinWebhookIdRequest().then(() => {
+        addAlert('alertWebhookUrlDiv', 'Deleted Jellyfin webhook url', 'success')
         setJellyfinWebhookUrl()
     }).catch(() => {
         addAlert('alertWebhookUrlDiv', 'Could not delete Jellyfin webhook url', 'danger')
