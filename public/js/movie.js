@@ -166,13 +166,15 @@ function editWatchDate() {
 }
 
 function refreshTmdbData() {
+    removeAlert('alertMovieOptionModalDiv')
+
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
 
     refreshTmdbDataRequest().then(() => {
         location.reload()
     }).catch(() => {
-        alert('Could not refresh tmdb data. Please try again.')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh tmdb data.', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
@@ -189,13 +191,15 @@ async function refreshTmdbDataRequest() {
 }
 
 function refreshImdbRating() {
+    removeAlert('alertMovieOptionModalDiv')
+
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
 
     refreshImdbRatingRequest().then(() => {
         location.reload()
     }).catch(() => {
-        alert('Could not refresh imdb rating. Please try again.')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh imdb rating.', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
