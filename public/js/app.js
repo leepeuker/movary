@@ -451,3 +451,15 @@ function toggleThemeSwitch() {
 
     setTheme('light')
 }
+
+function addAlert(parentDivId, message, color) {
+    document.getElementById(parentDivId).innerHTML =
+        '<div class="alert alert-' + color + ' alert-dismissible" role="alert">'
+        + message +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>'
+}
+
+function removeAlert(parentDivId) {
+    document.getElementById(parentDivId).innerHTML = ''
+}

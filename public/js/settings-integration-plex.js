@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchPlexWebhookId().then(webhookId => {
         setPlexWebhookUrl(webhookId)
     }).catch(() => {
-        alert('Could not fetch plex webhook url')
+        addAlert('alertWebhookUrlDiv', 'Could not fetch plex webhook url', 'danger')
         setPlexWebhookUrl()
     })
 })
@@ -12,11 +12,14 @@ function regeneratePlexWebhookId() {
         return
     }
 
+    removeAlert('alertWebhookUrlDiv')
+    setPlexWebhookUrlLoadingSpinner()
+
     regeneratePlexWebhookIdRequest().then(webhookId => {
+        addAlert('alertWebhookUrlDiv', 'Generate plex webhook url', 'success')
         setPlexWebhookUrl(webhookId)
     }).catch(() => {
-        alert('Could not regenerate plex webhook url')
-        setPlexWebhookUrl()
+        addAlert('alertWebhookUrlDiv', 'Could not generate plex webhook url', 'danger')
     })
 }
 
@@ -25,14 +28,20 @@ function deletePlexWebhookId() {
         return
     }
 
+    removeAlert('alertWebhookUrlDiv')
+    setPlexWebhookUrlLoadingSpinner()
+
     deletePlexWebhookIdRequest().then(() => {
         setPlexWebhookUrl()
+        addAlert('alertWebhookUrlDiv', 'Deleted plex webhook url', 'success')
     }).catch(() => {
-        alert('Could not delete plex webhook url')
+        addAlert('alertWebhookUrlDiv', 'Could not delete plex webhook url', 'danger')
     })
 }
 
 function setPlexWebhookUrl(webhookId) {
+    document.getElementById('loadingSpinner').classList.add('d-none')
+
     if (webhookId) {
         document.getElementById('plexWebhookUrl').innerHTML = location.protocol + '//' + location.host + '/plex/' + webhookId
         document.getElementById('deletePlexWebhookIdButton').classList.remove('disabled')
@@ -76,4 +85,11 @@ async function deletePlexWebhookIdRequest() {
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
     }
+}
+
+function setPlexWebhookUrlLoadingSpinner() {
+    document.getElementById('plexWebhookUrl').innerHTML =
+        '<div class="spinner-border spinner-border-sm" role="status" id="loadingSpinner" style="margin-top: .1rem">\n' +
+        '<span class="visually-hidden">Loading...</span>\n' +
+        '</div>'
 }

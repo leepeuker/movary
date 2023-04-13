@@ -18,7 +18,7 @@ function deleteWatchDate() {
             window.location.reload()
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete.')
+            addAlert('alertMovieModalDiv', 'Could not delete watch date.', 'danger')
         }
     })
 }
@@ -155,24 +155,26 @@ function editWatchDate() {
                     window.location.reload()
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Could not create new watch date.')
+                    addAlert('alertMovieModalDiv', 'Could not update watch date.', 'danger')
                 }
             })
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete old watch date.')
+            addAlert('alertMovieModalDiv', 'Could not delete old watch date.', 'danger')
         }
     })
 }
 
 function refreshTmdbData() {
+    removeAlert('alertMovieOptionModalDiv')
+
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
 
     refreshTmdbDataRequest().then(() => {
         location.reload()
     }).catch(() => {
-        alert('Could not refresh tmdb data. Please try again.')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh tmdb data.', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
@@ -189,13 +191,15 @@ async function refreshTmdbDataRequest() {
 }
 
 function refreshImdbRating() {
+    removeAlert('alertMovieOptionModalDiv')
+
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
 
     refreshImdbRatingRequest().then(() => {
         location.reload()
     }).catch(() => {
-        alert('Could not refresh imdb rating. Please try again.')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh imdb rating.', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
