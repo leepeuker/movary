@@ -18,7 +18,7 @@ function deleteWatchDate() {
             window.location.reload()
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete.')
+            addAlert('alertMovieModalDiv', 'Could not delete watch date.', 'danger')
         }
     })
 }
@@ -155,12 +155,12 @@ function editWatchDate() {
                     window.location.reload()
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Could not create new watch date.')
+                    addAlert('alertMovieModalDiv', 'Could not update watch date.', 'danger')
                 }
             })
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete old watch date.')
+            addAlert('alertMovieModalDiv', 'Could not delete old watch date.', 'danger')
         }
     })
 }

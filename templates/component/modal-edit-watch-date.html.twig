@@ -5,7 +5,7 @@
                 <h5 class="modal-title" id="watchDateModalTitle">Edit Watch Date</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="padding-bottom: 0">
                 <input type="hidden" value="" name="tmdbId" id="tmdbId" required>
                 <input type="hidden" value="" name="tmdbId" id="originalWatchDate" required>
                 <input type="hidden" value="" name="tmdbId" id="originalWatchDatePlays" required>
@@ -24,10 +24,11 @@
                     <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
                     <textarea class="form-control" rows="1" aria-label="Comment" id="editWatchDateModalCommentInput" placeholder="Comment"></textarea>
                 </div>
-                <div class="input-group" style="margin-top: 1rem">
+                <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
                     <i class="input-group-text">Plays</i>
                     <input type="number" class="datepicker_input form-control" placeholder="" aria-label="Plays" id="editWatchDateModalPlaysInput">
                 </div>
+                <div id="alertMovieModalDiv"></div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-danger" onclick="deleteWatchDate()">Delete</button>
