@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setPlexWebhookUrl(webhookId)
     }).catch(() => {
         addAlert('alertWebhookUrlDiv', 'Could not fetch plex webhook url', 'danger')
+        setPlexWebhookUrl()
     })
 })
 
