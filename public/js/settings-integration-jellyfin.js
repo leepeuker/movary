@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchJellyfinWebhookId().then(webhookId => {
         setJellyfinWebhookUrl(webhookId)
     }).catch(() => {
-        alert('Could not fetch Jellyfin webhook url')
+        addAlert('alertWebhookUrlDiv', 'Could not fetch Jellyfin webhook url', 'danger')
         setJellyfinWebhookUrl()
     })
 })
@@ -12,11 +12,14 @@ function regenerateJellyfinWebhookId() {
         return
     }
 
+    removeAlert('alertWebhookUrlDiv')
+    setJellyfinWebhookUrlLoadingSpinner()
+
     regenerateJellyfinWebhookIdRequest().then(webhookId => {
+        addAlert('alertWebhookUrlDiv', 'Generate Jellyfin webhook url', 'success')
         setJellyfinWebhookUrl(webhookId)
     }).catch(() => {
-        alert('Could not regenerate Jellyfin webhook url')
-        setJellyfinWebhookUrl()
+        addAlert('alertWebhookUrlDiv', 'Could not generate Jellyfin webhook url', 'danger')
     })
 }
 
@@ -24,15 +27,19 @@ function deleteJellyfinWebhookId() {
     if (confirm('Do you really want to delete the webhook url?') === false) {
         return
     }
+    removeAlert('alertWebhookUrlDiv')
+    setJellyfinWebhookUrlLoadingSpinner()
 
     deleteJellyfinWebhookIdRequest().then(() => {
         setJellyfinWebhookUrl()
     }).catch(() => {
-        alert('Could not delete Jellyfin webhook url')
+        addAlert('alertWebhookUrlDiv', 'Could not delete Jellyfin webhook url', 'danger')
     })
 }
 
 function setJellyfinWebhookUrl(webhookId) {
+    document.getElementById('loadingSpinner').classList.add('d-none')
+
     if (webhookId) {
         document.getElementById('jellyfinWebhookUrl').innerHTML = location.protocol + '//' + location.host + '/jellyfin/' + webhookId
         document.getElementById('deleteJellyfinWebhookIdButton').classList.remove('disabled')
@@ -74,4 +81,11 @@ async function deleteJellyfinWebhookIdRequest() {
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
     }
+}
+
+function setJellyfinWebhookUrlLoadingSpinner() {
+    document.getElementById('jellyfinWebhookUrl').innerHTML =
+        '<div class="spinner-border spinner-border-sm" role="status" id="loadingSpinner" style="margin-top: .1rem">\n' +
+        '<span class="visually-hidden">Loading...</span>\n' +
+        '</div>'
 }

@@ -39,8 +39,14 @@
                     </ul>
                 </div>
 
-                <p id="jellyfinWebhookUrl" class="overflow-auto text-nowrap webhookUrl"
-                   style="font-size:0.9rem;margin-left: 5%;margin-right: 5%;margin-top: 1rem;margin-bottom: 1rem">-</p>
+                <div id="jellyfinWebhookUrl" class="overflow-auto text-nowrap webhookUrl"
+                     style="font-size:1rem;margin-top: 1rem;margin-bottom: 1rem;">
+                    <div class="spinner-border spinner-border-sm" role="status" id="loadingSpinner" style="margin-top: .1rem">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <div id="alertWebhookUrlDiv"></div>
 
                 <button id="deleteJellyfinWebhookIdButton" type="button" class="btn btn-danger {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}"
                         onclick="deleteJellyfinWebhookId()">
