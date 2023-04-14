@@ -88,12 +88,8 @@
                 <div style="display: flex; align-items: center;cursor:pointer;" onclick="window.open('{{ movie.imdbUrl }}', '_blank')">
                     <img src="/images/imdb-logo.svg" style="width: 3rem">
                     <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
-                        <span class="fw-bold">
-                            {% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
-                        </span>
-                        <span class="fw-lighter">
-                            /{{ movie.imdbRatingVoteCount|default('-') }}
-                        </span>
+                        {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
+                        <span class="fw-bold">{% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span class="fw-lighter">/{{ movie.imdbRatingVoteCount|default('-') }}</span>
                     </p>
                 </div>
             {% endif %}
@@ -101,12 +97,8 @@
                  onclick="window.open('{{ movie.tmdbUrl }}', '_blank')">
                 <img src="/images/tmdb-logo.svg" style="width: 2rem">
                 <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
-                    <span class="fw-bold">
-                        {% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
-                    </span>
-                    <span class="fw-lighter">
-                        /{{ movie.tmdbRatingVoteCount|default('-') }}
-                    </span>
+                    {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
+                    <span class="fw-bold">{% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
                 </p>
             </div>
         </div>
