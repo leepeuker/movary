@@ -40,7 +40,7 @@ class ImdbWebScrapper
         $imdbRating = ImdbRating::create($ratingAverage, $ratingVoteCount);
 
         $this->logger->debug('IMDb: Found movie rating.', [
-            'url' => $this->urlGenerator->buildMovieRatingsUrl($imdbId),
+            'url' => $this->urlGenerator->buildMovieUrl($imdbId),
             'average' => $imdbRating->getRating(),
             'voteCount' => $imdbRating->getVotesCount(),
         ]);
@@ -52,7 +52,7 @@ class ImdbWebScrapper
     {
         preg_match('/iZlgcd">(\d([.,])\d)/', $imdbRatingPage, $averageRatingMatches);
         if (empty($averageRatingMatches[1]) === true) {
-            $this->logger->warning('IMDb: Could not extract rating average.', ['url' => $this->urlGenerator->buildMovieRatingsUrl($imdbId)]);
+            $this->logger->warning('IMDb: Could not extract rating average.', ['url' => $this->urlGenerator->buildMovieUrl($imdbId)]);
 
             return null;
         }
@@ -93,7 +93,7 @@ class ImdbWebScrapper
             return (int)((float)$voteCountMatches[1] * 1000000);
         }
 
-        $this->logger->warning('IMDb: Could not extract imdb rating vote count.', ['url' => $this->urlGenerator->buildMovieRatingsUrl($imdbId)]);
+        $this->logger->warning('IMDb: Could not extract imdb rating vote count.', ['url' => $this->urlGenerator->buildMovieUrl($imdbId)]);
 
         return null;
     }
