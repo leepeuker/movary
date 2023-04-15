@@ -132,11 +132,12 @@ function editWatchDate() {
 }
 
 function loadRatingModal() {
-    setRatingStars('editRatingModal', 0)
-    setRatingStars('editRatingModal', getRatingFromStars('movie'))
     const editRatingModal = new bootstrap.Modal(document.getElementById('editRatingModal'), {
         keyboard: false
     });
+
+    setRatingStars('editRatingModal', 0) // When this is removed the rating stars are reset to 0 every second time the edit modal is opened...  ¯\_(ツ)_/¯
+    setRatingStars('editRatingModal', getRatingFromStars('movie'))
 
     editRatingModal.show()
 }

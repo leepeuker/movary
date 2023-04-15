@@ -406,10 +406,6 @@ async function fetchRating(tmdbId) {
 }
 
 function setRatingStars(context, newRating) {
-    if (context === 'movie') {
-        return
-    }
-
     if (getRatingFromStars(context) == newRating) {
         newRating = 0
     }
