@@ -7,8 +7,6 @@ if ('serviceWorker' in navigator) {
     })
 }
 
-let ratingEditMode = false
-
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
     const darkModeInput = document.getElementById('darkModeInput');
@@ -408,7 +406,7 @@ async function fetchRating(tmdbId) {
 }
 
 function setRatingStars(context, newRating) {
-    if (context === 'movie' && ratingEditMode === false) {
+    if (context === 'movie') {
         return
     }
 
