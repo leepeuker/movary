@@ -85,8 +85,18 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     ############
     $routeCollector->addRoute(
         'GET',
-        '/settings/account',
-        [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
+        '/settings/account/general',
+        [\Movary\HttpController\SettingsController::class, 'renderGeneralAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/password',
+        [\Movary\HttpController\SettingsController::class, 'renderPasswordAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/data',
+        [\Movary\HttpController\SettingsController::class, 'renderDataAccountPage'],
     );
     $routeCollector->addRoute(
         'GET',

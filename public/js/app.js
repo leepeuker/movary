@@ -38,13 +38,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const navItemIntegrations = document.getElementById('navItemIntegrations');
+    const navItemAccount = document.getElementById('navItemAccount');
     if (navItemIntegrations != null) {
         const navIntegrations = document.getElementById('navIntegrations');
+        const navAccount = document.getElementById('navAccount');
 
         const navSecondLevelHr = document.getElementById('navSecondLevelHr');
         const navItemIntegrationsIcon = document.getElementById('navItemIntegrationsIcon');
+        const navItemAccountIcon = document.getElementById('navItemAccountIcon');
 
         navItemIntegrations.addEventListener('click', () => {
+            navAccount.classList.add('d-none')
+            navItemAccountIcon.classList.add('bi-chevron-down')
+            navItemAccountIcon.classList.remove('bi-chevron-up')
+
             if (navIntegrations.classList.contains('d-none')) {
                 navIntegrations.classList.remove('d-none')
                 navSecondLevelHr.classList.remove('d-none')
@@ -58,6 +65,26 @@ document.addEventListener('DOMContentLoaded', function () {
             navSecondLevelHr.classList.add('d-none')
             navItemIntegrationsIcon.classList.add('bi-chevron-down')
             navItemIntegrationsIcon.classList.remove('bi-chevron-up')
+        });
+
+        navItemAccount.addEventListener('click', () => {
+            navIntegrations.classList.add('d-none')
+            navItemIntegrationsIcon.classList.add('bi-chevron-down')
+            navItemIntegrationsIcon.classList.remove('bi-chevron-up')
+
+            if (navAccount.classList.contains('d-none')) {
+                navAccount.classList.remove('d-none')
+                navSecondLevelHr.classList.remove('d-none')
+                navItemAccountIcon.classList.remove('bi-chevron-down')
+                navItemAccountIcon.classList.add('bi-chevron-up')
+
+                return
+            }
+
+            navAccount.classList.add('d-none')
+            navSecondLevelHr.classList.add('d-none')
+            navItemAccountIcon.classList.add('bi-chevron-down')
+            navItemAccountIcon.classList.remove('bi-chevron-up')
         });
     }
 });

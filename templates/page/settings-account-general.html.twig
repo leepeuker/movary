@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Account
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <h5 style="margin-top: 1rem;">General settings</h5>
+            <form action="/settings/account" method="post">
+                <div class="mb-3">
+                    <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
+                    <select class="form-select" name="dateFormat" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
+                        {% for dateFormatOffset, dateFormat in dateFormats %}
+                            <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="emailHelp" class="form-text">Date format movary uses when displaying dates to user</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nameInput" class="form-label"><b>Username</b></label>
+                    <input type="text"
+                           class="form-control"
+                           name="username"
+                           placeholder="Username"
+                           value="{{ username }}"
+                           title="Only letters and numbers allowed"
+                           required
+                           id="nameInput"
+                           aria-describedby="usernameHelp"
+                           style="text-align: center;">
+                    <div id="usernameHelp" class="form-text">Must consist of only letters and numbers</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="privacyInput" class="form-label"><b>Privacy</b></label>
+                    <select class="form-select" name="privacyLevel" style="text-align: center;padding-right:0;" id="privacyInput" aria-describedby="privacyHelp" required>
+                        <option value="0" {% if privacyLevel == 0 %}selected{% endif %}>Not visible</option>
+                        <option value="1" {% if privacyLevel == 1 %}selected{% endif %}>Visible to users</option>
+                        <option value="2" {% if privacyLevel == 2 %}selected{% endif %}>Visible to everyone</option>
+                    </select>
+                    <div id="privacyHelp" class="form-text">Decide who you want to share your history and ratings with</div>
+                </div>
+
+                {% if generalUpdated == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="padding-right: 1rem">
+                        User updated
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                {% if generalErrorUsernameInvalidFormat == true %}
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="padding-right: 1rem">
+                        Error: Username invalid
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                {% if generalErrorUsernameNotUnique == true %}
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="padding-right: 1rem">
+                        Error: Username already in use
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </main>
+{% endblock %}

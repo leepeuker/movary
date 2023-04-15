@@ -123,70 +123,6 @@ class SettingsController
         return Response::createOk();
     }
 
-    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-    public function renderAccountPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $userId = $this->authenticationService->getCurrentUserId();
-
-        $passwordErrorNotEqual = $this->sessionWrapper->find('passwordErrorNotEqual');
-        $passwordErrorMinLength = $this->sessionWrapper->find('passwordErrorMinLength');
-        $passwordErrorCurrentInvalid = $this->sessionWrapper->find('passwordErrorCurrentInvalid');
-        $passwordUpdated = $this->sessionWrapper->find('passwordUpdated');
-        $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
-        $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
-        $importHistoryError = $this->sessionWrapper->find('importHistoryError');
-        $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
-        $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
-        $generalUpdated = $this->sessionWrapper->find('generalUpdated');
-        $generalErrorUsernameInvalidFormat = $this->sessionWrapper->find('generalErrorUsernameInvalidFormat');
-        $generalErrorUsernameNotUnique = $this->sessionWrapper->find('generalErrorUsernameNotUnique');
-
-        $this->sessionWrapper->unset(
-            'passwordUpdated',
-            'passwordErrorCurrentInvalid',
-            'passwordErrorMinLength',
-            'passwordErrorNotEqual',
-            'importHistorySuccessful',
-            'importRatingsSuccessful',
-            'importHistoryError',
-            'deletedUserHistory',
-            'deletedUserRatings',
-            'generalUpdated',
-            'generalErrorUsernameInvalidFormat',
-            'generalErrorUsernameNotUnique',
-        );
-
-        $user = $this->userApi->fetchUser($userId);
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-account.html.twig', [
-                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'dateFormats' => DateFormat::getFormats(),
-                'dateFormatSelected' => $user->getDateFormatId(),
-                'privacyLevel' => $user->getPrivacyLevel(),
-                'generalUpdated' => $generalUpdated,
-                'generalErrorUsernameInvalidFormat' => $generalErrorUsernameInvalidFormat,
-                'generalErrorUsernameNotUnique' => $generalErrorUsernameNotUnique,
-                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-                'passwordErrorNotEqual' => $passwordErrorNotEqual,
-                'passwordErrorMinLength' => $passwordErrorMinLength,
-                'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
-                'importHistorySuccessful' => $importHistorySuccessful,
-                'importRatingsSuccessful' => $importRatingsSuccessful,
-                'passwordUpdated' => $passwordUpdated,
-                'importHistoryError' => $importHistoryError,
-                'deletedUserHistory' => $deletedUserHistory,
-                'deletedUserRatings' => $deletedUserRatings,
-                'username' => $user->getName(),
-            ]),
-        );
-    }
-
     public function renderAppPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -199,6 +135,78 @@ class SettingsController
                 'currentApplicationVersion' => $this->currentApplicationVersion ?? self::VERSION_PLACEHOLDER,
                 'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
                 'timeZone' => date_default_timezone_get(),
+            ]),
+        );
+    }
+
+    public function renderDataAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
+        $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
+        $importHistoryError = $this->sessionWrapper->find('importHistoryError');
+        $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
+        $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
+
+        $this->sessionWrapper->unset(
+            'importHistorySuccessful',
+            'importRatingsSuccessful',
+            'importHistoryError',
+            'deletedUserHistory',
+            'deletedUserRatings',
+        );
+
+        $user = $this->userApi->fetchUser($userId);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-data.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'importHistorySuccessful' => $importHistorySuccessful,
+                'importRatingsSuccessful' => $importRatingsSuccessful,
+                'importHistoryError' => $importHistoryError,
+                'deletedUserHistory' => $deletedUserHistory,
+                'deletedUserRatings' => $deletedUserRatings,
+            ]),
+        );
+    }
+
+    public function renderGeneralAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $generalUpdated = $this->sessionWrapper->find('generalUpdated');
+        $generalErrorUsernameInvalidFormat = $this->sessionWrapper->find('generalErrorUsernameInvalidFormat');
+        $generalErrorUsernameNotUnique = $this->sessionWrapper->find('generalErrorUsernameNotUnique');
+
+        $this->sessionWrapper->unset(
+            'generalUpdated',
+            'generalErrorUsernameInvalidFormat',
+            'generalErrorUsernameNotUnique',
+        );
+
+        $user = $this->userApi->fetchUser($userId);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-general.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'dateFormats' => DateFormat::getFormats(),
+                'dateFormatSelected' => $user->getDateFormatId(),
+                'privacyLevel' => $user->getPrivacyLevel(),
+                'generalUpdated' => $generalUpdated,
+                'generalErrorUsernameInvalidFormat' => $generalErrorUsernameInvalidFormat,
+                'generalErrorUsernameNotUnique' => $generalErrorUsernameNotUnique,
+                'username' => $user->getName(),
             ]),
         );
     }
@@ -265,6 +273,39 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-netflix.html.twig'),
+        );
+    }
+
+    public function renderPasswordAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $passwordErrorNotEqual = $this->sessionWrapper->find('passwordErrorNotEqual');
+        $passwordErrorMinLength = $this->sessionWrapper->find('passwordErrorMinLength');
+        $passwordErrorCurrentInvalid = $this->sessionWrapper->find('passwordErrorCurrentInvalid');
+        $passwordUpdated = $this->sessionWrapper->find('passwordUpdated');
+
+        $this->sessionWrapper->unset(
+            'passwordUpdated',
+            'passwordErrorCurrentInvalid',
+            'passwordErrorMinLength',
+            'passwordErrorNotEqual',
+        );
+
+        $user = $this->userApi->fetchUser($userId);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-password.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'passwordErrorNotEqual' => $passwordErrorNotEqual,
+                'passwordErrorMinLength' => $passwordErrorMinLength,
+                'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
+            ]),
         );
     }
 

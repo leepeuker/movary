@@ -1,6 +1,8 @@
 <ul class="nav nav-pills nav-fill" style="margin-top: .5rem;">
     <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" href="/settings/account" id="navItemApp">Account</a>
+        <button class="nav-link {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" id="navItemAccount">
+            Account <i class="bi bi-chevron-{% if not (requestUrlPath starts with '/settings/account') %}down{% else %}up{% endif %}" id="navItemAccountIcon"></i>
+        </button>
     </li>
     <li class="nav-item">
         <button class="nav-link {% if requestUrlPath starts with '/settings/integrations' %}active{% endif %}" id="navItemIntegrations">
@@ -36,7 +38,19 @@
     </li>
 </ul>
 
+<ul class="nav nav-pills nav-fill {% if not (requestUrlPath starts with '/settings/account') %}d-none{% endif %}" style="margin-top: .5rem;" id="navAccount">
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/account/general' %}active{% endif %}" href="/settings/account/general">General</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/account/password' %}active{% endif %}" href="/settings/account/password">Password</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if requestUrlPath starts with '/settings/account/data' %}active{% endif %}" href="/settings/account/data">Data</a>
+    </li>
+</ul>
+
 <hr style="margin-bottom: 0;margin-top: .5rem"
-    class="{% if not (requestUrlPath starts with '/settings/integrations') %}d-none{% endif %}"
+    class="{% if (not (requestUrlPath starts with '/settings/integrations')) and (not (requestUrlPath starts with '/settings/account'))%}d-none{% endif %}"
     id="navSecondLevelHr"
 >
