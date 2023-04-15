@@ -23,19 +23,6 @@ function deleteWatchDate() {
     })
 }
 
-function editRating(e) {
-    ratingEditMode = true
-
-    if (originalRating === undefined) {
-        originalRating = getRatingFromStars('movie')
-    }
-
-    document.getElementById('ratingStarsSpan').classList.add('rating-edit-active')
-    document.getElementById('editRatingButton').style.display = 'none'
-    document.getElementById('saveRatingButton').style.display = 'inline'
-    document.getElementById('resetRatingButton').style.display = 'inline'
-}
-
 function getMovieId() {
     return document.getElementById('movieId').value
 }
@@ -45,7 +32,7 @@ function getRouteUsername() {
 }
 
 function saveRating() {
-    let newRating = getRatingFromStars('movie')
+    let newRating = getRatingFromStars('editRatingModal')
 
     fetch('/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
         method: 'post',
@@ -53,36 +40,15 @@ function saveRating() {
             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
         },
         body: 'rating=' + newRating
+    }).then(function (response) {
+        if (response.ok === false) {
+            addAlert('editRatingModalDiv', 'Could not update rating.', 'danger')
+
+            return
+        }
+
+        window.location.reload()
     })
-        .then(function (data) {
-            console.log('Request succeeded with JSON response', data)
-        })
-        .catch(function (error) {
-            alert('Could not update rating.')
-            console.log('Request failed', error)
-        })
-
-    ratingEditMode = false
-    originalRating = newRating
-
-    document.getElementById('ratingStarsSpan').classList.remove('rating-edit-active')
-    document.getElementById('editRatingButton').style.display = 'inline'
-    document.getElementById('saveRatingButton').style.display = 'none'
-    document.getElementById('resetRatingButton').style.display = 'none'
-}
-
-function resetRating(e) {
-    ratingEditMode = true
-
-    setRatingStars('movie', 0)
-    saveRating(e)
-
-    ratingEditMode = false
-
-    document.getElementById('ratingStarsSpan').classList.remove('rating-edit-active')
-    document.getElementById('editRatingButton').style.display = 'inline'
-    document.getElementById('saveRatingButton').style.display = 'none'
-    document.getElementById('resetRatingButton').style.display = 'none'
 }
 
 function toggleWatchDates() {
@@ -163,6 +129,17 @@ function editWatchDate() {
             addAlert('alertMovieModalDiv', 'Could not delete old watch date.', 'danger')
         }
     })
+}
+
+function loadRatingModal() {
+    const editRatingModal = new bootstrap.Modal(document.getElementById('editRatingModal'), {
+        keyboard: false
+    });
+
+    setRatingStars('editRatingModal', 0) // When this is removed the rating stars are reset to 0 every second time the edit modal is opened...  ¯\_(ツ)_/¯
+    setRatingStars('editRatingModal', getRatingFromStars('movie'))
+
+    editRatingModal.show()
 }
 
 function refreshTmdbData() {
