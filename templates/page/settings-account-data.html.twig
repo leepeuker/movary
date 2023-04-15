@@ -11,84 +11,85 @@
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
 
-            <h5 style="margin-top: 1rem">Export & Import</h5>
+            <div style="padding-top: 1rem">
+                <h5>Export & Import</h5>
 
-            <p class="text-muted">Export or import your movary history or ratings.</p>
+                <p class="text-muted">Export or import your movary history or ratings.</p>
 
-            <a class="btn btn-primary" target="_blank" href="/settings/account/export/csv/history">Export: history.csv</a>
-            <a class="btn btn-primary" target="_blank" href="/settings/account/export/csv/ratings">Export: ratings.csv</a>
+                <a class="btn btn-primary" target="_blank" href="/settings/account/export/csv/history">Export: history.csv</a>
+                <a class="btn btn-primary" target="_blank" href="/settings/account/export/csv/ratings">Export: ratings.csv</a>
 
-            <form action="/settings/account/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1.2rem">
-                <div class="input-group">
-                    <input type="file" class="form-control" name="history" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
-                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history.csv</button>
-                </div>
-            </form>
+                <form action="/settings/account/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1.2rem">
+                    <div class="input-group">
+                        <input type="file" class="form-control" name="history" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                        <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history.csv</button>
+                    </div>
+                </form>
 
-            {% if importHistorySuccessful == true %}
-                <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                    History was successfully imported.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-
-            {% if importHistoryError == 'history' %}
-                <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                    History could not be imported.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-
-            <form action="/settings/account/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
-                <div class="input-group">
-                    <input type="file" class="form-control" name="ratings" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
-                    <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import rating.csv</button>
-                </div>
-            </form>
-            {% if importRatingsSuccessful == true %}
-                <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                    Ratings were successfully imported.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-
-            {% if importHistoryError == 'ratings' %}
-                <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                    Ratings could not be imported.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
-
-            <hr>
-
-            <h5>Delete your data</h5>
-
-            <p class="text-muted">This will irrecoverable delete your data, so be sure that this is really what you want.</p>
-
-            <div style="margin-bottom: 1rem">
-                <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-history"
-                   onclick="return confirm('Are you sure you want to delete your watch history?')">Delete history</a>
-                <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-ratings"
-                   onclick="return confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
-                {% if deletedUserHistory == true %}
+                {% if importHistorySuccessful == true %}
                     <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                        History deleted successfully.
+                        History was successfully imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endif %}
-                {% if deletedUserRatings == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                        Ratings deleted successfully.
+
+                {% if importHistoryError == 'history' %}
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        History could not be imported.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endif %}
-            </div>
-            <div style="margin-bottom: 1rem">
-                <a class="btn btn-danger {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-account"
-                   onclick="return confirm('Are you sure you want to delete your account with all your data?')">Delete
-                    account</a>
-            </div>
 
+                <form action="/settings/account/import/csv/ratings" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
+                    <div class="input-group">
+                        <input type="file" class="form-control" name="ratings" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                        <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import rating.csv</button>
+                    </div>
+                </form>
+                {% if importRatingsSuccessful == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Ratings were successfully imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                {% if importHistoryError == 'ratings' %}
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Ratings could not be imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <hr>
+
+                <h5>Delete your data</h5>
+
+                <p class="text-muted">This will irrecoverable delete your data, so be sure that this is really what you want.</p>
+
+                <div style="margin-bottom: 1rem">
+                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-history"
+                       onclick="return confirm('Are you sure you want to delete your watch history?')">Delete history</a>
+                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-ratings"
+                       onclick="return confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
+                    {% if deletedUserHistory == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                            History deleted successfully.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if deletedUserRatings == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                            Ratings deleted successfully.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                </div>
+                <div style="margin-bottom: 1rem">
+                    <a class="btn btn-danger {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="/settings/account/delete-account"
+                       onclick="return confirm('Are you sure you want to delete your account with all your data?')">Delete
+                        account</a>
+                </div>
+            </div>
         </div>
     </main>
 {% endblock %}

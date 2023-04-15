@@ -42,7 +42,7 @@
                     <hr class="dropdown-divider">
                 </li>
                 {% if loggedIn == true %}
-                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="/settings/account">Settings</a></li>
+                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="/settings/account/general">Settings</a></li>
                     <li><a class="dropdown-item {% if requestUrlPath starts with '/job-queue' %}active{% endif %}" href="/job-queue">Job Queue</a></li>
                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                 {% else %}
