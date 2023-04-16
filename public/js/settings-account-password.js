@@ -1,4 +1,4 @@
-const errorMessageCurrentPasswordIncorrect = 'Current password not correct';
+const errorMessageCurrentPasswordIncorrect = 'Current password wrong';
 const errorMessageNewPasswordInvalid = 'New password not meeting requirements';
 
 const currentPassword = document.getElementById('currentPassword')

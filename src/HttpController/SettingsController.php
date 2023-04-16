@@ -421,7 +421,7 @@ class SettingsController
         $currentPassword = $responseData['currentPassword'];
 
         if ($this->userApi->isValidPassword($userId, $currentPassword) === false) {
-            return Response::createBadRequest('Current password not correct'); // Error message is referenced in JS!!!
+            return Response::createBadRequest('Current password wrong'); // Error message is referenced in JS!!!
         }
 
         if (strlen($newPassword) < 8) {
