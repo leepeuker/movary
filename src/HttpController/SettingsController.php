@@ -284,17 +284,8 @@ class SettingsController
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $passwordErrorNotEqual = $this->sessionWrapper->find('passwordErrorNotEqual');
-        $passwordErrorMinLength = $this->sessionWrapper->find('passwordErrorMinLength');
-        $passwordErrorCurrentInvalid = $this->sessionWrapper->find('passwordErrorCurrentInvalid');
         $passwordUpdated = $this->sessionWrapper->find('passwordUpdated');
-
-        $this->sessionWrapper->unset(
-            'passwordUpdated',
-            'passwordErrorCurrentInvalid',
-            'passwordErrorMinLength',
-            'passwordErrorNotEqual',
-        );
+        $this->sessionWrapper->unset('passwordUpdated');
 
         $user = $this->userApi->fetchUser($userId);
 
@@ -302,9 +293,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-password.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'passwordErrorNotEqual' => $passwordErrorNotEqual,
-                'passwordErrorMinLength' => $passwordErrorMinLength,
-                'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
+                'passwordUpdated' => $passwordUpdated,
             ]),
         );
     }
@@ -453,38 +442,24 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
 
-        $newPassword = $request->getPostParameters()['newPassword'];
-        $newPasswordRepeat = $request->getPostParameters()['newPasswordRepeat'];
-        $currentPassword = $request->getPostParameters()['currentPassword'];
+        $responseData = Json::decode($request->getBody());
+
+        $newPassword = $responseData['newPassword'];
+        $newPasswordRepeat = $responseData['newPasswordRepeat'];
+        $currentPassword = $responseData['currentPassword'];
 
         if ($this->userApi->isValidPassword($userId, $currentPassword) === false) {
-            $this->sessionWrapper->set('passwordErrorCurrentInvalid', true);
-
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
+            return Response::createBadRequest('Current password not correct.');
         }
 
         if ($newPassword !== $newPasswordRepeat) {
-            $this->sessionWrapper->set('passwordErrorNotEqual', true);
-
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
+            return Response::createBadRequest('Passwords were not equal.');
         }
 
         if (strlen($newPassword) < 8) {
-            $this->sessionWrapper->set('passwordErrorMinLength', true);
+            $this->sessionWrapper->set('Password must be at least 8 characters long.', true);
 
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
+            return Response::createBadRequest('Password must be at least 8 characters long.');
         }
 
         if ($user->hasCoreAccountChangesDisabled() === true) {
@@ -495,11 +470,7 @@ class SettingsController
 
         $this->sessionWrapper->set('passwordUpdated', true);
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::create(StatusCode::createOk());
     }
 
     public function updatePlex(Request $request) : Response

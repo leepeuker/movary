@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Account
+    Settings - General
 {% endblock %}
 
 {% block body %}
@@ -12,7 +12,7 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>General settings</h5>
+                <h5>General account</h5>
                 <form action="/settings/account" method="post">
                     <div class="mb-3">
                         <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
@@ -25,7 +25,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="nameInput" class="form-label"><b>Username</b></label>
+                        <label for="nameInput" class="form-label"><b>Username</b> <span class="text-danger">*</span></label>
                         <input type="text"
                                class="form-control"
                                name="username"
