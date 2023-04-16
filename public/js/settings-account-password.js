@@ -12,7 +12,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 
     if (currentPassword.value === '') {
         currentPassword.classList.add('invalid-input');
-        addAlert('alertChangePasswordDiv', errorMessageCurrentPasswordIncorrect, 'danger')
+        addAlert('alertChangePasswordDiv', 'You must enter current password.', 'danger')
         return
     }
 
