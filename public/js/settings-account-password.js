@@ -1,5 +1,5 @@
-const errorMessageCurrentPasswordIncorrect = 'Current password not correct.';
-const errorMessageNewPasswordInvalid = 'New password not meeting requirements.';
+const errorMessageCurrentPasswordIncorrect = 'Current password not correct';
+const errorMessageNewPasswordInvalid = 'New password not meeting requirements';
 
 const currentPassword = document.getElementById('currentPassword')
 const newPassword = document.getElementById('newPassword')
@@ -12,7 +12,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 
     if (currentPassword.value === '') {
         currentPassword.classList.add('invalid-input');
-        addAlert('alertChangePasswordDiv', 'You must enter current password.', 'danger')
+        addAlert('alertChangePasswordDiv', 'You must enter current password', 'danger')
         return
     }
 
@@ -24,7 +24,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 
     if (newPassword.value !== newPasswordRepeat.value) {
         newPasswordRepeat.classList.add('invalid-input');
-        addAlert('alertChangePasswordDiv', 'New passwords do not match.', 'danger')
+        addAlert('alertChangePasswordDiv', 'New passwords do not match', 'danger')
         return
     }
 
@@ -32,7 +32,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 
     switch (response.status) {
         case 200:
-            addAlert('alertChangePasswordDiv', 'Password was updated.', 'success')
+            addAlert('alertChangePasswordDiv', 'Password was updated', 'success')
             currentPassword.value = ''
             newPassword.value = ''
             newPasswordRepeat.value = ''
@@ -53,7 +53,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 
             return
         default:
-            addAlert('alertChangePasswordDiv', 'Unexpected server error.', 'danger')
+            addAlert('alertChangePasswordDiv', 'Unexpected server error', 'danger')
     }
 });
 

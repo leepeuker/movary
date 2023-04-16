@@ -182,19 +182,7 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $userId = $this->authenticationService->getCurrentUserId();
-
-        $generalUpdated = $this->sessionWrapper->find('generalUpdated');
-        $generalErrorUsernameInvalidFormat = $this->sessionWrapper->find('generalErrorUsernameInvalidFormat');
-        $generalErrorUsernameNotUnique = $this->sessionWrapper->find('generalErrorUsernameNotUnique');
-
-        $this->sessionWrapper->unset(
-            'generalUpdated',
-            'generalErrorUsernameInvalidFormat',
-            'generalErrorUsernameNotUnique',
-        );
-
-        $user = $this->userApi->fetchUser($userId);
+        $user = $this->authenticationService->getCurrentUser();
 
         return Response::create(
             StatusCode::createOk(),
@@ -203,9 +191,6 @@ class SettingsController
                 'dateFormats' => DateFormat::getFormats(),
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'privacyLevel' => $user->getPrivacyLevel(),
-                'generalUpdated' => $generalUpdated,
-                'generalErrorUsernameInvalidFormat' => $generalErrorUsernameInvalidFormat,
-                'generalErrorUsernameNotUnique' => $generalErrorUsernameNotUnique,
                 'username' => $user->getName(),
             ]),
         );
@@ -382,29 +367,23 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $postParameters = $request->getPostParameters();
+        $requestData = Json::decode($request->getBody());
 
-        $privacyLevel = isset($postParameters['privacyLevel']) === false ? 1 : (int)$postParameters['privacyLevel'];
-        $dateFormat = empty($postParameters['dateFormat']) === true ? 0 : (int)$postParameters['dateFormat'];
-        $name = $postParameters['username'] ?? '';
+        $privacyLevel = isset($requestData['privacyLevel']) === false ? 1 : (int)$requestData['privacyLevel'];
+        $dateFormat = empty($requestData['dateFormat']) === true ? 0 : (int)$requestData['dateFormat'];
+        $name = $requestData['username'] ?? '';
 
         try {
             $this->userApi->updatePrivacyLevel($this->authenticationService->getCurrentUserId(), $privacyLevel);
             $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
             $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
-
-            $this->sessionWrapper->set('generalUpdated', true);
-        } catch (User\Exception\UsernameInvalidFormat $e) {
-            $this->sessionWrapper->set('generalErrorUsernameInvalidFormat', true);
-        } catch (User\Exception\UsernameNotUnique $e) {
-            $this->sessionWrapper->set('generalErrorUsernameNotUnique', true);
+        } catch (User\Exception\UsernameInvalidFormat) {
+            return Response::createBadRequest('Username not meeting requirements');
+        } catch (User\Exception\UsernameNotUnique) {
+            return Response::createBadRequest('Username is not unique');
         }
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createOk();
     }
 
     public function updateJellyfin(Request $request) : Response
@@ -442,11 +421,11 @@ class SettingsController
         $currentPassword = $responseData['currentPassword'];
 
         if ($this->userApi->isValidPassword($userId, $currentPassword) === false) {
-            return Response::createBadRequest('Current password not correct.'); // Error message is referenced in JS!!!
+            return Response::createBadRequest('Current password not correct'); // Error message is referenced in JS!!!
         }
 
         if (strlen($newPassword) < 8) {
-            return Response::createBadRequest('New password not meeting requirements.'); // Error message is referenced in JS!!!
+            return Response::createBadRequest('New password not meeting requirements'); // Error message is referenced in JS!!!
         }
 
         if ($user->hasCoreAccountChangesDisabled() === true) {

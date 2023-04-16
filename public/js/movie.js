@@ -121,12 +121,12 @@ function editWatchDate() {
                     window.location.reload()
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    addAlert('alertMovieModalDiv', 'Could not update watch date.', 'danger')
+                    addAlert('alertMovieModalDiv', 'Could not update watch date', 'danger')
                 }
             })
         },
         error: function (xhr, textStatus, errorThrown) {
-            addAlert('alertMovieModalDiv', 'Could not delete old watch date.', 'danger')
+            addAlert('alertMovieModalDiv', 'Could not delete old watch date', 'danger')
         }
     })
 }
@@ -151,7 +151,7 @@ function refreshTmdbData() {
     refreshTmdbDataRequest().then(() => {
         location.reload()
     }).catch(() => {
-        addAlert('alertMovieOptionModalDiv', 'Could not refresh tmdb data.', 'danger')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh tmdb data', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
@@ -176,7 +176,7 @@ function refreshImdbRating() {
     refreshImdbRatingRequest().then(() => {
         location.reload()
     }).catch(() => {
-        addAlert('alertMovieOptionModalDiv', 'Could not refresh imdb rating.', 'danger')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh imdb rating', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
