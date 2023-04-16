@@ -282,18 +282,12 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $userId = $this->authenticationService->getCurrentUserId();
-
-        $passwordUpdated = $this->sessionWrapper->find('passwordUpdated');
-        $this->sessionWrapper->unset('passwordUpdated');
-
-        $user = $this->userApi->fetchUser($userId);
+        $user = $this->authenticationService->getCurrentUser();
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-password.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'passwordUpdated' => $passwordUpdated,
             ]),
         );
     }
@@ -445,30 +439,21 @@ class SettingsController
         $responseData = Json::decode($request->getBody());
 
         $newPassword = $responseData['newPassword'];
-        $newPasswordRepeat = $responseData['newPasswordRepeat'];
         $currentPassword = $responseData['currentPassword'];
 
         if ($this->userApi->isValidPassword($userId, $currentPassword) === false) {
-            return Response::createBadRequest('Current password not correct.');
-        }
-
-        if ($newPassword !== $newPasswordRepeat) {
-            return Response::createBadRequest('Passwords were not equal.');
+            return Response::createBadRequest('Current password not correct.'); // Error message is referenced in JS!!!
         }
 
         if (strlen($newPassword) < 8) {
-            $this->sessionWrapper->set('Password must be at least 8 characters long.', true);
-
-            return Response::createBadRequest('Password must be at least 8 characters long.');
+            return Response::createBadRequest('New password not meeting requirements.'); // Error message is referenced in JS!!!
         }
 
         if ($user->hasCoreAccountChangesDisabled() === true) {
-            throw new RuntimeException('Password changes are disabled for user: ' . $userId);
+            return Response::createForbidden();
         }
 
         $this->userApi->updatePassword($userId, $newPassword);
-
-        $this->sessionWrapper->set('passwordUpdated', true);
 
         return Response::create(StatusCode::createOk());
     }

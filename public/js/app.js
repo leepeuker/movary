@@ -7,6 +7,8 @@ if ('serviceWorker' in navigator) {
     })
 }
 
+const PASSWORD_MIN_LENGTH = 8
+
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
     const darkModeInput = document.getElementById('darkModeInput');
