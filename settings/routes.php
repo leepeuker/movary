@@ -268,6 +268,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/users/{username:[a-zA-Z0-9]+}/watchlist',
+        [\Movary\HttpController\WatchlistController::class, 'renderWatchlist'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/users/{username:[a-zA-Z0-9]+}/movies',
         [\Movary\HttpController\MoviesController::class, 'renderPage'],
     );

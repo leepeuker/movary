@@ -24,6 +24,11 @@
                         History
                     </a>
                 </li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/watchlist#' %}active{% endif %}"
+                       href="/users/{{ routeUsername ?: currentUserName }}/watchlist">
+                        Watchlist
+                    </a>
+                </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}"
                        href="/users/{{ routeUsername ?: currentUserName }}/movies">
                         All Movies</a>
