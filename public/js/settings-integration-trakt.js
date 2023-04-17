@@ -3,7 +3,7 @@ async function verifyTraktCredentials() {
     const clientId = document.getElementById('traktClientId').value;
 
     if (username == false || clientId == false) {
-        addAlertMessage('Username or client id missing.', 'warning')
+        addAlertMessage('Username or client id missing', 'warning')
 
         return
     }
@@ -23,9 +23,9 @@ async function verifyTraktCredentials() {
     })
 
     if (response.ok) {
-        addAlertMessage('Credentials are valid.', 'success')
+        addAlertMessage('Credentials are valid', 'success')
     } else if (response.status === 400) {
-        addAlertMessage('Credentials are not valid.', 'danger')
+        addAlertMessage('Credentials are not valid', 'danger')
     } else {
         addAlertMessage('Something went wrong...', 'warning')
 

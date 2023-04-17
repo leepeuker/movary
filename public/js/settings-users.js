@@ -99,8 +99,8 @@ function validateCreateUserInput() {
     })
 
     if (passwordInput.required === true || passwordInput.value.length > 0) {
-        if (passwordInput.value.length < 8 || passwordInput.value !== passwordRepeatInput.value) {
-            if (passwordInput.value.length < 8) {
+        if (passwordInput.value.length < PASSWORD_MIN_LENGTH || passwordInput.value !== passwordRepeatInput.value) {
+            if (passwordInput.value.length < PASSWORD_MIN_LENGTH) {
                 passwordInput.classList.add('invalid-input');
             }
             passwordRepeatInput.classList.add('invalid-input');

@@ -7,6 +7,8 @@ if ('serviceWorker' in navigator) {
     })
 }
 
+const PASSWORD_MIN_LENGTH = 8
+
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
     const darkModeInput = document.getElementById('darkModeInput');
@@ -35,30 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
             resetLogModalSearchResults()
             backToLogModalSearchResults()
         })
-    }
-
-    const navItemIntegrations = document.getElementById('navItemIntegrations');
-    if (navItemIntegrations != null) {
-        const navIntegrations = document.getElementById('navIntegrations');
-
-        const navSecondLevelHr = document.getElementById('navSecondLevelHr');
-        const navItemIntegrationsIcon = document.getElementById('navItemIntegrationsIcon');
-
-        navItemIntegrations.addEventListener('click', () => {
-            if (navIntegrations.classList.contains('d-none')) {
-                navIntegrations.classList.remove('d-none')
-                navSecondLevelHr.classList.remove('d-none')
-                navItemIntegrationsIcon.classList.remove('bi-chevron-down')
-                navItemIntegrationsIcon.classList.add('bi-chevron-up')
-
-                return
-            }
-
-            navIntegrations.classList.add('d-none')
-            navSecondLevelHr.classList.add('d-none')
-            navItemIntegrationsIcon.classList.add('bi-chevron-down')
-            navItemIntegrationsIcon.classList.remove('bi-chevron-up')
-        });
     }
 });
 
