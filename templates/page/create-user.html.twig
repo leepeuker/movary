@@ -9,6 +9,9 @@
 {% endblock %}
 
 {% block body %}
+    <script>
+        if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
+    </script>
     <main role="main" class="form-signin w-100 m-auto text-center">
         <form action="/create-user" method="post" enctype="multipart/form-data">
             <h1 class="">Movary</h1>
