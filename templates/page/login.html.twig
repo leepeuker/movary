@@ -9,21 +9,23 @@
 {% endblock %}
 
 {% block body %}
+    <script>
+        if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
+    </script>
     <main role="main" class="form-signin w-100 m-auto text-center">
         <form action="/login" method="post" enctype="multipart/form-data">
-            <h1 class="">Movary</h1>
-            <br>
+            <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">Movary</h1>
             <div class="form-floating">
-                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
+                <input type="email" name="email" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingInput" placeholder="name@example.com" required>
                 <label for="floatingInput">Email address</label>
             </div>
             <div class="form-floating">
-                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                <input type="password" name="password" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingPassword" placeholder="Password" required>
                 <label for="floatingPassword">Password</label>
             </div>
 
             <div class="checkbox mb-3" style="margin-bottom: 0.7rem!important;">
-                <label>
+                <label class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">
                     <input type="checkbox" name="rememberMe" value="true"> Remember me
                 </label>
             </div>

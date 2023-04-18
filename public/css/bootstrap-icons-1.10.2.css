@@ -22,13 +22,17 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 
 .bi-arrow-clockwise::before { content: "\f116"; }
 .bi-calendar-date::before { content: "\f1e4"; }
+.bi-chat-square-text::before { content: "\f264"; }
 .bi-check-circle-fill::before { content: "\f26a"; }
 .bi-chevron-down::before { content: "\f282"; }
 .bi-chevron-up::before { content: "\f286"; }
+.bi-moon-fill::before { content: "\f494"; }
 .bi-pencil-square::before { content: "\f4ca"; }
 .bi-search::before { content: "\f52a"; }
 .bi-star::before { content: "\f588"; }
 .bi-star-fill::before { content: "\f586"; }
 .bi-star-half::before { content: "\f587"; }
+.bi-sun::before { content: "\f5a2"; }
 .bi-trash-fill::before { content: "\f5dd"; }
+.bi-three-dots-vertical::before { content: "\f5d3"; }
 .bi-x-circle-fill::before { content: "\f622"; }

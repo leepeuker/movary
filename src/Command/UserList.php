@@ -25,6 +25,7 @@ class UserList extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $users = $this->userApi->fetchAll();
+
         foreach ($users as $user) {
             $this->generateOutput($output, sprintf('id: %s, email: %s', $user['id'], $user['email']));
         }

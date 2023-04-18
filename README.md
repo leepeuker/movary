@@ -4,6 +4,7 @@
 [![GitHub issues badge](https://img.shields.io/github/issues/leepeuker/movary)](https://github.com/leepeuker/movary/issues)
 [![Reddit badge](https://img.shields.io/reddit/subreddit-subscribers/movary)](https://www.reddit.com/r/movary/)
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
+[![Matrix](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Matrix_icon.svg//18px-Matrix_icon.svg.png)](https://matrix.to/#/#movary:leepeuker.dev)
 
 Movary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
 You can import/export your history and ratings from/to third parties like trakt.tv or letterboxd.com,
@@ -11,7 +12,7 @@ scrobble your watches via Plex and Jellyfin and more.
 
 Demo installation can be found [here](https://demo.movary.org/) (login email `testUser@movary.org` and password `testUser`).
 
-![Movary Dashboard Example](https://i.imgur.com/690Rr80.png)
+![Movary Dashboard Example](https://i.imgur.com/1qvhWFh.png)
 
 1. [About](#about)
 2. [Install](#install)
@@ -24,13 +25,14 @@ Demo installation can be found [here](https://demo.movary.org/) (login email `te
     3. [Plex Scrobbler](#plex-scrobbler)
     4. [Jellyfin Scrobbler](#jellyfin-scrobbler)
     5. [trakt.tv Import](#trakttv-import)
-    6. [trakt.tv Export](#trakttv-export)
-    7. [Letterboxd.com Import](#letterboxdcom-import)
-    8. [Letterboxd.com Export](#letterboxdcom-export)
+    6. [Letterboxd.com Import](#letterboxdcom-import)
+    7. [Letterboxd.com Export](#letterboxdcom-export)
+    8. [Netflix Import](#netflix-import)
     9. [IMDb Rating Sync](#imdb-rating-sync)
 5. [FAQ](#faq)
 6. [Development](#development)
 7. [Support](#support)
+8. [Contributors](#contributors)
 
 Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
 or visit the [official subreddit](https://www.reddit.com/r/movary/)!
@@ -278,10 +280,6 @@ Example cli import (import history and ratings for user with id 1 and overwrite 
 - `--ignore-cache`
   Use if you want to force import everything regardless if there was a change since the last import
 
-### Trakt.tv Export
-
-Coming soon ([maybe](https://github.com/leepeuker/movary/issues/97)?)
-
 ### Letterboxd.com Import
 
 You can import your watch history and ratings from letterboxd.com.
@@ -296,7 +294,11 @@ You can export your local watch history and ratings to letterboxd.com.
 
 Visit the movary settings page `/settings/letterboxd` for more instructions.
 
-<a name="#link-imdb-sync"></a>
+### Netflix Import
+
+You can import your watch history from netflix.
+
+Visit the movary settings page `/settings/netflix` for more instructions.
 
 ### IMDb Rating Sync
 
@@ -345,5 +347,12 @@ The application should be up-to-date and running locally now.
 
 ## Support
 
+- Join the matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
 - Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
 - Ask questions or discuss movary related topics in the [official subreddit](https://www.reddit.com/r/movary/)
+
+
+## Contributors
+
+* [@leepeuker](https://github.com/leepeuker) as Lee Peuker
+* [@JVT038](https://github.com/JVT038) as JVT038

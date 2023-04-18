@@ -1,0 +1,95 @@
+{% if loggedIn == true %}
+    <div class="modal fade" id="logPlayModal" tabindex="-1" role="dialog" data-bs-backdrop="static" aria-labelledby="logPlayModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logPlayModalTitle">Log play</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="logPlayModalSearchDiv">
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="Search"
+                                   value="{{ (searchTerm is null) ? '' : searchTerm }}"
+                                   id="logPlayModalSearchInput"
+                                   tabindex="0"
+                                   style="order:1">
+                            <button class="btn btn-primary"
+                                    type="submit"
+                                    onclick="searchTmdbWithLogModalSearchInput()"
+                                    id="logPlayModalSearchButton"
+                                    tabindex="0"
+                                    style="order:2"
+                                    disabled>
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+
+
+                        <div class="alert alert-danger d-none" role="alert" id="logPlayModalSearchErrorAlert" style="margin-top: 1rem;margin-bottom: 0">
+                            Something went wrong. Please try again.
+                        </div>
+                        <div class="alert alert-secondary d-none" role="alert" id="logPlayModalSearchNoResultAlert" style="margin-top: 1rem;margin-bottom: 0">
+                            No search results...
+                        </div>
+                        <div class="text-center d-none" style="margin-top: 1rem;margin-bottom: 0" id="logPlayModalSearchSpinner">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <ul class="list-group" id="logPlayModalSearchResultList"></ul>
+                    </div>
+
+                    <div class="d-none" id="logPlayModalWatchDateDiv">
+                        <input id="logPlayModalTmdbIdInput" hidden>
+
+                        <div class="input-group" id="watchDateGroup">
+                            <i class="bi bi-calendar-date input-group-text"></i>
+                            <input type="text"
+                                   class="datepicker_input form-control"
+                                   placeholder="Watch date"
+                                   aria-label="Watch date"
+                                   name="watchDate"
+                                   id="logPlayModalWatchDateInput"
+                                   required
+                                   onfocusout="validateWatchDate('logPlayModal', this.value)">
+                            <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
+                                Watch date is required!
+                            </div>
+                            <div class="invalid-feedback" id="watchDateValidationFormatErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
+                                Watch date format is invalid!
+                            </div>
+                        </div>
+                        <div class="fw-light" id="logPlayModalRatingStars"
+                             style="color: rgb(255, 193, 7);
+                                    font-size: 1.5rem;
+                                    margin-top: 0.5rem;
+                                    cursor:pointer;
+                                    border-top-right-radius: .375rem!important;
+                                    border-bottom-right-radius: .375rem">
+                            <span id="ratingStarsSpan">
+                                {% for i in 1..10 %}
+                                    <i class="bi bi-star" data-value="{{ i }}" id="logPlayModalRatingStar{{ i }}" onclick="updateRatingStars('logPlayModal', this)"></i>
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <div class="input-group" style="margin-top: 0.5rem;">
+                            <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
+                            <textarea class="form-control" rows="1" aria-label="Comment" id="logPlayModalCommentInput" placeholder="Comment"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger d-none" role="alert" id="logPlayModalLogErrorAlert" style="margin-top: 1rem;margin-bottom: 0">
+                        Could not log play. Please try again.
+                    </div>
+                </div>
+                <div class="modal-footer d-none" id="logPlayModalFooter">
+                    <button type="submit" class="btn btn-secondary" onclick="backToLogModalSearchResults()" id="logPlayModalFooterBackButton">Back</button>
+                    <button type="submit" class="btn btn-primary" onclick="logMovie('logPlayModal')">Log play</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

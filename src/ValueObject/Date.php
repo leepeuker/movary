@@ -44,6 +44,11 @@ class Date implements JsonSerializable
         return $this->date;
     }
 
+    public function format(string $format) : string
+    {
+        return (new \DateTime($this->date))->format($format);
+    }
+
     public function getDifferenceInDays(Date $date) : int
     {
         $daysSince = (new \DateTime($this->date))->diff((new \DateTime($date->date)))->days;

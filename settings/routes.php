@@ -90,8 +90,23 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     ############
     $routeCollector->addRoute(
         'GET',
-        '/settings/account',
-        [\Movary\HttpController\SettingsController::class, 'renderAccountPage'],
+        '/settings/account/general',
+        [\Movary\HttpController\SettingsController::class, 'renderGeneralAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/password',
+        [\Movary\HttpController\SettingsController::class, 'renderPasswordAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/account/data',
+        [\Movary\HttpController\SettingsController::class, 'renderDataAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/users',
+        [\Movary\HttpController\SettingsController::class, 'renderUsersPage'],
     );
     $routeCollector->addRoute(
         'POST',
@@ -130,7 +145,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/trakt',
+        '/settings/integrations/trakt',
         [\Movary\HttpController\SettingsController::class, 'renderTraktPage'],
     );
     $routeCollector->addRoute(
@@ -145,7 +160,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/letterboxd',
+        '/settings/integrations/letterboxd',
         [\Movary\HttpController\SettingsController::class, 'renderLetterboxdPage'],
     );
     $routeCollector->addRoute(
@@ -155,7 +170,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/plex',
+        '/settings/integrations/plex',
         [\Movary\HttpController\SettingsController::class, 'renderPlexPage'],
     );
     $routeCollector->addRoute(
@@ -180,7 +195,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/jellyfin',
+        '/settings/integrations/jellyfin',
         [\Movary\HttpController\SettingsController::class, 'renderJellyfinPage'],
     );
     $routeCollector->addRoute(
@@ -210,13 +225,13 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/netflix',
+        '/settings/integrations/netflix',
         [\Movary\HttpController\SettingsController::class, 'renderNetflixPage'],
     );
     $routeCollector->addRoute(
         'POST',
         '/settings/netflix',
-        [\Movary\HttpController\NetflixController::class, 'processNetflixActivity'],
+        [\Movary\HttpController\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'],
     );
     $routeCollector->addRoute(
         'POST',
@@ -226,7 +241,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/settings/netflix/search',
-        [\Movary\HttpController\NetflixController::class, 'searchTMDB'],
+        [\Movary\HttpController\NetflixController::class, 'searchTmbd'],
     );
 
     ##########
@@ -302,11 +317,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\MovieController::class, 'updateRating'],
     );
     $routeCollector->addRoute(
-        'GET',
-        '/log-movie',
-        [\Movary\HttpController\HistoryController::class, 'renderLogMoviePage'],
-    );
-    $routeCollector->addRoute(
         'POST',
         '/log-movie',
         [\Movary\HttpController\HistoryController::class, 'logMovie'],
@@ -322,5 +332,29 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/{username:[a-zA-Z0-9]+}[/]',
         [\Movary\HttpController\DashboardController::class, 'redirectToDashboard'],
+    );
+
+    ############
+    # REST Api #
+    ############
+    $routeCollector->addRoute(
+        'GET',
+        '/api/users',
+        [\Movary\HttpController\Rest\UserController::class, 'fetchUsers'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/api/users',
+        [\Movary\HttpController\Rest\UserController::class, 'createUser'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/api/users/{userId:\d+}',
+        [\Movary\HttpController\Rest\UserController::class, 'updateUser'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/api/users/{userId:\d+}',
+        [\Movary\HttpController\Rest\UserController::class, 'deleteUser'],
     );
 };

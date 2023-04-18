@@ -1,6 +1,12 @@
 .tmdbrow:hover {
     filter: brightness(50%);
 }
+.netflixrow[data-tmdbid='undefined']:hover {
+    background-color: #a46c06 !important;
+}
+.netflixrow[data-tmdbid='undefined']:hover .ratingIcon {
+    color: rgb(255, 193, 7) !important;
+}
 .tmdbrow {
     cursor: pointer;
 }

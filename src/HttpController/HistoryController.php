@@ -2,7 +2,6 @@
 
 namespace Movary\HttpController;
 
-use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
@@ -26,7 +25,6 @@ class HistoryController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly TmdbApi $tmdbApi,
         private readonly MovieApi $movieApi,
         private readonly UserApi $userApi,
         private readonly SyncMovie $tmdbMovieSyncService,
@@ -136,28 +134,6 @@ class HistoryController
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'historyEntries' => $historyPaginated,
                 'paginationElements' => $paginationElements,
-                'searchTerm' => $searchTerm,
-            ]),
-        );
-    }
-
-    public function renderLogMoviePage(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-
-        $movies = [];
-        if ($searchTerm !== null) {
-            $movies = $this->tmdbApi->searchMovie($searchTerm);
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/log-movie.html.twig', [
-                'movies' => $movies,
                 'searchTerm' => $searchTerm,
             ]),
         );

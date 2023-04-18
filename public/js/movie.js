@@ -1,15 +1,4 @@
-let ratingEditMode = false
 let originalRating
-
-const addWatchDateModal = document.getElementById('addWatchDateModal')
-addWatchDateModal.addEventListener('show.bs.modal', async function () {
-    const datepicker = new Datepicker(document.getElementById('addWatchDateModalInput'), {
-        format: document.getElementById('dateFormatJavascript').value,
-        title: 'Watch date',
-    })
-
-    document.getElementById('addWatchDateModalInput').value = getCurrentDate()
-})
 
 function deleteWatchDate() {
     const confirmed = confirm('Are you sure?')
@@ -29,61 +18,9 @@ function deleteWatchDate() {
             window.location.reload()
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete.')
+            addAlert('alertMovieModalDiv', 'Could not delete watch date.', 'danger')
         }
     })
-}
-
-function editRating(e) {
-    ratingEditMode = true
-
-    if (originalRating === undefined) {
-        originalRating = getRatingFromStars()
-    }
-
-    document.getElementById('ratingStarsSpan').classList.add('rating-edit-active')
-    document.getElementById('editRatingButton').style.display = 'none'
-    document.getElementById('saveRatingButton').style.display = 'inline'
-    document.getElementById('resetRatingButton').style.display = 'inline'
-}
-
-function getRatingFromStars() {
-    let rating = 0
-
-    for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-        if (document.getElementById('ratingStar' + ratingStarNumber).classList.contains('bi-star') === true) {
-            break
-        }
-
-        rating = ratingStarNumber
-    }
-
-    return rating
-}
-
-function setRatingStars(newRating) {
-    if (getRatingFromStars() == newRating) {
-        newRating = null
-    }
-
-    for (let ratingStarNumber = 1; ratingStarNumber <= 10; ratingStarNumber++) {
-        document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star-fill')
-        document.getElementById('ratingStar' + ratingStarNumber).classList.remove('bi-star')
-
-        if (ratingStarNumber <= newRating) {
-            document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star-fill')
-        } else {
-            document.getElementById('ratingStar' + ratingStarNumber).classList.add('bi-star')
-        }
-    }
-}
-
-function updateRatingStars(e) {
-    if (ratingEditMode === false) {
-        return
-    }
-
-    setRatingStars(e.id.substring(20, 10))
 }
 
 function getMovieId() {
@@ -95,7 +32,7 @@ function getRouteUsername() {
 }
 
 function saveRating() {
-    let newRating = getRatingFromStars()
+    let newRating = getRatingFromStars('editRatingModal')
 
     fetch('/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
         method: 'post',
@@ -103,36 +40,15 @@ function saveRating() {
             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
         },
         body: 'rating=' + newRating
+    }).then(function (response) {
+        if (response.ok === false) {
+            addAlert('editRatingModalDiv', 'Could not update rating.', 'danger')
+
+            return
+        }
+
+        window.location.reload()
     })
-        .then(function (data) {
-            console.log('Request succeeded with JSON response', data)
-        })
-        .catch(function (error) {
-            alert('Could not update rating.')
-            console.log('Request failed', error)
-        })
-
-    ratingEditMode = false
-    originalRating = newRating
-
-    document.getElementById('ratingStarsSpan').classList.remove('rating-edit-active')
-    document.getElementById('editRatingButton').style.display = 'inline'
-    document.getElementById('saveRatingButton').style.display = 'none'
-    document.getElementById('resetRatingButton').style.display = 'none'
-}
-
-function resetRating(e) {
-    ratingEditMode = true
-
-    setRatingStars(null)
-    saveRating(e)
-
-    ratingEditMode = false
-
-    document.getElementById('ratingStarsSpan').classList.remove('rating-edit-active')
-    document.getElementById('editRatingButton').style.display = 'inline'
-    document.getElementById('saveRatingButton').style.display = 'none'
-    document.getElementById('resetRatingButton').style.display = 'none'
 }
 
 function toggleWatchDates() {
@@ -205,130 +121,44 @@ function editWatchDate() {
                     window.location.reload()
                 },
                 error: function (xhr, textStatus, errorThrown) {
-                    alert('Could not create new watch date.')
+                    addAlert('alertMovieModalDiv', 'Could not update watch date', 'danger')
                 }
             })
         },
         error: function (xhr, textStatus, errorThrown) {
-            alert('Could not delete old watch date.')
+            addAlert('alertMovieModalDiv', 'Could not delete old watch date', 'danger')
         }
     })
 }
 
-function addWatchDate() {
-    const watchDate = document.getElementById('addWatchDateModalInput').value;
-    const comment = document.getElementById('addWatchDateModalCommentInput').value;
+function loadRatingModal() {
+    const editRatingModal = new bootstrap.Modal(document.getElementById('editRatingModal'), {
+        keyboard: false
+    });
 
-    if (validateWatchDate(watchDate) === false) {
-        return;
-    }
+    setRatingStars('editRatingModal', 0) // When this is removed the rating stars are reset to 0 every second time the edit modal is opened...  ¯\_(ツ)_/¯
+    setRatingStars('editRatingModal', getRatingFromStars('movie'))
 
-    const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
-
-    $.ajax({
-        url: apiUrl,
-        type: 'PUT',
-        data: JSON.stringify({
-            'watchDate': watchDate,
-            'plays': 1,
-            'comment': comment,
-            'dateFormat': document.getElementById('dateFormatPhp').value
-        }),
-        success: function (data, textStatus, xhr) {
-            window.location.reload()
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            alert('Could not create new watch date.')
-        }
-    })
-}
-
-function validateWatchDate(watchDate) {
-    document.getElementById('addWatchDateModalValidationRequiredErrorMessage').classList.remove('d-block')
-    document.getElementById('addWatchDateModalValidationFormatErrorMessage').classList.remove('d-block')
-
-    if (!watchDate) {
-        document.getElementById('addWatchDateModalInput').style.borderStyle = 'solid'
-        document.getElementById('addWatchDateModalInput').style.borderColor = '#dc3545'
-        document.getElementById('addWatchDateModalValidationRequiredErrorMessage').classList.add('d-block')
-
-        return false
-    }
-
-    if (isValidDate(watchDate) === false) {
-        document.getElementById('addWatchDateModalInput').style.borderStyle = 'solid'
-        document.getElementById('addWatchDateModalInput').style.borderColor = '#dc3545'
-        document.getElementById('addWatchDateModalValidationFormatErrorMessage').classList.add('d-block')
-
-        return false
-    }
-
-    document.getElementById('addWatchDateModalInput').style.borderStyle = ''
-    document.getElementById('addWatchDateModalInput').style.borderColor = ''
-
-    return true
-}
-
-function isValidDate(dateString) {
-    return true
-
-    // First check for the pattern
-    if (!/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(dateString)) {
-        return false
-    }
-
-    // Parse the date parts to integers
-    var parts = dateString.split('.')
-    var day = parseInt(parts[0], 10)
-    var month = parseInt(parts[1], 10)
-    var year = parseInt(parts[2], 10)
-
-    // Check the ranges of month and year
-    if (year < 1000 || year > 3000 || month == 0 || month > 12) return false
-
-    var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-    // Adjust for leap years
-    if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) monthLength[1] = 29
-
-    // Check the range of the day
-    return day > 0 && day <= monthLength[month - 1]
-}
-
-function getCurrentDate() {
-    const today = new Date()
-    const dd = String(today.getDate()).padStart(2, '0')
-    const mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
-    const yyyy = today.getFullYear()
-
-    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yyyy') {
-        return dd + '.' + mm + '.' + yyyy
-    }
-    if (document.getElementById('dateFormatJavascript').value === 'dd.mm.yy') {
-        return dd + '.' + mm + '.' + yyyy.toString().slice(-2)
-    }
-    if (document.getElementById('dateFormatJavascript').value === 'yy-mm-dd') {
-        return yyyy.toString().slice(-2) + '-' + mm + '-' + dd
-    }
-
-    return yyyy + '-' + mm + '-' + dd
+    editRatingModal.show()
 }
 
 function refreshTmdbData() {
+    removeAlert('alertMovieOptionModalDiv')
+
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
 
     refreshTmdbDataRequest().then(() => {
         location.reload()
     }).catch(() => {
-        alert('Could not refresh tmdb data. Please try again.')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh tmdb data', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
 }
 
 async function refreshTmdbDataRequest() {
-    const response = await fetch('/movies/303/refresh-tmdb')
+    const response = await fetch('/movies/' + getMovieId() + '/refresh-tmdb')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -338,20 +168,22 @@ async function refreshTmdbDataRequest() {
 }
 
 function refreshImdbRating() {
+    removeAlert('alertMovieOptionModalDiv')
+
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
 
     refreshImdbRatingRequest().then(() => {
         location.reload()
     }).catch(() => {
-        alert('Could not refresh imdb rating. Please try again.')
+        addAlert('alertMovieOptionModalDiv', 'Could not refresh imdb rating', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
     })
 }
 
 async function refreshImdbRatingRequest() {
-    const response = await fetch('/movies/303/refresh-imdb')
+    const response = await fetch('/movies/' + getMovieId() + '/refresh-imdb')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
