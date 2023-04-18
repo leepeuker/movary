@@ -84,7 +84,7 @@ class CreateUserController
         }
 
         try {
-            $this->userApi->createAdminUser($email, $password, $name);
+            $this->userApi->createUser($email, $password, $name);
 
             $this->authenticationService->login($email, $password, false);
         } catch (PasswordTooShort) {
