@@ -24,28 +24,19 @@
         <input type="hidden" id="username" value="{{ routeUsername }}">
 
         <div class="fw-light" id="ratingStars"
-             style="color: rgb(255, 193, 7);
-                     font-size: 1.5rem;
-                     margin-bottom: 0.5rem;
-                     {% if currentUsername == routeUsername %}cursor:pointer;{% endif %}">
-
+             style="color: rgb(255, 193, 7);font-size: 1.5rem;margin-bottom: 0.5rem;cursor: default">
             <span id="ratingStarsSpan">
                 {{ movie.personal_rating }}
                 {% for i in 1..10 %}
                     <i class="bi bi-star{% if movie.personalRating >= i %}-fill{% endif %}"
                        id="movieRatingStar{{ i }}"
-                       data-value="{{ i }}"
-                       onclick="updateRatingStars('movie', this)"></i>
+                       data-value="{{ i }}"></i>
                 {% endfor %}
-                {% if currentUsername == routeUsername %}
+                {% if currentUserName == routeUsername %}
                     <i class="bi bi-pencil-square {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color"
                        style="font-size: 1.3rem;cursor: pointer"
-                       onclick="editRating(this)"
+                       onclick="loadRatingModal()"
                        id="editRatingButton"></i>
-                    <i class="bi bi-check-circle-fill" style="color: #198754;font-size: 1.3rem;cursor: pointer;display: none" onclick="saveRating(this)"
-                       id="saveRatingButton"></i>
-                    <i class="bi bi-x-circle-fill" style="color: #dc3545;font-size: 1.3rem;cursor: pointer;display: none" onclick="resetRating(this)"
-                       id="resetRatingButton"></i>
                 {% endif %}
             </span>
         </div>
@@ -88,12 +79,9 @@
                 <div style="display: flex; align-items: center;cursor:pointer;" onclick="window.open('{{ movie.imdbUrl }}', '_blank')">
                     <img src="/images/imdb-logo.svg" style="width: 3rem">
                     <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
-                        <span class="fw-bold">
-                            {% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
-                        </span>
-                        <span class="fw-lighter">
-                            /{{ movie.imdbRatingVoteCount|default('-') }}
-                        </span>
+                        {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
+                        <span class="fw-bold">{% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span
+                                class="fw-lighter">/{{ movie.imdbRatingVoteCount|default('-') }}</span>
                     </p>
                 </div>
             {% endif %}
@@ -101,12 +89,9 @@
                  onclick="window.open('{{ movie.tmdbUrl }}', '_blank')">
                 <img src="/images/tmdb-logo.svg" style="width: 2rem">
                 <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
-                    <span class="fw-bold">
-                        {% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
-                    </span>
-                    <span class="fw-lighter">
-                        /{{ movie.tmdbRatingVoteCount|default('-') }}
-                    </span>
+                    {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
+                    <span class="fw-bold">{% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span
+                            class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
                 </p>
             </div>
         </div>
@@ -128,9 +113,9 @@
             <div class="row">
                 <ul class="list-group col-lg-5 col-xl-4 col-xxl-3" style="padding-right: 0">
                     {% for watchDate in watchDates|reverse %}
-                        <li class="list-group-item {% if currentUsername == routeUsername %}list-group-item-action{% endif %}"
-                            style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer;{% endif %}position:relative;"
-                            {% if currentUsername == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
+                        <li class="list-group-item {% if currentUserName == routeUsername %}list-group-item-action{% endif %}"
+                            style="text-align: center;{% if currentUserName == routeUsername %}cursor: pointer;{% endif %}position:relative;"
+                            {% if currentUserName == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
                             data-watch-date="{{ watchDate.watched_at|date(dateFormatPhp) }}"
                             data-plays="{{ watchDate.plays }}"
                             data-comment="{{ watchDate.comment }}">
@@ -142,7 +127,7 @@
             </div>
         </div>
 
-        {% if currentUsername == routeUsername %}
+        {% if currentUserName == routeUsername %}
             <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
                     <button type="button"
@@ -164,6 +149,7 @@
                 </div>
             </div>
 
+            {{ include('component/modal-edit-rating.html.twig') }}
             {{ include('component/modal-edit-watch-date.html.twig') }}
             {{ include('component/modal-more-options.html.twig') }}
         {% endif %}

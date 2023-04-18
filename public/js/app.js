@@ -7,7 +7,7 @@ if ('serviceWorker' in navigator) {
     })
 }
 
-let ratingEditMode = false
+const PASSWORD_MIN_LENGTH = 8
 
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
@@ -37,30 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
             resetLogModalSearchResults()
             backToLogModalSearchResults()
         })
-    }
-
-    const navItemIntegrations = document.getElementById('navItemIntegrations');
-    if (navItemIntegrations != null) {
-        const navIntegrations = document.getElementById('navIntegrations');
-
-        const navSecondLevelHr = document.getElementById('navSecondLevelHr');
-        const navItemIntegrationsIcon = document.getElementById('navItemIntegrationsIcon');
-
-        navItemIntegrations.addEventListener('click', () => {
-            if (navIntegrations.classList.contains('d-none')) {
-                navIntegrations.classList.remove('d-none')
-                navSecondLevelHr.classList.remove('d-none')
-                navItemIntegrationsIcon.classList.remove('bi-chevron-down')
-                navItemIntegrationsIcon.classList.add('bi-chevron-up')
-
-                return
-            }
-
-            navIntegrations.classList.add('d-none')
-            navSecondLevelHr.classList.add('d-none')
-            navItemIntegrationsIcon.classList.add('bi-chevron-down')
-            navItemIntegrationsIcon.classList.remove('bi-chevron-up')
-        });
     }
 });
 
@@ -408,10 +384,6 @@ async function fetchRating(tmdbId) {
 }
 
 function setRatingStars(context, newRating) {
-    if (context === 'movie' && ratingEditMode === false) {
-        return
-    }
-
     if (getRatingFromStars(context) == newRating) {
         newRating = 0
     }
@@ -450,4 +422,16 @@ function toggleThemeSwitch() {
     }
 
     setTheme('light')
+}
+
+function addAlert(parentDivId, message, color) {
+    document.getElementById(parentDivId).innerHTML =
+        '<div class="alert alert-' + color + ' alert-dismissible" role="alert">'
+        + message +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>'
+}
+
+function removeAlert(parentDivId) {
+    document.getElementById(parentDivId).innerHTML = ''
 }

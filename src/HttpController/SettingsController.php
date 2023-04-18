@@ -127,70 +127,6 @@ class SettingsController
         return Response::createOk();
     }
 
-    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-    public function renderAccountPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $userId = $this->authenticationService->getCurrentUserId();
-
-        $passwordErrorNotEqual = $this->sessionWrapper->find('passwordErrorNotEqual');
-        $passwordErrorMinLength = $this->sessionWrapper->find('passwordErrorMinLength');
-        $passwordErrorCurrentInvalid = $this->sessionWrapper->find('passwordErrorCurrentInvalid');
-        $passwordUpdated = $this->sessionWrapper->find('passwordUpdated');
-        $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
-        $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
-        $importHistoryError = $this->sessionWrapper->find('importHistoryError');
-        $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
-        $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
-        $generalUpdated = $this->sessionWrapper->find('generalUpdated');
-        $generalErrorUsernameInvalidFormat = $this->sessionWrapper->find('generalErrorUsernameInvalidFormat');
-        $generalErrorUsernameNotUnique = $this->sessionWrapper->find('generalErrorUsernameNotUnique');
-
-        $this->sessionWrapper->unset(
-            'passwordUpdated',
-            'passwordErrorCurrentInvalid',
-            'passwordErrorMinLength',
-            'passwordErrorNotEqual',
-            'importHistorySuccessful',
-            'importRatingsSuccessful',
-            'importHistoryError',
-            'deletedUserHistory',
-            'deletedUserRatings',
-            'generalUpdated',
-            'generalErrorUsernameInvalidFormat',
-            'generalErrorUsernameNotUnique',
-        );
-
-        $user = $this->userApi->fetchUser($userId);
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-account.html.twig', [
-                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'dateFormats' => DateFormat::getFormats(),
-                'dateFormatSelected' => $user->getDateFormatId(),
-                'privacyLevel' => $user->getPrivacyLevel(),
-                'generalUpdated' => $generalUpdated,
-                'generalErrorUsernameInvalidFormat' => $generalErrorUsernameInvalidFormat,
-                'generalErrorUsernameNotUnique' => $generalErrorUsernameNotUnique,
-                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
-                'passwordErrorNotEqual' => $passwordErrorNotEqual,
-                'passwordErrorMinLength' => $passwordErrorMinLength,
-                'passwordErrorCurrentInvalid' => $passwordErrorCurrentInvalid,
-                'importHistorySuccessful' => $importHistorySuccessful,
-                'importRatingsSuccessful' => $importRatingsSuccessful,
-                'passwordUpdated' => $passwordUpdated,
-                'importHistoryError' => $importHistoryError,
-                'deletedUserHistory' => $deletedUserHistory,
-                'deletedUserRatings' => $deletedUserRatings,
-                'username' => $user->getName(),
-            ]),
-        );
-    }
-
     public function renderAppPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -203,6 +139,63 @@ class SettingsController
                 'currentApplicationVersion' => $this->currentApplicationVersion ?? self::VERSION_PLACEHOLDER,
                 'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
                 'timeZone' => date_default_timezone_get(),
+            ]),
+        );
+    }
+
+    public function renderDataAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
+        $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
+        $importHistoryError = $this->sessionWrapper->find('importHistoryError');
+        $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
+        $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
+
+        $this->sessionWrapper->unset(
+            'importHistorySuccessful',
+            'importRatingsSuccessful',
+            'importHistoryError',
+            'deletedUserHistory',
+            'deletedUserRatings',
+        );
+
+        $user = $this->userApi->fetchUser($userId);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-data.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'importHistorySuccessful' => $importHistorySuccessful,
+                'importRatingsSuccessful' => $importRatingsSuccessful,
+                'importHistoryError' => $importHistoryError,
+                'deletedUserHistory' => $deletedUserHistory,
+                'deletedUserRatings' => $deletedUserRatings,
+            ]),
+        );
+    }
+
+    public function renderGeneralAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $user = $this->authenticationService->getCurrentUser();
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-general.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'dateFormats' => DateFormat::getFormats(),
+                'dateFormatSelected' => $user->getDateFormatId(),
+                'privacyLevel' => $user->getPrivacyLevel(),
+                'username' => $user->getName(),
             ]),
         );
     }
@@ -269,6 +262,22 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-netflix.html.twig'),
+        );
+    }
+
+    public function renderPasswordAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $user = $this->authenticationService->getCurrentUser();
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-password.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+            ]),
         );
     }
 
@@ -345,6 +354,22 @@ class SettingsController
         );
     }
 
+    public function renderUsersPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-users.html.twig'),
+        );
+    }
+
     public function traktVerifyCredentials(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -369,29 +394,23 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $postParameters = $request->getPostParameters();
+        $requestData = Json::decode($request->getBody());
 
-        $privacyLevel = isset($postParameters['privacyLevel']) === false ? 1 : (int)$postParameters['privacyLevel'];
-        $dateFormat = empty($postParameters['dateFormat']) === true ? 0 : (int)$postParameters['dateFormat'];
-        $name = $postParameters['username'] ?? '';
+        $privacyLevel = isset($requestData['privacyLevel']) === false ? 1 : (int)$requestData['privacyLevel'];
+        $dateFormat = empty($requestData['dateFormat']) === true ? 0 : (int)$requestData['dateFormat'];
+        $name = $requestData['username'] ?? '';
 
         try {
             $this->userApi->updatePrivacyLevel($this->authenticationService->getCurrentUserId(), $privacyLevel);
             $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
             $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
-
-            $this->sessionWrapper->set('generalUpdated', true);
-        } catch (User\Exception\UsernameInvalidFormat $e) {
-            $this->sessionWrapper->set('generalErrorUsernameInvalidFormat', true);
-        } catch (User\Exception\UsernameNotUnique $e) {
-            $this->sessionWrapper->set('generalErrorUsernameNotUnique', true);
+        } catch (User\Exception\UsernameInvalidFormat) {
+            return Response::createBadRequest('Username not meeting requirements');
+        } catch (User\Exception\UsernameNotUnique) {
+            return Response::createBadRequest('Username is not unique');
         }
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createOk();
     }
 
     public function updateJellyfin(Request $request) : Response
@@ -423,53 +442,26 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
 
-        $newPassword = $request->getPostParameters()['newPassword'];
-        $newPasswordRepeat = $request->getPostParameters()['newPasswordRepeat'];
-        $currentPassword = $request->getPostParameters()['currentPassword'];
+        $responseData = Json::decode($request->getBody());
+
+        $newPassword = $responseData['newPassword'];
+        $currentPassword = $responseData['currentPassword'];
 
         if ($this->userApi->isValidPassword($userId, $currentPassword) === false) {
-            $this->sessionWrapper->set('passwordErrorCurrentInvalid', true);
-
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
-        }
-
-        if ($newPassword !== $newPasswordRepeat) {
-            $this->sessionWrapper->set('passwordErrorNotEqual', true);
-
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
+            return Response::createBadRequest('Current password wrong'); // Error message is referenced in JS!!!
         }
 
         if (strlen($newPassword) < 8) {
-            $this->sessionWrapper->set('passwordErrorMinLength', true);
-
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
+            return Response::createBadRequest('New password not meeting requirements'); // Error message is referenced in JS!!!
         }
 
         if ($user->hasCoreAccountChangesDisabled() === true) {
-            throw new RuntimeException('Password changes are disabled for user: ' . $userId);
+            return Response::createForbidden();
         }
 
         $this->userApi->updatePassword($userId, $newPassword);
 
-        $this->sessionWrapper->set('passwordUpdated', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::create(StatusCode::createOk());
     }
 
     public function updatePlex(Request $request) : Response

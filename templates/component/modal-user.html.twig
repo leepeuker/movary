@@ -1,0 +1,52 @@
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModal" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="userModalHeaderTitle"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding-bottom: 0!important;">
+                <form>
+                    <input type="hidden" id="userModalIdInput">
+
+                    <div class="mb-3">
+                        <label for="userModalNameInput" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="userModalNameInput" required>
+                        <div id="userModalNameInputHelp" class="form-text">Name must consist of only letters and numbers</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userModalEmailInput" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="userModalEmailInput" required>
+                        <div id="userModalEmailInput" class="form-text">Must be a valid email address</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userModalPasswordInput" class="form-label">Password <span class="text-danger" id="userModalPasswordInputRequiredStar">*</span></label>
+                        <input type="password" class="form-control" id="userModalPasswordInput" minlength="8" required>
+                        <div id="userModalPasswordInput" class="form-text">Must be at least 8 characters long</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userModalRepeatPasswordInput" class="form-label">Repeat Password <span class="text-danger" id="userModalRepeatPasswordInputRequiredStar">*</span></label>
+                        <input type="password" class="form-control" id="userModalRepeatPasswordInput" minlength="8" required>
+                        <div id="userModalRepeatPasswordInput" class="form-text">Must match entered password</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="userModalIsAdminInput">
+                            <label class="form-check-label" for="userModalIsAdminInput">Admin</label>
+                        </div>
+                    </div>
+                </form>
+                <div id="userModalAlerts"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-none" id="userModalFooterCreateButton">
+                    <button type="submit" form="userCreateModal" class="btn btn-primary" id="createUserButton">Create</button>
+                </div>
+                <div class="d-none" id="userModalFooterButtons">
+                    <button type="button" class="btn btn-danger" id="deleteUserButton">Delete</button>
+                    <button type="button" class="btn btn-primary" id="updateUserButton">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

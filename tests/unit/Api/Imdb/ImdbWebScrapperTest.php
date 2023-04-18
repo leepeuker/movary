@@ -27,32 +27,57 @@ class ImdbWebScrapperTest extends TestCase
     {
         return [
             [
-                '<spanclass="sc-5931bdee-1jUnWeS">7.9</span>
-                <div class="sc-5931bdee-3 dWymrF">229.240</div>',
+                'iZlgcd">7.9</span>
+                bjjENQ">229.240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
-                <div class="sc-5931bdee-3 dWymrF">229,240</div>',
+                'iZlgcd">7,9</span>
+                bjjENQ">229,240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
-                <div class="sc-5931bdee-3 dWymrF">229240</div>',
+                'iZlgcd">7,9</span>
+                bjjENQ">229240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
-                <div class="sc-5931bdee-3 dWymrF">1.229,240</div>',
+                'iZlgcd">7,9</span>
+                bjjENQ">1.229,240</div>',
                 ImdbRating::create(7.9, 1229240)
             ],
             [
-                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>
-                <div class="sc-5931bdee-3 dWymrF">40</div>',
+                'iZlgcd">7,9</span>
+                bjjENQ">40</div>',
                 ImdbRating::create(7.9, 40)
             ],
             [
-                '<spanclass="sc-5931bdee-1jUnWeS">7,9</span>',
+                'iZlgcd">7,9</span>
+                bjjENQ">40K</div>',
+                ImdbRating::create(7.9, 40000)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">4.1K</div>',
+                ImdbRating::create(7.9, 4100)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">14.12K</div>',
+                ImdbRating::create(7.9, 14120)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">10M</div>',
+                ImdbRating::create(7.9, 10000000)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">10.1M</div>',
+                ImdbRating::create(7.9, 10100000)
+            ],
+            [
+                'iZlgcd">7,9</span>',
                 null
             ],
             [

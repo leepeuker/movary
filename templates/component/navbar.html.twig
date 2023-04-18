@@ -15,26 +15,26 @@
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
                     <a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}"
-                       href="/users/{{ routeUsername ?: currentUsername }}/dashboard">
+                       href="/users/{{ routeUsername ?: currentUserName }}/dashboard">
                         Dashboard
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}"
-                       href="/users/{{ routeUsername ?: currentUsername }}/history">
+                       href="/users/{{ routeUsername ?: currentUserName }}/history">
                         History
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}"
-                       href="/users/{{ routeUsername ?: currentUsername }}/movies">
+                       href="/users/{{ routeUsername ?: currentUserName }}/movies">
                         All Movies</a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/actors#' %}active{% endif %}"
-                       href="/users/{{ routeUsername ?: currentUsername }}/actors">
+                       href="/users/{{ routeUsername ?: currentUserName }}/actors">
                         Top Actors
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/directors#' %}active{% endif %}"
-                       href="/users/{{ routeUsername ?: currentUsername }}/directors">
+                       href="/users/{{ routeUsername ?: currentUserName }}/directors">
                         Top Directors
                     </a>
                 </li>
@@ -42,7 +42,7 @@
                     <hr class="dropdown-divider">
                 </li>
                 {% if loggedIn == true %}
-                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="/settings/account">Settings</a></li>
+                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="/settings/account/general">Settings</a></li>
                     <li><a class="dropdown-item {% if requestUrlPath starts with '/job-queue' %}active{% endif %}" href="/job-queue">Job Queue</a></li>
                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                 {% else %}
