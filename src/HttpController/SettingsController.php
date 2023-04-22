@@ -299,6 +299,38 @@ class SettingsController
         );
     }
 
+    public function renderServerGeneralPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-general.html.twig'),
+        );
+    }
+
+    public function renderServerUsersPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-users.html.twig'),
+        );
+    }
+
     public function renderTraktPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -324,22 +356,6 @@ class SettingsController
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
                 'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
             ]),
-        );
-    }
-
-    public function renderUsersPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-users.html.twig'),
         );
     }
 

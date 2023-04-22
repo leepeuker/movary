@@ -3,7 +3,7 @@
         <button class="nav-link dropdown-toggle {% if requestUrlPath starts with '/settings/account' %}active{% endif %}" data-bs-toggle="dropdown">
             Account
         </button>
-        <ul class="dropdown-menu" style="width: 100%;" id="navAccount">
+        <ul class="dropdown-menu" style="width: 100%;">
             <li class="dropdown-item">
                 <a class="nav-link {% if requestUrlPath starts with '/settings/account/general' %}active{% endif %}" href="/settings/account/general">General</a>
             </li>
@@ -19,7 +19,7 @@
         <button class="nav-link dropdown-toggle {% if requestUrlPath starts with '/settings/integrations' %}active{% endif %}" data-bs-toggle="dropdown">
             Integrations
         </button>
-        <ul class="dropdown-menu" style="width: 100%;" id="navIntegrations">
+        <ul class="dropdown-menu" style="width: 100%;">
             <li class="dropdown-item">
                 <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/plex' %}active{% endif %}" href="/settings/integrations/plex">Plex</a>
             </li>
@@ -38,8 +38,18 @@
         </ul>
     </li>
     {% if currentUserIsAdmin == true %}
-        <li class="nav-item">
-            <a class="nav-link {% if requestUrlPath starts with '/settings/users' %}active{% endif %}" href="/settings/users" id="navUsersApp">Users</a>
+        <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle {% if requestUrlPath starts with '/settings/server' %}active{% endif %}" data-bs-toggle="dropdown">
+                Integrations
+            </button>
+            <ul class="dropdown-menu" style="width: 100%;">
+                <li class="dropdown-item">
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/general' %}active{% endif %}" href="/settings/server/general">General</a>
+                </li>
+                <li class="dropdown-item">
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/users' %}active{% endif %}" href="/settings/server/users">Users</a>
+                </li>
+            </ul>
         </li>
     {% endif %}
     <li class="nav-item">
