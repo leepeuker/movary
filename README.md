@@ -194,7 +194,7 @@ It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IM
 | `LOG_LEVEL`                                 |        `warning`        |                                                                         |
 | `LOG_ENABLE_STACKTRACE`                     |           `0`           |                                                                         |
 | `LOG_ENABLE_FILE_LOGGING`                   |           `1`           | Log directory is at `storage/logs`                                      |
-| `REGISTRATION`                              |          `false`        | Allows anyone to create an account when they're not logged in. Useful for public instances. Allowed values are `true` or `false` |
+| `ENABLE_REGISTRATION`                              |          `0`        | Allows anyone to create an account when they're not logged in. Useful for public instances. Allowed values are `1` or `0` |
 
 More configuration can be done via the base image webdevops/php-nginx, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.

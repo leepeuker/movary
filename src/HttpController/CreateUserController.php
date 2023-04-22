@@ -28,16 +28,17 @@ class CreateUserController
 
     public function render() : Response
     {
-        if ($this->userApi->hasUsers() === true && strtolower($this->config->getAsString('REGISTRATION', 'false')) == 'false' || $this->authenticationService->isUserAuthenticated() === true) {
+        if (($this->userApi->hasUsers() === true && $this->config->getAsBool('ENABLE_REGISTRATION', false) === false) || $this->authenticationService->isUserAuthenticated() === true) {
             return Response::createSeeOther('/');
         }
 
         $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
         $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
         $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
+        $missingFormData = $this->sessionWrapper->find('missingFormData');
         $errorGeneric = $this->sessionWrapper->find('errorGeneric');
 
-        $this->sessionWrapper->unset('errorPasswordTooShort', 'errorPasswordNotEqual', 'errorUsernameInvalidFormat', 'errorGeneric');
+        $this->sessionWrapper->unset('errorPasswordTooShort', 'errorPasswordNotEqual', 'errorUsernameInvalidFormat', 'errorGeneric', 'missingFormData');
 
         return Response::create(
             StatusCode::createOk(),
@@ -46,22 +47,23 @@ class CreateUserController
                 'errorPasswordNotEqual' => $errorPasswordNotEqual,
                 'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
                 'errorGeneric' => $errorGeneric,
+                'missingFormData' => $missingFormData
             ]),
         );
     }
 
     public function createUser(Request $request) : Response
     {
-        if ($this->userApi->hasUsers() === true && strtolower($this->config->getAsString('REGISTRATION', 'false')) == 'false') {
+        if ($this->userApi->hasUsers() === true && $this->config->getAsBool('ENABLE_REGISTRATION', false) === false) {
             return Response::createSeeOther('/');
         }
 
         $postParameters = $request->getPostParameters();
 
-        $email = isset($postParameters['email']) === false ? null : (string)$postParameters['email'];
-        $name = isset($postParameters['name']) === false ? null : (string)$postParameters['name'];
-        $password = isset($postParameters['password']) === false ? null : (string)$postParameters['password'];
-        $repeatPassword = isset($postParameters['password']) === false ? null : (string)$postParameters['repeatPassword'];
+        $email = empty($postParameters['email']) === true ? null : (string)$postParameters['email'];
+        $name = empty($postParameters['name']) === true ? null : (string)$postParameters['name'];
+        $password = empty($postParameters['password']) === true ? null : (string)$postParameters['password'];
+        $repeatPassword = empty($postParameters['password']) === true ? null : (string)$postParameters['repeatPassword'];
 
         if ($email === null || $name === null || $password === null || $repeatPassword === null) {
             $this->sessionWrapper->set('missingFormData', true);

@@ -35,7 +35,7 @@ class LandingPageController
 
         $failedLogin = $this->sessionWrapper->has('failedLogin');
         $deletedAccount = $this->sessionWrapper->has('deletedAccount');
-        $registration = $this->config->getAsString('REGISTRATION', 'false');
+        $registrationEnabled = $this->config->getAsBool('ENABLE_REGISTRATION', false);
 
         $this->sessionWrapper->unset('failedLogin', 'deletedAccount');
 
@@ -44,7 +44,7 @@ class LandingPageController
             $this->twig->render('page/login.html.twig', [
                 'failedLogin' => $failedLogin,
                 'deletedAccount' => $deletedAccount,
-                'registration' => $registration
+                'registrationEnabled' => $registrationEnabled
             ]),
         );
     }
