@@ -10,6 +10,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
@@ -35,6 +36,7 @@ class SettingsController
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
+        private readonly ServerSettings $serverSettings,
         private readonly ?string $currentApplicationVersion = null,
     ) {
     }
@@ -311,7 +313,10 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-server-general.html.twig'),
+            $this->twig->render('page/settings-server-general.html.twig', [
+                'tmdbApiKey' => $this->serverSettings->getTmdbApiKey(),
+                'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
+            ]),
         );
     }
 
