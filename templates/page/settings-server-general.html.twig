@@ -8,6 +8,10 @@
     <link href="/css/settings.css" rel="stylesheet">
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/settings-server-general.js"></script>
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
@@ -36,7 +40,7 @@
                             {{ tmdbApiKeySetInEnv == true ? 'disabled' }}
                     >
                     <div id="tmdbApiKeyHelp" class="form-text">
-                        Get your API Key (v3) <a href="https://www.themoviedb.org/settings/api" arget="_blank">here</a>.
+                        Get your API Key (v3) <a href="https://www.themoviedb.org/settings/api" target="_blank">here</a>.
                     </div>
                 </div>
 

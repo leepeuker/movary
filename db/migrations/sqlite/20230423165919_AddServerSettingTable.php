@@ -18,7 +18,9 @@ final class AddServerSettingTable extends AbstractMigration
         $this->execute(
             <<<SQL
             CREATE TABLE `server_setting` (
-                `tmdb_api_key` TEXT DEFAULT NULL
+                `key` TEXT NOT NULL,
+                `value` TEXT DEFAULT NULL,
+                UNIQUE (`key`)
             )
             SQL,
         );

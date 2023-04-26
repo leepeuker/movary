@@ -46,13 +46,21 @@ use Twig;
 class Factory
 {
     private const SRC_DIRECTORY_NAME = 'src';
+
     private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
+
     private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
+
     private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
+
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
-    private const DEFAULT_APPLICATION_VERSION = null;
+
+    private const DEFAULT_APPLICATION_VERSION = 'dev';
+
     private const DEFAULT_TMDB_IMAGE_CACHING = false;
+
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
+
     private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
     public static function createConfig() : Config
@@ -225,11 +233,11 @@ class Factory
         );
     }
 
-    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\TmdbClient
+    public static function createTmdbApiClient(ContainerInterface $container) : Tmdb\TmdbClient
     {
         return new Tmdb\TmdbClient(
             $container->get(ClientInterface::class),
-            (string)$container->get(ServerSettings::class)->getTmdbApiKey()
+            $container->get(ServerSettings::class)
         );
     }
 

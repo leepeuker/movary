@@ -24,8 +24,6 @@ use ZipStream;
 
 class SettingsController
 {
-    private const VERSION_PLACEHOLDER = 'dev';
-
     public function __construct(
         private readonly Environment $twig,
         private readonly JobQueueApi $workerService,
@@ -37,7 +35,7 @@ class SettingsController
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
         private readonly ServerSettings $serverSettings,
-        private readonly ?string $currentApplicationVersion = null,
+        private readonly string $currentApplicationVersion,
     ) {
     }
 
@@ -479,6 +477,27 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
+    }
+
+    public function updateServerGeneral(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
+
+        if ($tmdbApiKey !== null) {
+            $this->serverSettings->setTmdbApiKey($tmdbApiKey);
+        }
+
+        return Response::createOk();
     }
 
     public function updateTrakt(Request $request) : Response

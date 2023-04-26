@@ -7,6 +7,8 @@ use Movary\ValueObject\Config;
 
 class ServerSettings
 {
+    private const TMDB_API_KEY = 'tmdbApiKey';
+
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
@@ -19,7 +21,10 @@ class ServerSettings
             return $this->config->getAsString('TMDB_API_KEY');
         }
 
-        $tmdbApiKey = $this->dbConnection->fetchFirstColumn('SELECT tmdb_api_key FROM `server_setting`');
+        $tmdbApiKey = $this->dbConnection->fetchFirstColumn(
+            'SELECT value FROM `server_setting` WHERE `key` = ?',
+            [self::TMDB_API_KEY],
+        );
 
         return empty ($tmdbApiKey) === true ? null : $tmdbApiKey[0];
     }
@@ -33,5 +38,16 @@ class ServerSettings
         }
 
         return empty($tmdbApiKey) === false;
+    }
+
+    public function setTmdbApiKey(string $tmdbApiKey) : void
+    {
+        if ($this->getTmdbApiKey() === null) {
+            $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
+
+            return;
+        }
+
+        $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
     }
 }
