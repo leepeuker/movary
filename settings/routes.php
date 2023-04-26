@@ -100,8 +100,18 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/users',
-        [\Movary\HttpController\SettingsController::class, 'renderUsersPage'],
+        '/settings/server/general',
+        [\Movary\HttpController\SettingsController::class, 'renderServerGeneralPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/server/general',
+        [\Movary\HttpController\SettingsController::class, 'updateServerGeneral'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/server/users',
+        [\Movary\HttpController\SettingsController::class, 'renderServerUsersPage'],
     );
     $routeCollector->addRoute(
         'POST',

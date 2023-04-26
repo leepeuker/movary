@@ -28,6 +28,7 @@ use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
+use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
@@ -54,7 +55,7 @@ class Factory
 
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
 
-    private const DEFAULT_APPLICATION_VERSION = null;
+    private const DEFAULT_APPLICATION_VERSION = 'dev';
 
     private const DEFAULT_TMDB_IMAGE_CACHING = false;
 
@@ -227,15 +228,16 @@ class Factory
             $container->get(SessionWrapper::class),
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),
+            $container->get(ServerSettings::class),
             $applicationVersion
         );
     }
 
-    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\TmdbClient
+    public static function createTmdbApiClient(ContainerInterface $container) : Tmdb\TmdbClient
     {
         return new Tmdb\TmdbClient(
             $container->get(ClientInterface::class),
-            $config->getAsString('TMDB_API_KEY')
+            $container->get(ServerSettings::class)
         );
     }
 
