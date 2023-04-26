@@ -5,6 +5,7 @@ namespace Movary\Api\Tmdb;
 use GuzzleHttp\Psr7\Request;
 use Movary\Api\Tmdb\Exception\TmdbAuthorizationError;
 use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
+use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -16,7 +17,7 @@ class TmdbClient
 
     public function __construct(
         private readonly ClientInterface $httpClient,
-        private readonly string $apiKey,
+        private readonly ServerSettings $serverSettingsService,
     ) {
     }
 
@@ -28,7 +29,7 @@ class TmdbClient
             $getParametersRendered .= $name . '=' . $getParameter . '&';
         }
 
-        $getParametersRendered .= 'api_key=' . $this->apiKey;
+        $getParametersRendered .= 'api_key=' . $this->serverSettingsService->getTmdbApiKey();
 
         $url = self::BASE_URL . $relativeUrl . $getParametersRendered;
         $request = new Request('GET', $url);

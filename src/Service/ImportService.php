@@ -42,9 +42,9 @@ class ImportService
 
             $tmdbId = (int)$record['tmdbId'];
 
-            $movie = $this->findOrCreateMovie($tmdbId, $record['title'], $record['imdbId']);
+            $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
 
-            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, Date::createFromString($record['watchedAt']));
+            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, Date::createFromString((string)$record['watchedAt']));
         }
     }
 
@@ -60,7 +60,7 @@ class ImportService
 
             $tmdbId = (int)$record['tmdbId'];
 
-            $movie = $this->findOrCreateMovie($tmdbId, $record['title'], $record['imdbId']);
+            $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
 
             $this->movieApi->updateUserRating($movie->getId(), $userId, PersonalRating::create((int)$record['userRating']));
         }
