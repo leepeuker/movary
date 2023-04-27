@@ -41,10 +41,14 @@ class ImportService
             }
 
             $tmdbId = (int)$record['tmdbId'];
+            $watchDate = Date::createFromString((string)$record['watchedAt']);
 
             $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
 
-            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, Date::createFromString((string)$record['watchedAt']));
+            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+            if (empty($record['comment']) === false) {
+                $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $record['comment']);
+            }
         }
     }
 
