@@ -27,6 +27,7 @@ class CreateUserController
     ) {
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function createUser(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === true) {
