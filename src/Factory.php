@@ -22,6 +22,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\CreateUserController;
 use Movary\HttpController\JobController;
+use Movary\HttpController\LandingPageController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
@@ -185,6 +186,17 @@ class Factory
         return new JobQueueScheduler(
             $container->get(JobQueueApi::class),
             self::getTmdbEnabledImageCaching($config)
+        );
+    }
+
+    public static function createLandingPageController(ContainerInterface $container, Config $config) : LandingPageController
+    {
+        return new LandingPageController(
+            $container->get(Twig\Environment::class),
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(SessionWrapper::class),
+            $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
 

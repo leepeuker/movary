@@ -23,7 +23,7 @@ class CreateUserController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
-        private readonly bool $enableRegistration,
+        private readonly bool $registrationEnabled,
     ) {
     }
 
@@ -35,7 +35,7 @@ class CreateUserController
 
         $hasUsers = $this->userApi->hasUsers();
 
-        if ($hasUsers === true && $this->enableRegistration === false) {
+        if ($hasUsers === true && $this->registrationEnabled === false) {
             return Response::createSeeOther('/');
         }
 
@@ -97,7 +97,7 @@ class CreateUserController
 
         $hasUsers = $this->userApi->hasUsers();
 
-        if ($hasUsers === true && $this->enableRegistration === false) {
+        if ($hasUsers === true && $this->registrationEnabled === false) {
             return Response::createSeeOther('/');
         }
 
