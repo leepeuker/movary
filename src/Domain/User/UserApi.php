@@ -14,11 +14,6 @@ class UserApi
     ) {
     }
 
-    public function createAdminUser(string $email, string $password, string $name) : void
-    {
-        $this->createUser($email, $password, $name, true);
-    }
-
     public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
     {
         $this->userValidator->ensureEmailIsUnique($email);

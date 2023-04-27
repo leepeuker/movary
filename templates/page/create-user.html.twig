@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Login
+    Create user
 {% endblock %}
 
 {% block stylesheets %}
@@ -9,25 +9,28 @@
 {% endblock %}
 
 {% block body %}
+    <script>
+        if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
+    </script>
     <main role="main" class="form-signin w-100 m-auto text-center">
         <form action="/create-user" method="post" enctype="multipart/form-data">
             <h1 class="">Movary</h1>
-            <p>Create your initial admin user</p>
+            <p>{{ subtitle }}</p>
             <div class="form-floating" style="margin-bottom: 0.3rem">
                 <input type="email" name="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required>
-                <label for="floatingEmail">Email address</label>
+                <label for="floatingEmail">Email address <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 0.3rem">
                 <input type="text" name="name" class="form-control" id="floatingName" placeholder="name" required>
-                <label for="floatingName">Username</label>
+                <label for="floatingName">Username <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 0.3rem">
                 <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="8" required>
-                <label for="floatingPassword">Password</label>
+                <label for="floatingPassword">Password <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 1rem">
                 <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Repeat password" minlength="8" required>
-                <label for="floatingRepeatPassword">Repeat password</label>
+                <label for="floatingRepeatPassword">Repeat password <span class="text-danger">*</span></label>
             </div>
             {% if errorPasswordNotEqual == true %}
                 <div class="alert alert-danger" role="alert">
@@ -44,6 +47,16 @@
                     Username must consist of only letters and numbers
                 </div>
             {% endif %}
+            {% if errorUsernameUnique == true %}
+                <div class="alert alert-danger" role="alert">
+                    Username is already used
+                </div>
+            {% endif %}
+            {% if errorEmailUnique == true %}
+                <div class="alert alert-danger" role="alert">
+                    Email is already used
+                </div>
+            {% endif %}
             {% if missingFormData == true %}
                 <div class="alert alert-danger" role="alert">
                     Please fill out all fields
@@ -51,6 +64,5 @@
             {% endif %}
             <button class="w-100 btn btn-lg btn-primary" type="submit">Create</button>
         </form>
-
     </main>
 {% endblock %}
