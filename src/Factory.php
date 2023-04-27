@@ -20,6 +20,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\CreateUserController;
 use Movary\HttpController\JobController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
@@ -77,6 +78,17 @@ class Factory
             $container->get(File::class),
             self::createDirectoryStorageApp(),
             self::createDirectoryAppRoot(),
+        );
+    }
+
+    public static function createCreateUserController(ContainerInterface $container, Config $config) : CreateUserController
+    {
+        return new CreateUserController(
+            $container->get(Twig\Environment::class),
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(SessionWrapper::class),
+            $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
 

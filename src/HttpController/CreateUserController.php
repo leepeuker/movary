@@ -2,8 +2,10 @@
 
 namespace Movary\HttpController;
 
+use Movary\Domain\User\Exception\EmailNotUnique;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
+use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Util\SessionWrapper;
@@ -11,9 +13,8 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\ValueObject\Config;
-use Twig\Environment;
 use Throwable;
+use Twig\Environment;
 
 class CreateUserController
 {
@@ -21,40 +22,20 @@ class CreateUserController
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly Config $config,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly bool $enableRegistration,
     ) {
-    }
-
-    public function render() : Response
-    {
-        if (($this->userApi->hasUsers() === true && $this->config->getAsBool('ENABLE_REGISTRATION', false) === false) || $this->authenticationService->isUserAuthenticated() === true) {
-            return Response::createSeeOther('/');
-        }
-
-        $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
-        $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
-        $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
-        $missingFormData = $this->sessionWrapper->find('missingFormData');
-        $errorGeneric = $this->sessionWrapper->find('errorGeneric');
-
-        $this->sessionWrapper->unset('errorPasswordTooShort', 'errorPasswordNotEqual', 'errorUsernameInvalidFormat', 'errorGeneric', 'missingFormData');
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/create-user.html.twig', [
-                'errorPasswordTooShort' => $errorPasswordTooShort,
-                'errorPasswordNotEqual' => $errorPasswordNotEqual,
-                'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
-                'errorGeneric' => $errorGeneric,
-                'missingFormData' => $missingFormData
-            ]),
-        );
     }
 
     public function createUser(Request $request) : Response
     {
-        if ($this->userApi->hasUsers() === true && $this->config->getAsBool('ENABLE_REGISTRATION', false) === false) {
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            return Response::createSeeOther('/');
+        }
+
+        $hasUsers = $this->userApi->hasUsers();
+
+        if ($hasUsers === true && $this->enableRegistration === false) {
             return Response::createSeeOther('/');
         }
 
@@ -86,13 +67,17 @@ class CreateUserController
         }
 
         try {
-            $this->userApi->createUser($email, $password, $name);
+            $this->userApi->createUser($email, $password, $name, $hasUsers === false);
 
             $this->authenticationService->login($email, $password, false);
         } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
         } catch (UsernameInvalidFormat) {
             $this->sessionWrapper->set('errorUsernameInvalidFormat', true);
+        } catch (UsernameNotUnique) {
+            $this->sessionWrapper->set('errorUsernameUnique', true);
+        } catch (EmailNotUnique) {
+            $this->sessionWrapper->set('errorEmailUnique', true);
         } catch (Throwable) {
             $this->sessionWrapper->set('errorGeneric', true);
         }
@@ -101,6 +86,51 @@ class CreateUserController
             StatusCode::createSeeOther(),
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function renderPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            return Response::createSeeOther('/');
+        }
+
+        $hasUsers = $this->userApi->hasUsers();
+
+        if ($hasUsers === true && $this->enableRegistration === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
+        $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
+        $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
+        $errorUsernameUnique = $this->sessionWrapper->find('errorUsernameUnique');
+        $errorEmailUnique = $this->sessionWrapper->find('errorEmailUnique');
+        $missingFormData = $this->sessionWrapper->find('missingFormData');
+        $errorGeneric = $this->sessionWrapper->find('errorGeneric');
+
+        $this->sessionWrapper->unset(
+            'errorPasswordTooShort',
+            'errorPasswordNotEqual',
+            'errorUsernameInvalidFormat',
+            'errorUsernameUnique',
+            'errorEmailUnique',
+            'errorGeneric',
+            'missingFormData',
+        );
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/create-user.html.twig', [
+                'subtitle' => $hasUsers === false ? 'Create initial admin user' : 'Create new user',
+                'errorPasswordTooShort' => $errorPasswordTooShort,
+                'errorPasswordNotEqual' => $errorPasswordNotEqual,
+                'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
+                'errorUsernameUnique' => $errorUsernameUnique,
+                'errorEmailUnique' => $errorEmailUnique,
+                'errorGeneric' => $errorGeneric,
+                'missingFormData' => $missingFormData
+            ]),
         );
     }
 }

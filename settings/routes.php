@@ -29,7 +29,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/create-user',
-        [\Movary\HttpController\CreateUserController::class, 'render'],
+        [\Movary\HttpController\CreateUserController::class, 'renderPage'],
     );
 
     #####################
