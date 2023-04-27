@@ -15,17 +15,18 @@ class ExportService
     {
         $movieWatchDates = $this->movieApi->fetchHistoryOrderedByWatchedAtDesc($userId);
 
-        $csv = 'title,year,tmdbId,imdbId,watchedAt' . PHP_EOL;
+        $csv = 'title,year,tmdbId,imdbId,watchedAt,comment' . PHP_EOL;
 
         foreach ($movieWatchDates as $movieWatchDate) {
             for ($i = 1; $i <= $movieWatchDate['plays']; $i++) {
                 $csv .= sprintf(
-                    '"%s",%s,%s,%s,%s' . PHP_EOL,
+                    '"%s",%s,%s,%s,%s,%s' . PHP_EOL,
                     $movieWatchDate['title'],
                     DateTime::createFromString($movieWatchDate['release_date'])->format('Y'),
                     $movieWatchDate['tmdb_id'],
                     $movieWatchDate['imdb_id'],
                     $movieWatchDate['watched_at'],
+                    $movieWatchDate['comment'],
                 );
             }
         }
