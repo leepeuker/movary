@@ -13,6 +13,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
@@ -26,8 +27,6 @@ use ZipStream;
 
 class SettingsController
 {
-    private const VERSION_PLACEHOLDER = 'dev';
-
     public function __construct(
         private readonly Environment $twig,
         private readonly JobQueueApi $workerService,
@@ -38,8 +37,9 @@ class SettingsController
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
+        private readonly ServerSettings $serverSettings,
         private readonly PlexApi $plexApi,
-        private readonly ?string $currentApplicationVersion = null,
+        private readonly string $currentApplicationVersion,
     ) {
     }
 
@@ -136,7 +136,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
-                'currentApplicationVersion' => $this->currentApplicationVersion ?? self::VERSION_PLACEHOLDER,
+                'currentApplicationVersion' => $this->currentApplicationVersion,
                 'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
                 'timeZone' => date_default_timezone_get(),
             ]),
@@ -326,6 +326,41 @@ class SettingsController
         );
     }
 
+    public function renderServerGeneralPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-general.html.twig', [
+                'tmdbApiKey' => $this->serverSettings->getTmdbApiKey(),
+                'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
+            ]),
+        );
+    }
+
+    public function renderServerUsersPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-users.html.twig'),
+        );
+    }
+
     public function renderTraktPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -351,22 +386,6 @@ class SettingsController
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
                 'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
             ]),
-        );
-    }
-
-    public function renderUsersPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-users.html.twig'),
         );
     }
 
@@ -485,6 +504,27 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
+    }
+
+    public function updateServerGeneral(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
+
+        if ($tmdbApiKey !== null) {
+            $this->serverSettings->setTmdbApiKey($tmdbApiKey);
+        }
+
+        return Response::createOk();
     }
 
     public function updateTrakt(Request $request) : Response

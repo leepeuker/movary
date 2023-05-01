@@ -28,7 +28,7 @@ function showCreateUserModal() {
 }
 
 function prepareCreateUserModal(name) {
-    document.getElementById('userModalHeaderTitle').innerHTML = 'Create user'
+    document.getElementById('userModalHeaderTitle').innerHTML = 'Create User'
 
     document.getElementById('userModalPasswordInput').required = true
     document.getElementById('userModalRepeatPasswordInput').required = false
@@ -52,7 +52,7 @@ function prepareCreateUserModal(name) {
 }
 
 function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword) {
-    document.getElementById('userModalHeaderTitle').innerHTML = 'Edit user'
+    document.getElementById('userModalHeaderTitle').innerHTML = 'Edit User'
 
     document.getElementById('userModalPasswordInput').required = false
     document.getElementById('userModalRepeatPasswordInput').required = false

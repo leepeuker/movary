@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - App
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-server-general.js"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-bottom: 1rem;padding-top: 1rem">
+                <h5 style="margin-bottom: 1rem">General server settings</h5>
+
+                <p class="text-muted">Configuration set via environment variables cannot be changed and will be readonly.</p>
+
+                <div class="mb-3">
+                    <label for="nameInput" class="form-label">
+                        <b>TMDB API Key </b> <span class="text-danger">*</span>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="TMDB API Key"
+                           value="{{ tmdbApiKey }}"
+                           title="Only letters and numbers allowed"
+                           required
+                           id="tmdbApiKeyInput"
+                           aria-describedby="tmdbApiKeyHelp"
+                           style="text-align: center;"
+                            {{ tmdbApiKeySetInEnv == true ? 'disabled' }}
+                    >
+                    <div id="tmdbApiKeyHelp" class="form-text">
+                        Get your API Key (v3) <a href="https://www.themoviedb.org/settings/api" target="_blank">here</a>.
+                    </div>
+                </div>
+
+                <div id="alertGeneralServerDiv"></div>
+
+                <button type="submit" class="btn btn-primary" id="generalServerUpdateButton">Submit</button>
+            </div>
+        </div>
+    </main>
+{% endblock %}
