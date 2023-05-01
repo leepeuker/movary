@@ -8,6 +8,7 @@ use Movary\ValueObject\Config;
 class ServerSettings
 {
     private const TMDB_API_KEY = 'tmdbApiKey';
+    private const SERVER_DOMAIN = 'serverDomain';
 
     public function __construct(
         private readonly Config $config,
@@ -27,6 +28,16 @@ class ServerSettings
         );
 
         return empty ($tmdbApiKey) === true ? null : $tmdbApiKey[0];
+    }
+
+    public function getServerDomain() : ?string
+    {
+        $serverDomain = $this->dbConnection->fetchFirstColumn(
+            'SELECT value FROM `server_setting` WHERE `key` = ?',
+            [self::SERVER_DOMAIN],
+        );
+
+        return empty ($serverDomain) === true ? null : $serverDomain[0];
     }
 
     public function isTmdbApiKeySetInEnvironment() : bool
@@ -49,5 +60,16 @@ class ServerSettings
         }
 
         $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
+    }
+
+    public function setServerDomain(string $serverDomain) : void
+    {
+        if ($this->getServerDomain() === null) {
+            $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$serverDomain, self::SERVER_DOMAIN]);
+
+            return;
+        }
+
+        $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$serverDomain, self::SERVER_DOMAIN]);
     }
 }

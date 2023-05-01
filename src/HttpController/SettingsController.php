@@ -492,9 +492,17 @@ class SettingsController
         $requestData = Json::decode($request->getBody());
 
         $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
+        $serverDomain = isset($requestData['serverDomain']) === false ? null : $requestData['serverDomain'];
 
         if ($tmdbApiKey !== null) {
             $this->serverSettings->setTmdbApiKey($tmdbApiKey);
+        }
+        if($serverDomain !== null) {
+            $regex = "/^\w*(\.\w{2,})+/";
+            if(preg_match($regex, $serverDomain) === false) {
+                return Response::createBadRequest('Invalid input');
+            }
+            $this->serverSettings->setServerDomain($serverDomain);
         }
 
         return Response::createOk();
