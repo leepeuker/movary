@@ -1,6 +1,6 @@
 const tmdbApiKeyInput = document.getElementById('tmdbApiKeyInput');
 const serverDomainInput = document.getElementById('serverDomainInput');
-const serverDomainRegex = /^\w*(\.\w{2,})+/;
+const serverDomainRegex = /^(https?\:\/\/)?[a-zA-Z0-9_-]{0,63}(\.[a-zA-Z0-9_-]{0,63})*/;
 
 document.getElementById('generalServerUpdateButton').addEventListener('click', async () => {
     tmdbApiKeyInput.classList.remove('invalid-input');

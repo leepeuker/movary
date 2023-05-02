@@ -498,7 +498,7 @@ class SettingsController
             $this->serverSettings->setTmdbApiKey($tmdbApiKey);
         }
         if($serverDomain !== null) {
-            $regex = "/^\w*(\.\w{2,})+/";
+            $regex = "/^(https?\:\/\/)?[a-zA-Z0-9_-]{0,63}(\.[a-zA-Z0-9_-]{0,63})*/";
             if(preg_match($regex, $serverDomain) === false) {
                 return Response::createBadRequest('Invalid input');
             }
