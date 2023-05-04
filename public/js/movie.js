@@ -142,11 +142,40 @@ function loadRatingModal() {
     editRatingModal.show()
 }
 
+function toggleWatchlist(isOnWatchlist) {
+    removeAlert('alertMovieOptionModalDiv')
+
+    document.getElementById('refreshTmdbDataButton').disabled = true;
+    document.getElementById('refreshImdbRatingButton').disabled = true;
+    document.getElementById('watchlistButton').disabled = true;
+
+    if (isOnWatchlist == null) {
+        addToWatchlistRequest().then(() => {
+            location.reload()
+        }).catch(() => {
+            addAlert('alertMovieOptionModalDiv', 'Could not add to Watchlist', 'danger')
+            document.getElementById('refreshTmdbDataButton').disabled = false;
+            document.getElementById('refreshImdbRatingButton').disabled = false;
+            document.getElementById('watchlistButton').disabled = false;
+        })
+    } else {
+        removeFromWatchlistRequest().then(() => {
+            location.reload()
+        }).catch(() => {
+            addAlert('alertMovieOptionModalDiv', 'Could not remove from Watchlist', 'danger')
+            document.getElementById('refreshTmdbDataButton').disabled = false;
+            document.getElementById('refreshImdbRatingButton').disabled = false;
+            document.getElementById('watchlistButton').disabled = false;
+        })
+    }
+}
+
 function refreshTmdbData() {
     removeAlert('alertMovieOptionModalDiv')
 
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
+    document.getElementById('watchlistButton').disabled = true;
 
     refreshTmdbDataRequest().then(() => {
         location.reload()
@@ -154,7 +183,28 @@ function refreshTmdbData() {
         addAlert('alertMovieOptionModalDiv', 'Could not refresh tmdb data', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
+        document.getElementById('watchlistButton').disabled = false;
     })
+}
+
+async function addToWatchlistRequest() {
+    const response = await fetch('/movies/' + getMovieId() + '/add-watchlist')
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return true
+}
+
+async function removeFromWatchlistRequest() {
+    const response = await fetch('/movies/' + getMovieId() + '/remove-watchlist')
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return true
 }
 
 async function refreshTmdbDataRequest() {
@@ -172,6 +222,7 @@ function refreshImdbRating() {
 
     document.getElementById('refreshTmdbDataButton').disabled = true;
     document.getElementById('refreshImdbRatingButton').disabled = true;
+    document.getElementById('watchlistButton').disabled = true;
 
     refreshImdbRatingRequest().then(() => {
         location.reload()
@@ -179,6 +230,7 @@ function refreshImdbRating() {
         addAlert('alertMovieOptionModalDiv', 'Could not refresh imdb rating', 'danger')
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('refreshImdbRatingButton').disabled = false;
+        document.getElementById('watchlistButton').disabled = false;
     })
 }
 

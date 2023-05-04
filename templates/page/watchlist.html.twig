@@ -23,12 +23,9 @@
             </form>
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for watchlistEntry in watchlistEntries %}
-                    <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ historyEntry.id }}'">
-                        <div class="card h-100  position-relative">
-                            <img src="{{ watchlistEntry.poster_path }}" class="card-img-top" alt="{{ watchlistEntry.title }} Poster">
-                            <div class="card-footer" style="padding: 0.1rem">
-                                <small class="text-muted" style="font-size: 0.8rem">{{ watchlistEntry.watched_at|date(dateFormatPhp) }}</small>
-                            </div>
+                    <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ watchlistEntry.id }}'">
+                        <div class="card h-100">
+                            <img src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
                         </div>
                     </div>
                 {% endfor %}

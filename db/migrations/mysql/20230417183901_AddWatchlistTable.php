@@ -16,9 +16,7 @@ final class AddWatchlistTable extends AbstractMigration
             CREATE TABLE `watchlist` (
                 `movie_id` INT(10) UNSIGNED,
                 `user_id` INT(10) UNSIGNED,
-                `name` VARCHAR(256) NOT NULL,
-                `tmdb_id` INT(10) UNSIGNED DEFAULT NULL,
-                `KEY` TIMESTAMP NOT NULL DEFAULT NOW(),
+                `added_at` TIMESTAMP NOT NULL,
                 FOREIGN KEY (`movie_id`) REFERENCES movie (`id`) ON DELETE CASCADE,
                 FOREIGN KEY (`user_id`) REFERENCES user (`id`) ON DELETE CASCADE,
                 UNIQUE (`movie_id`, `user_id`) 

@@ -33,16 +33,16 @@ class WatchlistController
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $historyPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated($userId, $limit, (int)$page, $searchTerm);
-        $historyCount = $this->movieWatchlistApi->fetchWatchlistCount($userId, $searchTerm);
+        $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated($userId, $limit, (int)$page, $searchTerm);
+        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount($userId, $searchTerm);
 
-        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $limit, (int)$page);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $limit, (int)$page);
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/watchlist.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
-                'watchlistEntries' => $historyPaginated,
+                'watchlistEntries' => $watchlistPaginated,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $searchTerm,
             ]),

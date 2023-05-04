@@ -252,6 +252,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/movies/{id:[0-9]+}/refresh-imdb',
         [\Movary\HttpController\MovieController::class, 'refreshImdbRating'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/add-watchlist',
+        [\Movary\HttpController\MovieController::class, 'addToWatchlist'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/remove-watchlist',
+        [\Movary\HttpController\MovieController::class, 'removeFromWatchlist'],
+    );
 
     ##############
     # User media #
