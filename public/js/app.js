@@ -189,6 +189,7 @@ function resetLogModalSearchResults() {
 function backToLogModalSearchResults() {
     document.getElementById('logPlayModalWatchDateDiv').classList.add('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterWatchlistButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.remove('d-none')
     document.getElementById('logPlayModalFooter').classList.add('d-none')
@@ -211,6 +212,7 @@ async function selectLogModalTmdbItemForLogging(event) {
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterWatchlistButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
@@ -238,6 +240,30 @@ function resetLogModalLogInputs() {
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
     document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
+    document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.add('d-none')
+}
+
+function addToWatchlist(context) {
+    const tmdbId = document.getElementById(context + 'TmdbIdInput').value
+
+    fetch('/add-movie-to-watchlist', {
+        method: 'post', headers: {
+            'Content-type': 'application/json',
+        }, body: JSON.stringify({
+            'tmdbId': tmdbId,
+        })
+    }).then(function (response) {
+        if (response.status === 200) {
+            location.reload();
+
+            return
+        }
+
+        document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.remove('d-none')
+    }).catch(function (error) {
+        console.log(error)
+        document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.remove('d-none')
+    })
 }
 
 function logMovie(context) {
@@ -247,6 +273,7 @@ function logMovie(context) {
     const comment = document.getElementById(context + 'CommentInput').value
     const dateFormatPhp = document.getElementById('dateFormatPhp').value
     document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
+    document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.add('d-none')
 
     if (validateWatchDate(context, watchDate) === false) {
         return
@@ -292,6 +319,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle) {
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.add('d-none')
+    document.getElementById('logPlayModalFooterWatchlistButton').classList.add('d-none')
 
     myModal.show()
 }

@@ -332,6 +332,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\HistoryController::class, 'logMovie'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/add-movie-to-watchlist',
+        [\Movary\HttpController\WatchlistController::class, 'addMovieToWatchlist'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/fetchMovieRatingByTmdbdId',
         [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId'],
