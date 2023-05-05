@@ -23,8 +23,8 @@
             </form>
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for watchlistEntry in watchlistEntries %}
-                    <div class="col" style="padding-bottom: 1rem;cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ watchlistEntry.id }}'">
-                        <div class="card h-100">
+                    <div class="col" style="padding-bottom: 1rem;">
+                        <div class="card h-100" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ watchlistEntry.id }}'">
                             <img src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
                         </div>
                     </div>
