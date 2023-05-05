@@ -6,7 +6,7 @@
                     <h5 class="modal-title" id="logPlayModalTitle">Log play</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding-bottom: 0">
                     <div id="logPlayModalSearchDiv">
                         <div class="input-group">
                             <input type="text"
@@ -81,12 +81,7 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-danger d-none" role="alert" id="logPlayModalLogErrorAlert" style="margin-top: 1rem;margin-bottom: 0">
-                        Could not log play. Please try again.
-                    </div>
-                    <div class="alert alert-danger d-none" role="alert" id="logPlayModalAddToWatchlistErrorAlert" style="margin-top: 1rem;margin-bottom: 0">
-                        Could not add to watchlist. Please try again.
-                    </div>
+                    <div id="logPlayModalAlert" style="margin-top: 1rem;margin-bottom: 0"></div>
                 </div>
                 <div class="modal-footer d-none" id="logPlayModalFooter">
                     <button type="submit" class="btn btn-secondary me-auto" onclick="backToLogModalSearchResults()" id="logPlayModalFooterBackButton">Back</button>

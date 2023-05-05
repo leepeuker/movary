@@ -195,7 +195,7 @@ function backToLogModalSearchResults() {
     document.getElementById('logPlayModalFooter').classList.add('d-none')
     document.getElementById('logPlayModalTitle').innerHTML = 'Log play'
 
-    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
+    removeAlert('logPlayModalAlert')
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
     setRatingStars('logPlayModal', 0)
@@ -239,8 +239,7 @@ function resetLogModalLogInputs() {
     document.getElementById('logPlayModalTmdbIdInput').value = ''
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
-    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
-    document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.add('d-none')
+    removeAlert('logPlayModalAlert')
 }
 
 function addToWatchlist(context) {
@@ -259,10 +258,10 @@ function addToWatchlist(context) {
             return
         }
 
-        document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.remove('d-none')
+        addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
     }).catch(function (error) {
         console.log(error)
-        document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.remove('d-none')
+        addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
     })
 }
 
@@ -272,8 +271,7 @@ function logMovie(context) {
     const watchDate = document.getElementById(context + 'WatchDateInput').value
     const comment = document.getElementById(context + 'CommentInput').value
     const dateFormatPhp = document.getElementById('dateFormatPhp').value
-    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
-    document.getElementById('logPlayModalAddToWatchlistErrorAlert').classList.add('d-none')
+    removeAlert('logPlayModalAlert')
 
     if (validateWatchDate(context, watchDate) === false) {
         return
@@ -296,10 +294,10 @@ function logMovie(context) {
             return
         }
 
-        document.getElementById('logPlayModalLogErrorAlert').classList.remove('d-none')
+        addAlert('logPlayModalAlert', 'Could not log play. Please try again.', 'danger')
     }).catch(function (error) {
         console.log(error)
-        document.getElementById('logPlayModalLogErrorAlert').classList.remove('d-none')
+        addAlert('logPlayModalAlert', 'Could not log play. Please try again.', 'danger')
     })
 }
 
