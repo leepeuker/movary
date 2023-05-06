@@ -4,7 +4,6 @@ namespace Movary\Domain\Movie\History;
 
 use Movary\Api\Tmdb;
 use Movary\Domain\Movie;
-use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
