@@ -8,6 +8,7 @@ class UserEntity
         private readonly int $id,
         private readonly string $name,
         private readonly string $passwordHash,
+        private readonly bool $isAdmin,
         private readonly int $privacyLevel,
         private readonly bool $coreAccountChangesDisabled,
         private readonly int $dateFormatId,
@@ -26,6 +27,7 @@ class UserEntity
             (int)$data['id'],
             $data['name'],
             $data['password'],
+            (bool)$data['is_admin'],
             $data['privacy_level'],
             (bool)$data['core_account_changes_disabled'],
             $data['date_format_id'],
@@ -101,5 +103,10 @@ class UserEntity
     public function hasPlexScrobbleWatchesEnabled() : bool
     {
         return $this->plexScrobbleWatches;
+    }
+
+    public function isAdmin() : bool
+    {
+        return $this->isAdmin;
     }
 }

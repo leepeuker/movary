@@ -19,9 +19,9 @@ class Response
         return new self($statusCode, $body, $headers);
     }
 
-    public static function createBadRequest() : self
+    public static function createBadRequest(?string $body = null) : self
     {
-        return new self(StatusCode::createBadRequest());
+        return new self(StatusCode::createBadRequest(), $body);
     }
 
     public static function createCsv(string $body) : self
@@ -52,6 +52,11 @@ class Response
     public static function createSeeOther(string $targetUrl) : self
     {
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
+    }
+
+    public static function createUnsupportedMediaType() : self
+    {
+        return new self(StatusCode::createUnsupportedMediaType());
     }
 
     public function getBody() : ?string

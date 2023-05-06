@@ -2,7 +2,6 @@
 
 namespace Movary\HttpController;
 
-use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
@@ -26,7 +25,6 @@ class HistoryController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly TmdbApi $tmdbApi,
         private readonly MovieApi $movieApi,
         private readonly UserApi $userApi,
         private readonly SyncMovie $tmdbMovieSyncService,
@@ -53,8 +51,9 @@ class HistoryController
         $movieId = (int)$request->getRouteParameters()['id'];
         $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
         $plays = (int)$requestBody['plays'];
+        $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
-        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays);
+        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }
@@ -98,6 +97,7 @@ class HistoryController
         $watchDate = Date::createFromStringAndFormat($requestData['watchDate'], $requestData['dateFormat']);
         $tmdbId = (int)$requestData['tmdbId'];
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
+        $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -107,6 +107,7 @@ class HistoryController
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+        $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createOk());
     }
@@ -138,28 +139,6 @@ class HistoryController
         );
     }
 
-    public function renderLogMoviePage(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-
-        $movies = [];
-        if ($searchTerm !== null) {
-            $movies = $this->tmdbApi->searchMovie($searchTerm);
-        }
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/log-movie.html.twig', [
-                'movies' => $movies,
-                'searchTerm' => $searchTerm,
-            ]),
-        );
-    }
-
     public function updateHistoryEntry(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -177,8 +156,10 @@ class HistoryController
         $movieId = (int)$request->getRouteParameters()['id'];
         $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
         $plays = (int)$requestBody['plays'];
+        $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
         $this->movieApi->increaseHistoryPlaysForMovieOnDate($movieId, $userId, $watchDate, $plays);
+        $this->movieApi->updateHistoryComment($movieId, $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }

@@ -1,0 +1,30 @@
+<div class="modal fade" id="editRatingModal" tabindex="-1" aria-labelledby="editRatingModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="watchDateModalTitle">Edit Rating</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding-bottom: 0">
+                <div class="fw-light"
+                     id="editRatingModalRatingStars"
+                     style="color: rgb(255, 193, 7);
+                            font-size: 1.5rem;
+                            cursor:pointer;
+                            padding-bottom: 1rem;
+                            border-top-right-radius: .375rem!important;
+                            border-bottom-right-radius: .375rem">
+                    <span id="ratingStarsSpan">
+                        {% for i in 1..10 %}
+                        <i class="bi bi-star" data-value="{{ i }}" id="editRatingModalRatingStar{{ i }}" onclick="updateRatingStars('editRatingModal', this)"></i>
+                        {% endfor %}
+                    </span>
+                </div>
+                <div id="editRatingModalDiv"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="saveRating()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>

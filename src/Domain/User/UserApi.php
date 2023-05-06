@@ -14,14 +14,14 @@ class UserApi
     ) {
     }
 
-    public function createUser(string $email, string $password, string $name) : void
+    public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
     {
         $this->userValidator->ensureEmailIsUnique($email);
         $this->userValidator->ensurePasswordIsValid($password);
         $this->userValidator->ensureNameFormatIsValid($name);
         $this->userValidator->ensureNameIsUnique($name);
 
-        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name);
+        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
     }
 
     public function deleteJellyfinWebhookId(int $userId) : void
@@ -169,6 +169,11 @@ class UserApi
         $this->userValidator->ensureEmailIsUnique($email, $userId);
 
         $this->repository->updateEmail($userId, $email);
+    }
+
+    public function updateIsAdmin(int $userId, bool $isAdmin) : void
+    {
+        $this->repository->updateIsAdmin($userId, $isAdmin);
     }
 
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void

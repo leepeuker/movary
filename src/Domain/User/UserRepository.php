@@ -25,13 +25,14 @@ class UserRepository
         );
     }
 
-    public function createUser(string $email, string $passwordHash, string $name) : void
+    public function createUser(string $email, string $passwordHash, string $name, bool $isAdmin) : void
     {
         $this->dbConnection->insert(
             'user',
             [
                 'email' => $email,
                 'password' => $passwordHash,
+                'is_admin' => (int)$isAdmin,
                 'name' => $name,
                 'created_at' => (string)DateTime::create(),
             ],
@@ -55,7 +56,7 @@ class UserRepository
 
     public function fetchAll() : array
     {
-        return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user` ORDER BY name');
+        return $this->dbConnection->fetchAllAssociative('SELECT id, name, email, is_admin as isAdmin FROM `user` ORDER BY id');
     }
 
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
@@ -342,6 +343,19 @@ class UserRepository
             'user',
             [
                 'email' => $email,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateIsAdmin(int $userId, bool $isAdmin) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'is_admin' => (int)$isAdmin,
             ],
             [
                 'id' => $userId,

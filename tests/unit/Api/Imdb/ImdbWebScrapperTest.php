@@ -27,69 +27,61 @@ class ImdbWebScrapperTest extends TestCase
     {
         return [
             [
-                '    <div class="allText">
-            <div class="allText">
-                229.240
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7.9 / 10
-
-
-
-            <br /><br />',
+                'iZlgcd">7.9</span>
+                bjjENQ">229.240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                229,240
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                'iZlgcd">7,9</span>
+                bjjENQ">229,240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                1.229,240
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                'iZlgcd">7,9</span>
+                bjjENQ">229240</div>',
+                ImdbRating::create(7.9, 229240)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">1.229,240</div>',
                 ImdbRating::create(7.9, 1229240)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                40
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                'iZlgcd">7,9</span>
+                bjjENQ">40</div>',
                 ImdbRating::create(7.9, 40)
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                 7,9 / 10
-
-
-
-            <br /><br />',
+                'iZlgcd">7,9</span>
+                bjjENQ">40K</div>',
+                ImdbRating::create(7.9, 40000)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">4.1K</div>',
+                ImdbRating::create(7.9, 4100)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">14.12K</div>',
+                ImdbRating::create(7.9, 14120)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">10M</div>',
+                ImdbRating::create(7.9, 10000000)
+            ],
+            [
+                'iZlgcd">7,9</span>
+                bjjENQ">10.1M</div>',
+                ImdbRating::create(7.9, 10100000)
+            ],
+            [
+                'iZlgcd">7,9</span>',
                 null
             ],
             [
-                '    <div class="allText">
-            <div class="allText">
-                
-IMDb users have given a <a href="https://help.imdb.com/article/imdb/track-movies-tv/weighted-average-ratings/GWT2DSBYVT2F25SK?ref_=cons_tt_rt_wtavg">weighted average</a> vote of                  / 10
-
-
-
-            <br /><br />',
+                '',
                 null
             ],
         ];

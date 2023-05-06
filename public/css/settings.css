@@ -10,3 +10,7 @@
     padding: 0.4rem;
     font:12px Monaco,Consolas,"Andale  Mono","DejaVu Sans Mono",monospace
 }
+
+.invalid-input {
+    border-color: rgb(220, 53, 69)!important;
+}

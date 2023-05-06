@@ -5,15 +5,12 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/css/datepicker-1.2.0.min.css">
     <link href="/css/movie.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/bootstrap-icons-1.10.2.css">
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/datepicker-full-1.2.0.min.js"></script>
     <script src="/js/movie.js"></script>
-    <script src="/js/userSelect.js"></script>
+    <script src="/js/user-select.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -26,29 +23,25 @@
         <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
         <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
 
-            <div class="covered-img"></div>
-            <h2 style="display: flex;margin-bottom: 0.2rem;padding-top: 10rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
+        <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
 
             <input type="hidden" id="movieId" value="{{ movie.id }}">
             <input type="hidden" id="username" value="{{ routeUsername }}">
 
-            <div class="fw-light" id="ratingStars"
-                 style="color: rgb(255, 193, 7);
-                         font-size: 1.5rem;
-                         margin-bottom: 0.5rem;
-                         {% if currentUsername == routeUsername %}cursor:pointer;{% endif %}">
-
+        <div class="fw-light" id="ratingStars"
+             style="color: rgb(255, 193, 7);font-size: 1.5rem;margin-bottom: 0.5rem;cursor: default">
             <span id="ratingStarsSpan">
                 {{ movie.personal_rating }}
                 {% for i in 1..10 %}
-                    <i class="bi bi-star{% if movie.personalRating >= i %}-fill{% endif %}" id="ratingStar{{ i }}" onclick="updateRatingStars(this)"></i>
+                    <i class="bi bi-star{% if movie.personalRating >= i %}-fill{% endif %}"
+                       id="movieRatingStar{{ i }}"
+                       data-value="{{ i }}"></i>
                 {% endfor %}
-                {% if currentUsername == routeUsername %}
-                    <i class="bi bi-pencil-square" style="color: black;font-size: 1.3rem;cursor: pointer" onclick="editRating(this)" id="editRatingButton"></i>
-                    <i class="bi bi-check-circle-fill" style="color: #198754;font-size: 1.3rem;cursor: pointer;display: none" onclick="saveRating(this)"
-                       id="saveRatingButton"></i>
-                    <i class="bi bi-x-circle-fill" style="color: #dc3545;font-size: 1.3rem;cursor: pointer;display: none" onclick="resetRating(this)"
-                       id="resetRatingButton"></i>
+                {% if currentUserName == routeUsername %}
+                    <i class="bi bi-pencil-square {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color"
+                       style="font-size: 1.3rem;cursor: pointer"
+                       onclick="loadRatingModal()"
+                       id="editRatingButton"></i>
                 {% endif %}
             </span>
             </div>
@@ -82,84 +75,95 @@
                         {% if movie.originalLanguage == '' %} - {% endif %}
                         {{ movie.originalLanguage }}
                     </span>
-                    </div>
                 </div>
             </div>
+        </div>
 
-
-            <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
-                {% if movie.imdbRatingAverage is not null %}
-                    <div style="display: flex; align-items: center;cursor:pointer;" onclick="window.open('{{ movie.imdbUrl }}', '_blank')">
-                        <img src="/images/imdb-logo.svg" style="width: 3rem">
-                        <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
+        <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
+            {% if movie.imdbRatingAverage is not null %}
+                <div style="display: flex; align-items: center;cursor:pointer;" onclick="window.open('{{ movie.imdbUrl }}', '_blank')">
+                    <img src="/images/imdb-logo.svg" style="width: 3rem">
+                    <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
                         <span class="fw-bold">
                             {% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
                         </span>
-                            <span class="fw-lighter">
+                        <span class="fw-lighter">
                             /{{ movie.imdbRatingVoteCount|default('-') }}
                         </span>
-                        </p>
-                    </div>
-                {% endif %}
-                <div style="display: flex; align-items: center;{% if movie.imdbRatingAverage is not null %}margin-left: 0.8rem;{% endif %}cursor:pointer;"
-                     onclick="window.open('{{ movie.tmdbUrl }}', '_blank')">
-                    <img src="/images/tmdb-logo.svg" style="width: 2rem">
-                    <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
+                    </p>
+                </div>
+            {% endif %}
+            <div style="display: flex; align-items: center;{% if movie.imdbRatingAverage is not null %}margin-left: 0.8rem;{% endif %}cursor:pointer;"
+                 onclick="window.open('{{ movie.tmdbUrl }}', '_blank')">
+                <img src="/images/tmdb-logo.svg" style="width: 2rem">
+                <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
                     <span class="fw-bold">
                         {% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
                     </span>
-                        <span class="fw-lighter">
+                    <span class="fw-lighter">
                         /{{ movie.tmdbRatingVoteCount|default('-') }}
                     </span>
-                    </p>
-                </div>
+                </p>
             </div>
+        </div>
 
             {# --- Buttons --- #}
 
-            <div class="container text-center" id="toggleWatchDatesButtonDiv" style="margin-bottom: 0.5rem">
+        <div class="container text-center" id="toggleWatchDatesButtonDiv" style="margin-bottom: 0.5rem">
+            <div class="row">
+                <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-light' : 'btn-dark' }}"
+                        onclick="toggleWatchDates()"
+                        id="toggleWatchDatesButton"
+                        {% if totalPlays == 0 %}disabled{% endif %}>
+                    {{ totalPlays }}x Play{% if totalPlays == 0 or totalPlays > 1 %}s{% endif %} <span style="font-size: 0.8rem">- View all</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="container text-center" style="display: none;" id="watchDatesListDiv">
+            <div class="row">
+                <ul class="list-group col-lg-5 col-xl-4 col-xxl-3" style="padding-right: 0">
+                    {% for watchDate in watchDates|reverse %}
+                        <li class="list-group-item {% if currentUserName == routeUsername %}list-group-item-action{% endif %}"
+                            style="text-align: center;{% if currentUserName == routeUsername %}cursor: pointer;{% endif %}position:relative;"
+                            {% if currentUserName == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
+                            data-watch-date="{{ watchDate.watched_at|date(dateFormatPhp) }}"
+                            data-plays="{{ watchDate.plays }}"
+                            data-comment="{{ watchDate.comment }}">
+                            {{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
+                            {% if watchDate.comment != '' %}<i class="bi bi-chat-square-text" style="position: absolute; right:.7rem; top:25%;">{% endif %}</i>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        {% if currentUserName == routeUsername %}
+            <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
-                    <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-dark" onclick="toggleWatchDates()" id="toggleWatchDatesButton"
-                            {% if totalPlays == 0 %}disabled{% endif %}>
-                        {{ totalPlays }}x Play{% if totalPlays == 0 or totalPlays > 1 %}s{% endif %} <span style="font-size: 0.8rem">- View all</span>
+                    <button type="button"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
+                            id="logSpecificMovieButton"
+                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, '{{ movie.title }}')">Log play
+                    </button>
+                </div>
+            </div>
+            <div class="container" style="margin-bottom: 0.5rem">
+                <div class="row">
+                    <button type="button"
+                            id="moreSpecificMovieButton"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#moreModal">
+                        More
                     </button>
                 </div>
             </div>
 
-            <div class="container text-center" style="display: none;" id="watchDatesListDiv">
-                <div class="row">
-                    <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
-                    <ul class="list-group col-lg-5 col-xl-4 col-xxl-3 " style="padding-right: 0">
-                        {% for watchDate in watchDates|reverse %}
-                            <li class="list-group-item {% if currentUsername == routeUsername %}list-group-item-action{% endif %}"
-                                style="text-align: center;{% if currentUsername == routeUsername %}cursor: pointer{% endif %}"
-                                {% if currentUsername == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
-                                id="watchDate-{{ loop.index }}">
-                                {{ watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
-                                <input value="{{ watchDate.watched_at|date(dateFormatPhp) }}" hidden id="inputDate-{{ loop.index }}">
-                                <input value="{{ watchDate.plays }}" hidden id="inputPlays-{{ loop.index }}">
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            {% if currentUsername == routeUsername %}
-                <div class="container" style="margin-bottom: 0.5rem">
-                    <div class="row">
-                        <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#addWatchDateModal">Log play</button>
-                    </div>
-                </div>
-                <div class="container" style="margin-bottom: 0.5rem">
-                    <div class="row">
-                        <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#moreModal">More</button>
-                    </div>
-                </div>
-
-                {{ include('component/movie-modal-more.html.twig') }}
-                {{ include('component/movie-modal-add-watch-date.html.twig') }}
-                {{ include('component/movie-modal-edit-watch-date.html.twig') }}
-            {% endif %}
+            {{ include('component/modal-edit-rating.html.twig') }}
+            {{ include('component/modal-edit-watch-date.html.twig') }}
+            {{ include('component/modal-more-options.html.twig') }}
+        {% endif %}
 
             {# --- Tagline --- #}
 

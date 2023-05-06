@@ -34,6 +34,7 @@ class UserUpdate extends Command
             ->addOption('email', [], InputOption::VALUE_OPTIONAL, 'New email')
             ->addOption('name', [], InputOption::VALUE_OPTIONAL, 'New name')
             ->addOption('password', [], InputOption::VALUE_OPTIONAL, 'New password')
+            ->addOption('isAdmin', [], InputOption::VALUE_OPTIONAL, 'Set user to admin')
             ->addOption('coreAccountChangesDisabled', [], InputOption::VALUE_OPTIONAL, 'Set core account changes disabled status')
             ->addOption('traktUserName', [], InputOption::VALUE_OPTIONAL, 'New trakt user name')
             ->addOption('traktClientId', [], InputOption::VALUE_OPTIONAL, 'New trakt client id');
@@ -74,6 +75,13 @@ class UserUpdate extends Command
                 $traktUserName = $traktUserName === '' ? null : $traktUserName;
 
                 $this->userApi->updateTraktUserName($userId, $traktUserName);
+            }
+
+            $isAdmin = $input->getOption('isAdmin');
+            if ($isAdmin !== null) {
+                $isAdmin = $isAdmin === '' ? null : $isAdmin;
+
+                $this->userApi->updateIsAdmin($userId, (bool)$isAdmin);
             }
 
             $traktClientId = $input->getOption('traktClientId');

@@ -6,12 +6,11 @@
 
 {% block stylesheets %}
     <link href="/css/dashboard.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/bootstrap-icons-1.10.2.css">
 {% endblock %}
 
 {% block scripts %}
     <script src="/js/dashboard.js"></script>
-    <script src="/js/userSelect.js"></script>
+    <script src="/js/user-select.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -21,7 +20,7 @@
             {{ include('component/user-select.html.twig') }}
 
             <h2 style="padding-bottom: 0.5rem">Overview</h2>
-            <div class="row justify-content-md-center">
+            <div class="row justify-content-md-center {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
                 <div class="col ">
                     <span class="stat-value">{{ totalPlayCount }}</span><br><span class="stat-description">TOTAL PLAYS</span>
                 </div>
@@ -33,7 +32,7 @@
                 </div>
             </div>
             <br>
-            <div class="row justify-content-md-center">
+            <div class="row justify-content-md-center {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
                 <div class="col ">
                     <span class="stat-value">{{ averagePlaysPerDay }}</span><br><span class="stat-description">PLAYS PER DAY</span>
                 </div>
@@ -45,10 +44,11 @@
                 </div>
             </div>
 
-            <hr>
+            <br>
 
             <div class="list-group">
-                <li class="list-group-item list-group-item-action user-select-none activeItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none activeItemButton {{ theme == 'dark' ? 'text-white' : 'activeItemButtonActiveLight' }}"
+                    onclick="toggleButton(this)">
                     Last Plays
                     <i class="bi bi-chevron-up float-end"></i>
                 </li>
@@ -79,7 +79,7 @@
                     <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Actors
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>
@@ -106,7 +106,7 @@
                 </li>
 
 
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Actresses
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>
@@ -132,7 +132,7 @@
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Directors
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>
@@ -158,7 +158,7 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Genres
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>
@@ -183,7 +183,7 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Languages
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>
@@ -208,7 +208,7 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Production Companies
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>
@@ -231,7 +231,7 @@
                     </div>
                 </li>
 
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton clearfix" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Release Years
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>

@@ -7,10 +7,20 @@ include .env
 up:
 	docker-compose up -d
 
+up_mysql:
+	mkdir -p tmp/db
+	docker-compose up -d mysql
+
+up_app: 
+	docker-compose up -d app
+
 down:
 	docker-compose down
 
 reup: down up
+
+logs: 
+	docker-compose logs -f
 
 build:
 	docker-compose build --no-cache

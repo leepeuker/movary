@@ -1,7 +1,9 @@
 .idea
 .phpunit.result.cache
-
 .env
 /vendor
 /public/storage
 docker-compose.override.yml
+.phpunit.result.cache
+tmp/*
+.vscode

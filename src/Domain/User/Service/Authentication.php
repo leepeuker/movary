@@ -40,7 +40,7 @@ class Authentication
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
         if ($userId === null && $token !== null) {
-            $userId = $this->repository->findUserIdByAuthToken($token);
+            $userId = $this->repository->findUserIdByAuthToken((string)$token);
             $this->sessionWrapper->set('userId', $userId);
         }
 
@@ -55,7 +55,7 @@ class Authentication
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
-        if (empty($token) === false && $this->isValidToken($token) === true) {
+        if (empty($token) === false && $this->isValidToken((string)$token) === true) {
             return true;
         }
 
@@ -121,7 +121,7 @@ class Authentication
         $token = filter_input(INPUT_COOKIE, 'id');
 
         if ($token !== null) {
-            $this->deleteToken($token);
+            $this->deleteToken((string)$token);
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
         }
