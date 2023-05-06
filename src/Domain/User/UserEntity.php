@@ -18,6 +18,7 @@ class UserEntity
         private readonly bool $jellyfinScrobbleWatches,
         private readonly bool $plexScrobbleWatches,
         private readonly bool $plexScrobbleRatings,
+        private readonly bool $watchlistAutomaticRemovalEnabled,
     ) {
     }
 
@@ -37,6 +38,7 @@ class UserEntity
             (bool)$data['jellyfin_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
+            (bool)$data['watchlist_automatic_removal_enabled'],
         );
     }
 
@@ -103,6 +105,11 @@ class UserEntity
     public function hasPlexScrobbleWatchesEnabled() : bool
     {
         return $this->plexScrobbleWatches;
+    }
+
+    public function hasWatchlistAutomaticRemovalEnabled() : bool
+    {
+        return $this->watchlistAutomaticRemovalEnabled;
     }
 
     public function isAdmin() : bool

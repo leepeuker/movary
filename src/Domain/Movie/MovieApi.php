@@ -15,6 +15,7 @@ use Movary\Domain\Movie\Genre\MovieGenreApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\Person\PersonApi;
 use Movary\Service\UrlGenerator;
 use Movary\Service\VoteCountFormatter;
@@ -30,6 +31,7 @@ class MovieApi
 {
     public function __construct(
         private readonly MovieHistoryApi $historyApi,
+        private readonly MovieWatchlistApi $watchlistApi,
         private readonly MovieGenreApi $movieGenreApi,
         private readonly CastApi $castApi,
         private readonly CrewApi $crewApi,
@@ -314,6 +316,8 @@ class MovieApi
     {
         $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
 
+        $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
+
         if ($historyEntry === null) {
             $this->historyApi->create(
                 $movieId,
@@ -339,12 +343,14 @@ class MovieApi
         $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
 
         if ($historyEntry === null) {
+            $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
+
             $this->historyApi->create(
                 $movieId,
                 $userId,
                 $watchedAt,
                 $playsPerDate,
-                $comment
+                $comment,
             );
 
             return;
