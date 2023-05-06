@@ -226,4 +226,9 @@ class UserApi
     {
         $this->repository->updateTraktUserName($userId, $traktUserName);
     }
+
+    public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void
+    {
+        $this->repository->updateWatchlistAutomaticRemovalEnabled($userId, $watchlistAutomaticRemovalEnabled);
+    }
 }

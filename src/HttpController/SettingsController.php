@@ -192,6 +192,7 @@ class SettingsController
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'privacyLevel' => $user->getPrivacyLevel(),
                 'username' => $user->getName(),
+                'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
             ]),
         );
     }
@@ -372,11 +373,13 @@ class SettingsController
         $privacyLevel = isset($requestData['privacyLevel']) === false ? 1 : (int)$requestData['privacyLevel'];
         $dateFormat = empty($requestData['dateFormat']) === true ? 0 : (int)$requestData['dateFormat'];
         $name = $requestData['username'] ?? '';
+        $enableAutomaticWatchlistRemoval = isset($requestData['enableAutomaticWatchlistRemoval']) === false ? false : (bool)$requestData['enableAutomaticWatchlistRemoval'];
 
         try {
             $this->userApi->updatePrivacyLevel($this->authenticationService->getCurrentUserId(), $privacyLevel);
             $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
             $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
+            $this->userApi->updateWatchlistAutomaticRemovalEnabled($this->authenticationService->getCurrentUserId(), $enableAutomaticWatchlistRemoval);
         } catch (User\Exception\UsernameInvalidFormat) {
             return Response::createBadRequest('Username not meeting requirements');
         } catch (User\Exception\UsernameNotUnique) {
