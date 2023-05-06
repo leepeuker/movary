@@ -193,7 +193,7 @@ function backToLogModalSearchResults() {
     document.getElementById('logPlayModalSearchDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.remove('d-none')
     document.getElementById('logPlayModalFooter').classList.add('d-none')
-    document.getElementById('logPlayModalTitle').innerHTML = 'Log play'
+    document.getElementById('logPlayModalTitle').innerHTML = 'Add movie'
 
     removeAlert('logPlayModalAlert')
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
@@ -294,10 +294,10 @@ function logMovie(context) {
             return
         }
 
-        addAlert('logPlayModalAlert', 'Could not log play. Please try again.', 'danger')
+        addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
     }).catch(function (error) {
         console.log(error)
-        addAlert('logPlayModalAlert', 'Could not log play. Please try again.', 'danger')
+        addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
     })
 }
 
