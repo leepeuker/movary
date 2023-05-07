@@ -4,70 +4,73 @@ namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
-use Movary\Service\Jellyfin\JellyfinScrobbler;
+use Movary\Service\Emby\EmbyScrobbler;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Psr\Log\LoggerInterface;
 
-class JellyfinController
+class EmbyController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly JellyfinScrobbler $jellyfinScrobbler,
+        private readonly EmbyScrobbler $embyScrobbler,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function deleteJellyfinWebhookId() : Response
+    public function deleteEmbyWebhookId() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
 
-        $this->userApi->deleteJellyfinWebhookId($this->authenticationService->getCurrentUserId());
+        $this->userApi->deleteEmbyWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
     }
 
-    public function getJellyfinWebhookId() : Response
+    public function getEmbyWebhookId() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
 
-        $webhookId = $this->userApi->findJellyfinWebhookId($_SESSION['userId']);
+        $webhookId = $this->userApi->findEmbyWebhookId($_SESSION['userId']);
 
         return Response::createJson(Json::encode(['id' => $webhookId]));
     }
 
-    public function handleJellyfinWebhook(Request $request) : Response
+    public function handleEmbyWebhook(Request $request) : Response
     {
         $webhookId = $request->getRouteParameters()['id'];
 
-        $userId = $this->userApi->findUserIdByJellyfinWebhookId($webhookId);
+        $userId = $this->userApi->findUserIdByEmbyWebhookId($webhookId);
         if ($userId === null) {
             return Response::createNotFound();
         }
 
         $requestPayload = $request->getBody();
+        if (empty($requestPayload) === true) {
+            $requestPayload = '[]';
+        }
 
-        $this->logger->debug('Jellyfin: Webhook triggered with payload: ' . $requestPayload);
+        $this->logger->debug('Emby: Webhook triggered with payload: ' . $requestPayload);
 
-        $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode($requestPayload));
+        $this->embyScrobbler->processEmbyWebhook($userId, Json::decode($requestPayload));
 
         return Response::createOk();
     }
 
-    public function regenerateJellyfinWebhookId() : Response
+    public function regenerateEmbyWebhookId() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
 
-        $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->getCurrentUserId());
+        $plexWebhookId = $this->userApi->regenerateEmbyWebhookId($this->authenticationService->getCurrentUserId());
 
-        return Response::createJson(Json::encode(['id' => $webhookId]));
+        return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
 }
