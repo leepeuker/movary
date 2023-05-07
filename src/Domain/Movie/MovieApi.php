@@ -340,9 +340,9 @@ class MovieApi
 
     public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate, ?string $comment = null) : void
     {
-        $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
+        $existingHistoryEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
 
-        if ($historyEntry === null) {
+        if ($existingHistoryEntry === null) {
             $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
 
             $this->historyApi->create(
@@ -354,6 +354,10 @@ class MovieApi
             );
 
             return;
+        }
+
+        if ($existingHistoryEntry->getPlays() < $playsPerDate) {
+            $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
         }
 
         $this->historyApi->update(
