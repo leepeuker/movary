@@ -2,6 +2,7 @@
 
 namespace Movary\Domain\Movie\Watchlist;
 
+use Movary\Domain\User\UserApi;
 use Movary\Service\UrlGenerator;
 
 class MovieWatchlistApi
@@ -9,6 +10,7 @@ class MovieWatchlistApi
     public function __construct(
         private readonly MovieWatchlistRepository $repository,
         private readonly UrlGenerator $urlGenerator,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -41,5 +43,14 @@ class MovieWatchlistApi
     public function removeMovieFromWatchlist(int $userId, int $movieId) : void
     {
         $this->repository->removeMovieFromWatchlist($userId, $movieId);
+    }
+
+    public function removeMovieFromWatchlistAutomatically(int $movieId, int $userId) : void
+    {
+        if ($this->userApi->fetchUser($userId)->hasWatchlistAutomaticRemovalEnabled() === false) {
+            return;
+        }
+
+        $this->removeMovieFromWatchlist($userId, $movieId);
     }
 }

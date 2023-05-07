@@ -1,6 +1,7 @@
 const dateFormatInput = document.getElementById('dateFormatInput')
 const nameInput = document.getElementById('nameInput')
 const privacyInput = document.getElementById('privacyInput')
+const enableAutomaticWatchlistRemovalInput = document.getElementById('enableAutomaticWatchlistRemovalInput')
 
 document.getElementById('generalAccountUpdateButton').addEventListener('click', async () => {
     nameInput.classList.remove('invalid-input');
@@ -12,7 +13,7 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
         return
     }
 
-    const response = await updateGeneral(dateFormatInput.value, nameInput.value, privacyInput.value)
+    const response = await updateGeneral(dateFormatInput.value, nameInput.value, privacyInput.value, enableAutomaticWatchlistRemovalInput.checked)
 
     switch (response.status) {
         case 200:
@@ -31,7 +32,7 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
     }
 });
 
-function updateGeneral(dateFormat, username, privacyLevel) {
+function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval) {
     return fetch('/settings/account', {
         method: 'POST',
         headers: {
@@ -41,6 +42,7 @@ function updateGeneral(dateFormat, username, privacyLevel) {
             'dateFormat': dateFormat,
             'username': username,
             'privacyLevel': privacyLevel,
+            'enableAutomaticWatchlistRemoval': enableAutomaticWatchlistRemoval,
         })
     })
 }

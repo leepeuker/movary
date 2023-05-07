@@ -55,6 +55,16 @@
                     <div id="privacyHelp" class="form-text">Who can see your history and ratings</div>
                 </div>
 
+                <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="enableAutomaticWatchlistRemovalInput"
+                            {% if enableAutomaticWatchlistRemoval == true %}checked{% endif %}
+                           style="margin-right: 0.2rem">
+                    <label class="form-check-label" for="scrobbleWatchesCheckbox">Enable automatic removals from watchlist</label>
+                </div>
+
                 <div id="alertGeneralAccountDiv"></div>
 
                 <button type="submit" class="btn btn-primary" id="generalAccountUpdateButton">Submit</button>

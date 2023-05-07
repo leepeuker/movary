@@ -454,4 +454,17 @@ class UserRepository
             ],
         );
     }
+
+    public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'watchlist_automatic_removal_enabled' => $watchlistAutomaticRemovalEnabled,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
 }
