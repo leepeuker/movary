@@ -189,12 +189,13 @@ function resetLogModalSearchResults() {
 function backToLogModalSearchResults() {
     document.getElementById('logPlayModalWatchDateDiv').classList.add('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterWatchlistButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.remove('d-none')
     document.getElementById('logPlayModalFooter').classList.add('d-none')
-    document.getElementById('logPlayModalTitle').innerHTML = 'Log play'
+    document.getElementById('logPlayModalTitle').innerHTML = 'Add movie'
 
-    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
+    removeAlert('logPlayModalAlert')
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
     setRatingStars('logPlayModal', 0)
@@ -211,6 +212,7 @@ async function selectLogModalTmdbItemForLogging(event) {
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterWatchlistButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
@@ -237,7 +239,30 @@ function resetLogModalLogInputs() {
     document.getElementById('logPlayModalTmdbIdInput').value = ''
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
-    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
+    removeAlert('logPlayModalAlert')
+}
+
+function addToWatchlist(context) {
+    const tmdbId = document.getElementById(context + 'TmdbIdInput').value
+
+    fetch('/add-movie-to-watchlist', {
+        method: 'post', headers: {
+            'Content-type': 'application/json',
+        }, body: JSON.stringify({
+            'tmdbId': tmdbId,
+        })
+    }).then(function (response) {
+        if (response.status === 200) {
+            location.reload();
+
+            return
+        }
+
+        addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
+    })
 }
 
 function logMovie(context) {
@@ -246,7 +271,7 @@ function logMovie(context) {
     const watchDate = document.getElementById(context + 'WatchDateInput').value
     const comment = document.getElementById(context + 'CommentInput').value
     const dateFormatPhp = document.getElementById('dateFormatPhp').value
-    document.getElementById('logPlayModalLogErrorAlert').classList.add('d-none')
+    removeAlert('logPlayModalAlert')
 
     if (validateWatchDate(context, watchDate) === false) {
         return
@@ -269,10 +294,10 @@ function logMovie(context) {
             return
         }
 
-        document.getElementById('logPlayModalLogErrorAlert').classList.remove('d-none')
+        addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
     }).catch(function (error) {
         console.log(error)
-        document.getElementById('logPlayModalLogErrorAlert').classList.remove('d-none')
+        addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
     })
 }
 
@@ -292,6 +317,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle) {
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.add('d-none')
+    document.getElementById('logPlayModalFooterWatchlistButton').classList.add('d-none')
 
     myModal.show()
 }

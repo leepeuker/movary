@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
@@ -20,12 +21,27 @@ class MovieController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieApi $movieApi,
+        private readonly MovieWatchlistApi $movieWatchlistApi,
         private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
     ) {
+    }
+
+    public function addToWatchlist(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createForbidden();
+        }
+
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $userId = $this->authenticationService->getCurrentUser()->getId();
+
+        $this->movieWatchlistApi->addMovieToWatchlist($userId, $movieId);
+
+        return Response::createOk();
     }
 
     public function fetchMovieRatingByTmdbdId(Request $request) : Response
@@ -90,6 +106,20 @@ class MovieController
         return Response::createOk();
     }
 
+    public function removeFromWatchlist(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createForbidden();
+        }
+
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $userId = $this->authenticationService->getCurrentUser()->getId();
+
+        $this->movieWatchlistApi->removeMovieFromWatchlist($userId, $movieId);
+
+        return Response::createOk();
+    }
+
     public function renderPage(Request $request) : Response
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
@@ -112,6 +142,7 @@ class MovieController
                 'directors' => $this->movieApi->findDirectorsByMovieId($movieId),
                 'totalPlays' => $this->movieApi->fetchHistoryMovieTotalPlays($movieId, $userId),
                 'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
+                'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
             ]),
         );
     }

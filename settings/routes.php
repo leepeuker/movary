@@ -267,6 +267,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/movies/{id:[0-9]+}/refresh-imdb',
         [\Movary\HttpController\MovieController::class, 'refreshImdbRating'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/add-watchlist',
+        [\Movary\HttpController\MovieController::class, 'addToWatchlist'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/remove-watchlist',
+        [\Movary\HttpController\MovieController::class, 'removeFromWatchlist'],
+    );
 
     ##############
     # User media #
@@ -280,6 +290,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/users/{username:[a-zA-Z0-9]+}/history',
         [\Movary\HttpController\HistoryController::class, 'renderHistory'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/watchlist',
+        [\Movary\HttpController\WatchlistController::class, 'renderWatchlist'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -330,6 +345,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/log-movie',
         [\Movary\HttpController\HistoryController::class, 'logMovie'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/add-movie-to-watchlist',
+        [\Movary\HttpController\WatchlistController::class, 'addMovieToWatchlist'],
     );
     $routeCollector->addRoute(
         'GET',
