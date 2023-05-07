@@ -51,10 +51,7 @@ class EmbyController
             return Response::createNotFound();
         }
 
-        $requestPayload = $request->getBody();
-        if (empty($requestPayload) === true) {
-            $requestPayload = '[]';
-        }
+        $requestPayload = $request->getPostParameters()['data'];
 
         $this->logger->debug('Emby: Webhook triggered with payload: ' . $requestPayload);
 

@@ -10,7 +10,7 @@ use RuntimeException;
 
 class EmbyWebhookDtoMapper
 {
-    private const SUPPORTED_NOTIFICATION_TYPE = 'PlaybackStop';
+    private const SUPPORTED_NOTIFICATION_TYPE = 'playback.stop';
 
     private const SUPPORTED_ITEM_TYPE = 'Movie';
 
@@ -20,10 +20,8 @@ class EmbyWebhookDtoMapper
 
     public function map(array $webhookPayload) : ?EmbyWebhookDto
     {
-        // TODO
-
-        $notificationType = $webhookPayload['NotificationType'] ?? null;
-        $itemType = $webhookPayload['ItemType'] ?? null;
+        $notificationType = $webhookPayload['Event'] ?? null;
+        $itemType = $webhookPayload['Item']['Type'] ?? null;
 
         if ($itemType !== self::SUPPORTED_ITEM_TYPE) {
             $this->logger->debug('Emby: Ignored webhook because item type is not supported', ['itemType' => $itemType]);
@@ -38,10 +36,10 @@ class EmbyWebhookDtoMapper
         }
 
         return EmbyWebhookDto::create(
-            $webhookPayload['Name'] ?? null,
-            empty($webhookPayload['Provider_tmdb']) === true ? null : (int)$webhookPayload['Provider_tmdb'],
-            $this->getWatchDate($webhookPayload['UtcTimestamp'] ?? null),
-            $webhookPayload['PlayedToCompletion'],
+            $webhookPayload['Item']['Name'] ?? null,
+            empty($webhookPayload['Item']['ProviderIds']['Tmdb']) === true ? null : (int)$webhookPayload['Item']['ProviderIds']['Tmdb'],
+            $this->getWatchDate($webhookPayload['Date'] ?? null),
+            $webhookPayload['PlaybackInfo']['PlayedToCompletion'],
         );
     }
 
