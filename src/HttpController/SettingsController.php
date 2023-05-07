@@ -176,6 +176,27 @@ class SettingsController
         );
     }
 
+    public function renderEmbyPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $embyScrobblerOptionsUpdated = $this->sessionWrapper->find('embyScrobblerOptionsUpdated');
+        $this->sessionWrapper->unset('embyScrobblerOptionsUpdated');
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-integration-emby.html.twig', [
+                'embyWebhookUrl' => $user->getEmbyWebhookId() ?? '-',
+                'scrobbleWatches' => $user->hasEmbyScrobbleWatchesEnabled(),
+                'embyScrobblerOptionsUpdated' => $embyScrobblerOptionsUpdated,
+            ]),
+        );
+    }
+
     public function renderGeneralAccountPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -379,6 +400,26 @@ class SettingsController
         }
 
         return Response::createOk();
+    }
+
+    public function updateEmby(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = $request->getPostParameters();
+
+        $this->userApi->updateEmbyScrobblerOptions($userId, (bool)$postParameters['scrobbleWatches']);
+
+        $this->sessionWrapper->set('embyScrobblerOptionsUpdated', true);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
     }
 
     public function updateGeneral(Request $request) : Response

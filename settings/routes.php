@@ -45,6 +45,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/jellyfin/{id:.+}',
         [\Movary\HttpController\JellyfinController::class, 'handleJellyfinWebhook'],
     );
+    $routeCollector->addRoute(
+        'POST',
+        '/emby/{id:.+}',
+        [\Movary\HttpController\EmbyController::class, 'handleEmbyWebhook'],
+    );
 
     #############
     # Job Queue #
@@ -227,6 +232,31 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'DELETE',
         '/settings/jellyfin/webhook-id',
         [\Movary\HttpController\JellyfinController::class, 'deleteJellyfinWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/integrations/emby',
+        [\Movary\HttpController\SettingsController::class, 'renderEmbyPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/emby',
+        [\Movary\HttpController\SettingsController::class, 'updateEmby'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/emby/webhook-id',
+        [\Movary\HttpController\EmbyController::class, 'getEmbyWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/settings/emby/webhook-id',
+        [\Movary\HttpController\EmbyController::class, 'regenerateEmbyWebhookId'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/settings/emby/webhook-id',
+        [\Movary\HttpController\EmbyController::class, 'deleteEmbyWebhookId'],
     );
     $routeCollector->addRoute(
         'GET',
