@@ -301,7 +301,7 @@ function logMovie(context) {
     })
 }
 
-async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle) {
+async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear) {
     const myModal = new bootstrap.Modal(document.getElementById('logPlayModal'), {
         keyboard: false
     });
@@ -310,7 +310,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle) {
     setRatingStars('logPlayModal', rating)
 
     document.getElementById('logPlayModalTmdbIdInput').value = tmdbId
-    document.getElementById('logPlayModalTitle').innerHTML = movieTitle
+    document.getElementById('logPlayModalTitle').innerHTML = movieTitle  + ' (' + releaseYear + ')'
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
