@@ -301,7 +301,7 @@ class MovieRepository
     public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.*, muwd.watched_at, muwd.plays
+            'SELECT m.*, muwd.watched_at, muwd.plays, comment
             FROM movie_user_watch_dates muwd
             JOIN movie m on muwd.movie_id = m.id
             WHERE muwd.user_id = ?

@@ -23,19 +23,18 @@
                 <h5>General account settings</h5>
                 <div class="mb-3">
                     <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
-                    <select class="form-select" name="dateFormat" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
+                    <select class="form-select" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
                         {% for dateFormatOffset, dateFormat in dateFormats %}
                             <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
                         {% endfor %}
                     </select>
-                    <div id="emailHelp" class="form-text">Date format used when displaying dates</div>
+                    <div id="emailHelp" class="form-text">Format used when displaying dates</div>
                 </div>
 
                 <div class="mb-3">
                     <label for="nameInput" class="form-label"><b>Username</b> <span class="text-danger">*</span></label>
                     <input type="text"
                            class="form-control"
-                           name="username"
                            placeholder="Username"
                            value="{{ username }}"
                            title="Only letters and numbers allowed"

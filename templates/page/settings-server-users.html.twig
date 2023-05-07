@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-users.js"></script>
+    <script src="/js/settings-server-users.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -18,10 +18,11 @@
 
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
-            <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5 style="margin-bottom: 1rem;padding-top: 0.5rem">User Management</h5>
 
-                <p class="text-muted">List of all users. Click on user to edit.</p>
+            <div style="padding-bottom: 1rem;padding-top: 1rem">
+                <h5 style="margin-bottom: 1rem;">User Management</h5>
+
+                <p class="text-muted">List of all users. Click on table row to edit/delete users.</p>
 
                 <div id="userManagementAlerts"></div>
 

@@ -16,6 +16,7 @@ class LandingPageController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly bool $registrationEnabled,
     ) {
     }
 
@@ -28,22 +29,7 @@ class LandingPageController
         }
 
         if ($this->userApi->hasUsers() === false) {
-            $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
-            $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
-            $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
-            $errorGeneric = $this->sessionWrapper->find('errorGeneric');
-
-            $this->sessionWrapper->unset('errorPasswordTooShort', 'errorPasswordNotEqual', 'errorUsernameInvalidFormat', 'errorGeneric');
-
-            return Response::create(
-                StatusCode::createOk(),
-                $this->twig->render('page/create-user.html.twig', [
-                    'errorPasswordTooShort' => $errorPasswordTooShort,
-                    'errorPasswordNotEqual' => $errorPasswordNotEqual,
-                    'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
-                    'errorGeneric' => $errorGeneric,
-                ]),
-            );
+            return Response::createSeeOther('/create-user');
         }
 
         $failedLogin = $this->sessionWrapper->has('failedLogin');
@@ -56,6 +42,7 @@ class LandingPageController
             $this->twig->render('page/login.html.twig', [
                 'failedLogin' => $failedLogin,
                 'deletedAccount' => $deletedAccount,
+                'registrationEnabled' => $this->registrationEnabled
             ]),
         );
     }
