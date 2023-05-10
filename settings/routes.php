@@ -100,6 +100,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/account/dashboard',
+        [\Movary\HttpController\SettingsController::class, 'renderDashboardAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/account/password',
         [\Movary\HttpController\SettingsController::class, 'renderPasswordAccountPage'],
     );

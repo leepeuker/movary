@@ -138,6 +138,20 @@ class SettingsController
             ]),
         );
     }
+ 
+    public function renderDashboardAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-dashboard.html.twig', [
+                
+            ]),
+        );
+    }
 
     public function renderDataAccountPage() : Response
     {
