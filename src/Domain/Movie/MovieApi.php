@@ -460,12 +460,12 @@ class MovieApi
         $this->repository->updateLetterboxdId($movieId, $letterboxdId);
     }
 
-    public function updateProductionCompanies(int $movieId, CompanyEntityList $genres) : void
+    public function updateProductionCompanies(int $movieId, CompanyEntityList $productionCompanies) : void
     {
         $this->movieProductionCompanyApi->deleteByMovieId($movieId);
 
-        foreach ($genres as $position => $genre) {
-            $this->movieProductionCompanyApi->create($movieId, $genre->getId(), (int)$position);
+        foreach ($productionCompanies->getUniqueCompanies() as $position => $productionCompany) {
+            $this->movieProductionCompanyApi->create($movieId, $productionCompany->getId(), (int)$position);
         }
     }
 
