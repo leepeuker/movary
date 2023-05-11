@@ -1,7 +1,7 @@
 const optionsModal = new bootstrap.Modal('#optionsModal');
 
 async function removeFromWatchList() {
-    let movieId = document.getElementById('optionsModal').dataset.movieId;
+    let movieId = document.getElementById('optionsModal').dataset.movieid;
     let url = '/movies/' + movieId + '/remove-watchlist';
 
     await fetch(url, {
