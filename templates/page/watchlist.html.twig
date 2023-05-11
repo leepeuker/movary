@@ -26,7 +26,7 @@
                 {% for watchlistEntry in watchlistEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100" style="cursor: pointer; position: relative;">
-                            <img onclick="openRemoveWatchlistModal(this)" data-watchlistEntryId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
+                            <img onclick="openOptionsModal(this)" data-watchlistEntryId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
                        </div>
                     </div>
                 {% endfor %}

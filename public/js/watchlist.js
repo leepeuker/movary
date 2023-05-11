@@ -20,7 +20,7 @@ async function removeFromWatchList() {
     });
 }
 
-function openRemoveWatchlistModal(trigger) {
+function openOptionsModal(trigger) {
     let watchlistEntryId = trigger.dataset.watchlistentryid;
     document.getElementById('optionsModal').setAttribute('data-watchlistEntryId', watchlistEntryId);
     optionsModal.show();
