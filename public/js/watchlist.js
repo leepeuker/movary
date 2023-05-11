@@ -1,8 +1,8 @@
 const optionsModal = new bootstrap.Modal('#optionsModal');
 
 async function removeFromWatchList() {
-    let watchlistEntryId = document.getElementById('optionsModal').dataset.watchlistentryid;
-    let url = '/movies/' + watchlistEntryId + '/remove-watchlist';
+    let movieId = document.getElementById('optionsModal').dataset.movieId;
+    let url = '/movies/' + movieId + '/remove-watchlist';
 
     await fetch(url, {
         method: 'GET'
@@ -21,14 +21,14 @@ async function removeFromWatchList() {
 }
 
 function openOptionsModal(trigger) {
-    let watchlistEntryId = trigger.dataset.watchlistentryid;
-    document.getElementById('optionsModal').setAttribute('data-watchlistEntryId', watchlistEntryId);
+    let movieId = trigger.dataset.movieid;
+    document.getElementById('optionsModal').setAttribute('data-movieId', movieId);
     optionsModal.show();
 }
 
 function goToMovie() {
     const currentRouteUsername = window.location.pathname.match(/(?<!^)\/([a-zA-Z0-9]+)\//)[1];
-    let watchlistEntryId = document.getElementById('optionsModal').dataset.watchlistentryid;
+    let movieId = document.getElementById('optionsModal').dataset.movieid;
 
-    window.location.href = '/users/' + currentRouteUsername + '/movies/' + watchlistEntryId;
+    window.location.href = '/users/' + currentRouteUsername + '/movies/' + movieId;
 }
