@@ -1,7 +1,7 @@
-const removeFromWatchlistModal = new bootstrap.Modal('#removeFromWatchlistModal');
+const optionsModal = new bootstrap.Modal('#optionsModal');
 
 async function removeFromWatchList() {
-    let watchlistEntryId = document.getElementById('removeFromWatchlistModal').dataset.watchlistentryid;
+    let watchlistEntryId = document.getElementById('optionsModal').dataset.watchlistentryid;
     let url = '/movies/' + watchlistEntryId + '/remove-watchlist';
 
     await fetch(url, {
@@ -22,13 +22,13 @@ async function removeFromWatchList() {
 
 function openRemoveWatchlistModal(trigger) {
     let watchlistEntryId = trigger.dataset.watchlistentryid;
-    document.getElementById('removeFromWatchlistModal').setAttribute('data-watchlistEntryId', watchlistEntryId);
-    removeFromWatchlistModal.show();
+    document.getElementById('optionsModal').setAttribute('data-watchlistEntryId', watchlistEntryId);
+    optionsModal.show();
 }
 
 function goToMovie() {
     const currentRouteUsername = window.location.pathname.match(/(?<!^)\/([a-zA-Z0-9]+)\//)[1];
-    let watchlistEntryId = document.getElementById('removeFromWatchlistModal').dataset.watchlistentryid;
+    let watchlistEntryId = document.getElementById('optionsModal').dataset.watchlistentryid;
 
     window.location.href = '/users/' + currentRouteUsername + '/movies/' + watchlistEntryId;
 }
