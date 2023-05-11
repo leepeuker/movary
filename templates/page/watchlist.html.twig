@@ -26,8 +26,7 @@
                 {% for watchlistEntry in watchlistEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100" style="cursor: pointer; position: relative;">
-                            <i class="bi-trash-fill removeFromWatchlistIcon" onclick="openRemoveWatchlistModal(this)" data-watchlistEntryId="{{ watchlistEntry.id }}" style="position: absolute; top: 0; right: 0; color: red;"></i>
-                            <img onclick="window.location='/users/{{ routeUsername }}/movies/{{ watchlistEntry.id }}'" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
+                            <img onclick="openRemoveWatchlistModal(this)" data-watchlistEntryId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
                        </div>
                     </div>
                 {% endfor %}
