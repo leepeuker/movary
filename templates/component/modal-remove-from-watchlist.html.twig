@@ -1,13 +1,15 @@
-<div class="modal fade modal-sm" id="removeFromWatchlistModal" tabindex="-1" aria-labelledby="removeFromWatchlistModal" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade modal-sm" id="optionsModal" tabindex="-1" aria-labelledby="optionsModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="removeFromWatchlistModalLabel">Remove item from watchlist</h5>
+                <h5 class="modal-title">Options</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <button type="button" id="removeFromWatchlistBtn" onclick="removeFromWatchList()" class="btn btn-danger">Yes</button>
-                <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">No</button>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" onclick="goToMovie()">Go to movie</button>
+                    <button type="button" class="btn btn-danger" onclick="removeFromWatchList()">Remove from watchlist</button>
+                </div>
             </div>
         </div>
   </div>
