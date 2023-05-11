@@ -25,7 +25,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for watchlistEntry in watchlistEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100" style="cursor: pointer; position: relative;">
+                        <div class="card h-100" style="cursor: pointer; position: relative;" id="card-{{ watchlistEntry.id }}">
                             <img onclick="openOptionsModal(this)" data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
                        </div>
                     </div>

@@ -24,6 +24,7 @@ function openOptionsModal(trigger) {
     let movieId = trigger.dataset.movieid;
     document.getElementById('optionsModal').setAttribute('data-movieId', movieId);
     optionsModal.show();
+    document.getElementById('card-' + movieId).style.filter = 'brightness(30%)'
 }
 
 function goToMovie() {
@@ -32,3 +33,9 @@ function goToMovie() {
 
     window.location.href = '/users/' + currentRouteUsername + '/movies/' + movieId;
 }
+
+document.getElementById('optionsModal').addEventListener('hidden.bs.modal', () => {
+    document.querySelectorAll('.card').forEach((element) => {
+        element.style.filter = 'brightness(100%)'
+    });
+})
