@@ -24,7 +24,7 @@ class ServerSettings
             [self::APPLICATION_URL_KEY],
         );
 
-        return empty ($applicationUrl) === true ? null : $applicationUrl[0];
+        return empty($applicationUrl[0]) === true ? null : $applicationUrl[0];
     }
 
     public function getTmdbApiKey() : ?string
@@ -38,7 +38,7 @@ class ServerSettings
             [self::TMDB_API_KEY],
         );
 
-        return empty ($tmdbApiKey) === true ? null : $tmdbApiKey[0];
+        return empty($tmdbApiKey[0]) === true ? null : $tmdbApiKey[0];
     }
 
     public function isTmdbApiKeySetInEnvironment() : bool
@@ -54,23 +54,13 @@ class ServerSettings
 
     public function setApplicationUrl(string $applicationUrl) : void
     {
-        if ($this->getApplicationUrl() === null) {
-            $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$applicationUrl, self::APPLICATION_URL_KEY]);
-
-            return;
-        }
-
-        $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$applicationUrl, self::APPLICATION_URL_KEY]);
+        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([self::APPLICATION_URL_KEY]);
+        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$applicationUrl, self::APPLICATION_URL_KEY]);
     }
 
     public function setTmdbApiKey(string $tmdbApiKey) : void
     {
-        if ($this->getTmdbApiKey() === null) {
-            $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
-
-            return;
-        }
-
-        $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
+        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([self::TMDB_API_KEY]);
+        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
     }
 }

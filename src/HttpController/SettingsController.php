@@ -310,10 +310,18 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $plexWebhookId = $user->getPlexWebhookId();
+
+        if ($applicationUrl !== null && $plexWebhookId !== null) {
+            $plexWebhookUrl = rtrim($applicationUrl, '/') . '/plex/' . $plexWebhookId;
+        }
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-plex.html.twig', [
-                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
+                'applicationUrl' => $applicationUrl,
+                'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
                 'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
