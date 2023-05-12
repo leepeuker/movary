@@ -8,12 +8,23 @@ use Movary\ValueObject\Config;
 class ServerSettings
 {
     private const TMDB_API_KEY = 'tmdbApiKey';
-    private const SERVER_DOMAIN = 'serverDomain';
+
+    private const APPLICATION_URL_KEY = 'applicationUrl';
 
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
     ) {
+    }
+
+    public function getApplicationUrl() : ?string
+    {
+        $applicationUrl = $this->dbConnection->fetchFirstColumn(
+            'SELECT value FROM `server_setting` WHERE `key` = ?',
+            [self::APPLICATION_URL_KEY],
+        );
+
+        return empty ($applicationUrl) === true ? null : $applicationUrl[0];
     }
 
     public function getTmdbApiKey() : ?string
@@ -30,16 +41,6 @@ class ServerSettings
         return empty ($tmdbApiKey) === true ? null : $tmdbApiKey[0];
     }
 
-    public function getServerDomain() : ?string
-    {
-        $serverDomain = $this->dbConnection->fetchFirstColumn(
-            'SELECT value FROM `server_setting` WHERE `key` = ?',
-            [self::SERVER_DOMAIN],
-        );
-
-        return empty ($serverDomain) === true ? null : $serverDomain[0];
-    }
-
     public function isTmdbApiKeySetInEnvironment() : bool
     {
         try {
@@ -51,6 +52,17 @@ class ServerSettings
         return empty($tmdbApiKey) === false;
     }
 
+    public function setApplicationUrl(string $applicationUrl) : void
+    {
+        if ($this->getApplicationUrl() === null) {
+            $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$applicationUrl, self::APPLICATION_URL_KEY]);
+
+            return;
+        }
+
+        $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$applicationUrl, self::APPLICATION_URL_KEY]);
+    }
+
     public function setTmdbApiKey(string $tmdbApiKey) : void
     {
         if ($this->getTmdbApiKey() === null) {
@@ -60,16 +72,5 @@ class ServerSettings
         }
 
         $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
-    }
-
-    public function setServerDomain(string $serverDomain) : void
-    {
-        if ($this->getServerDomain() === null) {
-            $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$serverDomain, self::SERVER_DOMAIN]);
-
-            return;
-        }
-
-        $this->dbConnection->prepare('UPDATE `server_setting` SET value = ? WHERE `key` = ?')->executeStatement([$serverDomain, self::SERVER_DOMAIN]);
     }
 }

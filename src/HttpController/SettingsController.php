@@ -334,6 +334,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-general.html.twig', [
+                'applicationUrl' => $this->serverSettings->getApplicationUrl(),
                 'tmdbApiKey' => $this->serverSettings->getTmdbApiKey(),
                 'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
             ]),
@@ -536,17 +537,13 @@ class SettingsController
         $requestData = Json::decode($request->getBody());
 
         $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
-        $serverDomain = isset($requestData['serverDomain']) === false ? null : $requestData['serverDomain'];
+        $applicationUrl = isset($requestData['applicationUrl']) === false ? null : $requestData['applicationUrl'];
 
         if ($tmdbApiKey !== null) {
             $this->serverSettings->setTmdbApiKey($tmdbApiKey);
         }
-        if($serverDomain !== null) {
-            $regex = "/^(https?\:\/\/)?[a-zA-Z0-9_-]{0,63}(\.[a-zA-Z0-9_-]{0,63})*/";
-            if(preg_match($regex, $serverDomain) === false) {
-                return Response::createBadRequest('Invalid input');
-            }
-            $this->serverSettings->setServerDomain($serverDomain);
+        if ($applicationUrl !== null) {
+            $this->serverSettings->setApplicationUrl($applicationUrl);
         }
 
         return Response::createOk();
