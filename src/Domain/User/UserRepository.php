@@ -164,6 +164,17 @@ class UserRepository
         return (int)$dateFormat;
     }
 
+    public function findEmbyWebhookId(int $userId) : ?string
+    {
+        $embyWebhookId = $this->dbConnection->fetchOne('SELECT `emby_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($embyWebhookId === false) {
+            return null;
+        }
+
+        return $embyWebhookId;
+    }
+
     public function findJellyfinWebhookId(int $userId) : ?string
     {
         $jellyfinWebhookId = $this->dbConnection->fetchOne('SELECT `jellyfin_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
@@ -252,6 +263,17 @@ class UserRepository
         return (int)$id;
     }
 
+    public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `emby_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
     public function findUserIdByJellyfinWebhookId(string $webhookId) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `jellyfin_webhook_uuid` = ?', [$webhookId]);
@@ -283,6 +305,19 @@ class UserRepository
         }
 
         return $count;
+    }
+
+    public function setEmbyWebhookId(int $userId, ?string $embyWebhookId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'emby_webhook_uuid' => $embyWebhookId,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
     }
 
     public function setJellyfinWebhookId(int $userId, ?string $jellyfinWebhookId) : void
@@ -343,6 +378,19 @@ class UserRepository
             'user',
             [
                 'email' => $email,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'emby_scrobble_views' => (int)$scrobbleWatches,
             ],
             [
                 'id' => $userId,
@@ -448,6 +496,19 @@ class UserRepository
             'user',
             [
                 'trakt_user_name' => $traktUserName,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'watchlist_automatic_removal_enabled' => $watchlistAutomaticRemovalEnabled,
             ],
             [
                 'id' => $userId,

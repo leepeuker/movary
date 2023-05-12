@@ -7,6 +7,12 @@
             </div>
             <div class="modal-body">
                 <div class="d-grid gap-2">
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="watchlistButton"
+                            onclick="toggleWatchlist({{ isOnWatchlist }})">
+                        {{ isOnWatchlist == true ? 'Remove from' : 'Add to' }} Watchlist
+                    </button>
                     <button type="button" class="btn btn-primary" id="refreshTmdbDataButton" onclick="refreshTmdbData()">Refresh TMDB data</button>
                     <button type="button" class="btn btn-primary" id="refreshImdbRatingButton" onclick="refreshImdbRating()">Refresh IMDb rating</button>
                 </div>
