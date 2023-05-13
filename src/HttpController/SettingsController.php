@@ -184,17 +184,21 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $embyScrobblerOptionsUpdated = $this->sessionWrapper->find('embyScrobblerOptionsUpdated');
-        $this->sessionWrapper->unset('embyScrobblerOptionsUpdated');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $webhookId = $user->getEmbyWebhookId();
+
+        if ($applicationUrl !== null && $webhookId !== null) {
+            $webhookUrl = $this->webhookUrlBuilder->buildEmbyWebhookUrl($webhookId);
+        }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-emby.html.twig', [
-                'embyWebhookUrl' => $user->getEmbyWebhookId() ?? '-',
+                'isActive' => $applicationUrl !== null,
+                'embyWebhookUrl' => $webhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasEmbyScrobbleWatchesEnabled(),
-                'embyScrobblerOptionsUpdated' => $embyScrobblerOptionsUpdated,
             ]),
         );
     }
@@ -420,17 +424,14 @@ class SettingsController
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
-        $postParameters = $request->getPostParameters();
 
-        $this->userApi->updateEmbyScrobblerOptions($userId, (bool)$postParameters['scrobbleWatches']);
+        $postParameters = Json::decode($request->getBody());
 
-        $this->sessionWrapper->set('embyScrobblerOptionsUpdated', true);
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        $this->userApi->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
+
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function updateGeneral(Request $request) : Response

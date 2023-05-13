@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Emby\EmbyScrobbler;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -16,6 +17,7 @@ class EmbyController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly EmbyScrobbler $embyScrobbler,
+        private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -29,17 +31,6 @@ class EmbyController
         $this->userApi->deleteEmbyWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
-    }
-
-    public function getEmbyWebhookUrl() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $webhookId = $this->userApi->findEmbyWebhookId($_SESSION['userId']);
-
-        return Response::createJson(Json::encode(['id' => $webhookId]));
     }
 
     public function handleEmbyWebhook(Request $request) : Response
@@ -66,8 +57,8 @@ class EmbyController
             return Response::createSeeOther('/');
         }
 
-        $plexWebhookId = $this->userApi->regenerateEmbyWebhookId($this->authenticationService->getCurrentUserId());
+        $webhookId = $this->userApi->regenerateEmbyWebhookId($this->authenticationService->getCurrentUserId());
 
-        return Response::createJson(Json::encode(['id' => $plexWebhookId]));
+        return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildEmbyWebhookUrl($webhookId)]));
     }
 }

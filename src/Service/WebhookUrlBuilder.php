@@ -10,7 +10,7 @@ readonly class WebhookUrlBuilder
 
     public function buildEmbyWebhookUrl(string $webhookId) : ?string
     {
-        return $this->buildUrl('embxy', $webhookId);
+        return $this->buildUrl('emby', $webhookId);
     }
 
     public function buildJellyfinWebhookUrl(string $webhookId) : ?string
