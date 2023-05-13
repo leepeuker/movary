@@ -20,7 +20,7 @@ document.getElementById('generalServerUpdateButton').addEventListener('click', a
 
     if (applicationUrlInput.value !== '') {
         if (isValidUrl(applicationUrlInput.value) === false) {
-            addAlert('alertGeneralServerDiv', 'Application url not a valid url.', 'danger');
+            addAlert('alertGeneralServerDiv', 'Application url not a valid url. Valid example: http://localhost', 'danger');
             applicationUrlInput.classList.add('invalid-input');
             return;
         }
