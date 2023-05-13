@@ -351,6 +351,7 @@ class SettingsController
                 'applicationUrl' => $this->serverSettings->getApplicationUrl(),
                 'tmdbApiKey' => $this->serverSettings->getTmdbApiKey(),
                 'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
+                'applicationUrlSetInEnv' => $this->serverSettings->isApplicationUrlSetInEnvironment(),
             ]),
         );
     }

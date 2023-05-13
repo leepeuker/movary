@@ -19,6 +19,10 @@ class ServerSettings
 
     public function getApplicationUrl() : ?string
     {
+        if ($this->isApplicationUrlSetInEnvironment() === true) {
+            return $this->config->getAsString('APPLICATION_URL');
+        }
+
         $applicationUrl = $this->dbConnection->fetchFirstColumn(
             'SELECT value FROM `server_setting` WHERE `key` = ?',
             [self::APPLICATION_URL_KEY],
@@ -39,6 +43,17 @@ class ServerSettings
         );
 
         return empty($tmdbApiKey[0]) === true ? null : $tmdbApiKey[0];
+    }
+
+    public function isApplicationUrlSetInEnvironment() : bool
+    {
+        try {
+            $tmdbApiKey = $this->config->getAsString('APPLICATION_URL');
+        } catch (\OutOfBoundsException) {
+            return false;
+        }
+
+        return empty($tmdbApiKey) === false;
     }
 
     public function isTmdbApiKeySetInEnvironment() : bool
