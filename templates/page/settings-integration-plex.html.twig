@@ -27,60 +27,55 @@
 
                 <div id="plexWebhookUrl"
                      class="overflow-auto text-nowrap webhookUrl"
-                     data-application-url="{{ applicationUrl }}"
+                     data-active="{{ isActive }}"
                      style="font-size:1rem;margin-top: 1rem;margin-bottom: 1rem;">
                     {{ plexWebhookUrl }}
-                    <div class="spinner-border spinner-border-sm d-none" role="status" id="loadingSpinner" style="margin-top: .1rem">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
                 </div>
 
-                <div id="alertWebhookUrlDiv"></div>
+                <div id="alertWebhookUrlDiv">
+                    <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
+                         role="alert"
+                         style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                        Webhooks inactive - Application url not set
+                    </div>
+                </div>
 
                 <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger {% if plexWebhookUrl == '-' %}disabled{% endif %}" onclick="deletePlexWebhookId()">
                     Delete url
                 </button>
-                <button type="button" class="btn btn-primary" onclick="regeneratePlexWebhookId()">Regenerate url</button>
+                <button type="button" class="btn btn-primary {% if isActive == '' %}disabled{% endif %}" onclick="regeneratePlexWebhookId()">Regenerate url</button>
             </div>
 
             <hr>
 
             <h5>Scrobble Options</h5>
 
-            <form action="/settings/plex" method="POST">
-                <div style="padding-bottom: 1rem;padding-top: 0.5rem">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           value="1"
-                           id="scrobbleWatchesCheckbox"
-                           name="scrobbleWatches"
-                           {% if plexWebhookUrl == '-' %}disabled{% endif %}
-                            {% if scrobbleWatches == true %}checked{% endif %}
-                           style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
-                </div>
-                <div style="padding-bottom: 1rem;">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           value="1"
-                           id="scrobbleRatingsCheckbox"
-                           name="scrobbleRatings"
-                           {% if plexWebhookUrl == '-' %}disabled{% endif %}
-                            {% if scrobbleRatings == true %}checked{% endif %}
-                           style="margin-left: 0.5rem;margin-right: 0.2rem">
-                    <label class="form-check-label" for="scrobbleRatingsCheckbox">Scrobble rating updates</label>
-                </div>
+            <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="1"
+                       id="scrobbleWatchesCheckbox"
+                       name="scrobbleWatches"
+                       {% if plexWebhookUrl == '-' %}disabled{% endif %}
+                        {% if scrobbleWatches == true %}checked{% endif %}
+                       style="margin-right: 0.2rem">
+                <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
+            </div>
+            <div style="padding-bottom: 1rem;">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="1"
+                       id="scrobbleRatingsCheckbox"
+                       name="scrobbleRatings"
+                       {% if plexWebhookUrl == '-' %}disabled{% endif %}
+                        {% if scrobbleRatings == true %}checked{% endif %}
+                       style="margin-left: 0.5rem;margin-right: 0.2rem;">
+                <label class="form-check-label" for="scrobbleRatingsCheckbox" style="margin-bottom: 1rem">Scrobble rating updates</label>
 
-                {% if plexScrobblerOptionsUpdated == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Plex scrobble options were updated.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endif %}
+                <div id="alertWebhookOptionsDiv"></div>
 
-                <button type="submit" class="btn btn-primary" {% if plexWebhookUrl == '-' %}disabled{% endif %} id="saveButton">Save</button>
-            </form>
-
+                <button type="submit" class="btn btn-primary" {% if plexWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
+            </div>
         </div>
     </main>
 {% endblock %}

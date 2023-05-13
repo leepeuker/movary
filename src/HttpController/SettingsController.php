@@ -320,7 +320,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-plex.html.twig', [
-                'applicationUrl' => $applicationUrl,
+                'isActive' => $applicationUrl !== null,
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
@@ -516,7 +516,7 @@ class SettingsController
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
-        $postParameters = $request->getPostParameters();
+        $postParameters = Json::decode($request->getBody());
 
         $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
         $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
@@ -525,11 +525,7 @@ class SettingsController
 
         $this->sessionWrapper->set('plexScrobblerOptionsUpdated', true);
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function updateServerGeneral(Request $request) : Response
