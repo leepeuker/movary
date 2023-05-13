@@ -2,7 +2,7 @@
 
 namespace Movary\Service;
 
-readonly class WebhookUrlBuilder
+class WebhookUrlBuilder
 {
     public function __construct(private ServerSettings $serverSettings)
     {
