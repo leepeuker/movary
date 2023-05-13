@@ -50,12 +50,15 @@
                     </label>
                     <input type="text"
                            class="form-control"
-                           placeholder="https://your-domain.com"
                            value="{{ applicationUrl }}"
                            id="applicationUrlInput"
+                           placeholder="Example: http://localhost"
                            style="text-align: center"
                             {{ applicationUrlSetInEnv == true ? 'disabled' }}
                     >
+                    <div id="applicationUrlInput" class="form-text">
+                        The public base url used to serve Movary.
+                    </div>
                 </div>
 
                 <div id="alertGeneralServerDiv"></div>
