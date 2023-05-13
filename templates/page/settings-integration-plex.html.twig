@@ -40,10 +40,13 @@
                     </div>
                 </div>
 
-                <button id="deletePlexWebhookIdButton" type="button" class="btn btn-danger {% if plexWebhookUrl == '-' %}disabled{% endif %}" onclick="deletePlexWebhookId()">
+                <button id="deletePlexWebhookButton"
+                        type="button"
+                        class="btn btn-danger {% if plexWebhookUrl == '-' %}disabled{% endif %}"
+                        onclick="deletePlexWebhook()">
                     Delete url
                 </button>
-                <button type="button" class="btn btn-primary {% if isActive == '' %}disabled{% endif %}" onclick="regeneratePlexWebhookId()">Regenerate url</button>
+                <button type="button" class="btn btn-primary {% if isActive == '' %}disabled{% endif %}" onclick="regeneratePlexWebhook()">Regenerate url</button>
             </div>
 
             <hr>

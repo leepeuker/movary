@@ -11,6 +11,7 @@ use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\ServerSettings;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
@@ -35,6 +36,7 @@ class SettingsController
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
         private readonly ServerSettings $serverSettings,
+        private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -224,17 +226,21 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $jellyfinScrobblerOptionsUpdated = $this->sessionWrapper->find('jellyfinScrobblerOptionsUpdated');
-        $this->sessionWrapper->unset('jellyfinScrobblerOptionsUpdated');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $webhookId = $user->getJellyfinWebhookId();
+
+        if ($applicationUrl !== null && $webhookId !== null) {
+            $webhookUrl = $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId);
+        }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-jellyfin.html.twig', [
-                'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
+                'isActive' => $applicationUrl !== null,
+                'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
-                'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
             ]),
         );
     }
@@ -305,16 +311,13 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $plexScrobblerOptionsUpdated = $this->sessionWrapper->find('plexScrobblerOptionsUpdated');
-        $this->sessionWrapper->unset('plexScrobblerOptionsUpdated');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         $plexWebhookId = $user->getPlexWebhookId();
 
         if ($applicationUrl !== null && $plexWebhookId !== null) {
-            $plexWebhookUrl = rtrim($applicationUrl, '/') . '/plex/' . $plexWebhookId;
+            $plexWebhookUrl = $this->webhookUrlBuilder->buildPlexWebhookUrl($plexWebhookId);
         }
 
         return Response::create(
@@ -324,7 +327,6 @@ class SettingsController
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
-                'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
             ]),
         );
     }
@@ -465,17 +467,14 @@ class SettingsController
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
-        $postParameters = $request->getPostParameters();
 
-        $this->userApi->updateJellyfinScrobblerOptions($userId, (bool)$postParameters['scrobbleWatches']);
+        $postParameters = Json::decode($request->getBody());
 
-        $this->sessionWrapper->set('jellyfinScrobblerOptionsUpdated', true);
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        $this->userApi->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
+
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function updatePassword(Request $request) : Response
@@ -522,8 +521,6 @@ class SettingsController
         $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
 
         $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
-
-        $this->sessionWrapper->set('plexScrobblerOptionsUpdated', true);
 
         return Response::create(StatusCode::createNoContent());
     }
