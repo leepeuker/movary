@@ -1,95 +1,93 @@
-document.addEventListener('DOMContentLoaded', function () {
-    fetchPlexWebhookId().then(webhookId => {
-        setPlexWebhookUrl(webhookId)
-    }).catch(() => {
-        addAlert('alertWebhookUrlDiv', 'Could not fetch plex webhook url', 'danger')
-        setPlexWebhookUrl()
-    })
-})
-
-function regeneratePlexWebhookId() {
+function regeneratePlexWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return
     }
 
     removeAlert('alertWebhookUrlDiv')
-    setPlexWebhookUrlLoadingSpinner()
 
-    regeneratePlexWebhookIdRequest().then(webhookId => {
-        addAlert('alertWebhookUrlDiv', 'Generate plex webhook url', 'success')
-        setPlexWebhookUrl(webhookId)
-    }).catch(() => {
-        addAlert('alertWebhookUrlDiv', 'Could not generate plex webhook url', 'danger')
+    regeneratePlexWebhookRequest().then(webhookUrl => {
+        setPlexWebhookUrl(webhookUrl)
+        addAlert('alertWebhookUrlDiv', 'Generated new webhook url', 'success')
+        document.getElementById('deletePlexWebhookButton').classList.remove('disabled')
+    }).catch((error) => {
+        console.log(error)
+        addAlert('alertWebhookUrlDiv', 'Could not generate webhook url', 'danger')
     })
 }
 
-function deletePlexWebhookId() {
+function deletePlexWebhook() {
     if (confirm('Do you really want to delete the webhook url?') === false) {
         return
     }
 
     removeAlert('alertWebhookUrlDiv')
-    setPlexWebhookUrlLoadingSpinner()
 
-    deletePlexWebhookIdRequest().then(() => {
+    deletePlexWebhookRequest().then(() => {
         setPlexWebhookUrl()
-        addAlert('alertWebhookUrlDiv', 'Deleted plex webhook url', 'success')
+        addAlert('alertWebhookUrlDiv', 'Deleted webhook url', 'success')
     }).catch(() => {
-        addAlert('alertWebhookUrlDiv', 'Could not delete plex webhook url', 'danger')
+        console.log(error)
+        addAlert('alertWebhookUrlDiv', 'Could not delete webhook url', 'danger')
     })
 }
 
-function setPlexWebhookUrl(webhookId) {
-    document.getElementById('loadingSpinner').classList.add('d-none')
+async function regeneratePlexWebhookRequest() {
+    const response = await fetch('/settings/plex/webhook', {'method': 'put'})
 
-    if (webhookId) {
-        document.getElementById('plexWebhookUrl').innerHTML = location.protocol + '//' + location.host + '/plex/' + webhookId
-        document.getElementById('deletePlexWebhookIdButton').classList.remove('disabled')
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data = await response.json()
+
+    return data.url
+}
+
+async function deletePlexWebhookRequest() {
+    const response = await fetch('/settings/plex/webhook', {'method': 'delete'})
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+}
+
+function setPlexWebhookUrl(webhookUrl) {
+    if (webhookUrl) {
+        document.getElementById('plexWebhookUrl').innerHTML = webhookUrl
+        document.getElementById('deletePlexWebhookButton').classList.remove('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('scrobbleRatingsCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
         document.getElementById('plexWebhookUrl').innerHTML = '-'
-        document.getElementById('deletePlexWebhookIdButton').classList.add('disabled')
+        document.getElementById('deletePlexWebhookButton').classList.add('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('scrobbleRatingsCheckbox').disabled = true
         document.getElementById('saveButton').disabled = true
     }
 }
 
-async function fetchPlexWebhookId() {
-    const response = await fetch('/settings/plex/webhook-id')
+async function updateScrobbleOptions() {
+    removeAlert('alertWebhookOptionsDiv')
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const data = await response.json()
+    await fetch('/settings/plex', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            'scrobbleWatches': document.getElementById('scrobbleWatchesCheckbox').checked,
+            'scrobbleRatings': document.getElementById('scrobbleRatingsCheckbox').checked
+        })
+    }).then(response => {
+        if (!response.ok) {
+            addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
 
-    return data.id
-}
+            return
+        }
 
-async function regeneratePlexWebhookIdRequest() {
-    const response = await fetch('/settings/plex/webhook-id', {'method': 'put'})
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const data = await response.json()
-
-    return data.id
-}
-
-async function deletePlexWebhookIdRequest() {
-    const response = await fetch('/settings/plex/webhook-id', {'method': 'delete'})
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-}
-
-function setPlexWebhookUrlLoadingSpinner() {
-    document.getElementById('plexWebhookUrl').innerHTML =
-        '<div class="spinner-border spinner-border-sm" role="status" id="loadingSpinner" style="margin-top: .1rem">\n' +
-        '<span class="visually-hidden">Loading...</span>\n' +
-        '</div>'
+        addAlert('alertWebhookOptionsDiv', 'Scrobble options were updated', 'success')
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
+    });
 }

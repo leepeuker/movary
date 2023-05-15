@@ -44,6 +44,22 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label for="applicationUrlInput" class="form-label">
+                        <b>Application url</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ applicationUrl }}"
+                           id="applicationUrlInput"
+                           style="text-align: center"
+                            {{ applicationUrlSetInEnv == true ? 'disabled' }}
+                    >
+                    <div id="applicationUrlInput" class="form-text">
+                        The public base url used to serve Movary.
+                    </div>
+                </div>
+
                 <div id="alertGeneralServerDiv"></div>
 
                 <button type="submit" class="btn btn-primary" id="generalServerUpdateButton">Submit</button>

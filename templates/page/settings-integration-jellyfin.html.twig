@@ -39,48 +39,49 @@
                     </ul>
                 </div>
 
-                <div id="jellyfinWebhookUrl" class="overflow-auto text-nowrap webhookUrl"
+                <div id="jellyfinWebhookUrl"
+                     class="overflow-auto text-nowrap webhookUrl"
+                     data-active="{{ isActive }}"
                      style="font-size:1rem;margin-top: 1rem;margin-bottom: 1rem;">
-                    <div class="spinner-border spinner-border-sm" role="status" id="loadingSpinner" style="margin-top: .1rem">
-                        <span class="visually-hidden">Loading...</span>
+                    {{ jellyfinWebhookUrl }}
+                </div>
+
+                <div id="alertWebhookUrlDiv">
+                    <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
+                         role="alert"
+                         style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                        Webhooks inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not set
                     </div>
                 </div>
 
-                <div id="alertWebhookUrlDiv"></div>
-
-                <button id="deleteJellyfinWebhookIdButton" type="button" class="btn btn-danger {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}"
-                        onclick="deleteJellyfinWebhookId()">
+                <button id="deleteJellyfinWebhookButton"
+                        type="button"
+                        class="btn btn-danger {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}"
+                        onclick="deleteJellyfinWebhook()">
                     Delete url
                 </button>
-                <button type="button" class="btn btn-primary " onclick="regenerateJellyfinWebhookId()">Regenerate url</button>
+                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateJellyfinWebhook()">Regenerate url</button>
             </div>
 
             <hr>
 
             <h5>Scrobble Options</h5>
 
-            <form action="/settings/jellyfin" method="POST">
-                <div style="padding-bottom: 1rem;padding-top: 0.5rem">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           value="1"
-                           id="scrobbleWatchesCheckbox"
-                           name="scrobbleWatches"
-                           {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}
-                            {% if scrobbleWatches == true %}checked{% endif %}
-                           style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
-                </div>
+            <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="1"
+                       id="scrobbleWatchesCheckbox"
+                       name="scrobbleWatches"
+                       {% if jellyfinWebhookUrl == '-' %}disabled{% endif %}
+                        {% if scrobbleWatches == true %}checked{% endif %}
+                       style="margin-right: 0.2rem">
+                <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
+            </div>
 
-                {% if jellyfinScrobblerOptionsUpdated == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Jellyfin scrobble options were updated.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endif %}
+            <div id="alertWebhookOptionsDiv"></div>
 
-                <button type="submit" class="btn btn-primary" {% if jellyfinWebhookUrl == '-' %}disabled{% endif %} id="saveButton">Save</button>
-            </form>
+            <button type="submit" class="btn btn-primary" {% if jellyfinWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
         </div>
     </main>
 {% endblock %}

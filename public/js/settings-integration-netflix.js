@@ -167,7 +167,7 @@ function updateTable() {
         return;
     }
 
-    
+
     enable(document.querySelector('label[for="amountToShowInput"]'));
     enable(document.getElementById('amountToShowInput'));
     enable(document.getElementById('searchInput'));
@@ -420,7 +420,7 @@ function processNetflixData(netflixActivityItems) {
         for (let i = 1; i <= 10; i++) {
             let tmdb_rating_icon = document.createElement('i');
             tmdb_rating_icon.className = 'bi bi-star ratingIcon';
-            if(netflixActivityItem.tmdbMatch === null) {
+            if (netflixActivityItem.tmdbMatch === null) {
                 tmdb_rating_icon.classList.add('text-dark');
             }
             tmdb_rating_icon.dataset.rating = i;
@@ -553,9 +553,9 @@ function saveTMDBItem() {
     let rowid = document.getElementById('tmdbSearchModal').dataset.rowid;
     let targetrow = document.getElementById(rowid);
 
-    if(targetrow.dataset.tmdbid === "undefined") {
+    if (targetrow.dataset.tmdbid === "undefined") {
         targetrow.getElementsByTagName('b')[0].innerText = 'Description: ';
-        if(document.getElementById('selectFilterInput').value === "notfound") {
+        if (document.getElementById('selectFilterInput').value === "notfound") {
             targetrow.classList.add('d-none');
         }
     }

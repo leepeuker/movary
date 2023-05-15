@@ -1,92 +1,89 @@
-document.addEventListener('DOMContentLoaded', function () {
-    fetchEmbyWebhookId().then(webhookId => {
-        setEmbyWebhookUrl(webhookId)
-    }).catch(() => {
-        addAlert('alertWebhookUrlDiv', 'Could not fetch Emby webhook url', 'danger')
-        setEmbyWebhookUrl()
-    })
-})
-
-function regenerateEmbyWebhookId() {
+function regenerateEmbyWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return
     }
 
     removeAlert('alertWebhookUrlDiv')
-    setEmbyWebhookUrlLoadingSpinner()
 
-    regenerateEmbyWebhookIdRequest().then(webhookId => {
-        addAlert('alertWebhookUrlDiv', 'Generated Emby webhook url', 'success')
-        setEmbyWebhookUrl(webhookId)
-    }).catch(() => {
-        addAlert('alertWebhookUrlDiv', 'Could not generate Emby webhook url', 'danger')
+    regenerateEmbyWebhookRequest().then(webhookUrl => {
+        setEmbyWebhookUrl(webhookUrl)
+        addAlert('alertWebhookUrlDiv', 'Generated new webhook url', 'success')
+    }).catch((error) => {
+        console.log(error)
+        addAlert('alertWebhookUrlDiv', 'Could not generate webhook url', 'danger')
     })
 }
 
-function deleteEmbyWebhookId() {
+function deleteEmbyWebhook() {
     if (confirm('Do you really want to delete the webhook url?') === false) {
         return
     }
-    removeAlert('alertWebhookUrlDiv')
-    setEmbyWebhookUrlLoadingSpinner()
 
-    deleteEmbyWebhookIdRequest().then(() => {
-        addAlert('alertWebhookUrlDiv', 'Deleted Emby webhook url', 'success')
+    removeAlert('alertWebhookUrlDiv')
+
+    deleteEmbyWebhookRequest().then(() => {
         setEmbyWebhookUrl()
-    }).catch(() => {
-        addAlert('alertWebhookUrlDiv', 'Could not delete Emby webhook url', 'danger')
+        addAlert('alertWebhookUrlDiv', 'Deleted webhook url', 'success')
+    }).catch((error) => {
+        console.log(error)
+        addAlert('alertWebhookUrlDiv', 'Could not delete webhook url', 'danger')
     })
 }
 
-function setEmbyWebhookUrl(webhookId) {
-    document.getElementById('loadingSpinner').classList.add('d-none')
+async function regenerateEmbyWebhookRequest() {
+    const response = await fetch('/settings/emby/webhook', {'method': 'put'})
 
-    if (webhookId) {
-        document.getElementById('embyWebhookUrl').innerHTML = location.protocol + '//' + location.host + '/emby/' + webhookId
-        document.getElementById('deleteEmbyWebhookIdButton').classList.remove('disabled')
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data = await response.json()
+
+    return data.url
+}
+
+async function deleteEmbyWebhookRequest() {
+    const response = await fetch('/settings/emby/webhook', {'method': 'delete'})
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+}
+
+function setEmbyWebhookUrl(webhookUrl) {
+    if (webhookUrl) {
+        document.getElementById('embyWebhookUrl').innerHTML = webhookUrl
+        document.getElementById('deleteEmbyWebhookButton').classList.remove('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = false
         document.getElementById('saveButton').disabled = false
     } else {
         document.getElementById('embyWebhookUrl').innerHTML = '-'
-        document.getElementById('deleteEmbyWebhookIdButton').classList.add('disabled')
+        document.getElementById('deleteEmbyWebhookButton').classList.add('disabled')
         document.getElementById('scrobbleWatchesCheckbox').disabled = true
         document.getElementById('saveButton').disabled = true
     }
 }
 
-async function fetchEmbyWebhookId() {
-    const response = await fetch('/settings/emby/webhook-id')
+async function updateScrobbleOptions() {
+    removeAlert('alertWebhookOptionsDiv')
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const data = await response.json()
+    await fetch('/settings/emby', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            'scrobbleWatches': document.getElementById('scrobbleWatchesCheckbox').checked,
+        })
+    }).then(response => {
+        if (!response.ok) {
+            addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
 
-    return data.id
-}
+            return
+        }
 
-async function regenerateEmbyWebhookIdRequest() {
-    const response = await fetch('/settings/emby/webhook-id', {'method': 'put'})
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const data = await response.json()
-
-    return data.id
-}
-
-async function deleteEmbyWebhookIdRequest() {
-    const response = await fetch('/settings/emby/webhook-id', {'method': 'delete'})
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-}
-
-function setEmbyWebhookUrlLoadingSpinner() {
-    document.getElementById('embyWebhookUrl').innerHTML =
-        '<div class="spinner-border spinner-border-sm" role="status" id="loadingSpinner" style="margin-top: .1rem">\n' +
-        '<span class="visually-hidden">Loading...</span>\n' +
-        '</div>'
+        addAlert('alertWebhookOptionsDiv', 'Scrobble options were updated', 'success')
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
+    });
 }
