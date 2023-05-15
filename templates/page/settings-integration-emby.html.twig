@@ -48,7 +48,7 @@
                     <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
                          role="alert"
                          style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Webhooks inactive - Application url not set
+                        Webhooks inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not set
                     </div>
                 </div>
 
