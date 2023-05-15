@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Jellyfin\JellyfinScrobbler;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -16,11 +17,12 @@ class JellyfinController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly JellyfinScrobbler $jellyfinScrobbler,
+        private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function deleteJellyfinWebhookId() : Response
+    public function deleteJellyfinWebhookUrl() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -29,17 +31,6 @@ class JellyfinController
         $this->userApi->deleteJellyfinWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
-    }
-
-    public function getJellyfinWebhookId() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $webhookId = $this->userApi->findJellyfinWebhookId($_SESSION['userId']);
-
-        return Response::createJson(Json::encode(['id' => $webhookId]));
     }
 
     public function handleJellyfinWebhook(Request $request) : Response
@@ -60,7 +51,7 @@ class JellyfinController
         return Response::createOk();
     }
 
-    public function regenerateJellyfinWebhookId() : Response
+    public function regenerateJellyfinWebhookUrl() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -68,6 +59,6 @@ class JellyfinController
 
         $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->getCurrentUserId());
 
-        return Response::createJson(Json::encode(['id' => $webhookId]));
+        return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId)]));
     }
 }

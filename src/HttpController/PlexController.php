@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Plex\PlexScrobbler;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -16,11 +17,12 @@ class PlexController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly PlexScrobbler $plexScrobbler,
+        private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function deletePlexWebhookId() : Response
+    public function deletePlexWebhookUrl() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -29,17 +31,6 @@ class PlexController
         $this->userApi->deletePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
-    }
-
-    public function getPlexWebhookId() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $plexWebhookId = $this->userApi->findPlexWebhookId($_SESSION['userId']);
-
-        return Response::createJson(Json::encode(['id' => $plexWebhookId]));
     }
 
     public function handlePlexWebhook(Request $request) : Response
@@ -63,14 +54,14 @@ class PlexController
         return Response::createOk();
     }
 
-    public function regeneratePlexWebhookId() : Response
+    public function regeneratePlexWebhookUrl() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
 
-        $plexWebhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->getCurrentUserId());
+        $webhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->getCurrentUserId());
 
-        return Response::createJson(Json::encode(['id' => $plexWebhookId]));
+        return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildPlexWebhookUrl($webhookId)]));
     }
 }

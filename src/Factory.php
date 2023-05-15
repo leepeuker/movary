@@ -32,6 +32,7 @@ use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -253,6 +254,7 @@ class Factory
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),
             $container->get(ServerSettings::class),
+            $container->get(WebhookUrlBuilder::class),
             $applicationVersion
         );
     }
