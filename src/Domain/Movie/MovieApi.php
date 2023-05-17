@@ -455,6 +455,11 @@ class MovieApi
         $this->repository->updateImdbRating($movieId, $imdbRating);
     }
 
+    public function updateImdbTimestamp(int $movieId) : void
+    {
+        $this->repository->updateImdbTimestamp($movieId);
+    }
+
     public function updateLetterboxdId(int $movieId, string $letterboxdId) : void
     {
         $this->repository->updateLetterboxdId($movieId, $letterboxdId);
