@@ -9,8 +9,9 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/dashboard.js"></script>
+    <script src="/js/chart-4.3.0.min.js"></script>
     <script src="/js/user-select.js"></script>
+    <script src="/js/dashboard.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -80,6 +81,17 @@
                 </li>
 
                 <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
+                    Rating distribution
+                    <i class="bi bi-chevron-down float-end"></i>
+                </li>
+                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
+                    <div id="ratingData" data-count1="1" data-count2="10" data-count3="15" data-count4="24" data-count5="30" data-count6="50" data-count7="2000" data-count8="40" data-count9="20" data-count10="8"></div>
+                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+                        <div style="width: 100%;padding-bottom: .5rem;"><canvas id="acquisitions"></canvas></div>
+                    </div>
+                </li>
+
+                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Actors
                     <i class="bi bi-chevron-down float-end"></i>
                 </li>
@@ -104,7 +116,6 @@
                     <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
-
 
                 <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
                     Most watched Actresses
