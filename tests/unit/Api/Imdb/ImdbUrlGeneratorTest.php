@@ -15,14 +15,6 @@ class ImdbUrlGeneratorTest extends TestCase
         $this->subject = new ImdbUrlGenerator();
     }
 
-    public function testBuildMovieRatingsUrl() : void
-    {
-        $this->assertSame(
-            'https://www.imdb.com/title/tt8760708/ratings',
-            $this->subject->buildMovieRatingsUrl('tt8760708'),
-        );
-    }
-
     public function testBuildMovieUrl() : void
     {
         $this->assertSame(

@@ -35,12 +35,15 @@ class ImdbMovieRatingSync
 
         $imdbRating = $this->findRating($imdbId);
         if ($imdbRating === null) {
+            $this->movieApi->updateImdbTimestamp($movieId);
+
             return;
         }
 
         if ($imdbRating->getRating() === $movie->getImdbRatingAverage() && $imdbRating->getVotesCount() === $movie->getImdbVoteCount()) {
             $this->logger->debug('IMDb: Skipped updating not changed movie rating', [$this->generateMovieLogData($movie)]);
 
+            $this->movieApi->updateImdbTimestamp($movieId);
             return;
         }
 

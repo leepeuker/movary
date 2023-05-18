@@ -13,7 +13,9 @@ $builder->addDefinitions(
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
+        \Movary\HttpController\CreateUserController::class => DI\factory([Factory::class, 'createCreateUserController']),
         \Movary\HttpController\JobController::class => DI\factory([Factory::class, 'createJobController']),
+        \Movary\HttpController\LandingPageController::class => DI\factory([Factory::class, 'createLandingPageController']),
         \Movary\HttpController\SettingsController::class => DI\factory([Factory::class, 'createSettingsController']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),
         \Movary\Command\CreatePublicStorageLink::class => DI\factory([Factory::class, 'createCreatePublicStorageLink']),
@@ -30,4 +32,9 @@ $builder->addDefinitions(
     ],
 );
 
-return $builder->build();
+$container = $builder->build();
+
+$timezone = $container->get(\Movary\ValueObject\Config::class)->getAsString('TIMEZONE', \Movary\ValueObject\DateTime::DEFAULT_TIME_ZONE);
+date_default_timezone_set($timezone);
+
+return $container;

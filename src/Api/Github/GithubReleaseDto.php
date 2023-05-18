@@ -4,7 +4,7 @@ namespace Movary\Api\Github;
 
 use Movary\ValueObject\Url;
 
-class ReleaseDto
+class GithubReleaseDto
 {
     private function __construct(
         private readonly string $name,

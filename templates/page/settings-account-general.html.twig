@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - General Account
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-account-general.js"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-top: 1rem">
+                <h5>General account settings</h5>
+                <div class="mb-3">
+                    <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
+                    <select class="form-select" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
+                        {% for dateFormatOffset, dateFormat in dateFormats %}
+                            <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="emailHelp" class="form-text">Format used when displaying dates</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="nameInput" class="form-label"><b>Username</b> <span class="text-danger">*</span></label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Username"
+                           value="{{ username }}"
+                           title="Only letters and numbers allowed"
+                           required
+                           id="nameInput"
+                           aria-describedby="usernameHelp"
+                           style="text-align: center;">
+                    <div id="usernameHelp" class="form-text">Must consist of only letters and numbers</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="privacyInput" class="form-label"><b>Privacy</b></label>
+                    <select class="form-select" name="privacyLevel" style="text-align: center;padding-right:0;" id="privacyInput" aria-describedby="privacyHelp" required>
+                        <option value="0" {% if privacyLevel == 0 %}selected{% endif %}>Not visible</option>
+                        <option value="1" {% if privacyLevel == 1 %}selected{% endif %}>Visible to users</option>
+                        <option value="2" {% if privacyLevel == 2 %}selected{% endif %}>Visible to everyone</option>
+                    </select>
+                    <div id="privacyHelp" class="form-text">Who can see your history and ratings</div>
+                </div>
+
+                <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="enableAutomaticWatchlistRemovalInput"
+                            {% if enableAutomaticWatchlistRemoval == true %}checked{% endif %}
+                           style="margin-right: 0.2rem">
+                    <label class="form-check-label" for="scrobbleWatchesCheckbox">Enable automatic removals from watchlist</label>
+                </div>
+
+                <div id="alertGeneralAccountDiv"></div>
+
+                <button type="submit" class="btn btn-primary" id="generalAccountUpdateButton">Submit</button>
+            </div>
+        </div>
+    </main>
+{% endblock %}

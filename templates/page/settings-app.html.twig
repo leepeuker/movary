@@ -15,8 +15,15 @@
                 <h5 style="margin-bottom: 1rem;">About</h5>
                 <p>
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Version:</span> <span class="fw-light">{{ currentApplicationVersion }}</span>
-                    {% set badgeStyle = (releases is empty or currentApplicationVersion != releases|first.name) ? 'text-bg-warning' : 'text-bg-success' %}
-                    {% set badgeText = (releases is empty or currentApplicationVersion != releases|first.name) ? 'Update available' : 'Up to date' %}
+
+                    {% if latestRelease is empty %}
+                        {% set badgeStyle = 'text-bg-secondary' %}
+                        {% set badgeText = 'Latest version unkown' %}
+                    {% else %}
+                        {% set badgeStyle = (currentApplicationVersion != latestRelease.name) ? 'text-bg-warning' : 'text-bg-success' %}
+                        {% set badgeText = (currentApplicationVersion != latestRelease.name) ? 'Update available' : 'Up to date' %}
+                    {% endif %}
+
                     <a
                             href="https://github.com/leepeuker/movary/releases"
                             class="badge rounded-pill {{ badgeStyle }}"
@@ -32,7 +39,7 @@
 
                 <hr>
 
-                <h5 style="margin-bottom: 1rem;padding-top: 0.5rem">Getting Support</h5>
+                <h5 style="margin-bottom: 1rem;">Getting Support</h5>
                 <p>
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Github:</span>
                     <a class="fw-light" href="https://github.com/leepeuker/movary/issues" target="_blank">leepeuker/movary</a>
@@ -48,18 +55,21 @@
 
                 <hr>
 
-                <h5 style="margin-bottom: 1rem;padding-top: 0.5rem">Latest Releases</h5>
+                <h5 style="margin-bottom: 1rem;">Latest Releases</h5>
                 <ul class="list-group">
                     {% set hastLatest = false %}
                     {% for release in releases %}
                         <li class="list-group-item">
-                            <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" >{{ release.name }}</span>
+                            <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">{{ release.name }}</span>
                             {% if hastLatest == false %}<span class="badge rounded-pill text-bg-success">Latest</span>{% endif %}
                             {% if (releases is not empty and currentApplicationVersion == release.name) %}<span class="badge rounded-pill text-bg-primary">Current</span>{% endif %}
 
                             {% set hastLatest = true %}
                         </li>
                     {% endfor %}
+                    <li class="list-group-item">
+                        <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">More...</span>
+                    </li>
                 </ul>
             </div>
         </div>

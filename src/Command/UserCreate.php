@@ -30,7 +30,8 @@ class UserCreate extends Command
             ->setDescription('Create a new user.')
             ->addArgument('email', InputArgument::REQUIRED, 'Email address for user')
             ->addArgument('password', InputArgument::REQUIRED, 'Password for user')
-            ->addArgument('name', InputArgument::REQUIRED, 'Name for user');
+            ->addArgument('name', InputArgument::REQUIRED, 'Name for user')
+            ->addArgument('isAdmin', InputArgument::OPTIONAL, 'Set user as admin', false);
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
@@ -39,9 +40,10 @@ class UserCreate extends Command
         $email = $input->getArgument('email');
         $password = $input->getArgument('password');
         $name = $input->getArgument('name');
+        $isAdmin = (bool)$input->getArgument('isAdmin');
 
         try {
-            $this->userApi->createUser($email, $password, $name);
+            $this->userApi->createUser($email, $password, $name, $isAdmin);
         } catch (EmailNotUnique $e) {
             $this->generateOutput($output, 'Could not create user: Email already in use');
 

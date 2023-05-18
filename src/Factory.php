@@ -20,7 +20,9 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\CreateUserController;
 use Movary\HttpController\JobController;
+use Movary\HttpController\LandingPageController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
@@ -28,7 +30,9 @@ use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
+use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -54,7 +58,7 @@ class Factory
 
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
 
-    private const DEFAULT_APPLICATION_VERSION = null;
+    private const DEFAULT_APPLICATION_VERSION = 'dev';
 
     private const DEFAULT_TMDB_IMAGE_CACHING = false;
 
@@ -76,6 +80,17 @@ class Factory
             $container->get(File::class),
             self::createDirectoryStorageApp(),
             self::createDirectoryAppRoot(),
+        );
+    }
+
+    public static function createCreateUserController(ContainerInterface $container, Config $config) : CreateUserController
+    {
+        return new CreateUserController(
+            $container->get(Twig\Environment::class),
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(SessionWrapper::class),
+            $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
 
@@ -175,6 +190,17 @@ class Factory
         );
     }
 
+    public static function createLandingPageController(ContainerInterface $container, Config $config) : LandingPageController
+    {
+        return new LandingPageController(
+            $container->get(Twig\Environment::class),
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(SessionWrapper::class),
+            $config->getAsBool('ENABLE_REGISTRATION', false),
+        );
+    }
+
     public static function createLineFormatter(Config $config) : LineFormatter
     {
         $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
@@ -227,15 +253,17 @@ class Factory
             $container->get(SessionWrapper::class),
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),
+            $container->get(ServerSettings::class),
+            $container->get(WebhookUrlBuilder::class),
             $applicationVersion
         );
     }
 
-    public static function createTmdbApiClient(ContainerInterface $container, Config $config) : Tmdb\TmdbClient
+    public static function createTmdbApiClient(ContainerInterface $container) : Tmdb\TmdbClient
     {
         return new Tmdb\TmdbClient(
             $container->get(ClientInterface::class),
-            $config->getAsString('TMDB_API_KEY')
+            $container->get(ServerSettings::class)
         );
     }
 
@@ -271,7 +299,8 @@ class Factory
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
-        $twig->addGlobal('currentUsername', $user?->getName());
+        $twig->addGlobal('currentUserName', $user?->getName());
+        $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);

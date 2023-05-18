@@ -30,4 +30,30 @@ class CompanyEntityList extends AbstractList
     {
         $this->data[] = $company;
     }
+
+    public function getUniqueCompanies() : self
+    {
+        $uniqueList = self::create();
+
+        foreach ($this as $company) {
+            if ($uniqueList->containsCompanyWithId($company->getId()) === true) {
+                continue;
+            }
+
+            $uniqueList->add($company);
+        }
+
+        return $uniqueList;
+    }
+
+    private function containsCompanyWithId(int $id) : bool
+    {
+        foreach ($this as $company) {
+            if ($company->getId() === $id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

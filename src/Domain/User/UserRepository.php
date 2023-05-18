@@ -25,13 +25,14 @@ class UserRepository
         );
     }
 
-    public function createUser(string $email, string $passwordHash, string $name) : void
+    public function createUser(string $email, string $passwordHash, string $name, bool $isAdmin) : void
     {
         $this->dbConnection->insert(
             'user',
             [
                 'email' => $email,
                 'password' => $passwordHash,
+                'is_admin' => (int)$isAdmin,
                 'name' => $name,
                 'created_at' => (string)DateTime::create(),
             ],
@@ -55,7 +56,7 @@ class UserRepository
 
     public function fetchAll() : array
     {
-        return $this->dbConnection->fetchAllAssociative('SELECT * FROM `user` ORDER BY name');
+        return $this->dbConnection->fetchAllAssociative('SELECT id, name, email, is_admin as isAdmin FROM `user` ORDER BY id');
     }
 
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
@@ -163,6 +164,17 @@ class UserRepository
         return (int)$dateFormat;
     }
 
+    public function findEmbyWebhookId(int $userId) : ?string
+    {
+        $embyWebhookId = $this->dbConnection->fetchOne('SELECT `emby_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($embyWebhookId === false) {
+            return null;
+        }
+
+        return $embyWebhookId;
+    }
+
     public function findJellyfinWebhookId(int $userId) : ?string
     {
         $jellyfinWebhookId = $this->dbConnection->fetchOne('SELECT `jellyfin_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
@@ -251,6 +263,17 @@ class UserRepository
         return (int)$id;
     }
 
+    public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `emby_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
     public function findUserIdByJellyfinWebhookId(string $webhookId) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `jellyfin_webhook_uuid` = ?', [$webhookId]);
@@ -282,6 +305,19 @@ class UserRepository
         }
 
         return $count;
+    }
+
+    public function setEmbyWebhookId(int $userId, ?string $embyWebhookId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'emby_webhook_uuid' => $embyWebhookId,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
     }
 
     public function setJellyfinWebhookId(int $userId, ?string $jellyfinWebhookId) : void
@@ -342,6 +378,32 @@ class UserRepository
             'user',
             [
                 'email' => $email,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'emby_scrobble_views' => (int)$scrobbleWatches,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateIsAdmin(int $userId, bool $isAdmin) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'is_admin' => (int)$isAdmin,
             ],
             [
                 'id' => $userId,
@@ -434,6 +496,19 @@ class UserRepository
             'user',
             [
                 'trakt_user_name' => $traktUserName,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'watchlist_automatic_removal_enabled' => $watchlistAutomaticRemovalEnabled,
             ],
             [
                 'id' => $userId,

@@ -301,7 +301,7 @@ class MovieRepository
     public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.*, muwd.watched_at, muwd.plays
+            'SELECT m.*, muwd.watched_at, muwd.plays, comment
             FROM movie_user_watch_dates muwd
             JOIN movie m on muwd.movie_id = m.id
             WHERE muwd.user_id = ?
@@ -833,6 +833,13 @@ class MovieRepository
             'imdb_rating_vote_count' => $imdbRating?->getVotesCount(),
             'updated_at_imdb' => (string)DateTime::create(),
             'updated_at' => (string)DateTime::create(),
+        ], ['id' => $id]);
+    }
+
+    public function updateImdbTimestamp(int $id) : void
+    {
+        $this->dbConnection->update('movie', [
+            'updated_at_imdb' => (string)DateTime::create(),
         ], ['id' => $id]);
     }
 

@@ -14,14 +14,19 @@ class UserApi
     ) {
     }
 
-    public function createUser(string $email, string $password, string $name) : void
+    public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
     {
         $this->userValidator->ensureEmailIsUnique($email);
         $this->userValidator->ensurePasswordIsValid($password);
         $this->userValidator->ensureNameFormatIsValid($name);
         $this->userValidator->ensureNameIsUnique($name);
 
-        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name);
+        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
+    }
+
+    public function deleteEmbyWebhookId(int $userId) : void
+    {
+        $this->repository->setEmbyWebhookId($userId, null);
     }
 
     public function deleteJellyfinWebhookId(int $userId) : void
@@ -85,6 +90,11 @@ class UserApi
         return $user;
     }
 
+    public function findEmbyWebhookId(int $userId) : ?string
+    {
+        return $this->repository->findEmbyWebhookId($userId);
+    }
+
     public function findJellyfinWebhookId(int $userId) : ?string
     {
         return $this->repository->findJellyfinWebhookId($userId);
@@ -108,6 +118,11 @@ class UserApi
     public function findUserByName(string $name) : ?UserEntity
     {
         return $this->repository->findUserByName($name);
+    }
+
+    public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
+    {
+        return $this->repository->findUserIdByEmbyWebhookId($webhookId);
     }
 
     public function findUserIdByJellyfinWebhookId(string $webhookId) : ?int
@@ -136,9 +151,18 @@ class UserApi
         return password_verify($password, $passwordHash) === true;
     }
 
+    public function regenerateEmbyWebhookId(int $userId) : string
+    {
+        $jellyfinWebhookId = (string)Uuid::uuid4();
+
+        $this->repository->setEmbyWebhookId($userId, $jellyfinWebhookId);
+
+        return $jellyfinWebhookId;
+    }
+
     public function regenerateJellyfinWebhookId(int $userId) : string
     {
-        $jellyfinWebhookId = Uuid::uuid4()->toString();
+        $jellyfinWebhookId = (string)Uuid::uuid4();
 
         $this->repository->setJellyfinWebhookId($userId, $jellyfinWebhookId);
 
@@ -147,7 +171,7 @@ class UserApi
 
     public function regeneratePlexWebhookId(int $userId) : string
     {
-        $plexWebhookId = Uuid::uuid4()->toString();
+        $plexWebhookId = (string)Uuid::uuid4();
 
         $this->repository->setPlexWebhookId($userId, $plexWebhookId);
 
@@ -169,6 +193,16 @@ class UserApi
         $this->userValidator->ensureEmailIsUnique($email, $userId);
 
         $this->repository->updateEmail($userId, $email);
+    }
+
+    public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void
+    {
+        $this->repository->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
+    }
+
+    public function updateIsAdmin(int $userId, bool $isAdmin) : void
+    {
+        $this->repository->updateIsAdmin($userId, $isAdmin);
     }
 
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
@@ -215,5 +249,10 @@ class UserApi
     public function updateTraktUserName(int $userId, ?string $traktUserName) : void
     {
         $this->repository->updateTraktUserName($userId, $traktUserName);
+    }
+
+    public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void
+    {
+        $this->repository->updateWatchlistAutomaticRemovalEnabled($userId, $watchlistAutomaticRemovalEnabled);
     }
 }

@@ -8,15 +8,20 @@ class UserEntity
         private readonly int $id,
         private readonly string $name,
         private readonly string $passwordHash,
+        private readonly bool $isAdmin,
         private readonly int $privacyLevel,
         private readonly bool $coreAccountChangesDisabled,
         private readonly int $dateFormatId,
         private readonly ?string $plexWebhookUuid,
+        private readonly ?string $jellyfinWebhookUuid,
+        private readonly ?string $embyWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
         private readonly bool $jellyfinScrobbleWatches,
+        private readonly bool $embyScrobbleWatches,
         private readonly bool $plexScrobbleWatches,
         private readonly bool $plexScrobbleRatings,
+        private readonly bool $watchlistAutomaticRemovalEnabled,
     ) {
     }
 
@@ -26,21 +31,31 @@ class UserEntity
             (int)$data['id'],
             $data['name'],
             $data['password'],
+            (bool)$data['is_admin'],
             $data['privacy_level'],
             (bool)$data['core_account_changes_disabled'],
             $data['date_format_id'],
             $data['plex_webhook_uuid'],
+            $data['jellyfin_webhook_uuid'],
+            $data['emby_webhook_uuid'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
             (bool)$data['jellyfin_scrobble_views'],
+            (bool)$data['emby_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
+            (bool)$data['watchlist_automatic_removal_enabled'],
         );
     }
 
     public function getDateFormatId() : int
     {
         return $this->dateFormatId;
+    }
+
+    public function getEmbyWebhookId() : ?string
+    {
+        return $this->embyWebhookUuid;
     }
 
     public function getId() : int
@@ -50,7 +65,7 @@ class UserEntity
 
     public function getJellyfinWebhookId() : ?string
     {
-        return $this->plexWebhookUuid;
+        return $this->jellyfinWebhookUuid;
     }
 
     public function getName() : string
@@ -88,6 +103,11 @@ class UserEntity
         return $this->coreAccountChangesDisabled;
     }
 
+    public function hasEmbyScrobbleWatchesEnabled() : bool
+    {
+        return $this->embyScrobbleWatches;
+    }
+
     public function hasJellyfinScrobbleWatchesEnabled() : bool
     {
         return $this->jellyfinScrobbleWatches;
@@ -101,5 +121,15 @@ class UserEntity
     public function hasPlexScrobbleWatchesEnabled() : bool
     {
         return $this->plexScrobbleWatches;
+    }
+
+    public function hasWatchlistAutomaticRemovalEnabled() : bool
+    {
+        return $this->watchlistAutomaticRemovalEnabled;
+    }
+
+    public function isAdmin() : bool
+    {
+        return $this->isAdmin;
     }
 }

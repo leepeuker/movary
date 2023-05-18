@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Emby
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-integration-emby.js"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-top: 1rem">
+                <h5>Emby webhook url</h5>
+
+                <p class="text-muted" style="margin-bottom: 0.5rem">
+                    Keep Movary automatically up to date with your latest watches in Emby.
+                </p>
+
+                <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
+                    <b>Configuration</b>
+                    <br style="margin-bottom: 0.5rem">
+                    Add the webhook url in your Emby server configuration and only activate:
+                    <ul style="margin-bottom: 0">
+                        <li>Events => Playback -> Stop</li>
+                        <li>Limit user events to => Select the relevant user</li>
+                        <li>Limit library events => Select your movie library/ies</li>
+                    </ul>
+                </div>
+
+                <div id="embyWebhookUrl"
+                     class="overflow-auto text-nowrap webhookUrl"
+                     data-active="{{ isActive }}"
+                     style="font-size:1rem;margin-top: 1rem;margin-bottom: 1rem;">
+                    {{ embyWebhookUrl }}
+                </div>
+
+                <div id="alertWebhookUrlDiv">
+                    <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
+                         role="alert"
+                         style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                        Webhooks inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not set
+                    </div>
+                </div>
+
+                <button id="deleteEmbyWebhookButton"
+                        type="button"
+                        class="btn btn-danger {% if embyWebhookUrl == '-' %}disabled{% endif %}"
+                        onclick="deleteEmbyWebhook()">
+                    Delete url
+                </button>
+                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateEmbyWebhook()">Regenerate url</button>
+            </div>
+
+            <hr>
+
+            <h5>Scrobble Options</h5>
+
+            <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="1"
+                       id="scrobbleWatchesCheckbox"
+                       name="scrobbleWatches"
+                       {% if embyWebhookUrl == '-' %}disabled{% endif %}
+                        {% if scrobbleWatches == true %}checked{% endif %}
+                       style="margin-right: 0.2rem">
+                <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
+            </div>
+
+            <div id="alertWebhookOptionsDiv"></div>
+
+            <button type="submit" class="btn btn-primary" {% if embyWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
+        </div>
+    </main>
+{% endblock %}
