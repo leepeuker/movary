@@ -20,8 +20,7 @@ final class AddDashboardSettingsToUserTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE user DROP COLUMN dashboard_order_of_rows;
-            ALTER TABLE user DROP COLUMN dashboard_hidden_rows;
+            ALTER TABLE user DROP COLUMN dashboard_extended_rows;
             ALTER TABLE user DROP COLUMN dashboard_visible_rows;
             SQL,
         );
@@ -31,9 +30,8 @@ final class AddDashboardSettingsToUserTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE user ADD COLUMN dashboard_order_of_rows VARCHAR(255) NULL AFTER is_admin;
-            ALTER TABLE user ADD COLUMN dashboard_hidden_rows VARCHAR(255) NULL AFTER dashboard_order_of_rows;
-            ALTER TABLE user ADD COLUMN dashboard_visible_rows VARCHAR(255) NULL AFTER dashboard_hidden_rows;
+            ALTER TABLE user ADD COLUMN dashboard_visible_rows VARCHAR(255) NULL AFTER is_admin;
+            ALTER TABLE user ADD COLUMN dashboard_extended_rows VARCHAR(255) NULL AFTER dashboard_visible_rows;
             SQL,
         );
     } 

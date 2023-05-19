@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-account-general.js"></script>
+    <script src="/js/settings-account-dashboard.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -21,18 +21,23 @@
 
             <div style="padding-top: 1rem">               
                 <div class="mb-3">
-                    <h5>Dashboard settings</h5>
-                    <ul class="nav flex-column">
-                        <span style="cursor: pointer" class="nav-link">Last Plays <i class="bi bi-list"></i></span>
-                        <span style="cursor: pointer" class="nav-link">Most watched Actors <i class="bi bi-list float-right"></i></span>
-                        <span style="cursor: pointer" class="nav-link">Most watched Actresses <i class="bi bi-list float-right"></i></span>
-                        <span style="cursor: pointer" class="nav-link">Most watched Directors <i class="bi bi-list float-right"></i></span>
-                        <span style="cursor: pointer" class="nav-link">Most watched Genres <i class="bi bi-list float-right"></i></span>
-                        <span style="cursor: pointer" class="nav-link">Most watched Languages <i class="bi bi-list float-right"></i></span>
-                        <span style="cursor: pointer" class="nav-link">Most watched Production Companies <i class="bi bi-list float-right"></i></span>
-                        <span style="cursor: pointer" class="nav-link">Most watched Release Years <i class="bi bi-list float-right"></i></span>
+                    <h5 class="text-center">Dashboard settings</h5>
+                    <div id="accountDashboardSettingsLog"></div>
+                    <ul class="nav flex-column mb-4">
+                        {% for row in rowOrder %}
+                            <span class="nav-link dashboardRowItem" data-rowid="{{ row }}" style="opacity: {{ row in extendedRows ? '1' : '0.5' }}">
+                                <span class="mx-auto">{{ row }}</span>
+                                <div class="btn-group float-end">
+                                    <button type="button" class="btn btn-primary"><i class="bi {{ row in extendedRows ? 'bi-eye' : 'bi-eye-slash' }}" onclick="toggleRowExtension(this)"></i></button>
+                                    <button type="button" class="btn btn-primary" onclick="moveItemUp(this)"><i class="bi bi-arrow-up"></i></button>
+                                    <button type="button" class="btn btn-primary" onclick="moveItemDown(this)"><i class="bi bi-arrow-down"></i></button>
+                                </div>
+                            </span>                            
+                        {% endfor %}
                     </ul>
+                    <button type="button" class="btn btn-primary float-end mt-3" onclick="updateDashboardRows()">Update dashboard rows</button>
                 </div>
+            </div>
         </div>
     </main>
 {% endblock %}

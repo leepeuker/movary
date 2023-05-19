@@ -164,6 +164,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'deleteAccount'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/settings/account/update-dashboard-rows',
+        [\Movary\HttpController\SettingsController::class, 'updateDashboardRows'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/settings/integrations/trakt',
         [\Movary\HttpController\SettingsController::class, 'renderTraktPage'],

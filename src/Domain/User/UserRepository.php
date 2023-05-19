@@ -450,6 +450,32 @@ class UserRepository
         );
     }
 
+    public function updateVisibleRows(int $userId, string $visibleRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_visible_rows' => $visibleRows,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateExtendedRows(int $userId, string $extendedRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_extended_rows' => $extendedRows,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
         $this->dbConnection->update(
