@@ -4,6 +4,10 @@
     Settings - App
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/settings-app.js"></script>
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
@@ -56,7 +60,12 @@
                 <hr>
 
                 <h5 style="margin-bottom: 1rem;">Latest Releases</h5>
+                <div class="spinner-border" role="status" id="loadingSpinner">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <ul class="list-group" id="latestReleases"></ul>
                 <ul class="list-group">
+
                     {% set hastLatest = false %}
                     {% for release in releases %}
                         <li class="list-group-item">
@@ -67,11 +76,10 @@
                             {% set hastLatest = true %}
                         </li>
                     {% endfor %}
-                    <li class="list-group-item">
-                        <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">More...</span>
-                    </li>
                 </ul>
             </div>
+
+            {{ include('component/modal-app-release.html.twig') }}
         </div>
     </main>
 {% endblock %}
