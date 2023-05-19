@@ -16,20 +16,4 @@ class GithubReleaseMapper
             Url::createFromString($releasesDataDecoded['html_url']),
         );
     }
-
-    public function mapReleasesFromApiJsonResponse(string $releasesData) : GithubReleaseDtoList
-    {
-        $releases = GithubReleaseDtoList::create();
-
-        foreach (Json::decode($releasesData) as $releaseData) {
-            $releases->add(
-                GithubReleaseDto::create(
-                    $releaseData['name'],
-                    Url::createFromString($releaseData['url']),
-                ),
-            );
-        }
-
-        return $releases;
-    }
 }

@@ -136,7 +136,6 @@ class SettingsController
             $this->twig->render('page/settings-app.html.twig', [
                 'currentApplicationVersion' => $this->currentApplicationVersion,
                 'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
-                'releases' => $this->githubApi->fetchLatestMovaryReleases(),
                 'timeZone' => date_default_timezone_get(),
             ]),
         );
