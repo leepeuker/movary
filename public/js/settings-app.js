@@ -19,7 +19,7 @@ function generatedReleases() {
     }).catch((error) => {
         console.log(error)
         document.getElementById('loadingSpinner').classList.add('d-none')
-        addAlert('alertReleasesDiv', 'Could not load releases', 'warning', false)
+        addAlert('alertReleasesDiv', 'Could not load latest releases. View them on <a href="https://github.com/leepeuker/movary/releases" target="_blank">Github</a> directly.', 'warning', false)
     })
 }
 
