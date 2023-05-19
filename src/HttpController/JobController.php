@@ -19,7 +19,6 @@ class JobController
         private readonly Authentication $authenticationService,
         private readonly JobQueueApi $jobQueueApi,
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
-        private readonly Environment $twig,
         private readonly SessionWrapper $sessionWrapper,
         private readonly string $appStorageDirectory,
     ) {

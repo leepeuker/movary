@@ -176,7 +176,6 @@ class Factory
             $container->get(Authentication::class),
             $container->get(JobQueueApi::class),
             $container->get(LetterboxdCsvValidator::class),
-            $container->get(Twig\Environment::class),
             $container->get(SessionWrapper::class),
             self::createDirectoryStorageApp()
         );
