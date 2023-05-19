@@ -255,6 +255,7 @@ class Factory
             $container->get(TraktApi::class),
             $container->get(ServerSettings::class),
             $container->get(WebhookUrlBuilder::class),
+            $container->get(JobQueueApi::class),
             $applicationVersion
         );
     }

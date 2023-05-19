@@ -114,6 +114,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderServerGeneralPage'],
     );
     $routeCollector->addRoute(
+        'GET',
+        '/settings/server/jobs',
+        [\Movary\HttpController\SettingsController::class, 'renderServerJobsPage'],
+    );
+    $routeCollector->addRoute(
         'POST',
         '/settings/server/general',
         [\Movary\HttpController\SettingsController::class, 'updateServerGeneral'],
