@@ -18,7 +18,8 @@ function generatedReleases() {
         })
     }).catch((error) => {
         console.log(error)
-        addAlert('alertWebhookUrlDiv', 'Could not generate webhook url', 'danger')
+        document.getElementById('loadingSpinner').classList.add('d-none')
+        addAlert('alertReleasesDiv', 'Could not load releases', 'warning', false)
     })
 }
 
@@ -34,17 +35,19 @@ function addReleaseToList(latestRelease) {
     releaseListItem.classList.add('list-group-item', 'list-group-item-action');
     releaseListItem.dataset.body = latestRelease.body
     releaseListItem.dataset.name = latestRelease.name
+    releaseListItem.dataset.url = latestRelease.url
     releaseListItem.style.cursor = 'pointer'
-    releaseListItem.setAttribute("onclick","showReleaseModal(this)");
+    releaseListItem.setAttribute("onclick", "showReleaseModal(this)");
 
     releasesList.appendChild(releaseListItem);
 }
 
-function showReleaseModal (element) {
+function showReleaseModal(element) {
     const modal = new bootstrap.Modal('#appReleaseModal');
 
     document.getElementById('appReleaseModalTitle').innerHTML = element.dataset.name
     document.getElementById('appReleaseModalBody').innerHTML = element.dataset.body
+    document.getElementById('appReleaseModalButtonViewGithub').href = element.dataset.url
 
     modal.show()
 }

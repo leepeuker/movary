@@ -310,7 +310,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
     setRatingStars('logPlayModal', rating)
 
     document.getElementById('logPlayModalTmdbIdInput').value = tmdbId
-    document.getElementById('logPlayModalTitle').innerHTML = movieTitle  + ' (' + releaseYear + ')'
+    document.getElementById('logPlayModalTitle').innerHTML = movieTitle + ' (' + releaseYear + ')'
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
@@ -450,11 +450,16 @@ function toggleThemeSwitch() {
     setTheme('light')
 }
 
-function addAlert(parentDivId, message, color) {
+function addAlert(parentDivId, message, color, withCloseButton = true) {
+    let closeButton = ''
+    if (withCloseButton === true) {
+        closeButton = '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
+    }
+
     document.getElementById(parentDivId).innerHTML =
         '<div class="alert alert-' + color + ' alert-dismissible" role="alert">'
         + message +
-        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        closeButton +
         '</div>'
 }
 
