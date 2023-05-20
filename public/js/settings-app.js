@@ -1294,7 +1294,7 @@ function showReleaseModal(element) {
 
 function parseBody(body) {
     let releaseDescriptionHtml = marked.parse(body);
-    releaseDescriptionHtml = releaseDescriptionHtml.replace(/<p><strong>Full Changelog<\/strong>: <a href="(.*)">https:\/\/github.com\/leepeuker\/movary\/compare\/.*<\/a><\/p>/, '<a href="$1" target="_blank">Full Changelog</a>')
+    releaseDescriptionHtml = releaseDescriptionHtml.replace(/<p><strong>Full Changelog<\/strong>: <a href="(.*)">https:\/\/github.com\/leepeuker\/movary\/compare\/(.*)<\/a><\/p>/, '<strong>Full Changelog:</strong> <a href="$1" target="_blank">$2</a>')
     releaseDescriptionHtml = releaseDescriptionHtml.replaceAll(/(@.*) in <a href="(.*)".*<\/a>/g, '<a href="$2" target="_blank">$1</a>')
 
     return releaseDescriptionHtml;
