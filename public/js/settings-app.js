@@ -60,7 +60,7 @@ function addReleaseToList(latestRelease) {
 
     releaseListItem.appendChild(releaseListItemTitle);
     releaseListItem.classList.add('list-group-item', 'list-group-item-action');
-    releaseListItem.dataset.body = latestRelease.body
+    releaseListItem.dataset.body = marked.parse(latestRelease.body)
     releaseListItem.dataset.name = latestRelease.name
     releaseListItem.dataset.url = latestRelease.html_url
     releaseListItem.style.cursor = 'pointer'
