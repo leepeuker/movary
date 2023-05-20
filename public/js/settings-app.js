@@ -11,11 +11,29 @@ async function fetchLatestReleases() {
 }
 
 function generatedReleases() {
+    let latestReleases = localStorage.getItem('latestReleases')
+    if (latestReleases !== null) {
+        latestReleases = JSON.parse(latestReleases)
+
+        const maxAgeCachedReleasesInSeconds = 60;
+
+        if (new Date() - new Date(latestReleases.time) < maxAgeCachedReleasesInSeconds * 1000) {
+            latestReleases.data.forEach((latestRelease) => {
+                document.getElementById('loadingSpinner').classList.add('d-none')
+                addReleaseToList(latestRelease)
+            })
+
+            return
+        }
+    }
+
     fetchLatestReleases().then(latestReleases => {
         latestReleases.forEach((latestRelease) => {
             document.getElementById('loadingSpinner').classList.add('d-none')
             addReleaseToList(latestRelease)
         })
+
+        localStorage.setItem('latestReleases', JSON.stringify({'data': latestReleases, 'time': new Date().toString()}))
     }).catch((error) => {
         console.log(error)
         document.getElementById('loadingSpinner').classList.add('d-none')
