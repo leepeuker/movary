@@ -60,23 +60,13 @@
                 <hr>
 
                 <h5 style="margin-bottom: 1rem;">Latest Releases</h5>
+
                 <div class="spinner-border" role="status" id="loadingSpinner" style="margin-top: .5rem">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+
                 <ul class="list-group" id="latestReleases"></ul>
-                <ul class="list-group">
 
-                    {% set hastLatest = false %}
-                    {% for release in releases %}
-                        <li class="list-group-item">
-                            <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">{{ release.name }}</span>
-                            {% if hastLatest == false %}<span class="badge rounded-pill text-bg-success">Latest</span>{% endif %}
-                            {% if (releases is not empty and currentApplicationVersion == release.name) %}<span class="badge rounded-pill text-bg-primary">Current</span>{% endif %}
-
-                            {% set hastLatest = true %}
-                        </li>
-                    {% endfor %}
-                </ul>
                 <div id="alertReleasesDiv"></div>
             </div>
 
