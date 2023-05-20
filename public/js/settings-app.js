@@ -18,8 +18,9 @@ function generatedReleases() {
         const maxAgeCachedReleasesInSeconds = 60;
 
         if (new Date() - new Date(latestReleases.time) < maxAgeCachedReleasesInSeconds * 1000) {
+            document.getElementById('loadingSpinner').classList.add('d-none')
+
             latestReleases.data.forEach((latestRelease) => {
-                document.getElementById('loadingSpinner').classList.add('d-none')
                 addReleaseToList(latestRelease)
             })
 
@@ -28,12 +29,20 @@ function generatedReleases() {
     }
 
     fetchLatestReleases().then(latestReleases => {
+        let usedLatestReleases = [];
+
         latestReleases.forEach((latestRelease) => {
+            if (latestRelease.prerelease === true || latestRelease.draft === true) {
+                return
+            }
+
             document.getElementById('loadingSpinner').classList.add('d-none')
             addReleaseToList(latestRelease)
+
+            usedLatestReleases.push(latestRelease)
         })
 
-        localStorage.setItem('latestReleases', JSON.stringify({'data': latestReleases, 'time': new Date().toString()}))
+        localStorage.setItem('latestReleases', JSON.stringify({'data': usedLatestReleases, 'time': new Date().toString()}))
     }).catch((error) => {
         console.log(error)
         document.getElementById('loadingSpinner').classList.add('d-none')
@@ -53,9 +62,9 @@ function addReleaseToList(latestRelease) {
     releaseListItem.classList.add('list-group-item', 'list-group-item-action');
     releaseListItem.dataset.body = latestRelease.body
     releaseListItem.dataset.name = latestRelease.name
-    releaseListItem.dataset.url = latestRelease.url
+    releaseListItem.dataset.url = latestRelease.html_url
     releaseListItem.style.cursor = 'pointer'
-    releaseListItem.setAttribute("onclick", "showReleaseModal(this)");
+    releaseListItem.setAttribute('onclick', "showReleaseModal(this)");
 
     releasesList.appendChild(releaseListItem);
 }
