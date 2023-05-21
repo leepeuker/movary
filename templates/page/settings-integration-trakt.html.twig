@@ -116,6 +116,11 @@
                         {% endfor %}
                         </tbody>
                     </table>
+                    {% if lastTraktImportJobs|length == 0 %}
+                        <tr>
+                            No logged imports
+                        </tr>
+                    {% endif %}
                 </div>
             </div>
         </div>
