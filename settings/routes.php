@@ -56,11 +56,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     #############
     $routeCollector->addRoute(
         'GET',
-        '/job-queue',
-        [\Movary\HttpController\JobController::class, 'renderQueuePage'],
-    );
-    $routeCollector->addRoute(
-        'GET',
         '/job-queue/purge-processed',
         [\Movary\HttpController\JobController::class, 'purgeProcessedJobs'],
     );
@@ -112,6 +107,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/settings/server/general',
         [\Movary\HttpController\SettingsController::class, 'renderServerGeneralPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/server/jobs',
+        [\Movary\HttpController\SettingsController::class, 'renderServerJobsPage'],
     );
     $routeCollector->addRoute(
         'POST',

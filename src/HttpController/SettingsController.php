@@ -37,6 +37,7 @@ class SettingsController
         private readonly TraktApi $traktApi,
         private readonly ServerSettings $serverSettings,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -353,6 +354,29 @@ class SettingsController
                 'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
                 'applicationUrlSetInEnv' => $this->serverSettings->isApplicationUrlSetInEnvironment(),
             ]),
+        );
+    }
+
+    public function renderServerJobsPage(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
+
+        $jobs = $this->jobQueueApi->fetchJobsForStatusPage((int)$jobsPerPage);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render(
+                'page/settings-server-jobs.html.twig',
+                ['jobs' => $jobs],
+            ),
         );
     }
 
