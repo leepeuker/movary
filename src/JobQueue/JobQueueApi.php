@@ -88,6 +88,11 @@ class JobQueueApi
         return $this->repository->findLastDateForJobByType(JobType::createImdbSync());
     }
 
+    public function findLastLetterboxdImportsForUser(int $userId) : array
+    {
+        return $this->repository->findLastLetterboxdImportsForUser($userId);
+    }
+
     public function findLastTmdbSync() : ?DateTime
     {
         $lastMovieSync = $this->repository->findLastDateForJobByType(JobType::createTmdbMovieSync());
@@ -104,16 +109,9 @@ class JobQueueApi
         return $lastMovieSync->isAfter($lastPersonSync) ? $lastMovieSync : $lastPersonSync;
     }
 
-    public function findLastTraktSync(int $userId) : ?DateTime
+    public function findLastTraktImportsForUser(int $userId) : array
     {
-        $ratingsDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportRatings(), $userId);
-        $historyDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportHistory(), $userId);
-
-        if ($ratingsDate > $historyDate) {
-            return $ratingsDate;
-        }
-
-        return $historyDate;
+        return $this->repository->findLastTraktImportsForUser($userId);
     }
 
     public function purgeAllJobs() : void

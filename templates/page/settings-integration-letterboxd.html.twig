@@ -4,6 +4,10 @@
     Settings - Letterboxd
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/settings-integration-letterboxd.js"></script>
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
@@ -40,7 +44,7 @@
 
                     {% if letterboxdDiarySyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Watched movies import <a href="/job-queue">scheduled</a>
+                            History import scheduled
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
 
@@ -64,7 +68,7 @@
 
                     {% if letterboxdRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Ratings import <a href="/job-queue">scheduled</a>
+                            Ratings import scheduled
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
@@ -75,6 +79,42 @@
                         </div>
                     {% endif %}
                 </form>
+
+                <hr>
+
+                <h5 style="margin-top: 0.9rem">Import Log</h5>
+
+                <p class="text-muted">List of your last Letterboxd imports (max 10).</p>
+
+                <button class="w-100 btn btn-primary mb-3" type="submit" id="showImportTableButton" onclick="toggleTableVisibility()" style="margin-bottom: 0!important;">Show</button>
+
+                <div class="table-responsive d-none" style="text-align: center;margin-top: .5rem;margin-bottom: 0" id="importTable">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Type</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Finished</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for job in lastLetterboxdImportJobs %}
+                            <tr>
+                                <td>{% if job.job_type == 'letterboxd_import_history' %} History {% else %} Ratings {% endif %}</td>
+                                <td>{{ job.job_status }}</td>
+                                <td>{{ job.created_at }}</td>
+                                <td>{% if job.job_status == 'done' %}{{ job.updated_at }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if lastLetterboxdImportJobs|length == 0 %}
+                        <tr>
+                            No logged imports
+                        </tr>
+                    {% endif %}
+                </div>
 
                 <hr>
 

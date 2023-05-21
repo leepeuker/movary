@@ -278,6 +278,7 @@ class SettingsController
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
                 'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+                'lastLetterboxdImportJobs' => $this->workerService->findLastLetterboxdImportsForUser($user->getId()),
             ]),
         );
     }
@@ -419,7 +420,7 @@ class SettingsController
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
-                'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
+                'lastTraktImportJobs' => $this->workerService->findLastTraktImportsForUser($user->getId()),
             ]),
         );
     }

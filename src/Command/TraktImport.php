@@ -95,9 +95,11 @@ class TraktImport extends Command
     {
         $this->generateOutput($output, 'Importing history...');
 
+        $jobId = $this->jobQueueApi->addTraktImportHistoryJob($userId, JobStatus::createInProgress());
+
         $this->importWatchedMovies->execute($userId, $overwriteExistingData, $ignoreCache);
 
-        $this->jobQueueApi->addTraktImportHistoryJob($userId, JobStatus::createDone());
+        $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
         $this->generateOutput($output, 'Importing history done.');
     }
@@ -106,9 +108,11 @@ class TraktImport extends Command
     {
         $this->generateOutput($output, 'Importing ratings...');
 
+        $jobId = $this->jobQueueApi->addTraktImportRatingsJob($userId, JobStatus::createInProgress());
+
         $this->importRatings->execute($userId, $overwriteExistingData);
 
-        $this->jobQueueApi->addTraktImportRatingsJob($userId, JobStatus::createDone());
+        $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
         $this->generateOutput($output, 'Importing ratings ratings.');
     }
