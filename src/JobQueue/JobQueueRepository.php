@@ -68,6 +68,22 @@ class JobQueueRepository
         return DateTime::createFromString($data);
     }
 
+    public function findLastLetterboxdImportsForUser(int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT *
+            FROM `job_queue` 
+            WHERE job_type IN (?, ?) AND user_id = ? 
+            ORDER BY created_at DESC
+            LIMIT 10',
+            [
+                JobType::createLetterboxdImportHistory(),
+                JobType::createLetterboxdImportRatings(),
+                $userId,
+            ],
+        );
+    }
+
     public function findLastTraktImportsForUser(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(

@@ -88,6 +88,11 @@ class JobQueueApi
         return $this->repository->findLastDateForJobByType(JobType::createImdbSync());
     }
 
+    public function findLastLetterboxdImportsForUser(int $userId) : array
+    {
+        return $this->repository->findLastLetterboxdImportsForUser($userId);
+    }
+
     public function findLastTmdbSync() : ?DateTime
     {
         $lastMovieSync = $this->repository->findLastDateForJobByType(JobType::createTmdbMovieSync());

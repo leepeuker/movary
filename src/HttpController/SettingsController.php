@@ -278,6 +278,7 @@ class SettingsController
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
                 'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+                'lastLetterboxdImportJobs' => $this->workerService->findLastLetterboxdImportsForUser($user->getId()),
             ]),
         );
     }
