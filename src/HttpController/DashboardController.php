@@ -43,6 +43,9 @@ class DashboardController
         }
         $user = $this->authenticationService->getCurrentUser();
 
+        /**
+         * @psalm-suppress PossiblyNullArgument
+         */
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/dashboard.html.twig', [

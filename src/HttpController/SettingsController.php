@@ -150,7 +150,9 @@ class SettingsController
         }
 
         $user = $this->authenticationService->getCurrentUser();
+        /** @psalm-suppress PossiblyNullArgument */
         $rowOrder = empty($user->getDashboardRowOrder()) === true ? self::rowIds : explode(';', $user->getDashboardRowOrder());
+        /** @psalm-suppress PossiblyNullArgument */
         $extendedRows = empty($user->getDashboardExtendedRows()) === true ? [] : explode(';', $user->getDashboardExtendedRows());
 
         return Response::create(
