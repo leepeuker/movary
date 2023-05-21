@@ -419,7 +419,7 @@ class SettingsController
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
-                'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
+                'lastTraktImportJobs' => $this->workerService->findLastTraktImportsForUser($user->getId()),
             ]),
         );
     }

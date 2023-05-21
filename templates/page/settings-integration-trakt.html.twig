@@ -48,7 +48,7 @@
                     </div>
 
 
-                    <div id="alerts"  style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
+                    <div id="alerts" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;">
                         {% if traktCredentialsUpdated == true %}
                             <div class="alert alert-success alert-dismissible" role="alert">
                                 Trakt credentials were updated.
@@ -57,7 +57,8 @@
                         {% endif %}
                     </div>
 
-                    <button class="btn btn-outline-primary" type="button" {% if coreAccountChangesDisabled == true %}disabled{% endif %} onclick="verifyTraktCredentials()" id="verifyButton">
+                    <button class="btn btn-outline-primary" type="button" {% if coreAccountChangesDisabled == true %}disabled{% endif %} onclick="verifyTraktCredentials()"
+                            id="verifyButton">
                         Verify
                     </button>
                     <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Save</button>
@@ -80,13 +81,42 @@
 
                     {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Trakt {% if traktScheduleHistorySyncSuccessful == true %}history{% else %}ratings{% endif %} import <a href="/job-queue">scheduled</a>
+                            Trakt {% if traktScheduleHistorySyncSuccessful == true %}history{% else %}ratings{% endif %} import scheduled
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
                 </div>
 
-                <p style="margin-top: 0.8rem">Last sync: <span class="fw-light">{{ lastSyncTrakt }}</span></p>
+                <hr>
+
+                <h5 style="margin-top: 0.9rem">Import Log</h5>
+
+                <p class="text-muted">List of your last trakt.tv imports (max 10).</p>
+
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="submit" id="showImportTableButton" onclick="toggleTableVisibility()">Show</button>
+
+                <div class="table-responsive d-none" style="text-align: center;" id="importTable">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Type</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Finished</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for job in lastTraktImportJobs %}
+                            <tr>
+                                <td>{% if job.job_type == 'trakt_import_history' %} History {% else %} Ratings {% endif %}</td>
+                                <td>{{ job.job_status }}</td>
+                                <td>{{ job.created_at }}</td>
+                                <td>{% if job.job_status == 'done' %}{{ job.updated_at }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>

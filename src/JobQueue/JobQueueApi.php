@@ -104,16 +104,9 @@ class JobQueueApi
         return $lastMovieSync->isAfter($lastPersonSync) ? $lastMovieSync : $lastPersonSync;
     }
 
-    public function findLastTraktSync(int $userId) : ?DateTime
+    public function findLastTraktImportsForUser(int $userId) : array
     {
-        $ratingsDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportRatings(), $userId);
-        $historyDate = $this->repository->findLastDateForJobByTypeAndUserId(JobType::createTraktImportHistory(), $userId);
-
-        if ($ratingsDate > $historyDate) {
-            return $ratingsDate;
-        }
-
-        return $historyDate;
+        return $this->repository->findLastTraktImportsForUser($userId);
     }
 
     public function purgeAllJobs() : void
