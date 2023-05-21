@@ -81,7 +81,7 @@
 
                     {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Trakt {% if traktScheduleHistorySyncSuccessful == true %}history{% else %}ratings{% endif %} import scheduled
+                            {% if traktScheduleHistorySyncSuccessful == true %}History{% else %}Ratings{% endif %} import scheduled
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
