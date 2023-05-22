@@ -6,7 +6,9 @@ WORKDIR /app
 
 FROM development AS production
 ARG APPLICATION_VERSION
-ENV APPLICATION_VERSION=${APPLICATION_VERSION}
+ENV \ 
+    APPLICATION_VERSION=${APPLICATION_VERSION} \ 
+    PHP_DISMOD=imagick
 COPY --chown=application ./ ./
 COPY .env.production.example .env
 COPY settings/supervisor/movary.conf /opt/docker/etc/supervisor.d/movary.conf
