@@ -16,6 +16,13 @@ class TmdbIso6931Cache
     ) {
     }
 
+    public function delete() : void
+    {
+        $this->dbConnection->executeQuery('DELETE FROM cache_tmdb_languages');
+
+        $this->languages = [];
+    }
+
     public function getLanguageByCode(string $languageCode) : string
     {
         if ($this->languages === []) {
@@ -35,23 +42,33 @@ class TmdbIso6931Cache
         throw new RuntimeException('Language code not handled: ' . $languageCode);
     }
 
+    public function loadFromTmdb() : bool
+    {
+        $languages = $this->client->get('/configuration/languages');
+
+        $this->dbConnection->beginTransaction();
+
+        $existingIsoCodes = $this->dbConnection->fetchFirstColumn('SELECT iso_639_1 FROM cache_tmdb_languages');
+
+        foreach ($languages as $language) {
+            if (in_array($language['iso_639_1'], $existingIsoCodes, true) === true) {
+                continue;
+            }
+
+            $this->dbConnection->insert('cache_tmdb_languages', ['iso_639_1' => $language['iso_639_1'], 'english_name' => $language['english_name']]);
+        }
+
+        $this->dbConnection->commit();
+
+        $this->loadFromDatabase();
+
+        return true;
+    }
+
     private function loadFromDatabase() : bool
     {
         $this->languages = $this->dbConnection->fetchAllKeyValue('SELECT iso_639_1, english_name FROM cache_tmdb_languages');
 
         return empty($this->languages);
-    }
-
-    private function loadFromTmdb() : bool
-    {
-        $languages = $this->client->get('/configuration/languages');
-
-        foreach ($languages as $language) {
-            $this->dbConnection->insert('cache_tmdb_languages', ['iso_639_1' => $language['iso_639_1'], 'english_name' => $language['english_name']]);
-        }
-
-        $this->loadFromDatabase();
-
-        return true;
     }
 }
