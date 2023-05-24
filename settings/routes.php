@@ -95,6 +95,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/account/dashboard',
+        [\Movary\HttpController\SettingsController::class, 'renderDashboardAccountPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/account/password',
         [\Movary\HttpController\SettingsController::class, 'renderPasswordAccountPage'],
     );
@@ -157,6 +162,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/settings/account/delete-account',
         [\Movary\HttpController\SettingsController::class, 'deleteAccount'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/account/update-dashboard-rows',
+        [\Movary\HttpController\SettingsController::class, 'updateDashboardRows'],
     );
     $routeCollector->addRoute(
         'GET',

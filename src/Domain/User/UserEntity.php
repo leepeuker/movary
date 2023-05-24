@@ -9,6 +9,8 @@ class UserEntity
         private readonly string $name,
         private readonly string $passwordHash,
         private readonly bool $isAdmin,
+        private readonly ?string $dashboardRowOrder,
+        private readonly ?string $dashboardExtendedRows,
         private readonly int $privacyLevel,
         private readonly bool $coreAccountChangesDisabled,
         private readonly int $dateFormatId,
@@ -32,6 +34,8 @@ class UserEntity
             $data['name'],
             $data['password'],
             (bool)$data['is_admin'],
+            $data['dashboard_visible_rows'],
+            $data['dashboard_extended_rows'],
             $data['privacy_level'],
             (bool)$data['core_account_changes_disabled'],
             $data['date_format_id'],
@@ -131,5 +135,15 @@ class UserEntity
     public function isAdmin() : bool
     {
         return $this->isAdmin;
+    }
+
+    public function getDashboardRowOrder() : ?string
+    {
+        return $this->dashboardRowOrder;
+    }
+
+    public function getDashboardExtendedRows() : ?string
+    {
+        return $this->dashboardExtendedRows;
     }
 }

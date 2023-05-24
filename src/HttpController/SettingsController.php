@@ -25,6 +25,8 @@ use ZipStream;
 
 class SettingsController
 {
+    private const rowIds = ['Last Plays', 'Most Watched Actors', 'Most Watched Actresses', 'Most Watched Directors', 'Most Watched Genres', 'Most Watched Languages', 'Most Watched Production Companies', 'Most Watched Release Years'];
+    
     public function __construct(
         private readonly Environment $twig,
         private readonly JobQueueApi $workerService,
@@ -138,6 +140,27 @@ class SettingsController
                 'currentApplicationVersion' => $this->currentApplicationVersion,
                 'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
                 'timeZone' => date_default_timezone_get(),
+            ]),
+        );
+    }
+ 
+    public function renderDashboardAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $user = $this->authenticationService->getCurrentUser();
+        /** @psalm-suppress PossiblyNullArgument */
+        $rowOrder = empty($user->getDashboardRowOrder()) === true ? self::rowIds : explode(';', $user->getDashboardRowOrder());
+        /** @psalm-suppress PossiblyNullArgument */
+        $extendedRows = empty($user->getDashboardExtendedRows()) === true ? [] : explode(';', $user->getDashboardExtendedRows());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-dashboard.html.twig', [
+                'rowOrder' => $rowOrder,
+                'extendedRows' => $extendedRows
             ]),
         );
     }
@@ -606,5 +629,32 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
+    }
+
+    public function updateDashboardRows(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $bodyData = Json::decode($request->getBody());
+
+        $visibleRows = $bodyData['rowOrder'];
+        $extendedRows = $bodyData['extendedRows'];
+        
+        foreach(self::rowIds as $rowId) {
+            if(in_array($rowId, $visibleRows) === false) {
+                return Response::createBadRequest();
+            }
+        }
+
+        $visibleRowsString = implode(';', $visibleRows);
+        $extendedRowsString = implode(';', $extendedRows);
+        
+        $this->userApi->updateVisibleRows($userId, $visibleRowsString);
+        $this->userApi->updateExtendedRows($userId, $extendedRowsString);
+
+        return Response::createOk();
     }
 }

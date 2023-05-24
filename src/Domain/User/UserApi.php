@@ -231,6 +231,24 @@ class UserApi
         $this->repository->updatePassword($userId, $passwordHash);
     }
 
+    public function updateVisibleRows(int $userId, string $visibleRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateVisibleRows($userId, $visibleRows);
+    }
+
+    public function updateExtendedRows(int $userId, string $extendedRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateExtendedRows($userId, $extendedRows);
+    }
+
     public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
         $this->repository->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
