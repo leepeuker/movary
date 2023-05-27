@@ -19,7 +19,6 @@ class JobController
         private readonly Authentication $authenticationService,
         private readonly JobQueueApi $jobQueueApi,
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
-        private readonly Environment $twig,
         private readonly SessionWrapper $sessionWrapper,
         private readonly string $appStorageDirectory,
     ) {
@@ -33,7 +32,7 @@ class JobController
 
         $this->jobQueueApi->purgeAllJobs();
 
-        return Response::createSeeOther('/job-queue');
+        return Response::createSeeOther('/settings/server/jobs');
     }
 
     public function purgeProcessedJobs() : Response
@@ -44,26 +43,7 @@ class JobController
 
         $this->jobQueueApi->purgeProcessedJobs();
 
-        return Response::createSeeOther('/job-queue');
-    }
-
-    public function renderQueuePage(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
-
-        $jobs = $this->jobQueueApi->fetchJobsForStatusPage((int)$jobsPerPage);
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render(
-                'page/job-queue.html.twig',
-                ['jobs' => $jobs],
-            ),
-        );
+        return Response::createSeeOther('/settings/server/jobs');
     }
 
     public function scheduleLetterboxdDiaryImport(Request $request) : Response

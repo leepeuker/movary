@@ -15,5 +15,5 @@ document.addEventListener("DOMContentLoaded", function () {
 function refreshPage() {
     const jobsPerPage = document.getElementById('jobsPerPage').value
 
-    window.location.href = '/job-queue?jpp=' + jobsPerPage
+    window.location.href = '/settings/server/jobs?jpp=' + jobsPerPage
 }

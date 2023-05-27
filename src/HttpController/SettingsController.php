@@ -39,6 +39,7 @@ class SettingsController
         private readonly TraktApi $traktApi,
         private readonly ServerSettings $serverSettings,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -300,6 +301,7 @@ class SettingsController
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
                 'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+                'lastLetterboxdImportJobs' => $this->workerService->findLastLetterboxdImportsForUser($user->getId()),
             ]),
         );
     }
@@ -379,6 +381,29 @@ class SettingsController
         );
     }
 
+    public function renderServerJobsPage(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
+
+        $jobs = $this->jobQueueApi->fetchJobsForStatusPage((int)$jobsPerPage);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render(
+                'page/settings-server-jobs.html.twig',
+                ['jobs' => $jobs],
+            ),
+        );
+    }
+
     public function renderServerUsersPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -418,7 +443,7 @@ class SettingsController
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
-                'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
+                'lastTraktImportJobs' => $this->workerService->findLastTraktImportsForUser($user->getId()),
             ]),
         );
     }

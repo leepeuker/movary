@@ -4,11 +4,12 @@ namespace Movary\Api\Github;
 
 use Exception;
 use GuzzleHttp\Client;
+use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
 
 class GithubApi
 {
-    private const GITHUB_LATEST_RELEASES_URL = 'https://api.github.com/repos/leepeuker/movary/releases/latest';
+    private const GITHUB_LATEST_RELEASE_URL = 'https://api.github.com/repos/leepeuker/movary/releases/latest';
 
     public function __construct(
         private readonly Client $httpClient,
@@ -20,7 +21,7 @@ class GithubApi
     public function fetchLatestMovaryRelease() : ?GithubReleaseDto
     {
         try {
-            $response = $this->httpClient->get(self::GITHUB_LATEST_RELEASES_URL);
+            $response = $this->httpClient->get(self::GITHUB_LATEST_RELEASE_URL);
         } catch (Exception $e) {
             $this->logger->warning('Could not send request to fetch latest github releases.', ['exception' => $e]);
 
@@ -33,6 +34,6 @@ class GithubApi
             return null;
         }
 
-        return $this->releaseMapper->mapFromApiJsonResponse($response->getBody()->getContents());
+        return $this->releaseMapper->mapReleaseFromApiJsonResponse($response->getBody()->getContents());
     }
 }

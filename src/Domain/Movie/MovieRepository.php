@@ -836,6 +836,13 @@ class MovieRepository
         ], ['id' => $id]);
     }
 
+    public function updateImdbTimestamp(int $id) : void
+    {
+        $this->dbConnection->update('movie', [
+            'updated_at_imdb' => (string)DateTime::create(),
+        ], ['id' => $id]);
+    }
+
     public function updateLetterboxdId(int $id, string $letterboxdId) : void
     {
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId, 'updated_at' => (string)DateTime::create()], ['id' => $id]);

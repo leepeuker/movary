@@ -7,7 +7,7 @@ use Movary\ValueObject\Url;
 
 class GithubReleaseMapper
 {
-    public function mapFromApiJsonResponse(string $releasesData) : GithubReleaseDto
+    public function mapReleaseFromApiJsonResponse(string $releasesData) : GithubReleaseDto
     {
         $releasesDataDecoded = Json::decode($releasesData);
 

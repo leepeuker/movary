@@ -1,4 +1,4 @@
-name: Update docker hub description
+name: Update docker hub description with README
 
 on:
   push:
