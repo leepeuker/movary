@@ -534,7 +534,7 @@ class UserRepository
         $this->dbConnection->update(
             'user',
             [
-                'watchlist_automatic_removal_enabled' => $watchlistAutomaticRemovalEnabled,
+                'watchlist_automatic_removal_enabled' => (int)$watchlistAutomaticRemovalEnabled,
             ],
             [
                 'id' => $userId,

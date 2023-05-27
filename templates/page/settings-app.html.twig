@@ -21,21 +21,24 @@
                 <p>
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Version:</span> <span class="fw-light">{{ currentApplicationVersion }}</span>
 
-                    {% if latestRelease is empty %}
-                        {% set badgeStyle = 'text-bg-secondary' %}
-                        {% set badgeText = 'Latest version unkown' %}
-                    {% else %}
-                        {% set badgeStyle = (currentApplicationVersion != latestRelease.name) ? 'text-bg-warning' : 'text-bg-success' %}
-                        {% set badgeText = (currentApplicationVersion != latestRelease.name) ? 'Update available' : 'Up to date' %}
-                    {% endif %}
 
-                    <a
-                            href="https://github.com/leepeuker/movary/releases"
-                            class="badge rounded-pill {{ badgeStyle }}"
-                            target="_blank"
-                            style="text-decoration-line:none">
-                        {{ badgeText }}
-                    </a>
+                    {% if currentApplicationVersion != 'nightly' %}
+                        {% if latestRelease is empty %}
+                            {% set badgeStyle = 'text-bg-secondary' %}
+                            {% set badgeText = 'Latest version unkown' %}
+                        {% else %}
+                            {% set badgeStyle = (currentApplicationVersion != latestRelease.name) ? 'text-bg-warning' : 'text-bg-success' %}
+                            {% set badgeText = (currentApplicationVersion != latestRelease.name) ? 'Update available' : 'Up to date' %}
+                        {% endif %}
+
+                        <a
+                                href="https://github.com/leepeuker/movary/releases"
+                                class="badge rounded-pill {{ badgeStyle }}"
+                                target="_blank"
+                                style="text-decoration-line:none">
+                            {{ badgeText }}
+                        </a>
+                    {% endif %}
                 </p>
                 <p>
                     <span class="text-{{ theme == 'dark' ? 'light' : 'dark' }} theme-text-color">Timezone:</span>
