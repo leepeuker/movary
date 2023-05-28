@@ -44,7 +44,7 @@ class Config
         }
     }
 
-    public function getAsString(string $parameter, ?string $fallbackValue = null) : string
+    public function getAsString(string $parameter, string $fallbackValue = null) : string
     {
         try {
             return (string)$this->get($parameter);

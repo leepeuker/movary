@@ -105,3 +105,6 @@ app_imdb_sync_rating:
 
 app_jobs_process:
 	make exec_app_cmd CMD="php bin/console.php jobs:process"
+
+# Shortcuts
+php: exec_app_bash

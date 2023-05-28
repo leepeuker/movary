@@ -337,6 +337,35 @@ class SettingsController
         );
     }
 
+    public function renderServerEmailPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-email.html.twig', [
+                'smtpHost' => $this->serverSettings->getSmtpHost(),
+                'smtpHostSetInEnv' => $this->serverSettings->isSmtpHostSetInEnvironment(),
+                'smtpPort' => $this->serverSettings->getSmtpPort(),
+                'smtpPortSetInEnv' => $this->serverSettings->isSmtpPortSetInEnvironment(),
+                'smtpFromAddress' => $this->serverSettings->getFromAddress(),
+                'smtpFromAddressSetInEnv' => $this->serverSettings->isSmtpFromAddressSetInEnvironment(),
+                'smtpWithAuthentication' => $this->serverSettings->getSmtpWithAuthentication(),
+                'smtpWithAuthenticationSetInEnv' => $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment(),
+                'smtpUser' => $this->serverSettings->getSmtpUser(),
+                'smtpUserSetInEnv' => $this->serverSettings->isSmtpUserSetInEnvironment(),
+                'smtpPassword' => $this->serverSettings->getSmtpPassword(),
+                'smtpPasswordSetInEnv' => $this->serverSettings->isSmtpPasswordSetInEnvironment(),
+            ]),
+        );
+    }
+
     public function renderServerGeneralPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -550,6 +579,47 @@ class SettingsController
         $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
 
         return Response::create(StatusCode::createNoContent());
+    }
+
+    public function updateServerEmail(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $smtpHost = isset($requestData['smtpHost']) === false ? null : $requestData['smtpHost'];
+        $smtpPort = isset($requestData['smtpPort']) === false ? null : $requestData['smtpPort'];
+        $smtpFromAddress = isset($requestData['smtpFromAddress']) === false ? null : $requestData['smtpFromAddress'];
+        $smtpWithAuthentication = isset($requestData['smtpWithAuthentication']) === false ? null : (bool)$requestData['smtpWithAuthentication'];
+        $smtpUser = isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'];
+        $smtpPassword = isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'];
+
+        if ($smtpHost !== null) {
+            $this->serverSettings->setSmptHost($smtpHost);
+        }
+        if ($smtpPort !== null) {
+            $this->serverSettings->setSmptPort($smtpPort);
+        }
+        if ($smtpFromAddress !== null) {
+            $this->serverSettings->setSmptFromAddress($smtpFromAddress);
+        }
+        if ($smtpWithAuthentication !== null) {
+            $this->serverSettings->setSmptFromWithAuthentication($smtpWithAuthentication);
+        }
+        if ($smtpUser !== null) {
+            $this->serverSettings->setSmptUser($smtpUser);
+        }
+        if ($smtpPassword !== null) {
+            $this->serverSettings->setSmptPassword($smtpPassword);
+        }
+
+        return Response::createOk();
     }
 
     public function updateServerGeneral(Request $request) : Response

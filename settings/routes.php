@@ -124,6 +124,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'renderServerUsersPage'],
     );
     $routeCollector->addRoute(
+        'GET',
+        '/settings/server/email',
+        handler: [\Movary\HttpController\SettingsController::class, 'renderServerEmailPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/server/email',
+        [\Movary\HttpController\SettingsController::class, 'updateServerEmail'],
+    );
+    $routeCollector->addRoute(
         'POST',
         '/settings/account',
         [\Movary\HttpController\SettingsController::class, 'updateGeneral'],

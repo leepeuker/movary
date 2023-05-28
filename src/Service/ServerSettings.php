@@ -7,9 +7,15 @@ use Movary\ValueObject\Config;
 
 class ServerSettings
 {
-    private const TMDB_API_KEY = 'tmdbApiKey';
-
-    private const APPLICATION_URL_KEY = 'applicationUrl';
+    private const APPLICATION_URL = 'APPLICATION_URL';
+    private const SMPT_HOST = 'SMPT_HOST';
+    private const SMPT_HOST_SENDER_ADDRESS = 'SMPT_HOST_SENDER_ADDRESS';
+    private const SMPT_PASSWORD = 'SMPT_PASSWORD';
+    private const SMPT_PORT = 'SMPT_PORT';
+    private const SMPT_USER = 'SMPT_USER';
+    private const SMPT_FROM_ADDRESS = 'SMPT_FROM_ADDRESS';
+    private const SMPT_WITH_AUTH = 'SMPT_WITH_AUTH';
+    private const TMDB_API_KEY = 'TMDB_API_KEY';
 
     public function __construct(
         private readonly Config $config,
@@ -19,63 +25,214 @@ class ServerSettings
 
     public function getApplicationUrl() : ?string
     {
-        if ($this->isApplicationUrlSetInEnvironment() === true) {
-            return $this->config->getAsString('APPLICATION_URL');
+        try {
+            $value = $this->config->getAsString(self::APPLICATION_URL);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::APPLICATION_URL);
         }
 
-        $applicationUrl = $this->dbConnection->fetchFirstColumn(
-            'SELECT value FROM `server_setting` WHERE `key` = ?',
-            [self::APPLICATION_URL_KEY],
-        );
+        return (string)$value === '' ? null : (string)$value;
+    }
 
-        return empty($applicationUrl[0]) === true ? null : $applicationUrl[0];
+    public function getFromAddress() : ?string
+    {
+        try {
+            $value = $this->config->getAsString(self::SMPT_FROM_ADDRESS);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMPT_FROM_ADDRESS);
+        }
+
+        return (string)$value === '' ? null : (string)$value;
+    }
+
+    public function getSmtpHost() : ?string
+    {
+        try {
+            $value = $this->config->getAsString(self::SMPT_HOST);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMPT_HOST);
+        }
+
+        return (string)$value === '' ? null : (string)$value;
+    }
+
+    public function getSmtpHostAddress() : ?string
+    {
+        try {
+            $value = $this->config->getAsString(self::SMPT_HOST_SENDER_ADDRESS);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMPT_HOST_SENDER_ADDRESS);
+        }
+
+        return (string)$value === '' ? null : (string)$value;
+    }
+
+    public function getSmtpPassword() : ?string
+    {
+        try {
+            $value = $this->config->getAsString(self::SMPT_PASSWORD);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMPT_PASSWORD);
+        }
+
+        return (string)$value === '' ? null : (string)$value;
+    }
+
+    public function getSmtpPort() : ?int
+    {
+        try {
+            $value = $this->config->getAsString(self::SMPT_PORT);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMPT_PORT);
+        }
+
+        return (string)$value === '' ? null : (int)$value;
+    }
+
+    public function getSmtpUser() : ?string
+    {
+        try {
+            $value = $this->config->getAsString(self::SMPT_USER);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMPT_USER);
+        }
+
+        return (string)$value === '' ? null : (string)$value;
+    }
+
+    public function getSmtpWithAuthentication() : ?bool
+    {
+        try {
+            $value = $this->config->getAsString(self::SMPT_WITH_AUTH);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMPT_WITH_AUTH);
+        }
+
+        return (string)$value === '' ? null : (bool)$value;
     }
 
     public function getTmdbApiKey() : ?string
     {
-        if ($this->isTmdbApiKeySetInEnvironment() === true) {
-            return $this->config->getAsString('TMDB_API_KEY');
+        try {
+            $value = $this->config->getAsString(self::TMDB_API_KEY);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::TMDB_API_KEY);
         }
 
-        $tmdbApiKey = $this->dbConnection->fetchFirstColumn(
-            'SELECT value FROM `server_setting` WHERE `key` = ?',
-            [self::TMDB_API_KEY],
-        );
-
-        return empty($tmdbApiKey[0]) === true ? null : $tmdbApiKey[0];
+        return (string)$value === '' ? null : (string)$value;
     }
 
     public function isApplicationUrlSetInEnvironment() : bool
     {
+        return $this->isSetInEnvironment(self::APPLICATION_URL);
+    }
+
+    public function isSetInEnvironment(string $key) : bool
+    {
         try {
-            $tmdbApiKey = $this->config->getAsString('APPLICATION_URL');
+            $this->config->getAsString($key);
         } catch (\OutOfBoundsException) {
             return false;
         }
 
-        return empty($tmdbApiKey) === false;
+        return true;
+    }
+
+    public function isSmtpFromAddressSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::SMPT_FROM_ADDRESS);
+    }
+
+    public function isSmtpHostSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::SMPT_HOST);
+    }
+
+    public function isSmtpPasswordSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::SMPT_PASSWORD);
+    }
+
+    public function isSmtpPortSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::SMPT_PORT);
+    }
+
+    public function isSmtpUserSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::SMPT_USER);
+    }
+
+    public function isSmtpWithAuthenticationSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::SMPT_FROM_ADDRESS);
     }
 
     public function isTmdbApiKeySetInEnvironment() : bool
     {
-        try {
-            $tmdbApiKey = $this->config->getAsString('TMDB_API_KEY');
-        } catch (\OutOfBoundsException) {
-            return false;
-        }
-
-        return empty($tmdbApiKey) === false;
+        return $this->isSetInEnvironment(self::TMDB_API_KEY);
     }
 
     public function setApplicationUrl(string $applicationUrl) : void
     {
-        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([self::APPLICATION_URL_KEY]);
-        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$applicationUrl, self::APPLICATION_URL_KEY]);
+        $this->updateValue(self::APPLICATION_URL, $applicationUrl);
+    }
+
+    public function setSmptFromAddress(string $smtpFromAddress) : void
+    {
+        $this->updateValue(self::SMPT_FROM_ADDRESS, $smtpFromAddress);
+    }
+
+    public function setSmptFromWithAuthentication(bool $smtpFromWithAuthentication) : void
+    {
+        $this->updateValue(self::SMPT_WITH_AUTH, $smtpFromWithAuthentication);
+    }
+
+    public function setSmptHost(string $smtpHost) : void
+    {
+        $this->updateValue(self::SMPT_HOST, $smtpHost);
+    }
+
+    public function setSmptPassword(string $smtpPassword) : void
+    {
+        $this->updateValue(self::SMPT_PASSWORD, $smtpPassword);
+    }
+
+    public function setSmptPort(string $smtpPort) : void
+    {
+        $this->updateValue(self::SMPT_PORT, $smtpPort);
+    }
+
+    public function setSmptUser(string $smtpUser) : void
+    {
+        $this->updateValue(self::SMPT_USER, $smtpUser);
     }
 
     public function setTmdbApiKey(string $tmdbApiKey) : void
     {
-        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([self::TMDB_API_KEY]);
-        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([$tmdbApiKey, self::TMDB_API_KEY]);
+        $this->updateValue(self::TMDB_API_KEY, $tmdbApiKey);
+    }
+
+    private function convertEnvironmentKeyToDatabaseKey(string $environmentKey) : string
+    {
+        return lcfirst(str_replace('_', '', ucwords(strtolower($environmentKey), '_')));
+    }
+
+    private function fetchValueFromDatabase(string $environmentKey) : ?string
+    {
+        $value = $this->dbConnection->fetchFirstColumn(
+            'SELECT value FROM `server_setting` WHERE `key` = ?',
+            [$this->convertEnvironmentKeyToDatabaseKey($environmentKey)],
+        );
+
+        return isset($value[0]) === false ? null : (string)$value[0];
+    }
+
+    private function updateValue(string $environmentKey, mixed $value) : void
+    {
+        $key = $this->convertEnvironmentKeyToDatabaseKey($environmentKey);
+
+        $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([$key]);
+        $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([(string)$value, $key]);
     }
 }
