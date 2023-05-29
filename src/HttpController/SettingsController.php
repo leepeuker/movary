@@ -620,6 +620,7 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function updateServerEmail(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {

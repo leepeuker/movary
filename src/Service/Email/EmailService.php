@@ -20,13 +20,11 @@ class EmailService
         $this->phpMailer->Host = $smtpConfig->getHost();
         $this->phpMailer->Port = $smtpConfig->getPort();
         $this->phpMailer->setFrom($smtpConfig->getFromAddress());
-        if ($smtpConfig->getEncryption() !== null) {
-            $this->phpMailer->SMTPSecure = $smtpConfig->getEncryption();
-        }
+        $this->phpMailer->SMTPSecure = (string)$smtpConfig->getEncryption();
 
         $this->phpMailer->SMTPAuth = $smtpConfig->isWithAuthentication();
-        $this->phpMailer->Username = $smtpConfig->getUser();
-        $this->phpMailer->Password = $smtpConfig->getPassword();
+        $this->phpMailer->Username = (string)$smtpConfig->getUser();
+        $this->phpMailer->Password = (string)$smtpConfig->getPassword();
 
         $this->phpMailer->addAddress($targetEmailAddress);
         $this->phpMailer->Subject = $subject;
