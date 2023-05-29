@@ -51,19 +51,6 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="smtpFromAddressInput" class="form-label">
-                        <b>From Address</b>
-                    </label>
-                    <input type="text"
-                           class="form-control"
-                           value="{{ smtpFromAddress }}"
-                           id="smtpFromAddressInput"
-                           style="text-align: center;"
-                            {{ smtpFromAddressSetInEnv == true ? 'disabled' }}
-                    >
-                </div>
-
-                <div class="mb-3">
                     <label for="smtpEncryptionInput" class="form-label">
                         <b>SMTP Encryption</b>
                     </label>
@@ -77,6 +64,19 @@
                         <option value="tsl" {% if smtpEncryption == 'tsl' %}selected{% endif %}>TSL</option>
 
                     </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtpFromAddressInput" class="form-label">
+                        <b>From Address</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ smtpFromAddress }}"
+                           id="smtpFromAddressInput"
+                           style="text-align: center;"
+                            {{ smtpFromAddressSetInEnv == true ? 'disabled' }}
+                    >
                 </div>
 
                 <div style="padding-bottom: 1rem;padding-top: 0.5rem">
