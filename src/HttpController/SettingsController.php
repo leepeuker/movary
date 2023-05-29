@@ -9,6 +9,7 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Letterboxd\LetterboxdExporter;
@@ -483,12 +484,16 @@ class SettingsController
             isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
         );
 
-        $this->emailService->sendEmail(
-            $requestData['recipient'],
-            'Movary test email',
-            'Test content',
-            $smtpConfig,
-        );
+        try {
+            $this->emailService->sendEmail(
+                $requestData['recipient'],
+                'Movary test email',
+                'Test content',
+                $smtpConfig,
+            );
+        } catch (CannotSendEmailException $e) {
+            return Response::createBadRequest($e->getMessage());
+        }
 
         return Response::createOk();
     }

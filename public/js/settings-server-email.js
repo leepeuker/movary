@@ -50,10 +50,15 @@ function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWi
     });
 }
 
+const testEmailModal = new bootstrap.Modal('#testEmailModal')
+
 document.getElementById('emailSettingsTestButton').addEventListener('click', async () => {
-    const testEmailModal = new bootstrap.Modal('#testEmailModal')
     testEmailModal.show()
 });
+
+document.getElementById('testEmailModal').addEventListener('show.bs.modal', function () {
+    removeAlert('testEmailModalAlerts')
+})
 
 document.getElementById('sendTestEmailButton').addEventListener('click', async () => {
     const recipient = document.getElementById('testEmailAddressRecipientInput').value;
@@ -89,8 +94,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
         case 400:
             const errorMessage = await response.text();
 
-            tmdbApiKeyInput.classList.add('invalid-input');
-            addAlert('testEmailModalAlerts', errorMessage, 'danger');
+            addAlert('testEmailModalAlerts', 'Error: ' + errorMessage, 'danger');
 
             return;
         default:

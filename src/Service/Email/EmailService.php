@@ -16,6 +16,14 @@ class EmailService
     {
         $this->phpMailer->SMTPDebug = SMTP::DEBUG_OFF;
 
+        if ($smtpConfig->getHost() === '') {
+            throw new CannotSendEmailException('SMTP host must be set.');
+        }
+
+        if ($smtpConfig->getPort() === 0) {
+            throw new CannotSendEmailException('SMTP port must be set.');
+        }
+
         $this->phpMailer->isSMTP();
         $this->phpMailer->Host = $smtpConfig->getHost();
         $this->phpMailer->Port = $smtpConfig->getPort();
@@ -31,7 +39,7 @@ class EmailService
         $this->phpMailer->Body = $htmlMessage;
 
         if ($this->phpMailer->send() === false || $this->phpMailer->isError() === true) {
-            throw new \RuntimeException($this->phpMailer->ErrorInfo);
+            throw new CannotSendEmailException($this->phpMailer->ErrorInfo);
         }
     }
 }
