@@ -485,8 +485,8 @@ class SettingsController
         try {
             $this->emailService->sendEmail(
                 $requestData['recipient'],
-                'Movary test email',
-                'Test content',
+                'Movary: Test Email',
+                'This is a test email sent to check the currently set email settings. It seems to work!',
                 $smtpConfig,
             );
         } catch (CannotSendEmailException $e) {
