@@ -466,10 +466,8 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $currentUser = $this->authenticationService->getCurrentUser();
-
-        if ($currentUser->isAdmin() === false) {
-            return Response::createForbidden();
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
         }
 
         $requestData = Json::decode($request->getBody());
