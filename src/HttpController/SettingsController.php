@@ -9,6 +9,8 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\Email\EmailService;
+use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
@@ -38,6 +40,7 @@ class SettingsController
         private readonly ServerSettings $serverSettings,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly JobQueueApi $jobQueueApi,
+        private readonly EmailService $emailService,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -356,6 +359,8 @@ class SettingsController
                 'smtpPortSetInEnv' => $this->serverSettings->isSmtpPortSetInEnvironment(),
                 'smtpFromAddress' => $this->serverSettings->getFromAddress(),
                 'smtpFromAddressSetInEnv' => $this->serverSettings->isSmtpFromAddressSetInEnvironment(),
+                'smtpEncryption' => $this->serverSettings->getSmtpEncryption(),
+                'smtpEncryptionSetInEnv' => $this->serverSettings->isSmtpEncryptionSetInEnvironment(),
                 'smtpWithAuthentication' => $this->serverSettings->getSmtpWithAuthentication(),
                 'smtpWithAuthenticationSetInEnv' => $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment(),
                 'smtpUser' => $this->serverSettings->getSmtpUser(),
@@ -452,6 +457,40 @@ class SettingsController
                 'lastTraktImportJobs' => $this->workerService->findLastTraktImportsForUser($user->getId()),
             ]),
         );
+    }
+
+    public function sendTestEmail(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $currentUser = $this->authenticationService->getCurrentUser();
+
+        if ($currentUser->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $smtpConfig = SmtpConfig::create(
+            (string)$requestData['smtpHost'],
+            (int)$requestData['smtpPort'],
+            (string)$requestData['smtpFromAddress'],
+            (string)$requestData['smtpEncryption'],
+            (bool)$requestData['smtpWithAuthentication'],
+            isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
+            isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
+        );
+
+        $this->emailService->sendEmail(
+            $requestData['recipient'],
+            'Movary test email',
+            'Test content',
+            $smtpConfig,
+        );
+
+        return Response::createOk();
     }
 
     public function traktVerifyCredentials(Request $request) : Response
@@ -596,27 +635,31 @@ class SettingsController
         $smtpHost = isset($requestData['smtpHost']) === false ? null : $requestData['smtpHost'];
         $smtpPort = isset($requestData['smtpPort']) === false ? null : $requestData['smtpPort'];
         $smtpFromAddress = isset($requestData['smtpFromAddress']) === false ? null : $requestData['smtpFromAddress'];
+        $smtpEncryption = isset($requestData['smtpEncryption']) === false ? null : $requestData['smtpEncryption'];
         $smtpWithAuthentication = isset($requestData['smtpWithAuthentication']) === false ? null : (bool)$requestData['smtpWithAuthentication'];
         $smtpUser = isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'];
         $smtpPassword = isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'];
 
         if ($smtpHost !== null) {
-            $this->serverSettings->setSmptHost($smtpHost);
+            $this->serverSettings->setSmtpHost($smtpHost);
         }
         if ($smtpPort !== null) {
-            $this->serverSettings->setSmptPort($smtpPort);
+            $this->serverSettings->setSmtpPort($smtpPort);
         }
         if ($smtpFromAddress !== null) {
-            $this->serverSettings->setSmptFromAddress($smtpFromAddress);
+            $this->serverSettings->setSmtpFromAddress($smtpFromAddress);
+        }
+        if ($smtpEncryption !== null) {
+            $this->serverSettings->setSmtpEncryption($smtpEncryption);
         }
         if ($smtpWithAuthentication !== null) {
-            $this->serverSettings->setSmptFromWithAuthentication($smtpWithAuthentication);
+            $this->serverSettings->setSmtpFromWithAuthentication($smtpWithAuthentication);
         }
         if ($smtpUser !== null) {
-            $this->serverSettings->setSmptUser($smtpUser);
+            $this->serverSettings->setSmtpUser($smtpUser);
         }
         if ($smtpPassword !== null) {
-            $this->serverSettings->setSmptPassword($smtpPassword);
+            $this->serverSettings->setSmtpPassword($smtpPassword);
         }
 
         return Response::createOk();

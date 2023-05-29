@@ -26,6 +26,7 @@ use Movary\HttpController\LandingPageController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
+use Movary\Service\Email\EmailService;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdExporter;
@@ -241,6 +242,7 @@ class Factory
             $container->get(ServerSettings::class),
             $container->get(WebhookUrlBuilder::class),
             $container->get(JobQueueApi::class),
+            $container->get(EmailService::class),
             self::getApplicationVersion($config)
         );
     }

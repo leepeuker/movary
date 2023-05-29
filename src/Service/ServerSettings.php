@@ -8,13 +8,14 @@ use Movary\ValueObject\Config;
 class ServerSettings
 {
     private const APPLICATION_URL = 'APPLICATION_URL';
-    private const SMPT_HOST = 'SMPT_HOST';
-    private const SMPT_HOST_SENDER_ADDRESS = 'SMPT_HOST_SENDER_ADDRESS';
-    private const SMPT_PASSWORD = 'SMPT_PASSWORD';
-    private const SMPT_PORT = 'SMPT_PORT';
-    private const SMPT_USER = 'SMPT_USER';
-    private const SMPT_FROM_ADDRESS = 'SMPT_FROM_ADDRESS';
-    private const SMPT_WITH_AUTH = 'SMPT_WITH_AUTH';
+    private const SMTP_HOST = 'SMTP_HOST';
+    private const SMTP_HOST_SENDER_ADDRESS = 'SMTP_HOST_SENDER_ADDRESS';
+    private const SMTP_PASSWORD = 'SMTP_PASSWORD';
+    private const SMTP_PORT = 'SMTP_PORT';
+    private const SMTP_USER = 'SMTP_USER';
+    private const SMTP_FROM_ADDRESS = 'SMTP_FROM_ADDRESS';
+    private const SMTP_ENCRYPTION = 'SMTP_ENCRYPTION';
+    private const SMTP_WITH_AUTH = 'SMTP_WITH_AUTH';
     private const TMDB_API_KEY = 'TMDB_API_KEY';
 
     public function __construct(
@@ -37,9 +38,20 @@ class ServerSettings
     public function getFromAddress() : ?string
     {
         try {
-            $value = $this->config->getAsString(self::SMPT_FROM_ADDRESS);
+            $value = $this->config->getAsString(self::SMTP_FROM_ADDRESS);
         } catch (\OutOfBoundsException) {
-            $value = $this->fetchValueFromDatabase(self::SMPT_FROM_ADDRESS);
+            $value = $this->fetchValueFromDatabase(self::SMTP_FROM_ADDRESS);
+        }
+
+        return (string)$value === '' ? null : (string)$value;
+    }
+
+    public function getSmtpEncryption() : ?string
+    {
+        try {
+            $value = $this->config->getAsString(self::SMTP_ENCRYPTION);
+        } catch (\OutOfBoundsException) {
+            $value = $this->fetchValueFromDatabase(self::SMTP_ENCRYPTION);
         }
 
         return (string)$value === '' ? null : (string)$value;
@@ -48,9 +60,9 @@ class ServerSettings
     public function getSmtpHost() : ?string
     {
         try {
-            $value = $this->config->getAsString(self::SMPT_HOST);
+            $value = $this->config->getAsString(self::SMTP_HOST);
         } catch (\OutOfBoundsException) {
-            $value = $this->fetchValueFromDatabase(self::SMPT_HOST);
+            $value = $this->fetchValueFromDatabase(self::SMTP_HOST);
         }
 
         return (string)$value === '' ? null : (string)$value;
@@ -59,9 +71,9 @@ class ServerSettings
     public function getSmtpHostAddress() : ?string
     {
         try {
-            $value = $this->config->getAsString(self::SMPT_HOST_SENDER_ADDRESS);
+            $value = $this->config->getAsString(self::SMTP_HOST_SENDER_ADDRESS);
         } catch (\OutOfBoundsException) {
-            $value = $this->fetchValueFromDatabase(self::SMPT_HOST_SENDER_ADDRESS);
+            $value = $this->fetchValueFromDatabase(self::SMTP_HOST_SENDER_ADDRESS);
         }
 
         return (string)$value === '' ? null : (string)$value;
@@ -70,9 +82,9 @@ class ServerSettings
     public function getSmtpPassword() : ?string
     {
         try {
-            $value = $this->config->getAsString(self::SMPT_PASSWORD);
+            $value = $this->config->getAsString(self::SMTP_PASSWORD);
         } catch (\OutOfBoundsException) {
-            $value = $this->fetchValueFromDatabase(self::SMPT_PASSWORD);
+            $value = $this->fetchValueFromDatabase(self::SMTP_PASSWORD);
         }
 
         return (string)$value === '' ? null : (string)$value;
@@ -81,9 +93,9 @@ class ServerSettings
     public function getSmtpPort() : ?int
     {
         try {
-            $value = $this->config->getAsString(self::SMPT_PORT);
+            $value = $this->config->getAsString(self::SMTP_PORT);
         } catch (\OutOfBoundsException) {
-            $value = $this->fetchValueFromDatabase(self::SMPT_PORT);
+            $value = $this->fetchValueFromDatabase(self::SMTP_PORT);
         }
 
         return (string)$value === '' ? null : (int)$value;
@@ -92,9 +104,9 @@ class ServerSettings
     public function getSmtpUser() : ?string
     {
         try {
-            $value = $this->config->getAsString(self::SMPT_USER);
+            $value = $this->config->getAsString(self::SMTP_USER);
         } catch (\OutOfBoundsException) {
-            $value = $this->fetchValueFromDatabase(self::SMPT_USER);
+            $value = $this->fetchValueFromDatabase(self::SMTP_USER);
         }
 
         return (string)$value === '' ? null : (string)$value;
@@ -103,9 +115,9 @@ class ServerSettings
     public function getSmtpWithAuthentication() : ?bool
     {
         try {
-            $value = $this->config->getAsString(self::SMPT_WITH_AUTH);
+            $value = $this->config->getAsString(self::SMTP_WITH_AUTH);
         } catch (\OutOfBoundsException) {
-            $value = $this->fetchValueFromDatabase(self::SMPT_WITH_AUTH);
+            $value = $this->fetchValueFromDatabase(self::SMTP_WITH_AUTH);
         }
 
         return (string)$value === '' ? null : (bool)$value;
@@ -138,34 +150,39 @@ class ServerSettings
         return true;
     }
 
+    public function isSmtpEncryptionSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::SMTP_ENCRYPTION);
+    }
+
     public function isSmtpFromAddressSetInEnvironment() : bool
     {
-        return $this->isSetInEnvironment(self::SMPT_FROM_ADDRESS);
+        return $this->isSetInEnvironment(self::SMTP_FROM_ADDRESS);
     }
 
     public function isSmtpHostSetInEnvironment() : bool
     {
-        return $this->isSetInEnvironment(self::SMPT_HOST);
+        return $this->isSetInEnvironment(self::SMTP_HOST);
     }
 
     public function isSmtpPasswordSetInEnvironment() : bool
     {
-        return $this->isSetInEnvironment(self::SMPT_PASSWORD);
+        return $this->isSetInEnvironment(self::SMTP_PASSWORD);
     }
 
     public function isSmtpPortSetInEnvironment() : bool
     {
-        return $this->isSetInEnvironment(self::SMPT_PORT);
+        return $this->isSetInEnvironment(self::SMTP_PORT);
     }
 
     public function isSmtpUserSetInEnvironment() : bool
     {
-        return $this->isSetInEnvironment(self::SMPT_USER);
+        return $this->isSetInEnvironment(self::SMTP_USER);
     }
 
     public function isSmtpWithAuthenticationSetInEnvironment() : bool
     {
-        return $this->isSetInEnvironment(self::SMPT_FROM_ADDRESS);
+        return $this->isSetInEnvironment(self::SMTP_FROM_ADDRESS);
     }
 
     public function isTmdbApiKeySetInEnvironment() : bool
@@ -178,34 +195,43 @@ class ServerSettings
         $this->updateValue(self::APPLICATION_URL, $applicationUrl);
     }
 
-    public function setSmptFromAddress(string $smtpFromAddress) : void
+    public function setSmtpEncryption(string $smtpEncryption) : void
     {
-        $this->updateValue(self::SMPT_FROM_ADDRESS, $smtpFromAddress);
+        if ($smtpEncryption === '') {
+            $smtpEncryption = null;
+        }
+
+        $this->updateValue(self::SMTP_ENCRYPTION, $smtpEncryption);
     }
 
-    public function setSmptFromWithAuthentication(bool $smtpFromWithAuthentication) : void
+    public function setSmtpFromAddress(string $smtpFromAddress) : void
     {
-        $this->updateValue(self::SMPT_WITH_AUTH, $smtpFromWithAuthentication);
+        $this->updateValue(self::SMTP_FROM_ADDRESS, $smtpFromAddress);
     }
 
-    public function setSmptHost(string $smtpHost) : void
+    public function setSmtpFromWithAuthentication(bool $smtpFromWithAuthentication) : void
     {
-        $this->updateValue(self::SMPT_HOST, $smtpHost);
+        $this->updateValue(self::SMTP_WITH_AUTH, $smtpFromWithAuthentication);
     }
 
-    public function setSmptPassword(string $smtpPassword) : void
+    public function setSmtpHost(string $smtpHost) : void
     {
-        $this->updateValue(self::SMPT_PASSWORD, $smtpPassword);
+        $this->updateValue(self::SMTP_HOST, $smtpHost);
     }
 
-    public function setSmptPort(string $smtpPort) : void
+    public function setSmtpPassword(string $smtpPassword) : void
     {
-        $this->updateValue(self::SMPT_PORT, $smtpPort);
+        $this->updateValue(self::SMTP_PASSWORD, $smtpPassword);
     }
 
-    public function setSmptUser(string $smtpUser) : void
+    public function setSmtpPort(string $smtpPort) : void
     {
-        $this->updateValue(self::SMPT_USER, $smtpUser);
+        $this->updateValue(self::SMTP_PORT, $smtpPort);
+    }
+
+    public function setSmtpUser(string $smtpUser) : void
+    {
+        $this->updateValue(self::SMTP_USER, $smtpUser);
     }
 
     public function setTmdbApiKey(string $tmdbApiKey) : void

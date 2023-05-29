@@ -135,6 +135,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
+        '/settings/server/email-test',
+        [\Movary\HttpController\SettingsController::class, 'sendTestEmail'],
+    );
+    $routeCollector->addRoute(
+        'POST',
         '/settings/account',
         [\Movary\HttpController\SettingsController::class, 'updateGeneral'],
     );

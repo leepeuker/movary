@@ -26,7 +26,7 @@
 
                 <div class="mb-3">
                     <label for="smtpHostInput" class="form-label">
-                        <b>SMTP Host <span class="text-danger" id="userModalPasswordInputRequiredStar">*</span></b>
+                        <b>SMTP Host</b>
                     </label>
                     <input type="text"
                            class="form-control"
@@ -39,7 +39,7 @@
 
                 <div class="mb-3">
                     <label for="smtpPortInput" class="form-label">
-                        <b>SMTP Port <span class="text-danger" id="userModalPasswordInputRequiredStar">*</span></b>
+                        <b>SMTP Port</b>
                     </label>
                     <input type="text"
                            class="form-control"
@@ -52,7 +52,7 @@
 
                 <div class="mb-3">
                     <label for="smtpFromAddressInput" class="form-label">
-                        <b>From Address <span class="text-danger" id="userModalPasswordInputRequiredStar">*</span></b>
+                        <b>From Address</b>
                     </label>
                     <input type="text"
                            class="form-control"
@@ -61,6 +61,22 @@
                            style="text-align: center;"
                             {{ smtpFromAddressSetInEnv == true ? 'disabled' }}
                     >
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtpEncryptionInput" class="form-label">
+                        <b>SMTP Encryption</b>
+                    </label>
+                    <select class="form-control"
+                            id="smtpEncryptionInput"
+                            style="text-align: center;"
+                            {{ smtpEncryptionSetInEnv == true ? 'disabled' }}
+                    >
+                        <option value="" {% if smtpEncryption == '' %}selected{% endif %}>None</option>
+                        <option value="ssl" {% if smtpEncryption == 'ssl' %}selected{% endif %}>SSL</option>
+                        <option value="tsl" {% if smtpEncryption == 'tsl' %}selected{% endif %}>TSL</option>
+
+                    </select>
                 </div>
 
                 <div style="padding-bottom: 1rem;padding-top: 0.5rem">
@@ -106,5 +122,7 @@
                 <button type="submit" class="btn btn-primary" id="emailSettingsUpdateButton">Submit</button>
             </div>
         </div>
+
+        {{ include('component/modal-test-email.html.twig') }}
     </main>
 {% endblock %}

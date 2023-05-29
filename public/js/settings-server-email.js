@@ -1,53 +1,17 @@
 const smtpHostInput = document.getElementById('smtpHostInput');
 const smtpPortInput = document.getElementById('smtpPortInput');
+const smtpEncryptionInput = document.getElementById('smtpEncryptionInput');
 const smtpFromAddressInput = document.getElementById('smtpFromAddressInput');
 const smtpWithAuthenticationInput = document.getElementById('smtpWithAuthenticationInput');
 const smtpUserInput = document.getElementById('smtpUserInput');
 const smtpPasswordInput = document.getElementById('smtpPasswordInput');
 
 document.getElementById('emailSettingsUpdateButton').addEventListener('click', async () => {
-    smtpHostInput.classList.remove('invalid-input');
-    smtpPortInput.classList.remove('invalid-input');
-    smtpFromAddressInput.classList.remove('invalid-input');
-
-    let smtpHostValue = null;
-    let smtpPortValue = null;
-    let smtpFromAddressInputValue = null;
-
-    let error = false
-
-    if (smtpHostInput.disabled === false) {
-        smtpHostValue = smtpHostInput.value;
-        if (smtpHostValue === '') {
-            smtpHostInput.classList.add('invalid-input');
-            error = true
-        }
-    }
-    if (smtpPortInput.disabled === false) {
-        smtpPortValue = smtpPortInput.value;
-        if (smtpPortValue === '') {
-            smtpPortInput.classList.add('invalid-input');
-            error = true
-        }
-    }
-    if (smtpFromAddressInput.disabled === false) {
-        smtpFromAddressInputValue = smtpFromAddressInput.value;
-        if (smtpFromAddressInputValue === '') {
-            smtpFromAddressInput.classList.add('invalid-input');
-            error = true
-        }
-    }
-
-    if (error === true) {
-        addAlert('alertEmailDiv', 'Please enter missing SMPT information', 'danger');
-
-        return
-    }
-
     const response = await updateEmail(
-        smtpHostValue,
-        smtpPortValue,
-        smtpFromAddressInputValue,
+        smtpHostInput.value,
+        smtpPortInput.value,
+        smtpFromAddressInput.value,
+        smtpEncryptionInput.value,
         smtpWithAuthenticationInput.value,
         smtpUserInput.value,
         smtpPasswordInput.value
@@ -70,13 +34,79 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
     }
 });
 
-function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpWithAuthentication, smtpUser, smtpPassword) {
+function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
     return fetch('/settings/server/email', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({
             'smtpHost': smtpHost,
             'smtpPort': smtpPort,
+            'smtpFromAddress': smtpFromAddress,
+            'smtpEncryption': smtpEncryption,
+            'smtpWithAuthentication': smtpWithAuthentication,
+            'smtpUser': smtpUser,
+            'smtpPassword': smtpPassword
+        })
+    });
+}
+
+document.getElementById('emailSettingsTestButton').addEventListener('click', async () => {
+    const testEmailModal = new bootstrap.Modal('#testEmailModal')
+    testEmailModal.show()
+});
+
+document.getElementById('sendTestEmailButton').addEventListener('click', async () => {
+    const recipient = document.getElementById('testEmailAddressRecipientInput').value;
+    const loadingSpinner = document.getElementById('testEmailLoadingSpinner');
+
+    if (recipient === '') {
+        addAlert('testEmailModalAlerts', 'Recipient email address must be set.', 'danger');
+
+        return;
+    }
+
+    removeAlert('testEmailModalAlerts')
+    loadingSpinner.classList.remove('d-none')
+
+    const response = await testEmail(
+        recipient,
+        smtpHostInput.value,
+        smtpPortInput.value,
+        smtpFromAddressInput.value,
+        smtpEncryptionInput.value,
+        smtpWithAuthenticationInput.value,
+        smtpUserInput.value,
+        smtpPasswordInput.value
+    );
+
+    loadingSpinner.classList.add('d-none')
+
+    switch (response.status) {
+        case 200:
+            addAlert('testEmailModalAlerts', 'Test email was successfully sent', 'success');
+
+            return;
+        case 400:
+            const errorMessage = await response.text();
+
+            tmdbApiKeyInput.classList.add('invalid-input');
+            addAlert('testEmailModalAlerts', errorMessage, 'danger');
+
+            return;
+        default:
+            addAlert('testEmailModalAlerts', 'Could not send email. Check app logs for more details.', 'danger');
+    }
+});
+
+function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
+    return fetch('/settings/server/email-test', {
+        method: 'POST', headers: {
+            'Content-Type': 'application/json'
+        }, body: JSON.stringify({
+            'recipient': recipient,
+            'smtpHost': smtpHost,
+            'smtpPort': smtpPort,
+            'smtpEncryption': smtpEncryption,
             'smtpFromAddress': smtpFromAddress,
             'smtpWithAuthentication': smtpWithAuthentication,
             'smtpUser': smtpUser,

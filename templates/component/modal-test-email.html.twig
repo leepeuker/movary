@@ -1,0 +1,27 @@
+<div class="modal fade" id="testEmailModal" tabindex="-1" aria-labelledby="moreModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Test email settings</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding-bottom: 0!important;">
+                <div class="mb-3">
+                    <label for="testEmailAddressRecipientInput" class="form-label">Recipient Email Address <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="testEmailAddressRecipientInput" required>
+                </div>
+                <div class="text-center d-none" style="margin-top: .5rem;margin-bottom: 1rem" id="testEmailLoadingSpinner">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="testEmailModalAlerts"></div>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-primary" id="sendTestEmailButton">Send test email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
