@@ -98,7 +98,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
 
             return;
         default:
-            addAlert('testEmailModalAlerts', 'Could not send email. Check app logs for more details.', 'danger');
+            addAlert('testEmailModalAlerts', 'Unexpected server error.', 'danger');
     }
 });
 
