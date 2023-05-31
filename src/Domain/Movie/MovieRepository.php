@@ -563,8 +563,8 @@ class MovieRepository
             SELECT COUNT(DISTINCT m.id)
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            JOIN movie_genre mg on m.id = mg.movie_id
-            JOIN genre g on mg.genre_id = g.id
+            LEFT JOIN movie_genre mg on m.id = mg.movie_id
+            LEFT JOIN genre g on mg.genre_id = g.id
             $whereQuery
             SQL,
             $payload,
