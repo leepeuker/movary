@@ -1,8 +1,15 @@
 name: Copy docs directory content to docs webserver
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - docs/**
   release:
     types: [published]
+    paths:
+      - docs/**
 
 jobs:
 
