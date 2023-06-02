@@ -362,4 +362,4 @@ The application should be up-to-date and running locally now.
 ## Contributors
 
 * [@leepeuker](https://github.com/leepeuker) as Lee Peuker
-* [@JVT038](https://github.com/JVT038) as JVT038
+* [@JVT038](https://github.com/JVT038) as JVT038 
