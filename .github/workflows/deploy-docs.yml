@@ -1,0 +1,20 @@
+name: Copy docs directory content to docs webserver
+
+on:
+  release:
+    types: [published]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: copy files
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.DOCS_SSH_HOST }}
+          key: ${{ secrets.DOCS_SSH_KEY }}
+          source: "docs/*"
+          target: ${{ secrets.DOCS_DEPLOYMENT_DIRECTORY }}
