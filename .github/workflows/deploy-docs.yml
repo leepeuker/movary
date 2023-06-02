@@ -26,3 +26,5 @@ jobs:
           key: ${{ secrets.DOCS_SSH_KEY }}
           source: "docs/*"
           target: ${{ secrets.DOCS_DEPLOYMENT_DIRECTORY }}
+          rm: true
+          strip_components: 1
