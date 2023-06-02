@@ -355,7 +355,7 @@ The application should be up-to-date and running locally now.
 
 ## Support
 
-- Join the matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
+- Join the matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev) 
 - Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
 - Ask questions or discuss movary related topics in the [official subreddit](https://www.reddit.com/r/movary/)
 
