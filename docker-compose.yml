@@ -27,5 +27,12 @@ services:
     ports:
       - "${DATABASE_MYSQL_PORT}:3306"
 
+  mkdocs:
+    image: squidfunk/mkdocs-material:latest
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/docs:ro
+
 volumes:
   movary-database:
