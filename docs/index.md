@@ -6,7 +6,7 @@
 
 ## Introduction
 
-M0ovary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
+Movary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
 You can import/export your history and ratings from/to third parties like trakt.tv or letterboxd.com,
 automatically log your Plex/Jellyfin/Emby watches and much more.
 
