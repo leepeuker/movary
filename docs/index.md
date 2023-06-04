@@ -30,7 +30,7 @@ which can lead to sudden breaking changes until then, so keep the release notes 
 - PWA: Can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
 - Completely free, no ads, no tracking and open source! :)
 
-## Support 
+## Support  
 
 Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
 or visit the [official subreddit](https://www.reddit.com/r/movary/)!
