@@ -6,7 +6,7 @@
 [![License badge](https://img.shields.io/github/license/leepeuker/movary)](https://github.com/leepeuker/movary/blob/main/LICENSE)
 [![Matrix](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Matrix_icon.svg//18px-Matrix_icon.svg.png)](https://matrix.to/#/#movary:leepeuker.dev)
 
-Movary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
+Moovary is a self-hosted web application to track and rate your watched movies (like a digital movie diary).
 You can import/export your history and ratings from/to third parties like trakt.tv or letterboxd.com,
 scrobble your watches via Plex/Jellyfin/Emby and more.
 
