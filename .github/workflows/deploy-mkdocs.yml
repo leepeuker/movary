@@ -1,4 +1,4 @@
-name: Copy docs directory content to docs webserver
+name: Deploy mkdocs
 
 on:
   push:
@@ -30,4 +30,3 @@ jobs:
           source: "mkdocs.yml,docs/*"
           target: ${{ secrets.DOCS_DEPLOYMENT_DIRECTORY }}
           rm: true
-          strip_components: 1
