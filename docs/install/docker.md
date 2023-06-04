@@ -1,8 +1,8 @@
-This is the recommended way to run the app.
+It is recommended to run Movary with the official Docker image.
 
-You must provide a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
+You should provide at least a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
 
-Example using SQLite:
+Example using SQLite (easiest setup):
 
 ```shell
 $ docker volume create movary-storage

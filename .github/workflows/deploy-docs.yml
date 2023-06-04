@@ -4,12 +4,15 @@ on:
   push:
     branches:
       - main
+      - add-mkdocs-setup
     paths:
       - docs/**
+      - mkdocs.yml
   release:
     types: [published]
     paths:
       - docs/**
+      - mkdocs.yml
 
 jobs:
 
@@ -24,7 +27,7 @@ jobs:
           host: ${{ secrets.DOCS_SSH_HOST }}
           username: ${{ secrets.DOCS_SSH_USER }}
           key: ${{ secrets.DOCS_SSH_KEY }}
-          source: "docs/*"
+          source: "mkdocs.yml,docs/*"
           target: ${{ secrets.DOCS_DEPLOYMENT_DIRECTORY }}
           rm: true
           strip_components: 1
