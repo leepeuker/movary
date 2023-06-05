@@ -27,7 +27,7 @@ It provides statistics about your history,
 third party integrations to import/export from e.g. Trakt, Letterboxd or Netflix,
 automatically logs plays in Plex, Jellyfin or Emby and much [more](#features).
 
-![Movary Dashboard Example](docs/images/dashboard-screenshot.png)
+![Movary Dashboard Example](https://raw.githubusercontent.com/leepeuker/movary/main/docs/images/dashboard-screenshot.png)
 
 Demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`)
 
