@@ -11,7 +11,7 @@
 <a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?color=yellow&label=github%20stars" ></a>
 <a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/issues/leepeuker/movary?color=eba434&label=github%20issues" ></a>
 <a href="https://www.reddit.com/r/movary/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/reddit/subreddit-subscribers/movary" ></a>
-<a href="https://matrix.to/#/#movary-development:leepeuker.dev" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/matrix/movary-development:leepeuker.dev?label=support%20chat&server_fqdn=matrix.leepeuker.dev" ></a>
+<a href="https://matrix.to/#/#movary-support:leepeuker.dev" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/matrix/movary-support:leepeuker.dev?label=support%20chat&server_fqdn=matrix.leepeuker.dev" ></a>
 <a href="https://github.com/leepeuker/movary/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/license/leepeuker/movary" ></a>
 </p>
 
