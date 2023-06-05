@@ -25,12 +25,17 @@ theme:
     - content.action.edit
     - content.action.view
 
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
 nav:
   - Home: 'index.md'
   - Installation:
       - Docker (recommended): install/docker.md
       - Manual: install/manual.md
-  - First steps: 'first-steps.md'
+  - Getting started: 'getting-started.md'
   - Configuration: 'configuration.md'
   - Features:
       - TMDB Data: features/tmdb-data.md

@@ -1,4 +1,4 @@
-#### Available environment variables with their default values:
+## Environment variables
 
 | NAME                                        |      DEFAULT VALUE      | INFO                                                                    |
 |:--------------------------------------------|:-----------------------:|:------------------------------------------------------------------------|

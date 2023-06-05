@@ -1,8 +1,28 @@
-It is recommended to run Movary with the official Docker image.
+It is recommended to host Movary with the [official Docker image](https://hub.docker.com/r/leepeuker/movary).
 
-You should provide at least a tmdb api key (get one [here](https://www.themoviedb.org/settings/api)).
+A TMDB api key is necessary for Movary to work correctly (get one [here](https://www.themoviedb.org/settings/api)).
 
-Example using SQLite (easiest setup):
+The official docker image extends webdevops/php-nginx, checkout
+their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more configuration information.
+
+!!! Warning
+
+    After the **initial installation** and after **each update** execute the database migrations, example:
+
+    `docker exec movary php bin/console.php database:migration:migrate`
+
+    Missing database migrations can cause potentialy criticatal errors!
+
+!!! Info
+
+    All docker examples set the environment variable `TMDB_API_KEY`.
+    This is not required but recommend. 
+    The application will not work correctly at some places without it.
+
+
+## Example using SQLite
+
+This is the easiest setup and especially recommend for beginners
 
 ```shell
 $ docker volume create movary-storage
@@ -15,7 +35,7 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-Example using MySQL:
+## Example using MySQL
 
 ```shell
 $ docker volume create movary-storage
@@ -32,9 +52,9 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-Example docker-compose.yml with a MySQL server
+Here is a `docker-compose.yml` which includes a MySQL server
 
-```yml
+```yaml
 version: "3.5"
 
 services:
@@ -67,8 +87,3 @@ volumes:
   movary-db:
   movary-storage:
 ```
-
-More configuration can be done via the base image webdevops/php-nginx, checkout
-their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more.
-
-Continue with [First steps](../first-steps.md)...
