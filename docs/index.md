@@ -22,14 +22,12 @@
 <a href="https://demo.movary.org/" target="_blank" rel="noopener noreferrer">Demo</a>
 </p>
 
-Movary is a web application to track, rate and manage your movie watch history.
+Movary is free and open source web application to track, rate and manage your movie watch history.
 It provides statistics about your history,
 third party integrations to import/export from e.g. Trakt, Letterboxd or Netflix,
-automatically logs online plays in Plex, Jellyfin or Emby and much [more](#features).
+automatically logs plays in Plex, Jellyfin or Emby and much [more](#features).
 
-Most importantly: It is free, open source and wants to empower users to have full control over their personal data.
-
-![Movary Dashboard Example](https://i.imgur.com/1qvhWFh.png)
+![Movary Dashboard Example](images/dashboard-screenshot.png)
 
 Demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`)
 
