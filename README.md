@@ -15,8 +15,6 @@
 <a href="https://github.com/leepeuker/movary/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/license/leepeuker/movary" ></a>
 </p>
 
-
-
 <p align="center">
 <a href="https://movary.org" target="_blank" rel="noopener noreferrer">Website</a> •
 <a href="https://docs.movary.org/install/docker/" target="_blank" rel="noopener noreferrer">Installation</a> •
@@ -25,21 +23,21 @@
 </p>
 
 Movary is a web application to track, rate and manage your movie watch history.
-It provides statistics about your history, 
-third party integrations to import/export from e.g. Trakt, Letterboxd or Netflix, 
+It provides statistics about your history,
+third party integrations to import/export from e.g. Trakt, Letterboxd or Netflix,
 automatically logs online plays in Plex, Jellyfin or Emby and much [more](#features).
 
 Most importantly: It is free, open source and wants to empower users to have full control over their personal data.
 
 ![Movary Dashboard Example](https://i.imgur.com/1qvhWFh.png)
 
-Demo installation can be found [here](https://demo.movary.org/) (user `testUser@movary.org` and password `testUser`).
+Demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`)
 
 Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
 or visit the [official subreddit](https://www.reddit.com/r/movary/)!
 
-**Disclaimer:** This project is still in an experimental (but usable) state. 
-There are plans to add more and improve existing features before creating a 1.0 Release,
+**Disclaimer:** This project is still in an experimental (but usable) state.
+There are plans to add more and improve existing features before creating the 1.0 Release,
 which can lead to sudden breaking changes from time to time, so keep the release notes in mind when updating until then.
 
 ## Features
@@ -60,7 +58,6 @@ Movary has support for multiple users accounts in case you want to share your in
 - Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
 - Join the matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
 - Ask questions or discuss movary related topics in the [official subreddit](https://www.reddit.com/r/movary/)
-
 
 ## Contributors
 

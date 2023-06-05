@@ -31,13 +31,13 @@ Most importantly: It is free, open source and wants to empower users to have ful
 
 ![Movary Dashboard Example](https://i.imgur.com/1qvhWFh.png)
 
-Demo installation can be found [here](https://demo.movary.org/) (user `testUser@movary.org` and password `testUser`).
+Demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`)
 
 Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
 or visit the [official subreddit](https://www.reddit.com/r/movary/)!
 
 **Disclaimer:** This project is still in an experimental (but usable) state.
-There are plans to add more and improve existing features before creating a 1.0 Release,
+There are plans to add more and improve existing features before creating the 1.0 Release,
 which can lead to sudden breaking changes from time to time, so keep the release notes in mind when updating until then.
 
 ## Features
@@ -58,7 +58,6 @@ Movary has support for multiple users accounts in case you want to share your in
 - Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
 - Join the matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
 - Ask questions or discuss movary related topics in the [official subreddit](https://www.reddit.com/r/movary/)
-
 
 ## Contributors
 
