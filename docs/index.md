@@ -45,18 +45,17 @@ which can lead to sudden breaking changes from time to time, so keep the release
 - Scrobbler: Automatically add new plays and ratings from Plex, Jellyfin or Emby
 - Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
 - Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
-- PWA: Can be installed as an app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
+- PWA: Can be installed as a smartphone app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
+- User-management: Use Movary alone or with others
 - Completely free, no ads, no tracking and open source! :)
-
-Movary has support for multiple users accounts in case you want to share your instance, but was designed with only a small number of accounts in mind.
-
-## Documentation
-
-The documentation for the latest release is located [here](https://docs.movary.org). Please report missing or wrong information.
 
 ## Demo
 
 A demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`).
+
+## Documentation
+
+The documentation for the latest release is located [here](https://docs.movary.org). Please report missing or wrong information.
 
 ## Support
 
