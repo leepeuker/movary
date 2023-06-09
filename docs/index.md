@@ -50,9 +50,13 @@ which can lead to sudden breaking changes from time to time, so keep the release
 
 Movary has support for multiple users accounts in case you want to share your instance, but was designed with only a small number of accounts in mind.
 
+## Documentation
+
+The documentation for the latest release is located [here](https://docs.movary.org). Please report missing or wrong information.
+
 ## Demo
 
-A demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`)
+A demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`).
 
 ## Support
 
