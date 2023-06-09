@@ -1,5 +1,5 @@
 function moveItemUp(clickedElement) {
-    let row = clickedElement.closest('.nav-link');
+    let row = clickedElement.closest('.list-group-item');
     let firstChild = row.parentElement.firstElementChild;
     if(row === firstChild) {
         return;
@@ -9,7 +9,7 @@ function moveItemUp(clickedElement) {
 }
 
 function moveItemDown(clickedElement) {
-    let row = clickedElement.closest('.nav-link');
+    let row = clickedElement.closest('.list-group-item');
     let firstChild = row.parentElement.lastElementChild;
     if(row === firstChild) {
         return;

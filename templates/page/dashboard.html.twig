@@ -49,10 +49,10 @@
             <div class="list-group">
                 {% for row in rowOrder %}
                 {% if row == 'Last Plays' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }} {{ theme == 'dark' ? 'text-white' : 'activeItemButtonActiveLight' }}"
+                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}"
                     onclick="toggleButton(this)">
                     Last Plays
-                    <i class="bi bi-chevron-up float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 0.9rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -81,9 +81,9 @@
                     <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
                 {% elseif row == 'Most Watched Actors' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none  {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
                     Most watched Actors
-                    <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -107,9 +107,9 @@
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
                 {% elseif row == 'Most Watched Actresses' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
                     Most watched Actresses
-                    <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -133,9 +133,9 @@
                        style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
                 </li>
                 {% elseif row == 'Most Watched Directors' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
                     Most watched Directors
-                    <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -159,9 +159,9 @@
                     </div>
                 </li>
                 {% elseif row == 'Most Watched Genres' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
                     Most watched Genres
-                    <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -184,9 +184,9 @@
                     </div>
                 </li>
                 {% elseif row == 'Most Watched Languages' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
                     Most watched Languages
-                    <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -209,9 +209,9 @@
                     </div>
                 </li>
                 {% elseif row == 'Most Watched Production Companies' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
                     Most watched Production Companies
-                    <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
@@ -232,9 +232,9 @@
                     </div>
                 </li>
                 {% elseif row == 'Most Watched Release Years' %}
-                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? 'activeItemButton' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
+                <li class="list-group-item list-group-item-action user-select-none {{ row in extendedRows ? theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' : 'inactiveItemButton' }}" onclick="toggleButton(this)">
                     Most watched Release Years
-                    <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi {{ row in extendedRows ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
                 </li>
                 <li class="list-group-item {{ row in extendedRows ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
