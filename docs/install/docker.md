@@ -52,7 +52,9 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-Here is a `docker-compose.yml` which includes a MySQL server
+## Example docker compose with MySQL
+
+Here is a `docker-compose.yml` template
 
 ```yaml
 version: "3.5"

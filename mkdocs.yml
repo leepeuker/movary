@@ -39,7 +39,7 @@ nav:
   - Configuration: 'configuration.md'
   - Features:
       - TMDB Data: features/tmdb-data.md
-      - IMDB Rating: features/imdb-rating.md
+      - IMDb Rating: features/imdb-rating.md
       - Plex: features/plex.md
       - Jellyfin: features/jellyfin.md
       - Emby: features/emby.md

@@ -6,7 +6,7 @@ Clone the repository and follow these steps for a local development setup:
 
 The application should be up-to-date and running locally now.
 
-### Useful links:
+### Useful links
 
 - [Trakt API docs](https://trakt.docs.apiary.io/)
 - [TMDB API docs](https://developers.themoviedb.org/3)
