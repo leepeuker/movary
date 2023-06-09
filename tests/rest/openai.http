@@ -1,0 +1,13 @@
+POST https://api.openai.com/v1/chat/completions
+Authorization: Bearer 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
+Content-Type: application/json
+
+{
+  "model": "gpt-4",
+  "messages": [
+    {
+      "role": "user",
+      "content": "I have this app description: 'The central hub to track, rate and explore your entire movie watch history'. Can you improve this. Do not make it longer"
+    }
+  ]
+}

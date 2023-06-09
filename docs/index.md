@@ -6,6 +6,8 @@
   <br>
 </h1>
 
+<h4 align="center">The central hub to track, rate and explore your movie watch history</h4>
+
 <p align="center">
 <a href="https://hub.docker.com/r/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/docker/pulls/leepeuker/movary" ></a>
 <a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?color=yellow&label=github%20stars" ></a>
@@ -22,17 +24,14 @@
 <a href="https://demo.movary.org/" target="_blank" rel="noopener noreferrer">Demo</a>
 </p>
 
-Movary is free and open source web application to track, rate and manage your movie watch history.
-It provides statistics about your history,
-third party integrations to import/export from e.g. Trakt, Letterboxd or Netflix,
-automatically logs plays in Plex, Jellyfin or Emby and much [more](#features).
+Movary is free and open source web application to track, rate and explore your movie watch history.
+You can host it for yourself and others.
+It offers detailed statistics, 
+third-party integrations for importing and exporting your history from platforms like Trakt, Letterboxd, or Netflix,
+automated play tracking for Plex, Jellyfin or Emby and much [more](#features).
 
 ![Movary Dashboard Example](images/dashboard-screenshot.png)
 
-Demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`)
-
-Please report all bugs, improvement suggestions or feature wishes by creating [github issues](https://www.reddit.com/r/movary/)
-or visit the [official subreddit](https://www.reddit.com/r/movary/)!
 
 **Disclaimer:** This project is still in an experimental (but usable) state.
 There are plans to add more and improve existing features before creating the 1.0 Release,
@@ -40,9 +39,9 @@ which can lead to sudden breaking changes from time to time, so keep the release
 
 ## Features
 
-- Movie tracking: Collect and manage your watch history and ratings
-- Statistics: Overview over your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
-- Third party support: Import and export your history and ratings from/to third partys like letterboxd.com or trakt.tv
+- Movie watch history: Collect and manage your watch history and ratings
+- Statistics: View  your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
+- Third party integrations: Import and export your history and ratings from/to platforms like Trakt, Letterboxd, or Netflix
 - Plex/Jellyfin/Emby scrobbler: Automatically add new watches and ratings to Movary
 - Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
 - Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
@@ -51,11 +50,15 @@ which can lead to sudden breaking changes from time to time, so keep the release
 
 Movary has support for multiple users accounts in case you want to share your instance, but was designed with only a small number of accounts in mind.
 
+## Demo
+
+A demo installation can be found [here](https://demo.movary.org/) (User: `testUser@movary.org` Password:`testUser`)
+
 ## Support
 
-- Report bugs or request features via github [issues](https://github.com/leepeuker/movary/issues)
-- Join the matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
-- Ask questions or discuss movary related topics in the [official subreddit](https://www.reddit.com/r/movary/)
+- Please report bugs and request features/changes via [Github issues](https://github.com/leepeuker/movary/issues)
+- Ask for help or discuss related topics in the [Movary subreddit](https://www.reddit.com/r/movary/)
+- Join the Matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
 
 ## Contributors
 
