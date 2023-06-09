@@ -1,6 +1,5 @@
 <h1 align="center">
-  <br>
-  <a href="https://tandoor.dev"><img src="https://github.com/leepeuker/movary/raw/main/public/images/movary-logo-192x192.png" height="180px" width="180px"></a>
+  <a href="https://tandoor.dev"><img src="https://github.com/leepeuker/movary/raw/main/public/images/movary-logo-192x192.png" height="160px" width="160px"></a>
   <br>
   Movary
   <br>
@@ -10,7 +9,7 @@
 
 <p align="center">
 <a href="https://hub.docker.com/r/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/docker/pulls/leepeuker/movary" ></a>
-<a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?color=yellow&label=github%20stars" ></a>
+<a href="https://github.com/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?color=yellow&label=github%20stars" ></a>
 <a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/issues/leepeuker/movary?color=eba434&label=github%20issues" ></a>
 <a href="https://www.reddit.com/r/movary/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/reddit/subreddit-subscribers/movary" ></a>
 <a href="https://matrix.to/#/#movary-support:leepeuker.dev" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/matrix/movary-support:leepeuker.dev?label=support%20chat&server_fqdn=matrix.leepeuker.dev" ></a>
