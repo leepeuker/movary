@@ -5,19 +5,13 @@ It is recommended to host Movary with the [official Docker image](https://hub.do
 The official docker image extends the `webdevops/php-nginx` image, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more configuration information.
 
-!!! warning
+!!! danger
 
     After the **initial installation** and after **each image update** execute the database migrations, example:
 
     `docker exec movary php bin/console.php database:migration:migrate`
 
-    Missing database migrations can cause potentialy criticatal errors!
-
-!!! Info
-
-    All docker examples include the environment variable `TMDB_API_KEY` (get a key [here](https://www.themoviedb.org/settings/api)).
-    It is not strictly required to be set here but recommend. 
-    Many features of the application will not work correctly without it.
+    Missing database migrations can cause criticatal errors!
 
 ## Image tags
 
@@ -26,17 +20,23 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 
 ## Storage permissions
 
-The `storage` directory is used by Movary to store all its files (e.g. logs or images), which means Movary needs read/write access to it.
+The `/app/storage` directory is used to store all created files (e.g. logs and images).
+It should be persisted outside the container and Movary needs read/write access to it.
 
 The easiest way to do this are managed docker volumes (used in the examples below).
 
+!!! info
 
-!!! warning
+    If you bind a local mount, make sure the directory exists before you start the container
+    and that it has the necessary permissions/ownership.
 
-    If you bind a local mount, make sure the local directory exists before you start the container
-    and that it has the necessary permissions/ownership set.
+## Examples
 
-## Example using SQLite
+All examples include the environment variable `TMDB_API_KEY` (get a key [here](https://www.themoviedb.org/settings/api)).
+It is not strictly required to be set here but recommend. 
+Many features of the application will not work correctly without it.
+
+### With SQLite
 
 This is the easiest setup and especially recommend for beginners
 
@@ -51,7 +51,7 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-## Example using MySQL
+### With MySQL
 
 ```shell
 $ docker volume create movary-storage
@@ -68,7 +68,7 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-## Example docker compose with MySQL
+### With docker compose
 
 Here is a `docker-compose.yml` template
 
