@@ -1,13 +1,13 @@
+## Introduction
+
 It is recommended to host Movary with the [official Docker image](https://hub.docker.com/r/leepeuker/movary).
 
-A TMDB api key is necessary for Movary to work correctly (get one [here](https://www.themoviedb.org/settings/api)).
-
-The official docker image extends webdevops/php-nginx, checkout
+The official docker image extends the `webdevops/php-nginx` image, checkout
 their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more configuration information.
 
-!!! Warning
+!!! warning
 
-    After the **initial installation** and after **each update** execute the database migrations, example:
+    After the **initial installation** and after **each image update** execute the database migrations, example:
 
     `docker exec movary php bin/console.php database:migration:migrate`
 
@@ -15,10 +15,26 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 
 !!! Info
 
-    All docker examples set the environment variable `TMDB_API_KEY`.
-    This is not required but recommend. 
-    The application will not work correctly at some places without it.
+    All docker examples include the environment variable `TMDB_API_KEY` (get a key [here](https://www.themoviedb.org/settings/api)).
+    It is not strictly required to be set here but recommend. 
+    Many features of the application will not work correctly without it.
 
+## Image tags
+
+- `latest` The latest released stable version (**recommended**)
+- `nightly` The latest changes independent of versioning (caution: experimental)
+
+## Storage permissions
+
+The `storage` directory is used by Movary to store all its files (e.g. logs or images), which means Movary needs read/write access to it.
+
+The easiest way to do this are managed docker volumes (used in the examples below).
+
+
+!!! warning
+
+    If you bind a local mount, make sure the local directory exists before you start the container
+    and that it has the necessary permissions/ownership set.
 
 ## Example using SQLite
 
