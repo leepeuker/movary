@@ -3,7 +3,8 @@
 namespace Movary\HttpController;
 
 use Movary\Domain\User\Service\Authentication;
-use Movary\Service\ExportService;
+use Movary\Service\Export\ExportService;
+use Movary\Util\File;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -12,6 +13,7 @@ class ExportController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly ExportService $exportService,
+        private readonly File $fileUtil,
     ) {
     }
 
@@ -23,16 +25,22 @@ class ExportController
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $exportCsv = match ($request->getRouteParameters()['exportType']) {
-            'history' => $this->exportService->getHistoryCsv($userId),
-            'ratings' => $this->exportService->getRatingCsv($userId),
+        $exportType = $request->getRouteParameters()['exportType'] ?? null;
+
+        $exportCsvPath = match ($exportType) {
+            'history' => $this->exportService->createExportHistoryCsv($userId),
+            'ratings' => $this->exportService->createExportRatingsCsv($userId),
             default => null
         };
 
-        if ($exportCsv === null) {
+        if ($exportCsvPath === null) {
             return Response::createNotFound();
         }
 
-        return Response::createCsv($exportCsv);
+        $exportCsvContent = $this->fileUtil->readFile($exportCsvPath);
+
+        $this->fileUtil->deleteFile($exportCsvPath);
+
+        return Response::createCsv($exportCsvContent);
     }
 }
