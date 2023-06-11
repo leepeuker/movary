@@ -15,26 +15,11 @@ class Config
     {
         $fpmEnvironment = $_ENV;
         $systemEnvironment = getenv();
+        // $mysqlRootPassword = file_get_contents($fpmEnvironment['DATABASE_MYSQL_ROOT_PASSWORD_FILE']);
+        // $mysqlPassword = file_get_contents($fpmEnvironment['DATABASE_MYSQL_PASSWORD_FILE']);
+        // array_push($additionalData, [''])
 
         return new self(array_merge($fpmEnvironment, $systemEnvironment, $additionalData));
-    }
-
-    public static function getSecrets() : array
-    {
-        try {
-            $secrets = [];
-            $mysqlRootPassword = file_get_contents($_ENV['DATABASE_MYSQL_ROOT_PASSWORD_FILE']);
-            $mysqlPassword = file_get_contents($_ENV['DATABASE_MYSQL_PASSWORD_FILE']);
-            if($mysqlPassword !== false) {
-                array_push($secrets, ['DATABASE_MYSQL_PASSWORD' => rtrim($mysqlPassword)]);
-            }
-            if($mysqlRootPassword !== false) {
-                array_push($secrets, ['DATABASE_MYSQL_ROOT_PASSWORD' => rtrim($mysqlRootPassword)]);
-            }
-            return $secrets;
-        } catch(TypeError) {
-            return [];
-        }
     }
 
     public function getAsBool(string $parameter, ?bool $fallbackValue = null) : bool
@@ -67,6 +52,22 @@ class Config
     {
         try {
             return (string)$this->get($parameter);
+        } catch (OutOfBoundsException $e) {
+            if ($fallbackValue === null) {
+                throw $e;
+            }
+
+            return $fallbackValue;
+        }
+    }
+
+    public function getSecretAsString(string $parameter, ?string $fallbackValue = null) : string
+    {
+        try {
+            if(file_exists($this->get($parameter))) {
+                return (string)file_get_contents($this->get($parameter));
+            }
+            return $fallbackValue;
         } catch (OutOfBoundsException $e) {
             if ($fallbackValue === null) {
                 throw $e;

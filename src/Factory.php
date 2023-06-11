@@ -73,9 +73,7 @@ class Factory
         $dotenv = Dotenv::createMutable(self::createDirectoryAppRoot());
         $dotenv->safeLoad();
 
-        $secretEnv = Config::getSecrets();
-
-        return Config::createFromEnv($secretEnv);
+        return Config::createFromEnv();
     }
 
     public static function createCreatePublicStorageLink(ContainerInterface $container) : CreatePublicStorageLink
@@ -130,6 +128,11 @@ class Factory
     public static function createDbConnection(Config $config) : DBAL\Connection
     {
         $databaseMode = self::getDatabaseMode($config);
+        try {
+            $mysqlPassword = $config->getAsString('DATABASE_MYSQL_PASSWORD');
+        } catch(OutOfBoundsException) {
+            $mysqlPassword = $config->getSecretAsString('DATABASE_MYSQL_PASSWORD__FILE');
+        }
 
         $config = match ($databaseMode) {
             'sqlite' => [
@@ -142,7 +145,7 @@ class Factory
                 'port' => self::getDatabaseMysqlPort($config),
                 'dbname' => $config->getAsString('DATABASE_MYSQL_NAME'),
                 'user' => $config->getAsString('DATABASE_MYSQL_USER'),
-                'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
+                'password' => $mysqlPassword,
                 'charset' => self::getDatabaseMysqlCharset($config),
             ],
             default => throw new \RuntimeException('Not supported database mode: ' . $databaseMode)

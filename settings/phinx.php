@@ -5,6 +5,12 @@ $container = require(__DIR__ . '/../bootstrap.php');
 
 $config = $container->get(Movary\ValueObject\Config::class);
 
+try {
+    $mysqlPassword = $config->getAsString('DATABASE_MYSQL_PASSWORD');
+} catch(OutOfBoundsException) {
+    $mysqlPassword = $config->getSecretAsString('DATABASE_MYSQL_PASSWORD__FILE');
+}
+
 $databaseMode = \Movary\Factory::getDatabaseMode($config);
 if ($databaseMode === 'sqlite') {
     $sqliteFile = pathinfo($config->getAsString('DATABASE_SQLITE'));
@@ -20,7 +26,7 @@ if ($databaseMode === 'sqlite') {
         'port' => \Movary\Factory::getDatabaseMysqlPort($config),
         'name' => $config->getAsString('DATABASE_MYSQL_NAME'),
         'user' => $config->getAsString('DATABASE_MYSQL_USER'),
-        'pass' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
+        'pass' => $mysqlPassword,
         'charset' => \Movary\Factory::getDatabaseMysqlCharset($config),
         'collation' => 'utf8_unicode_ci',
     ];
