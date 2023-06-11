@@ -15,8 +15,9 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 
 ## Image tags
 
-- `latest` The latest released stable version (**recommended**)
-- `nightly` The latest changes independent of versioning (caution: experimental)
+- `latest` Default image. Latest stable version and **recommended** for the average user
+- `nightly` Has the latest changes as soon as possible. Warning: Not stable, use with caution
+- `X.Y.Z` There is a tag for every individual version
 
 ## Storage permissions
 

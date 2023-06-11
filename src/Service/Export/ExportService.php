@@ -6,8 +6,6 @@ use Movary\Domain\Movie\MovieApi;
 
 class ExportService
 {
-    private const DEFAULT_PATH = __DIR__ . '/../../storage/app/';
-
     private const CSV_HEADER_HISTORY = 'title,year,tmdbId,imdbId,watchedAt,comment' . PHP_EOL;
 
     private const CSV_HEADER_RATINGS = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
@@ -15,6 +13,7 @@ class ExportService
     public function __construct(
         private readonly MovieApi $movieApi,
         private readonly ExportWriter $dataMapper,
+        private readonly string $storageDirectory,
     ) {
     }
 
@@ -76,6 +75,6 @@ class ExportService
     {
         $timestamp = time();
 
-        return self::DEFAULT_PATH . "export-{$exportType}-{$userId}-{$timestamp}.csv";
+        return $this->storageDirectory . "export-{$exportType}-{$userId}-{$timestamp}.csv";
     }
 }
