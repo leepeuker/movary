@@ -31,10 +31,18 @@ The easiest way to do this are managed docker volumes (used in the examples belo
     If you bind a local mount, make sure the directory exists before you start the container
     and that it has the necessary permissions/ownership.
 
+## Docker secrets
+
+Docker secrets can be used for all environment variables, just append `_FILE` to the environment variable name.
+Secrets are used as a fallback for not existing environment variables.
+Make sure to not set the environment variable without the `_FILE` prefix if you want to use a secret.
+
+For more info on Docker secrets, read the [official Docker documentation](https://docs.docker.com/engine/swarm/secrets/).
+
 ## Examples
 
 All examples include the environment variable `TMDB_API_KEY` (get a key [here](https://www.themoviedb.org/settings/api)).
-It is not strictly required to be set here but recommend. 
+It is not strictly required to be set here but recommend.
 Many features of the application will not work correctly without it.
 
 ### With SQLite
@@ -69,9 +77,7 @@ $ docker run --rm -d \
   leepeuker/movary:latest
 ```
 
-### With docker compose
-
-Here is a `docker-compose.yml` template
+### docker-compose.yml with MySQL
 
 ```yaml
 version: "3.5"
@@ -107,15 +113,7 @@ volumes:
   movary-storage:
 ```
 
-### With Docker secrets
-
-The following environment variable can also be added with secrets.
-
-* `DATABASE_MYSQL_PASSWORD` 
-* `DATABASE_MYSQL_ROOT_PASSWORD`
-
-Both can be injected as secrets instead of plain environment variables by appending `_FILE` (with one underscore) to them.
-A `docker-compose.yml` file would look like this:
+### docker-compose.yml with MySQL and secrets
 
 ```yaml
 version: "3.5"
@@ -125,6 +123,8 @@ secrets:
     file: /path/to/docker/secret/mysql_root_password_file
   mysql_password:
     file: /path/to/docker/secret/mysql_password_file
+  tmdb_key:
+    file: /path/to/docker/secret/tmdb_key_file
 
 services:
   movary:
@@ -133,7 +133,7 @@ services:
     ports:
       - "80:80"
     environment:
-      TMDB_API_KEY: "<tmdb_key>"
+      TMDB_API_KEY_FILE: /run/secrets/tmdb_key
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
       DATABASE_MYSQL_NAME: "movary"
@@ -161,7 +161,3 @@ volumes:
   movary-db:
   movary-storage:
 ```
-
-If both `DATABASE_MYSQL_PASSWORD` and `DATABASE_MYSQL_PASSWORD_FILE` are present in the Movary docker container, the `DATABASE_MYSQL_PASSWORD` will have priority and will be used instead of the `DATABASE_MYSQL_PASSWORD_FILE`. So make sure you remove `DATABASE_MYSQL_PASSWORD` before using `DATABASE_MYSQL_PASSWORD_FILE`.
-
-For more info on Docker secrets, read the [official Docker documentation](https://docs.docker.com/engine/swarm/secrets/)
