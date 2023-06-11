@@ -133,7 +133,6 @@ class Factory
     public static function createDbConnection(Config $config) : DBAL\Connection
     {
         $databaseMode = self::getDatabaseMode($config);
-        $mysqlPassword = $config->getAsString('DATABASE_MYSQL_PASSWORD');
 
         $config = match ($databaseMode) {
             'sqlite' => [
@@ -146,7 +145,7 @@ class Factory
                 'port' => self::getDatabaseMysqlPort($config),
                 'dbname' => $config->getAsString('DATABASE_MYSQL_NAME'),
                 'user' => $config->getAsString('DATABASE_MYSQL_USER'),
-                'password' => $mysqlPassword,
+                'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
                 'charset' => self::getDatabaseMysqlCharset($config),
             ],
             default => throw new \RuntimeException('Not supported database mode: ' . $databaseMode)

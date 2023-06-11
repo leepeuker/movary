@@ -5,8 +5,6 @@ $container = require(__DIR__ . '/../bootstrap.php');
 
 $config = $container->get(Movary\ValueObject\Config::class);
 
-$mysqlPassword = $config->getAsString('DATABASE_MYSQL_PASSWORD');
-
 $databaseMode = \Movary\Factory::getDatabaseMode($config);
 if ($databaseMode === 'sqlite') {
     $sqliteFile = pathinfo($config->getAsString('DATABASE_SQLITE'));
@@ -22,7 +20,7 @@ if ($databaseMode === 'sqlite') {
         'port' => \Movary\Factory::getDatabaseMysqlPort($config),
         'name' => $config->getAsString('DATABASE_MYSQL_NAME'),
         'user' => $config->getAsString('DATABASE_MYSQL_USER'),
-        'pass' => $mysqlPassword,
+        'pass' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
         'charset' => \Movary\Factory::getDatabaseMysqlCharset($config),
         'collation' => 'utf8_unicode_ci',
     ];
