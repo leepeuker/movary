@@ -15,9 +15,6 @@ class Config
     {
         $fpmEnvironment = $_ENV;
         $systemEnvironment = getenv();
-        // $mysqlRootPassword = file_get_contents($fpmEnvironment['DATABASE_MYSQL_ROOT_PASSWORD_FILE']);
-        // $mysqlPassword = file_get_contents($fpmEnvironment['DATABASE_MYSQL_PASSWORD_FILE']);
-        // array_push($additionalData, [''])
 
         return new self(array_merge($fpmEnvironment, $systemEnvironment, $additionalData));
     }
