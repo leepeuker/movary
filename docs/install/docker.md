@@ -112,7 +112,7 @@ volumes:
 The following environment variable can also be added with secrets.
 
 * `DATABASE_MYSQL_PASSWORD` 
-* `DATABASE_MYSQL_ROOT__PASSWORD`
+* `DATABASE_MYSQL_ROOT_PASSWORD`
 
 Both can be injected as secrets instead of plain environment variables by appending `_FILE` (with one underscore) to them.
 A `docker-compose.yml` file would look like this:
