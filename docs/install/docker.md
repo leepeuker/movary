@@ -106,3 +106,62 @@ volumes:
   movary-db:
   movary-storage:
 ```
+
+### With Docker secrets
+
+The following environment variable can also be added with secrets.
+
+* `DATABASE_MYSQL_PASSWORD` 
+* `DATABASE_MYSQL_ROOT__PASSWORD`
+
+Both can be injected as secrets instead of plain environment variables by appending `_FILE` (with one underscore) to them.
+A `docker-compose.yml` file would look like this:
+
+```yaml
+version: "3.5"
+
+secrets:
+  mysql_root_password:
+    file: /path/to/docker/secret/mysql_root_password_file
+  mysql_password:
+    file: /path/to/docker/secret/mysql_password_file
+
+services:
+  movary:
+    image: leepeuker/movary:latest
+    container_name: movary
+    ports:
+      - "80:80"
+    environment:
+      TMDB_API_KEY: "<tmdb_key>"
+      DATABASE_MODE: "mysql"
+      DATABASE_MYSQL_HOST: "mysql"
+      DATABASE_MYSQL_NAME: "movary"
+      DATABASE_MYSQL_USER: "movary_user"
+      DATABASE_MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    volumes:
+      - movary-storage:/app/storage
+    secrets:
+      - mysql_password
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: "movary"
+      MYSQL_USER: "movary_user"
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+    volumes:
+      - movary-db:/var/lib/mysql
+    secrets:
+      - mysql_root_password
+      - mysql_password
+
+volumes:
+  movary-db:
+  movary-storage:
+```
+
+If both `DATABASE_MYSQL_PASSWORD` and `DATABASE_MYSQL_PASSWORD_FILE` are present in the Movary docker container, the `DATABASE_MYSQL_PASSWORD` will have priority and will be used instead of the `DATABASE_MYSQL_PASSWORD_FILE`. So make sure you remove `DATABASE_MYSQL_PASSWORD` before using `DATABASE_MYSQL_PASSWORD_FILE`.
+
+For more info on Docker secrets, read the [official Docker documentation](https://docs.docker.com/engine/swarm/secrets/)

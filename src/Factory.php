@@ -131,7 +131,7 @@ class Factory
         try {
             $mysqlPassword = $config->getAsString('DATABASE_MYSQL_PASSWORD');
         } catch(OutOfBoundsException) {
-            $mysqlPassword = $config->getSecretAsString('DATABASE_MYSQL_PASSWORD__FILE');
+            $mysqlPassword = $config->getSecretAsString('DATABASE_MYSQL_PASSWORD_FILE');
         }
 
         $config = match ($databaseMode) {
