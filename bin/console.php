@@ -18,6 +18,8 @@ $application->add($container->get(Movary\Command\DatabaseMigrationMigrate::class
 $application->add($container->get(Movary\Command\DatabaseMigrationRollback::class));
 $application->add($container->get(Movary\Command\UserCreate::class));
 $application->add($container->get(Movary\Command\UserDelete::class));
+$application->add($container->get(Movary\Command\UserHistoryExport::class));
+$application->add($container->get(Movary\Command\UserRatingExport::class));
 $application->add($container->get(Movary\Command\UserUpdate::class));
 $application->add($container->get(Movary\Command\UserList::class));
 $application->add($container->get(Movary\Command\ProcessJobs::class));
