@@ -49,7 +49,7 @@ class ServerSettings
     {
         try {
             $tmdbApiKey = $this->config->getAsString('APPLICATION_URL');
-        } catch (\OutOfBoundsException) {
+        } catch (\RuntimeException) {
             return false;
         }
 
@@ -60,7 +60,7 @@ class ServerSettings
     {
         try {
             $tmdbApiKey = $this->config->getAsString('TMDB_API_KEY');
-        } catch (\OutOfBoundsException) {
+        } catch (\RuntimeException) {
             return false;
         }
 

@@ -2,28 +2,21 @@
 
 namespace Movary\ValueObject;
 
-use OutOfBoundsException;
-use TypeError;
+use Movary\Util\File;
 
 class Config
 {
-    public function __construct(private readonly array $config)
-    {
-    }
-
-    public static function createFromEnv(array $additionalData = []) : self
-    {
-        $fpmEnvironment = $_ENV;
-        $systemEnvironment = getenv();
-
-        return new self(array_merge($fpmEnvironment, $systemEnvironment, $additionalData));
+    public function __construct(
+        private readonly File $fileUtil,
+        private readonly array $config,
+    ) {
     }
 
     public function getAsBool(string $parameter, ?bool $fallbackValue = null) : bool
     {
         try {
             return (bool)$this->get($parameter);
-        } catch (OutOfBoundsException $e) {
+        } catch (\RuntimeException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -36,7 +29,7 @@ class Config
     {
         try {
             return (int)$this->get($parameter);
-        } catch (OutOfBoundsException $e) {
+        } catch (\RuntimeException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -49,42 +42,29 @@ class Config
     {
         try {
             return (string)$this->get($parameter);
-        } catch (OutOfBoundsException $e) {
+        } catch (\RuntimeException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
 
             return $fallbackValue;
-        }
-    }
-
-    public function getSecretAsString(string $parameter, ?string $fallbackValue = null) : string
-    {
-        try {
-            if(file_exists($this->get($parameter))) {
-                return (string)file_get_contents($this->get($parameter));
-            }
-            return $fallbackValue;
-        } catch (OutOfBoundsException $e) {
-            if ($fallbackValue === null) {
-                throw $e;
-            }
-
-            return $fallbackValue;
-        }
-    }
-
-    private function ensureKeyExists(string $key) : void
-    {
-        if (isset($this->config[$key]) === false) {
-            throw new OutOfBoundsException('Key does not exist: ' . $key);
         }
     }
 
     private function get(string $key) : mixed
     {
-        $this->ensureKeyExists($key);
+        if (isset($this->config[$key]) === true) {
+            return $this->config[$key];
+        }
 
-        return $this->config[$key];
+        if (isset($this->config[$key . '_FILE']) === true) {
+            $secretFile = $this->get($key . '_FILE');
+
+            if ($this->fileUtil->fileExists($secretFile) === true) {
+                return $this->fileUtil->readFile($secretFile);
+            }
+        }
+
+        throw new \RuntimeException('Config key does not exist: ' . $key);
     }
 }
