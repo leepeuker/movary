@@ -26,6 +26,8 @@ use Movary\HttpController\LandingPageController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
+use Movary\Service\Export\ExportService;
+use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdExporter;
@@ -49,13 +51,21 @@ use Twig;
 class Factory
 {
     private const SRC_DIRECTORY_NAME = 'src';
+
     private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
+
     private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
+
     private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
+
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
+
     private const DEFAULT_APPLICATION_VERSION = 'unknown';
+
     private const DEFAULT_TMDB_IMAGE_CACHING = false;
+
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
+
     private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
     public static function createConfig() : Config
@@ -145,6 +155,15 @@ class Factory
         }
 
         return $connection;
+    }
+
+    public static function createExportService(ContainerInterface $container) : ExportService
+    {
+        return new ExportService(
+            $container->get(MovieApi::class),
+            $container->get(ExportWriter::class),
+            self::createDirectoryStorage(),
+        );
     }
 
     public static function createHttpClient() : ClientInterface
