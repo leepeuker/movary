@@ -63,7 +63,9 @@ class Factory
         $dotenv = Dotenv::createMutable(self::createDirectoryAppRoot());
         $dotenv->safeLoad();
 
-        return Config::createFromEnv();
+        $secretEnv = Config::getSecrets();
+
+        return Config::createFromEnv($secretEnv);
     }
 
     public static function createCreatePublicStorageLink(ContainerInterface $container) : CreatePublicStorageLink

@@ -2,7 +2,9 @@
 
 namespace Movary\ValueObject;
 
+use Exception;
 use OutOfBoundsException;
+use TypeError;
 
 class Config
 {
@@ -16,6 +18,24 @@ class Config
         $systemEnvironment = getenv();
 
         return new self(array_merge($fpmEnvironment, $systemEnvironment, $additionalData));
+    }
+
+    public static function getSecrets() : array
+    {
+        try {
+            $secrets = [];
+            $mysqlRootPassword = file_get_contents($_ENV['DATABASE_MYSQL_ROOT_PASSWORD_FILE']);
+            $mysqlPassword = file_get_contents($_ENV['DATABASE_MYSQL_PASSWORD_FILE']);
+            if($mysqlPassword !== false) {
+                array_push($secrets, ['DATABASE_MYSQL_PASSWORD' => rtrim($mysqlPassword)]);
+            }
+            if($mysqlRootPassword !== false) {
+                array_push($secrets, ['DATABASE_MYSQL_ROOT_PASSWORD' => rtrim($mysqlRootPassword)]);
+            }
+            return $secrets;
+        } catch(TypeError) {
+            return [];
+        }
     }
 
     public function getAsBool(string $parameter, ?bool $fallbackValue = null) : bool
