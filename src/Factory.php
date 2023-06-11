@@ -32,6 +32,7 @@ use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -48,21 +49,13 @@ use Twig;
 class Factory
 {
     private const SRC_DIRECTORY_NAME = 'src';
-
     private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
-
     private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
-
     private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
-
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
-
-    private const DEFAULT_APPLICATION_VERSION = 'dev';
-
+    private const DEFAULT_APPLICATION_VERSION = 'unknown';
     private const DEFAULT_TMDB_IMAGE_CACHING = false;
-
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
-
     private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
     public static function createConfig() : Config
@@ -175,7 +168,6 @@ class Factory
             $container->get(Authentication::class),
             $container->get(JobQueueApi::class),
             $container->get(LetterboxdCsvValidator::class),
-            $container->get(Twig\Environment::class),
             $container->get(SessionWrapper::class),
             self::createDirectoryStorageApp()
         );
@@ -236,12 +228,6 @@ class Factory
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
     {
-        try {
-            $applicationVersion = $config->getAsString('APPLICATION_VERSION');
-        } catch (OutOfBoundsException) {
-            $applicationVersion = self::DEFAULT_APPLICATION_VERSION;
-        }
-
         return new SettingsController(
             $container->get(Twig\Environment::class),
             $container->get(JobQueueApi::class),
@@ -253,7 +239,9 @@ class Factory
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),
             $container->get(ServerSettings::class),
-            $applicationVersion
+            $container->get(WebhookUrlBuilder::class),
+            $container->get(JobQueueApi::class),
+            self::getApplicationVersion($config)
         );
     }
 
@@ -374,6 +362,15 @@ class Factory
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
         return $streamHandler;
+    }
+
+    private static function getApplicationVersion(Config $config) : string
+    {
+        try {
+            return $config->getAsString('APPLICATION_VERSION');
+        } catch (OutOfBoundsException) {
+            return self::DEFAULT_APPLICATION_VERSION;
+        }
     }
 
     private static function getLogLevel(Config $config) : string

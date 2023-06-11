@@ -6,7 +6,7 @@
             {% endif %}
             {% if loggedIn == true %}
                 <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#logPlayModal" style="border-color: #9d9d9d">
-                    Log play
+                    Add movie
                 </button>
             {% endif %}
             <button type="button" class="btn btn-outline-light" data-bs-toggle="dropdown" aria-expanded="false" style="border-color: #9d9d9d;">
@@ -22,6 +22,11 @@
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}"
                        href="/users/{{ routeUsername ?: currentUserName }}/history">
                         History
+                    </a>
+                </li>
+                <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/watchlist#' %}active{% endif %}"
+                       href="/users/{{ routeUsername ?: currentUserName }}/watchlist">
+                        Watchlist
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}"
@@ -43,7 +48,6 @@
                 </li>
                 {% if loggedIn == true %}
                     <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="/settings/account/general">Settings</a></li>
-                    <li><a class="dropdown-item {% if requestUrlPath starts with '/job-queue' %}active{% endif %}" href="/job-queue">Job Queue</a></li>
                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                 {% else %}
                     <li><a class="dropdown-item" href="/login">Login</a></li>

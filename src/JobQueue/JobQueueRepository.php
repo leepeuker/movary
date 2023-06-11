@@ -68,23 +68,36 @@ class JobQueueRepository
         return DateTime::createFromString($data);
     }
 
-    public function findLastDateForJobByTypeAndUserId(JobType $jobType, int $userId) : ?DateTime
+    public function findLastLetterboxdImportsForUser(int $userId) : array
     {
-        $data =
-            $this->dbConnection->fetchOne(
-                'SELECT created_at FROM `job_queue` WHERE job_type = ? AND job_status = ? AND user_id = ? ORDER BY created_at DESC',
-                [
-                    $jobType,
-                    JobStatus::createDone(),
-                    $userId,
-                ],
-            );
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT *
+            FROM `job_queue` 
+            WHERE job_type IN (?, ?) AND user_id = ? 
+            ORDER BY created_at DESC
+            LIMIT 10',
+            [
+                JobType::createLetterboxdImportHistory(),
+                JobType::createLetterboxdImportRatings(),
+                $userId,
+            ],
+        );
+    }
 
-        if ($data === false) {
-            return null;
-        }
-
-        return DateTime::createFromString($data);
+    public function findLastTraktImportsForUser(int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT *
+            FROM `job_queue` 
+            WHERE job_type IN (?, ?) AND user_id = ? 
+            ORDER BY created_at DESC
+            LIMIT 10',
+            [
+                JobType::createTraktImportHistory(),
+                JobType::createTraktImportRatings(),
+                $userId,
+            ],
+        );
     }
 
     public function purgeNotProcessedJobs() : void

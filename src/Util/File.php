@@ -79,13 +79,24 @@ class File
         rmdir($path);
     }
 
-    public function deleteFile(string $imageFile) : void
+    public function deleteFile(string $fileName) : void
     {
-        unlink($imageFile);
+        unlink($fileName);
     }
 
     public function fileExists(string $fileName) : bool
     {
         return file_exists($fileName) === true;
+    }
+
+    public function readFile(string $fileName) : string
+    {
+        $fileContent = file_get_contents($fileName);
+
+        if ($fileContent === false) {
+            throw new \RuntimeException('Could not read file: ' . $fileName);
+        }
+
+        return $fileContent;
     }
 }

@@ -45,15 +45,15 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/jellyfin/{id:.+}',
         [\Movary\HttpController\JellyfinController::class, 'handleJellyfinWebhook'],
     );
+    $routeCollector->addRoute(
+        'POST',
+        '/emby/{id:.+}',
+        [\Movary\HttpController\EmbyController::class, 'handleEmbyWebhook'],
+    );
 
     #############
     # Job Queue #
     #############
-    $routeCollector->addRoute(
-        'GET',
-        '/job-queue',
-        [\Movary\HttpController\JobController::class, 'renderQueuePage'],
-    );
     $routeCollector->addRoute(
         'GET',
         '/job-queue/purge-processed',
@@ -107,6 +107,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/settings/server/general',
         [\Movary\HttpController\SettingsController::class, 'renderServerGeneralPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/server/jobs',
+        [\Movary\HttpController\SettingsController::class, 'renderServerJobsPage'],
     );
     $routeCollector->addRoute(
         'POST',
@@ -189,19 +194,14 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'updatePlex'],
     );
     $routeCollector->addRoute(
-        'GET',
-        '/settings/plex/webhook-id',
-        [\Movary\HttpController\PlexController::class, 'getPlexWebhookId'],
-    );
-    $routeCollector->addRoute(
         'PUT',
-        '/settings/plex/webhook-id',
-        [\Movary\HttpController\PlexController::class, 'regeneratePlexWebhookId'],
+        '/settings/plex/webhook',
+        [\Movary\HttpController\PlexController::class, 'regeneratePlexWebhookUrl'],
     );
     $routeCollector->addRoute(
         'DELETE',
-        '/settings/plex/webhook-id',
-        [\Movary\HttpController\PlexController::class, 'deletePlexWebhookId'],
+        '/settings/plex/webhook',
+        [\Movary\HttpController\PlexController::class, 'deletePlexWebhookUrl'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -215,18 +215,43 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/jellyfin/webhook-id',
-        [\Movary\HttpController\JellyfinController::class, 'getJellyfinWebhookId'],
+        '/settings/jellyfin/webhook',
+        [\Movary\HttpController\JellyfinController::class, 'getJellyfinWebhookUrl'],
     );
     $routeCollector->addRoute(
         'PUT',
-        '/settings/jellyfin/webhook-id',
-        [\Movary\HttpController\JellyfinController::class, 'regenerateJellyfinWebhookId'],
+        '/settings/jellyfin/webhook',
+        [\Movary\HttpController\JellyfinController::class, 'regenerateJellyfinWebhookUrl'],
     );
     $routeCollector->addRoute(
         'DELETE',
-        '/settings/jellyfin/webhook-id',
-        [\Movary\HttpController\JellyfinController::class, 'deleteJellyfinWebhookId'],
+        '/settings/jellyfin/webhook',
+        [\Movary\HttpController\JellyfinController::class, 'deleteJellyfinWebhookUrl'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/integrations/emby',
+        [\Movary\HttpController\SettingsController::class, 'renderEmbyPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/emby',
+        [\Movary\HttpController\SettingsController::class, 'updateEmby'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/emby/webhook',
+        [\Movary\HttpController\EmbyController::class, 'getEmbyWebhookUrl'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/settings/emby/webhook',
+        [\Movary\HttpController\EmbyController::class, 'regenerateEmbyWebhookUrl'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/settings/emby/webhook',
+        [\Movary\HttpController\EmbyController::class, 'deleteEmbyWebhookUrl'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -267,6 +292,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/movies/{id:[0-9]+}/refresh-imdb',
         [\Movary\HttpController\MovieController::class, 'refreshImdbRating'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/add-watchlist',
+        [\Movary\HttpController\MovieController::class, 'addToWatchlist'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/remove-watchlist',
+        [\Movary\HttpController\MovieController::class, 'removeFromWatchlist'],
+    );
 
     ##############
     # User media #
@@ -280,6 +315,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/users/{username:[a-zA-Z0-9]+}/history',
         [\Movary\HttpController\HistoryController::class, 'renderHistory'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/users/{username:[a-zA-Z0-9]+}/watchlist',
+        [\Movary\HttpController\WatchlistController::class, 'renderWatchlist'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -317,11 +357,6 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\HistoryController::class, 'createHistoryEntry'],
     );
     $routeCollector->addRoute(
-        'PUT',
-        '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history',
-        [\Movary\HttpController\HistoryController::class, 'updateHistoryEntry'],
-    );
-    $routeCollector->addRoute(
         'POST',
         '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating',
         [\Movary\HttpController\MovieController::class, 'updateRating'],
@@ -330,6 +365,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'POST',
         '/log-movie',
         [\Movary\HttpController\HistoryController::class, 'logMovie'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/add-movie-to-watchlist',
+        [\Movary\HttpController\WatchlistController::class, 'addMovieToWatchlist'],
     );
     $routeCollector->addRoute(
         'GET',

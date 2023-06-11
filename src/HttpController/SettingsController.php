@@ -11,6 +11,7 @@ use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\ServerSettings;
+use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
@@ -35,6 +36,8 @@ class SettingsController
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
         private readonly ServerSettings $serverSettings,
+        private readonly WebhookUrlBuilder $webhookUrlBuilder,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -176,6 +179,31 @@ class SettingsController
         );
     }
 
+    public function renderEmbyPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $webhookId = $user->getEmbyWebhookId();
+
+        if ($applicationUrl !== null && $webhookId !== null) {
+            $webhookUrl = $this->webhookUrlBuilder->buildEmbyWebhookUrl($webhookId);
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-integration-emby.html.twig', [
+                'isActive' => $applicationUrl !== null,
+                'embyWebhookUrl' => $webhookUrl ?? '-',
+                'scrobbleWatches' => $user->hasEmbyScrobbleWatchesEnabled(),
+            ]),
+        );
+    }
+
     public function renderGeneralAccountPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -192,6 +220,7 @@ class SettingsController
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'privacyLevel' => $user->getPrivacyLevel(),
                 'username' => $user->getName(),
+                'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
             ]),
         );
     }
@@ -202,17 +231,21 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $jellyfinScrobblerOptionsUpdated = $this->sessionWrapper->find('jellyfinScrobblerOptionsUpdated');
-        $this->sessionWrapper->unset('jellyfinScrobblerOptionsUpdated');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $webhookId = $user->getJellyfinWebhookId();
+
+        if ($applicationUrl !== null && $webhookId !== null) {
+            $webhookUrl = $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId);
+        }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-jellyfin.html.twig', [
-                'jellyfinWebhookUrl' => $user->getJellyfinWebhookId() ?? '-',
+                'isActive' => $applicationUrl !== null,
+                'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
-                'jellyfinScrobblerOptionsUpdated' => $jellyfinScrobblerOptionsUpdated,
             ]),
         );
     }
@@ -245,6 +278,7 @@ class SettingsController
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
                 'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+                'lastLetterboxdImportJobs' => $this->workerService->findLastLetterboxdImportsForUser($user->getId()),
             ]),
         );
     }
@@ -283,18 +317,22 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $plexScrobblerOptionsUpdated = $this->sessionWrapper->find('plexScrobblerOptionsUpdated');
-        $this->sessionWrapper->unset('plexScrobblerOptionsUpdated');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $plexWebhookId = $user->getPlexWebhookId();
+
+        if ($applicationUrl !== null && $plexWebhookId !== null) {
+            $plexWebhookUrl = $this->webhookUrlBuilder->buildPlexWebhookUrl($plexWebhookId);
+        }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-plex.html.twig', [
-                'plexWebhookUrl' => $user->getPlexWebhookId() ?? '-',
+                'isActive' => $applicationUrl !== null,
+                'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
-                'plexScrobblerOptionsUpdated' => $plexScrobblerOptionsUpdated,
             ]),
         );
     }
@@ -312,9 +350,34 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-general.html.twig', [
+                'applicationUrl' => $this->serverSettings->getApplicationUrl(),
                 'tmdbApiKey' => $this->serverSettings->getTmdbApiKey(),
                 'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
+                'applicationUrlSetInEnv' => $this->serverSettings->isApplicationUrlSetInEnvironment(),
             ]),
+        );
+    }
+
+    public function renderServerJobsPage(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
+
+        $jobs = $this->jobQueueApi->fetchJobsForStatusPage((int)$jobsPerPage);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render(
+                'page/settings-server-jobs.html.twig',
+                ['jobs' => $jobs],
+            ),
         );
     }
 
@@ -357,7 +420,7 @@ class SettingsController
                 'traktCredentialsUpdated' => $traktCredentialsUpdated,
                 'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
                 'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
-                'lastSyncTrakt' => $this->workerService->findLastTraktSync($user->getId()) ?? '-',
+                'lastTraktImportJobs' => $this->workerService->findLastTraktImportsForUser($user->getId()),
             ]),
         );
     }
@@ -380,6 +443,23 @@ class SettingsController
         return Response::createOk();
     }
 
+    public function updateEmby(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $postParameters = Json::decode($request->getBody());
+
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
+
+        $this->userApi->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
+
+        return Response::create(StatusCode::createNoContent());
+    }
+
     public function updateGeneral(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -391,11 +471,13 @@ class SettingsController
         $privacyLevel = isset($requestData['privacyLevel']) === false ? 1 : (int)$requestData['privacyLevel'];
         $dateFormat = empty($requestData['dateFormat']) === true ? 0 : (int)$requestData['dateFormat'];
         $name = $requestData['username'] ?? '';
+        $enableAutomaticWatchlistRemoval = isset($requestData['enableAutomaticWatchlistRemoval']) === false ? false : (bool)$requestData['enableAutomaticWatchlistRemoval'];
 
         try {
             $this->userApi->updatePrivacyLevel($this->authenticationService->getCurrentUserId(), $privacyLevel);
             $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
             $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
+            $this->userApi->updateWatchlistAutomaticRemovalEnabled($this->authenticationService->getCurrentUserId(), $enableAutomaticWatchlistRemoval);
         } catch (User\Exception\UsernameInvalidFormat) {
             return Response::createBadRequest('Username not meeting requirements');
         } catch (User\Exception\UsernameNotUnique) {
@@ -412,17 +494,14 @@ class SettingsController
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
-        $postParameters = $request->getPostParameters();
 
-        $this->userApi->updateJellyfinScrobblerOptions($userId, (bool)$postParameters['scrobbleWatches']);
+        $postParameters = Json::decode($request->getBody());
 
-        $this->sessionWrapper->set('jellyfinScrobblerOptionsUpdated', true);
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        $this->userApi->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
+
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function updatePassword(Request $request) : Response
@@ -463,20 +542,14 @@ class SettingsController
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
-        $postParameters = $request->getPostParameters();
+        $postParameters = Json::decode($request->getBody());
 
         $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
         $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
 
         $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
 
-        $this->sessionWrapper->set('plexScrobblerOptionsUpdated', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function updateServerGeneral(Request $request) : Response
@@ -492,9 +565,13 @@ class SettingsController
         $requestData = Json::decode($request->getBody());
 
         $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
+        $applicationUrl = isset($requestData['applicationUrl']) === false ? null : $requestData['applicationUrl'];
 
         if ($tmdbApiKey !== null) {
             $this->serverSettings->setTmdbApiKey($tmdbApiKey);
+        }
+        if ($applicationUrl !== null) {
+            $this->serverSettings->setApplicationUrl($applicationUrl);
         }
 
         return Response::createOk();

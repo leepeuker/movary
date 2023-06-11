@@ -563,8 +563,8 @@ class MovieRepository
             SELECT COUNT(DISTINCT m.id)
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            JOIN movie_genre mg on m.id = mg.movie_id
-            JOIN genre g on mg.genre_id = g.id
+            LEFT JOIN movie_genre mg on m.id = mg.movie_id
+            LEFT JOIN genre g on mg.genre_id = g.id
             $whereQuery
             SQL,
             $payload,
@@ -833,6 +833,13 @@ class MovieRepository
             'imdb_rating_vote_count' => $imdbRating?->getVotesCount(),
             'updated_at_imdb' => (string)DateTime::create(),
             'updated_at' => (string)DateTime::create(),
+        ], ['id' => $id]);
+    }
+
+    public function updateImdbTimestamp(int $id) : void
+    {
+        $this->dbConnection->update('movie', [
+            'updated_at_imdb' => (string)DateTime::create(),
         ], ['id' => $id]);
     }
 

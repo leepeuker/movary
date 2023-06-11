@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Watchlist
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/user-select.js"></script>
+    <script src="/js/watchlist.js"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/user-select.html.twig') }}
+            <form action="/users/{{ routeUsername }}/watchlist" method="GET">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+            <div id="watchlistAlert" role="alert"></div>
+            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+                {% for watchlistEntry in watchlistEntries %}
+                    <div class="col" style="padding-bottom: 1rem;">
+                        <div class="card h-100" style="cursor: pointer; position: relative;" id="card-{{ watchlistEntry.id }}">
+                            <img onclick="openOptionsModal(this)" data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
+                       </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <ul class="pagination justify-content-center">
+                {% if paginationElements.previous is null %}
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&laquo;</span></p></li>
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="/users/{{ routeUsername }}/watchlist?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p=1">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="/users/{{ routeUsername }}/watchlist?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.previous }}">
+                            <span aria-hidden="true">&lsaquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="page-item active">
+                    <p class="page-link">{{ paginationElements.currentPage }} of {{ paginationElements.maxPage }}</p>
+                </li>
+                {% if paginationElements.next is null %}
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&rsaquo;</span></p></li>
+                    <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="/users/{{ routeUsername }}/watchlist?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.next }}">
+                            <span aria-hidden="true">&rsaquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="/users/{{ routeUsername }}/watchlist?{{ (searchTerm is null) ? '' : "s=#{searchTerm}&" }}p={{ paginationElements.maxPage }}">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+            
+            {{ include('component/modal-remove-from-watchlist.html.twig') }}
+        </div>
+    </main>
+{% endblock %}
