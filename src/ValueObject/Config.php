@@ -2,7 +2,6 @@
 
 namespace Movary\ValueObject;
 
-use Exception;
 use OutOfBoundsException;
 use TypeError;
 
