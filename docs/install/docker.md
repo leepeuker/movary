@@ -118,14 +118,6 @@ volumes:
 ```yaml
 version: "3.5"
 
-secrets:
-  mysql_root_password:
-    file: /path/to/docker/secret/mysql_root_password_file
-  mysql_password:
-    file: /path/to/docker/secret/mysql_password_file
-  tmdb_key:
-    file: /path/to/docker/secret/tmdb_key_file
-
 services:
   movary:
     image: leepeuker/movary:latest
@@ -142,6 +134,7 @@ services:
     volumes:
       - movary-storage:/app/storage
     secrets:
+      - tmdb_key
       - mysql_password
 
   mysql:
@@ -156,6 +149,14 @@ services:
     secrets:
       - mysql_root_password
       - mysql_password
+
+secrets:
+  mysql_root_password:
+    file: /path/to/docker/secret/mysql_root_password
+  mysql_password:
+    file: /path/to/docker/secret/mysql_password
+  tmdb_key:
+    file: /path/to/docker/secret/tmdb_key
 
 volumes:
   movary-db:

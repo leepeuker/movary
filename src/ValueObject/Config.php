@@ -61,7 +61,7 @@ class Config
             $secretFile = $this->get($key . '_FILE');
 
             if ($this->fileUtil->fileExists($secretFile) === true) {
-                return $this->fileUtil->readFile($secretFile);
+                return trim($this->fileUtil->readFile($secretFile));
             }
         }
 
