@@ -25,8 +25,17 @@ use ZipStream;
 
 class SettingsController
 {
-    private const rowIds = ['Last Plays', 'Most Watched Actors', 'Most Watched Actresses', 'Most Watched Directors', 'Most Watched Genres', 'Most Watched Languages', 'Most Watched Production Companies', 'Most Watched Release Years'];
-    
+    private const rowIds = [
+        'Last Plays',
+        'Most Watched Actors',
+        'Most Watched Actresses',
+        'Most Watched Directors',
+        'Most Watched Genres',
+        'Most Watched Languages',
+        'Most Watched Production Companies',
+        'Most Watched Release Years'
+    ];
+
     public function __construct(
         private readonly Environment $twig,
         private readonly JobQueueApi $workerService,
@@ -143,7 +152,7 @@ class SettingsController
             ]),
         );
     }
- 
+
     public function renderDashboardAccountPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -466,6 +475,33 @@ class SettingsController
         return Response::createOk();
     }
 
+    public function updateDashboardRows(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $bodyData = Json::decode($request->getBody());
+
+        $visibleRows = $bodyData['rowOrder'];
+        $extendedRows = $bodyData['extendedRows'];
+
+        foreach (self::rowIds as $rowId) {
+            if (in_array($rowId, $visibleRows) === false) {
+                return Response::createBadRequest();
+            }
+        }
+
+        $visibleRowsString = implode(';', $visibleRows);
+        $extendedRowsString = implode(';', $extendedRows);
+
+        $this->userApi->updateVisibleDashboardRow($userId, $visibleRowsString);
+        $this->userApi->updateExtendedDashboardRows($userId, $extendedRowsString);
+
+        return Response::createOk();
+    }
+
     public function updateEmby(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -629,32 +665,5 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
-    }
-
-    public function updateDashboardRows(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $userId = $this->authenticationService->getCurrentUserId();
-        $bodyData = Json::decode($request->getBody());
-
-        $visibleRows = $bodyData['rowOrder'];
-        $extendedRows = $bodyData['extendedRows'];
-        
-        foreach(self::rowIds as $rowId) {
-            if(in_array($rowId, $visibleRows) === false) {
-                return Response::createBadRequest();
-            }
-        }
-
-        $visibleRowsString = implode(';', $visibleRows);
-        $extendedRowsString = implode(';', $extendedRows);
-        
-        $this->userApi->updateVisibleRows($userId, $visibleRowsString);
-        $this->userApi->updateExtendedRows($userId, $extendedRowsString);
-
-        return Response::createOk();
     }
 }

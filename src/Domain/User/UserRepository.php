@@ -398,6 +398,19 @@ class UserRepository
         );
     }
 
+    public function updateExtendedDashboardRows(int $userId, string $extendedRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_extended_rows' => $extendedRows,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateIsAdmin(int $userId, bool $isAdmin) : void
     {
         $this->dbConnection->update(
@@ -443,32 +456,6 @@ class UserRepository
             'user',
             [
                 'password' => $passwordHash,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateVisibleRows(int $userId, string $visibleRows) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'dashboard_visible_rows' => $visibleRows,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateExtendedRows(int $userId, string $extendedRows) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'dashboard_extended_rows' => $extendedRows,
             ],
             [
                 'id' => $userId,
@@ -522,6 +509,19 @@ class UserRepository
             'user',
             [
                 'trakt_user_name' => $traktUserName,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateVisibleDashboardRows(int $userId, string $visibleRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_visible_rows' => $visibleRows,
             ],
             [
                 'id' => $userId,
