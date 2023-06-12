@@ -18,7 +18,7 @@ function moveItemDown(clickedElement) {
     nextElement.after(row);
 }
 
-function toggleRowExtension(element) {
+function toggleRowVisibility(element) {
     if (element.classList.contains('bi-eye')) {
         element.classList.remove('bi-eye');
         element.classList.add('bi-eye-slash');
@@ -27,6 +27,16 @@ function toggleRowExtension(element) {
         element.classList.remove('bi-eye-slash');
         element.classList.add('bi-eye');
         element.closest('.dashboardRowItem').style.opacity = 1;
+    }
+}
+
+function toggleRowExtension(element) {
+    if (element.classList.contains('bi-arrows-angle-expand')) {
+        element.classList.remove('bi-arrows-angle-expand');
+        element.classList.add('bi-arrows-angle-contract');
+    } else {
+        element.classList.remove('bi-arrows-angle-contract');
+        element.classList.add('bi-arrows-angle-expand');
     }
 }
 
@@ -53,7 +63,8 @@ function getVisibleRows() {
 }
 
 function getExtendedRows() {
-    let extendedRows = [];
+    let extendedRows = document.getElementsByClassName('bi-arrows-angle-contract');
+
     let rowList = [];
     for (let i = 0; i < extendedRows.length; i++) {
         rowList.push(extendedRows[i].closest('.dashboardRowItem').dataset.rowid);
