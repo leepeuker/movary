@@ -200,6 +200,15 @@ class UserApi
         $this->repository->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
     }
 
+    public function updateExtendedDashboardRows(int $userId, string $extendedRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateExtendedDashboardRows($userId, $extendedRows);
+    }
+
     public function updateIsAdmin(int $userId, bool $isAdmin) : void
     {
         $this->repository->updateIsAdmin($userId, $isAdmin);
@@ -231,24 +240,6 @@ class UserApi
         $this->repository->updatePassword($userId, $passwordHash);
     }
 
-    public function updateVisibleRows(int $userId, string $visibleRows) : void
-    {
-        if ($this->repository->findUserById($userId) === null) {
-            throw new RuntimeException('There is no user with id: ' . $userId);
-        }
-
-        $this->repository->updateVisibleRows($userId, $visibleRows);
-    }
-
-    public function updateExtendedRows(int $userId, string $extendedRows) : void
-    {
-        if ($this->repository->findUserById($userId) === null) {
-            throw new RuntimeException('There is no user with id: ' . $userId);
-        }
-
-        $this->repository->updateExtendedRows($userId, $extendedRows);
-    }
-
     public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
         $this->repository->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
@@ -267,6 +258,15 @@ class UserApi
     public function updateTraktUserName(int $userId, ?string $traktUserName) : void
     {
         $this->repository->updateTraktUserName($userId, $traktUserName);
+    }
+
+    public function updateVisibleDashboardRow(int $userId, string $visibleRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateVisibleDashboardRows($userId, $visibleRows);
     }
 
     public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void

@@ -9,7 +9,7 @@ class UserEntity
         private readonly string $name,
         private readonly string $passwordHash,
         private readonly bool $isAdmin,
-        private readonly ?string $dashboardRowOrder,
+        private readonly ?string $dashboardVisibleRows,
         private readonly ?string $dashboardExtendedRows,
         private readonly int $privacyLevel,
         private readonly bool $coreAccountChangesDisabled,
@@ -50,6 +50,16 @@ class UserEntity
             (bool)$data['plex_scrobble_ratings'],
             (bool)$data['watchlist_automatic_removal_enabled'],
         );
+    }
+
+    public function getDashboardExtendedRows() : ?string
+    {
+        return $this->dashboardExtendedRows;
+    }
+
+    public function getDashboardVisibleRows() : ?string
+    {
+        return $this->dashboardVisibleRows;
     }
 
     public function getDateFormatId() : int
@@ -135,15 +145,5 @@ class UserEntity
     public function isAdmin() : bool
     {
         return $this->isAdmin;
-    }
-
-    public function getDashboardRowOrder() : ?string
-    {
-        return $this->dashboardRowOrder;
-    }
-
-    public function getDashboardExtendedRows() : ?string
-    {
-        return $this->dashboardExtendedRows;
     }
 }
