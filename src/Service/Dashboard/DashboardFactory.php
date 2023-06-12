@@ -12,9 +12,11 @@ class DashboardFactory
     {
         $visibleRows = (string)$user->getDashboardVisibleRows();
         $extendedRows = (string)$user->getDashboardExtendedRows();
+        $orderRows = (string)$user->getDashboardOrderRows();
 
         $visibleRows = $visibleRows !== '' ? explode(';', $visibleRows) : [];
         $extendedRows = $extendedRows !== '' ? explode(';', $extendedRows) : [];
+        $orderRows = $orderRows !== '' ? explode(';', $orderRows) : [];
 
         if (empty($visibleRows) === true) {
             return $this->createDefaultDashboardRows();
@@ -22,8 +24,18 @@ class DashboardFactory
 
         $dashboardRows = DashboardRowList::create();
 
-        foreach ($visibleRows as $rowId) {
-            $dashboardRows->add($this->createDashboardRowById((int)$rowId, in_array($rowId, $extendedRows, true)));
+        foreach (self::createDefaultDashboardRows() as $defaultDashboardRow) {
+            $isVisible = in_array($defaultDashboardRow->getId(), $visibleRows);
+            $isExtended = in_array($defaultDashboardRow->getId(), $extendedRows);
+            $position = array_search((string)$defaultDashboardRow->getId(), $orderRows);
+
+            if ($position === false) {
+                $dashboardRows->add($this->createDashboardRowById($defaultDashboardRow->getId(), $isVisible, $isExtended));
+
+                continue;
+            }
+
+            $dashboardRows->addAtOffset($position, $this->createDashboardRowById($defaultDashboardRow->getId(), $isVisible, $isExtended));
         }
 
         return $dashboardRows;
@@ -43,17 +55,17 @@ class DashboardFactory
         );
     }
 
-    private function createDashboardRowById(int $rowId, bool $isExtended) : DashboardRow
+    private function createDashboardRowById(int $rowId, bool $isVisible, bool $isExtended) : DashboardRow
     {
         return match (true) {
-            DashboardRow::createLastPlays()->getId() === $rowId => DashboardRow::createLastPlays($isExtended),
-            DashboardRow::createMostWatchedActors()->getId() === $rowId => DashboardRow::createMostWatchedActors($isExtended),
-            DashboardRow::createMostWatchedActresses()->getId() === $rowId => DashboardRow::createMostWatchedActresses($isExtended),
-            DashboardRow::createMostWatchedDirectors()->getId() === $rowId => DashboardRow::createMostWatchedDirectors($isExtended),
-            DashboardRow::createMostWatchedGenres()->getId() === $rowId => DashboardRow::createMostWatchedGenres($isExtended),
-            DashboardRow::createMostWatchedLanguages()->getId() === $rowId => DashboardRow::createMostWatchedLanguages($isExtended),
-            DashboardRow::createMostWatchedProductionCompanies()->getId() === $rowId => DashboardRow::createMostWatchedProductionCompanies($isExtended),
-            DashboardRow::createMostWatchedReleaseYears()->getId() === $rowId => DashboardRow::createMostWatchedReleaseYears($isExtended),
+            DashboardRow::createLastPlays()->getId() === $rowId => DashboardRow::createLastPlays($isVisible, $isExtended),
+            DashboardRow::createMostWatchedActors()->getId() === $rowId => DashboardRow::createMostWatchedActors($isVisible, $isExtended),
+            DashboardRow::createMostWatchedActresses()->getId() === $rowId => DashboardRow::createMostWatchedActresses($isVisible, $isExtended),
+            DashboardRow::createMostWatchedDirectors()->getId() === $rowId => DashboardRow::createMostWatchedDirectors($isVisible, $isExtended),
+            DashboardRow::createMostWatchedGenres()->getId() === $rowId => DashboardRow::createMostWatchedGenres($isVisible, $isExtended),
+            DashboardRow::createMostWatchedLanguages()->getId() === $rowId => DashboardRow::createMostWatchedLanguages($isVisible, $isExtended),
+            DashboardRow::createMostWatchedProductionCompanies()->getId() === $rowId => DashboardRow::createMostWatchedProductionCompanies($isVisible, $isExtended),
+            DashboardRow::createMostWatchedReleaseYears()->getId() === $rowId => DashboardRow::createMostWatchedReleaseYears($isVisible, $isExtended),
 
             default => throw new \RuntimeException('Not supported dashboard row id: ' . $rowId)
         };

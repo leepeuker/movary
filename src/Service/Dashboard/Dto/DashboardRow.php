@@ -7,53 +7,54 @@ class DashboardRow
     public function __construct(
         private readonly int $id,
         private readonly string $name,
+        private readonly bool $isVisible,
         private readonly bool $isExtended,
     ) {
     }
 
-    public static function createLastPlays(bool $isExtended = true) : self
+    public static function createLastPlays(bool $isVisible = true, bool $isExtended = true) : self
     {
-        return self::create(0, 'Last Plays', $isExtended);
+        return self::create(0, 'Last Plays', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedActors(bool $isExtended = false) : self
+    public static function createMostWatchedActors(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(1, 'Most watched Actors', $isExtended);
+        return self::create(1, 'Most watched Actors', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedActresses(bool $isExtended = false) : self
+    public static function createMostWatchedActresses(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(2, 'Most watched Actresses', $isExtended);
+        return self::create(2, 'Most watched Actresses', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedDirectors(bool $isExtended = false) : self
+    public static function createMostWatchedDirectors(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(3, 'Most watched Directors', $isExtended);
+        return self::create(3, 'Most watched Directors', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedGenres(bool $isExtended = false) : self
+    public static function createMostWatchedGenres(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(4, 'Most watched Genres', $isExtended);
+        return self::create(4, 'Most watched Genres', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedLanguages(bool $isExtended = false) : self
+    public static function createMostWatchedLanguages(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(8, 'Most watched Languages', $isExtended);
+        return self::create(8, 'Most watched Languages', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedProductionCompanies(bool $isExtended = false) : self
+    public static function createMostWatchedProductionCompanies(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(6, 'Most watched Production Companies', $isExtended);
+        return self::create(6, 'Most watched Production Companies', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedReleaseYears(bool $isExtended = false) : self
+    public static function createMostWatchedReleaseYears(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(7, 'Most watched Release Years', $isExtended);
+        return self::create(7, 'Most watched Release Years', $isVisible, $isExtended);
     }
 
-    private static function create(int $id, string $name, bool $isExtended) : self
+    private static function create(int $id, string $name, bool $isVisible, bool $isExtended) : self
     {
-        return new self($id, $name, $isExtended);
+        return new self($id, $name, $isVisible, $isExtended);
     }
 
     public function getId() : int
@@ -93,7 +94,7 @@ class DashboardRow
 
     public function isMostWatchedGenres() : bool
     {
-        return $this->getId() === self::createMostWatchedDirectors()->getId();
+        return $this->getId() === self::createMostWatchedGenres()->getId();
     }
 
     public function isMostWatchedLanguages() : bool
@@ -109,5 +110,10 @@ class DashboardRow
     public function isMostWatchedReleaseYears() : bool
     {
         return $this->getId() === self::createMostWatchedReleaseYears()->getId();
+    }
+
+    public function isVisible() : bool
+    {
+        return $this->isVisible;
     }
 }

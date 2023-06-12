@@ -450,6 +450,19 @@ class UserRepository
         );
     }
 
+    public function updateOrderDashboardRows(int $userId, string $orderRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_order_rows' => $orderRows,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updatePassword(int $userId, string $passwordHash) : void
     {
         $this->dbConnection->update(

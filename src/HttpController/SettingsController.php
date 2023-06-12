@@ -472,20 +472,17 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $bodyData = Json::decode($request->getBody());
 
-        $visibleRows = $bodyData['rowOrder'];
+        $visibleRows = $bodyData['visibleRows'];
         $extendedRows = $bodyData['extendedRows'];
-
-        foreach ($this->dashboardFactory->createDefaultDashboardRows() as $row) {
-            if (in_array($row->getId(), $visibleRows) === false) {
-                return Response::createBadRequest();
-            }
-        }
+        $orderRows = $bodyData['orderRows'];
 
         $visibleRowsString = implode(';', $visibleRows);
         $extendedRowsString = implode(';', $extendedRows);
+        $orderRowsString = implode(';', $orderRows);
 
-        $this->userApi->updateVisibleDashboardRow($userId, $visibleRowsString);
+        $this->userApi->updateVisibleDashboardRows($userId, $visibleRowsString);
         $this->userApi->updateExtendedDashboardRows($userId, $extendedRowsString);
+        $this->userApi->updateOrderDashboardRows($userId, $orderRowsString);
 
         return Response::createOk();
     }

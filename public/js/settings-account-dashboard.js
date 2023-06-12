@@ -1,7 +1,7 @@
 function moveItemUp(clickedElement) {
     let row = clickedElement.closest('.list-group-item');
     let firstChild = row.parentElement.firstElementChild;
-    if(row === firstChild) {
+    if (row === firstChild) {
         return;
     }
     let previousElement = row.previousElementSibling;
@@ -11,7 +11,7 @@ function moveItemUp(clickedElement) {
 function moveItemDown(clickedElement) {
     let row = clickedElement.closest('.list-group-item');
     let firstChild = row.parentElement.lastElementChild;
-    if(row === firstChild) {
+    if (row === firstChild) {
         return;
     }
     let nextElement = row.nextElementSibling;
@@ -19,7 +19,7 @@ function moveItemDown(clickedElement) {
 }
 
 function toggleRowExtension(element) {
-    if(element.classList.contains('bi-eye')) {
+    if (element.classList.contains('bi-eye')) {
         element.classList.remove('bi-eye');
         element.classList.add('bi-eye-slash');
         element.closest('.dashboardRowItem').style.opacity = 0.5;
@@ -32,24 +32,39 @@ function toggleRowExtension(element) {
 
 function getRowOrder() {
     let rows = document.getElementsByClassName('dashboardRowItem');
+
     let rowOrder = [];
-    for(let i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
         rowOrder.push(rows[i].closest('.dashboardRowItem').dataset.rowid);
     }
+
     return rowOrder;
 }
 
-function getExtendedRows() {
-    let extendedRows = document.getElementsByClassName('bi-eye');
+function getVisibleRows() {
+    let rows = document.getElementsByClassName('bi-eye');
+
     let rowList = [];
-    for(let i = 0; i < extendedRows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
+        rowList.push(rows[i].closest('.dashboardRowItem').dataset.rowid);
+    }
+
+    return rowList;
+}
+
+function getExtendedRows() {
+    let extendedRows = [];
+    let rowList = [];
+    for (let i = 0; i < extendedRows.length; i++) {
         rowList.push(extendedRows[i].closest('.dashboardRowItem').dataset.rowid);
     }
+
     return rowList;
 }
 
 async function updateDashboardRows() {
-    let rowOrder = getRowOrder();
+    let orderRows = getRowOrder();
+    let visibleRows = getVisibleRows();
     let extendedRows = getExtendedRows();
     await fetch('/settings/account/update-dashboard-rows', {
         method: 'POST',
@@ -57,7 +72,8 @@ async function updateDashboardRows() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'rowOrder': rowOrder,
+            'orderRows': orderRows,
+            'visibleRows': visibleRows,
             'extendedRows': extendedRows
         })
     }).then(response => {
@@ -66,7 +82,7 @@ async function updateDashboardRows() {
             return false;
         } else {
             addAlert('accountDashboardSettingsLog', 'Dashboard rows succesfully updated!', 'success');
-        };
+        }
     }).catch(function (error) {
         addAlert('accountDashboardSettingsLog', 'Error: Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.', 'danger');
         console.error(error);

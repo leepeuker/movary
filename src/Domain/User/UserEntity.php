@@ -11,6 +11,7 @@ class UserEntity
         private readonly bool $isAdmin,
         private readonly ?string $dashboardVisibleRows,
         private readonly ?string $dashboardExtendedRows,
+        private readonly ?string $dashboardOrderRows,
         private readonly int $privacyLevel,
         private readonly bool $coreAccountChangesDisabled,
         private readonly int $dateFormatId,
@@ -36,6 +37,7 @@ class UserEntity
             (bool)$data['is_admin'],
             $data['dashboard_visible_rows'],
             $data['dashboard_extended_rows'],
+            $data['dashboard_order_rows'],
             $data['privacy_level'],
             (bool)$data['core_account_changes_disabled'],
             $data['date_format_id'],
@@ -55,6 +57,11 @@ class UserEntity
     public function getDashboardExtendedRows() : ?string
     {
         return $this->dashboardExtendedRows;
+    }
+
+    public function getDashboardOrderRows() : ?string
+    {
+        return $this->dashboardOrderRows;
     }
 
     public function getDashboardVisibleRows() : ?string
