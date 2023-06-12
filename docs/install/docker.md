@@ -35,7 +35,7 @@ The easiest way to do this are managed docker volumes (used in the examples belo
 
 Docker secrets can be used for all environment variables, just append `_FILE` to the environment variable name.
 Secrets are used as a fallback for not existing environment variables.
-Make sure to not set the environment variable without the `_FILE` prefix if you want to use a secret.
+Make sure to not set the environment variable without the `_FILE` suffix if you want to use a secret.
 
 For more info on Docker secrets, read the [official Docker documentation](https://docs.docker.com/engine/swarm/secrets/).
 
