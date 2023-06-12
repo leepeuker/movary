@@ -48,28 +48,28 @@
 
             <div class="list-group">
                 {% for dashboardRow in dashboardRows %}
-                    {% if dashboardRow.name == 'Last Plays' %}
+                    {% if dashboardRow.isLastPlays == true %}
                         {% import 'component/dashboard/row-last-plays.html.twig' as dashboardLastPlays %}
                         {{ dashboardLastPlays.create(dashboardRow.isExtended, lastPlays, routeUsername) }}
-                    {% elseif dashboardRow.name == 'Most watched Actors' %}
+                    {% elseif dashboardRow.isMostWatchedActors == true %}
                         {% import "component/dashboard/row-most-watched-actors.html.twig" as dashboardMostWatchedActors %}
                         {{ dashboardMostWatchedActors.create(dashboardRow.isExtended, mostWatchedActors, routeUsername) }}
-                    {% elseif dashboardRow.name == 'Most watched Actresses' %}
+                    {% elseif dashboardRow.isMostWatchedActresses == true %}
                         {% import "component/dashboard/row-most-watched-actresses.html.twig" as dashboardMostWatchedActresses %}
                         {{ dashboardMostWatchedActresses.create(dashboardRow.isExtended, mostWatchedActresses, routeUsername) }}
-                    {% elseif dashboardRow.name == 'Most watched Directors' %}
+                    {% elseif dashboardRow.isMostWatchedDirectors == true %}
                         {% import "component/dashboard/row-most-watched-directors.html.twig" as dashboardMostWatchedDirectors %}
                         {{ dashboardMostWatchedDirectors.create(dashboardRow.isExtended, mostWatchedDirectors, routeUsername) }}
-                    {% elseif dashboardRow.name == 'Most watched Genres' %}
+                    {% elseif dashboardRow.isMostWatchedGenres == true %}
                         {% import "component/dashboard/row-most-watched-genres.html.twig" as dashboardMostWatchedGenres %}
                         {{ dashboardMostWatchedGenres.create(dashboardRow.isExtended, mostWatchedGenres, routeUsername) }}
-                    {% elseif dashboardRow.name == 'Most watched Languages' %}
+                    {% elseif dashboardRow.isMostWatchedLanguages == true %}
                         {% import "component/dashboard/row-most-watched-languages.html.twig" as dashboardMostWatchedLanguages %}
                         {{ dashboardMostWatchedLanguages.create(dashboardRow.isExtended, mostWatchedLanguages, routeUsername) }}
-                    {% elseif dashboardRow.name == 'Most watched Production Companies' %}
+                    {% elseif dashboardRow.isMostWatchedProductionCompanies == true %}
                         {% import "component/dashboard/row-most-watched-production-companies.html.twig" as dashboardMostWatchedProductionCopmanies %}
                         {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow.isExtended, mostWatchedProductionCompanies, routeUsername) }}
-                    {% elseif dashboardRow.name == 'Most watched Release Years' %}
+                    {% elseif dashboardRow.isMostWatchedReleaseYears == true %}
                         {% import "component/dashboard/row-most-watched-release-year.html.twig" as dashboardMostWatchedProductionCopmanies %}
                         {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow.isExtended, mostWatchedProductionCompanies, routeUsername) }}
                     {% endif %}

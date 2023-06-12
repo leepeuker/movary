@@ -70,4 +70,44 @@ class DashboardRow
     {
         return $this->isExtended;
     }
+
+    public function isLastPlays() : bool
+    {
+        return $this->getId() === self::createLastPlays()->getId();
+    }
+
+    public function isMostWatchedActors() : bool
+    {
+        return $this->getId() === self::createMostWatchedActors()->getId();
+    }
+
+    public function isMostWatchedActresses() : bool
+    {
+        return $this->getId() === self::createMostWatchedActresses()->getId();
+    }
+
+    public function isMostWatchedDirectors() : bool
+    {
+        return $this->getId() === self::createMostWatchedDirectors()->getId();
+    }
+
+    public function isMostWatchedGenres() : bool
+    {
+        return $this->getId() === self::createMostWatchedDirectors()->getId();
+    }
+
+    public function isMostWatchedLanguages() : bool
+    {
+        return $this->getId() === self::createMostWatchedLanguages()->getId();
+    }
+
+    public function isMostWatchedProductionCompanies() : bool
+    {
+        return $this->getId() === self::createMostWatchedProductionCompanies()->getId();
+    }
+
+    public function isMostWatchedReleaseYears() : bool
+    {
+        return $this->getId() === self::createMostWatchedReleaseYears()->getId();
+    }
 }
