@@ -3,6 +3,7 @@
 namespace Movary\ValueObject;
 
 use Movary\Util\File;
+use Movary\ValueObject\Exception\ConfigKeyNotSetException;
 
 class Config
 {
@@ -12,11 +13,12 @@ class Config
     ) {
     }
 
-    public function getAsBool(string $parameter, ?bool $fallbackValue = null) : bool
+    /** @throws ConfigKeyNotSetException */
+    public function getAsBool(string $key, ?bool $fallbackValue = null) : bool
     {
         try {
-            return (bool)$this->get($parameter);
-        } catch (\RuntimeException $e) {
+            return (bool)$this->get($key);
+        } catch (ConfigKeyNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -25,11 +27,12 @@ class Config
         }
     }
 
-    public function getAsInt(string $parameter, ?int $fallbackValue = null) : int
+    /** @throws ConfigKeyNotSetException */
+    public function getAsInt(string $key, ?int $fallbackValue = null) : int
     {
         try {
-            return (int)$this->get($parameter);
-        } catch (\RuntimeException $e) {
+            return (int)$this->get($key);
+        } catch (ConfigKeyNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -38,11 +41,12 @@ class Config
         }
     }
 
-    public function getAsString(string $parameter, ?string $fallbackValue = null) : string
+    /** @throws ConfigKeyNotSetException */
+    public function getAsString(string $key, ?string $fallbackValue = null) : string
     {
         try {
-            return (string)$this->get($parameter);
-        } catch (\RuntimeException $e) {
+            return (string)$this->get($key);
+        } catch (ConfigKeyNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -51,6 +55,7 @@ class Config
         }
     }
 
+    /** @throws ConfigKeyNotSetException */
     private function get(string $key) : mixed
     {
         if (isset($this->config[$key]) === true) {
@@ -65,6 +70,6 @@ class Config
             }
         }
 
-        throw new \RuntimeException('Config key does not exist: ' . $key);
+        throw ConfigKeyNotSetException::create($key);
     }
 }

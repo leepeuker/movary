@@ -4,6 +4,7 @@ namespace Movary\Service;
 
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\Config;
+use Movary\ValueObject\Exception\ConfigKeyNotSetException;
 
 class ServerSettings
 {
@@ -49,7 +50,7 @@ class ServerSettings
     {
         try {
             $tmdbApiKey = $this->config->getAsString('APPLICATION_URL');
-        } catch (\RuntimeException) {
+        } catch (ConfigKeyNotSetException) {
             return false;
         }
 
@@ -60,7 +61,7 @@ class ServerSettings
     {
         try {
             $tmdbApiKey = $this->config->getAsString('TMDB_API_KEY');
-        } catch (\RuntimeException) {
+        } catch (ConfigKeyNotSetException) {
             return false;
         }
 
