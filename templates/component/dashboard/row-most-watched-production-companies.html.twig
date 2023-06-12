@@ -1,7 +1,7 @@
 {% macro create(isExtended, mostWatchedProductionCompanies, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
-    {{ rowItemToggle.create('Most watched Languages', isExtended) }}
+    {{ rowItemToggle.create('Most watched Production Companies', isExtended) }}
 
     <li class="list-group-item {{ isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">

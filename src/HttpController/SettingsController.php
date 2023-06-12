@@ -9,6 +9,7 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
@@ -25,17 +26,6 @@ use ZipStream;
 
 class SettingsController
 {
-    private const rowIds = [
-        'Last Plays',
-        'Most Watched Actors',
-        'Most Watched Actresses',
-        'Most Watched Directors',
-        'Most Watched Genres',
-        'Most Watched Languages',
-        'Most Watched Production Companies',
-        'Most Watched Release Years'
-    ];
-
     public function __construct(
         private readonly Environment $twig,
         private readonly JobQueueApi $workerService,
@@ -49,6 +39,7 @@ class SettingsController
         private readonly ServerSettings $serverSettings,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly JobQueueApi $jobQueueApi,
+        private readonly DashboardFactory $dashboardFactory,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -160,16 +151,13 @@ class SettingsController
         }
 
         $user = $this->authenticationService->getCurrentUser();
-        /** @psalm-suppress PossiblyNullArgument */
-        $rowOrder = empty($user->getDashboardRowOrder()) === true ? self::rowIds : explode(';', $user->getDashboardRowOrder());
-        /** @psalm-suppress PossiblyNullArgument */
-        $extendedRows = empty($user->getDashboardExtendedRows()) === true ? [] : explode(';', $user->getDashboardExtendedRows());
+
+        $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($user);
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-dashboard.html.twig', [
-                'rowOrder' => $rowOrder,
-                'extendedRows' => $extendedRows
+                'dashboardRows' => $dashboardRows
             ]),
         );
     }
@@ -487,8 +475,8 @@ class SettingsController
         $visibleRows = $bodyData['rowOrder'];
         $extendedRows = $bodyData['extendedRows'];
 
-        foreach (self::rowIds as $rowId) {
-            if (in_array($rowId, $visibleRows) === false) {
+        foreach ($this->dashboardFactory->createDefaultDashboardRows() as $row) {
+            if (in_array($row->getId(), $visibleRows) === false) {
                 return Response::createBadRequest();
             }
         }

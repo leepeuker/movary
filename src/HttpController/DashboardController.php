@@ -6,6 +6,7 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Service\Dashboard\DashboardFactory;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -14,14 +15,13 @@ use Twig\Environment;
 
 class DashboardController
 {
-    private const rowIds = ['Last Plays', 'Most Watched Actors', 'Most Watched Actresses', 'Most Watched Directors', 'Most Watched Genres', 'Most Watched Languages', 'Most Watched Production Companies', 'Most Watched Release Years'];
-
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly Authentication $authenticationService
+        private readonly Authentication $authenticationService,
+        private readonly DashboardFactory $dashboardFactory,
     ) {
     }
 
@@ -43,9 +43,6 @@ class DashboardController
         }
         $user = $this->authenticationService->getCurrentUser();
 
-        /**
-         * @psalm-suppress PossiblyNullArgument
-         */
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/dashboard.html.twig', [
@@ -65,8 +62,7 @@ class DashboardController
                 'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),
                 'mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12),
                 'mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId),
-                'rowOrder' => empty($user->getDashboardRowOrder()) === true ? self::rowIds : explode(';', $user->getDashboardRowOrder()),
-                'extendedRows' => empty($user->getDashboardExtendedRows()) === true ? [] : explode(';', $user->getDashboardExtendedRows())
+                'dashboardRows' => $this->dashboardFactory->createDashboardRowsForUser($user),
             ]),
         );
     }
