@@ -1,0 +1,28 @@
+{% macro create(isExtended, mostWatchedLanguages, routeUsername) %}
+
+    {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {{ rowItemToggle.create('Most watched Languages', isExtended) }}
+
+    <li class="list-group-item {{ isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
+        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+            {% for mostWatchedLanguage in mostWatchedLanguages %}
+                {% if loop.index <= 12 %}
+                    <div class="col" style="padding-bottom: 1rem;">
+                        <div class="card h-100 position-relative"
+                             style="cursor: pointer"
+                             onclick="window.location='/users/{{ routeUsername }}/movies?la={{ mostWatchedLanguage.code }}'">
+                            <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
+                                <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.name }}</small>
+                            </div>
+                            <div class="card-footer" style="padding: 0.1rem">
+                                <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedLanguage.count }}x</small>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/directors"
+           style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+    </li>
+{% endmacro %}
