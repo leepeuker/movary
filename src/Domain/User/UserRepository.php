@@ -398,7 +398,7 @@ class UserRepository
         );
     }
 
-    public function updateExtendedDashboardRows(int $userId, string $extendedRows) : void
+    public function updateExtendedDashboardRows(int $userId, ?string $extendedRows) : void
     {
         $this->dbConnection->update(
             'user',
@@ -443,6 +443,19 @@ class UserRepository
             'user',
             [
                 'name' => $name,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateOrderDashboardRows(int $userId, ?string $orderRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_order_rows' => $orderRows,
             ],
             [
                 'id' => $userId,
@@ -516,7 +529,7 @@ class UserRepository
         );
     }
 
-    public function updateVisibleDashboardRows(int $userId, string $visibleRows) : void
+    public function updateVisibleDashboardRows(int $userId, ?string $visibleRows) : void
     {
         $this->dbConnection->update(
             'user',

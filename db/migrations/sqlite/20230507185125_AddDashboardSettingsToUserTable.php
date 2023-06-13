@@ -92,6 +92,7 @@ final class AddDashboardSettingsToUserTable extends AbstractMigration
                 `is_admin` TINYINT(1) DEFAULT 0,
                 `dashboard_visible_rows` TEXT DEFAULT NULL,
                 `dashboard_extended_rows` TEXT DEFAULT NULL,
+                `dashboard_order_rows` TEXT DEFAULT NULL,
                 `privacy_level` INTEGER DEFAULT 1,
                 `date_format_id` INTEGER DEFAULT 0,
                 `trakt_user_name` TEXT,

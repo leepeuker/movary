@@ -40,7 +40,8 @@ which can lead to sudden breaking changes from time to time, so keep the release
 ## Features
 
 - Movie watch history: Collect and manage your watch history and ratings
-- Statistics: View  your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
+- Statistics: Analyze your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
+- Customization: You decide how your dashboard should look like, what format to use when displaying dates and more
 - Third party integrations: Import and export your history and ratings from/to platforms like Trakt, Letterboxd, or Netflix
 - Scrobbler: Automatically add new plays and ratings from Plex, Jellyfin or Emby
 - Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time

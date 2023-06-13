@@ -154,10 +154,14 @@ class SettingsController
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($user);
 
+        $dashboardRowsSuccessfullyReset = $this->sessionWrapper->find('dashboardRowsSuccessfullyReset');
+        $this->sessionWrapper->unset('dashboardRowsSuccessfullyReset');
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-dashboard.html.twig', [
-                'dashboardRows' => $dashboardRows
+                'dashboardRows' => $dashboardRows,
+                'dashboardRowsSuccessfullyReset' => $dashboardRowsSuccessfullyReset,
             ]),
         );
     }
@@ -445,6 +449,23 @@ class SettingsController
         );
     }
 
+    public function resetDashboardRows() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $this->userApi->updateVisibleDashboardRows($userId, null);
+        $this->userApi->updateExtendedDashboardRows($userId, null);
+        $this->userApi->updateOrderDashboardRows($userId, null);
+
+        $this->sessionWrapper->set('dashboardRowsSuccessfullyReset', true);
+
+        return Response::createOk();
+    }
+
     public function traktVerifyCredentials(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -472,20 +493,17 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $bodyData = Json::decode($request->getBody());
 
-        $visibleRows = $bodyData['rowOrder'];
+        $visibleRows = $bodyData['visibleRows'];
         $extendedRows = $bodyData['extendedRows'];
-
-        foreach ($this->dashboardFactory->createDefaultDashboardRows() as $row) {
-            if (in_array($row->getId(), $visibleRows) === false) {
-                return Response::createBadRequest();
-            }
-        }
+        $orderRows = $bodyData['orderRows'];
 
         $visibleRowsString = implode(';', $visibleRows);
         $extendedRowsString = implode(';', $extendedRows);
+        $orderRowsString = implode(';', $orderRows);
 
-        $this->userApi->updateVisibleDashboardRow($userId, $visibleRowsString);
+        $this->userApi->updateVisibleDashboardRows($userId, $visibleRowsString);
         $this->userApi->updateExtendedDashboardRows($userId, $extendedRowsString);
+        $this->userApi->updateOrderDashboardRows($userId, $orderRowsString);
 
         return Response::createOk();
     }

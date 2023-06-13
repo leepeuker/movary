@@ -1,7 +1,7 @@
 function moveItemUp(clickedElement) {
     let row = clickedElement.closest('.list-group-item');
     let firstChild = row.parentElement.firstElementChild;
-    if(row === firstChild) {
+    if (row === firstChild) {
         return;
     }
     let previousElement = row.previousElementSibling;
@@ -11,15 +11,15 @@ function moveItemUp(clickedElement) {
 function moveItemDown(clickedElement) {
     let row = clickedElement.closest('.list-group-item');
     let firstChild = row.parentElement.lastElementChild;
-    if(row === firstChild) {
+    if (row === firstChild) {
         return;
     }
     let nextElement = row.nextElementSibling;
     nextElement.after(row);
 }
 
-function toggleRowExtension(element) {
-    if(element.classList.contains('bi-eye')) {
+function toggleRowVisibility(element) {
+    if (element.classList.contains('bi-eye')) {
         element.classList.remove('bi-eye');
         element.classList.add('bi-eye-slash');
         element.closest('.dashboardRowItem').style.opacity = 0.5;
@@ -30,26 +30,52 @@ function toggleRowExtension(element) {
     }
 }
 
+function toggleRowExtension(element) {
+    if (element.classList.contains('bi-chevron-expand')) {
+        element.classList.remove('bi-chevron-expand');
+        element.classList.add('bi-chevron-contract');
+    } else {
+        element.classList.remove('bi-chevron-contract');
+        element.classList.add('bi-chevron-expand');
+    }
+}
+
 function getRowOrder() {
     let rows = document.getElementsByClassName('dashboardRowItem');
+
     let rowOrder = [];
-    for(let i = 0; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
         rowOrder.push(rows[i].closest('.dashboardRowItem').dataset.rowid);
     }
+
     return rowOrder;
 }
 
-function getExtendedRows() {
-    let extendedRows = document.getElementsByClassName('bi-eye');
+function getVisibleRows() {
+    let rows = document.getElementById('dashboardRowList').getElementsByClassName('bi-eye');
+
     let rowList = [];
-    for(let i = 0; i < extendedRows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
+        rowList.push(rows[i].closest('.dashboardRowItem').dataset.rowid);
+    }
+
+    return rowList;
+}
+
+function getExtendedRows() {
+    let extendedRows = document.getElementById('dashboardRowList').getElementsByClassName('bi-chevron-expand');
+
+    let rowList = [];
+    for (let i = 0; i < extendedRows.length; i++) {
         rowList.push(extendedRows[i].closest('.dashboardRowItem').dataset.rowid);
     }
+
     return rowList;
 }
 
 async function updateDashboardRows() {
-    let rowOrder = getRowOrder();
+    let orderRows = getRowOrder();
+    let visibleRows = getVisibleRows();
     let extendedRows = getExtendedRows();
     await fetch('/settings/account/update-dashboard-rows', {
         method: 'POST',
@@ -57,18 +83,42 @@ async function updateDashboardRows() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'rowOrder': rowOrder,
+            'orderRows': orderRows,
+            'visibleRows': visibleRows,
             'extendedRows': extendedRows
         })
     }).then(response => {
         if (!response.ok) {
-            console.error(error);
+            console.error(response);
+            addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+
             return false;
         } else {
-            addAlert('accountDashboardSettingsLog', 'Dashboard rows succesfully updated!', 'success');
-        };
+            addAlert('accountDashboardSettingsLog', 'Dashboard rows successfully updated.', 'success');
+        }
     }).catch(function (error) {
-        addAlert('accountDashboardSettingsLog', 'Error: Please check your browser console log (F12 -> Console) and the Movary application logs and report the error via <a href="https://github.com/leepeuker/movary" target="_blank">Github</a>.', 'danger');
+        addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+        console.error(error);
+    });
+}
+
+async function resetDashboardRows() {
+    await fetch('/settings/account/reset-dashboard-rows', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }).then(response => {
+        if (!response.ok) {
+            console.error(response);
+            addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+
+            return false;
+        } else {
+            location.reload()
+        }
+    }).catch(function (error) {
+        addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
         console.error(error);
     });
 }

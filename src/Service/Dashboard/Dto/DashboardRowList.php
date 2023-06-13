@@ -24,5 +24,14 @@ class DashboardRowList extends AbstractList
     public function add(DashboardRow $dashboardRow) : void
     {
         $this->data[] = $dashboardRow;
+
+        ksort($this->data);
+    }
+
+    public function addAtOffset(int $position, DashboardRow $dashboardRow) : void
+    {
+        $this->data[$position] = $dashboardRow;
+
+        ksort($this->data);
     }
 }

@@ -4,8 +4,8 @@ namespace Movary\HttpController;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
-use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
@@ -20,8 +20,8 @@ class DashboardController
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly Authentication $authenticationService,
         private readonly DashboardFactory $dashboardFactory,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -41,7 +41,8 @@ class DashboardController
         if ($userId === null) {
             return Response::createSeeOther('/');
         }
-        $user = $this->authenticationService->getCurrentUser();
+
+        $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
 
         return Response::create(
             StatusCode::createOk(),
@@ -62,7 +63,7 @@ class DashboardController
                 'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),
                 'mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12),
                 'mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId),
-                'dashboardRows' => $this->dashboardFactory->createDashboardRowsForUser($user),
+                'dashboardRows' => $dashboardRows,
             ]),
         );
     }

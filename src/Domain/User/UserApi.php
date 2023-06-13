@@ -200,7 +200,7 @@ class UserApi
         $this->repository->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
     }
 
-    public function updateExtendedDashboardRows(int $userId, string $extendedRows) : void
+    public function updateExtendedDashboardRows(int $userId, ?string $extendedRows) : void
     {
         if ($this->repository->findUserById($userId) === null) {
             throw new RuntimeException('There is no user with id: ' . $userId);
@@ -225,6 +225,15 @@ class UserApi
         $this->userValidator->ensureNameIsUnique($name, $userId);
 
         $this->repository->updateName($userId, $name);
+    }
+
+    public function updateOrderDashboardRows(int $userId, ?string $orderRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateOrderDashboardRows($userId, $orderRows);
     }
 
     public function updatePassword(int $userId, string $newPassword) : void
@@ -260,7 +269,7 @@ class UserApi
         $this->repository->updateTraktUserName($userId, $traktUserName);
     }
 
-    public function updateVisibleDashboardRow(int $userId, string $visibleRows) : void
+    public function updateVisibleDashboardRows(int $userId, ?string $visibleRows) : void
     {
         if ($this->repository->findUserById($userId) === null) {
             throw new RuntimeException('There is no user with id: ' . $userId);

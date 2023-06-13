@@ -169,6 +169,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'updateDashboardRows'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/settings/account/reset-dashboard-rows',
+        [\Movary\HttpController\SettingsController::class, 'resetDashboardRows'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/settings/integrations/trakt',
         [\Movary\HttpController\SettingsController::class, 'renderTraktPage'],
