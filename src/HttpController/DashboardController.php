@@ -4,7 +4,6 @@ namespace Movary\HttpController;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
-use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Dashboard\DashboardFactory;
@@ -21,7 +20,6 @@ class DashboardController
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly MovieApi $movieApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly Authentication $authenticationService,
         private readonly DashboardFactory $dashboardFactory,
         private readonly UserApi $userApi,
     ) {
