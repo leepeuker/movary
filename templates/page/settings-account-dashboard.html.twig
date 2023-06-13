@@ -22,9 +22,11 @@
             <div style="padding-top: 1rem">
                 <h5 class="text-center">Dashboard customization</h5>
 
-                <p>Customize the dashboard to your personal taste and preferences.</p>
+                <p>Customize the dashboard statistic rows to your personal taste and preferences.</p>
+                <button type="button" class="btn btn-info float-end" data-bs-toggle="modal" data-bs-target="#dashboardRowsHelpModal">Help</button>
+                <br style="margin-bottom: .8rem" />
 
-                <div class="mb-3" style="margin-top: 1em">
+                <div style="margin-top: 1em">
                     <ul class="list-group" style="margin-bottom: 1rem">
                         {% for dashboardRow in dashboardRows %}
                             <span class="list-group-item dashboardRowItem" data-rowid="{{ dashboardRow.id }}" style="opacity: {{ dashboardRow.isVisible ? '1' : '0.5' }}">
@@ -38,6 +40,7 @@
                             </span>
                         {% endfor %}
                     </ul>
+
                     <div id="accountDashboardSettingsLog">
                         {% if dashboardRowsSuccessfullyReset %}
                             <div class="alert alert-success alert-dismissible" role="alert">
@@ -46,10 +49,14 @@
                             </div>
                         {% endif %}
                     </div>
+
                     <button type="button" class="btn btn-danger float-start" onclick="resetDashboardRows()">Reset</button>
                     <button type="button" class="btn btn-primary float-end" onclick="updateDashboardRows()">Update</button>
+
                 </div>
             </div>
         </div>
+
+        {{ include('component/dashboard/row-help-modal.twig') }}
     </main>
 {% endblock %}
