@@ -200,6 +200,15 @@ class UserApi
         $this->repository->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
     }
 
+    public function updateExtendedDashboardRows(int $userId, ?string $extendedRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateExtendedDashboardRows($userId, $extendedRows);
+    }
+
     public function updateIsAdmin(int $userId, bool $isAdmin) : void
     {
         $this->repository->updateIsAdmin($userId, $isAdmin);
@@ -216,6 +225,15 @@ class UserApi
         $this->userValidator->ensureNameIsUnique($name, $userId);
 
         $this->repository->updateName($userId, $name);
+    }
+
+    public function updateOrderDashboardRows(int $userId, ?string $orderRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateOrderDashboardRows($userId, $orderRows);
     }
 
     public function updatePassword(int $userId, string $newPassword) : void
@@ -249,6 +267,15 @@ class UserApi
     public function updateTraktUserName(int $userId, ?string $traktUserName) : void
     {
         $this->repository->updateTraktUserName($userId, $traktUserName);
+    }
+
+    public function updateVisibleDashboardRows(int $userId, ?string $visibleRows) : void
+    {
+        if ($this->repository->findUserById($userId) === null) {
+            throw new RuntimeException('There is no user with id: ' . $userId);
+        }
+
+        $this->repository->updateVisibleDashboardRows($userId, $visibleRows);
     }
 
     public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void

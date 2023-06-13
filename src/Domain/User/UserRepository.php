@@ -398,6 +398,19 @@ class UserRepository
         );
     }
 
+    public function updateExtendedDashboardRows(int $userId, ?string $extendedRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_extended_rows' => $extendedRows,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateIsAdmin(int $userId, bool $isAdmin) : void
     {
         $this->dbConnection->update(
@@ -430,6 +443,19 @@ class UserRepository
             'user',
             [
                 'name' => $name,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateOrderDashboardRows(int $userId, ?string $orderRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_order_rows' => $orderRows,
             ],
             [
                 'id' => $userId,
@@ -496,6 +522,19 @@ class UserRepository
             'user',
             [
                 'trakt_user_name' => $traktUserName,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateVisibleDashboardRows(int $userId, ?string $visibleRows) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'dashboard_visible_rows' => $visibleRows,
             ],
             [
                 'id' => $userId,
