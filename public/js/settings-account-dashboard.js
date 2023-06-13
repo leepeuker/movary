@@ -52,7 +52,7 @@ function getRowOrder() {
 }
 
 function getVisibleRows() {
-    let rows = document.getElementsByClassName('bi-eye');
+    let rows = document.getElementById('dashboardRowList').getElementsByClassName('bi-eye');
 
     let rowList = [];
     for (let i = 0; i < rows.length; i++) {
@@ -63,7 +63,7 @@ function getVisibleRows() {
 }
 
 function getExtendedRows() {
-    let extendedRows = document.getElementsByClassName('bi-chevron-expand');
+    let extendedRows = document.getElementById('dashboardRowList').getElementsByClassName('bi-chevron-expand');
 
     let rowList = [];
     for (let i = 0; i < extendedRows.length; i++) {
