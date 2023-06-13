@@ -31,12 +31,12 @@ function toggleRowVisibility(element) {
 }
 
 function toggleRowExtension(element) {
-    if (element.classList.contains('bi-arrows-angle-expand')) {
-        element.classList.remove('bi-arrows-angle-expand');
-        element.classList.add('bi-arrows-angle-contract');
+    if (element.classList.contains('bi-chevron-expand')) {
+        element.classList.remove('bi-chevron-expand');
+        element.classList.add('bi-chevron-contract');
     } else {
-        element.classList.remove('bi-arrows-angle-contract');
-        element.classList.add('bi-arrows-angle-expand');
+        element.classList.remove('bi-chevron-contract');
+        element.classList.add('bi-chevron-expand');
     }
 }
 
@@ -63,7 +63,7 @@ function getVisibleRows() {
 }
 
 function getExtendedRows() {
-    let extendedRows = document.getElementsByClassName('bi-arrows-angle-contract');
+    let extendedRows = document.getElementsByClassName('bi-chevron-expand');
 
     let rowList = [];
     for (let i = 0; i < extendedRows.length; i++) {
@@ -94,7 +94,28 @@ async function updateDashboardRows() {
 
             return false;
         } else {
-            addAlert('accountDashboardSettingsLog', 'Dashboard rows successfully updated!', 'success');
+            addAlert('accountDashboardSettingsLog', 'Dashboard rows successfully updated.', 'success');
+        }
+    }).catch(function (error) {
+        addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+        console.error(error);
+    });
+}
+
+async function resetDashboardRows() {
+    await fetch('/settings/account/reset-dashboard-rows', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }).then(response => {
+        if (!response.ok) {
+            console.error(response);
+            addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+
+            return false;
+        } else {
+            location.reload()
         }
     }).catch(function (error) {
         addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');

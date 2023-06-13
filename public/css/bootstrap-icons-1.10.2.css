@@ -40,5 +40,5 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-trash-fill::before { content: "\f5dd"; }
 .bi-three-dots-vertical::before { content: "\f5d3"; }
 .bi-x-circle-fill::before { content: "\f622"; }
-.bi-arrows-angle-expand::before { content: "\f14a"; }
-.bi-arrows-angle-contract::before { content: "\f149"; }
+.bi-chevron-expand::before { content: "\f283"; }
+.bi-chevron-contract::before { content: "\f27d"; }

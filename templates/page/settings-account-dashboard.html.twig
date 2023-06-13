@@ -31,14 +31,22 @@
                                 <span class="ml-0 float-start col-6 d-flex" style="margin-top:.5rem">{{ dashboardRow.name }}</span>
                                 <div class="btn-group float-end">
                                     <button type="button" class="btn btn-primary" onclick="toggleRowVisibility(this.firstChild)"><i class="bi {{ dashboardRow.isVisible ? 'bi-eye' : 'bi-eye-slash' }}"></i></button>
-                                    <button type="button" class="btn btn-primary" onclick="toggleRowExtension(this.firstChild)"><i class="bi {{ dashboardRow.isExtended ? 'bi-arrows-angle-contract' : 'bi-arrows-angle-expand' }}"></i></button>
+                                    <button type="button" class="btn btn-primary" onclick="toggleRowExtension(this.firstChild)"><i class="bi {{ dashboardRow.isExtended ? 'bi-chevron-expand' : 'bi-chevron-contract' }}"></i></button>
                                     <button type="button" class="btn btn-primary" onclick="moveItemUp(this)"><i class="bi bi-arrow-up"></i></button>
                                     <button type="button" class="btn btn-primary" onclick="moveItemDown(this)"><i class="bi bi-arrow-down"></i></button>
                                 </div>
                             </span>
                         {% endfor %}
                     </ul>
-                    <div id="accountDashboardSettingsLog"></div>
+                    <div id="accountDashboardSettingsLog">
+                        {% if dashboardRowsSuccessfullyReset %}
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                Dashboard rows successfully reset.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-danger float-start" onclick="resetDashboardRows()">Reset</button>
                     <button type="button" class="btn btn-primary float-end" onclick="updateDashboardRows()">Update</button>
                 </div>
             </div>
