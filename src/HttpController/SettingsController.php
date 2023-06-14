@@ -10,6 +10,9 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Dashboard\DashboardFactory;
+use Movary\Service\Email\CannotSendEmailException;
+use Movary\Service\Email\EmailService;
+use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
@@ -40,6 +43,7 @@ class SettingsController
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly JobQueueApi $jobQueueApi,
         private readonly DashboardFactory $dashboardFactory,
+        private readonly EmailService $emailService,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -361,6 +365,37 @@ class SettingsController
         );
     }
 
+    public function renderServerEmailPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-email.html.twig', [
+                'smtpHost' => $this->serverSettings->getSmtpHost(),
+                'smtpHostSetInEnv' => $this->serverSettings->isSmtpHostSetInEnvironment(),
+                'smtpPort' => $this->serverSettings->getSmtpPort(),
+                'smtpPortSetInEnv' => $this->serverSettings->isSmtpPortSetInEnvironment(),
+                'smtpFromAddress' => $this->serverSettings->getFromAddress(),
+                'smtpFromAddressSetInEnv' => $this->serverSettings->isSmtpFromAddressSetInEnvironment(),
+                'smtpEncryption' => $this->serverSettings->getSmtpEncryption(),
+                'smtpEncryptionSetInEnv' => $this->serverSettings->isSmtpEncryptionSetInEnvironment(),
+                'smtpWithAuthentication' => $this->serverSettings->getSmtpWithAuthentication(),
+                'smtpWithAuthenticationSetInEnv' => $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment(),
+                'smtpUser' => $this->serverSettings->getSmtpUser(),
+                'smtpUserSetInEnv' => $this->serverSettings->isSmtpUserSetInEnvironment(),
+                'smtpPassword' => $this->serverSettings->getSmtpPassword(),
+                'smtpPasswordSetInEnv' => $this->serverSettings->isSmtpPasswordSetInEnvironment(),
+            ]),
+        );
+    }
+
     public function renderServerGeneralPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -462,6 +497,42 @@ class SettingsController
         $this->userApi->updateOrderDashboardRows($userId, null);
 
         $this->sessionWrapper->set('dashboardRowsSuccessfullyReset', true);
+
+        return Response::createOk();
+    }
+
+    public function sendTestEmail(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $smtpConfig = SmtpConfig::create(
+            (string)$requestData['smtpHost'],
+            (int)$requestData['smtpPort'],
+            (string)$requestData['smtpFromAddress'],
+            (string)$requestData['smtpEncryption'],
+            (bool)$requestData['smtpWithAuthentication'],
+            isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
+            isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
+        );
+
+        try {
+            $this->emailService->sendEmail(
+                $requestData['recipient'],
+                'Movary: Test Email',
+                'This is a test email sent to check the currently set email settings. It seems to work!',
+                $smtpConfig,
+            );
+        } catch (CannotSendEmailException $e) {
+            return Response::createBadRequest($e->getMessage());
+        }
 
         return Response::createOk();
     }
@@ -615,6 +686,52 @@ class SettingsController
         $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
 
         return Response::create(StatusCode::createNoContent());
+    }
+
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+    public function updateServerEmail(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $smtpHost = isset($requestData['smtpHost']) === false ? null : $requestData['smtpHost'];
+        $smtpPort = isset($requestData['smtpPort']) === false ? null : $requestData['smtpPort'];
+        $smtpFromAddress = isset($requestData['smtpFromAddress']) === false ? null : $requestData['smtpFromAddress'];
+        $smtpEncryption = isset($requestData['smtpEncryption']) === false ? null : $requestData['smtpEncryption'];
+        $smtpWithAuthentication = isset($requestData['smtpWithAuthentication']) === false ? null : (bool)$requestData['smtpWithAuthentication'];
+        $smtpUser = isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'];
+        $smtpPassword = isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'];
+
+        if ($smtpHost !== null) {
+            $this->serverSettings->setSmtpHost($smtpHost);
+        }
+        if ($smtpPort !== null) {
+            $this->serverSettings->setSmtpPort($smtpPort);
+        }
+        if ($smtpFromAddress !== null) {
+            $this->serverSettings->setSmtpFromAddress($smtpFromAddress);
+        }
+        if ($smtpEncryption !== null) {
+            $this->serverSettings->setSmtpEncryption($smtpEncryption);
+        }
+        if ($smtpWithAuthentication !== null) {
+            $this->serverSettings->setSmtpFromWithAuthentication($smtpWithAuthentication);
+        }
+        if ($smtpUser !== null) {
+            $this->serverSettings->setSmtpUser($smtpUser);
+        }
+        if ($smtpPassword !== null) {
+            $this->serverSettings->setSmtpPassword($smtpPassword);
+        }
+
+        return Response::createOk();
     }
 
     public function updateServerGeneral(Request $request) : Response

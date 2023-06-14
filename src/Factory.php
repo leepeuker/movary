@@ -27,6 +27,7 @@ use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\Dashboard\DashboardFactory;
+use Movary\Service\Email\EmailService;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
@@ -259,7 +260,8 @@ class Factory
             $container->get(WebhookUrlBuilder::class),
             $container->get(JobQueueApi::class),
             $container->get(DashboardFactory::class),
-            self::getApplicationVersion($config)
+            $container->get(EmailService::class),
+            self::getApplicationVersion($config),
         );
     }
 

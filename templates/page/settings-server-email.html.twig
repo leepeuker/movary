@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - App
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-server-email.js"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-bottom: 1rem;padding-top: 1rem">
+                <h5 style="margin-bottom: 1rem">Email settings</h5>
+
+                <p class="text-muted">Configuration set via environment variables cannot be changed and will be readonly.</p>
+
+                <div class="mb-3">
+                    <label for="smtpHostInput" class="form-label">
+                        <b>SMTP Host</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ smtpHost }}"
+                           id="smtpHostInput"
+                           style="text-align: center;"
+                            {{ smtpHostSetInEnv == true ? 'disabled' }}
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtpPortInput" class="form-label">
+                        <b>SMTP Port</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ smtpPort }}"
+                           id="smtpPortInput"
+                           style="text-align: center;"
+                            {{ smtpPortSetInEnv == true ? 'disabled' }}
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtpEncryptionInput" class="form-label">
+                        <b>SMTP Encryption</b>
+                    </label>
+                    <select class="form-control"
+                            id="smtpEncryptionInput"
+                            style="text-align: center;"
+                            {{ smtpEncryptionSetInEnv == true ? 'disabled' }}
+                    >
+                        <option value="" {% if smtpEncryption == '' %}selected{% endif %}>None</option>
+                        <option value="ssl" {% if smtpEncryption == 'ssl' %}selected{% endif %}>SSL</option>
+                        <option value="tsl" {% if smtpEncryption == 'tsl' %}selected{% endif %}>TSL</option>
+
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtpFromAddressInput" class="form-label">
+                        <b>From Address</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ smtpFromAddress }}"
+                           id="smtpFromAddressInput"
+                           style="text-align: center;"
+                            {{ smtpFromAddressSetInEnv == true ? 'disabled' }}
+                    >
+                </div>
+
+                <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="smtpWithAuthenticationInput"
+                           {% if smtpWithAuthentication == true %}checked{% endif %}
+                            {{ smtpWithAuthenticationSetInEnv == true ? 'disabled' }}
+                           style="margin-right: 0.2rem">
+                    <label class="form-check-label" for="Input">Enable SMTP Authentication</label>
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtpUserInput" class="form-label">
+                        <b>SMTP User</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ smtpUser }}"
+                           id="smtpUserInput"
+                           style="text-align: center;"
+                            {{ smtpUserSetInEnv == true ? 'disabled' }}
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="smtpPasswordInput" class="form-label">
+                        <b>SMTP Password</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           value="{{ smtpPassword }}"
+                           id="smtpPasswordInput"
+                           style="text-align: center;"
+                            {{ smtpPasswordSetInEnv == true ? 'disabled' }}
+                    >
+                </div>
+
+                <div id="alertEmailDiv"></div>
+
+                <button type="submit" class="btn btn-primary" id="emailSettingsTestButton">Test</button>
+                <button type="submit" class="btn btn-primary" id="emailSettingsUpdateButton">Submit</button>
+            </div>
+        </div>
+
+        {{ include('component/modal-test-email.html.twig') }}
+    </main>
+{% endblock %}
