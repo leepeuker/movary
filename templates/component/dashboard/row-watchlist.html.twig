@@ -9,11 +9,13 @@
                 <div class="col" style="padding-bottom: 1rem;">
                     <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}'"
                          style="cursor: pointer;">
-                        <div class="card-header text-truncate" style="padding: 0.2rem">
-                            <small class="text-muted" style="font-size: 0.9rem;">{{ watchlistItem.title }}</small>
-                        </div>
                         <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title }}" type="hidden">
-                        <img src="{{ watchlistItem.poster_path }}" alt="{{ watchlistItem.title }} Poster">
+                        <div style="height: 100%">
+                            <img src="{{ watchlistItem.poster_path }}"
+                                 class="card-img-top"
+                                 alt="{{ watchlistItem.title }} Poster">
+
+                        </div>
                         <div class="card-footer" style="padding: 0.1rem">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ watchlistItem.created_at|date(dateFormatPhp) }}</small>
                         </div>
