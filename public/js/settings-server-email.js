@@ -12,7 +12,7 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
         smtpPortInput.value,
         smtpFromAddressInput.value,
         smtpEncryptionInput.value,
-        smtpWithAuthenticationInput.value,
+        smtpWithAuthenticationInput.checked,
         smtpUserInput.value,
         smtpPasswordInput.value
     );

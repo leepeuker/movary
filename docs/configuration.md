@@ -20,3 +20,10 @@
 | `LOG_ENABLE_FILE_LOGGING`                   |           `1`           | Log directory is at `storage/logs`                                      |
 | `ENABLE_REGISTRATION`                       |           `0`           | Enables public user registration                                        |
 | `APPLICATION_URL`                           |            -            | Public base url of the application (e.g. `htttp://localhost`)           |
+| `SMTP_HOST`                                 |            -            | Required for sending emails                                             |
+| `SMTP_PORT`                                 |            -            | Required for sending emails                                             |
+| `SMTP_FROM_ADDRESS`                         |            -            | Required for sending emails                                             |
+| `SMTP_ENCRYPTION`                           |            -            | Required for sending emails (SSL or TSL)                                |
+| `SMTP_WITH_AUTH`                            |            -            | Required for sending emails (0 or 1)                                    |
+| `SMTP_USER`                                 |            -            | Required if `SMTP_WITH_AUTH` is set to 1                                |
+| `SMTP_PASSWORD`                             |            -            | Required if `SMTP_WITH_AUTH` is set to 1                                |

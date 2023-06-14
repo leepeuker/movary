@@ -12,7 +12,7 @@ class ServerSettings
 
     private const SMTP_HOST = 'SMTP_HOST';
 
-    private const SMTP_HOST_SENDER_ADDRESS = 'SMTP_HOST_SENDER_ADDRESS';
+    private const SMTP_SENDER_ADDRESS = 'SMTP_SENDER_ADDRESS';
 
     private const SMTP_PASSWORD = 'SMTP_PASSWORD';
 
@@ -78,17 +78,6 @@ class ServerSettings
         return (string)$value === '' ? null : (string)$value;
     }
 
-    public function getSmtpHostAddress() : ?string
-    {
-        try {
-            $value = $this->config->getAsString(self::SMTP_HOST_SENDER_ADDRESS);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_HOST_SENDER_ADDRESS);
-        }
-
-        return (string)$value === '' ? null : (string)$value;
-    }
-
     public function getSmtpPassword() : ?string
     {
         try {
@@ -109,6 +98,17 @@ class ServerSettings
         }
 
         return (string)$value === '' ? null : (int)$value;
+    }
+
+    public function getSmtpSenderAddress() : ?string
+    {
+        try {
+            $value = $this->config->getAsString(self::SMTP_SENDER_ADDRESS);
+        } catch (ConfigKeyNotSetException) {
+            $value = $this->fetchValueFromDatabase(self::SMTP_SENDER_ADDRESS);
+        }
+
+        return (string)$value === '' ? null : (string)$value;
     }
 
     public function getSmtpUser() : ?string
@@ -192,7 +192,7 @@ class ServerSettings
 
     public function isSmtpWithAuthenticationSetInEnvironment() : bool
     {
-        return $this->isSetInEnvironment(self::SMTP_FROM_ADDRESS);
+        return $this->isSetInEnvironment(self::SMTP_WITH_AUTH);
     }
 
     public function isTmdbApiKeySetInEnvironment() : bool
