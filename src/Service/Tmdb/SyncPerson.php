@@ -23,7 +23,13 @@ class SyncPerson
     {
         try {
             $tmdbPerson = $this->tmdbApi->fetchPersonDetails($tmdbId);
-        } catch (TmdbResourceNotFound $e) {
+        } catch (TmdbResourceNotFound) {
+            $person = $this->personApi->findByTmdbId($tmdbId);
+
+            if ($person !== null) {
+                $this->personApi->deleteById($person->getId());
+            }
+
             $this->logger->debug('No person existing on tmdb with id: ' . $tmdbId);
 
             return;
