@@ -11,20 +11,22 @@ There are two main ways how to set your server configuration:
 
 ## Environment variables
 
-The `Web UI` column is set to yes if an environment variable can alternatively be set via the web UI (after the application is already running).
+The `Web UI` column is set to yes if an environment variable can alternatively be set via the web UI.
 
 ### General
 
 | NAME                                        |   DEFAULT VALUE   | INFO                                                                    | Web UI |
-|:--------------------------------------------|:-----------------:|:------------------------------------------------------------------------|--------|
-| `TMDB_API_KEY`                              |         -         | **Required** (get key [here](https://www.themoviedb.org/settings/api))  | yes    |
-| `APPLICATION_URL`                           |         -         | Public base url of the application (e.g. `htttp://localhost`)           | yes    |
+|:--------------------------------------------|:-----------------:|:------------------------------------------------------------------------|:------:|
+| `TMDB_API_KEY`                              |         -         | **Required** (get key [here](https://www.themoviedb.org/settings/api))  |  yes   |
+| `APPLICATION_URL`                           |         -         | Public base url of the application (e.g. `htttp://localhost`)           |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |        `0`        | More info [here](features/tmdb-data.md#image-cache)                     |        |
 | `ENABLE_REGISTRATION`                       |        `0`        | Enables public user registration                                        |        |
 | `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |       `15`        | Minimum time between background jobs processing                         |        |
 | `TIMEZONE`                                  | `"Europe/Berlin"` | Supported timezones [here](https://www.php.net/manual/en/timezones.php) |        |
 
 ### Database
+
+Required to run the application
 
 | NAME                      |      DEFAULT VALUE      | INFO                             |
 |:--------------------------|:-----------------------:|:---------------------------------|
@@ -42,14 +44,14 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 Required when email support is wanted
 
 | NAME                | DEFAULT VALUE | INFO                                 | Web UI |
-|:--------------------|:-------------:|:-------------------------------------|--------|
-| `SMTP_HOST`         |       -       |                                      | yes    |
-| `SMTP_PORT`         |       -       |                                      | yes    |
-| `SMTP_FROM_ADDRESS` |       -       | Email address used as sender address | yes    |
-| `SMTP_ENCRYPTION`   |       -       | `SSL` and `TSL` supported            | yes    |
-| `SMTP_WITH_AUTH`    |       -       | `0` or `1`                           | yes    |
-| `SMTP_USER`         |       -       | Required if auth is enabled          | yes    |
-| `SMTP_PASSWORD`     |       -       | Required if auth is enabled          | yes    |
+|:--------------------|:-------------:|:-------------------------------------|:------:|
+| `SMTP_HOST`         |       -       |                                      |  yes   |
+| `SMTP_PORT`         |       -       |                                      |  yes   |
+| `SMTP_FROM_ADDRESS` |       -       | Email address used as sender address |  yes   |
+| `SMTP_ENCRYPTION`   |       -       | `SSL` and `TSL` supported            |  yes   |
+| `SMTP_WITH_AUTH`    |       -       | `0` or `1`                           |  yes   |
+| `SMTP_USER`         |       -       | Required if auth is enabled          |  yes   |
+| `SMTP_PASSWORD`     |       -       | Required if auth is enabled          |  yes   |
 
 ### Logging
 
