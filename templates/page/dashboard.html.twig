@@ -72,6 +72,9 @@
                     {% elseif dashboardRow.isMostWatchedReleaseYears and dashboardRow.isVisible %}
                         {% import "component/dashboard/row-most-watched-release-year.html.twig" as dashboardMostWatchedProductionCopmanies %}
                         {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow.isExtended, mostWatchedProductionCompanies, routeUsername) }}
+                    {% elseif dashboardRow.isWatchlist and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-watchlist.html.twig" as dashboardWatchlist %}
+                        {{ dashboardWatchlist.create(dashboardRow.isExtended, watchlistItems, routeUsername) }}
                     {% endif %}
                 {% endfor %}
             </div>

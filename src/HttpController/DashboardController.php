@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Dashboard\DashboardFactory;
@@ -19,6 +20,7 @@ class DashboardController
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly MovieApi $movieApi,
+        private readonly MovieWatchlistApi $movieWatchlistApi,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly DashboardFactory $dashboardFactory,
         private readonly UserApi $userApi,
@@ -63,6 +65,7 @@ class DashboardController
                 'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),
                 'mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12),
                 'mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId),
+                'watchlistItems' => $this->movieWatchlistApi->fetchWatchlistPaginated($userId, 6, 1),
                 'dashboardRows' => $dashboardRows,
             ]),
         );
