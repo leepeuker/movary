@@ -79,6 +79,11 @@ class PersonApi
         $this->repository->deleteAllNotReferenced();
     }
 
+    public function deleteById(int $id) : void
+    {
+        $this->repository->deleteById($id);
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
         return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);

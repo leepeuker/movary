@@ -8,7 +8,7 @@ Make sure you have set a valid TMDB api key, e.g. via environment variable (`TMD
 
     Execute the metadata sync and image cache commands regularly, e.g. via cronjobs, to keep your application data up to date.
 
-## Movie metadata
+## Movie & Person data
 
 ### Description
 Update local movie or person information with the latest data from TMDB.

@@ -1,12 +1,6 @@
 name: Deploy mkdocs
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - docs/**
-      - mkdocs.yml
   release:
     types: [published]
     paths:

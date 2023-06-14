@@ -57,6 +57,13 @@ class PersonRepository
         );
     }
 
+    public function deleteById(int $id) : void
+    {
+        $this->dbConnection->delete('movie_cast', ['person_id' => $id]);
+        $this->dbConnection->delete('movie_crew', ['person_id' => $id]);
+        $this->dbConnection->delete('person', ['id' => $id]);
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
     {
         $query = 'SELECT * FROM `person` ORDER BY updated_at_tmdb ASC';
