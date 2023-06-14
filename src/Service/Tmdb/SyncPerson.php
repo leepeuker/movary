@@ -26,7 +26,9 @@ class SyncPerson
         } catch (TmdbResourceNotFound) {
             $person = $this->personApi->findByTmdbId($tmdbId);
 
-            $this->personApi->deleteById($person->getId());
+            if ($person !== null) {
+                $this->personApi->deleteById($person->getId());
+            }
 
             $this->logger->debug('No person existing on tmdb with id: ' . $tmdbId);
 
