@@ -37,6 +37,11 @@ class DashboardRow
         return self::create(4, 'Most watched Genres', $isVisible, $isExtended);
     }
 
+    public static function createMostWatchedLanguages(bool $isVisible = true, bool $isExtended = false) : self
+    {
+        return self::create(8, 'Most watched Languages', $isVisible, $isExtended);
+    }
+
     public static function createMostWatchedProductionCompanies(bool $isVisible = true, bool $isExtended = false) : self
     {
         return self::create(6, 'Most watched Production Companies', $isVisible, $isExtended);
@@ -47,14 +52,9 @@ class DashboardRow
         return self::create(7, 'Most watched Release Years', $isVisible, $isExtended);
     }
 
-    public static function createMostWatchedLanguages(bool $isVisible = true, bool $isExtended = false) : self
-    {
-        return self::create(8, 'Most watched Languages', $isVisible, $isExtended);
-    }
-
     public static function createWatchlist(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(9, 'Items to watch', $isVisible, $isExtended);
+        return self::create(9, 'Latest in Watchlist', $isVisible, $isExtended);
     }
 
     private static function create(int $id, string $name, bool $isVisible, bool $isExtended) : self
@@ -117,13 +117,13 @@ class DashboardRow
         return $this->getId() === self::createMostWatchedReleaseYears()->getId();
     }
 
-    public function isWatchlist() : bool
-    {
-        return $this->getId() === self::createWatchlist()->getId();
-    }
-
     public function isVisible() : bool
     {
         return $this->isVisible;
+    }
+
+    public function isWatchlist() : bool
+    {
+        return $this->getId() === self::createWatchlist()->getId();
     }
 }

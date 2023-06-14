@@ -1,9 +1,9 @@
-{% macro create(isExtended, mostWatchedActresses, routeUsername) %}
+{% macro create(dashboardRow, mostWatchedActresses, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
-    {{ rowItemToggle.create('Most watched Actresses', isExtended) }}
+    {{ rowItemToggle.create(dashboardRow) }}
 
-    <li class="list-group-item {{ isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
+    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for mostWatchedActress in mostWatchedActresses %}
                 <div class="col" style="padding-bottom: 1rem;">

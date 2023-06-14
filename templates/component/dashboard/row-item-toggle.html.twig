@@ -1,15 +1,15 @@
-{% macro create(title, isExtended) %}
+{% macro create(dashboardRow) %}
     <li class="list-group-item
             list-group-item-action
             user-select-none
-            {% if isExtended %}
+            {% if dashboardRow.isExtended %}
             {{ theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' }}
             {% else %}
             {{ theme == 'dark' ? 'inactiveItemButton' : 'inactiveItemButton' }}
             {% endif %}
             "
         onclick="toggleButton(this)">
-        {{ title }}
-        <i class="bi {{ isExtended ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
+        {{ dashboardRow.name }}
+        <i class="bi {{ dashboardRow.isExtended ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
     </li>
 {% endmacro %}
