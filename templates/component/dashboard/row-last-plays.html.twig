@@ -1,9 +1,9 @@
-{% macro create(isExtended, lastPlays, routeUsername) %}
+{% macro create(dashboardRow, lastPlays, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
-    {{ rowItemToggle.create('Last Plays', isExtended) }}
+    {{ rowItemToggle.create(dashboardRow) }}
 
-    <li class="list-group-item {{ isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
+    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for lastPlay in lastPlays %}
                 <div class="col" style="padding-bottom: 1rem;">

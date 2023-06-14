@@ -1,9 +1,9 @@
-{% macro create(isExtended, mostWatchedGenres, routeUsername) %}
+{% macro create(dashboardRow, mostWatchedGenres, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
-    {{ rowItemToggle.create('Most watched Genres', isExtended) }}
+    {{ rowItemToggle.create(dashboardRow) }}
 
-    <li class="list-group-item {{ isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
+    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for mostWatchedGenre in mostWatchedGenres %}
                 {% if loop.index <= 12 %}
