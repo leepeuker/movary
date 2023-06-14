@@ -1,0 +1,15 @@
+{% macro create(title, isExtended) %}
+    <li class="list-group-item
+            list-group-item-action
+            user-select-none
+            {% if isExtended %}
+            {{ theme == 'dark' ? 'activeItemButton text-white' : 'activeItemButton activeItemButtonActiveLight' }}
+            {% else %}
+            {{ theme == 'dark' ? 'inactiveItemButton' : 'inactiveItemButton' }}
+            {% endif %}
+            "
+        onclick="toggleButton(this)">
+        {{ title }}
+        <i class="bi {{ isExtended ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
+    </li>
+{% endmacro %}

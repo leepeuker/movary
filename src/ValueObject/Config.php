@@ -2,27 +2,23 @@
 
 namespace Movary\ValueObject;
 
-use OutOfBoundsException;
+use Movary\Util\File;
+use Movary\ValueObject\Exception\ConfigKeyNotSetException;
 
 class Config
 {
-    public function __construct(private readonly array $config)
-    {
+    public function __construct(
+        private readonly File $fileUtil,
+        private readonly array $config,
+    ) {
     }
 
-    public static function createFromEnv(array $additionalData = []) : self
-    {
-        $fpmEnvironment = $_ENV;
-        $systemEnvironment = getenv();
-
-        return new self(array_merge($fpmEnvironment, $systemEnvironment, $additionalData));
-    }
-
-    public function getAsBool(string $parameter, ?bool $fallbackValue = null) : bool
+    /** @throws ConfigKeyNotSetException */
+    public function getAsBool(string $key, ?bool $fallbackValue = null) : bool
     {
         try {
-            return (bool)$this->get($parameter);
-        } catch (OutOfBoundsException $e) {
+            return (bool)$this->get($key);
+        } catch (ConfigKeyNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -31,11 +27,12 @@ class Config
         }
     }
 
-    public function getAsInt(string $parameter, ?int $fallbackValue = null) : int
+    /** @throws ConfigKeyNotSetException */
+    public function getAsInt(string $key, ?int $fallbackValue = null) : int
     {
         try {
-            return (int)$this->get($parameter);
-        } catch (OutOfBoundsException $e) {
+            return (int)$this->get($key);
+        } catch (ConfigKeyNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -44,11 +41,12 @@ class Config
         }
     }
 
-    public function getAsString(string $parameter, string $fallbackValue = null) : string
+    /** @throws ConfigKeyNotSetException */
+    public function getAsString(string $key, ?string $fallbackValue = null) : string
     {
         try {
-            return (string)$this->get($parameter);
-        } catch (OutOfBoundsException $e) {
+            return (string)$this->get($key);
+        } catch (ConfigKeyNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -57,17 +55,21 @@ class Config
         }
     }
 
-    private function ensureKeyExists(string $key) : void
-    {
-        if (isset($this->config[$key]) === false) {
-            throw new OutOfBoundsException('Key does not exist: ' . $key);
-        }
-    }
-
+    /** @throws ConfigKeyNotSetException */
     private function get(string $key) : mixed
     {
-        $this->ensureKeyExists($key);
+        if (isset($this->config[$key]) === true) {
+            return $this->config[$key];
+        }
 
-        return $this->config[$key];
+        if (isset($this->config[$key . '_FILE']) === true) {
+            $secretFile = $this->get($key . '_FILE');
+
+            if ($this->fileUtil->fileExists($secretFile) === true) {
+                return trim($this->fileUtil->readFile($secretFile));
+            }
+        }
+
+        throw ConfigKeyNotSetException::create($key);
     }
 }

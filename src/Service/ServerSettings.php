@@ -4,18 +4,28 @@ namespace Movary\Service;
 
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\Config;
+use Movary\ValueObject\Exception\ConfigKeyNotSetException;
 
 class ServerSettings
 {
     private const APPLICATION_URL = 'APPLICATION_URL';
+
     private const SMTP_HOST = 'SMTP_HOST';
+
     private const SMTP_HOST_SENDER_ADDRESS = 'SMTP_HOST_SENDER_ADDRESS';
+
     private const SMTP_PASSWORD = 'SMTP_PASSWORD';
+
     private const SMTP_PORT = 'SMTP_PORT';
+
     private const SMTP_USER = 'SMTP_USER';
+
     private const SMTP_FROM_ADDRESS = 'SMTP_FROM_ADDRESS';
+
     private const SMTP_ENCRYPTION = 'SMTP_ENCRYPTION';
+
     private const SMTP_WITH_AUTH = 'SMTP_WITH_AUTH';
+
     private const TMDB_API_KEY = 'TMDB_API_KEY';
 
     public function __construct(
@@ -28,7 +38,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::APPLICATION_URL);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::APPLICATION_URL);
         }
 
@@ -39,7 +49,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_FROM_ADDRESS);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_FROM_ADDRESS);
         }
 
@@ -50,7 +60,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_ENCRYPTION);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_ENCRYPTION);
         }
 
@@ -61,7 +71,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_HOST);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_HOST);
         }
 
@@ -72,7 +82,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_HOST_SENDER_ADDRESS);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_HOST_SENDER_ADDRESS);
         }
 
@@ -83,7 +93,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_PASSWORD);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_PASSWORD);
         }
 
@@ -94,7 +104,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_PORT);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_PORT);
         }
 
@@ -105,7 +115,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_USER);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_USER);
         }
 
@@ -116,7 +126,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::SMTP_WITH_AUTH);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::SMTP_WITH_AUTH);
         }
 
@@ -127,7 +137,7 @@ class ServerSettings
     {
         try {
             $value = $this->config->getAsString(self::TMDB_API_KEY);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             $value = $this->fetchValueFromDatabase(self::TMDB_API_KEY);
         }
 
@@ -143,7 +153,7 @@ class ServerSettings
     {
         try {
             $this->config->getAsString($key);
-        } catch (\OutOfBoundsException) {
+        } catch (ConfigKeyNotSetException) {
             return false;
         }
 

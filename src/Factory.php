@@ -26,7 +26,10 @@ use Movary\HttpController\LandingPageController;
 use Movary\HttpController\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
+use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\EmailService;
+use Movary\Service\Export\ExportService;
+use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdExporter;
@@ -39,7 +42,6 @@ use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
-use OutOfBoundsException;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -59,12 +61,18 @@ class Factory
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
     private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
-    public static function createConfig() : Config
+    public static function createConfig(ContainerInterface $container) : Config
     {
         $dotenv = Dotenv::createMutable(self::createDirectoryAppRoot());
         $dotenv->safeLoad();
 
-        return Config::createFromEnv();
+        $fpmEnvironment = $_ENV;
+        $systemEnvironment = getenv();
+
+        return new Config(
+            $container->get(File::class),
+            array_merge($fpmEnvironment, $systemEnvironment)
+        );
     }
 
     public static function createCreatePublicStorageLink(ContainerInterface $container) : CreatePublicStorageLink
@@ -146,6 +154,15 @@ class Factory
         return $connection;
     }
 
+    public static function createExportService(ContainerInterface $container) : ExportService
+    {
+        return new ExportService(
+            $container->get(MovieApi::class),
+            $container->get(ExportWriter::class),
+            self::createDirectoryStorage(),
+        );
+    }
+
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client();
@@ -197,11 +214,7 @@ class Factory
     {
         $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
 
-        try {
-            $enableStackTrace = $config->getAsBool('LOG_ENABLE_STACKTRACE');
-        } catch (OutOfBoundsException) {
-            $enableStackTrace = self::DEFAULT_LOG_ENABLE_STACKTRACE;
-        }
+        $enableStackTrace = $config->getAsBool('LOG_ENABLE_STACKTRACE', self::DEFAULT_LOG_ENABLE_STACKTRACE);
 
         $formatter->includeStacktraces($enableStackTrace);
 
@@ -214,11 +227,7 @@ class Factory
 
         $logger->pushHandler(self::createLoggerStreamHandlerStdout($container, $config));
 
-        try {
-            $enableFileLogging = $config->getAsBool('LOG_ENABLE_FILE_LOGGING');
-        } catch (OutOfBoundsException) {
-            $enableFileLogging = self::DEFAULT_ENABLE_FILE_LOGGING;
-        }
+        $enableFileLogging = $config->getAsBool('LOG_ENABLE_FILE_LOGGING', self::DEFAULT_ENABLE_FILE_LOGGING);
 
         if ($enableFileLogging === true) {
             $logger->pushHandler(self::createLoggerStreamHandlerFile($container, $config));
@@ -242,6 +251,7 @@ class Factory
             $container->get(ServerSettings::class),
             $container->get(WebhookUrlBuilder::class),
             $container->get(JobQueueApi::class),
+            $container->get(DashboardFactory::class),
             $container->get(EmailService::class),
             self::getApplicationVersion($config)
         );
@@ -368,11 +378,7 @@ class Factory
 
     private static function getApplicationVersion(Config $config) : string
     {
-        try {
-            return $config->getAsString('APPLICATION_VERSION');
-        } catch (OutOfBoundsException) {
-            return self::DEFAULT_APPLICATION_VERSION;
-        }
+        return $config->getAsString('APPLICATION_VERSION', self::DEFAULT_APPLICATION_VERSION);
     }
 
     private static function getLogLevel(Config $config) : string

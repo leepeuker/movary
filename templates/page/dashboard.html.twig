@@ -47,215 +47,33 @@
             <br>
 
             <div class="list-group">
-                <li class="list-group-item list-group-item-action user-select-none activeItemButton {{ theme == 'dark' ? 'text-white' : 'activeItemButtonActiveLight' }}"
-                    onclick="toggleButton(this)">
-                    Last Plays
-                    <i class="bi bi-chevron-up float-end"></i>
-                </li>
-                <li class="list-group-item activeItem" style="padding: 0.9rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for lastPlay in lastPlays %}
-                            <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ lastPlay.id }}'">
-                                    <div style="height: 100%">
-                                        <img src="{{ lastPlay.poster_path }}"
-                                             class="card-img-top"
-                                             alt="{{ lastPlay.title }} Poster">
-
-                                    </div>
-                                    <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>
-                                    </div>
-
-                                    {% if lastPlay.user_rating is not null %}
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                            {{ lastPlay.user_rating }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
-                </li>
-
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
-                    Most watched Actors
-                    <i class="bi bi-chevron-down float-end"></i>
-                </li>
-                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for mostWatchedActor in mostWatchedActors %}
-                            <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}'"
-                                     style="cursor: pointer;">
-                                    <div class="card-header text-truncate" style="padding: 0.2rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
-                                    </div>
-                                    <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                                    <img src="{{ mostWatchedActor.poster_path }}" alt="{{ mostWatchedActor.name }} Poster">
-                                    <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.uniqueCount }}x</small>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
-                       style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
-                </li>
-
-
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
-                    Most watched Actresses
-                    <i class="bi bi-chevron-down float-end"></i>
-                </li>
-                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for mostWatchedActress in mostWatchedActresses %}
-                            <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedActress.id }}'"
-                                     style="cursor: pointer;">
-                                    <div class="card-header text-truncate" style="padding: 0.2rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
-                                    </div>
-                                    <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
-                                    <img src="{{ mostWatchedActress.poster_path }}" alt="{{ mostWatchedActress.name }} Poster">
-                                    <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.uniqueCount }}x</small>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=1&pp=24"
-                       style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
-                </li>
-
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
-                    Most watched Directors
-                    <i class="bi bi-chevron-down float-end"></i>
-                </li>
-                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for mostWatchedDirector in mostWatchedDirectors %}
-                            <div class="col" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedDirector.id }}'"
-                                     style="cursor: pointer;">
-                                    <div class="card-header text-truncate" style="padding: 0.2rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.name }}</small>
-                                    </div>
-                                    <input id="directorName_{{ mostWatchedDirector.id }}" value="{{ mostWatchedDirector.name }}" type="hidden">
-                                    <img src="{{ mostWatchedDirector.poster_path }}" alt="{{ mostWatchedDirector.name }} Poster">
-                                    <div class="card-footer" style="padding: 0.1rem">
-                                        <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedDirector.uniqueCount }}x</small>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/directors"
-                           style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
-                    </div>
-                </li>
-
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
-                    Most watched Genres
-                    <i class="bi bi-chevron-down float-end"></i>
-                </li>
-                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for mostWatchedGenre in mostWatchedGenres %}
-                            {% if loop.index <= 12 %}
-                                <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100 position-relative"
-                                         style="cursor: pointer"
-                                         onclick="window.location='/users/{{ routeUsername }}/movies?ge={{ mostWatchedGenre.name }}'">
-                                        <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                            <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedGenre.name }}</small>
-                                        </div>
-                                        <div class="card-footer" style="padding: 0.1rem">
-                                            <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedGenre.count }}x</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </li>
-
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
-                    Most watched Languages
-                    <i class="bi bi-chevron-down float-end"></i>
-                </li>
-                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for mostWatchedLanguage in mostWatchedLanguages %}
-                            {% if loop.index <= 12 %}
-                                <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100 position-relative"
-                                         style="cursor: pointer"
-                                         onclick="window.location='/users/{{ routeUsername }}/movies?la={{ mostWatchedLanguage.code }}'">
-                                        <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                            <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedLanguage.name }}</small>
-                                        </div>
-                                        <div class="card-footer" style="padding: 0.1rem">
-                                            <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedLanguage.count }}x</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </li>
-
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
-                    Most watched Production Companies
-                    <i class="bi bi-chevron-down float-end"></i>
-                </li>
-                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for mostWatchedProductionCompany in mostWatchedProductionCompanies %}
-                            {% if loop.index <= 12 %}
-                                <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100 position-relative">
-                                        <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                            <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedProductionCompany.name }}</small>
-                                        </div>
-                                        <div class="card-footer" style="padding: 0.1rem">
-                                            <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedProductionCompany.count }}x</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </li>
-
-                <li class="list-group-item list-group-item-action user-select-none inactiveItemButton" onclick="toggleButton(this)">
-                    Most watched Release Years
-                    <i class="bi bi-chevron-down float-end"></i>
-                </li>
-                <li class="list-group-item inactiveItem" style="padding: 1rem 0.4rem 0 0.4rem;">
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                        {% for mostWatchedReleaseYear in mostWatchedReleaseYears %}
-                            {% if loop.index <= 12 %}
-                                <div class="col" style="padding-bottom: 1rem;">
-                                    <div class="card h-100 position-relative"
-                                         style="cursor: pointer"
-                                         onclick="window.location='/users/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}'">
-                                        <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
-                                            <small class="text-muted" style="font-size: 0.9rem;font-weight: bold;">{{ mostWatchedReleaseYear.name }}</small>
-                                        </div>
-                                        <div class="card-footer" style="padding: 0.1rem">
-                                            <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedReleaseYear.count }}x</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </li>
-
+                {% for dashboardRow in dashboardRows %}
+                    {% if dashboardRow.isLastPlays and dashboardRow.isVisible %}
+                        {% import 'component/dashboard/row-last-plays.html.twig' as dashboardLastPlays %}
+                        {{ dashboardLastPlays.create(dashboardRow.isExtended, lastPlays, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedActors and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-actors.html.twig" as dashboardMostWatchedActors %}
+                        {{ dashboardMostWatchedActors.create(dashboardRow.isExtended, mostWatchedActors, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedActresses and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-actresses.html.twig" as dashboardMostWatchedActresses %}
+                        {{ dashboardMostWatchedActresses.create(dashboardRow.isExtended, mostWatchedActresses, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedDirectors and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-directors.html.twig" as dashboardMostWatchedDirectors %}
+                        {{ dashboardMostWatchedDirectors.create(dashboardRow.isExtended, mostWatchedDirectors, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedGenres and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-genres.html.twig" as dashboardMostWatchedGenres %}
+                        {{ dashboardMostWatchedGenres.create(dashboardRow.isExtended, mostWatchedGenres, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedLanguages and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-languages.html.twig" as dashboardMostWatchedLanguages %}
+                        {{ dashboardMostWatchedLanguages.create(dashboardRow.isExtended, mostWatchedLanguages, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedProductionCompanies and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-production-companies.html.twig" as dashboardMostWatchedProductionCopmanies %}
+                        {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow.isExtended, mostWatchedProductionCompanies, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedReleaseYears and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-release-year.html.twig" as dashboardMostWatchedProductionCopmanies %}
+                        {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow.isExtended, mostWatchedProductionCompanies, routeUsername) }}
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </main>

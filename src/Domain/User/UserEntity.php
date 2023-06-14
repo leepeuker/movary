@@ -9,6 +9,9 @@ class UserEntity
         private readonly string $name,
         private readonly string $passwordHash,
         private readonly bool $isAdmin,
+        private readonly ?string $dashboardVisibleRows,
+        private readonly ?string $dashboardExtendedRows,
+        private readonly ?string $dashboardOrderRows,
         private readonly int $privacyLevel,
         private readonly bool $coreAccountChangesDisabled,
         private readonly int $dateFormatId,
@@ -32,6 +35,9 @@ class UserEntity
             $data['name'],
             $data['password'],
             (bool)$data['is_admin'],
+            $data['dashboard_visible_rows'],
+            $data['dashboard_extended_rows'],
+            $data['dashboard_order_rows'],
             $data['privacy_level'],
             (bool)$data['core_account_changes_disabled'],
             $data['date_format_id'],
@@ -46,6 +52,21 @@ class UserEntity
             (bool)$data['plex_scrobble_ratings'],
             (bool)$data['watchlist_automatic_removal_enabled'],
         );
+    }
+
+    public function getDashboardExtendedRows() : ?string
+    {
+        return $this->dashboardExtendedRows;
+    }
+
+    public function getDashboardOrderRows() : ?string
+    {
+        return $this->dashboardOrderRows;
+    }
+
+    public function getDashboardVisibleRows() : ?string
+    {
+        return $this->dashboardVisibleRows;
     }
 
     public function getDateFormatId() : int
