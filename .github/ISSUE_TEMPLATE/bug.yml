@@ -45,35 +45,39 @@ body:
     label: Logs
     description: Please copy and paste any relevant log output. (Will be automatically formatted, no need for backticks)
     render: shell
-- type: dropdown
-  id: platform
+- type: input
+  id: server-os
   attributes:
-    label: Platform
+    label: Server OS
+    description: e.g. Ubuntu 22.04, Windows 11
+  validations:
+    required: false
+- type: dropdown
+  id: client-platform
+  attributes:
+    label: Client Platform
+    description: Provide if frontend is affected
     options:
     - Desktop
     - Smartphone
     - Tablet
-  validations:
-    required: true
 - type: input
   id: device
   attributes:
-    label: Device
-    description: e.g., iPhone X, Surface Pro, Samsung Galaxy Tab
-  validations:
-    required: true
+    label: Client Device
+    description: Provide if frontend is affected, e.g. iPhone X, Surface Pro, Samsung Galaxy Tab
 - type: input
-  id: os
+  id: client-os
   attributes:
-    label: Operating System
-    description: e.g., iOS 8.1, Windows 10, Android 11
+    label: Client OS
+    description: Provide if frontend is affected, e.g. iOS 16.3, Windows 11, Android 12
   validations:
     required: false
 - type: input
-  id: browser
+  id: client-browser
   attributes:
-    label: Browser
-    description: e.g., Chrome, Safari, Edge, Firefox
+    label: Client Browser
+    description: Provide if frontend is affected, e.g. Chrome, Safari, Edge, Firefox
   validations:
     required: false
 - type: textarea
