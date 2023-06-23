@@ -108,3 +108,4 @@ app_jobs_process:
 
 # Shortcuts
 php: exec_app_bash
+test: composer_test

@@ -17,6 +17,8 @@ class ImdbSync extends Command
 
     private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
+    private const OPTION_NAME_MOVIE_IDS = 'movieIds';
+
     protected static $defaultName = 'imdb:sync';
 
     public function __construct(
@@ -30,9 +32,10 @@ class ImdbSync extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Sync imdb ratings for local movies.')
-            ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Max number of movies to sync.')
-            ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.');
+            ->setDescription('Sync imdb ratings for local movies, sorted by how outdated they are (oldest first).')
+            ->addOption(self::OPTION_NAME_MOVIE_IDS, 'movieIds', InputOption::VALUE_REQUIRED, 'Comma separated string of movie ids to force sync.')
+            ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Maximum number of movies to sync.')
+            ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Number of hours required to have elapsed since last sync.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
@@ -41,14 +44,17 @@ class ImdbSync extends Command
         $maxAgeInHours = $hoursOption !== null ? (int)$hoursOption : null;
 
         $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
-        $movieCountSyncThreshold = $thresholdOption !== null ? (int)$thresholdOption : null;
+        $movieCountSyncThreshold = (int)$thresholdOption !== 0 ? (int)$thresholdOption : null;
+
+        $movieIdsOption = $input->getOption(self::OPTION_NAME_MOVIE_IDS);
+        $movieIds = (string)$movieIdsOption !== '' ? array_map('intval', explode(',', $movieIdsOption)) : null;
 
         $jobId = $this->jobQueueApi->addImdbSyncJob(JobStatus::createInProgress());
 
         try {
             $this->generateOutput($output, 'Syncing imdb movie ratings...');
 
-            $this->imdbMovieRatingSync->syncMultipleMovieRatings($maxAgeInHours, $movieCountSyncThreshold);
+            $this->imdbMovieRatingSync->syncMultipleMovieRatings($maxAgeInHours, $movieCountSyncThreshold, $movieIds);
 
             $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 

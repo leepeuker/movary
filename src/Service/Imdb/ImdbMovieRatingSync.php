@@ -6,6 +6,7 @@ use Exception;
 use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
@@ -44,6 +45,7 @@ class ImdbMovieRatingSync
             $this->logger->debug('IMDb: Skipped updating not changed movie rating', [$this->generateMovieLogData($movie)]);
 
             $this->movieApi->updateImdbTimestamp($movieId);
+
             return;
         }
 
@@ -68,14 +70,15 @@ class ImdbMovieRatingSync
     public function syncMultipleMovieRatings(
         ?int $maxAgeInHours = null,
         ?int $movieCountSyncThreshold = null,
+        array $movieIds = null,
         int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
     ) : void {
-        $movieIds = $this->movieApi->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold);
+        $movieIds = $this->movieApi->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold, $movieIds);
 
         foreach ($movieIds as $index => $movieId) {
             $this->syncMovieRating($movieId);
 
-            if ($index === array_key_last($movieIds)) {
+            if ($index === array_key_last($movieIds) || ((int)$movieCountSyncThreshold !== 0 && (int)$index + 1 >= $movieCountSyncThreshold)) {
                 break;
             }
 

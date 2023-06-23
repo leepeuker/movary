@@ -424,18 +424,23 @@ class MovieRepository
         );
     }
 
-    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null) : array
+    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null, ?array $filterMovieIds = null) : array
     {
         $limitQuery = '';
         if ($limit !== null) {
             $limitQuery = " LIMIT $limit";
         }
 
+        $filterMovieIdsQuery = '';
+        if ($filterMovieIds !== null) {
+            $filterMovieIdsQuery = ' AND movie.id IN (' . implode(',', $filterMovieIds) . ')';
+        }
+
         if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
             return $this->dbConnection->fetchFirstColumn(
                 'SELECT movie.id
                 FROM `movie` 
-                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= datetime("now","-' . $maxAgeInHours . ' hours"))
+                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= datetime("now","-' . $maxAgeInHours . ' hours"))' . $filterMovieIdsQuery . ' 
                 ORDER BY updated_at_imdb ASC' . $limitQuery,
             );
         }
@@ -443,7 +448,7 @@ class MovieRepository
         return $this->dbConnection->fetchFirstColumn(
             'SELECT movie.id
                 FROM `movie` 
-                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR))
+                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR))' . $filterMovieIdsQuery . ' 
                 ORDER BY updated_at_imdb ASC' . $limitQuery,
             [(int)$maxAgeInHours],
         );

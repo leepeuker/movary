@@ -15,18 +15,20 @@ Movies without IMDb ratings or updated the longest time ago are prioritized.
 php bin/console.php imdb:sync
 ```
 
-### Important flags
+### Interesting flags
 
 - `--help`
   Detailed information about the command
 - `--hours`
-  Only sync movie ratings which were last synced at least X hours ago
+  Number of hours required to have elapsed since last sync
 - `--threshold`
-  Maximum number of movie ratings to sync
+  Maximum number of movies to sync
+- `--movieIds`
+  Comma separated string of movie ids to force sync for
 
 ### Example
 
-Update ratings for the first 30 movies which were updated at least 24 hours ago
+Update ratings for the first 30 movies which were not updated in the last 24 hours ago
 ```shell
 php bin/console.php imdb:sync` --hours 24 --threshold 30
 ```
