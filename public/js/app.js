@@ -8,6 +8,7 @@ if ('serviceWorker' in navigator) {
 }
 
 const PASSWORD_MIN_LENGTH = 8
+let currentModalVersion = 1;
 
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
@@ -29,9 +30,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
             document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
+
+            currentModalVersion++
         })
 
         document.getElementById('logPlayModal').addEventListener('hidden.bs.modal', function () {
+            setLogPlayModalSearchSpinner(false)
             logPlayModalSearchInput.value = ''
             resetLogModalLogInputs()
             resetLogModalSearchResults()
@@ -39,6 +43,16 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 });
+
+function setLogPlayModalSearchSpinner(visible) {
+    if (visible === true) {
+        document.getElementById('logPlayModalSearchSpinner').classList.remove('d-none')
+
+        return
+    }
+
+    document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
+}
 
 function setTheme(theme, force = false) {
     const htmlTag = document.getElementById('html');
@@ -103,38 +117,60 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
 
 async function searchTmdbWithLogModalSearchInput() {
     resetLogModalSearchResults()
-    document.getElementById('logPlayModalSearchSpinner').classList.remove('d-none')
+    setLogPlayModalSearchSpinner(true)
+
+    let targetModalVersion = currentModalVersion
 
     const data = await fetch('/settings/netflix/search', {
-        method: 'POST', headers: {
+        signal: AbortSignal.timeout(4000),
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json'
-        }, body: JSON.stringify({
+        },
+        body: JSON.stringify({
             'query': document.getElementById('logPlayModalSearchInput').value
         })
     }).then(response => {
         if (!response.ok) {
             console.error(response);
-            document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
-            displayLogModalTmdbSearchError()
+
+            if (targetModalVersion !== currentModalVersion) {
+                return null
+            }
+
+            setLogPlayModalSearchSpinner(false)
+            displayLogModalTmdbSearchError('Something went wrong. Please try again.')
 
             return null;
         }
 
         return response.json()
     }).catch(function (error) {
-        console.error(error);
+        setLogPlayModalSearchSpinner(false)
 
-        document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
-        displayLogModalTmdbSearchError()
+        console.log(error)
+
+        if (targetModalVersion !== currentModalVersion) {
+            return null
+        }
+
+        if (error instanceof DOMException) {
+            displayLogModalTmdbSearchError('Search request timed out. Please try again.')
+        } else {
+            displayLogModalTmdbSearchError('Something went wrong. Please try again.')
+        }
+
+        return null
     });
 
-    if (data !== null) {
-        document.getElementById('logPlayModalSearchSpinner').classList.add('d-none')
+    if (data !== null && targetModalVersion === currentModalVersion) {
+        setLogPlayModalSearchSpinner(false)
         loadLogModalSearchResults(data)
     }
 }
 
-function displayLogModalTmdbSearchError() {
+function displayLogModalTmdbSearchError(message) {
+    document.getElementById('logPlayModalSearchErrorAlert').innerHTML = message
     document.getElementById('logPlayModalSearchErrorAlert').classList.remove('d-none')
 }
 
