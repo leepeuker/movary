@@ -31,6 +31,12 @@ class ImdbWebScrapperTest extends TestCase
                 bjjENQ">229.240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
+            'returns no rating if current production status is found' => [
+                'hjAonB">Post-production
+                iZlgcd">7.9</span>
+                bjjENQ">229.240</div>',
+                null,
+            ],
             [
                 'iZlgcd">7,9</span>
                 bjjENQ">229,240</div>',

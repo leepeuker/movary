@@ -27,6 +27,16 @@ class ImdbWebScrapper
             return null;
         }
 
+        $productionStatus = $this->extractProductionStatus($imdbMovieRatingPage);
+        if ($productionStatus !== null) {
+            $this->logger->debug('IMDb: Ignoring not yet released movie', [
+                'url' => $this->urlGenerator->buildMovieUrl($imdbId),
+                'productionStatus' => $productionStatus,
+            ]);
+
+            return null;
+        }
+
         $ratingAverage = $this->extractRatingAverage($imdbMovieRatingPage, $imdbId);
         if ($ratingAverage === null) {
             return null;
@@ -46,6 +56,16 @@ class ImdbWebScrapper
         ]);
 
         return $imdbRating;
+    }
+
+    private function extractProductionStatus(string $imdbRatingPage) : ?string
+    {
+        preg_match('~hjAonB">([^<]*)~', $imdbRatingPage, $productionStatus);
+        if (empty($productionStatus[1]) === true) {
+            return null;
+        }
+
+        return $productionStatus[1];
     }
 
     private function extractRatingAverage(string $imdbRatingPage, string $imdbId) : ?float
