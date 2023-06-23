@@ -22,13 +22,15 @@
             <div style="padding-top: 1rem">
                 <h5 class="text-center">Dashboard customization</h5>
 
-                <p>Customize the dashboard statistic rows to your personal taste and preferences.</p>
-                <h4 class="text-center float-start" style="padding-top: .4rem">Dashboard rows</h4>
-                <button type="button" class="btn btn-info float-end" data-bs-toggle="modal" data-bs-target="#dashboardRowsHelpModal">Help</button>
-                <br style="margin-bottom: .8rem" />
+                <div style="padding-bottom: .8rem">
+                    <p>Customize the dashboard statistic rows to your personal taste and preferences.</p>
+                    <h4 class="text-center float-start" style="padding-top: .4rem">Dashboard rows</h4>
+                    <button type="button" class="btn btn-info float-end" data-bs-toggle="modal" data-bs-target="#dashboardRowsHelpModal">Help</button>
+                </div>
+                <br>
 
                 <div style="margin-top: 1em">
-                    <ul class="list-group" id="dashboardRowList" style="margin-bottom: 1rem">
+                    <ul class="list-group" id="dashboardRowList" style="margin-bottom: 1rem;text-align: start">
                         {% for dashboardRow in dashboardRows %}
                             <span class="list-group-item dashboardRowItem" data-rowid="{{ dashboardRow.id }}" style="opacity: {{ dashboardRow.isVisible ? '1' : '0.5' }}">
                                 <span class="ml-0 float-start col-6 d-flex" style="margin-top:.5rem">{{ dashboardRow.name }}</span>
