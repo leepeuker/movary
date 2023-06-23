@@ -19,7 +19,7 @@ body:
   id: version
   attributes:
     label: Version
-    description: What version of Movary are you running? (You can find this in Settings → App -> About)
+    description: What version of Movary are you running? (You can find this in Settings → App → About)
   validations:
     required: true
 - type: textarea
@@ -49,7 +49,7 @@ body:
   id: server-os
   attributes:
     label: Server OS
-    description: e.g. Ubuntu 22.04, Windows 11
+    description: Provide if possible, e.g. Ubuntu 22.04, Windows 11
   validations:
     required: false
 - type: dropdown
@@ -65,19 +65,19 @@ body:
   id: device
   attributes:
     label: Client Device
-    description: Provide if frontend is affected, e.g. iPhone X, Surface Pro, Samsung Galaxy Tab
+    description: Provide if frontend is affected, e.g. Pixel 7a, iPhone 12, Samsung Galaxy Tab A8
 - type: input
   id: client-os
   attributes:
     label: Client OS
-    description: Provide if frontend is affected, e.g. iOS 16.3, Windows 11, Android 12
+    description: Provide if frontend is affected, e.g. Android 12, iOS 16.3, Windows 11
   validations:
     required: false
 - type: input
   id: client-browser
   attributes:
     label: Client Browser
-    description: Provide if frontend is affected, e.g. Chrome, Safari, Edge, Firefox
+    description: Provide if frontend is affected, e.g. Firefox, Chrome, Safari, Edge
   validations:
     required: false
 - type: textarea
