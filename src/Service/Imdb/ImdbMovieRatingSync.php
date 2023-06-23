@@ -6,6 +6,7 @@ use Exception;
 use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
@@ -32,6 +33,12 @@ class ImdbMovieRatingSync
         }
 
         $this->logger->debug('IMDb: Start movie rating update', [$this->generateMovieLogData($movie)]);
+
+        if ($movie->getReleaseDate()->isAfter(DateTime::create()) === true) {
+            $this->logger->debug('IMDb: Ignoring not yet released movie', [$this->generateMovieLogData($movie)]);
+
+            return;
+        }
 
         $imdbRating = $this->findRating($imdbId);
         if ($imdbRating === null) {
