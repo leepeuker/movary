@@ -55,6 +55,15 @@ class Config
         }
     }
 
+    public function getAsStringNullable(string $key, ?string $fallbackValue = null) : ?string
+    {
+        try {
+            return $this->getAsString($key, $fallbackValue);
+        } catch (ConfigKeyNotSetException) {
+            return null;
+        }
+    }
+
     /** @throws ConfigKeyNotSetException */
     private function get(string $key) : mixed
     {

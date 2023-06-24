@@ -17,6 +17,8 @@ class LandingPageController
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly bool $registrationEnabled,
+        private readonly ?string $defaultEmail,
+        private readonly ?string $defaultPassword,
     ) {
     }
 
@@ -42,7 +44,9 @@ class LandingPageController
             $this->twig->render('page/login.html.twig', [
                 'failedLogin' => $failedLogin,
                 'deletedAccount' => $deletedAccount,
-                'registrationEnabled' => $this->registrationEnabled
+                'registrationEnabled' => $this->registrationEnabled,
+                'defaultEmail' => $this->defaultEmail,
+                'defaultPassword' => $this->defaultPassword,
             ]),
         );
     }
