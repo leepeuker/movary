@@ -23,6 +23,8 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `ENABLE_REGISTRATION`                       |        `0`        | Enables public user registration                                        |        |
 | `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |       `15`        | Minimum time between background jobs processing                         |        |
 | `TIMEZONE`                                  | `"Europe/Berlin"` | Supported timezones [here](https://www.php.net/manual/en/timezones.php) |        |
+| `DEFAULT_LOGIN_EMAIL`                       |         -         | Email address to always autofill on login page                          |        |
+| `DEFAULT_LOGIN_PASSWORD`                    |         -         | Password to always autofill on login page                               |        |
 
 ### Database
 
