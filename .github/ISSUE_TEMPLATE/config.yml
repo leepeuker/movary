@@ -1,7 +1,10 @@
 contact_links:
-  - name: Support via Matrix
-    url: https://matrix.to/#/#movary-support:leepeuker.dev
-    about: Chat with the dev team and other users to get support
   - name: Support via GitHub Discussions
     url: https://github.com/leepeuker/movary/discussions
-    about: Ask questions and discuss with the dev team and other users
+    about: Ask questions and discuss Movary with the devs and community
+  - name: Support via Chat
+    url: https://matrix.to/#/#movary-support:leepeuker.dev
+    about: Get support via chat from the devs and community (Matrix)
+  - name: General discussion Chat
+    url: https://matrix.to/#/#movary-general:leepeuker.dev
+    about: General open Movary discussion chat (Matrix)
