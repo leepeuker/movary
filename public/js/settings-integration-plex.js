@@ -91,3 +91,28 @@ async function updateScrobbleOptions() {
         addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
     });
 }
+
+async function updatePlexToken() {
+    removeAlert('alertPlexWatchlistImportDiv')
+
+    await fetch('/settings/plex-token', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            'plexToken': document.getElementById('plexTokenInput').value,
+        })
+    }).then(response => {
+        if (!response.ok) {
+            addAlert('alertPlexWatchlistImportDiv', 'Could not update plex token', 'danger')
+
+            return
+        }
+
+        addAlert('alertPlexWatchlistImportDiv', 'Plex token was updated', 'success')
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertPlexWatchlistImportDiv', 'Could not update plex token', 'danger')
+    });
+}

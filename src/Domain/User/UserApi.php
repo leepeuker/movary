@@ -254,6 +254,11 @@ class UserApi
         $this->repository->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
     }
 
+    public function updatePlexToken(int $userId, ?string $plexToken) : void
+    {
+        $this->repository->updatePlexToken($userId, $plexToken);
+    }
+
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
     {
         $this->repository->updatePrivacyLevel($userId, $privacyLevel);

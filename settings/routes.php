@@ -221,7 +221,12 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/settings/plex',
-        [\Movary\HttpController\SettingsController::class, 'updatePlex'],
+        [\Movary\HttpController\SettingsController::class, 'updatePlexScrobbleOptions'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/plex-token',
+        [\Movary\HttpController\SettingsController::class, 'updatePlexToken'],
     );
     $routeCollector->addRoute(
         'PUT',

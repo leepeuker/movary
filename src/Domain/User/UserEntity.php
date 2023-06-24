@@ -24,6 +24,7 @@ class UserEntity
         private readonly bool $embyScrobbleWatches,
         private readonly bool $plexScrobbleWatches,
         private readonly bool $plexScrobbleRatings,
+        private readonly ?string $plexToken,
         private readonly bool $watchlistAutomaticRemovalEnabled,
     ) {
     }
@@ -50,6 +51,7 @@ class UserEntity
             (bool)$data['emby_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
+            $data['plex_token'],
             (bool)$data['watchlist_automatic_removal_enabled'],
         );
     }
@@ -97,6 +99,11 @@ class UserEntity
     public function getPasswordHash() : string
     {
         return $this->passwordHash;
+    }
+
+    public function getPlexToken() : ?string
+    {
+        return $this->plexToken;
     }
 
     public function getPlexWebhookId() : ?string

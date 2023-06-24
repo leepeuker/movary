@@ -361,6 +361,7 @@ class SettingsController
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
+                'plexToken' => $user->getPlexToken(),
             ]),
         );
     }
@@ -671,7 +672,7 @@ class SettingsController
         return Response::create(StatusCode::createOk());
     }
 
-    public function updatePlex(Request $request) : Response
+    public function updatePlexScrobbleOptions(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -684,6 +685,22 @@ class SettingsController
         $scrobbleRatings = (bool)$postParameters['scrobbleRatings'];
 
         $this->userApi->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
+
+        return Response::create(StatusCode::createNoContent());
+    }
+
+    public function updatePlexToken(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = Json::decode($request->getBody());
+
+        $scrobbleWatches = $postParameters['plexToken'] ?? null;
+
+        $this->userApi->updatePlexToken($userId, $scrobbleWatches);
 
         return Response::create(StatusCode::createNoContent());
     }

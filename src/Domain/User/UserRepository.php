@@ -490,6 +490,19 @@ class UserRepository
         );
     }
 
+    public function updatePlexToken(int $userId, ?string $plexToken) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_token' => $plexToken,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
     {
         $this->dbConnection->update(
