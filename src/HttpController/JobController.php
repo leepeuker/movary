@@ -11,7 +11,6 @@ use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use RuntimeException;
-use Twig\Environment;
 
 class JobController
 {
@@ -120,6 +119,21 @@ class JobController
         $this->jobQueueApi->addLetterboxdImportRatingsJob($userId, $targetFile);
 
         $this->sessionWrapper->set('letterboxdRatingsSyncSuccessful', true);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function schedulePlexWatchlistImport() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $this->jobQueueApi->addPlexImportWatchlistJob($this->authenticationService->getCurrentUserId());
 
         return Response::create(
             StatusCode::createSeeOther(),

@@ -34,6 +34,7 @@ use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
+use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
 use Movary\Service\WebhookUrlBuilder;
@@ -263,6 +264,7 @@ class Factory
             $container->get(JobQueueApi::class),
             $container->get(DashboardFactory::class),
             $container->get(EmailService::class),
+            $container->get(PlexWatchlistImporter::class),
             self::getApplicationVersion($config),
         );
     }

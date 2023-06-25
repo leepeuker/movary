@@ -6,6 +6,8 @@ use RuntimeException;
 
 class JobType
 {
+    private const TYPE_PLEX_IMPORT_WATCHLIST = 'plex_import_watchlist';
+
     private const TYPE_TMDB_PERSON_SYNC = 'tmdb_person_sync';
 
     private const TYPE_IMDB_SYNC = 'imdb_sync';
@@ -33,6 +35,7 @@ class JobType
                 self::TYPE_TRAKT_IMPORT_HISTORY,
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
+                self::TYPE_PLEX_IMPORT_WATCHLIST,
             ]) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
@@ -61,6 +64,11 @@ class JobType
     public static function createLetterboxdImportRatings() : self
     {
         return new self(self::TYPE_LETTERBOXD_IMPORT_RATINGS);
+    }
+
+    public static function createPlexImportWatchlist() : self
+    {
+        return new self(self::TYPE_PLEX_IMPORT_WATCHLIST);
     }
 
     public static function createTmdbImageCache() : self
@@ -101,6 +109,11 @@ class JobType
     public function isOfTypeLetterboxdImportRankings() : bool
     {
         return $this->type === self::TYPE_LETTERBOXD_IMPORT_RATINGS;
+    }
+
+    public function isOfTypePlexImportWatchlist() : bool
+    {
+        return $this->type === self::TYPE_PLEX_IMPORT_WATCHLIST;
     }
 
     public function isOfTypeTmdbImageCache() : bool

@@ -14,6 +14,7 @@ use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
@@ -44,6 +45,7 @@ class SettingsController
         private readonly JobQueueApi $jobQueueApi,
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
+        private readonly PlexWatchlistImporter $plexWatchlistImporter,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -670,6 +672,22 @@ class SettingsController
         $this->userApi->updatePassword($userId, $newPassword);
 
         return Response::create(StatusCode::createOk());
+    }
+
+    public function updatePlexImportWatchlist(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = Json::decode($request->getBody());
+
+        $plexToken = (string)$postParameters['plexToken'];
+
+        $this->plexWatchlistImporter->importPlexWatchlist($userId, $plexToken);
+
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function updatePlexScrobbleOptions(Request $request) : Response

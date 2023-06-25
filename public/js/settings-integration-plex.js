@@ -1,3 +1,23 @@
+const plexTokenInput = document.getElementById('plexTokenInput');
+toggleWatchlistImportButtonState()
+plexTokenInput.addEventListener('input', toggleWatchlistImportButtonState);
+
+function toggleWatchlistImportButtonState() {
+    document.getElementById('plexWatchlistImportButton').disabled = plexTokenInput.value === ''
+}
+
+async function importPlexWatchlist() {
+    const response = await fetch('/jobs/schedule/plex-watchlist-sync', {'method': 'get'})
+
+    if (!response.ok) {
+        addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    addAlert('alertPlexWatchlistImportDiv', 'Watchlist import scheduled', 'success')
+}
+
 function regeneratePlexWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return
@@ -101,7 +121,7 @@ async function updatePlexToken() {
             'Content-type': 'application/json'
         },
         body: JSON.stringify({
-            'plexToken': document.getElementById('plexTokenInput').value,
+            'plexToken': plexTokenInput.value,
         })
     }).then(response => {
         if (!response.ok) {

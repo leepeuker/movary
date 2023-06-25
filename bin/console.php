@@ -22,6 +22,7 @@ $application->add($container->get(Movary\Command\UserHistoryExport::class));
 $application->add($container->get(Movary\Command\UserRatingExport::class));
 $application->add($container->get(Movary\Command\UserUpdate::class));
 $application->add($container->get(Movary\Command\UserList::class));
+$application->add($container->get(Movary\Command\PlexWatchlistImport::class));
 $application->add($container->get(Movary\Command\ProcessJobs::class));
 $application->add($container->get(Movary\Command\ImdbSync::class));
 
