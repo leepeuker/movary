@@ -77,7 +77,7 @@ class PlexApi
                     $this->logger->debug(
                         'Plex Api - Found tmdb id on plex',
                         [
-                            'tmdbId' => (string)$tmdbId,
+                            'tmdbId' => $tmdbId,
                             'plexTitle' => $moviePlexTitle,
                             'plexYear' => (string)$moviePlexYear,
                         ],
