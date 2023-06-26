@@ -41,11 +41,6 @@ class PlexApi
             $moviePlexTitle = $plexWatchlistMovie['title'];
             $moviePlexYear = Year::createFromInt($plexWatchlistMovie['year']);
 
-            $logPayload = [
-                'plexTitle' => $moviePlexTitle,
-                'plexYear' => (string)$moviePlexYear,
-            ];
-
             $movie = $this->movieApi->findByTitleAndYear($moviePlexTitle, $moviePlexYear);
 
             $tmdbId = $movie?->getTmdbId();
@@ -53,7 +48,14 @@ class PlexApi
             if ($tmdbId !== null) {
                 yield $tmdbId;
 
-                $this->logger->debug("Plex Api - Found tmdb id locally: " . $tmdbId, $logPayload);
+                $this->logger->debug(
+                    'Plex Api - Found tmdb id locally',
+                    [
+                        'tmdbId' => (string)$tmdbId,
+                        'plexTitle' => $moviePlexTitle,
+                        'plexYear' => (string)$moviePlexYear,
+                    ],
+                );
 
                 continue;
             }
@@ -64,7 +66,7 @@ class PlexApi
                 continue;
             }
 
-            $foundTmdbId = false;
+            $tmdbId = null;
 
             foreach ($movieData['MediaContainer']['Metadata'][0]['Guid'] as $guid) {
                 if (str_starts_with($guid['id'], 'tmdb') === true) {
@@ -72,16 +74,27 @@ class PlexApi
 
                     yield $tmdbId;
 
-                    $this->logger->debug("Plex Api - Found tmdb id on plex: " . $tmdbId, $logPayload);
-
-                    $foundTmdbId = true;
+                    $this->logger->debug(
+                        'Plex Api - Found tmdb id on plex',
+                        [
+                            'tmdbId' => (string)$tmdbId,
+                            'plexTitle' => $moviePlexTitle,
+                            'plexYear' => (string)$moviePlexYear,
+                        ],
+                    );
 
                     break;
                 }
             }
 
-            if ($foundTmdbId === false) {
-                $this->logger->debug("Plex Api - Could not find tmdb id", $logPayload);
+            if ($tmdbId === null) {
+                $this->logger->debug(
+                    'Plex Api - Could not find tmdb id',
+                    [
+                        'plexTitle' => $moviePlexTitle,
+                        'plexYear' => (string)$moviePlexYear,
+                    ],
+                );
             }
         }
     }
