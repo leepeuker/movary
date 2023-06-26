@@ -19,12 +19,16 @@ class PlexTvClient
 
     public function get(string $relativeUrl, int $limit = 20, int $offset = 0) : array
     {
-        $request = new Request('GET', self::BASE_URL . ltrim($relativeUrl, '/'), [
-            'Content-Type' => 'application/json',
-            'X-Plex-Container-Size' => $limit,
-            'X-Plex-Container-Start' => $offset,
-            'Accept' => 'application/json'
-        ]);
+        $request = new Request(
+            'GET',
+            self::BASE_URL . ltrim($relativeUrl, '/'),
+            [
+                'Content-Type' => 'application/json',
+                'X-Plex-Container-Size' => (string)$limit,
+                'X-Plex-Container-Start' => (string)$offset,
+                'Accept' => 'application/json'
+            ]
+        );
 
         $response = $this->httpClient->sendRequest($request);
 

@@ -4,6 +4,7 @@ namespace Movary\Domain\Movie\Watchlist;
 
 use Movary\Domain\User\UserApi;
 use Movary\Service\UrlGenerator;
+use Movary\ValueObject\DateTime;
 
 class MovieWatchlistApi
 {
@@ -14,13 +15,13 @@ class MovieWatchlistApi
     ) {
     }
 
-    public function addMovieToWatchlist(int $userId, int $movieId) : void
+    public function addMovieToWatchlist(int $userId, int $movieId, ?DateTime $addedAt = null) : void
     {
         if ($this->repository->hasMovieInWatchlist($userId, $movieId) === true) {
             return;
         }
 
-        $this->repository->addMovieToWatchlist($userId, $movieId);
+        $this->repository->addMovieToWatchlist($userId, $movieId, $addedAt);
     }
 
     public function fetchWatchlistCount(int $userId, ?string $searchTerm = null) : int

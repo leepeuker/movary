@@ -674,18 +674,15 @@ class SettingsController
         return Response::create(StatusCode::createOk());
     }
 
-    public function updatePlexImportWatchlist(Request $request) : Response
+    public function updatePlexImportWatchlist() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
-        $postParameters = Json::decode($request->getBody());
 
-        $plexToken = (string)$postParameters['plexToken'];
-
-        $this->plexWatchlistImporter->importPlexWatchlist($userId, $plexToken);
+        $this->plexWatchlistImporter->importPlexWatchlist($userId);
 
         return Response::create(StatusCode::createNoContent());
     }

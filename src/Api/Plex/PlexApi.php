@@ -2,31 +2,17 @@
 
 namespace Movary\Api\Plex;
 
+use Movary\Domain\Movie\MovieApi;
+use Movary\ValueObject\Year;
+use Psr\Log\LoggerInterface;
+
 class PlexApi
 {
     public function __construct(
         private readonly PlexTvClient $plexClient,
+        private readonly MovieApi $movieApi,
+        private readonly LoggerInterface $logger,
     ) {
-    }
-
-    public function findTmdbIdsOfWatchlistMovies(\Generator $plexWatchlistMovies, string $plexToken) : \Generator
-    {
-        foreach ($plexWatchlistMovies as $plexWatchlistMovie) {
-            // TODO check if movie matching title and year already existing to save PLEX call?
-
-            $movieData = $this->plexClient->get($plexWatchlistMovie['key'] . '?X-Plex-Token=' . $plexToken);
-
-            if ($movieData['MediaContainer']['Metadata'][0]['type'] !== 'movie') {
-                continue;
-            }
-
-            foreach ($movieData['MediaContainer']['Metadata'][0]['Guid'] as $guid) {
-                if (str_starts_with($guid['id'], 'tmdb') === true) {
-                    yield str_replace('tmdb://', '', $guid['id']);
-                }
-            }
-            // TODO log if there is no tmdb found
-        }
     }
 
     public function fetchWatchlist(string $plexToken) : \Generator
@@ -47,5 +33,56 @@ class PlexApi
                 yield $movie;
             }
         } while ($totalItems > $offset);
+    }
+
+    public function findTmdbIdsOfWatchlistMovies(\Generator $plexWatchlistMovies, string $plexToken) : \Generator
+    {
+        foreach ($plexWatchlistMovies as $plexWatchlistMovie) {
+            $moviePlexTitle = $plexWatchlistMovie['title'];
+            $moviePlexYear = Year::createFromInt($plexWatchlistMovie['year']);
+
+            $logPayload = [
+                'plexTitle' => $moviePlexTitle,
+                'plexYear' => (string)$moviePlexYear,
+            ];
+
+            $movie = $this->movieApi->findByTitleAndYear($moviePlexTitle, $moviePlexYear);
+
+            $tmdbId = $movie?->getTmdbId();
+
+            if ($tmdbId !== null) {
+                yield $tmdbId;
+
+                $this->logger->debug("Plex Api - Found tmdb id locally: " . $tmdbId, $logPayload);
+
+                continue;
+            }
+
+            $movieData = $this->plexClient->get($plexWatchlistMovie['key'] . '?X-Plex-Token=' . $plexToken);
+
+            if ($movieData['MediaContainer']['Metadata'][0]['type'] !== 'movie') {
+                continue;
+            }
+
+            $foundTmdbId = false;
+
+            foreach ($movieData['MediaContainer']['Metadata'][0]['Guid'] as $guid) {
+                if (str_starts_with($guid['id'], 'tmdb') === true) {
+                    $tmdbId = str_replace('tmdb://', '', $guid['id']);
+
+                    yield $tmdbId;
+
+                    $this->logger->debug("Plex Api - Found tmdb id on plex: " . $tmdbId, $logPayload);
+
+                    $foundTmdbId = true;
+
+                    break;
+                }
+            }
+
+            if ($foundTmdbId === false) {
+                $this->logger->debug("Plex Api - Could not find tmdb id", $logPayload);
+            }
+        }
     }
 }

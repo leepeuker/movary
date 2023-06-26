@@ -11,14 +11,14 @@ class MovieWatchlistRepository
     {
     }
 
-    public function addMovieToWatchlist(int $userId, int $movieId) : void
+    public function addMovieToWatchlist(int $userId, int $movieId, ?DateTime $addedAt = null) : void
     {
         $this->dbConnection->insert(
             'watchlist',
             [
                 'movie_id' => $movieId,
                 'user_id' => $userId,
-                'added_at' => DateTime::create(),
+                'added_at' => $addedAt ?? DateTime::create(),
             ],
         );
     }
