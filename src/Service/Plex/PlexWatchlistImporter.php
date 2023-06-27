@@ -45,6 +45,8 @@ class PlexWatchlistImporter
         foreach ($this->plexApi->findTmdbIdsOfWatchlistMovies($plexWatchlistMovies, $plexToken) as $tmdbId) {
             try {
                 $this->importPlexWatchlistMovie($userId, (int)$tmdbId, $timestamp);
+
+                $timestamp = $timestamp->subSeconds(1); // To prevent movies having the same timestamp which causes sorting issues
             } catch (\Exception $e) {
                 $this->logger->warning(
                     'Could not import plex watchlist movie: ' . $e->getMessage(),
@@ -65,8 +67,6 @@ class PlexWatchlistImporter
         if ($movie === null) {
             $movie = $this->tmdbMovieSync->syncMovie($tmdbId);
         }
-
-        $timestamp = $timestamp->subSeconds(1);
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId(), $timestamp);
     }

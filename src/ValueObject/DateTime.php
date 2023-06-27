@@ -68,7 +68,7 @@ class DateTime implements JsonSerializable
     public function subSeconds(int $seconds) : self
     {
         $dateTime = new \DateTime($this->dateTime);
-        $dateTime = $dateTime->sub(new \DateInterval('PT' . $seconds . 'S'));
+        $dateTime->sub(new \DateInterval('PT' . $seconds . 'S'));
 
         return new self($dateTime);
     }

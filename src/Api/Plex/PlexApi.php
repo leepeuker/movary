@@ -17,9 +17,22 @@ class PlexApi
 
     public function fetchWatchlist(string $plexToken) : \Generator
     {
-        $relativeUrl = 'library/sections/watchlist/all?X-Plex-Token=' . $plexToken;
+        $queryParameters = [
+            'type' => '1',
+            'includeFields' => 'title%2Ctype%2Cyear%2Ckey',
+            'includeElements' => 'Guid',
+            'sort' => 'watchlistedAt%3Adesc',
+            'X-Plex-Token' => $plexToken,
+        ];
 
-        $limit = 20;
+        $queryString = '';
+        foreach ($queryParameters as $key => $value) {
+            $queryString .= "$key=$value&";
+        }
+
+        $relativeUrl = 'library/sections/watchlist/all?' . $queryString;
+
+        $limit = 30;
         $offset = 0;
 
         do {
@@ -61,10 +74,6 @@ class PlexApi
             }
 
             $movieData = $this->plexClient->get($plexWatchlistMovie['key'] . '?X-Plex-Token=' . $plexToken);
-
-            if ($movieData['MediaContainer']['Metadata'][0]['type'] !== 'movie') {
-                continue;
-            }
 
             $tmdbId = null;
 
