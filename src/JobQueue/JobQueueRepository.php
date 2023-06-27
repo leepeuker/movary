@@ -70,33 +70,6 @@ class JobQueueRepository
         return JobEntityList::createFromArray($data);
     }
 
-    public function findLastDateForJobByType(JobType $jobType) : ?DateTime
-    {
-        $data = $this->dbConnection->fetchOne('SELECT created_at FROM `job_queue` WHERE job_type = ? AND job_status = ? ORDER BY created_at', [$jobType, JobStatus::createDone()]);
-
-        if ($data === false) {
-            return null;
-        }
-
-        return DateTime::createFromString($data);
-    }
-
-    public function findLastLetterboxdImportsForUser(int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT *
-            FROM `job_queue` 
-            WHERE job_type IN (?, ?) AND user_id = ? 
-            ORDER BY created_at DESC
-            LIMIT 10',
-            [
-                JobType::createLetterboxdImportHistory(),
-                JobType::createLetterboxdImportRatings(),
-                $userId,
-            ],
-        );
-    }
-
     public function purgeNotProcessedJobs() : void
     {
         $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createWaiting()]);

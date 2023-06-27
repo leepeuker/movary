@@ -88,27 +88,6 @@ class JobQueueApi
         return $this->repository->find($userId, $jobType);
     }
 
-    public function findLastLetterboxdImportsForUser(int $userId) : array
-    {
-        return $this->repository->findLastLetterboxdImportsForUser($userId);
-    }
-
-    public function findLastTmdbSync() : ?DateTime
-    {
-        $lastMovieSync = $this->repository->findLastDateForJobByType(JobType::createTmdbMovieSync());
-        $lastPersonSync = $this->repository->findLastDateForJobByType(JobType::createTmdbPersonSync());
-
-        if ($lastMovieSync === null) {
-            return $lastPersonSync;
-        }
-
-        if ($lastPersonSync === null) {
-            return $lastMovieSync;
-        }
-
-        return $lastMovieSync->isAfter($lastPersonSync) ? $lastMovieSync : $lastPersonSync;
-    }
-
     public function purgeAllJobs() : void
     {
         $this->repository->purgeProcessedJobs();

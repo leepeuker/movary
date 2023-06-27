@@ -42,6 +42,12 @@ function setJobModalTitle(jobType) {
         case 'trakt_import_history':
             title = 'History imports';
             break;
+        case 'letterboxd_import_ratings':
+            title = 'Rating imports';
+            break;
+        case 'letterboxd_import_history':
+            title = 'History imports';
+            break;
         default:
             throw new Error('Not supported job type: ' + jobType);
     }

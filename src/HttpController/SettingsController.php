@@ -31,7 +31,6 @@ class SettingsController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly JobQueueApi $workerService,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,
@@ -306,7 +305,6 @@ class SettingsController
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
                 'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
-                'lastLetterboxdImportJobs' => $this->workerService->findLastLetterboxdImportsForUser($user->getId()),
             ]),
         );
     }
