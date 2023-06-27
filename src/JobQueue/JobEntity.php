@@ -7,7 +7,7 @@ use Movary\ValueObject\DateTime;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 
-class JobEntity
+class JobEntity implements \JsonSerializable
 {
     private function __construct(
         private readonly int $id,
@@ -66,5 +66,16 @@ class JobEntity
     public function getUserId() : ?int
     {
         return $this->userId;
+    }
+
+    public function jsonSerialize() : array
+    {
+        return [
+            'type' => $this->type,
+            'status' => $this->getStatus(),
+            'userId' => $this->getUserId(),
+            'createdAt' => $this->getCreatedAt(),
+            'updatedAt' => $this->getUpdatedAt()
+        ];
     }
 }

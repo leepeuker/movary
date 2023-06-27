@@ -251,7 +251,6 @@ class Factory
     {
         return new SettingsController(
             $container->get(Twig\Environment::class),
-            $container->get(JobQueueApi::class),
             $container->get(Authentication::class),
             $container->get(UserApi::class),
             $container->get(MovieApi::class),

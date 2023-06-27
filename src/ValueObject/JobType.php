@@ -4,7 +4,7 @@ namespace Movary\ValueObject;
 
 use RuntimeException;
 
-class JobType
+class JobType implements \JsonSerializable
 {
     private const TYPE_PLEX_IMPORT_WATCHLIST = 'plex_import_watchlist';
 
@@ -134,5 +134,10 @@ class JobType
     public function isOfTypeTraktImportRatings() : bool
     {
         return $this->type === self::TYPE_TRAKT_IMPORT_RATINGS;
+    }
+
+    public function jsonSerialize() : string
+    {
+        return $this->type;
     }
 }

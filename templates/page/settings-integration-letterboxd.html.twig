@@ -6,6 +6,7 @@
 
 {% block scripts %}
     <script src="/js/settings-integration-letterboxd.js"></script>
+    <script src="/js/job-modal.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -34,13 +35,15 @@
                 </div>
 
                 <form action="/jobs/schedule/letterboxd-diary-sync" method="post" enctype="multipart/form-data">
-                    <h5 style="margin-bottom: 0.5rem">Import Diary</h5>
+                    <h5 style="margin-bottom: 0.5rem">Import History</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the diary.csv file</p>
                     <div class="input-group mb-3">
                         <input type="file" class="form-control" accept=".csv" name="diaryCsv" id="diaryCsv" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
-                    <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
+
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_history')" style="margin-right: .3rem">Show imports</button>
+                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history</button>
 
                     {% if letterboxdDiarySyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
@@ -56,7 +59,9 @@
                         </div>
                     {% endif %}
                 </form>
+
                 <br>
+
                 <form action="/jobs/schedule/letterboxd-ratings-sync" method="post" enctype="multipart/form-data">
                     <h5 style="margin-bottom: 0.5rem">Import Ratings</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
@@ -64,7 +69,9 @@
                         <input type="file" class="form-control" accept=".csv" name="ratingsCsv" id="ratingsCsv" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
-                    <button type="submit" class="btn btn-primary" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Schedule import</button>
+
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_ratings')" style="margin-right: .3rem">Show imports</button>
+                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import ratings</button>
 
                     {% if letterboxdRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
@@ -82,43 +89,7 @@
 
                 <hr>
 
-                <h5 style="margin-top: 0.9rem">Import Log</h5>
-
-                <p class="text-muted">List of your last Letterboxd imports (max 10).</p>
-
-                <button class="w-100 btn btn-primary mb-3" type="submit" id="showImportTableButton" onclick="toggleTableVisibility()" style="margin-bottom: 0!important;">Show</button>
-
-                <div class="table-responsive d-none" style="text-align: center;margin-top: .5rem;margin-bottom: 0" id="importTable">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Type</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Created</th>
-                            <th scope="col">Finished</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for job in lastLetterboxdImportJobs %}
-                            <tr>
-                                <td>{% if job.job_type == 'letterboxd_import_history' %} History {% else %} Ratings {% endif %}</td>
-                                <td>{{ job.job_status }}</td>
-                                <td>{{ job.created_at }}</td>
-                                <td>{% if job.job_status == 'done' %}{{ job.updated_at }}{% else %}-{% endif %}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    {% if lastLetterboxdImportJobs|length == 0 %}
-                        <tr>
-                            No logged imports
-                        </tr>
-                    {% endif %}
-                </div>
-
-                <hr>
-
-                <h4 style="margin-bottom: 0.5rem">Export</h4>
+                <h4 style="margin-bottom: 0.5rem">Letterboxd Export</h4>
 
                 <p class="text-muted" style="margin-bottom: 0.8rem">
                     Download your data as csv and import them via the <a href="https://letterboxd.com/about/importing-data/" target="_blank">letterboxd importer</a>.
@@ -129,5 +100,7 @@
                 <a class="btn btn-primary" href="/settings/letterboxd-export" target="_blank">Generate export data</a>
             </div>
         </div>
+
+        {{ include('component/modal-job.html.twig') }}
     </main>
 {% endblock %}

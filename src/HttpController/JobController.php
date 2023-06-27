@@ -5,11 +5,13 @@ namespace Movary\HttpController;
 use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
+use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\JobType;
 use RuntimeException;
 
 class JobController
@@ -21,6 +23,21 @@ class JobController
         private readonly SessionWrapper $sessionWrapper,
         private readonly string $appStorageDirectory,
     ) {
+    }
+
+    public function getJobs(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $parameters = $request->getGetParameters();
+
+        $jobType = JobType::createFromString($parameters['type']);
+
+        $jobs = $this->jobQueueApi->find($this->authenticationService->getCurrentUserId(), $jobType);
+
+        return Response::createJson(Json::encode($jobs));
     }
 
     public function purgeAllJobs() : Response

@@ -57,47 +57,17 @@ class JobQueueRepository
         return JobEntity::createFromArray($data);
     }
 
-    public function findLastDateForJobByType(JobType $jobType) : ?DateTime
+    public function find(int $userId, JobType $jobType) : ?JobEntityList
     {
-        $data = $this->dbConnection->fetchOne('SELECT created_at FROM `job_queue` WHERE job_type = ? AND job_status = ? ORDER BY created_at', [$jobType, JobStatus::createDone()]);
-
-        if ($data === false) {
-            return null;
-        }
-
-        return DateTime::createFromString($data);
-    }
-
-    public function findLastLetterboxdImportsForUser(int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT *
-            FROM `job_queue` 
-            WHERE job_type IN (?, ?) AND user_id = ? 
-            ORDER BY created_at DESC
-            LIMIT 10',
+        $data = $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM `job_queue` WHERE job_type = ? and user_id = ? ORDER BY `created_at` DESC LIMIT 10',
             [
-                JobType::createLetterboxdImportHistory(),
-                JobType::createLetterboxdImportRatings(),
-                $userId,
+                $jobType,
+                $userId
             ],
         );
-    }
 
-    public function findLastTraktImportsForUser(int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT *
-            FROM `job_queue` 
-            WHERE job_type IN (?, ?) AND user_id = ? 
-            ORDER BY created_at DESC
-            LIMIT 10',
-            [
-                JobType::createTraktImportHistory(),
-                JobType::createTraktImportRatings(),
-                $userId,
-            ],
-        );
+        return JobEntityList::createFromArray($data);
     }
 
     public function purgeNotProcessedJobs() : void
