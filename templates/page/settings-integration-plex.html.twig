@@ -79,6 +79,46 @@
 
                 <button type="submit" class="btn btn-primary" {% if plexWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
             </div>
+
+            <hr>
+
+            <div style="padding-top: 1rem;">
+                <h5>Import Plex history</h5>
+                <p class="text-muted">
+                {% if plexAuth != '' %}
+                    Click on the Login button below to login with Plex. After logging in, you'll have to authorize Movary as an application that can access your account. When you've authorized it, you'll be returned to Movary and be able to interact with your Plex account.
+                {% else %}
+                    You have already authorized Movary to your account. You can click on the button below to remove all access tokens. This can be useful if you want to log in again and create a fresh session. Keep in mind that this does not invalidate the access tokens. It only removes them from the database, so if you want to invalidate the access tokens, you'll have to go to your Plex account -> Authorized devices -> Click on the red cross in the top-right corner to invalidate the acess tokens.
+                {% endif %}
+                </p>
+            </div>
+            {% if plexAuth != '' %}
+                <a class="btn btn-primary mb-3" href="{{ plexAuth }}">Log in with Plex</a>
+            {% else %}
+                <a class="btn btn-primary mb-3" href="/settings/plex/logout">Log out with Plex.</a>
+                <p>Username: {{ plexUsername }}</p>
+            {% endif %}
+            <p class="text-muted">After authenticating, you can enter your Plex server URL. This can be a local URL (e.g. http://localhost:32400) or a reverse proxy URL (e.g. https://plex.mydomain.com). If Movary is running in Docker on the same Docker network as Plex, you can also use your plex container name, instead of IP address.</p>
+            <form action="/settings/plex/saveserverurl" method="POST">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="plexServerUrlInputPrefix">Plex server URL</span>
+                    <input type="text" name="plexServerUrlInput" id="plexServerUrlInput" class="form-control {% if plexAuth != '' %} disabled {% endif %}" placeholder="http://localhost:32400" value="{{ plexServerUrl }}" aria-describedby="plexServerUrlInputPrefix" {% if plexAuth != '' %} disabled {% endif %}>
+                </div>
+                <button type="submit" class="btn btn-primary mb-3 {% if plexAuth != '' %} disabled {% endif %}" id="submitServerUrlBtn" {% if plexAuth != '' %} disabled {% endif %}>Save server URL</button>
+            </form>
+            <div id="plexImportHistoryLog"></div>
+            {% if serverUrlStatus is not null %}
+                {% if serverUrlStatus == false %}
+                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
+                    {{ serverUrlStatus }}
+                        Server could not be reached. Check if the server is on and if you have access to this server with your Plex account.
+                    </div>
+                {% elseif serverUrlStatus == true %}
+                    <div class="alert alert-success" role="alert" style="margin-bottom: 0.7rem!important;">
+                        Server url has succesfully been added!
+                    </div>
+                {% endif %}
+            {% endif %}
         </div>
     </main>
 {% endblock %}

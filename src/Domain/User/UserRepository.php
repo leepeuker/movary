@@ -186,6 +186,50 @@ class UserRepository
         return $jellyfinWebhookId;
     }
 
+    public function findPlexAccessToken(int $userId) : ?string
+    {
+        $plexAccessToken = $this->dbConnection->fetchOne('SELECT `plex_access_token` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexAccessToken === false) {
+            return null;
+        }
+
+        return $plexAccessToken;
+    }
+
+    public function findPlexClientId(int $userId) : ?string
+    {
+        $plexClientId = $this->dbConnection->fetchOne('SELECT `plex_client_id` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexClientId === false) {
+            return null;
+        }
+
+        return $plexClientId;
+    }
+
+    public function findTemporaryPlexCode(int $userId) : ?string
+    {
+        $plexCode = $this->dbConnection->fetchOne('SELECT `plex_client_temporary_code` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexCode === false) {
+            return null;
+        }
+
+        return $plexCode;
+    }
+
+    public function findPlexServerUrl(int $userId) : ?string
+    {
+        $plexServerUrl = $this->dbConnection->fetchOne('SELECT `plex_server_url` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexServerUrl === false) {
+            return null;
+        }
+
+        return $plexServerUrl;
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
@@ -526,6 +570,71 @@ class UserRepository
             [
                 'id' => $userId,
             ],
+        );
+    }
+
+    public function updatePlexAccessToken(int $userId, ?string $accessToken) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_access_token' => $accessToken
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
+    public function updatePlexClientId(int $userId, ?int $plexClientId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_client_id' => $plexClientId
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
+    public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_client_temporary_code' => $plexClientCode
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
+    public function updatePlexAccountId(int $userId, ?string $accountId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_account_id' => $accountId
+            ],
+            [
+                'id' => $userId
+            ]
+        );
+    }
+
+    public function updatePlexServerUrl(int $userId, ?string $plexServerUrl) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_server_url' => $plexServerUrl
+            ],
+            [
+                'id' => $userId
+            ]
         );
     }
 

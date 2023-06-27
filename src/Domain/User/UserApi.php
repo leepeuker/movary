@@ -100,6 +100,26 @@ class UserApi
         return $this->repository->findJellyfinWebhookId($userId);
     }
 
+    public function findPlexAccessToken(int $userId) : ?string
+    {
+        return $this->repository->findPlexAccessToken($userId);
+    }
+
+    public function findPlexClientId(int $userId) : ?string
+    {
+        return $this->repository->findPlexClientId($userId);
+    }
+
+    public function findTemporaryPlexCode(int $userId) : ?string
+    {
+        return $this->repository->findTemporaryPlexCode($userId);
+    }
+
+    public function findPlexServerUrl(int $userId) : ?string
+    {
+        return $this->repository->findPlexServerUrl($userId);
+    }
+
     public function findPlexWebhookId(int $userId) : ?string
     {
         return $this->repository->findPlexWebhookId($userId);
@@ -267,6 +287,31 @@ class UserApi
     public function updateTraktUserName(int $userId, ?string $traktUserName) : void
     {
         $this->repository->updateTraktUserName($userId, $traktUserName);
+    }
+
+    public function updatePlexAccessToken(int $userId, ?string $plexAccessToken) : void
+    {
+        $this->repository->updatePlexAccessToken($userId, $plexAccessToken);
+    }
+
+    public function updatePlexClientId(int $userId, ?int $plexClientId) : void
+    {
+        $this->repository->updatePlexClientId($userId, $plexClientId);
+    }
+
+    public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void
+    {
+        $this->repository->updateTemporaryPlexClientCode($userId, $plexClientCode);
+    }
+
+    public function updatePlexAccountId(int $userId, ?string $plexAccountId) : void
+    {
+        $this->repository->updatePlexAccountId($userId, $plexAccountId);
+    }
+
+    public function updatePlexServerurl(int $userId, string $plexServerUrl) : void
+    {
+        $this->repository->updatePlexServerurl($userId, $plexServerUrl);
     }
 
     public function updateVisibleDashboardRows(int $userId, ?string $visibleRows) : void

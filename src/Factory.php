@@ -9,6 +9,11 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Plex;
+use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Api\Plex\PlexApi;
+use Movary\Api\Plex\PlexLocalServerClient;
+use Movary\Api\Plex\PlexTvClient;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -255,6 +260,7 @@ class Factory
             $container->get(UserApi::class),
             $container->get(MovieApi::class),
             $container->get(GithubApi::class),
+            $container->get(PlexApi::class),
             $container->get(SessionWrapper::class),
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),
@@ -266,6 +272,33 @@ class Factory
             self::getApplicationVersion($config),
         );
     }
+
+    public static function createPlexLocalServerClient(ContainerInterface $container, Config $config) : Plex\PlexLocalServerClient
+    {
+        $userId = $container->get(Authentication::class)->getCurrentUserId();
+        $plexServerUrl = $container->get(UserApi::class)->findPlexServerUrl($userId) ?? '';
+        return new Plex\PlexLocalServerClient(
+            $container->get(GuzzleHttp\Client::class),
+            $config->getAsString('PLEX_IDENTIFIER'),
+            $config->getAsString('APPLICATION_VERSION'),
+            $plexServerUrl
+        );
+    }
+
+    public static function createPlexApi(ContainerInterface $container) : PlexApi
+    {
+        $userId = $container->get(Authentication::class)->getCurrentUserId();
+        $plexAccessToken = $container->get((UserApi::class))->findPlexAccessToken($userId) ?? '';
+        return new Plex\PlexApi(
+            $container->get(Authentication::class),
+            $container->get(ServerSettings::class),
+            $container->get(LoggerInterface::class),
+            $container->get(PlexTvClient::class),
+            $container->get(PlexLocalServerClient::class),
+            PlexAccessToken::createPlexAccessToken($plexAccessToken),
+            $container->get(UserApi::class)
+        );
+    }    
 
     public static function createTmdbApiClient(ContainerInterface $container) : Tmdb\TmdbClient
     {

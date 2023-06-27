@@ -4,6 +4,9 @@ namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Trakt\TraktApi;
+use Movary\Api\Plex\PlexApi;
+use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Api\Plex\Dto\PlexAccount;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
@@ -36,6 +39,7 @@ class SettingsController
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,
         private readonly GithubApi $githubApi,
+        private readonly PlexApi $plexApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
@@ -345,7 +349,27 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
+        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+        if($plexAccessToken === null) {
+            $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
+        } else {
+            $plexAccount = $this->plexApi->fetchPlexAccount(PlexAccessToken::createPlexAccessToken($plexAccessToken));
+            if($plexAccount instanceof PlexAccount) {
+                $plexUsername = $plexAccount->getPlexUsername();
+                if(($plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId())) == null) {
+                    $plexServerUrl = "";
+                }
+            } else {
+                $plexAuth = $this->plexApi->generatePlexAuthenticationUrl();
+            }
+        }
+
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $serverUrlStatus = $this->sessionWrapper->find('serverUrlStatus');
+        if($serverUrlStatus) {
+            $this->sessionWrapper->unset('serverUrlStatus');
+        }
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         $plexWebhookId = $user->getPlexWebhookId();
@@ -361,6 +385,10 @@ class SettingsController
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
+                'plexAuth' => $plexAuth ?? "",
+                'plexServerUrl' => $plexServerUrl ?? "",
+                'plexUsername' => $plexUsername ?? "",
+                'serverUrlStatus' => $serverUrlStatus
             ]),
         );
     }
