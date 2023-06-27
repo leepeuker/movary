@@ -1,0 +1,41 @@
+{% if loggedIn == true %}
+    <div class="modal fade" id="jobModal" tabindex="-1" role="dialog" data-bs-backdrop="static" aria-labelledby="logPlayModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="jobModalTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding-top: .5rem;padding-bottom: .5rem">
+                    <input type="hidden" value="" id="jobModalType">
+
+                    <div class="table-responsive" style="text-align: center" id="jobModalTable">
+                        <table class="table" style="margin-bottom: 0">
+                            <thead>
+                            <tr>
+                                <th scope="col">Created</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Finished</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+                        <p style="margin-top: .7rem;margin-bottom: .3rem" id="jobModalEmptyMessage" class="d-none">No imports yet</p>
+
+                        <div style="margin-bottom: 0;margin-top: 1rem" class="spinner-border d-none" role="status" id="jobModalLoadingSpinner">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+
+                        <div class="alert alert-danger d-none" role="alert" id="jobModalErrorAlert" style="margin-top: .8rem;margin-bottom: .7rem">
+                            Something went wrong. Please try again.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="logPlayModalFooter">
+                    <button type="submit" class="btn btn-primary" onclick="loadJobModal()">Refresh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

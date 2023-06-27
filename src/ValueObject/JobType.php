@@ -4,7 +4,7 @@ namespace Movary\ValueObject;
 
 use RuntimeException;
 
-class JobType
+class JobType implements \JsonSerializable
 {
     private const TYPE_TMDB_PERSON_SYNC = 'tmdb_person_sync';
 
@@ -121,5 +121,10 @@ class JobType
     public function isOfTypeTraktImportRatings() : bool
     {
         return $this->type === self::TYPE_TRAKT_IMPORT_RATINGS;
+    }
+
+    public function jsonSerialize() : string
+    {
+        return $this->type;
     }
 }
