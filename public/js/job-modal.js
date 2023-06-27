@@ -5,12 +5,31 @@ async function showJobModal(jobType) {
     jobModalTypeInput.value = jobType
     setJobModalTitle(jobModalTypeInput.value)
 
-    setJobModalLoadingSpinner(true)
+    loadJobModal(true)
+}
 
-    jobModal.show();
-    loadJobModalTable(await fetchJobs(jobModalTypeInput.value))
+async function loadJobModal(showModal) {
+    setJobModalLoadingSpinner(true)
+    document.getElementById('jobModalEmptyMessage').classList.add('d-none')
+    document.getElementById('jobModalErrorAlert').classList.add('d-none')
+
+    if (showModal === true) {
+        jobModal.show();
+    }
+
+    let jobs = null
+
+    try {
+        jobs = await fetchJobs(jobModalTypeInput.value);
+    } catch (error) {
+        document.getElementById('jobModalErrorAlert').classList.remove('d-none')
+    }
 
     setJobModalLoadingSpinner(false)
+
+    if (jobs !== null) {
+        renderJobModalTable(jobs)
+    }
 }
 
 function setJobModalTitle(jobType) {
@@ -31,15 +50,6 @@ function setJobModalTitle(jobType) {
     document.getElementById('jobModalTitle').innerText = title;
 }
 
-async function refreshJobModal() {
-    setJobModalLoadingSpinner(true)
-
-    loadJobModalTable(await fetchJobs(jobModalTypeInput.value))
-
-    setJobModalLoadingSpinner(false)
-
-}
-
 async function fetchJobs(jobType) {
 
     const response = await fetch('/jobs?type=' + jobType)
@@ -54,15 +64,13 @@ async function fetchJobs(jobType) {
 function setJobModalLoadingSpinner(isActive = true) {
     if (isActive === true) {
         emptyJobModalTable()
-        document.getElementById('jobModalEmptyMessage').classList.add('d-none')
-
         document.getElementById('jobModalLoadingSpinner').classList.remove('d-none');
     } else {
         document.getElementById('jobModalLoadingSpinner').classList.add('d-none');
     }
 }
 
-async function loadJobModalTable(jobs) {
+async function renderJobModalTable(jobs) {
     const table = document.getElementById('jobModalTable');
 
     let tbodyRef = table.getElementsByTagName('tbody')[0];
