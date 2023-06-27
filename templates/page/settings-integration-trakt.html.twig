@@ -6,6 +6,7 @@
 
 {% block scripts %}
     <script src="/js/settings-integration-trakt.js"></script>
+    <script src="/js/job-modal.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -72,57 +73,34 @@
                     The import only adds data missing in movary, it will not overwrite or remove existing data.
                 </p>
 
+                {% if traktScheduleHistorySyncSuccessful == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 0rem">
+                        History import scheduled
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
                 <div style="margin-top: 0.9rem">
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_history')" style="margin-right: .3rem">Show imports</button>
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
                        href="/jobs/schedule/trakt-history-sync">History import</a>
 
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       href="/jobs/schedule/trakt-ratings-sync">Ratings import</a>
+                    <br>
 
-                    {% if traktScheduleHistorySyncSuccessful == true or traktScheduleRatingsSyncSuccessful == true %}
+                    {% if traktScheduleRatingsSyncSuccessful == true %}
                         <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            {% if traktScheduleHistorySyncSuccessful == true %}History{% else %}Ratings{% endif %} import scheduled
+                            Ratings import scheduled
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
-                </div>
 
-                <hr>
-
-                <h5 style="margin-top: 0.9rem">Import Log</h5>
-
-                <p class="text-muted">List of your last trakt.tv imports (max 10).</p>
-
-                <button class="w-100 btn btn-primary mb-3" type="submit" id="showImportTableButton" onclick="toggleTableVisibility()" style="margin-bottom: .5rem!important;">Show</button>
-
-                <div class="table-responsive d-none" style="text-align: center;" id="importTable">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Type</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Created</th>
-                            <th scope="col">Finished</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for job in lastTraktImportJobs %}
-                            <tr>
-                                <td>{% if job.job_type == 'trakt_import_history' %} History {% else %} Ratings {% endif %}</td>
-                                <td>{{ job.job_status }}</td>
-                                <td>{{ job.created_at }}</td>
-                                <td>{% if job.job_status == 'done' %}{{ job.updated_at }}{% else %}-{% endif %}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    {% if lastTraktImportJobs|length == 0 %}
-                        <tr>
-                            No logged imports
-                        </tr>
-                    {% endif %}
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_ratings')" style="margin-right: .3rem;margin-top: 1rem">Show imports</button>
+                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
+                       href="/jobs/schedule/trakt-ratings-sync" style="margin-top: 1rem">Ratings import</a>
                 </div>
             </div>
         </div>
+
+        {{ include('component/modal-job.html.twig') }}
     </main>
 {% endblock %}

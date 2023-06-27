@@ -4,7 +4,7 @@ namespace Movary\ValueObject;
 
 use RuntimeException;
 
-class JobStatus
+class JobStatus implements \JsonSerializable
 {
     private const STATUS_DONE = 'done';
 
@@ -52,6 +52,11 @@ class JobStatus
     }
 
     public function __toString() : string
+    {
+        return $this->status;
+    }
+
+    public function jsonSerialize() : string
     {
         return $this->status;
     }

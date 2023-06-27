@@ -57,6 +57,19 @@ class JobQueueRepository
         return JobEntity::createFromArray($data);
     }
 
+    public function find(int $userId, JobType $jobType) : ?JobEntityList
+    {
+        $data = $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM `job_queue` WHERE job_type = ? and user_id = ? ORDER BY `created_at` DESC LIMIT 10',
+            [
+                $jobType,
+                $userId
+            ],
+        );
+
+        return JobEntityList::createFromArray($data);
+    }
+
     public function findLastDateForJobByType(JobType $jobType) : ?DateTime
     {
         $data = $this->dbConnection->fetchOne('SELECT created_at FROM `job_queue` WHERE job_type = ? AND job_status = ? ORDER BY created_at', [$jobType, JobStatus::createDone()]);
@@ -79,22 +92,6 @@ class JobQueueRepository
             [
                 JobType::createLetterboxdImportHistory(),
                 JobType::createLetterboxdImportRatings(),
-                $userId,
-            ],
-        );
-    }
-
-    public function findLastTraktImportsForUser(int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT *
-            FROM `job_queue` 
-            WHERE job_type IN (?, ?) AND user_id = ? 
-            ORDER BY created_at DESC
-            LIMIT 10',
-            [
-                JobType::createTraktImportHistory(),
-                JobType::createTraktImportRatings(),
                 $userId,
             ],
         );

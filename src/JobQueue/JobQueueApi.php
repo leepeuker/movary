@@ -83,9 +83,9 @@ class JobQueueApi
         return $this->repository->fetchOldestWaitingJob();
     }
 
-    public function findLastImdbSync() : ?DateTime
+    public function find(int $userId, JobType $jobType) : ?JobEntityList
     {
-        return $this->repository->findLastDateForJobByType(JobType::createImdbSync());
+        return $this->repository->find($userId, $jobType);
     }
 
     public function findLastLetterboxdImportsForUser(int $userId) : array
@@ -107,11 +107,6 @@ class JobQueueApi
         }
 
         return $lastMovieSync->isAfter($lastPersonSync) ? $lastMovieSync : $lastPersonSync;
-    }
-
-    public function findLastTraktImportsForUser(int $userId) : array
-    {
-        return $this->repository->findLastTraktImportsForUser($userId);
     }
 
     public function purgeAllJobs() : void
