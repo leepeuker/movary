@@ -6,6 +6,7 @@
 
 {% block scripts %}
     <script src="/js/settings-integration-plex.js"></script>
+    <script src="/js/job-modal.js"></script>
 {% endblock %}
 
 {% block stylesheets %}
@@ -85,7 +86,8 @@
             <h5>Watchlist import</h5>
 
             <p class="text-muted">This import will add all movies missing from the Plex Watchlist to your Movary Watchlist.<br>
-                You need a X-Plex-Token for authentication, more info <a href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/" target="_blank">here</a>.
+                You need a X-Plex-Token for authentication, more info <a href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/"
+                                                                         target="_blank">here</a>.
             </p>
 
             <label for="plexTokenInput" class="form-label"><b>X-Plex-Token</b> <span class="text-danger">*</span></label>
@@ -96,7 +98,10 @@
 
             <div id="alertPlexWatchlistImportDiv"></div>
 
+            <button type="button" class="btn btn-outline-primary" onclick="showJobModal('plex_import_watchlist')">Show imports</button>
             <button type="button" disabled class="btn btn-warning" onclick="importPlexWatchlist()" id="plexWatchlistImportButton">Import watchlist</button>
         </div>
+
+        {{ include('component/modal-job.html.twig') }}
     </main>
 {% endblock %}
