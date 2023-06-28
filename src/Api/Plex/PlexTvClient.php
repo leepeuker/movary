@@ -37,9 +37,12 @@ class PlexTvClient
         ];
     }
 
+    /**
+     * @psalm-suppress PossiblyUndefinedVariable
+     */
     public function get(
         string $relativeUrl,
-        ?array $headers = [],
+        array $headers = [],
     ) : array {
         if ($this->plexIdentifier === null) {
             throw PlexNoClientIdentifier::create();
@@ -54,12 +57,20 @@ class PlexTvClient
         try {
             $response = $this->httpClient->request('GET', $requestUrl, $requestOptions);
         } catch (ClientException $e) {
-            $this->throwConvertedClientException($e, $requestUrl);
+            match (true) {
+                $e->getCode() === 401 => throw PlexAuthenticationError::create(),
+                $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
+
+                default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
+            };
         }
 
         return Json::decode((string)$response->getBody());
     }
 
+    /**
+     * @psalm-suppress PossiblyUndefinedVariable
+     */
     public function sendPostRequest(string $relativeUrl) : array
     {
         if ($this->plexIdentifier === null) {
@@ -75,19 +86,14 @@ class PlexTvClient
         try {
             $response = $this->httpClient->request('POST', $requestUrl, $requestOptions);
         } catch (ClientException $e) {
-            $this->throwConvertedClientException($e, $requestUrl);
+            match (true) {
+                $e->getCode() === 401 => throw PlexAuthenticationError::create(),
+                $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
+
+                default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
+            };
         }
 
         return Json::decode((string)$response->getBody());
-    }
-
-    private function throwConvertedClientException(ClientException $exception, string $url) : void
-    {
-        match (true) {
-            $exception->getCode() === 401 => throw PlexAuthenticationError::create(),
-            $exception->getCode() === 404 => throw PlexNotFoundError::create($url),
-
-            default => throw new RuntimeException('Plex API error. Response message: ' . $exception->getMessage()),
-        };
     }
 }

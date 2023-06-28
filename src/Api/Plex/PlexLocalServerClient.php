@@ -37,6 +37,9 @@ class PlexLocalServerClient
         ];
     }
 
+    /**
+     * @psalm-suppress PossiblyUndefinedVariable
+     */
     public function sendGetRequest(
         string $requestUrl,
         ?array $customQuery = [],
