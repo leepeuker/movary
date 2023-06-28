@@ -250,18 +250,6 @@ class Factory
         return $logger;
     }
 
-    public static function createPlexApi(ContainerInterface $container) : PlexApi
-    {
-        return new Plex\PlexApi(
-            $container->get(Authentication::class),
-            $container->get(ServerSettings::class),
-            $container->get(LoggerInterface::class),
-            $container->get(PlexTvClient::class),
-            $container->get(PlexLocalServerClient::class),
-            $container->get(UserApi::class)
-        );
-    }
-
     public static function createPlexLocalServerClient(ContainerInterface $container, Config $config) : Plex\PlexLocalServerClient
     {
         return new Plex\PlexLocalServerClient(
