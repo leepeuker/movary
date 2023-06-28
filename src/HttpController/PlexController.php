@@ -10,10 +10,12 @@ use Movary\Service\Plex\PlexScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
+use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
 
 class PlexController
@@ -134,11 +136,17 @@ class PlexController
             return Response::createSeeOther('/settings/integrations/plex');
         }
 
+        try {
+            $plexServerUrl = Url::createFromString($plexServerUrl);
+        } catch (InvalidUrl) {
+            return Response::createBadRequest('Not a valid url: ' . $plexServerUrl);
+        }
+
         if ($this->plexApi->verifyPlexUrl($userId, $plexServerUrl) === false) {
             $this->sessionWrapper->set('serverUrlStatus', false);
         } else {
             $this->sessionWrapper->set('serverUrlStatus', true);
-            $this->userApi->updatePlexServerurl($this->authenticationService->getCurrentUserId(), $plexServerUrl);
+            $this->userApi->updatePlexServerUrl($this->authenticationService->getCurrentUserId(), $plexServerUrl);
         }
 
         return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);

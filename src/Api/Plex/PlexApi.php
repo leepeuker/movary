@@ -11,6 +11,8 @@ use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
+use Movary\ValueObject\RelativeUrl;
+use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -46,8 +48,10 @@ class PlexApi
             'code' => $temporaryPlexClientCode,
         ];
 
+        $relativeUrl = RelativeUrl::createFromString('/pins/' . $plexPinId);
+
         try {
-            $plexRequest = $this->plexTvClient->get('/pins/' . $plexPinId, $headers);
+            $plexRequest = $this->plexTvClient->get($relativeUrl, $headers);
         } catch (PlexNotFoundError) {
             $this->logger->error('Plex pin does not exist');
 
@@ -63,8 +67,10 @@ class PlexApi
             'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
         ];
 
+        $relativeUrl = RelativeUrl::createFromString('/user');
+
         try {
-            $accountData = $this->plexTvClient->get('/user', $headers);
+            $accountData = $this->plexTvClient->get($relativeUrl, $headers);
         } catch (PlexAuthenticationError) {
             $this->logger->error('Plex access token is invalid');
 
@@ -82,8 +88,10 @@ class PlexApi
      */
     public function generatePlexAuthenticationUrl() : ?string
     {
+        $relativeUrl = RelativeUrl::createFromString('/pins');
+
         try {
-            $plexAuthenticationData = $this->plexTvClient->sendPostRequest('/pins');
+            $plexAuthenticationData = $this->plexTvClient->sendPostRequest($relativeUrl);
         } catch (PlexNoClientIdentifier) {
             return null;
         }
@@ -112,7 +120,7 @@ class PlexApi
         return self::BASE_URL . http_build_query($getParameters);
     }
 
-    public function verifyPlexUrl(int $userId, string $url) : bool
+    public function verifyPlexUrl(int $userId, Url $url) : bool
     {
         $query = [
             'X-Plex-Token' => $this->userApi->fetchUser($userId)->getPlexAccessToken()
