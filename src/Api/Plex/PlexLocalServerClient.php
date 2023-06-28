@@ -16,8 +16,7 @@ class PlexLocalServerClient
     private const APP_NAME = 'Movary';
 
     private const DEFAULT_HEADERS = [
-        'accept' => 'application/json',
-        'Content-Type' => 'application/json'
+        'accept' => 'application/json'
     ];
 
     private array $defaultFormData;
