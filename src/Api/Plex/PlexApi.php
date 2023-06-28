@@ -36,7 +36,6 @@ class PlexApi
         private readonly LoggerInterface $logger,
         private readonly PlexTvClient $plexTvClient,
         private readonly PlexLocalServerClient $localClient,
-        private readonly PlexAccessToken $plexAccessToken,
         private readonly UserApi $userApi,
     ) {
     }
@@ -113,14 +112,14 @@ class PlexApi
         return self::BASE_URL . http_build_query($getParameters);
     }
 
-    public function verifyPlexUrl(string $url) : bool
+    public function verifyPlexUrl(int $userId, string $url) : bool
     {
         $query = [
-            'X-Plex-Token' => $this->plexAccessToken->getPlexAccessTokenAsString()
+            'X-Plex-Token' => $this->userApi->fetchUser($userId)->getPlexAccessToken()
         ];
 
         try {
-            $this->localClient->sendGetRequest('', $query, $url);
+            $this->localClient->sendGetRequest($url, $query);
 
             return true;
         } catch (PlexAuthenticationError) {

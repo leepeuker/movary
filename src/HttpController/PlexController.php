@@ -125,13 +125,14 @@ class PlexController
             return Response::createSeeOther('/');
         }
 
+        $userId = $this->authenticationService->getCurrentUserId();
         $plexServerUrl = $request->getPostParameters()['plexServerUrlInput'];
 
         if (empty($plexServerUrl)) {
             return Response::createSeeOther('/settings/integrations/plex');
         }
 
-        if (!$this->plexApi->verifyPlexUrl($plexServerUrl)) {
+        if ($this->plexApi->verifyPlexUrl($userId, $plexServerUrl) === false) {
             $this->sessionWrapper->set('serverUrlStatus', false);
         } else {
             $this->sessionWrapper->set('serverUrlStatus', true);

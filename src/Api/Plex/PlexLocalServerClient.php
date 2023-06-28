@@ -19,14 +19,14 @@ class PlexLocalServerClient
         'Content-Type' => 'application/json'
     ];
 
-    private array $defaultPostAndGetData;
+    private array $defaultFormData;
 
     public function __construct(
         private readonly HttpClient $httpClient,
         private readonly string $plexIdentifier,
         private readonly string $applicationVersion,
     ) {
-        $this->defaultPostAndGetData = [
+        $this->defaultFormData = [
             'X-Plex-Client-Identifier' => $this->plexIdentifier,
             'X-Plex-Product' => self::APP_NAME,
             'X-Plex-Product-Version' => $this->applicationVersion,
@@ -38,17 +38,16 @@ class PlexLocalServerClient
     }
 
     public function sendGetRequest(
-        string $userId,
-        ?array $customGetQuery = [],
+        string $requestUrl,
+        ?array $customQuery = [],
     ) : array {
         if ($this->plexIdentifier === '') {
             throw PlexNoClientIdentifier::create();
         }
 
-        $requestUrl = $baseUrl . $relativeUrl;
         $requestOptions = [
-            'form_params' => $this->defaultPostAndGetData,
-            'query' => $customGetQuery,
+            'form_params' => $this->defaultFormData,
+            'query' => $customQuery,
             'headers' => self::DEFAULT_HEADERS
         ];
 
