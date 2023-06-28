@@ -47,6 +47,7 @@ class PlexTvClient
 
         $requestUrl = self::BASE_URL . $relativeUrl;
         $requestOptions = [
+            'form_params' => $this->defaultFormData,
             'headers' => array_merge(self::DEFAULT_HEADERS, $headers)
         ];
 
