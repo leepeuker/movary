@@ -2,9 +2,8 @@
 
 namespace Movary\ValueObject;
 
-use InvalidArgumentException;
 use JsonSerializable;
-use RuntimeException;
+use Movary\ValueObject\Exception\InvalidRelativeUrl;
 
 class RelativeUrl implements JsonSerializable
 {
@@ -26,44 +25,15 @@ class RelativeUrl implements JsonSerializable
         return $this->relativeUrl;
     }
 
-    /**
-     * @throws RuntimeException
-     * @psalm-suppress TypeDoesNotContainType
-     */
-    public function getQuery() : ?string
-    {
-        $query = parse_url($this->relativeUrl, PHP_URL_QUERY);
-
-        if ($query === false) {
-            throw new RuntimeException(sprintf('Could not parse query from url "%s"', $this->relativeUrl)); // @codeCoverageIgnore
-        }
-
-        return $query;
-    }
-
-    public function isEqual(RelativeUrl $relativeUrl) : bool
-    {
-        return $this->relativeUrl === $relativeUrl->relativeUrl;
-    }
-
     public function jsonSerialize() : string
     {
         return $this->relativeUrl;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     private function ensureIsValidRelativeUrl(string $url) : void
     {
-        if (str_starts_with($url, '/') === false) {
-            throw new InvalidArgumentException('Relative URL must start with a leading slash: ' . $url);
-        }
-
-        $parsedUrl = parse_url($url);
-
-        if ($parsedUrl === false) {
-            throw new InvalidArgumentException('Invalid relative url: ' . $url);  // @codeCoverageIgnore
+        if (str_starts_with($url, '/') === false || parse_url($url) === false) {
+            throw new InvalidRelativeUrl('Invalid relative url: ' . $url);
         }
     }
     //endregion methods
