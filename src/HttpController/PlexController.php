@@ -106,10 +106,12 @@ class PlexController
             return Response::createSeeOther('/');
         }
 
-        $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), null);
-        $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), null);
-        $this->userApi->updatePlexAccountId($this->authenticationService->getCurrentUserId(), null);
-        $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), null);
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $this->userApi->updatePlexAccessToken($userId, null);
+        $this->userApi->updatePlexClientId($userId, null);
+        $this->userApi->updatePlexAccountId($userId, null);
+        $this->userApi->updateTemporaryPlexClientCode($userId, null);
 
         return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);
     }
