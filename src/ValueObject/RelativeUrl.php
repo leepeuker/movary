@@ -15,7 +15,7 @@ class RelativeUrl implements JsonSerializable
     //endregion instancing
 
     //region methods
-    public static function createFromString(string $url) : self
+    public static function create(string $url) : self
     {
         return new self($url);
     }
@@ -33,7 +33,7 @@ class RelativeUrl implements JsonSerializable
     private function ensureIsValidRelativeUrl(string $url) : void
     {
         if (str_starts_with($url, '/') === false || parse_url($url) === false) {
-            throw new InvalidRelativeUrl('Invalid relative url: ' . $url);
+            throw InvalidRelativeUrl::create($url);
         }
     }
     //endregion methods

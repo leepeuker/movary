@@ -48,7 +48,7 @@ class PlexApi
             'code' => $temporaryPlexClientCode,
         ];
 
-        $relativeUrl = RelativeUrl::createFromString('/pins/' . $plexPinId);
+        $relativeUrl = RelativeUrl::create('/pins/' . $plexPinId);
 
         try {
             $plexRequest = $this->plexTvClient->get($relativeUrl, $headers);
@@ -67,7 +67,7 @@ class PlexApi
             'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
         ];
 
-        $relativeUrl = RelativeUrl::createFromString('/user');
+        $relativeUrl = RelativeUrl::create('/user');
 
         try {
             $accountData = $this->plexTvClient->get($relativeUrl, $headers);
@@ -88,7 +88,7 @@ class PlexApi
      */
     public function generatePlexAuthenticationUrl() : ?string
     {
-        $relativeUrl = RelativeUrl::createFromString('/pins');
+        $relativeUrl = RelativeUrl::create('/pins');
 
         try {
             $plexAuthenticationData = $this->plexTvClient->sendPostRequest($relativeUrl);

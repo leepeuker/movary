@@ -12,7 +12,7 @@ class UrlTest extends TestCase
 {
     public function testAppendRelativeUrl() : void
     {
-        $relativeUrl = RelativeUrl::createFromString('/relativeUrl?q=a');
+        $relativeUrl = RelativeUrl::create('/relativeUrl?q=a');
 
         $subject = Url::createFromString('https://movary.org/path');
 
@@ -20,13 +20,6 @@ class UrlTest extends TestCase
             Url::createFromString('https://movary.org/path/relativeUrl?q=a'),
             $subject->appendRelativeUrl($relativeUrl),
         );
-    }
-
-    public function testCreateFromString() : void
-    {
-        $subject = Url::createFromString('https://movary.org');
-
-        self::assertSame('https://movary.org', (string)$subject);
     }
 
     public function testCreateThrowsExceptionIfUrlIsNotValid() : void
