@@ -52,7 +52,8 @@ class PlexLocalServerClient
         $requestOptions = [
             'form_params' => $this->defaultFormData,
             'query' => $customQuery,
-            'headers' => self::DEFAULT_HEADERS
+            'headers' => self::DEFAULT_HEADERS,
+            'connect_timeout' => 2,
         ];
 
         try {
