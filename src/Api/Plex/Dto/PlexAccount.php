@@ -7,13 +7,12 @@ class PlexAccount
     public function __construct(
         private readonly int $plexId,
         private readonly string $username,
-        private readonly string $email
-    ){
+    ) {
     }
 
-    public static function createplexAccount(int $plexId, string $username, string $email) : self
+    public static function createPlexAccount(int $plexId, string $username) : self
     {
-        return new self($plexId, $username, $email);
+        return new self($plexId, $username);
     }
 
     public function getPlexId() : int
@@ -24,10 +23,5 @@ class PlexAccount
     public function getPlexUsername() : string
     {
         return $this->username;
-    }
-
-    public function getPlexEmail() : string
-    {
-        return $this->email;
     }
 }

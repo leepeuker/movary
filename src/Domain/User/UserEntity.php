@@ -20,6 +20,7 @@ class UserEntity
         private readonly ?string $embyWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
+        private readonly ?string $plexAccessToken,
         private readonly bool $jellyfinScrobbleWatches,
         private readonly bool $embyScrobbleWatches,
         private readonly bool $plexScrobbleWatches,
@@ -46,6 +47,7 @@ class UserEntity
             $data['emby_webhook_uuid'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
+            $data['plex_access_token'],
             (bool)$data['jellyfin_scrobble_views'],
             (bool)$data['emby_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
@@ -97,6 +99,11 @@ class UserEntity
     public function getPasswordHash() : string
     {
         return $this->passwordHash;
+    }
+
+    public function getPlexAccessToken() : ?string
+    {
+        return $this->plexAccessToken;
     }
 
     public function getPlexWebhookId() : ?string
