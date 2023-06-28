@@ -251,6 +251,39 @@ class Factory
         return $logger;
     }
 
+    public static function createPlexApi(ContainerInterface $container) : PlexApi
+    {
+        $userId = $container->get(Authentication::class)->getCurrentUserId();
+        $plexAccessToken = $container->get((UserApi::class))->findPlexAccessToken($userId) ?? '';
+
+        return new Plex\PlexApi(
+            $container->get(Authentication::class),
+            $container->get(ServerSettings::class),
+            $container->get(LoggerInterface::class),
+            $container->get(PlexTvClient::class),
+            $container->get(PlexLocalServerClient::class),
+            PlexAccessToken::createPlexAccessToken($plexAccessToken),
+            $container->get(UserApi::class)
+        );
+    }
+
+    public static function createPlexLocalServerClient(ContainerInterface $container, Config $config) : Plex\PlexLocalServerClient
+    {
+        return new Plex\PlexLocalServerClient(
+            $container->get(GuzzleHttp\Client::class),
+            $config->getAsString('PLEX_IDENTIFIER'),
+            $config->getAsString('APPLICATION_VERSION'),
+        );
+    }
+
+    public static function createPlexTvClient(ContainerInterface $container, Config $config) : Plex\PlexTvClient
+    {
+        return new Plex\PlexTvClient(
+            $container->get(GuzzleHttp\Client::class),
+            $config->getAsString('PLEX_IDENTIFIER'),
+        );
+    }
+
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
     {
         return new SettingsController(
@@ -272,33 +305,6 @@ class Factory
             self::getApplicationVersion($config),
         );
     }
-
-    public static function createPlexLocalServerClient(ContainerInterface $container, Config $config) : Plex\PlexLocalServerClient
-    {
-        $userId = $container->get(Authentication::class)->getCurrentUserId();
-        $plexServerUrl = $container->get(UserApi::class)->findPlexServerUrl($userId) ?? '';
-        return new Plex\PlexLocalServerClient(
-            $container->get(GuzzleHttp\Client::class),
-            $config->getAsString('PLEX_IDENTIFIER'),
-            $config->getAsString('APPLICATION_VERSION'),
-            $plexServerUrl
-        );
-    }
-
-    public static function createPlexApi(ContainerInterface $container) : PlexApi
-    {
-        $userId = $container->get(Authentication::class)->getCurrentUserId();
-        $plexAccessToken = $container->get((UserApi::class))->findPlexAccessToken($userId) ?? '';
-        return new Plex\PlexApi(
-            $container->get(Authentication::class),
-            $container->get(ServerSettings::class),
-            $container->get(LoggerInterface::class),
-            $container->get(PlexTvClient::class),
-            $container->get(PlexLocalServerClient::class),
-            PlexAccessToken::createPlexAccessToken($plexAccessToken),
-            $container->get(UserApi::class)
-        );
-    }    
 
     public static function createTmdbApiClient(ContainerInterface $container) : Tmdb\TmdbClient
     {

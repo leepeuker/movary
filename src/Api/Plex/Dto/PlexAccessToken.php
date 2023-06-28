@@ -5,8 +5,8 @@ namespace Movary\Api\Plex\Dto;
 class PlexAccessToken
 {
     public function __construct(
-        private readonly string $plexAccessToken
-    ){
+        private readonly string $plexAccessToken,
+    ) {
     }
 
     public static function createPlexAccessToken(string $plexAccessToken) : self

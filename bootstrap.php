@@ -13,6 +13,7 @@ $builder->addDefinitions(
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Api\Plex\PlexLocalServerClient::class => DI\factory([Factory::class, 'createPlexLocalServerClient']),
+        \Movary\Api\Plex\PlexTvClient::class => DI\factory([Factory::class, 'createPlexTvClient']),
         \Movary\Api\Plex\PlexApi::class => DI\factory([Factory::class, 'createPlexApi']),
         \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\Service\Export\ExportService::class => DI\factory([Factory::class, 'createExportService']),
