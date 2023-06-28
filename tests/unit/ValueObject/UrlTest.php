@@ -2,23 +2,30 @@
 
 namespace Tests\Unit\Movary\ValueObject;
 
+use Movary\ValueObject\Exception\InvalidUrl;
+use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
 use PHPUnit\Framework\TestCase;
 
 /** @covers \Movary\ValueObject\Url */
 class UrlTest extends TestCase
 {
-    public function testCreateFromString() : void
+    public function testAppendRelativeUrl() : void
     {
-        $subject = Url::createFromString('https://movary.org');
+        $relativeUrl = RelativeUrl::create('/relativeUrl?q=a');
 
-        self::assertSame('https://movary.org', (string)$subject);
+        $subject = Url::createFromString('https://movary.org/path');
+
+        self::assertEquals(
+            Url::createFromString('https://movary.org/path/relativeUrl?q=a'),
+            $subject->appendRelativeUrl($relativeUrl),
+        );
     }
 
     public function testCreateThrowsExceptionIfUrlIsNotValid() : void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Invalid url: not-valid');
+        $this->expectException(InvalidUrl::class);
+        $this->expectExceptionMessage('Not a valid url: not-valid');
 
         Url::createFromString('not-valid');
     }

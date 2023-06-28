@@ -8,6 +8,8 @@ use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Util\Json;
+use Movary\ValueObject\RelativeUrl;
+use Movary\ValueObject\Url;
 use RuntimeException;
 
 class PlexTvClient
@@ -41,21 +43,21 @@ class PlexTvClient
      * @psalm-suppress PossiblyUndefinedVariable
      */
     public function get(
-        string $relativeUrl,
+        RelativeUrl $relativeUrl,
         array $headers = [],
     ) : array {
         if ($this->plexIdentifier === null) {
             throw PlexNoClientIdentifier::create();
         }
 
-        $requestUrl = self::BASE_URL . $relativeUrl;
+        $requestUrl = Url::createFromString(self::BASE_URL)->appendRelativeUrl($relativeUrl);
         $requestOptions = [
             'form_params' => $this->defaultFormData,
             'headers' => array_merge(self::DEFAULT_HEADERS, $headers)
         ];
 
         try {
-            $response = $this->httpClient->request('GET', $requestUrl, $requestOptions);
+            $response = $this->httpClient->request('GET', (string)$requestUrl, $requestOptions);
         } catch (ClientException $e) {
             match (true) {
                 $e->getCode() === 401 => throw PlexAuthenticationError::create(),
@@ -71,20 +73,20 @@ class PlexTvClient
     /**
      * @psalm-suppress PossiblyUndefinedVariable
      */
-    public function sendPostRequest(string $relativeUrl) : array
+    public function sendPostRequest(RelativeUrl $relativeUrl) : array
     {
         if ($this->plexIdentifier === null) {
             throw PlexNoClientIdentifier::create();
         }
 
-        $requestUrl = self::BASE_URL . $relativeUrl;
+        $requestUrl = Url::createFromString(self::BASE_URL)->appendRelativeUrl($relativeUrl);
         $requestOptions = [
             'form_params' => $this->defaultFormData,
             'headers' => self::DEFAULT_HEADERS
         ];
 
         try {
-            $response = $this->httpClient->request('POST', $requestUrl, $requestOptions);
+            $response = $this->httpClient->request('POST', (string)$requestUrl, $requestOptions);
         } catch (ClientException $e) {
             match (true) {
                 $e->getCode() === 401 => throw PlexAuthenticationError::create(),

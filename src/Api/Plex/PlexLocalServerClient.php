@@ -8,6 +8,7 @@ use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Util\Json;
+use Movary\ValueObject\Url;
 use RuntimeException;
 
 class PlexLocalServerClient
@@ -41,7 +42,7 @@ class PlexLocalServerClient
      * @psalm-suppress PossiblyUndefinedVariable
      */
     public function sendGetRequest(
-        string $requestUrl,
+        Url $requestUrl,
         ?array $customQuery = [],
     ) : array {
         if ($this->plexIdentifier === '') {
@@ -55,7 +56,7 @@ class PlexLocalServerClient
         ];
 
         try {
-            $response = $this->httpClient->request('GET', $requestUrl, $requestOptions);
+            $response = $this->httpClient->request('GET', (string)$requestUrl, $requestOptions);
         } catch (ClientException $e) {
             match (true) {
                 $e->getCode() === 401 => throw PlexAuthenticationError::create(),
