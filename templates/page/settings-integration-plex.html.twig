@@ -105,6 +105,7 @@
                        value="{{ plexServerUrl }}"
                        aria-describedby="plexServerUrlInputPrefix" {% if plexTokenExists == false %} disabled {% endif %}
                 >
+                <button class="btn btn-outline-secondary" type="button" id="plexServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#plexServerUrlHelpModal">?</button>
             </div>
 
             <div class="spinner-border d-none" role="status" id="alertPlexServerUrlLoadingSpinner" style="margin-bottom: 1rem">
@@ -127,5 +128,30 @@
             >Save URL
             </button>
         </div>
+
+        <div class="modal fade" id="plexServerUrlHelpModal" tabindex="-1" role="dialog" aria-labelledby="plexServerUrlHelpModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="plexServerUrlHelpModalTitle">Help: Plex server URL</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <p>
+                                You have to provide a URL to your Plex server which can be accessed by Movary. Example urls:
+                            </p>
+                            <ul>
+                                <li>http://localhost:32400</li>
+                                <li>http://192.168.1.2:32400</li>
+                                <li>https://plex.yourDomain.com</li>
+                            </ul>
+                            <p>
+                                Note: A valid url must start with the protocol (e.g. http://)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </main>
 {% endblock %}
