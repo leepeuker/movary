@@ -8,6 +8,6 @@ class PlexNoClientIdentifier extends RuntimeException
 {
     public static function create() : self
     {
-        return new self('No client identifier has been found. Please add it in the environment variables before using the Plex API');
+        return new self('Plex client identifier not set');
     }
 }
