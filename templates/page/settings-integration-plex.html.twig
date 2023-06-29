@@ -86,10 +86,16 @@
                 For personal data access you have to authenticate with Plex and provide your server url.
             </p>
 
-            <div id="alertPlexAuthenticationDiv"></div>
+            <div id="alertPlexAuthenticationDiv">
+                <div class="alert alert-warning {% if plexTokenExists == true or isActive != '' %}d-none{% endif %}"
+                     role="alert"
+                     style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                    Plex Authentication inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not set
+                </div>
+            </div>
 
             <div id="authenticateWithPlexDiv" class="{% if plexTokenExists == true %}d-none{% endif %}">
-                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()">Authenticate with Plex</button>
+                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()" {% if isActive == '' %}disabled{% endif %}>Authenticate with Plex</button>
             </div>
             <div id="removeAuthenticationWithPlexDiv" class="{% if plexTokenExists == false %}d-none{% endif %}">
                 <button type="button" class="btn btn-danger mb-3" onclick="removePlexAuthentication()">Remove Authentication</button>

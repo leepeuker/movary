@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Plex\Exception\MovaryApplicationUrlNotSet;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -50,7 +51,11 @@ class PlexController
             throw new \RuntimeException('User is already authenticated');
         }
 
-        $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl();
+        try {
+            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl();
+        } catch (MovaryApplicationUrlNotSet) {
+            return Response::createBadRequest('Movary application url not set');
+        }
 
         return Response::createJson(Json::encode(['authenticationUrl' => $plexAuthenticationUrl]));
     }

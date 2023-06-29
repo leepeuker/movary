@@ -108,7 +108,7 @@ class PlexApi
             'clientID' => $plexClientIdentifier,
             'code' => (string)$plexTemporaryClientCode,
             'context[device][product]' => $plexAppName,
-            'forwardUrl' => (string)Url::createFromString($applicationUrl . '/settings/plex/callback'),
+            'forwardUrl' => (string)Url::createFromString(trim($applicationUrl, '/') . '/settings/plex/callback'),
         ];
 
         return self::BASE_URL . http_build_query($getParameters);
