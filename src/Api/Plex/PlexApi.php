@@ -5,8 +5,8 @@ namespace Movary\Api\Plex;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\Dto\PlexAccount;
 use Movary\Api\Plex\Dto\PlexItem;
+use Movary\Api\Plex\Exception\MovaryApplicationUrlNotSet;
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
-use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -86,15 +86,11 @@ class PlexApi
      * 3. Based on the info returned by the Plex API, a new url will be generated, which looks like this: `https://app.plex.tv/auth#?clientID=<clientIdentifier>&code=<clientCode>&context[device][product]=<AppName>&forwardUrl=<urlCallback>`
      * 4. The URL is returned to the settingsController
      */
-    public function generatePlexAuthenticationUrl() : ?string
+    public function generatePlexAuthenticationUrl() : string
     {
         $relativeUrl = RelativeUrl::create('/pins');
 
-        try {
-            $plexAuthenticationData = $this->plexTvClient->sendPostRequest($relativeUrl);
-        } catch (PlexNoClientIdentifier) {
-            return null;
-        }
+        $plexAuthenticationData = $this->plexTvClient->sendPostRequest($relativeUrl);
 
         $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['id']);
         $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['code']);
@@ -105,16 +101,14 @@ class PlexApi
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         if ($applicationUrl === null) {
-            return null;
+            throw new MovaryApplicationUrlNotSet();
         }
-
-        $urlCallback = $applicationUrl . '/settings/plex/callback';
 
         $getParameters = [
             'clientID' => $plexClientIdentifier,
             'code' => (string)$plexTemporaryClientCode,
             'context[device][product]' => $plexAppName,
-            'forwardUrl' => $urlCallback,
+            'forwardUrl' => (string)Url::createFromString($applicationUrl . '/settings/plex/callback'),
         ];
 
         return self::BASE_URL . http_build_query($getParameters);

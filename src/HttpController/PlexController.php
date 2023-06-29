@@ -2,14 +2,12 @@
 
 namespace Movary\HttpController;
 
-use Movary\Api\Plex\Dto\PlexItemList;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Plex\PlexScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -25,7 +23,6 @@ class PlexController
         private readonly UserApi $userApi,
         private readonly PlexScrobbler $plexScrobbler,
         private readonly PlexApi $plexApi,
-        private readonly SessionWrapper $sessionWrapper,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
     ) {
@@ -40,6 +37,22 @@ class PlexController
         $this->userApi->deletePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
+    }
+
+    public function generatePlexAuthenticationUrl() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createForbidden();
+        }
+
+        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+        if ($plexAccessToken !== null) {
+            throw new \RuntimeException('User is already authenticated');
+        }
+
+        $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl();
+
+        return Response::createJson(Json::encode(['authenticationUrl' => $plexAuthenticationUrl]));
     }
 
     public function handlePlexWebhook(Request $request) : Response
@@ -66,18 +79,18 @@ class PlexController
     public function processPlexCallback() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
+            return Response::createForbidden();
         }
 
         $plexClientId = $this->userApi->findPlexClientId($this->authenticationService->getCurrentUserId());
         $plexClientCode = $this->userApi->findTemporaryPlexCode($this->authenticationService->getCurrentUserId());
         if ($plexClientId === null || $plexClientCode === null) {
-            return Response::createSeeOther('/');
+            throw new \RuntimeException('Missing plex client id or code');
         }
 
         $plexAccessToken = $this->plexApi->findPlexAccessToken($plexClientId, $plexClientCode);
         if ($plexAccessToken === null) {
-            return Response::createSeeOther('/');
+            throw new \RuntimeException('Missing plex client id or code');
         }
 
         $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), $plexAccessToken->getPlexAccessTokenAsString());
@@ -124,31 +137,50 @@ class PlexController
             return Response::createSeeOther('/');
         }
 
-        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
-        if ($plexAccessToken === null) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
-        $plexServerUrl = $request->getPostParameters()['plexServerUrlInput'];
 
+        $plexServerUrl = Json::decode($request->getBody())['plexServerUrl'];
         if (empty($plexServerUrl)) {
-            return Response::createSeeOther('/settings/integrations/plex');
+            $this->userApi->updatePlexServerUrl($userId, null);
+
+            return Response::createOk();
         }
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
         } catch (InvalidUrl) {
-            return Response::createBadRequest('Not a valid url: ' . $plexServerUrl);
+            return Response::createBadRequest('Url not properly formatted');
         }
 
-        if ($this->plexApi->verifyPlexUrl($userId, $plexServerUrl) === false) {
-            $this->sessionWrapper->set('serverUrlStatus', false);
-        } else {
-            $this->sessionWrapper->set('serverUrlStatus', true);
-            $this->userApi->updatePlexServerUrl($this->authenticationService->getCurrentUserId(), $plexServerUrl);
+        $this->userApi->updatePlexServerUrl($userId, $plexServerUrl);
+
+        return Response::createOk();
+    }
+
+    public function verifyPlexServerUrl(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
         }
 
-        return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $plexAccessToken = $this->userApi->findPlexAccessToken($userId);
+        if ($plexAccessToken === null) {
+            return Response::createBadRequest('Verification failed, plex authentication token missing.');
+        }
+
+        $plexServerUrl = Json::decode($request->getBody())['plexServerUrl'];
+        if (empty($plexServerUrl)) {
+            return Response::createBadRequest('Url not correctly formatted');
+        }
+
+        try {
+            $plexServerUrl = Url::createFromString($plexServerUrl);
+        } catch (InvalidUrl) {
+            return Response::createBadRequest('Verification failed, url not properly formatted');
+        }
+
+        return Response::createJson(Json::encode($this->plexApi->verifyPlexUrl($userId, $plexServerUrl)));
     }
 }

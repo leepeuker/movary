@@ -351,17 +351,11 @@ class SettingsController
 
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
 
-        if ($plexAccessToken === null) {
-            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl();
-        } else {
+        if ($plexAccessToken !== null) {
             $plexAccount = $this->plexApi->findPlexAccount(PlexAccessToken::createPlexAccessToken($plexAccessToken));
             if ($plexAccount instanceof PlexAccount) {
                 $plexUsername = $plexAccount->getPlexUsername();
-                if (($plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId())) == null) {
-                    $plexServerUrl = "";
-                }
-            } else {
-                $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl();
+                $plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId());
             }
         }
 
@@ -386,7 +380,7 @@ class SettingsController
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
-                'plexAuth' => $plexAuthenticationUrl ?? '',
+                'plexTokenExists' => $plexAccessToken !== null,
                 'plexServerUrl' => $plexServerUrl ?? '',
                 'plexUsername' => $plexUsername ?? '',
                 'serverUrlStatus' => $serverUrlStatus

@@ -83,40 +83,49 @@
             <h5>Plex Authentication</h5>
 
             <p class="text-muted" style="padding-bottom: 0">
-                For private data access you have to authenticate with Plex and private your server url.
+                For personal data access you have to authenticate with Plex and provide your server url.
             </p>
 
-            {% if plexAuth != '' %}
-                <a class="btn btn-primary mb-3" href="{{ plexAuth }}">Authenticate with Plex</a>
-            {% else %}
-                <a class="btn btn-danger mb-3" href="/settings/plex/logout">Remove Authentication</a>
-                <p>Username: {{ plexUsername }}</p>
-            {% endif %}
+            <div id="alertPlexAuthenticationDiv"></div>
 
-            <form action="/settings/plex/saveserverurl" method="POST">
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="plexServerUrlInputPrefix">Plex server URL</span>
-                    <input type="text" name="plexServerUrlInput" id="plexServerUrlInput" class="form-control {% if plexAuth != '' %} disabled {% endif %}"
-                           placeholder="" value="{{ plexServerUrl }}"
-                           aria-describedby="plexServerUrlInputPrefix" {% if plexAuth != '' %} disabled {% endif %}>
-                </div>
-                <button type="submit" class="btn btn-primary mb-3 {% if plexAuth != '' %} disabled {% endif %}"
-                        id="submitServerUrlBtn" {% if plexAuth != '' %} disabled {% endif %}>Save server URL
-                </button>
-            </form>
-            <div id="plexImportHistoryLog"></div>
-            {% if serverUrlStatus is not null %}
-                {% if serverUrlStatus == false %}
-                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
-                        {{ serverUrlStatus }}
-                        Server could not be reached. Check if the server is on and if you have access to this server with your Plex account.
-                    </div>
-                {% elseif serverUrlStatus == true %}
-                    <div class="alert alert-success" role="alert" style="margin-bottom: 0.7rem!important;">
-                        Server url has succesfully been added!
-                    </div>
-                {% endif %}
-            {% endif %}
+            <div id="authenticateWithPlexDiv" class="{% if plexTokenExists == true %}d-none{% endif %}">
+                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()">Authenticate with Plex</button>
+            </div>
+            <div id="removeAuthenticationWithPlexDiv" class="{% if plexTokenExists == false %}d-none{% endif %}">
+                <button type="button" class="btn btn-danger mb-3" onclick="removePlexAuthentication()">Remove Authentication</button>
+                <p>Username: {{ plexUsername }}</p>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="plexServerUrlInputPrefix">Plex Server URL</span>
+                <input type="text"
+                       name="plexServerUrlInput"
+                       id="plexServerUrlInput"
+                       class="form-control {% if plexTokenExists == false %} disabled {% endif %}"
+                       value="{{ plexServerUrl }}"
+                       aria-describedby="plexServerUrlInputPrefix" {% if plexTokenExists == false %} disabled {% endif %}
+                >
+            </div>
+
+            <div class="spinner-border d-none" role="status" id="alertPlexServerUrlLoadingSpinner" style="margin-bottom: 1rem">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="alertPlexServerUrlDiv"></div>
+
+            <button type="submit"
+                    class="btn btn-outline-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
+                    id="verifyServerUrlButton"
+                    {% if plexTokenExists == false %} disabled {% endif %}
+                    onclick="verifyPlexServerUrl()"
+            >Test connection
+            </button>
+            <button type="submit"
+                    class="btn btn-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
+                    id="saveServerUrlButton"
+                    {% if plexTokenExists == false %} disabled {% endif %}
+                    onclick="savePlexServerUrl()"
+            >Save URL
+            </button>
         </div>
     </main>
 {% endblock %}

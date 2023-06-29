@@ -225,14 +225,24 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/plex/saveserverurl',
+        '/settings/plex/server-url-save',
         [\Movary\HttpController\PlexController::class, 'savePlexServerUrl'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/plex/server-url-verify',
+        [\Movary\HttpController\PlexController::class, 'verifyPlexServerUrl'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/plex/authentication-url',
+        [\Movary\HttpController\PlexController::class, 'generatePlexAuthenticationUrl'],
     );
     $routeCollector->addRoute(
         'GET',
         '/settings/plex/callback',
         [\Movary\HttpController\PlexController::class, 'processPlexCallback'],
-    );    
+    );
     $routeCollector->addRoute(
         'POST',
         '/settings/plex',

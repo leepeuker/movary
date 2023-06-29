@@ -290,7 +290,7 @@ class UserApi
         $this->repository->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
     }
 
-    public function updatePlexServerUrl(int $userId, Url $plexServerUrl) : void
+    public function updatePlexServerUrl(int $userId, ?Url $plexServerUrl) : void
     {
         $this->repository->updatePlexServerurl($userId, $plexServerUrl);
     }
