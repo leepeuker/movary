@@ -58,7 +58,7 @@ class PlexApi
             return null;
         }
 
-        return PlexAccessToken::createPlexAccessToken($plexRequest['authToken']);
+        return PlexAccessToken::create($plexRequest['authToken']);
     }
 
     public function findPlexAccount(PlexAccessToken $plexAccessToken) : ?PlexAccount
@@ -77,7 +77,7 @@ class PlexApi
             return null;
         }
 
-        return PlexAccount::createPlexAccount((int)$accountData['id'], $accountData['username']);
+        return PlexAccount::create((int)$accountData['id'], $accountData['username']);
     }
 
     /**
