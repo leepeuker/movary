@@ -90,7 +90,8 @@
                 <div class="alert alert-warning {% if plexTokenExists == true or isActive != '' %}d-none{% endif %}"
                      role="alert"
                      style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                    Plex Authentication inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not set
+                    Plex Authentication inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not
+                    set
                 </div>
             </div>
 
@@ -111,7 +112,9 @@
                        value="{{ plexServerUrl }}"
                        aria-describedby="plexServerUrlInputPrefix" {% if plexTokenExists == false %} disabled {% endif %}
                 >
-                <button class="btn btn-outline-secondary" type="button" id="plexServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#plexServerUrlHelpModal">?</button>
+                <button class="btn btn-outline-secondary" type="button" id="plexServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#plexServerUrlHelpModal">
+                    <i class="bi bi-question-lg"></i>
+                </button>
             </div>
 
             <div class="spinner-border d-none" role="status" id="alertPlexServerUrlLoadingSpinner" style="margin-bottom: 1rem">
