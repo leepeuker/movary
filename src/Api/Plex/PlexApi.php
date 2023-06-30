@@ -4,8 +4,6 @@ namespace Movary\Api\Plex;
 
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\Dto\PlexAccount;
-use Movary\Api\Plex\Dto\PlexItem;
-use Movary\Api\Plex\Exception\MovaryApplicationUrlNotSet;
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Domain\User\Service\Authentication;
@@ -99,10 +97,7 @@ class PlexApi
         $plexClientIdentifier = $plexAuthenticationData['clientIdentifier'];
         $plexTemporaryClientCode = $plexAuthenticationData['code'];
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
-        if ($applicationUrl === null) {
-            throw new MovaryApplicationUrlNotSet();
-        }
+        $applicationUrl = $this->serverSettings->requireApplicationUrl();
 
         $getParameters = [
             'clientID' => $plexClientIdentifier,

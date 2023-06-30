@@ -4,7 +4,7 @@ namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\Util\File;
 use Movary\ValueObject\Config;
-use Movary\ValueObject\Exception\ConfigKeyNotSetException;
+use Movary\ValueObject\Exception\ConfigNotSetException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -40,8 +40,8 @@ class ConfigTest extends TestCase
     {
         $this->fileUtilMock->expects(self::never())->method('fileExists');
 
-        $this->expectException(ConfigKeyNotSetException::class);
-        $this->expectExceptionMessage('Config key does not exist: bool_test_not_existing');
+        $this->expectException(ConfigNotSetException::class);
+        $this->expectExceptionMessage('Required config not set: bool_test_not_existing');
 
         $this->subject->getAsBool('bool_test_not_existing');
     }
@@ -56,8 +56,8 @@ class ConfigTest extends TestCase
     {
         $this->fileUtilMock->expects(self::never())->method('fileExists');
 
-        $this->expectException(ConfigKeyNotSetException::class);
-        $this->expectExceptionMessage('Config key does not exist: int_test_not_existing');
+        $this->expectException(ConfigNotSetException::class);
+        $this->expectExceptionMessage('Required config not set: int_test_not_existing');
 
         $this->subject->getAsBool('int_test_not_existing');
     }
@@ -89,8 +89,8 @@ class ConfigTest extends TestCase
     {
         $this->fileUtilMock->expects(self::never())->method('fileExists');
 
-        $this->expectException(ConfigKeyNotSetException::class);
-        $this->expectExceptionMessage('Config key does not exist: string_test_not_existing');
+        $this->expectException(ConfigNotSetException::class);
+        $this->expectExceptionMessage('Required config not set: string_test_not_existing');
 
         $this->subject->getAsString('string_test_not_existing');
     }
@@ -103,8 +103,8 @@ class ConfigTest extends TestCase
             ->with('/path/to/secret')
             ->willReturn(false);
 
-        $this->expectException(ConfigKeyNotSetException::class);
-        $this->expectExceptionMessage('Config key does not exist: string_test_secret');
+        $this->expectException(ConfigNotSetException::class);
+        $this->expectExceptionMessage('Required config not set: string_test_secret');
 
         self::assertSame('value_secret', $this->subject->getAsString('string_test_secret'));
     }

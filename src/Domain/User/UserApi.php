@@ -2,6 +2,7 @@
 
 namespace Movary\Domain\User;
 
+use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\Url;
 use Ramsey\Uuid\Uuid;
@@ -101,9 +102,15 @@ class UserApi
         return $this->repository->findJellyfinWebhookId($userId);
     }
 
-    public function findPlexAccessToken(int $userId) : ?string
+    public function findPlexAccessToken(int $userId) : ?PlexAccessToken
     {
-        return $this->repository->findPlexAccessToken($userId);
+        $plexAccessToken = $this->repository->findPlexAccessToken($userId);
+
+        if ($plexAccessToken === null) {
+            return null;
+        }
+
+        return PlexAccessToken::create($plexAccessToken);
     }
 
     public function findPlexClientId(int $userId) : ?string

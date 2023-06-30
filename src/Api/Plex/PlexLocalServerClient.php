@@ -5,8 +5,8 @@ namespace Movary\Api\Plex;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
-use Movary\Api\Plex\Exception\PlexNoClientIdentifier;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
+use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\ValueObject\Url;
 use RuntimeException;
@@ -19,22 +19,10 @@ class PlexLocalServerClient
         'accept' => 'application/json'
     ];
 
-    private array $defaultFormData;
-
     public function __construct(
         private readonly HttpClient $httpClient,
-        private readonly string $plexIdentifier,
-        private readonly string $applicationVersion,
+        private readonly ServerSettings $serverSettings,
     ) {
-        $this->defaultFormData = [
-            'X-Plex-Client-Identifier' => $this->plexIdentifier,
-            'X-Plex-Product' => self::APP_NAME,
-            'X-Plex-Product-Version' => $this->applicationVersion,
-            'X-Plex-Platform' => php_uname('s'),
-            'X-Plex-Platform-Version' => php_uname('v'),
-            'X-Plex-Provides' => 'Controller',
-            'strong' => 'true'
-        ];
     }
 
     /**
@@ -44,12 +32,8 @@ class PlexLocalServerClient
         Url $requestUrl,
         ?array $customQuery = [],
     ) : array {
-        if ($this->plexIdentifier === '') {
-            throw PlexNoClientIdentifier::create();
-        }
-
         $requestOptions = [
-            'form_params' => $this->defaultFormData,
+            'form_params' => $this->generateDefaultFormData(),
             'query' => $customQuery,
             'headers' => self::DEFAULT_HEADERS,
             'connect_timeout' => 2,
@@ -66,5 +50,18 @@ class PlexLocalServerClient
         }
 
         return Json::decode((string)$response->getBody());
+    }
+
+    private function generateDefaultFormData() : array
+    {
+        return [
+            'X-Plex-Client-Identifier' => $this->serverSettings->requirePlexIdentifier(),
+            'X-Plex-Product' => self::APP_NAME,
+            'X-Plex-Product-Version' => $this->serverSettings->getApplicationVersion(),
+            'X-Plex-Platform' => php_uname('s'),
+            'X-Plex-Platform-Version' => php_uname('v'),
+            'X-Plex-Provides' => 'Controller',
+            'strong' => 'true'
+        ];
     }
 }

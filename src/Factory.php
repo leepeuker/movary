@@ -11,8 +11,6 @@ use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Plex;
 use Movary\Api\Plex\PlexApi;
-use Movary\Api\Plex\PlexLocalServerClient;
-use Movary\Api\Plex\PlexTvClient;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -248,23 +246,6 @@ class Factory
         }
 
         return $logger;
-    }
-
-    public static function createPlexLocalServerClient(ContainerInterface $container, Config $config) : Plex\PlexLocalServerClient
-    {
-        return new Plex\PlexLocalServerClient(
-            $container->get(GuzzleHttp\Client::class),
-            $config->getAsString('PLEX_IDENTIFIER'),
-            $config->getAsString('APPLICATION_VERSION'),
-        );
-    }
-
-    public static function createPlexTvClient(ContainerInterface $container, Config $config) : Plex\PlexTvClient
-    {
-        return new Plex\PlexTvClient(
-            $container->get(GuzzleHttp\Client::class),
-            $config->getAsString('PLEX_IDENTIFIER'),
-        );
     }
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController

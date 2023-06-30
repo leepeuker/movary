@@ -2,13 +2,13 @@
 
 namespace Movary\HttpController;
 
-use Movary\Api\Plex\Exception\MovaryApplicationUrlNotSet;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Plex\PlexScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
+use Movary\ValueObject\Exception\ConfigNotSetException;
 use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -53,8 +53,8 @@ class PlexController
 
         try {
             $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl();
-        } catch (MovaryApplicationUrlNotSet) {
-            return Response::createBadRequest('Movary application url not set');
+        } catch (ConfigNotSetException $e) {
+            return Response::createBadRequest($e->getMessage());
         }
 
         return Response::createJson(Json::encode(['authenticationUrl' => $plexAuthenticationUrl]));

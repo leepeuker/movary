@@ -2,10 +2,10 @@
 
 namespace Movary\ValueObject\Exception;
 
-class ConfigKeyNotSetException extends \RuntimeException
+class ConfigNotSetException extends \RuntimeException
 {
     public static function create(string $key) : self
     {
-        return new self('Config key does not exist: ' . $key);
+        return new self('Required config not set: ' . $key);
     }
 }
