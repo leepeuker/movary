@@ -37,7 +37,7 @@
                     <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
                          role="alert"
                          style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Webhooks inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not set
+                        Webhook disabled - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
                     </div>
                 </div>
 
@@ -91,8 +91,7 @@
                 <div class="alert alert-warning {% if plexTokenExists == true or isActive != '' %}d-none{% endif %}"
                      role="alert"
                      style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                    Plex Authentication inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not
-                    set
+                    Authentication disabled - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
                 </div>
             </div>
 
@@ -144,10 +143,20 @@
 
             <p class="text-muted">This import will add all movies missing from the Plex Watchlist to your Movary Watchlist.</p>
 
-            <div id="alertPlexWatchlistImportDiv"></div>
+            <div id="alertPlexWatchlistImportDiv">
+                <div class="alert alert-warning {% if plexTokenExists == true %}d-none{% endif %}"
+                     role="alert"
+                     style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                    Import disabled - Plex authentication required
+                </div>
+            </div>
 
-            <button type="button" class="btn btn-outline-primary" onclick="showJobModal('plex_import_watchlist')">Show imports</button>
-            <button type="button" class="btn btn-warning" onclick="importPlexWatchlist()" id="plexWatchlistImportButton">Import watchlist</button>
+            <button type="button" class="btn btn-outline-primary" onclick="showJobModal('plex_import_watchlist')">
+                Show imports
+            </button>
+            <button type="button" class="btn btn-warning" onclick="importPlexWatchlist()" id="plexWatchlistImportButton" {% if plexTokenExists == false %}disabled{% endif %}>
+                Import watchlist
+            </button>
         </div>
 
         <div class="modal fade" id="plexServerUrlHelpModal" tabindex="-1" role="dialog" aria-labelledby="plexServerUrlHelpModalTitle" aria-hidden="true">
