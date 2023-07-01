@@ -2,6 +2,9 @@
 
 namespace Movary\Domain\User;
 
+use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\ValueObject\Url;
+
 class UserEntity
 {
     private function __construct(
@@ -20,7 +23,8 @@ class UserEntity
         private readonly ?string $embyWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
-        private readonly ?string $plexAccessToken,
+        private readonly ?PlexAccessToken $plexAccessToken,
+        private readonly ?Url $plexServerUrl,
         private readonly bool $jellyfinScrobbleWatches,
         private readonly bool $embyScrobbleWatches,
         private readonly bool $plexScrobbleWatches,
@@ -47,7 +51,8 @@ class UserEntity
             $data['emby_webhook_uuid'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
-            $data['plex_access_token'],
+            $data['plex_access_token'] === null ? null : PlexAccessToken::create($data['plex_access_token']),
+            $data['plex_server_url'] === null ? null : Url::createFromString($data['plex_server_url']),
             (bool)$data['jellyfin_scrobble_views'],
             (bool)$data['emby_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
@@ -101,9 +106,14 @@ class UserEntity
         return $this->passwordHash;
     }
 
-    public function getPlexAccessToken() : ?string
+    public function getPlexAccessToken() : ?PlexAccessToken
     {
         return $this->plexAccessToken;
+    }
+
+    public function getPlexServerUrl() : ?Url
+    {
+        return $this->plexServerUrl;
     }
 
     public function getPlexWebhookId() : ?string

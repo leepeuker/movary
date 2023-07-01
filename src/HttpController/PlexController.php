@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -98,7 +99,7 @@ class PlexController
             throw new \RuntimeException('Missing plex client id or code');
         }
 
-        $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), $plexAccessToken->getPlexAccessTokenAsString());
+        $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), (string)$plexAccessToken);
 
         $plexAccount = $this->plexApi->findPlexAccount($plexAccessToken);
         if ($plexAccount !== null) {
@@ -168,9 +169,7 @@ class PlexController
             return Response::createSeeOther('/');
         }
 
-        $userId = $this->authenticationService->getCurrentUserId();
-
-        $plexAccessToken = $this->userApi->findPlexAccessToken($userId);
+        $plexAccessToken = $this->authenticationService->getCurrentUser()->getPlexAccessToken();
         if ($plexAccessToken === null) {
             return Response::createBadRequest('Verification failed, plex authentication token missing.');
         }
@@ -186,6 +185,8 @@ class PlexController
             return Response::createBadRequest('Verification failed, url not properly formatted');
         }
 
-        return Response::createJson(Json::encode($this->plexApi->verifyPlexUrl($userId, $plexServerUrl)));
+        $userClientConfiguration = PlexUserClientConfiguration::create($plexAccessToken, $plexServerUrl);
+
+        return Response::createJson(Json::encode($this->plexApi->verifyPlexUrl($userClientConfiguration)));
     }
 }

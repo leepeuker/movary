@@ -5,6 +5,7 @@ namespace Movary\Service;
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Letterboxd;
+use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\Service\Trakt;
 use Movary\Service\Trakt\ImportWatchedMovies;
@@ -19,6 +20,7 @@ class JobProcessor
         private readonly Letterboxd\LetterboxdImportDiary $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,
         private readonly TmdbImageCache $tmdbImageCache,
+        private readonly PlexWatchlistImporter $plexWatchlistImporter,
     ) {
     }
 
@@ -31,6 +33,7 @@ class JobProcessor
             $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
             $job->getType()->isOfTypeTmdbMovieSync() => $this->tmdbSyncMovies->syncMovies(),
+            $job->getType()->isOfTypePlexImportWatchlist() => $this->plexWatchlistImporter->executeJob($job),
 
             default => throw new RuntimeException('Job type not supported: ' . $job->getType()),
         };

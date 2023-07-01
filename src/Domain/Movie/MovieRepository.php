@@ -726,6 +726,17 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
+    public function findByTitleAndYear(string $title, Year $releaseYear) : ?MovieEntity
+    {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE title = ? AND strftime(\'%Y\',release_date) = ?', [$title, $releaseYear]);
+        } else {
+            $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE title = ? AND YEAR(release_date) = ?', [$title, $releaseYear]);
+        }
+
+        return $data === false ? null : MovieEntity::createFromArray($data);
+    }
+
     public function findByTmdbId(int $tmdbId) : ?MovieEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE tmdb_id = ?', [$tmdbId]);

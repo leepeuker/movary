@@ -4,13 +4,16 @@ namespace Movary\Api\Plex;
 
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\Dto\PlexAccount;
+use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
+use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
+use Movary\ValueObject\Year;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -35,9 +38,40 @@ class PlexApi
         private readonly ServerSettings $serverSettings,
         private readonly LoggerInterface $logger,
         private readonly PlexTvClient $plexTvClient,
-        private readonly PlexLocalServerClient $localClient,
+        private readonly PlexUserClient $userClient,
         private readonly UserApi $userApi,
+        private readonly MovieApi $movieApi,
     ) {
+    }
+
+    public function fetchWatchlist(PlexAccessToken $plexAccessToken) : array
+    {
+        $query = [
+            'type' => '1',
+            'includeFields' => 'title,type,year,key',
+            'includeElements' => 'Guid',
+        ];
+
+        $relativeUrl = RelativeUrl::create('/library/sections/watchlist/all');
+
+        $limit = 30;
+        $offset = 0;
+
+        $watchlistMovies = [];
+
+        do {
+            $responseData = $this->plexTvClient->getMetadata($plexAccessToken, $relativeUrl, $query, $limit, $offset);
+
+            $offset += $limit;
+
+            $totalItems = $responseData['MediaContainer']['totalSize'];
+
+            foreach ($responseData['MediaContainer']['Metadata'] as $movie) {
+                $watchlistMovies[] = $movie;
+            }
+        } while ($totalItems > $offset);
+
+        return $watchlistMovies;
     }
 
     public function findPlexAccessToken(string $plexPinId, string $temporaryPlexClientCode) : ?PlexAccessToken
@@ -62,7 +96,7 @@ class PlexApi
     public function findPlexAccount(PlexAccessToken $plexAccessToken) : ?PlexAccount
     {
         $headers = [
-            'X-Plex-Token' => $plexAccessToken->getPlexAccessTokenAsString()
+            'X-Plex-Token' => (string)$plexAccessToken
         ];
 
         $relativeUrl = RelativeUrl::create('/user');
@@ -78,6 +112,70 @@ class PlexApi
         return PlexAccount::create((int)$accountData['id'], $accountData['username']);
     }
 
+    public function findTmdbIdsOfWatchlistMovies(PlexAccessToken $plexAccessToken, array $plexWatchlistMovies) : array
+    {
+        $tmdbIds = [];
+
+        foreach ($plexWatchlistMovies as $plexWatchlistMovie) {
+            $moviePlexTitle = $plexWatchlistMovie['title'];
+            $moviePlexYear = Year::createFromInt($plexWatchlistMovie['year']);
+
+            $movie = $this->movieApi->findByTitleAndYear($moviePlexTitle, $moviePlexYear);
+
+            $tmdbId = $movie?->getTmdbId();
+
+            if ($tmdbId !== null) {
+                $tmdbIds[] = $tmdbId;
+
+                $this->logger->debug(
+                    'Plex Api - Found tmdb id locally',
+                    [
+                        'tmdbId' => (string)$tmdbId,
+                        'plexTitle' => $moviePlexTitle,
+                        'plexYear' => (string)$moviePlexYear,
+                    ],
+                );
+
+                continue;
+            }
+
+            $movieData = $this->plexTvClient->getMetadata($plexAccessToken, RelativeUrl::create($plexWatchlistMovie['key']));
+
+            $tmdbId = null;
+
+            foreach ($movieData['MediaContainer']['Metadata'][0]['Guid'] as $guid) {
+                if (str_starts_with($guid['id'], 'tmdb') === true) {
+                    $tmdbId = str_replace('tmdb://', '', $guid['id']);
+
+                    $tmdbIds[] = $tmdbId;
+
+                    $this->logger->debug(
+                        'Plex Api - Found tmdb id on plex',
+                        [
+                            'tmdbId' => $tmdbId,
+                            'plexTitle' => $moviePlexTitle,
+                            'plexYear' => (string)$moviePlexYear,
+                        ],
+                    );
+
+                    break;
+                }
+            }
+
+            if ($tmdbId === null) {
+                $this->logger->debug(
+                    'Plex Api - Could not find tmdb id',
+                    [
+                        'plexTitle' => $moviePlexTitle,
+                        'plexYear' => (string)$moviePlexYear,
+                    ],
+                );
+            }
+        }
+
+        return $tmdbIds;
+    }
+
     /**
      * 1. A HTTP POST request will be sent to the Plex API, requesting a client ID and a client Code. The code is usually valid for 1800 seconds or 15 minutes. After 15min, a new code has to be requested.
      * 2. Both the pin ID and code will be stored in the database for later use in the plexCallback controller
@@ -88,7 +186,7 @@ class PlexApi
     {
         $relativeUrl = RelativeUrl::create('/pins');
 
-        $plexAuthenticationData = $this->plexTvClient->sendPostRequest($relativeUrl);
+        $plexAuthenticationData = $this->plexTvClient->post($relativeUrl);
 
         $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['id']);
         $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['code']);
@@ -109,14 +207,10 @@ class PlexApi
         return self::BASE_URL . http_build_query($getParameters);
     }
 
-    public function verifyPlexUrl(int $userId, Url $url) : bool
+    public function verifyPlexUrl(PlexUserClientConfiguration $userClientConfiguration) : bool
     {
-        $query = [
-            'X-Plex-Token' => $this->userApi->fetchUser($userId)->getPlexAccessToken()
-        ];
-
         try {
-            $this->localClient->sendGetRequest($url, $query);
+            $this->userClient->get($userClientConfiguration);
 
             return true;
         } catch (PlexAuthenticationError) {

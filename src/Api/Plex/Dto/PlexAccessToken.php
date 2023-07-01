@@ -14,7 +14,7 @@ class PlexAccessToken
         return new self($plexAccessToken);
     }
 
-    public function getPlexAccessTokenAsString() : string
+    public function __toString() : string
     {
         return $this->plexAccessToken;
     }

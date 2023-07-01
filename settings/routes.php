@@ -89,6 +89,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/jobs/schedule/letterboxd-ratings-sync',
         [\Movary\HttpController\JobController::class, 'scheduleLetterboxdRatingsImport'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/jobs/schedule/plex-watchlist-sync',
+        [\Movary\HttpController\JobController::class, 'schedulePlexWatchlistImport'],
+    );
 
     ############
     # Settings #

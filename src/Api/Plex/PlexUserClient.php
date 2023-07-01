@@ -4,14 +4,15 @@ namespace Movary\Api\Plex;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
+use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
 use Movary\Api\Plex\Exception\PlexAuthenticationError;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
-use Movary\ValueObject\Url;
+use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 
-class PlexLocalServerClient
+class PlexUserClient
 {
     private const APP_NAME = 'Movary';
 
@@ -25,19 +26,23 @@ class PlexLocalServerClient
     ) {
     }
 
-    /**
-     * @psalm-suppress PossiblyUndefinedVariable
-     */
-    public function sendGetRequest(
-        Url $requestUrl,
-        ?array $customQuery = [],
+    public function get(
+        PlexUserClientConfiguration $clientConfiguration,
+        ?RelativeUrl $relativeUrl = null,
     ) : array {
         $requestOptions = [
             'form_params' => $this->generateDefaultFormData(),
-            'query' => $customQuery,
+            'query' => [
+                'X-Plex-Token' => (string)$clientConfiguration->getAccessToken(),
+            ],
             'headers' => self::DEFAULT_HEADERS,
             'connect_timeout' => 2,
         ];
+
+        $requestUrl = $clientConfiguration->getServerUrl();
+        if ($relativeUrl !== null) {
+            $requestUrl = $requestUrl->appendRelativeUrl($relativeUrl);
+        }
 
         try {
             $response = $this->httpClient->request('GET', (string)$requestUrl, $requestOptions);
@@ -49,6 +54,7 @@ class PlexLocalServerClient
             };
         }
 
+        /** @psalm-suppress PossiblyUndefinedVariable */
         return Json::decode((string)$response->getBody());
     }
 

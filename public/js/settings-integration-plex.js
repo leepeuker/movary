@@ -223,3 +223,15 @@ document.getElementById('verifyServerUrlButton').disabled = document.getElementB
 document.getElementById('plexServerUrlInput').addEventListener('input', function (e) {
     document.getElementById('verifyServerUrlButton').disabled = e.target.value === ''
 });
+
+async function importPlexWatchlist() {
+    const response = await fetch('/jobs/schedule/plex-watchlist-sync', {'method': 'get'})
+
+    if (!response.ok) {
+        addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    addAlert('alertPlexWatchlistImportDiv', 'Watchlist import scheduled', 'success')
+}
