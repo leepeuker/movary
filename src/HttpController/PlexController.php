@@ -48,7 +48,7 @@ class PlexController
 
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
         if ($plexAccessToken !== null) {
-            throw new \RuntimeException('User is already authenticated');
+            return Response::createBadRequest('User is already authenticated');
         }
 
         try {
