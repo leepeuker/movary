@@ -4,11 +4,16 @@ namespace Movary\Service;
 
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\Config;
-use Movary\ValueObject\Exception\ConfigKeyNotSetException;
+use Movary\ValueObject\Exception\ConfigNotSetException;
+use function PHPUnit\Framework\assertNotNull;
 
 class ServerSettings
 {
+    private const PLEX_IDENTIFIER = 'PLEX_IDENTIFIER';
+
     private const APPLICATION_URL = 'APPLICATION_URL';
+
+    private const APPLICATION_VERSION = 'APPLICATION_VERSION';
 
     private const SMTP_HOST = 'SMTP_HOST';
 
@@ -36,128 +41,67 @@ class ServerSettings
 
     public function getApplicationUrl() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::APPLICATION_URL);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::APPLICATION_URL);
-        }
+        return $this->getByKey(self::APPLICATION_URL);
+    }
 
-        return (string)$value === '' ? null : (string)$value;
+    public function getApplicationVersion() : ?string
+    {
+        return $this->getByKey(self::APPLICATION_VERSION);
     }
 
     public function getFromAddress() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_FROM_ADDRESS);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_FROM_ADDRESS);
-        }
+        return $this->getByKey(self::SMTP_FROM_ADDRESS);
+    }
 
-        return (string)$value === '' ? null : (string)$value;
+    public function getPlexIdentifier() : ?string
+    {
+        return $this->getByKey(self::PLEX_IDENTIFIER);
     }
 
     public function getSmtpEncryption() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_ENCRYPTION);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_ENCRYPTION);
-        }
-
-        return (string)$value === '' ? null : (string)$value;
+        return $this->getByKey(self::SMTP_ENCRYPTION);
     }
 
     public function getSmtpHost() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_HOST);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_HOST);
-        }
-
-        return (string)$value === '' ? null : (string)$value;
+        return $this->getByKey(self::SMTP_HOST);
     }
 
     public function getSmtpPassword() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_PASSWORD);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_PASSWORD);
-        }
-
-        return (string)$value === '' ? null : (string)$value;
+        return $this->getByKey(self::SMTP_PASSWORD);
     }
 
     public function getSmtpPort() : ?int
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_PORT);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_PORT);
-        }
-
-        return (string)$value === '' ? null : (int)$value;
+        return (int)$this->getByKey(self::SMTP_PORT);
     }
 
     public function getSmtpSenderAddress() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_SENDER_ADDRESS);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_SENDER_ADDRESS);
-        }
-
-        return (string)$value === '' ? null : (string)$value;
+        return $this->getByKey(self::SMTP_SENDER_ADDRESS);
     }
 
     public function getSmtpUser() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_USER);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_USER);
-        }
-
-        return (string)$value === '' ? null : (string)$value;
+        return $this->getByKey(self::SMTP_USER);
     }
 
     public function getSmtpWithAuthentication() : ?bool
     {
-        try {
-            $value = $this->config->getAsString(self::SMTP_WITH_AUTH);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::SMTP_WITH_AUTH);
-        }
-
-        return (string)$value === '' ? null : (bool)$value;
+        return (bool)$this->getByKey(self::SMTP_WITH_AUTH);
     }
 
     public function getTmdbApiKey() : ?string
     {
-        try {
-            $value = $this->config->getAsString(self::TMDB_API_KEY);
-        } catch (ConfigKeyNotSetException) {
-            $value = $this->fetchValueFromDatabase(self::TMDB_API_KEY);
-        }
-
-        return (string)$value === '' ? null : (string)$value;
+        return (string)$this->getByKey(self::TMDB_API_KEY);
     }
 
     public function isApplicationUrlSetInEnvironment() : bool
     {
         return $this->isSetInEnvironment(self::APPLICATION_URL);
-    }
-
-    public function isSetInEnvironment(string $key) : bool
-    {
-        try {
-            $this->config->getAsString($key);
-        } catch (ConfigKeyNotSetException) {
-            return false;
-        }
-
-        return true;
     }
 
     public function isSmtpEncryptionSetInEnvironment() : bool
@@ -200,6 +144,22 @@ class ServerSettings
         return $this->isSetInEnvironment(self::TMDB_API_KEY);
     }
 
+    public function requireApplicationUrl() : string
+    {
+        $value = $this->getByKey(self::APPLICATION_URL, true);
+        assertNotNull($value);
+
+        return $value;
+    }
+
+    public function requirePlexIdentifier() : string
+    {
+        $value = $this->getByKey(self::PLEX_IDENTIFIER, true);
+        assertNotNull($value);
+
+        return $value;
+    }
+
     public function setApplicationUrl(string $applicationUrl) : void
     {
         $this->updateValue(self::APPLICATION_URL, $applicationUrl);
@@ -234,7 +194,7 @@ class ServerSettings
         $this->updateValue(self::SMTP_PASSWORD, $smtpPassword);
     }
 
-    public function setSmtpPort(string $smtpPort) : void
+    public function setSmtpPort(int $smtpPort) : void
     {
         $this->updateValue(self::SMTP_PORT, $smtpPort);
     }
@@ -262,6 +222,32 @@ class ServerSettings
         );
 
         return isset($value[0]) === false ? null : (string)$value[0];
+    }
+
+    private function getByKey(string $key, bool $required = false) : ?string
+    {
+        try {
+            $value = $this->config->getAsString($key);
+        } catch (ConfigNotSetException $e) {
+            $value = $this->fetchValueFromDatabase($key);
+
+            if (empty($value) === true && $required === true) {
+                throw $e;
+            }
+        }
+
+        return (string)$value === '' ? null : (string)$value;
+    }
+
+    private function isSetInEnvironment(string $key) : bool
+    {
+        try {
+            $this->config->getAsString($key);
+        } catch (ConfigNotSetException) {
+            return false;
+        }
+
+        return true;
     }
 
     private function updateValue(string $environmentKey, mixed $value) : void

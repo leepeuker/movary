@@ -9,6 +9,8 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Plex;
+use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -254,6 +256,7 @@ class Factory
             $container->get(UserApi::class),
             $container->get(MovieApi::class),
             $container->get(GithubApi::class),
+            $container->get(PlexApi::class),
             $container->get(SessionWrapper::class),
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),

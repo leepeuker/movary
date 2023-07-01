@@ -4,6 +4,7 @@ namespace Movary\Domain\User;
 
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\Url;
 use RuntimeException;
 
 class UserRepository
@@ -153,48 +154,48 @@ class UserRepository
         return DateTime::createFromString($expirationDate);
     }
 
-    public function findDateFormatId(int $userId) : ?int
+    public function findPlexAccessToken(int $userId) : ?string
     {
-        $dateFormat = $this->dbConnection->fetchOne('SELECT `date_format_id` FROM `user` WHERE `id` = ?', [$userId]);
+        $plexAccessToken = $this->dbConnection->fetchOne('SELECT `plex_access_token` FROM `user` WHERE `id` = ?', [$userId]);
 
-        if ($dateFormat === false) {
+        if ($plexAccessToken === false) {
             return null;
         }
 
-        return (int)$dateFormat;
+        return $plexAccessToken;
     }
 
-    public function findEmbyWebhookId(int $userId) : ?string
+    public function findPlexClientId(int $userId) : ?string
     {
-        $embyWebhookId = $this->dbConnection->fetchOne('SELECT `emby_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+        $plexClientId = $this->dbConnection->fetchOne('SELECT `plex_client_id` FROM `user` WHERE `id` = ?', [$userId]);
 
-        if ($embyWebhookId === false) {
+        if ($plexClientId === false) {
             return null;
         }
 
-        return $embyWebhookId;
+        return $plexClientId;
     }
 
-    public function findJellyfinWebhookId(int $userId) : ?string
+    public function findPlexServerUrl(int $userId) : ?string
     {
-        $jellyfinWebhookId = $this->dbConnection->fetchOne('SELECT `jellyfin_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+        $plexServerUrl = $this->dbConnection->fetchOne('SELECT `plex_server_url` FROM `user` WHERE `id` = ?', [$userId]);
 
-        if ($jellyfinWebhookId === false) {
+        if ($plexServerUrl === false) {
             return null;
         }
 
-        return $jellyfinWebhookId;
+        return $plexServerUrl;
     }
 
-    public function findPlexWebhookId(int $userId) : ?string
+    public function findTemporaryPlexCode(int $userId) : ?string
     {
-        $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
+        $plexCode = $this->dbConnection->fetchOne('SELECT `plex_client_temporary_code` FROM `user` WHERE `id` = ?', [$userId]);
 
-        if ($plexWebhookId === false) {
+        if ($plexCode === false) {
             return null;
         }
 
-        return $plexWebhookId;
+        return $plexCode;
     }
 
     public function findTraktClientId(int $userId) : ?string
@@ -476,6 +477,45 @@ class UserRepository
         );
     }
 
+    public function updatePlexAccessToken(int $userId, ?string $accessToken) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_access_token' => $accessToken
+            ],
+            [
+                'id' => $userId
+            ],
+        );
+    }
+
+    public function updatePlexAccountId(int $userId, ?string $accountId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_account_id' => $accountId
+            ],
+            [
+                'id' => $userId
+            ],
+        );
+    }
+
+    public function updatePlexClientId(int $userId, ?int $plexClientId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_client_id' => $plexClientId
+            ],
+            [
+                'id' => $userId
+            ],
+        );
+    }
+
     public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
         $this->dbConnection->update(
@@ -490,6 +530,19 @@ class UserRepository
         );
     }
 
+    public function updatePlexServerUrl(int $userId, ?Url $plexServerUrl) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_server_url' => (string)$plexServerUrl
+            ],
+            [
+                'id' => $userId
+            ],
+        );
+    }
+
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
     {
         $this->dbConnection->update(
@@ -499,6 +552,19 @@ class UserRepository
             ],
             [
                 'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'plex_client_temporary_code' => $plexClientCode
+            ],
+            [
+                'id' => $userId
             ],
         );
     }

@@ -42,3 +42,4 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-x-circle-fill::before { content: "\f622"; }
 .bi-chevron-expand::before { content: "\f283"; }
 .bi-chevron-contract::before { content: "\f27d"; }
+.bi-question-lg::before { content: "\f64e"; }

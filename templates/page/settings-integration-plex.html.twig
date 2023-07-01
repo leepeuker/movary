@@ -49,9 +49,7 @@
                 <button type="button" class="btn btn-primary {% if isActive == '' %}disabled{% endif %}" onclick="regeneratePlexWebhook()">Regenerate url</button>
             </div>
 
-            <hr>
-
-            <h5>Scrobble Options</h5>
+            <h5 style="margin-top: 1rem">Options</h5>
 
             <div style="padding-bottom: 1rem;padding-top: 0.5rem">
                 <input class="form-check-input"
@@ -64,7 +62,7 @@
                        style="margin-right: 0.2rem">
                 <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
             </div>
-            <div style="padding-bottom: 1rem;">
+            <div>
                 <input class="form-check-input"
                        type="checkbox"
                        value="1"
@@ -79,6 +77,91 @@
 
                 <button type="submit" class="btn btn-primary" {% if plexWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
             </div>
+
+            <hr>
+
+            <h5>Plex Authentication</h5>
+
+            <p class="text-muted" style="padding-bottom: 0">
+                For personal data access you have to authenticate with Plex and provide your server url.
+            </p>
+
+            <div id="alertPlexAuthenticationDiv">
+                <div class="alert alert-warning {% if plexTokenExists == true or isActive != '' %}d-none{% endif %}"
+                     role="alert"
+                     style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                    Plex Authentication inactive - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} not
+                    set
+                </div>
+            </div>
+
+            <div id="authenticateWithPlexDiv" class="{% if plexTokenExists == true %}d-none{% endif %}">
+                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()" {% if isActive == '' %}disabled{% endif %}>Authenticate with Plex</button>
+            </div>
+            <div id="removeAuthenticationWithPlexDiv" class="{% if plexTokenExists == false %}d-none{% endif %}">
+                <button type="button" class="btn btn-danger mb-3" onclick="removePlexAuthentication()">Remove Authentication</button>
+                <p>Username: {{ plexUsername }}</p>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="plexServerUrlInputPrefix">Plex Server URL</span>
+                <input type="text"
+                       name="plexServerUrlInput"
+                       id="plexServerUrlInput"
+                       class="form-control {% if plexTokenExists == false %} disabled {% endif %}"
+                       value="{{ plexServerUrl }}"
+                       aria-describedby="plexServerUrlInputPrefix" {% if plexTokenExists == false %} disabled {% endif %}
+                >
+                <button class="btn btn-outline-secondary" type="button" id="plexServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#plexServerUrlHelpModal">
+                    <i class="bi bi-question-lg"></i>
+                </button>
+            </div>
+
+            <div class="spinner-border d-none" role="status" id="alertPlexServerUrlLoadingSpinner" style="margin-bottom: 1rem">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="alertPlexServerUrlDiv"></div>
+
+            <button type="submit"
+                    class="btn btn-outline-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
+                    id="verifyServerUrlButton"
+                    {% if plexTokenExists == false %} disabled {% endif %}
+                    onclick="verifyPlexServerUrl()"
+            >Test connection
+            </button>
+            <button type="submit"
+                    class="btn btn-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
+                    id="saveServerUrlButton"
+                    {% if plexTokenExists == false %} disabled {% endif %}
+                    onclick="savePlexServerUrl()"
+            >Save URL
+            </button>
         </div>
+
+        <div class="modal fade" id="plexServerUrlHelpModal" tabindex="-1" role="dialog" aria-labelledby="plexServerUrlHelpModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="plexServerUrlHelpModalTitle">Help: Plex Server URL</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <p>
+                                You have to provide a Plex server URL which can be accessed by Movary.
+                                If your Plex server is in a restricted network make sure Movary has access to it. Example urls:
+                            </p>
+                            <ul>
+                                <li>http://localhost:32400</li>
+                                <li>http://192.168.1.2:32400</li>
+                                <li>https://plex.yourDomain.com</li>
+                            </ul>
+                            <p>
+                                Note: A valid url must start with the protocol (e.g. http://)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </main>
 {% endblock %}

@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Plex\PlexApi;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
@@ -35,6 +36,7 @@ class SettingsController
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,
         private readonly GithubApi $githubApi,
+        private readonly PlexApi $plexApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
@@ -343,6 +345,16 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
+        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+
+        if ($plexAccessToken !== null) {
+            $plexAccount = $this->plexApi->findPlexAccount($plexAccessToken);
+            if ($plexAccount !== null) {
+                $plexUsername = $plexAccount->getPlexUsername();
+                $plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId());
+            }
+        }
+
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
@@ -359,6 +371,9 @@ class SettingsController
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
+                'plexTokenExists' => $plexAccessToken !== null,
+                'plexServerUrl' => $plexServerUrl ?? '',
+                'plexUsername' => $plexUsername ?? '',
             ]),
         );
     }
@@ -710,7 +725,7 @@ class SettingsController
             $this->serverSettings->setSmtpHost($smtpHost);
         }
         if ($smtpPort !== null) {
-            $this->serverSettings->setSmtpPort($smtpPort);
+            $this->serverSettings->setSmtpPort((int)$smtpPort);
         }
         if ($smtpFromAddress !== null) {
             $this->serverSettings->setSmtpFromAddress($smtpFromAddress);

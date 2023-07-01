@@ -3,7 +3,7 @@
 namespace Movary\ValueObject;
 
 use Movary\Util\File;
-use Movary\ValueObject\Exception\ConfigKeyNotSetException;
+use Movary\ValueObject\Exception\ConfigNotSetException;
 
 class Config
 {
@@ -13,12 +13,12 @@ class Config
     ) {
     }
 
-    /** @throws ConfigKeyNotSetException */
+    /** @throws ConfigNotSetException */
     public function getAsBool(string $key, ?bool $fallbackValue = null) : bool
     {
         try {
             return (bool)$this->get($key);
-        } catch (ConfigKeyNotSetException $e) {
+        } catch (ConfigNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -27,12 +27,12 @@ class Config
         }
     }
 
-    /** @throws ConfigKeyNotSetException */
+    /** @throws ConfigNotSetException */
     public function getAsInt(string $key, ?int $fallbackValue = null) : int
     {
         try {
             return (int)$this->get($key);
-        } catch (ConfigKeyNotSetException $e) {
+        } catch (ConfigNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -41,12 +41,12 @@ class Config
         }
     }
 
-    /** @throws ConfigKeyNotSetException */
+    /** @throws ConfigNotSetException */
     public function getAsString(string $key, ?string $fallbackValue = null) : string
     {
         try {
             return (string)$this->get($key);
-        } catch (ConfigKeyNotSetException $e) {
+        } catch (ConfigNotSetException $e) {
             if ($fallbackValue === null) {
                 throw $e;
             }
@@ -59,12 +59,12 @@ class Config
     {
         try {
             return $this->getAsString($key, $fallbackValue);
-        } catch (ConfigKeyNotSetException) {
+        } catch (ConfigNotSetException) {
             return null;
         }
     }
 
-    /** @throws ConfigKeyNotSetException */
+    /** @throws ConfigNotSetException */
     private function get(string $key) : mixed
     {
         if (isset($this->config[$key]) === true) {
@@ -79,6 +79,6 @@ class Config
             }
         }
 
-        throw ConfigKeyNotSetException::create($key);
+        throw ConfigNotSetException::create($key);
     }
 }

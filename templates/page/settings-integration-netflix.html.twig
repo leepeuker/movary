@@ -42,7 +42,9 @@
                 <div class="input-group" style="margin-bottom: 1rem">
                     <span class="input-group-text">CSV Date Format</span>
                     <input id="netflixCsvDateFormatInput" class="form-control" placeholder="e.g. d/m/y" name="csvDateFormat" type="text" required="required"/>
-                    <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#csvDateFormatHelpModal">Help</button>
+                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#csvDateFormatHelpModal">
+                        <i class="bi bi-question-lg"></i>
+                    </button>
                 </div>
 
                 <div class="d-none" role="alert" id="netflixCsvUploadAlert"></div>
@@ -159,10 +161,10 @@
 
     <!-- Modal to display help text for csv date format -->
     <div class="modal fade" id="csvDateFormatHelpModal" tabindex="-1" role="dialog" aria-labelledby="csvDateFormatHelpModalTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="csvDateFormatHelpModalTitle">How to find out the Netflix CSV date format</h5>
+                    <h5 class="modal-title" id="csvDateFormatHelpModalTitle">Help: CSV Date Format</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

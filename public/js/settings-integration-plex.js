@@ -91,3 +91,135 @@ async function updateScrobbleOptions() {
         addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
     });
 }
+
+async function authenticateWithPlex() {
+    const response = await fetch(
+        '/settings/plex/authentication-url',
+        {signal: AbortSignal.timeout(4000)}
+    ).catch(function (error) {
+        document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
+
+        console.log(error)
+        addAlert('alertPlexServerUrlDiv', 'Authentication did not work', 'danger')
+    });
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertPlexAuthenticationDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertPlexAuthenticationDiv', 'Authentication did not work', 'danger')
+
+        return
+    }
+
+    const data = await response.json()
+
+    location.href = data.authenticationUrl;
+}
+
+async function removePlexAuthentication() {
+    const response = await fetch(
+        '/settings/plex/logout',
+        {signal: AbortSignal.timeout(4000)}
+    ).catch(function (error) {
+        console.log(error)
+
+        addAlert('alertPlexAuthenticationDiv', 'Could not remove authentication', 'danger')
+    });
+
+    if (!response.ok) {
+        addAlert('alertPlexAuthenticationDiv', 'Could not remove authentication', 'danger')
+
+        return
+    }
+
+    document.getElementById('plexServerUrlInput').disabled = true
+    document.getElementById('plexServerUrlInput').value = ''
+    document.getElementById('saveServerUrlButton').disabled = true
+    document.getElementById('verifyServerUrlButton').disabled = true
+
+    document.getElementById('authenticateWithPlexDiv').classList.remove('d-none')
+    document.getElementById('removeAuthenticationWithPlexDiv').classList.add('d-none')
+
+    addAlert('alertPlexAuthenticationDiv', 'Plex authentication was removed', 'success')
+}
+
+async function savePlexServerUrl() {
+    const response = await fetch('/settings/plex/server-url-save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'plexServerUrl': document.getElementById('plexServerUrlInput').value,
+        })
+    }).then(async function (response) {
+        return {'status': response.status, 'message': await response.text()};
+    }).then(function (data) {
+        if (data.status === 200) {
+            addAlert('alertPlexServerUrlDiv', 'Server URL was updated', 'success')
+
+            return
+        }
+
+        if (data.status === 400) {
+            addAlert('alertPlexServerUrlDiv', data.message, 'danger')
+
+            return
+        }
+
+        addAlert('alertPlexServerUrlDiv', 'Server URL could not be updated', 'danger')
+    }).catch(function (error) {
+        document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
+
+        console.log(error)
+        addAlert('alertPlexServerUrlDiv', 'Server URL could not be updated', 'danger')
+    });
+}
+
+async function verifyPlexServerUrl() {
+    document.getElementById('alertPlexServerUrlLoadingSpinner').classList.remove('d-none')
+    removeAlert('alertPlexServerUrlDiv')
+
+    const response = await fetch('/settings/plex/server-url-verify', {
+        signal: AbortSignal.timeout(4000),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'plexServerUrl': document.getElementById('plexServerUrlInput').value,
+        })
+    }).then(async function (response) {
+        document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
+
+        return {'status': response.status, 'message': await response.json()};
+    }).then(function (data) {
+        if (data.status === 200 && data.message === true) {
+            addAlert('alertPlexServerUrlDiv', 'Connection test successful', 'success')
+
+            return
+        }
+
+        if (data.status === 400) {
+            addAlert('alertPlexServerUrlDiv', data.message, 'danger')
+
+            return
+        }
+
+        addAlert('alertPlexServerUrlDiv', 'Connection test failed', 'danger')
+    }).catch(function (error) {
+        document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
+
+        console.log(error)
+        addAlert('alertPlexServerUrlDiv', 'Connection test failed', 'danger')
+    });
+}
+
+document.getElementById('verifyServerUrlButton').disabled = document.getElementById('plexServerUrlInput').value === ''
+document.getElementById('plexServerUrlInput').addEventListener('input', function (e) {
+    document.getElementById('verifyServerUrlButton').disabled = e.target.value === ''
+});

@@ -2,7 +2,9 @@
 
 namespace Movary\Domain\User;
 
+use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
+use Movary\ValueObject\Url;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
 
@@ -90,19 +92,32 @@ class UserApi
         return $user;
     }
 
-    public function findEmbyWebhookId(int $userId) : ?string
+    public function findPlexAccessToken(int $userId) : ?PlexAccessToken
     {
-        return $this->repository->findEmbyWebhookId($userId);
+        $plexAccessToken = $this->repository->findPlexAccessToken($userId);
+
+        if ($plexAccessToken === null) {
+            return null;
+        }
+
+        return PlexAccessToken::create($plexAccessToken);
     }
 
-    public function findJellyfinWebhookId(int $userId) : ?string
+    public function findPlexClientId(int $userId) : ?string
     {
-        return $this->repository->findJellyfinWebhookId($userId);
+        return $this->repository->findPlexClientId($userId);
     }
 
-    public function findPlexWebhookId(int $userId) : ?string
+    public function findPlexServerUrl(int $userId) : ?Url
     {
-        return $this->repository->findPlexWebhookId($userId);
+        $url = $this->repository->findPlexServerUrl($userId);
+
+        return $url !== null ? Url::createFromString($url) : null;
+    }
+
+    public function findTemporaryPlexCode(int $userId) : ?string
+    {
+        return $this->repository->findTemporaryPlexCode($userId);
     }
 
     public function findTraktClientId(int $userId) : ?string
@@ -249,14 +264,39 @@ class UserApi
         $this->repository->updatePassword($userId, $passwordHash);
     }
 
+    public function updatePlexAccessToken(int $userId, ?string $plexAccessToken) : void
+    {
+        $this->repository->updatePlexAccessToken($userId, $plexAccessToken);
+    }
+
+    public function updatePlexAccountId(int $userId, ?string $plexAccountId) : void
+    {
+        $this->repository->updatePlexAccountId($userId, $plexAccountId);
+    }
+
+    public function updatePlexClientId(int $userId, ?int $plexClientId) : void
+    {
+        $this->repository->updatePlexClientId($userId, $plexClientId);
+    }
+
     public function updatePlexScrobblerOptions(int $userId, bool $scrobbleWatches, bool $scrobbleRatings) : void
     {
         $this->repository->updatePlexScrobblerOptions($userId, $scrobbleWatches, $scrobbleRatings);
     }
 
+    public function updatePlexServerUrl(int $userId, ?Url $plexServerUrl) : void
+    {
+        $this->repository->updatePlexServerurl($userId, $plexServerUrl);
+    }
+
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void
     {
         $this->repository->updatePrivacyLevel($userId, $privacyLevel);
+    }
+
+    public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void
+    {
+        $this->repository->updateTemporaryPlexClientCode($userId, $plexClientCode);
     }
 
     public function updateTraktClientId(int $userId, ?string $traktClientId) : void
