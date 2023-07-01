@@ -5,7 +5,7 @@ namespace Movary\Api\Plex;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
-use Movary\Api\Plex\Exception\PlexAuthenticationError;
+use Movary\Api\Plex\Exception\PlexAuthenticationInvalid;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
@@ -48,7 +48,7 @@ class PlexUserClient
             $response = $this->httpClient->request('GET', (string)$requestUrl, $requestOptions);
         } catch (ClientException $e) {
             match (true) {
-                $e->getCode() === 401 => throw PlexAuthenticationError::create(),
+                $e->getCode() === 401 => throw PlexAuthenticationInvalid::create(),
                 $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
                 default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
             };

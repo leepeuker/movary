@@ -225,9 +225,22 @@ document.getElementById('plexServerUrlInput').addEventListener('input', function
 });
 
 async function importPlexWatchlist() {
-    const response = await fetch('/jobs/schedule/plex-watchlist-sync', {'method': 'get'})
+    const response = await fetch(
+        '/jobs/schedule/plex-watchlist-sync',
+        {'method': 'get'}
+    ).catch(function (error) {
+        addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    });
 
     if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertPlexWatchlistImportDiv', await response.text(), 'danger')
+
+            return
+        }
+
         addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
 
         throw new Error(`HTTP error! status: ${response.status}`)

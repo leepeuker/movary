@@ -3,7 +3,7 @@
 namespace Movary\Service\Plex;
 
 use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
-use Movary\Api\Plex\Exception\PlexAuthenticationTokenMissing;
+use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Api\Plex\Exception\PlexServerUrlMissing;
 use Movary\Domain\User\UserApi;
 
@@ -19,7 +19,7 @@ class PlexUserClientConfigurationProvider
 
         $plexToken = $user->getPlexAccessToken();
         if ($plexToken === null) {
-            throw PlexAuthenticationTokenMissing::create();
+            throw PlexAuthenticationMissing::create();
         }
 
         $plexServerUrl = $user->getPlexServerUrl();

@@ -18,7 +18,7 @@ class MovieWatchlistRepository
             [
                 'movie_id' => $movieId,
                 'user_id' => $userId,
-                'added_at' => $addedAt ?: (string)DateTime::create()
+                'added_at' => $addedAt === null ? (string)DateTime::create() : (string)$addedAt
             ],
         );
     }

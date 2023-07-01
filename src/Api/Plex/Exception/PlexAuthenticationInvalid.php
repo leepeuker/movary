@@ -4,10 +4,10 @@ namespace Movary\Api\Plex\Exception;
 
 use RuntimeException;
 
-class PlexAuthenticationError extends RuntimeException
+class PlexAuthenticationInvalid extends RuntimeException
 {
     public static function create() : self
     {
-        return new self('The access token is invalid.');
+        return new self('Plex authentication is not valid');
     }
 }

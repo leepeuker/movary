@@ -4,10 +4,10 @@ namespace Movary\Api\Plex\Exception;
 
 use RuntimeException;
 
-class PlexAuthenticationTokenMissing extends RuntimeException
+class PlexAuthenticationMissing extends RuntimeException
 {
     public static function create() : self
     {
-        return new self('The Plex authentication is missing.');
+        return new self('Plex authentication is missing');
     }
 }

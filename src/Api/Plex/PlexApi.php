@@ -5,7 +5,7 @@ namespace Movary\Api\Plex;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\Dto\PlexAccount;
 use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
-use Movary\Api\Plex\Exception\PlexAuthenticationError;
+use Movary\Api\Plex\Exception\PlexAuthenticationInvalid;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
@@ -103,7 +103,7 @@ class PlexApi
 
         try {
             $accountData = $this->plexTvClient->get($relativeUrl, $headers);
-        } catch (PlexAuthenticationError) {
+        } catch (PlexAuthenticationInvalid) {
             $this->logger->error('Plex access token is invalid');
 
             return null;
@@ -213,7 +213,7 @@ class PlexApi
             $this->userClient->get($userClientConfiguration);
 
             return true;
-        } catch (PlexAuthenticationError) {
+        } catch (PlexAuthenticationInvalid) {
             $this->logger->error('Plex access token is invalid');
 
             return false;

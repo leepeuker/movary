@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
@@ -150,7 +151,12 @@ class JobController
             return Response::createSeeOther('/');
         }
 
-        $this->jobQueueApi->addPlexImportWatchlistJob($this->authenticationService->getCurrentUserId());
+        $currentUser = $this->authenticationService->getCurrentUser();
+        if ($currentUser->getPlexAccessToken() === null) {
+            return Response::createBadRequest(PlexAuthenticationMissing::create()->getMessage());
+        }
+
+        $this->jobQueueApi->addPlexImportWatchlistJob($currentUser->getId());
 
         return Response::create(
             StatusCode::createSeeOther(),
