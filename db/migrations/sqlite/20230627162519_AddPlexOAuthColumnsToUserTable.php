@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddPlexColumns extends AbstractMigration
+final class AddPlexOAuthColumnsToUserTable extends AbstractMigration
 {
     public function down() : void
     {
