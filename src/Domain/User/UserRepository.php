@@ -154,39 +154,6 @@ class UserRepository
         return DateTime::createFromString($expirationDate);
     }
 
-    public function findDateFormatId(int $userId) : ?int
-    {
-        $dateFormat = $this->dbConnection->fetchOne('SELECT `date_format_id` FROM `user` WHERE `id` = ?', [$userId]);
-
-        if ($dateFormat === false) {
-            return null;
-        }
-
-        return (int)$dateFormat;
-    }
-
-    public function findEmbyWebhookId(int $userId) : ?string
-    {
-        $embyWebhookId = $this->dbConnection->fetchOne('SELECT `emby_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
-
-        if ($embyWebhookId === false) {
-            return null;
-        }
-
-        return $embyWebhookId;
-    }
-
-    public function findJellyfinWebhookId(int $userId) : ?string
-    {
-        $jellyfinWebhookId = $this->dbConnection->fetchOne('SELECT `jellyfin_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
-
-        if ($jellyfinWebhookId === false) {
-            return null;
-        }
-
-        return $jellyfinWebhookId;
-    }
-
     public function findPlexAccessToken(int $userId) : ?string
     {
         $plexAccessToken = $this->dbConnection->fetchOne('SELECT `plex_access_token` FROM `user` WHERE `id` = ?', [$userId]);
@@ -218,17 +185,6 @@ class UserRepository
         }
 
         return $plexServerUrl;
-    }
-
-    public function findPlexWebhookId(int $userId) : ?string
-    {
-        $plexWebhookId = $this->dbConnection->fetchOne('SELECT `plex_webhook_uuid` FROM `user` WHERE `id` = ?', [$userId]);
-
-        if ($plexWebhookId === false) {
-            return null;
-        }
-
-        return $plexWebhookId;
     }
 
     public function findTemporaryPlexCode(int $userId) : ?string

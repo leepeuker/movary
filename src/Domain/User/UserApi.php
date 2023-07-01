@@ -92,16 +92,6 @@ class UserApi
         return $user;
     }
 
-    public function findEmbyWebhookId(int $userId) : ?string
-    {
-        return $this->repository->findEmbyWebhookId($userId);
-    }
-
-    public function findJellyfinWebhookId(int $userId) : ?string
-    {
-        return $this->repository->findJellyfinWebhookId($userId);
-    }
-
     public function findPlexAccessToken(int $userId) : ?PlexAccessToken
     {
         $plexAccessToken = $this->repository->findPlexAccessToken($userId);
@@ -118,14 +108,11 @@ class UserApi
         return $this->repository->findPlexClientId($userId);
     }
 
-    public function findPlexServerUrl(int $userId) : ?string
+    public function findPlexServerUrl(int $userId) : ?Url
     {
-        return $this->repository->findPlexServerUrl($userId);
-    }
+        $url = $this->repository->findPlexServerUrl($userId);
 
-    public function findPlexWebhookId(int $userId) : ?string
-    {
-        return $this->repository->findPlexWebhookId($userId);
+        return $url !== null ? Url::createFromString($url) : null;
     }
 
     public function findTemporaryPlexCode(int $userId) : ?string
