@@ -2,7 +2,6 @@
 
 namespace Movary\JobQueue;
 
-use Movary\ValueObject\DateTime;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 
@@ -26,6 +25,11 @@ class JobQueueApi
     public function addLetterboxdImportRatingsJob(int $userId, string $importFile) : void
     {
         $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
+    }
+
+    public function addPlexImportWatchlistJob(int $userId, ?JobStatus $jobStatus = null) : int
+    {
+        return $this->repository->addJob(JobType::createPlexImportWatchlist(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
     public function addTmdbImageCacheJob(array $movieIds = [], array $personIds = [], ?JobStatus $jobStatus = null) : int

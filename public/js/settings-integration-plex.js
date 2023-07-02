@@ -196,16 +196,16 @@ async function verifyPlexServerUrl() {
     }).then(async function (response) {
         document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
 
-        return {'status': response.status, 'message': await response.json()};
-    }).then(function (data) {
-        if (data.status === 200 && data.message === true) {
-            addAlert('alertPlexServerUrlDiv', 'Connection test successful', 'success')
+        if (response.status === 400) {
+            addAlert('alertPlexServerUrlDiv', await response.text(), 'danger')
 
             return
         }
 
-        if (data.status === 400) {
-            addAlert('alertPlexServerUrlDiv', data.message, 'danger')
+        const data = await response.json()
+
+        if (response.status === 200 && data === true) {
+            addAlert('alertPlexServerUrlDiv', 'Connection test successful', 'success')
 
             return
         }
@@ -223,3 +223,28 @@ document.getElementById('verifyServerUrlButton').disabled = document.getElementB
 document.getElementById('plexServerUrlInput').addEventListener('input', function (e) {
     document.getElementById('verifyServerUrlButton').disabled = e.target.value === ''
 });
+
+async function importPlexWatchlist() {
+    const response = await fetch(
+        '/jobs/schedule/plex-watchlist-sync',
+        {'method': 'get'}
+    ).catch(function (error) {
+        addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    });
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertPlexWatchlistImportDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    addAlert('alertPlexWatchlistImportDiv', 'Watchlist import scheduled', 'success')
+}

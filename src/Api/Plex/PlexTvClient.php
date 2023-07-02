@@ -2,82 +2,53 @@
 
 namespace Movary\Api\Plex;
 
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Exception\ClientException;
-use Movary\Api\Plex\Exception\PlexAuthenticationError;
-use Movary\Api\Plex\Exception\PlexNotFoundError;
-use Movary\Service\ServerSettings;
-use Movary\Util\Json;
+use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
-use RuntimeException;
 
-class PlexTvClient
+class PlexTvClient extends PlexClient
 {
-    private const BASE_URL = 'https://plex.tv/api/v2';
-
-    private const APP_NAME = 'Movary';
-
-    private const DEFAULT_HEADERS = [
-        'accept' => 'application/json'
-    ];
-
-    public function __construct(
-        private readonly HttpClient $httpClient,
-        private readonly ServerSettings $serverSettings,
-    ) {
-    }
-
-    /**
-     * @psalm-suppress PossiblyUndefinedVariable
-     */
-    public function get(
-        RelativeUrl $relativeUrl,
-        array $headers = [],
-    ) : array {
-        $requestUrl = Url::createFromString(self::BASE_URL)->appendRelativeUrl($relativeUrl);
+    public function get(RelativeUrl $relativeUrl, array $headers) : array
+    {
+        $requestUrl = Url::createFromString('https://plex.tv/api/v2')->appendRelativeUrl($relativeUrl);
         $requestOptions = [
             'form_params' => $this->generateDefaultFormData(),
             'headers' => array_merge(self::DEFAULT_HEADERS, $headers)
         ];
 
-        try {
-            $response = $this->httpClient->request('GET', (string)$requestUrl, $requestOptions);
-        } catch (ClientException $e) {
-            match (true) {
-                $e->getCode() === 401 => throw PlexAuthenticationError::create(),
-                $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
-
-                default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
-            };
-        }
-
-        return Json::decode((string)$response->getBody());
+        return $this->sendRequest('GET', $requestUrl, $requestOptions);
     }
 
-    /**
-     * @psalm-suppress PossiblyUndefinedVariable
-     */
-    public function sendPostRequest(RelativeUrl $relativeUrl) : array
+    public function getMetadata(
+        PlexAccessToken $plexAccessToken,
+        RelativeUrl $relativeUrl,
+        array $query = [],
+        int $limit = null,
+        int $offset = null,
+    ) : array {
+        $requestUrl = Url::createFromString('https://metadata.provider.plex.tv/')->appendRelativeUrl($relativeUrl);
+        $requestOptions = [
+            'query' => array_merge([
+                'X-Plex-Container-Size' => (string)$limit,
+                'X-Plex-Container-Start' => (string)$offset
+            ], $query),
+            'headers' => array_merge([
+                'X-Plex-Token' => (string)$plexAccessToken,
+            ], self::DEFAULT_HEADERS),
+        ];
+
+        return $this->sendRequest('GET', $requestUrl, $requestOptions);
+    }
+
+    public function post(RelativeUrl $relativeUrl) : array
     {
-        $requestUrl = Url::createFromString(self::BASE_URL)->appendRelativeUrl($relativeUrl);
+        $requestUrl = Url::createFromString('https://plex.tv/api/v2')->appendRelativeUrl($relativeUrl);
         $requestOptions = [
             'form_params' => $this->generateDefaultFormData(),
             'headers' => self::DEFAULT_HEADERS
         ];
 
-        try {
-            $response = $this->httpClient->request('POST', (string)$requestUrl, $requestOptions);
-        } catch (ClientException $e) {
-            match (true) {
-                $e->getCode() === 401 => throw PlexAuthenticationError::create(),
-                $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
-
-                default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
-            };
-        }
-
-        return Json::decode((string)$response->getBody());
+        return $this->sendRequest('POST', $requestUrl, $requestOptions);
     }
 
     private function generateDefaultFormData() : array

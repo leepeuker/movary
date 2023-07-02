@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
@@ -13,7 +14,6 @@ use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\JobType;
 use RuntimeException;
-use Twig\Environment;
 
 class JobController
 {
@@ -137,6 +137,26 @@ class JobController
         $this->jobQueueApi->addLetterboxdImportRatingsJob($userId, $targetFile);
 
         $this->sessionWrapper->set('letterboxdRatingsSyncSuccessful', true);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function schedulePlexWatchlistImport() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $currentUser = $this->authenticationService->getCurrentUser();
+        if ($currentUser->getPlexAccessToken() === null) {
+            return Response::createBadRequest(PlexAuthenticationMissing::create()->getMessage());
+        }
+
+        $this->jobQueueApi->addPlexImportWatchlistJob($currentUser->getId());
 
         return Response::create(
             StatusCode::createSeeOther(),

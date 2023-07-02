@@ -7,8 +7,8 @@ use RuntimeException;
 
 class PlexNotFoundError extends RuntimeException
 {
-    public static function create(Url $requestUri) : self
+    public static function create(Url $requestUrl) : self
     {
-        return new self('The requested URI does not exist: ' . $requestUri);
+        return new self('The requested url does not exist: ' . $requestUrl);
     }
 }

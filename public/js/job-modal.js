@@ -48,6 +48,9 @@ function setJobModalTitle(jobType) {
         case 'letterboxd_import_history':
             title = 'History imports';
             break;
+        case 'plex_import_watchlist':
+            title = 'Watchlist imports';
+            break;
         default:
             throw new Error('Not supported job type: ' + jobType);
     }

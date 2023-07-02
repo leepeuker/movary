@@ -277,6 +277,11 @@ class MovieApi
         return $this->repository->findByLetterboxdId($letterboxdId);
     }
 
+    public function findByTitleAndYear(string $title, Year $releaseYear) : ?MovieEntity
+    {
+        return $this->repository->findByTitleAndYear($title, $releaseYear);
+    }
+
     public function findByTmdbId(int $tmdbId) : ?MovieEntity
     {
         return $this->repository->findByTmdbId($tmdbId);

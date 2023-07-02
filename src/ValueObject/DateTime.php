@@ -64,4 +64,12 @@ class DateTime implements JsonSerializable
     {
         return $this->format(self::DEFAULT_STRING_FORMAT);
     }
+
+    public function subSeconds(int $seconds) : self
+    {
+        $dateTime = new \DateTime($this->dateTime);
+        $dateTime->sub(new \DateInterval('PT' . $seconds . 'S'));
+
+        return new self($dateTime);
+    }
 }

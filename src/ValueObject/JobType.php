@@ -14,7 +14,7 @@ class JobType implements \JsonSerializable
 
     private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
 
-    private const TYPE_TMDB_IMAGE_CHACHE = 'tmdb_image_cache';
+    private const TYPE_TMDB_IMAGE_CACHE = 'tmdb_image_cache';
 
     private const TYPE_TMDB_MOVIE_SYNC = 'tmdb_movie_sync';
 
@@ -22,17 +22,20 @@ class JobType implements \JsonSerializable
 
     private const TYPE_TRAKT_IMPORT_RATINGS = 'trakt_import_ratings';
 
+    private const TYPE_PLEX_IMPORT_WATCHLIST = 'plex_import_watchlist';
+
     private function __construct(private readonly string $type)
     {
         if (in_array($this->type, [
                 self::TYPE_LETTERBOXD_IMPORT_HISTORY,
                 self::TYPE_LETTERBOXD_IMPORT_RATINGS,
-                self::TYPE_TMDB_IMAGE_CHACHE,
+                self::TYPE_TMDB_IMAGE_CACHE,
                 self::TYPE_TMDB_MOVIE_SYNC,
                 self::TYPE_TMDB_PERSON_SYNC,
                 self::TYPE_TRAKT_IMPORT_HISTORY,
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
+                self::TYPE_PLEX_IMPORT_WATCHLIST,
             ]) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
@@ -63,9 +66,14 @@ class JobType implements \JsonSerializable
         return new self(self::TYPE_LETTERBOXD_IMPORT_RATINGS);
     }
 
+    public static function createPlexImportWatchlist() : self
+    {
+        return new self(self::TYPE_PLEX_IMPORT_WATCHLIST);
+    }
+
     public static function createTmdbImageCache() : self
     {
-        return new self(self::TYPE_TMDB_IMAGE_CHACHE);
+        return new self(self::TYPE_TMDB_IMAGE_CACHE);
     }
 
     public static function createTmdbMovieSync() : self
@@ -103,9 +111,14 @@ class JobType implements \JsonSerializable
         return $this->type === self::TYPE_LETTERBOXD_IMPORT_RATINGS;
     }
 
+    public function isOfTypePlexImportWatchlist() : bool
+    {
+        return $this->type === self::TYPE_PLEX_IMPORT_WATCHLIST;
+    }
+
     public function isOfTypeTmdbImageCache() : bool
     {
-        return $this->type === self::TYPE_TMDB_IMAGE_CHACHE;
+        return $this->type === self::TYPE_TMDB_IMAGE_CACHE;
     }
 
     public function isOfTypeTmdbMovieSync() : bool

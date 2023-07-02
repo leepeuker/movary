@@ -9,7 +9,6 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
-use Movary\Api\Plex;
 use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
@@ -175,7 +174,7 @@ class Factory
 
     public static function createHttpClient() : ClientInterface
     {
-        return new GuzzleHttp\Client();
+        return new GuzzleHttp\Client(['timeout' => 4]);
     }
 
     public static function createImageCacheService(ContainerInterface $container) : ImageCacheService
