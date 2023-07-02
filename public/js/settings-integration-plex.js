@@ -196,16 +196,16 @@ async function verifyPlexServerUrl() {
     }).then(async function (response) {
         document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
 
-        return {'status': response.status, 'message': await response.json()};
-    }).then(function (data) {
-        if (data.status === 200 && data.message === true) {
-            addAlert('alertPlexServerUrlDiv', 'Connection test successful', 'success')
+        if (response.status === 400) {
+            addAlert('alertPlexServerUrlDiv', await response.text(), 'danger')
 
             return
         }
 
-        if (data.status === 400) {
-            addAlert('alertPlexServerUrlDiv', data.message, 'danger')
+        const data = await response.json()
+
+        if (response.status === 200 && data === true) {
+            addAlert('alertPlexServerUrlDiv', 'Connection test successful', 'success')
 
             return
         }

@@ -171,22 +171,19 @@ class PlexController
 
         $plexAccessToken = $this->authenticationService->getCurrentUser()->getPlexAccessToken();
         if ($plexAccessToken === null) {
-            return Response::createBadRequest('Verification failed, plex authentication token missing.');
+            return Response::createBadRequest('Plex authentication is missing');
         }
 
-        $plexServerUrl = Json::decode($request->getBody())['plexServerUrl'];
-        if (empty($plexServerUrl)) {
-            return Response::createBadRequest('Url not correctly formatted');
-        }
+        $plexServerUrl = Json::decode($request->getBody())['plexServerUrl'] ?? '';
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
         } catch (InvalidUrl) {
-            return Response::createBadRequest('Verification failed, url not properly formatted');
+            return Response::createBadRequest('Provided server url is not a valid url');
         }
 
         $userClientConfiguration = PlexUserClientConfiguration::create($plexAccessToken, $plexServerUrl);
 
-        return Response::createJson(Json::encode($this->plexApi->verifyPlexUrl($userClientConfiguration)));
+        return Response::createJson(Json::encode($this->plexApi->testUserClientConfiguration($userClientConfiguration)));
     }
 }

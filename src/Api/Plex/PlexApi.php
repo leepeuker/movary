@@ -207,7 +207,7 @@ class PlexApi
         return self::BASE_URL . http_build_query($getParameters);
     }
 
-    public function verifyPlexUrl(PlexUserClientConfiguration $userClientConfiguration) : bool
+    public function testUserClientConfiguration(PlexUserClientConfiguration $userClientConfiguration) : bool
     {
         try {
             $this->userClient->get($userClientConfiguration);

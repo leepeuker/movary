@@ -174,10 +174,7 @@ class Factory
 
     public static function createHttpClient() : ClientInterface
     {
-        return new GuzzleHttp\Client([
-            'connect_timeout' => 4,
-            'timeout' => 4,
-        ]);
+        return new GuzzleHttp\Client(['timeout' => 4]);
     }
 
     public static function createImageCacheService(ContainerInterface $container) : ImageCacheService

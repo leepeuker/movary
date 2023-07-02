@@ -16,6 +16,7 @@ class PlexUserClient extends PlexClient
                 self::DEFAULT_HEADERS,
                 ['X-Plex-Token' => (string)$clientConfiguration->getAccessToken()],
             ),
+            'connect_timeout' => 4,
         ];
 
         $requestUrl = $clientConfiguration->getServerUrl();
