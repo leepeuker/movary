@@ -29,11 +29,12 @@ class PlexTvClient extends PlexClient
         $requestUrl = Url::createFromString('https://metadata.provider.plex.tv/')->appendRelativeUrl($relativeUrl);
         $requestOptions = [
             'query' => array_merge([
-                'X-Plex-Token' => (string)$plexAccessToken,
                 'X-Plex-Container-Size' => (string)$limit,
                 'X-Plex-Container-Start' => (string)$offset
             ], $query),
-            'headers' => self::DEFAULT_HEADERS,
+            'headers' => array_merge([
+                'X-Plex-Token' => (string)$plexAccessToken,
+            ], self::DEFAULT_HEADERS),
         ];
 
         return $this->sendRequest('GET', $requestUrl, $requestOptions);

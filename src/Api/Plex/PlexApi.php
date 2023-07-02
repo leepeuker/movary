@@ -144,22 +144,24 @@ class PlexApi
             $tmdbId = null;
 
             foreach ($movieData['MediaContainer']['Metadata'][0]['Guid'] as $guid) {
-                if (str_starts_with($guid['id'], 'tmdb') === true) {
-                    $tmdbId = str_replace('tmdb://', '', $guid['id']);
-
-                    $tmdbIds[] = $tmdbId;
-
-                    $this->logger->debug(
-                        'Plex Api - Found tmdb id on plex',
-                        [
-                            'tmdbId' => $tmdbId,
-                            'plexTitle' => $moviePlexTitle,
-                            'plexYear' => (string)$moviePlexYear,
-                        ],
-                    );
-
-                    break;
+                if (str_starts_with($guid['id'], 'tmdb') === false) {
+                    continue;
                 }
+
+                $tmdbId = str_replace('tmdb://', '', $guid['id']);
+
+                $tmdbIds[] = $tmdbId;
+
+                $this->logger->debug(
+                    'Plex Api - Found tmdb id on plex',
+                    [
+                        'tmdbId' => $tmdbId,
+                        'plexTitle' => $moviePlexTitle,
+                        'plexYear' => (string)$moviePlexYear,
+                    ],
+                );
+
+                break;
             }
 
             if ($tmdbId === null) {
