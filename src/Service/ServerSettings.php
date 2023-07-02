@@ -154,7 +154,9 @@ class ServerSettings
     public function requireApplicationUrl() : string
     {
         $value = $this->getByKey(self::APPLICATION_URL, true);
-        assertNotNull($value);
+        if ($value === null) {
+            throw ConfigNotSetException::create(self::APPLICATION_URL);
+        }
 
         return $value;
     }
@@ -162,7 +164,9 @@ class ServerSettings
     public function requirePlexIdentifier() : string
     {
         $value = $this->getByKey(self::PLEX_IDENTIFIER, true);
-        assertNotNull($value);
+        if ($value === null) {
+            throw ConfigNotSetException::create(self::PLEX_IDENTIFIER);
+        }
 
         return $value;
     }
