@@ -2,31 +2,12 @@
 
 namespace Movary\Api\Plex;
 
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Exception\ClientException;
 use Movary\Api\Plex\Dto\PlexAccessToken;
-use Movary\Api\Plex\Exception\PlexAuthenticationInvalid;
-use Movary\Api\Plex\Exception\PlexNotFoundError;
-use Movary\Service\ServerSettings;
-use Movary\Util\Json;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
-use RuntimeException;
 
-class PlexTvClient
+class PlexTvClient extends PlexClient
 {
-    private const APP_NAME = 'Movary';
-
-    private const DEFAULT_HEADERS = [
-        'accept' => 'application/json'
-    ];
-
-    public function __construct(
-        private readonly HttpClient $httpClient,
-        private readonly ServerSettings $serverSettings,
-    ) {
-    }
-
     public function get(RelativeUrl $relativeUrl, array $headers) : array
     {
         $requestUrl = Url::createFromString('https://plex.tv/api/v2')->appendRelativeUrl($relativeUrl);
@@ -35,19 +16,7 @@ class PlexTvClient
             'headers' => array_merge(self::DEFAULT_HEADERS, $headers)
         ];
 
-        try {
-            $response = $this->httpClient->request('GET', (string)$requestUrl, $requestOptions);
-        } catch (ClientException $e) {
-            match (true) {
-                $e->getCode() === 401 => throw PlexAuthenticationInvalid::create(),
-                $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
-
-                default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
-            };
-        }
-
-        /** @psalm-suppress PossiblyUndefinedVariable */
-        return Json::decode((string)$response->getBody());
+        return $this->sendRequest('GET', $requestUrl, $requestOptions);
     }
 
     public function getMetadata(
@@ -67,19 +36,7 @@ class PlexTvClient
             'headers' => self::DEFAULT_HEADERS,
         ];
 
-        try {
-            $response = $this->httpClient->request('GET', (string)$requestUrl, $requestOptions);
-        } catch (ClientException $e) {
-            match (true) {
-                $e->getCode() === 401 => throw PlexAuthenticationInvalid::create(),
-                $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
-
-                default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
-            };
-        }
-
-        /** @psalm-suppress PossiblyUndefinedVariable */
-        return Json::decode((string)$response->getBody());
+        return $this->sendRequest('GET', $requestUrl, $requestOptions);
     }
 
     public function post(RelativeUrl $relativeUrl) : array
@@ -90,19 +47,7 @@ class PlexTvClient
             'headers' => self::DEFAULT_HEADERS
         ];
 
-        try {
-            $response = $this->httpClient->request('POST', (string)$requestUrl, $requestOptions);
-        } catch (ClientException $e) {
-            match (true) {
-                $e->getCode() === 401 => throw PlexAuthenticationInvalid::create(),
-                $e->getCode() === 404 => throw PlexNotFoundError::create($requestUrl),
-
-                default => throw new RuntimeException('Plex API error. Response message: ' . $e->getMessage()),
-            };
-        }
-
-        /** @psalm-suppress PossiblyUndefinedVariable */
-        return Json::decode((string)$response->getBody());
+        return $this->sendRequest('POST', $requestUrl, $requestOptions);
     }
 
     private function generateDefaultFormData() : array
