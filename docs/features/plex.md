@@ -37,7 +37,7 @@ When an authentication is removed in Movary, the token will be deleted from the 
 ### Description
 
 Import missing movies from your Plex Watchlist to your Movary Watchlist.
-Missing movies imported to the Movary Watchlist are always put at the start of the list and in the same order they are coming in Plex.
+Missing movies imported to the Movary Watchlist are put at the beginning of the list in the same order as they are in Plex.
 
 !!! Info
 
