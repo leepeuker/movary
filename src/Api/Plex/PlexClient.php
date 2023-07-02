@@ -12,8 +12,6 @@ use Movary\ValueObject\Url;
 
 abstract class PlexClient
 {
-    protected const APP_NAME = 'Movary';
-
     protected const DEFAULT_HEADERS = [
         'accept' => 'application/json'
     ];

@@ -9,6 +9,8 @@ use function PHPUnit\Framework\assertNotNull;
 
 class ServerSettings
 {
+    private const PLEX_APP_NAME = 'PLEX_APP_NAME';
+
     private const PLEX_IDENTIFIER = 'PLEX_IDENTIFIER';
 
     private const APPLICATION_URL = 'APPLICATION_URL';
@@ -37,6 +39,11 @@ class ServerSettings
         private readonly Config $config,
         private readonly Connection $dbConnection,
     ) {
+    }
+
+    public function getAppName() : string
+    {
+        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';
     }
 
     public function getApplicationUrl() : ?string
