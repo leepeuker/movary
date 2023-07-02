@@ -23,7 +23,7 @@
             <div style="padding-top: 1rem">
                 <h5>Plex webhook url</h5>
 
-                <p class="text-muted">Enter the following URL as a webhook to your plex account to automatically log movies watched via plex. <br>
+                <p class="text-muted">Enter the following url as a webhook to your plex account to automatically log movies watched via plex. <br>
                     For more info about plex webhooks visit the official <a href="https://support.plex.tv/articles/115002267687-webhooks/" target="_blank">documentation</a>.</p>
 
                 <div id="plexWebhookUrl"
@@ -84,7 +84,7 @@
             <h5>Plex Authentication</h5>
 
             <p class="text-muted" style="padding-bottom: 0">
-                For personal data access you have to authenticate with Plex and provide your server url.
+                For personal data access you have to authenticate against Plex and provide your server url.
             </p>
 
             <div id="alertPlexAuthenticationDiv">
@@ -96,7 +96,7 @@
             </div>
 
             <div id="authenticateWithPlexDiv" class="{% if plexTokenExists == true %}d-none{% endif %}">
-                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()" {% if isActive == '' %}disabled{% endif %}>Authenticate with Plex</button>
+                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()" {% if isActive == '' %}disabled{% endif %}>Authenticate</button>
             </div>
             <div id="removeAuthenticationWithPlexDiv" class="{% if plexTokenExists == false %}d-none{% endif %}">
                 <button type="button" class="btn btn-danger mb-3" onclick="removePlexAuthentication()">Remove Authentication</button>
@@ -104,7 +104,7 @@
             </div>
 
             <div class="input-group mb-3">
-                <span class="input-group-text" id="plexServerUrlInputPrefix">Plex Server URL</span>
+                <span class="input-group-text" id="plexServerUrlInputPrefix">Plex Server Url</span>
                 <input type="text"
                        name="plexServerUrlInput"
                        id="plexServerUrlInput"
@@ -134,7 +134,7 @@
                     id="saveServerUrlButton"
                     {% if plexTokenExists == false %} disabled {% endif %}
                     onclick="savePlexServerUrl()"
-            >Save URL
+            >Save url
             </button>
 
             <hr>
@@ -163,13 +163,13 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="plexServerUrlHelpModalTitle">Help: Plex Server URL</h5>
+                        <h5 class="modal-title" id="plexServerUrlHelpModalTitle">Help: Plex Server Url</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
                             <p>
-                                You have to provide a Plex server URL which can be accessed by Movary.
+                                You have to provide a Plex server url which can be accessed by Movary.
                                 If your Plex server is in a restricted network make sure Movary has access to it. Example urls:
                             </p>
                             <ul>

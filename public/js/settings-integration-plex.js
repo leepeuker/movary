@@ -160,7 +160,7 @@ async function savePlexServerUrl() {
         return {'status': response.status, 'message': await response.text()};
     }).then(function (data) {
         if (data.status === 200) {
-            addAlert('alertPlexServerUrlDiv', 'Server URL was updated', 'success')
+            addAlert('alertPlexServerUrlDiv', 'Server url was updated', 'success')
 
             return
         }
