@@ -52,7 +52,7 @@ class UserEntity
             $data['trakt_user_name'],
             $data['trakt_client_id'],
             $data['plex_access_token'] === null ? null : PlexAccessToken::create($data['plex_access_token']),
-            $data['plex_server_url'] === null ? null : Url::createFromString($data['plex_server_url']),
+            empty($data['plex_server_url']) === true ? null : Url::createFromString($data['plex_server_url']),
             (bool)$data['jellyfin_scrobble_views'],
             (bool)$data['emby_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
