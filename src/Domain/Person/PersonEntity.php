@@ -16,6 +16,7 @@ class PersonEntity
         private readonly int $tmdbId,
         private readonly ?string $posterPath,
         private readonly ?string $tmdbPosterPath,
+        private readonly ?string $biography,
         private readonly ?Date $birthDate,
         private readonly ?Date $deathDate,
         private readonly ?string $placeOfBirth,
@@ -33,11 +34,17 @@ class PersonEntity
             $data['tmdb_id'],
             $data['poster_path'],
             $data['tmdb_poster_path'],
+            empty($data['biography']) === true ? null : $data['biography'],
             empty($data['birth_date']) === true ? null : Date::createFromString($data['birth_date']),
             empty($data['death_date']) === true ? null : Date::createFromString($data['death_date']),
             $data['place_of_birth'],
             empty($data['updated_at_tmdb']) === true ? null : DateTime::createFromString($data['updated_at_tmdb']),
         );
+    }
+
+    public function getBiography() : ?string
+    {
+        return $this->biography;
     }
 
     public function getBirthDate() : ?Date

@@ -60,9 +60,11 @@ class PersonController
                     'knownForDepartment' => $person->getKnownForDepartment(),
                     'gender' => $person->getGender(),
                     'age' => $age,
+                    'biography' => $person->getBiography(),
                     'birthDate' => $person->getBirthDate(),
                     'deathDate' => $person->getDeathDate(),
                     'placeOfBirth' => $person->getPlaceOfBirth(),
+                    'tmdbId' => $person->getTmdbId()
                 ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
