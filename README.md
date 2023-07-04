@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://tandoor.dev"><img src="https://github.com/leepeuker/movary/raw/main/public/images/movary-logo-192x192.png" height="160px" width="160px"></a>
+  <a href="https://movary.org"><img src="https://github.com/leepeuker/movary/raw/main/public/images/movary-logo-192x192.png" height="160px" width="160px"></a>
   <br>
   Movary
   <br>
