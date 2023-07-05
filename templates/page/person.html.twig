@@ -51,7 +51,7 @@
             </div>
 
             <div style="padding-right: 1rem; margin-bottom: 0.4rem; padding-left: 1rem;" class="col-xxl-9 col-xl-8 col-lg-7 col-md-6 col-xs-12">
-                <h2 class="d-sm-none d-md-flex">{{ person.name }}</h2>
+                <h2 class="d-none d-md-block">{{ person.name }}</h2>
                 <h6 style="margin-bottom: 0.1rem; font-weight: bold;">Biography</h6>
                 {% if person.biography is not null %}
                     <p style="margin-bottom: 0;" id="biographyParagraph">{{ person.biography|nl2br }}</p>
