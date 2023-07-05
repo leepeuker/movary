@@ -14,7 +14,7 @@
 .truncated {
   -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-  max-height: 70vh;
+  max-height: 20vh;
   overflow-y: hidden; 
 }
 </style>
@@ -25,12 +25,12 @@
 
         <div class="d-flex flex-row flex-wrap">
 
-            <div style="padding-left: 1rem" class="col-md-3 col-xs-8">
+            <div style="margin-bottom: 1rem; padding-left: 1rem;" class="col-xxl-3 col-xl-4 col-lg-5 col-md-6 col-xs-8">
                 <div>
-                    <img src="{{ person.posterPath }}" width="200rem" style="width: 11rem; align-self: start;">
+                    <img src="{{ person.posterPath }}" style="width: 100%; height: 100%; align-self: start;">
                 </div>
                 <div>
-                    <h2 style="display: flex;">{{ person.name }}</h2>
+                    <h2 class="d-md-none d-sm-flex">{{ person.name }}</h2>
                     <h6 style="margin-bottom: 0.1rem; font-weight: bold;">Known for</h6>
                     <p style="margin-bottom: 0.4rem">{{ person.knownForDepartment }}</p>
                     <h6 style="margin-bottom: 0.1rem; font-weight: bold;">Gender</h6>
@@ -47,91 +47,86 @@
                         <h6 style="margin-bottom: 0.1rem; font-weight: bold;">Place of birth</h6>
                         <p style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
                     {% endif %}
-                    <img src="/images/tmdb-logo.svg" style="width: 2rem; cursor: pointer;" onclick="window.open('https://www.themoviedb.org/person/{{ person.tmdbId }}', '_blank')">
                 </div>
             </div>
 
-            <div style="padding-right: 1rem; margin-bottom: 0.4rem;" class="col-lg-9 col-xs-12">
+            <div style="padding-right: 1rem; margin-bottom: 0.4rem; padding-left: 1rem;" class="col-xxl-9 col-xl-8 col-lg-7 col-md-6 col-xs-12">
+                <h2 class="d-sm-none d-md-flex">{{ person.name }}</h2>
                 <h6 style="margin-bottom: 0.1rem; font-weight: bold;">Biography</h6>
                 {% if person.biography is not null %}
                     <p style="margin-bottom: 0;" id="biographyParagraph">{{ person.biography|nl2br }}</p>
                     <div style="cursor: pointer; top: 0;" class="d-none" id="expandContainer">
-                        <span style="border: 2px solid; border-radius: 50%; float: right;" onclick="toggleBiography()"><i class="bi bi-chevron-down"></i></span>
+                        <span style="border: 2px solid; padding: 3px; border-radius: 50%; float: right;" onclick="toggleBiography()"><i class="bi bi-chevron-down"></i></span>
                         <span style="float: right; margin-right: 0.5em;" onclick="toggleBiography()">Show more&#8230;</span>
                     </div>
                 {% else %}
                     <p>No biography available.</p>
                 {% endif %}
-            </div>
-        </div>
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' or moviesAsDirector is empty %}active{% endif %}"
+                                id="home-tab"
+                                data-bs-toggle="tab" data-bs-target="#acting"
+                                type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
+                            Acting {% if moviesAsActor is not empty %}({{ moviesAsActor|length }}){% endif %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if moviesAsDirector is empty %}disabled{% elseif person.knownForDepartment == 'Directing' or moviesAsActor is empty %}active{% endif %}"
+                                id="profile-tab"
+                                data-bs-toggle="tab" data-bs-target="#director" type="button"
+                                role="tab" aria-controls="profile-tab-pane" aria-selected="false">
+                            Director {% if moviesAsDirector is not empty %}({{ moviesAsDirector|length }}){% endif %}
+                        </button>
+                    </li>
+                </ul>
 
-        <br>
+                <div class="tab-content">
+                    <div class="tab-pane fade show {% if person.knownForDepartment == 'Acting' or (moviesAsDirector is empty and moviesAsActor is not empty) %}active{% endif %}"
+                        id="acting" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                        {% if moviesAsActor is not empty %}
+                            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                                {% for movieAsActor in moviesAsActor %}
+                                    <div class="col position-relative" style="padding-bottom: 1rem;">
+                                        <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
+                                            <div class="position-relative">
+                                                <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
+                                            </div>
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' or moviesAsDirector is empty %}active{% endif %}"
-                        id="home-tab"
-                        data-bs-toggle="tab" data-bs-target="#acting"
-                        type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
-                    Acting {% if moviesAsActor is not empty %}({{ moviesAsActor|length }}){% endif %}
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsDirector is empty %}disabled{% elseif person.knownForDepartment == 'Directing' or moviesAsActor is empty %}active{% endif %}"
-                        id="profile-tab"
-                        data-bs-toggle="tab" data-bs-target="#director" type="button"
-                        role="tab" aria-controls="profile-tab-pane" aria-selected="false">
-                    Director {% if moviesAsDirector is not empty %}({{ moviesAsDirector|length }}){% endif %}
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show {% if person.knownForDepartment == 'Acting' or (moviesAsDirector is empty and moviesAsActor is not empty) %}active{% endif %}"
-                 id="acting" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                {% if moviesAsActor is not empty %}
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
-                        {% for movieAsActor in moviesAsActor %}
-                            <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
-                                    <div class="position-relative">
-                                        <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
+                                            {% if movieAsActor.userRating is not null %}
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                                    {{ movieAsActor.userRating }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
                                     </div>
-
-                                    {% if movieAsActor.userRating is not null %}
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                            {{ movieAsActor.userRating }}
-                                        </span>
-                                    {% endif %}
-                                </div>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
-            <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' or (moviesAsActor is empty and moviesAsDirector is not empty) %}active{% endif %}"
-                 id="director" role="tabpanel" aria-labelledby="profile-tab"
-                 tabindex="0">
-                <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
-                    {% for movieAsDirector in moviesAsDirector %}
-                        <div class="col position-relative" style="padding-bottom: 1rem">
-                            <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
-                                <div class="position-relative">
-                                    <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
+                    <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' or (moviesAsActor is empty and moviesAsDirector is not empty) %}active{% endif %}"
+                        id="director" role="tabpanel" aria-labelledby="profile-tab"
+                        tabindex="0">
+                        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                            {% for movieAsDirector in moviesAsDirector %}
+                                <div class="col position-relative" style="padding-bottom: 1rem">
+                                    <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                                        <div class="position-relative">
+                                            <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
+                                        </div>
+                                        {% if movieAsDirector.userRating is not null %}
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                                {{ movieAsDirector.userRating }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                {% if movieAsDirector.userRating is not null %}
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
-                                        {{ movieAsDirector.userRating }}
-                                    </span>
-                                {% endif %}
-                            </div>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
-        <br>
-
     </main>
 {% endblock %}

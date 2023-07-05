@@ -17,7 +17,7 @@ function toggleBiography()
 document.addEventListener("DOMContentLoaded", () => {
     let biographyHeight = document.getElementById('biographyParagraph').offsetHeight;
     let windowHeight = window.outerHeight;
-    if(((biographyHeight / windowHeight) * 100) > 60) {
+    if(((biographyHeight / windowHeight) * 100) > 20) {
         document.getElementById('biographyParagraph').classList.add('truncated');
         document.getElementById('expandContainer').classList.remove('d-none');
     }
