@@ -682,14 +682,14 @@ class MovieRepository
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
+            SELECT DISTINCT m.*, mur.rating as userRating, mc.character_name
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
             JOIN movie_user_watch_dates muwd ON m.id = muwd.movie_id
             LEFT JOIN movie_user_rating mur ON muwd.movie_id = mur.movie_id and mur.user_id = ?
             WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh) AND muwd.user_id = ?
-            ORDER BY m.title
+            ORDER BY m.release_date DESC
             SQL,
             [$userId, $personId, $userId],
         );

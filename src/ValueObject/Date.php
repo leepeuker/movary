@@ -13,22 +13,22 @@ class Date implements JsonSerializable
     {
     }
 
-    public static function create() : self
+    public static function create(): self
     {
         return new self ((new \DateTime())->format(self::FORMAT));
     }
 
-    public static function createFromDateTime(DateTime $dateTime) : self
+    public function format(string $format): string
+    {
+        return (new \DateTime($this->date))->format($format);
+    }
+
+    public static function createFromDateTime(DateTime $dateTime): self
     {
         return new self ((new \DateTime((string)$dateTime))->format(self::FORMAT));
     }
 
-    public static function createFromString(string $dateString) : self
-    {
-        return new self ((new \DateTime($dateString))->format(self::FORMAT));
-    }
-
-    public static function createFromStringAndFormat(string $dateString, string $dateFormat) : self
+    public static function createFromStringAndFormat(string $dateString, string $dateFormat): self
     {
         $dateTime = \DateTime::createFromFormat($dateFormat, $dateString);
 
@@ -39,17 +39,12 @@ class Date implements JsonSerializable
         return new self ($dateTime->format(self::FORMAT));
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return $this->date;
     }
 
-    public function format(string $format) : string
-    {
-        return (new \DateTime($this->date))->format($format);
-    }
-
-    public function getDifferenceInDays(Date $date) : int
+    public function getDifferenceInDays(Date $date): int
     {
         $daysSince = (new \DateTime($this->date))->diff((new \DateTime($date->date)))->days;
 
@@ -60,13 +55,23 @@ class Date implements JsonSerializable
         return $daysSince;
     }
 
-    public function getDifferenceInYears(Date $date) : int
+    public function getDifferenceInYears(Date $date): int
     {
         return (new \DateTime($this->date))->diff((new \DateTime($date->date)))->y;
     }
 
-    public function jsonSerialize() : string
+    public function jsonSerialize(): string
     {
         return $this->date;
+    }
+
+    public function getYear(): Year
+    {
+        return Year::createFromString($this->format('Y'));
+    }
+
+    public static function createFromString(string $dateString): self
+    {
+        return new self ((new \DateTime($dateString))->format(self::FORMAT));
     }
 }

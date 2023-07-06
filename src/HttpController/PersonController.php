@@ -15,15 +15,16 @@ use Twig\Environment;
 class PersonController
 {
     public function __construct(
-        private readonly Person\PersonApi $personApi,
-        private readonly MovieApi $movieApi,
-        private readonly Environment $twig,
+        private readonly Person\PersonApi             $personApi,
+        private readonly MovieApi                     $movieApi,
+        private readonly Environment                  $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly UrlGenerator $urlGenerator,
-    ) {
+        private readonly UrlGenerator                 $urlGenerator,
+    )
+    {
     }
 
-    public function renderPage(Request $request) : Response
+    public function renderPage(Request $request): Response
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
         if ($userId === null) {
@@ -50,6 +51,19 @@ class PersonController
             }
         }
 
+        $actorMovies = $this->movieApi->fetchWithActor($personId, $userId);
+
+        $actorMoviesGroupedByReleaseYear = [];
+        foreach ($actorMovies as $actorMovie) {
+            $year = Date::createFromString($actorMovie['release_date'])->getYear();
+
+            if (isset($actorMoviesGroupedByReleaseYear[(string)$year]) === false) {
+                $actorMoviesGroupedByReleaseYear[(string)$year] = [];
+            }
+
+            $actorMoviesGroupedByReleaseYear[(string)$year][] = $actorMovie;
+        }
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/person.html.twig', [
@@ -66,7 +80,7 @@ class PersonController
                     'placeOfBirth' => $person->getPlaceOfBirth(),
                     'tmdbId' => $person->getTmdbId()
                 ],
-                'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
+                'moviesAsActor' => $actorMoviesGroupedByReleaseYear,
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
             ]),
         );
