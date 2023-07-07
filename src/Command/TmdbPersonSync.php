@@ -2,6 +2,7 @@
 
 namespace Movary\Command;
 
+use Movary\Command\Mapper\InputMapper;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Tmdb\SyncPersons;
 use Movary\ValueObject\JobStatus;
@@ -17,11 +18,14 @@ class TmdbPersonSync extends Command
 
     private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
+    private const OPTION_NAME_PERSON_IDS = 'personIds';
+
     protected static $defaultName = 'tmdb:person:sync';
 
     public function __construct(
         private readonly SyncPersons $syncPersons,
         private readonly JobQueueApi $jobQueueApi,
+        private readonly InputMapper $inputMapper,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -32,23 +36,22 @@ class TmdbPersonSync extends Command
         $this
             ->setDescription('Sync themoviedb.org meta data for local persons.')
             ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Max number of persons to sync.')
-            ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.');
+            ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.')
+            ->addOption(self::OPTION_NAME_PERSON_IDS, 'personIds', InputOption::VALUE_REQUIRED, 'Comma seperated ids of persons to sync.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $hoursOption = $input->getOption(self::OPTION_NAME_FORCE_HOURS);
-        $maxAgeInHours = $hoursOption !== null ? (int)$hoursOption : null;
-
-        $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
-        $personCountSyncThreshold = $thresholdOption !== null ? (int)$thresholdOption : null;
+        $maxAgeInHours = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_HOURS);
+        $maxSyncsThreshold = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_THRESHOLD);
+        $personIds = $this->inputMapper->mapOptionToIds($input, self::OPTION_NAME_PERSON_IDS);
 
         $jobId = $this->jobQueueApi->addTmdbPersonSyncJob(JobStatus::createInProgress());
 
         try {
             $this->generateOutput($output, 'Syncing person meta data...');
 
-            $this->syncPersons->syncPersons($maxAgeInHours, $personCountSyncThreshold);
+            $this->syncPersons->syncPersons($maxAgeInHours, $maxSyncsThreshold, $personIds);
 
             $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 

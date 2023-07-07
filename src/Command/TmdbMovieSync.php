@@ -2,6 +2,7 @@
 
 namespace Movary\Command;
 
+use Movary\Command\Mapper\InputMapper;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\ValueObject\JobStatus;
@@ -22,6 +23,7 @@ class TmdbMovieSync extends Command
     public function __construct(
         private readonly SyncMovies $syncMovieDetails,
         private readonly JobQueueApi $jobQueueApi,
+        private readonly InputMapper $inputMapper,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -37,18 +39,15 @@ class TmdbMovieSync extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $hoursOption = $input->getOption(self::OPTION_NAME_FORCE_HOURS);
-        $maxAgeInHours = $hoursOption !== null ? (int)$hoursOption : null;
-
-        $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
-        $movieCountSyncThreshold = $thresholdOption !== null ? (int)$thresholdOption : null;
+        $maxAgeInHours = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_HOURS);
+        $maxSyncsThreshold = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_THRESHOLD);
 
         $jobId = $this->jobQueueApi->addTmdbMovieSyncJob(JobStatus::createInProgress());
 
         try {
             $this->generateOutput($output, 'Syncing movie meta data...');
 
-            $this->syncMovieDetails->syncMovies($maxAgeInHours, $movieCountSyncThreshold);
+            $this->syncMovieDetails->syncMovies($maxAgeInHours, $maxSyncsThreshold);
 
             $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
