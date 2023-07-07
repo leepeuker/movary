@@ -1,9 +1,8 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddBiographyToPerson extends AbstractMigration
+final class AddBiographyToPersonTable extends AbstractMigration
 {
     public function down()
     {
@@ -60,7 +59,7 @@ final class AddBiographyToPerson extends AbstractMigration
             FROM `person`'
         );
         $this->execute('DROP TABLE `person`');
-        $this->execute('ALTER TABLE `tmp_person` RENAME TO `person`');       
+        $this->execute('ALTER TABLE `tmp_person` RENAME TO `person`');
     }
 
     public function up()

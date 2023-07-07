@@ -49,7 +49,7 @@ class ImdbWebScrapper
 
         $imdbRating = ImdbRating::create($ratingAverage, $ratingVoteCount);
 
-        $this->logger->debug('IMDb: Found movie rating.', [
+        $this->logger->debug('IMDb: Found movie rating', [
             'url' => $this->urlGenerator->buildMovieUrl($imdbId),
             'average' => $imdbRating->getRating(),
             'voteCount' => $imdbRating->getVotesCount(),

@@ -17,7 +17,7 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
 
-        <div style="text-align: center;">
+        <div style="text-align: center;margin-bottom: 1rem">
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
@@ -84,7 +84,7 @@
             <h5>Plex Authentication</h5>
 
             <p class="text-muted" style="padding-bottom: 0">
-                For personal data access you have to authenticate against Plex and provide your server url.
+                For personal data access you have to authenticate against Plex.
             </p>
 
             <div id="alertPlexAuthenticationDiv">
@@ -103,41 +103,44 @@
                 <p>Username: {{ plexUsername }}</p>
             </div>
 
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="plexServerUrlInputPrefix">Plex Server Url</span>
-                <input type="text"
-                       name="plexServerUrlInput"
-                       id="plexServerUrlInput"
-                       class="form-control {% if plexTokenExists == false %} disabled {% endif %}"
-                       value="{{ plexServerUrl }}"
-                       aria-describedby="plexServerUrlInputPrefix" {% if plexTokenExists == false %} disabled {% endif %}
-                >
-                <button class="btn btn-outline-secondary" type="button" id="plexServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#plexServerUrlHelpModal">
-                    <i class="bi bi-question-lg"></i>
+            {# The following element is hidden because it is not in use yet #}
+            <div class="d-none">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="plexServerUrlInputPrefix">Plex Server Url</span>
+                    <input type="text"
+                           name="plexServerUrlInput"
+                           id="plexServerUrlInput"
+                           class="form-control {% if plexTokenExists == false %} disabled {% endif %}"
+                           value="{{ plexServerUrl }}"
+                           aria-describedby="plexServerUrlInputPrefix" {% if plexTokenExists == false %} disabled {% endif %}
+                    >
+                    <button class="btn btn-outline-secondary" type="button" id="plexServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#plexServerUrlHelpModal">
+                        <i class="bi bi-question-lg"></i>
+                    </button>
+                </div>
+
+                <div class="spinner-border d-none" role="status" id="alertPlexServerUrlLoadingSpinner" style="margin-bottom: 1rem">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div id="alertPlexServerUrlDiv"></div>
+
+                <button type="submit"
+                        class="btn btn-outline-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
+                        id="verifyServerUrlButton"
+                        {% if plexTokenExists == false %} disabled {% endif %}
+                        onclick="verifyPlexServerUrl()"
+                >Test connection
+                </button>
+                <button type="submit"
+                        class="btn btn-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
+                        id="saveServerUrlButton"
+                        {% if plexTokenExists == false %} disabled {% endif %}
+                        onclick="savePlexServerUrl()"
+                >Save url
                 </button>
             </div>
 
-            <div class="spinner-border d-none" role="status" id="alertPlexServerUrlLoadingSpinner" style="margin-bottom: 1rem">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <div id="alertPlexServerUrlDiv"></div>
-
-            <button type="submit"
-                    class="btn btn-outline-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
-                    id="verifyServerUrlButton"
-                    {% if plexTokenExists == false %} disabled {% endif %}
-                    onclick="verifyPlexServerUrl()"
-            >Test connection
-            </button>
-            <button type="submit"
-                    class="btn btn-primary mb-3 {% if plexTokenExists == false %} disabled {% endif %}"
-                    id="saveServerUrlButton"
-                    {% if plexTokenExists == false %} disabled {% endif %}
-                    onclick="savePlexServerUrl()"
-            >Save url
-            </button>
-
-            <hr>
+            <hr style="margin-top: 0">
 
             <h5>Watchlist import</h5>
 
