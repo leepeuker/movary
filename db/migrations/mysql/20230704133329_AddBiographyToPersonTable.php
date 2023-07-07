@@ -1,11 +1,10 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddBiographyToPerson extends AbstractMigration
+final class AddBiographyToPersonTable extends AbstractMigration
 {
-    public function down() : void
+    public function down(): void
     {
         $this->execute(
             <<<SQL
@@ -14,7 +13,7 @@ final class AddBiographyToPerson extends AbstractMigration
         );
     }
 
-    public function up() : void
+    public function up(): void
     {
         $this->execute(
             <<<SQL
