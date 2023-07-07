@@ -8,6 +8,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\ValueObject\Date;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 class SyncMovie
@@ -21,6 +22,7 @@ class SyncMovie
         private readonly ProductionCompanyConverter $productionCompanyConverter,
         private readonly Connection $dbConnection,
         private readonly JobQueueScheduler $jobScheduler,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -38,6 +40,8 @@ class SyncMovie
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
         $this->dbConnection->beginTransaction();
+
+        $createdMovie = false;
 
         try {
             if ($movie === null) {
@@ -57,6 +61,8 @@ class SyncMovie
                 );
 
                 $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
+
+                $createdMovie = true;
             } else {
                 $originalTmdbPosterPath = $movie->getTmdbPosterPath();
 
@@ -89,6 +95,12 @@ class SyncMovie
             $this->dbConnection->rollBack();
 
             throw $e;
+        }
+
+        if ($createdMovie === true) {
+            $this->logger->debug('TMDB: Created movie meta data', ['movieId' => $movie->getId(), 'tmdbId' => $movie->getTmdbId()]);
+        } else {
+            $this->logger->debug('TMDB: Updated movie meta data', ['movieId' => $movie->getId(), 'tmdbId' => $movie->getTmdbId()]);
         }
 
         return $movie;
