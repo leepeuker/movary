@@ -17,9 +17,9 @@ class SyncMovies
     ) {
     }
 
-    public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
+    public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null, ?array $ids = []) : void
     {
-        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold);
+        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold, $ids);
 
         foreach ($movies as $movie) {
             $movie = MovieEntity::createFromArray($movie);

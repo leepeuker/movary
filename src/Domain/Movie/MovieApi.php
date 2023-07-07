@@ -110,9 +110,9 @@ class MovieApi
         return $this->repository->fetchAll();
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : \Traversable
     {
-        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit);
+        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit, $ids);
     }
 
     public function fetchById(int $movieId) : MovieEntity
