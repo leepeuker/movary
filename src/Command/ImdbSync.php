@@ -2,6 +2,7 @@
 
 namespace Movary\Command;
 
+use Movary\Command\Mapper\InputMapper;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\ValueObject\JobStatus;
@@ -24,6 +25,7 @@ class ImdbSync extends Command
     public function __construct(
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
         private readonly JobQueueApi $jobQueueApi,
+        private readonly InputMapper $inputMapper,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
@@ -40,14 +42,9 @@ class ImdbSync extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $hoursOption = $input->getOption(self::OPTION_NAME_FORCE_HOURS);
-        $maxAgeInHours = $hoursOption !== null ? (int)$hoursOption : null;
-
-        $thresholdOption = $input->getOption(self::OPTION_NAME_FORCE_THRESHOLD);
-        $movieCountSyncThreshold = (int)$thresholdOption !== 0 ? (int)$thresholdOption : null;
-
-        $movieIdsOption = $input->getOption(self::OPTION_NAME_MOVIE_IDS);
-        $movieIds = (string)$movieIdsOption !== '' ? array_map('intval', explode(',', $movieIdsOption)) : null;
+        $movieCountSyncThreshold = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_THRESHOLD);
+        $maxAgeInHours = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_HOURS);
+        $movieIds = $this->inputMapper->mapOptionToIds($input, self::OPTION_NAME_MOVIE_IDS);
 
         $jobId = $this->jobQueueApi->addImdbSyncJob(JobStatus::createInProgress());
 

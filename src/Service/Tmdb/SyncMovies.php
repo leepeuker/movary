@@ -17,9 +17,9 @@ class SyncMovies
     ) {
     }
 
-    public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
+    public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null, ?array $ids = []) : void
     {
-        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold);
+        $movies = $this->movieApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold, $ids);
 
         foreach ($movies as $movie) {
             $movie = MovieEntity::createFromArray($movie);
@@ -34,7 +34,14 @@ class SyncMovies
             try {
                 $this->syncMovieService->syncMovie($movie->getTmdbId());
             } catch (Throwable $t) {
-                $this->logger->warning('Could not sync movie with id "' . $movie->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+                $this->logger->warning(
+                    'TMDB: Could not update movie.',
+                    [
+                        'exception' => $t,
+                        'movieId' => $movie->getId(),
+                        'tmdbId' => $movie->getTmdbId(),
+                    ],
+                );
             }
         }
     }

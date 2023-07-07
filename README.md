@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://tandoor.dev"><img src="https://github.com/leepeuker/movary/raw/main/public/images/movary-logo-192x192.png" height="160px" width="160px"></a>
+  <a href="https://movary.org"><img src="https://github.com/leepeuker/movary/raw/main/public/images/movary-logo-192x192.png" height="160px" width="160px"></a>
   <br>
   Movary
   <br>
@@ -11,7 +11,7 @@
 <a href="https://hub.docker.com/r/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/docker/pulls/leepeuker/movary" ></a>
 <a href="https://github.com/leepeuker/movary" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/stars/leepeuker/movary?color=yellow&label=github%20stars" ></a>
 <a href="https://github.com/leepeuker/movary/issues" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/issues/leepeuker/movary?color=eba434&label=github%20issues" ></a>
-<a href="https://matrix.to/#/#movary-support:leepeuker.dev" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/matrix/movary-support:leepeuker.dev?label=support%20chat&server_fqdn=matrix.leepeuker.dev" ></a>
+<a href="https://discord.gg/KbcSqggrgW" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/discord/1125830398715363399" ></a>
 <a href="https://github.com/leepeuker/movary/blob/main/LICENSE" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/github/license/leepeuker/movary" ></a>
 </p>
 
@@ -60,7 +60,7 @@ The documentation for the latest release is located [here](https://docs.movary.o
 
 - Please report bugs and request features/changes via [Github issues](https://github.com/leepeuker/movary/issues/new/choose)
 - Ask for help or discuss related topics via [Github discussions](https://github.com/leepeuker/movary/discussions)
-- Join the Matrix [support chat](https://matrix.to/#/#movary-support:leepeuker.dev)
+- Join our [Discord server](https://discord.gg/KbcSqggrgW)
 
 ## Contributors
 

@@ -41,7 +41,7 @@ Missing movies imported to the Movary Watchlist are put at the beginning of the 
 
 !!! Info
 
-    A Plex access token is required, the server url is not necessary. 
+    Plex authentication is required. 
 
 ### Instruction
 

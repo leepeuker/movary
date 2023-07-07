@@ -112,7 +112,7 @@ class UserApi
     {
         $url = $this->repository->findPlexServerUrl($userId);
 
-        return $url !== null ? Url::createFromString($url) : null;
+        return empty($url) === false ? Url::createFromString($url) : null;
     }
 
     public function findTemporaryPlexCode(int $userId) : ?string

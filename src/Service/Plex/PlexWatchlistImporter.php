@@ -2,9 +2,11 @@
 
 namespace Movary\Service\Plex;
 
+use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
+use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\ValueObject\DateTime;
@@ -17,8 +19,8 @@ class PlexWatchlistImporter
         private readonly PlexApi $plexApi,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly MovieApi $movieApi,
+        private readonly UserApi $userApi,
         private readonly MovieWatchlistApi $movieWatchlistApi,
-        private readonly PlexUserClientConfigurationProvider $clientConfigurationProvider,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -35,13 +37,16 @@ class PlexWatchlistImporter
 
     public function importPlexWatchlist(int $userId) : void
     {
-        $clientConfiguration = $this->clientConfigurationProvider->provideUserClientConfiguration($userId);
+        $plexAccessToken = $this->userApi->findPlexAccessToken($userId);
+        if ($plexAccessToken === null) {
+            throw PlexAuthenticationMissing::create();
+        }
 
-        $plexWatchlistMovies = $this->plexApi->fetchWatchlist($clientConfiguration->getAccessToken());
+        $plexWatchlistMovies = $this->plexApi->fetchWatchlist($plexAccessToken);
 
         $timestamp = DateTime::create();
 
-        foreach ($this->plexApi->findTmdbIdsOfWatchlistMovies($clientConfiguration->getAccessToken(), $plexWatchlistMovies) as $tmdbId) {
+        foreach ($this->plexApi->findTmdbIdsOfWatchlistMovies($plexAccessToken, $plexWatchlistMovies) as $tmdbId) {
             try {
                 $this->importPlexWatchlistMovie($userId, (int)$tmdbId, $timestamp);
 

@@ -66,7 +66,7 @@ class PersonRepository
         $this->dbConnection->delete('person', ['id' => $id]);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit, ?array $ids) : \Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : \Traversable
     {
         $whereQuery = '';
         if ($ids !== null && count($ids) > 0) {

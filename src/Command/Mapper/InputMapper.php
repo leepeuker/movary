@@ -14,7 +14,17 @@ class InputMapper
             return null;
         }
 
-        return array_map('intval', explode(',', $optionValue));
+        $ids = [];
+
+        foreach (explode(',', $optionValue) as $idValue) {
+            if (ctype_digit($idValue) === false) {
+                throw new \RuntimeException('Option must be a comma separated string of only numbers: ' . $optionName);
+            }
+
+            $ids[] = (int)$idValue;
+        }
+
+        return $ids;
     }
 
     public function mapOptionToInteger(InputInterface $input, string $optionName) : ?int
@@ -26,7 +36,7 @@ class InputMapper
         }
 
         if (ctype_digit($optionValue) === false) {
-            throw new \RuntimeException('Invalid option value, must be a number: ' . $optionName);
+            throw new \RuntimeException('Option must be a number: ' . $optionName);
         }
 
         return (int)$optionValue;

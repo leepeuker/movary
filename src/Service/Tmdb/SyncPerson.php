@@ -30,7 +30,7 @@ class SyncPerson
                 $this->personApi->deleteById($person->getId());
             }
 
-            $this->logger->debug('No person existing on tmdb with id: ' . $tmdbId);
+            $this->logger->debug('TMDB: Could not update person, tmdb id not found', ['tmdbId' => $tmdbId]);
 
             return;
         }
@@ -50,6 +50,8 @@ class SyncPerson
                 $tmdbPerson->getPlaceOfBirth(),
                 updatedAtTmdb: DateTime::create(),
             );
+
+            $this->logger->debug('TMDB: Created person meta data', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
 
             $this->jobScheduler->storePersonIdForTmdbImageCacheJob($person->getId());
 
@@ -71,6 +73,8 @@ class SyncPerson
             $tmdbPerson->getPlaceOfBirth(),
             DateTime::create(),
         );
+
+        $this->logger->debug('TMDB: Updated person meta data', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
 
         if ($originalTmdbPosterPath !== $person->getTmdbPosterPath()) {
             $this->jobScheduler->storePersonIdForTmdbImageCacheJob($person->getId());
