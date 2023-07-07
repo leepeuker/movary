@@ -17,11 +17,11 @@ class SyncPersons
     ) {
     }
 
-    public function syncPersons(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null) : void
+    public function syncPersons(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null, ?array $ids = []) : void
     {
         $this->personApi->deleteAllNotReferenced();
 
-        $persons = $this->personApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold);
+        $persons = $this->personApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold, $ids);
 
         foreach ($persons as $person) {
             $person = PersonEntity::createFromArray($person);
@@ -34,7 +34,14 @@ class SyncPersons
             try {
                 $this->syncPerson->syncPerson($person->getTmdbId());
             } catch (Throwable $t) {
-                $this->logger->warning('Could not sync person with id "' . $person->getId() . '". Error: ' . $t->getMessage(), ['exception' => $t]);
+                $this->logger->warning(
+                    'TMDB: Could not update person',
+                    [
+                        'exception' => $t,
+                        'movieId' => $person->getId(),
+                        'tmdbId' => $person->getTmdbId(),
+                    ],
+                );
             }
         }
     }

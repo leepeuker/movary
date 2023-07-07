@@ -64,15 +64,21 @@ class PersonRepository
         $this->dbConnection->delete('person', ['id' => $id]);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null) : \Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : \Traversable
     {
-        $query = 'SELECT * FROM `person` ORDER BY updated_at_tmdb ASC';
+        $whereQuery = '';
+        if ($ids !== null && count($ids) > 0) {
+            $placeholders = str_repeat('?, ', count($ids));
+            $whereQuery = ' WHERE id IN (' . trim($placeholders, ', ') . ')';
+        }
+
+        $query = "SELECT * FROM `person` $whereQuery ORDER BY updated_at_tmdb, created_at";
 
         if ($limit !== null) {
             $query .= ' LIMIT ' . $limit;
         }
 
-        return $this->dbConnection->prepare($query)->executeQuery()->iterateAssociative();
+        return $this->dbConnection->prepare($query)->executeQuery($ids ?? [])->iterateAssociative();
     }
 
     public function findByPersonId(int $personId) : ?PersonEntity
