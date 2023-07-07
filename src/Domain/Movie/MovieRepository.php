@@ -443,6 +443,8 @@ class MovieRepository
         }
 
         if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            $maxAgeInHours = $maxAgeInHours ?? 0;
+
             return $this->dbConnection->fetchFirstColumn(
                 'SELECT movie.id
                 FROM `movie` 
