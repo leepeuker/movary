@@ -67,7 +67,7 @@
                 {% else %}
                     <p>No biography available.</p>
                 {% endif %}
-                <ul class="nav nav-tabs" role="tablist" style="padding-top: 12rem">
+                <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' or moviesAsDirector is empty %}active{% endif %}"
                                 id="home-tab"
