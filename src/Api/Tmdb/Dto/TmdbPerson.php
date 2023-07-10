@@ -10,6 +10,7 @@ class TmdbPerson
     private function __construct(
         private readonly int $tmdbId,
         private readonly string $name,
+        private readonly ?string $biography,
         private readonly ?Date $birthDate,
         private readonly ?Date $deathDate,
         private readonly Gender $gender,
@@ -25,6 +26,7 @@ class TmdbPerson
         return new self(
             $data['id'],
             $data['name'],
+            empty($data['biography']) === true ? null : $data['biography'],
             empty($data['birthday']) === true ? null : Date::createFromString($data['birthday']),
             empty($data['deathday']) === true ? null : Date::createFromString($data['deathday']),
             Gender::createFromInt($data['gender']),
@@ -33,6 +35,11 @@ class TmdbPerson
             $data['profile_path'],
             empty($data['place_of_birth']) === true ? null : $data['place_of_birth'],
         );
+    }
+
+    public function getBiography() : ?string
+    {
+        return $this->biography;
     }
 
     public function getBirthDate() : ?Date

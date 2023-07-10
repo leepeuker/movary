@@ -6,9 +6,18 @@
 
 {% block scripts %}
     <script src="/js/user-select.js"></script>
+    <script src="/js/person.js"></script>
 {% endblock %}
 
 {% block body %}
+    <style>
+        .truncated {
+            -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+            max-height: 4rem;
+            overflow-y: hidden;
+        }
+    </style>
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
@@ -29,19 +38,34 @@
 
                 {% if person.birthDate is not null %}
                     <h6 style="margin-bottom: 0.1rem">Birth date</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.birthDate }} ({{ person.age }}{% if person.deathDate is not null %}&#10013;{% endif %})</p>
+                    <p style="margin-bottom: 0.4rem">{{ person.birthDate }} {% if person.deathDate is null %}({{ person.age }}){% endif %}</p>
                 {% endif %}
 
                 {% if person.deathDate is not null %}
-                    <h6 style="margin-bottom: 0.1rem">Death date</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.deathDate }}</p>
+                    <h6 style="margin-bottom: 0.1rem">Day of Death</h6>
+                    <p style="margin-bottom: 0.4rem">{{ person.deathDate }} ({{ person.age }})</p>
+                {% endif %}
+
+                {% if person.placeOfBirth is not null %}
+                    <h6 style="margin-bottom: 0.1rem">Place of Birth</h6>
+                    <p style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
                 {% endif %}
             </div>
         </div>
 
-        <br>
+        <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">Biography</h6>
+        {% if person.biography is not null %}
+            <p id="biographyParagraph" style="margin-bottom: 1rem">{{ person.biography|nl2br }}</p>
+            <div class="text-primary d-none" style="cursor: pointer; top: 0;" id="expandContainer">
+                <span style="padding: 0;float: right;" onclick="toggleBiography()"><i class="bi bi-chevron-down"></i></span>
+                <span style="float: right; margin-right: 0.5em;" onclick="toggleBiography()">Read more&#8230;</span>
+                <br>
+            </div>
+        {% else %}
+            <p>No biography available.</p>
+        {% endif %}
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <ul class="nav nav-tabs" id="myTab" role="tablist" >
             <li class="nav-item" role="presentation">
                 <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' or moviesAsDirector is empty %}active{% endif %}"
                         id="home-tab"
