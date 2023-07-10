@@ -21,7 +21,7 @@ class TmdbMovie
         private readonly ?string $posterPath,
         private readonly ?string $backdropPath,
         private readonly ?string $imdbId,
-        private readonly ?TmdbCredits $credits,
+        private readonly TmdbCredits $credits,
     ) {
     }
 
@@ -42,7 +42,7 @@ class TmdbMovie
             $data['poster_path'],
             $data['backdrop_path'],
             empty($data['imdb_id']) === true ? null : $data['imdb_id'],
-            empty($data['credits']) === true ? null : TmdbCredits::createFromArray($data['credits']),
+            empty($data['credits']) === true ? TmdbCredits::create() : TmdbCredits::createFromArray($data['credits']),
         );
     }
 
@@ -51,7 +51,7 @@ class TmdbMovie
         return $this->backdropPath;
     }
 
-    public function getCredits() : ?TmdbCredits
+    public function getCredits() : TmdbCredits
     {
         return $this->credits;
     }

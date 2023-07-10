@@ -28,6 +28,7 @@ class TmdbMovieTest extends TestCase
             'poster_path' => null,
             'backdrop_path' => null,
             'imdb_id' => null,
+            'credits' => null,
         ];
 
         $subject = TmdbMovie::createFromArray($testData);
