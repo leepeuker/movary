@@ -4,7 +4,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class AddBiographyToPersonTable extends AbstractMigration
 {
-    public function down(): void
+    public function down() : void
     {
         $this->execute(
             <<<SQL
@@ -13,7 +13,7 @@ final class AddBiographyToPersonTable extends AbstractMigration
         );
     }
 
-    public function up(): void
+    public function up() : void
     {
         $this->execute(
             <<<SQL

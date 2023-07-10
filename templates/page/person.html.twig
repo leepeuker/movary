@@ -10,14 +10,14 @@
 {% endblock %}
 
 {% block body %}
-<style>
-.truncated {
-  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-  max-height: 20vh;
-  overflow-y: hidden; 
-}
-</style>
+    <style>
+        .truncated {
+            -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+            max-height: 4rem;
+            overflow-y: hidden;
+        }
+    </style>
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}

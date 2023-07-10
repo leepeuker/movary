@@ -56,7 +56,7 @@ final class AddBiographyToPersonTable extends AbstractMigration
                 `created_at`,
                 `updated_at`,
                 `updated_at_tmdb` 
-            FROM `person`'
+            FROM `person`',
         );
         $this->execute('DROP TABLE `person`');
         $this->execute('ALTER TABLE `tmp_person` RENAME TO `person`');
@@ -115,7 +115,7 @@ final class AddBiographyToPersonTable extends AbstractMigration
                 `created_at`,
                 `updated_at`,
                 `updated_at_tmdb` 
-            FROM `person`'
+            FROM `person`',
         );
         $this->execute('DROP TABLE `person`');
         $this->execute('ALTER TABLE `tmp_person` RENAME TO `person`');

@@ -10,7 +10,7 @@ function toggleBiography()
         document.getElementById('biographyParagraph').classList.add('truncated');
         expandContainer.getElementsByTagName('i')[0].classList.add('bi-chevron-down');
         expandContainer.getElementsByTagName('i')[0].classList.remove('bi-chevron-up');
-        expandContainer.children[1].innerHTML = 'Show more&#8230;';        
+        expandContainer.children[1].innerHTML = 'Show more&#8230;';
     }
 }
 
