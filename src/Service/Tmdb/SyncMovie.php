@@ -88,7 +88,8 @@ class SyncMovie
             $this->movieApi->updateGenres($movie->getId(), $this->genreConverter->getMovaryGenresFromTmdbMovie($tmdbMovie));
             $this->movieApi->updateProductionCompanies($movie->getId(), $this->productionCompanyConverter->getMovaryProductionCompaniesFromTmdbMovie($tmdbMovie));
 
-            $this->updateCredits($movie->getId(), $tmdbId);
+            $this->movieApi->updateCast($movie->getId(), $tmdbMovie->getCredits()->getCast());
+            $this->movieApi->updateCrew($movie->getId(), $tmdbMovie->getCredits()->getCrew());
 
             $this->dbConnection->commit();
         } catch (\Exception $e) {
@@ -104,13 +105,5 @@ class SyncMovie
         }
 
         return $movie;
-    }
-
-    private function updateCredits(int $movieId, int $tmdbId) : void
-    {
-        $credits = $this->tmdbApi->fetchMovieCredits($tmdbId);
-
-        $this->movieApi->updateCast($movieId, $credits->getCast());
-        $this->movieApi->updateCrew($movieId, $credits->getCrew());
     }
 }
