@@ -60,6 +60,7 @@ class PersonController
                     'knownForDepartment' => $person->getKnownForDepartment(),
                     'gender' => $person->getGender(),
                     'age' => $age,
+                    'biography' => $person->getBiography(),
                     'birthDate' => $person->getBirthDate(),
                     'deathDate' => $person->getDeathDate(),
                     'placeOfBirth' => $person->getPlaceOfBirth(),
