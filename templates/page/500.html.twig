@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Not found
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+        <div style="text-align: center;padding-bottom: 1rem">
+            <br>
+            <h1 class="fw-normal" style="font-size: 8rem;">500</h1>
+            <h4>Internal server error :(</h4>
+        </div>
+    </main>
+{% endblock %}

@@ -130,6 +130,11 @@ class MovieController
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $movie = $this->movieApi->findByIdFormatted($movieId);
+
+        if ($movie === null) {
+            return Response::createNotFound();
+        }
+
         $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
         return Response::create(

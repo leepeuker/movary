@@ -39,6 +39,11 @@ class Response
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
 
+    public static function createMethodNotAllowed() : self
+    {
+        return new self(StatusCode::createMethodNotAllowed());
+    }
+
     public static function createNotFound() : self
     {
         return new self(StatusCode::createNotFound());
