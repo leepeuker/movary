@@ -23,15 +23,25 @@ class MovieWatchProviderController
     {
         $movieId = (int)$request->getRouteParameters()['id'];
         $country = $request->getGetParameters()['country'];
+        $streamType = $request->getGetParameters()['streamType'] ?? '';
 
         $movie = $this->movieApi->fetchById($movieId);
 
         $watchProviders = $this->tmdbApi->getWatchProviders($movie->getTmdbId(), $country);
 
+        $watchProviders = match (true) {
+            $streamType === 'rent' => $watchProviders->getRent(),
+            $streamType === 'ads' => $watchProviders->getAds(),
+            $streamType === 'free' => $watchProviders->getFree(),
+            $streamType === 'flatrate' => $watchProviders->getFlatrate(),
+            $streamType === 'buy' => $watchProviders->getBuy(),
+            default => $watchProviders->getAll()
+        };
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('component/watch-providers.html.twig', [
-                'watchProviders' => $watchProviders->getBuy()
+                'watchProviders' => $watchProviders
             ]),
         );
     }

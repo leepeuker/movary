@@ -50,11 +50,11 @@ class TmdbApi
         $data = $data['results'][$country] ?? [];
 
         return TmdbWatchProviderCollection::create(
-            TmdbWatchProviderList::createFromArray($data['free'] ?? []),
             TmdbWatchProviderList::createFromArray($data['flatrate'] ?? []),
             TmdbWatchProviderList::createFromArray($data['rent'] ?? []),
             TmdbWatchProviderList::createFromArray($data['buy'] ?? []),
             TmdbWatchProviderList::createFromArray($data['ads'] ?? []),
+            TmdbWatchProviderList::createFromArray($data['free'] ?? []),
         );
     }
 

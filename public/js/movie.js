@@ -255,14 +255,14 @@ function getCookie(name) {
     if (match) return match[2];
 }
 
-async function loadWatchProviders(country) {
+async function loadWatchProviders(country, streamType) {
     document.getElementById('whereToWatchModalSearchSpinner').classList.remove('d-none')
     document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
     document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
     document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
     removeAlert('alertWhereToWatchModalDiv')
 
-    document.getElementById('whereToWatchModalProvidersList').innerHTML = await fetchWatchProviders(country)
+    document.getElementById('whereToWatchModalProvidersList').innerHTML = await fetchWatchProviders(country, streamType)
         .catch(function (error) {
             addAlert('alertWhereToWatchModalDiv', 'Could not fetch watch providers', 'danger')
             document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
@@ -274,6 +274,7 @@ async function loadWatchProviders(country) {
 
 document.getElementById('countrySelect').addEventListener('change', (e) => {
     const country = document.getElementById('countrySelect').value;
+    const streamType = document.getElementById('streamTypeSelect').value;
 
     if (country === '') {
         document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
@@ -286,11 +287,22 @@ document.getElementById('countrySelect').addEventListener('change', (e) => {
 
     document.cookie = 'country=' + country + ';samesite=strict;path=/';
 
-    loadWatchProviders(country)
+    loadWatchProviders(country, streamType)
 })
 
-async function fetchWatchProviders(country) {
-    const response = await fetch('/movies/' + getMovieId() + '/watch-providers?country=' + country)
+document.getElementById('streamTypeSelect').addEventListener('change', (e) => {
+    const country = document.getElementById('countrySelect').value;
+    const streamType = document.getElementById('streamTypeSelect').value;
+
+    if (country === '') {
+        return;
+    }
+
+    loadWatchProviders(country, streamType)
+})
+
+async function fetchWatchProviders(country, streamType) {
+    const response = await fetch('/movies/' + getMovieId() + '/watch-providers?country=' + country + '&streamType=' + streamType)
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

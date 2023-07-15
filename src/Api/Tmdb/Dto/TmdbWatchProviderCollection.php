@@ -28,6 +28,12 @@ class TmdbWatchProviderCollection
         return $this->ads;
     }
 
+    public function getAll() : TmdbWatchProviderList
+    {
+        // TODO merge all to get unique and sort
+        return TmdbWatchProviderList::createFromArray([]);
+    }
+
     public function getBuy() : TmdbWatchProviderList
     {
         return $this->buy;
