@@ -70,8 +70,8 @@
                         {% import "component/dashboard/row-most-watched-production-companies.html.twig" as dashboardMostWatchedProductionCopmanies %}
                         {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow, mostWatchedProductionCompanies, routeUsername) }}
                     {% elseif dashboardRow.isMostWatchedReleaseYears and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-release-year.html.twig" as dashboardMostWatchedProductionCopmanies %}
-                        {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow, mostWatchedProductionCompanies, routeUsername) }}
+                        {% import "component/dashboard/row-most-watched-release-year.html.twig" as dashboardMostWatchedReleaseYears %}
+                        {{ dashboardMostWatchedReleaseYears.create(dashboardRow, mostWatchedReleaseYears, routeUsername) }}
                     {% elseif dashboardRow.isWatchlist and dashboardRow.isVisible %}
                         {% import "component/dashboard/row-watchlist.html.twig" as dashboardWatchlist %}
                         {{ dashboardWatchlist.create(dashboardRow, watchlistItems, routeUsername) }}
