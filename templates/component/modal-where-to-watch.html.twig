@@ -6,12 +6,29 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <select class="form-select" aria-label="Country select" id="countrySelect">
-                    <option>Select country</option>
-                    {% for ISO31661, name in countries %}
-                        <option value="{{ ISO31661 }}">{{ name }}</option>
-                    {% endfor %}
-                </select>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="countrySelect">Country</label>
+                    <select class="form-select" aria-label="Country select" id="countrySelect">
+                        <option value=""></option>
+                        {% for ISO31661, name in countries %}
+                            <option value="{{ ISO31661 }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="countrySelect">Stream Type</label>
+                    <select class="form-select" aria-label="Stream type select" id="streamTypeSelect">
+                        <option value="all" selected>All</option>
+                        <option value="abo">Abo</option>
+                        <option value="rent">Rent</option>
+                        <option value="buy">Buy</option>
+                        <option value="ads">Ads</option>
+                        <option value="free">Free</option>
+                    </select>
+                </div>
+
+                <hr>
 
                 <div>
                     <p class="d-none text-center" style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalProvidersInfo">No providers found.</p>

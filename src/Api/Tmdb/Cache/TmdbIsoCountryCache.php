@@ -60,7 +60,7 @@ class TmdbIsoCountryCache
 
     private function loadFromDatabase() : bool
     {
-        $this->languages = $this->dbConnection->fetchAllKeyValue('SELECT iso_3166_1, english_name FROM cache_tmdb_countries');
+        $this->languages = $this->dbConnection->fetchAllKeyValue('SELECT iso_3166_1, english_name FROM cache_tmdb_countries ORDER BY english_name');
 
         return empty($this->languages);
     }

@@ -233,14 +233,8 @@ async function refreshImdbRatingRequest() {
 
 //region whereToWatchModal
 async function showWhereToWatchModal(tmdbId) {
-    const myModal = new bootstrap.Modal(document.getElementById('whereToWatchModal'), {
-        keyboard: false
-    })
-
     const countrySelect = document.getElementById('countrySelect');
     let country = countrySelect.value;
-
-    myModal.show()
 
     if (country.length !== 2) {
         const countryCookie = getCookie('country');
@@ -280,6 +274,16 @@ async function loadWatchProviders(country) {
 
 document.getElementById('countrySelect').addEventListener('change', (e) => {
     const country = document.getElementById('countrySelect').value;
+
+    if (country === '') {
+        document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+        document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
+        document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+        document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
+
+        return;
+    }
+
     document.cookie = 'country=' + country + ';samesite=strict;path=/';
 
     loadWatchProviders(country)

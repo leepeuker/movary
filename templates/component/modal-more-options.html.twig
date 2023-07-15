@@ -13,6 +13,14 @@
                             onclick="toggleWatchlist({{ isOnWatchlist }})">
                         {{ isOnWatchlist == true ? 'Remove from' : 'Add to' }} Watchlist
                     </button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="watchlistButton"
+                            data-bs-target="#whereToWatchModal"
+                            data-bs-toggle="modal"
+                            onclick="showWhereToWatchModal({{ movie.tmdbId }})">
+                        Where to watch
+                    </button>
                     <button type="button" class="btn btn-primary" id="refreshTmdbDataButton" onclick="refreshTmdbData()">Refresh TMDB data</button>
                     <button type="button" class="btn btn-primary" id="refreshImdbRatingButton" onclick="refreshImdbRating()">Refresh IMDb rating</button>
                 </div>

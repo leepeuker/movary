@@ -1,7 +1,11 @@
-<ul class="" style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalProvidersList">
-    {% for watchProvider in watchProviders %}
-        <li>
-            <img src="https://image.tmdb.org/t/p/w92{{ watchProvider.logo }}" style="width: 2rem;margin-right: .5rem;margin-bottom: .5rem" alt="">{{ watchProvider.name }}
-        </li>
-    {% endfor %}
-</ul>
+{% if watchProviders|length == 0 %}
+    <p style="margin-top: 1rem;margin-bottom: 0">No watch providers found.</p>
+{% else %}
+    <ul style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalProvidersList">
+        {% for watchProvider in watchProviders %}
+            <li>
+                <img src="https://image.tmdb.org/t/p/w92{{ watchProvider.logo }}" style="width: 2rem;margin-right: .5rem;margin-bottom: .5rem" alt="">{{ watchProvider.name }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
