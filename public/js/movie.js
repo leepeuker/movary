@@ -200,7 +200,6 @@ async function refreshTmdbDataRequest() {
     }
 
     return true
-
 }
 
 //region refreshImdbRating
