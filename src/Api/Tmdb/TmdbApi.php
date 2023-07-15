@@ -2,17 +2,18 @@
 
 namespace Movary\Api\Tmdb;
 
-use Movary\Api\Tmdb\Cache\TmdbIso6931Cache;
+use Movary\Api\Tmdb\Cache\TmdbIsoLanguageCache;
 use Movary\Api\Tmdb\Dto\TmdbCompany;
-use Movary\Api\Tmdb\Dto\TmdbCredits;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbPerson;
+use Movary\Api\Tmdb\Dto\TmdbWatchProviderCollection;
+use Movary\Api\Tmdb\Dto\TmdbWatchProviderList;
 
 class TmdbApi
 {
     public function __construct(
         private readonly TmdbClient $client,
-        private readonly TmdbIso6931Cache $iso6931,
+        private readonly TmdbIsoLanguageCache $iso6931,
     ) {
     }
 
@@ -40,6 +41,21 @@ class TmdbApi
     public function getLanguageByCode(string $languageCode) : string
     {
         return $this->iso6931->getLanguageByCode($languageCode);
+    }
+
+    public function getWatchProviders(int $tmdbId, string $country) : TmdbWatchProviderCollection
+    {
+        $data = $this->client->get("/movie/$tmdbId/watch/providers", ['append_to_response' => 'credits']);
+
+        $data = $data['results'][$country] ?? [];
+
+        return TmdbWatchProviderCollection::create(
+            TmdbWatchProviderList::createFromArray($data['free'] ?? []),
+            TmdbWatchProviderList::createFromArray($data['flatrate'] ?? []),
+            TmdbWatchProviderList::createFromArray($data['rent'] ?? []),
+            TmdbWatchProviderList::createFromArray($data['buy'] ?? []),
+            TmdbWatchProviderList::createFromArray($data['ads'] ?? []),
+        );
     }
 
     public function searchMovie(string $searchTerm) : array

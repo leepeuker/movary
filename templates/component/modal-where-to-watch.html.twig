@@ -1,0 +1,31 @@
+<div class="modal fade" id="whereToWatchModal" tabindex="-1" aria-labelledby="moreModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Where to watch</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <select class="form-select" aria-label="Country select" id="countrySelect">
+                    <option>Select country</option>
+                    {% for ISO31661, name in countries %}
+                        <option value="{{ ISO31661 }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+
+                <div>
+                    <p class="d-none text-center" style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalProvidersInfo">No providers found.</p>
+                    <div class="d-none" style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalProvidersList"></div>
+                </div>
+
+                <div class="text-center d-none" style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalSearchSpinner">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="alertWhereToWatchModalDiv" style="margin-left: 1rem;margin-right: 1rem;text-align: center"></div>
+        </div>
+    </div>
+</div>

@@ -2,7 +2,7 @@
 
 namespace Movary\Command;
 
-use Movary\Api\Tmdb\Cache\TmdbIso6931Cache;
+use Movary\Api\Tmdb\Cache\TmdbIsoLanguageCache;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,7 +13,7 @@ class TmdbCountryCacheDelete extends Command
     protected static $defaultName = 'tmdb:countryCodeCache:delete';
 
     public function __construct(
-        private readonly TmdbIso6931Cache $tmdbIso6931Cache,
+        private readonly TmdbIsoLanguageCache $tmdbIso6931Cache,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();

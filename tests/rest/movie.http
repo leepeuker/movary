@@ -22,3 +22,11 @@ Cache-Control: no-cache
 Content-Type: application/application/json
 
 {"date" : "23.07.22", "dateFormat" : "d.m.y"}
+
+
+####
+
+GET http://127.0.0.1/movies/4/watch-providers?country=DE
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/application/json

@@ -140,6 +140,15 @@
             <div class="container" style="margin-bottom: 0.5rem">
                 <div class="row">
                     <button type="button"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
+                            id="logSpecificMovieButton"
+                            onclick="showWhereToWatchModal({{ movie.tmdbId }})">Where to watch
+                    </button>
+                </div>
+            </div>
+            <div class="container" style="margin-bottom: 0.5rem">
+                <div class="row">
+                    <button type="button"
                             id="moreSpecificMovieButton"
                             class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             data-bs-toggle="modal"
@@ -149,6 +158,7 @@
                 </div>
             </div>
 
+            {{ include('component/modal-where-to-watch.html.twig') }}
             {{ include('component/modal-edit-rating.html.twig') }}
             {{ include('component/modal-edit-watch-date.html.twig') }}
             {{ include('component/modal-more-options.html.twig') }}

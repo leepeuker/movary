@@ -78,8 +78,6 @@ function loadWatchDateModal(watchDateListElement) {
     document.getElementById('editWatchDateModalPlaysInput').value = watchDateListElement.dataset.plays;
     document.getElementById('editWatchDateModalCommentInput').value = watchDateListElement.dataset.comment;
 
-    console.log(document.getElementById('editWatchDateModalCommentInput').value)
-
     document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
     document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
 
@@ -202,8 +200,10 @@ async function refreshTmdbDataRequest() {
     }
 
     return true
+
 }
 
+//region refreshImdbRating
 function refreshImdbRating() {
     removeAlert('alertMovieOptionModalDiv')
 
@@ -230,3 +230,69 @@ async function refreshImdbRatingRequest() {
 
     return true
 }
+//endregion refreshImdbRating
+
+//region whereToWatchModal
+async function showWhereToWatchModal(tmdbId) {
+    const myModal = new bootstrap.Modal(document.getElementById('whereToWatchModal'), {
+        keyboard: false
+    })
+
+    const countrySelect = document.getElementById('countrySelect');
+    let country = countrySelect.value;
+
+    myModal.show()
+
+    if (country.length !== 2) {
+        const countryCookie = getCookie('country');
+
+        if (countryCookie === undefined) {
+            return
+        }
+
+        countrySelect.value = countryCookie
+        country = countrySelect.value
+    }
+
+    loadWatchProviders(country)
+}
+
+function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    if (match) return match[2];
+}
+
+async function loadWatchProviders(country) {
+    document.getElementById('whereToWatchModalSearchSpinner').classList.remove('d-none')
+    document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
+    document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+    document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
+    removeAlert('alertWhereToWatchModalDiv')
+
+    document.getElementById('whereToWatchModalProvidersList').innerHTML = await fetchWatchProviders(country)
+        .catch(function (error) {
+            addAlert('alertWhereToWatchModalDiv', 'Could not fetch watch providers', 'danger')
+            document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
+        });
+
+    document.getElementById('whereToWatchModalProvidersList').classList.remove('d-none')
+    document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
+}
+
+document.getElementById('countrySelect').addEventListener('change', (e) => {
+    const country = document.getElementById('countrySelect').value;
+    document.cookie = 'country=' + country + ';samesite=strict;path=/';
+
+    loadWatchProviders(country)
+})
+
+async function fetchWatchProviders(country) {
+    const response = await fetch('/movies/' + getMovieId() + '/watch-providers?country=' + country)
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return await response.text();
+}
+//endregion whereToWatchModal
