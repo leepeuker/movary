@@ -4,7 +4,6 @@ namespace Movary\HttpController\Movie;
 
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\MovieApi;
-use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -30,12 +29,13 @@ class MovieWatchProviderController
         $watchProviders = $this->tmdbApi->getWatchProviders($movie->getTmdbId(), $country);
 
         $watchProviders = match (true) {
-            $streamType === 'rent' => $watchProviders->getRent(),
-            $streamType === 'ads' => $watchProviders->getAds(),
-            $streamType === 'free' => $watchProviders->getFree(),
-            $streamType === 'flatrate' => $watchProviders->getFlatrate(),
-            $streamType === 'buy' => $watchProviders->getBuy(),
-            default => $watchProviders->getAll()
+            $streamType === 'rent' => $watchProviders->getRentProviders(),
+            $streamType === 'ads' => $watchProviders->getAdsProviders(),
+            $streamType === 'free' => $watchProviders->getFreeProviders(),
+            $streamType === 'abo' => $watchProviders->getFlatrateProviders(),
+            $streamType === 'buy' => $watchProviders->getBuyProviders(),
+            $streamType === 'all' => $watchProviders->getAll(),
+            default => throw new \RuntimeException('Not supported stream type: ' . $streamType)
         };
 
         return Response::create(

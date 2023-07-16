@@ -5,52 +5,59 @@ namespace Movary\Api\Tmdb\Dto;
 class TmdbWatchProviderCollection
 {
     private function __construct(
-        private readonly TmdbWatchProviderList $flatrate,
-        private readonly TmdbWatchProviderList $rent,
-        private readonly TmdbWatchProviderList $buy,
-        private readonly TmdbWatchProviderList $ads,
-        private readonly TmdbWatchProviderList $free,
+        private readonly TmdbWatchProviderList $flatrateProviders,
+        private readonly TmdbWatchProviderList $rentProviders,
+        private readonly TmdbWatchProviderList $buyProviders,
+        private readonly TmdbWatchProviderList $adsProviders,
+        private readonly TmdbWatchProviderList $freeProviders,
     ) {
     }
 
     public static function create(
-        TmdbWatchProviderList $flatrate,
-        TmdbWatchProviderList $rent,
-        TmdbWatchProviderList $buy,
-        TmdbWatchProviderList $ads,
-        TmdbWatchProviderList $free,
+        TmdbWatchProviderList $flatrateProviders,
+        TmdbWatchProviderList $rentProviders,
+        TmdbWatchProviderList $buyProviders,
+        TmdbWatchProviderList $adsProviders,
+        TmdbWatchProviderList $freeProviders,
     ) : self {
-        return new self($flatrate, $rent, $buy, $ads, $free);
+        return new self($flatrateProviders, $rentProviders, $buyProviders, $adsProviders, $freeProviders);
     }
 
-    public function getAds() : TmdbWatchProviderList
+    public function getAdsProviders() : TmdbWatchProviderList
     {
-        return $this->ads;
+        return $this->adsProviders;
     }
 
     public function getAll() : TmdbWatchProviderList
     {
-        // TODO merge all to get unique and sort
-        return TmdbWatchProviderList::createFromArray([]);
+        $uniqueProviders = TmdbWatchProviderList::create();
+
+        $uniqueProviders->addUniqueProviders($this->buyProviders);
+        $uniqueProviders->addUniqueProviders($this->rentProviders);
+        $uniqueProviders->addUniqueProviders($this->freeProviders);
+        $uniqueProviders->addUniqueProviders($this->adsProviders);
+        $uniqueProviders->addUniqueProviders($this->flatrateProviders);
+
+        return $uniqueProviders->sortByDisplayPriority();
     }
 
-    public function getBuy() : TmdbWatchProviderList
+    public function getBuyProviders() : TmdbWatchProviderList
     {
-        return $this->buy;
+        return $this->buyProviders;
     }
 
-    public function getFlatrate() : TmdbWatchProviderList
+    public function getFlatrateProviders() : TmdbWatchProviderList
     {
-        return $this->flatrate;
+        return $this->flatrateProviders;
     }
 
-    public function getFree() : TmdbWatchProviderList
+    public function getFreeProviders() : TmdbWatchProviderList
     {
-        return $this->free;
+        return $this->freeProviders;
     }
 
-    public function getRent() : TmdbWatchProviderList
+    public function getRentProviders() : TmdbWatchProviderList
     {
-        return $this->rent;
+        return $this->rentProviders;
     }
 }

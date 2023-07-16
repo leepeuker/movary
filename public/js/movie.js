@@ -229,12 +229,14 @@ async function refreshImdbRatingRequest() {
 
     return true
 }
+
 //endregion refreshImdbRating
 
 //region whereToWatchModal
 async function showWhereToWatchModal(tmdbId) {
     const countrySelect = document.getElementById('countrySelect');
     let country = countrySelect.value;
+    const streamType = document.getElementById('streamTypeSelect').value;
 
     if (country.length !== 2) {
         const countryCookie = getCookie('country');
@@ -247,7 +249,7 @@ async function showWhereToWatchModal(tmdbId) {
         country = countrySelect.value
     }
 
-    loadWatchProviders(country)
+    loadWatchProviders(country, streamType)
 }
 
 function getCookie(name) {
@@ -262,11 +264,17 @@ async function loadWatchProviders(country, streamType) {
     document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
     removeAlert('alertWhereToWatchModalDiv')
 
-    document.getElementById('whereToWatchModalProvidersList').innerHTML = await fetchWatchProviders(country, streamType)
+    const watchProvidersHtml = await fetchWatchProviders(country, streamType)
         .catch(function (error) {
-            addAlert('alertWhereToWatchModalDiv', 'Could not fetch watch providers', 'danger')
+            addAlert('alertWhereToWatchModalDiv', 'Could not fetch watch providers', 'danger', false, 0)
             document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
         });
+
+    if (watchProvidersHtml === undefined) {
+        return
+    }
+
+    document.getElementById('whereToWatchModalProvidersList').innerHTML = watchProvidersHtml;
 
     document.getElementById('whereToWatchModalProvidersList').classList.remove('d-none')
     document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
@@ -302,7 +310,10 @@ document.getElementById('streamTypeSelect').addEventListener('change', (e) => {
 })
 
 async function fetchWatchProviders(country, streamType) {
-    const response = await fetch('/movies/' + getMovieId() + '/watch-providers?country=' + country + '&streamType=' + streamType)
+    const response = await fetch(
+        '/movies/' + getMovieId() + '/watch-providers?country=' + country + '&streamType=' + streamType,
+        {signal: AbortSignal.timeout(4000)}
+    )
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -310,4 +321,16 @@ async function fetchWatchProviders(country, streamType) {
 
     return await response.text();
 }
+
+function refreshWhereToWatchModal() {
+    const country = document.getElementById('countrySelect').value;
+    const streamType = document.getElementById('streamTypeSelect').value;
+
+    if (country === '') {
+        return;
+    }
+
+    loadWatchProviders(country, streamType)
+}
+
 //endregion whereToWatchModal
