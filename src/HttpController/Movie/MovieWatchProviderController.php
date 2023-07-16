@@ -22,7 +22,7 @@ class MovieWatchProviderController
     {
         $movieId = (int)$request->getRouteParameters()['id'];
         $country = $request->getGetParameters()['country'];
-        $streamType = $request->getGetParameters()['streamType'] ?? '';
+        $streamType = $request->getGetParameters()['streamType'] ?? 'all';
 
         $movie = $this->movieApi->fetchById($movieId);
 
