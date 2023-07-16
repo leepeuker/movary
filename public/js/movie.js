@@ -239,24 +239,18 @@ async function showWhereToWatchModal(tmdbId) {
     const streamType = document.getElementById('streamTypeSelect').value;
 
     if (country.length !== 2) {
-        const countryCookie = getCookie('country');
+        const countryLocalStorage = localStorage.getItem('country');
 
-        if (countryCookie === undefined) {
+        if (countryLocalStorage === undefined) {
             return
         }
 
-        countrySelect.value = countryCookie
+        countrySelect.value = countryLocalStorage
         country = countrySelect.value
     }
 
     loadWatchProviders(country, streamType)
 }
-
-function getCookie(name) {
-    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    if (match) return match[2];
-}
-
 async function loadWatchProviders(country, streamType) {
     document.getElementById('whereToWatchModalSearchSpinner').classList.remove('d-none')
     document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
@@ -293,7 +287,7 @@ document.getElementById('countrySelect').addEventListener('change', (e) => {
         return;
     }
 
-    document.cookie = 'country=' + country + ';samesite=strict;path=/';
+    localStorage.setItem('country', country)
 
     loadWatchProviders(country, streamType)
 })
