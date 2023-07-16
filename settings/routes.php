@@ -365,12 +365,12 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/movies/{id:[0-9]+}/add-watchlist',
-        [\Movary\HttpController\WatchlistController::class, 'addToWatchlist'],
+        [\Movary\HttpController\Movie\MovieWatchlistController::class, 'addToWatchlist'],
     );
     $routeCollector->addRoute(
         'GET',
         '/movies/{id:[0-9]+}/remove-watchlist',
-        [\Movary\HttpController\WatchlistController::class, 'removeFromWatchlist'],
+        [\Movary\HttpController\Movie\MovieWatchlistController::class, 'removeFromWatchlist'],
     );
 
     ##############
