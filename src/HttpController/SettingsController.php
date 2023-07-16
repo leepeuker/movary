@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Plex\PlexApi;
+use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
@@ -45,6 +46,7 @@ class SettingsController
         private readonly JobQueueApi $jobQueueApi,
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
+        private readonly TmdbIsoCountryCache $countryCache,
         private readonly string $currentApplicationVersion,
     ) {
     }
@@ -250,6 +252,8 @@ class SettingsController
                 'privacyLevel' => $user->getPrivacyLevel(),
                 'username' => $user->getName(),
                 'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
+                'countries' => $this->countryCache->fetchAll(),
+                'userCountry' => $user->getCountry(),
             ]),
         );
     }
@@ -619,11 +623,13 @@ class SettingsController
         $privacyLevel = isset($requestData['privacyLevel']) === false ? 1 : (int)$requestData['privacyLevel'];
         $dateFormat = empty($requestData['dateFormat']) === true ? 0 : (int)$requestData['dateFormat'];
         $name = $requestData['username'] ?? '';
+        $country = $requestData['country'] ?? null;
         $enableAutomaticWatchlistRemoval = isset($requestData['enableAutomaticWatchlistRemoval']) === false ? false : (bool)$requestData['enableAutomaticWatchlistRemoval'];
 
         try {
             $this->userApi->updatePrivacyLevel($this->authenticationService->getCurrentUserId(), $privacyLevel);
             $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
+            $this->userApi->updateCountry($this->authenticationService->getCurrentUserId(), $country);
             $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
             $this->userApi->updateWatchlistAutomaticRemovalEnabled($this->authenticationService->getCurrentUserId(), $enableAutomaticWatchlistRemoval);
         } catch (User\Exception\UsernameInvalidFormat) {
