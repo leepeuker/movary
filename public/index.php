@@ -4,11 +4,14 @@ session_start();
 
 /** @var DI\Container $container */
 
+use Movary\HttpController\ErrorController;
+use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Psr\Log\LoggerInterface;
 
 $container = require(__DIR__ . '/../bootstrap.php');
-$httpRequest = $container->get(\Movary\ValueObject\Http\Request::class);
+$httpRequest = $container->get(Request::class);
 
 try {
     $dispatcher = FastRoute\simpleDispatcher(
@@ -26,10 +29,10 @@ try {
     $routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $uri);
     switch ($routeInfo[0]) {
         case FastRoute\Dispatcher::NOT_FOUND:
-            $response = Response::create(StatusCode::createNotFound());
+            $response = Response::createNotFound();
             break;
         case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-            $response = Response::create(StatusCode::createMethodNotAllowed());
+            $response = Response::createMethodNotAllowed();
             break;
         case FastRoute\Dispatcher::FOUND:
             $handler = $routeInfo[1];
@@ -38,18 +41,23 @@ try {
             $response = $container->call($handler, [$httpRequest]);
             break;
         default:
-            throw new \LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
+            throw new LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
     }
 
-    header((string)$response->getStatusCode());
-    foreach ($response->getHeaders() as $header) {
-        header((string)$header);
+    if ($response->getStatusCode()->getCode() === 404) {
+        $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
+} catch (Throwable $t) {
+    $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
-    echo $response->getBody();
-} catch (\Throwable $t) {
-    $container->get(\Psr\Log\LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
-
-    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
+    $response = $container->get(ErrorController::class)->renderInternalServerError();
 }
+
+header((string)$response->getStatusCode());
+foreach ($response->getHeaders() as $header) {
+    header((string)$header);
+}
+
+echo $response->getBody();
+
 exit(0);

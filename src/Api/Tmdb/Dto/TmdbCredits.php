@@ -10,6 +10,14 @@ class TmdbCredits
     ) {
     }
 
+    public static function create() : self
+    {
+        return new self(
+            TmdbCast::create(),
+            TmdbCrew::create(),
+        );
+    }
+
     public static function createFromArray(array $data) : self
     {
         return new self(

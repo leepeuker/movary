@@ -23,16 +23,9 @@ class TmdbApi
         return TmdbCompany::createFromArray($data);
     }
 
-    public function fetchMovieCredits(int $movieId) : TmdbCredits
-    {
-        $data = $this->client->get('/movie/' . $movieId . '/credits');
-
-        return TmdbCredits::createFromArray($data);
-    }
-
     public function fetchMovieDetails(int $movieId) : TmdbMovie
     {
-        $data = $this->client->get('/movie/' . $movieId);
+        $data = $this->client->get('/movie/' . $movieId, ['append_to_response' => 'credits']);
 
         return TmdbMovie::createFromArray($data);
     }

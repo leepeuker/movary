@@ -133,11 +133,11 @@
                     <button type="button"
                             class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="logSpecificMovieButton"
-                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, '{{ movie.title }}', {{ movie.releaseDate|date("Y") }})">Add play
+                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
                     </button>
                 </div>
             </div>
-            <div class="container" style="margin-bottom: 0.5rem">
+            <div class="container" style="margin-bottom: .8rem">
                 <div class="row">
                     <button type="button"
                             id="moreSpecificMovieButton"

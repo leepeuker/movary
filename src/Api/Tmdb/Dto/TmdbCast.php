@@ -10,9 +10,14 @@ use Movary\ValueObject\AbstractList;
  */
 class TmdbCast extends AbstractList
 {
+    public static function create() : self
+    {
+        return new self();
+    }
+
     public static function createFromArray(array $data) : self
     {
-        $cast = new self();
+        $cast = self::create();
 
         foreach ($data as $castMember) {
             $cast->add(TmdbCastMember::createFromArray($castMember));
