@@ -55,6 +55,17 @@
                     <div id="privacyHelp" class="form-text">Who can see your history and ratings</div>
                 </div>
 
+                <div class="mb-3">
+                    <label for="countryInput" class="form-label"><b>Country</b></label>
+                    <select class="form-select" name="country" style="text-align: center;padding-right:0;" id="countryInput" aria-describedby="countryHelp" required>
+                        <option value=""></option>
+                        {% for ISO31661, name in countries %}
+                            <option value="{{ ISO31661 }}" {% if ISO31661 == userCountry %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="privacyHelp" class="form-text">Used as default for "Where to Watch"</div>
+                </div>
+
                 <div style="padding-bottom: 1rem;padding-top: 0.5rem">
                     <input class="form-check-input"
                            type="checkbox"

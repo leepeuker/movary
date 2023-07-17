@@ -78,8 +78,6 @@ function loadWatchDateModal(watchDateListElement) {
     document.getElementById('editWatchDateModalPlaysInput').value = watchDateListElement.dataset.plays;
     document.getElementById('editWatchDateModalCommentInput').value = watchDateListElement.dataset.comment;
 
-    console.log(document.getElementById('editWatchDateModalCommentInput').value)
-
     document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
     document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
 
@@ -204,6 +202,7 @@ async function refreshTmdbDataRequest() {
     return true
 }
 
+//region refreshImdbRating
 function refreshImdbRating() {
     removeAlert('alertMovieOptionModalDiv')
 
@@ -230,3 +229,112 @@ async function refreshImdbRatingRequest() {
 
     return true
 }
+
+//endregion refreshImdbRating
+
+//region whereToWatchModal
+async function showWhereToWatchModal() {
+    const countrySelect = document.getElementById('countrySelect');
+    const countrySelectValue = countrySelect.value;
+    const streamType = document.getElementById('streamTypeSelect').value;
+
+    if (countrySelectValue.length !== 2) {
+        const currentUserDefaultCountry = document.getElementById('currentUserCountry').value
+
+        if (currentUserDefaultCountry.length === 2) {
+            countrySelect.value = currentUserDefaultCountry
+        } else {
+            const localStorageCountry = localStorage.getItem('country');
+
+            if (localStorageCountry === undefined) {
+                return
+            }
+
+            countrySelect.value = localStorageCountry
+        }
+    }
+
+    loadWatchProviders(countrySelect.value, streamType)
+}
+
+async function loadWatchProviders(country, streamType) {
+    document.getElementById('whereToWatchModalSearchSpinner').classList.remove('d-none')
+    document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
+    document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+    document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
+    removeAlert('alertWhereToWatchModalDiv')
+
+    const watchProvidersHtml = await fetchWatchProviders(country, streamType)
+        .catch(function (error) {
+            addAlert('alertWhereToWatchModalDiv', 'Could not fetch watch providers', 'danger', false, 0)
+            document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
+        });
+
+    if (watchProvidersHtml === undefined) {
+        return
+    }
+
+    document.getElementById('whereToWatchModalProvidersList').innerHTML = watchProvidersHtml;
+
+    document.getElementById('whereToWatchModalProvidersList').classList.remove('d-none')
+    document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
+}
+
+document.getElementById('countrySelect').addEventListener('change', (e) => {
+    const country = document.getElementById('countrySelect').value;
+    const streamType = document.getElementById('streamTypeSelect').value;
+
+    if (country === '') {
+        document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+        document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
+        document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+        document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
+
+        return;
+    }
+
+    localStorage.setItem('country', country)
+
+    loadWatchProviders(country, streamType)
+})
+
+document.getElementById('streamTypeSelect').addEventListener('change', (e) => {
+    const country = document.getElementById('countrySelect').value;
+    const streamType = document.getElementById('streamTypeSelect').value;
+
+    if (country === '') {
+        return;
+    }
+
+    loadWatchProviders(country, streamType)
+})
+
+async function fetchWatchProviders(country, streamType) {
+    const response = await fetch(
+        '/movies/' + getMovieId() + '/watch-providers?country=' + country + '&streamType=' + streamType,
+        {signal: AbortSignal.timeout(4000)}
+    )
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return await response.text();
+}
+
+function refreshWhereToWatchModal() {
+    const country = document.getElementById('countrySelect').value;
+    const streamType = document.getElementById('streamTypeSelect').value;
+
+    if (country === '') {
+        return;
+    }
+
+    loadWatchProviders(country, streamType)
+}
+
+document.getElementById('whereToWatchModal').addEventListener('hide.bs.modal', event => {
+    document.getElementById('countrySelect').value = ''
+    document.getElementById('streamTypeSelect').value = 'all'
+});
+//endregion whereToWatchModal

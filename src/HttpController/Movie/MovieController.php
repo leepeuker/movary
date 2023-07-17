@@ -1,19 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Movary\HttpController;
+namespace Movary\HttpController\Movie;
 
+use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\Domain\User\UserApi;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\Service\Tmdb\SyncMovie;
-use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\ValueObject\PersonalRating;
 use Twig\Environment;
 
 class MovieController
@@ -22,47 +20,12 @@ class MovieController
         private readonly Environment $twig,
         private readonly MovieApi $movieApi,
         private readonly MovieWatchlistApi $movieWatchlistApi,
-        private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
+        private readonly TmdbIsoCountryCache $tmdbIsoCountryCache,
     ) {
-    }
-
-    public function addToWatchlist(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
-        $movieId = (int)$request->getRouteParameters()['id'];
-        $userId = $this->authenticationService->getCurrentUser()->getId();
-
-        $this->movieWatchlistApi->addMovieToWatchlist($userId, $movieId);
-
-        return Response::createOk();
-    }
-
-    public function fetchMovieRatingByTmdbdId(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $userId = $this->authenticationService->getCurrentUserId();
-        $tmdbId = $request->getGetParameters()['tmdbId'] ?? null;
-
-        $userRating = null;
-        $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
-
-        if ($movie !== null) {
-            $userRating = $this->movieApi->findUserRating($movie->getId(), $userId);
-        }
-
-        return Response::createJson(
-            Json::encode(['personalRating' => $userRating?->asInt()]),
-        );
     }
 
     public function refreshImdbRating(Request $request) : Response
@@ -106,20 +69,6 @@ class MovieController
         return Response::createOk();
     }
 
-    public function removeFromWatchlist(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
-        $movieId = (int)$request->getRouteParameters()['id'];
-        $userId = $this->authenticationService->getCurrentUser()->getId();
-
-        $this->movieWatchlistApi->removeMovieFromWatchlist($userId, $movieId);
-
-        return Response::createOk();
-    }
-
     public function renderPage(Request $request) : Response
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
@@ -148,33 +97,8 @@ class MovieController
                 'totalPlays' => $this->movieApi->fetchHistoryMovieTotalPlays($movieId, $userId),
                 'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
+                'countries' => $this->tmdbIsoCountryCache->fetchAll(),
             ]),
         );
-    }
-
-    public function updateRating(Request $request) : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
-        $userId = $this->authenticationService->getCurrentUserId();
-
-        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
-            return Response::createForbidden();
-        }
-
-        $movieId = (int)$request->getRouteParameters()['id'];
-
-        $postParameters = $request->getPostParameters();
-
-        $personalRating = null;
-        if (empty($postParameters['rating']) === false && $postParameters['rating'] !== 0) {
-            $personalRating = PersonalRating::create((int)$postParameters['rating']);
-        }
-
-        $this->movieApi->updateUserRating($movieId, $this->authenticationService->getCurrentUserId(), $personalRating);
-
-        return Response::create(StatusCode::createNoContent());
     }
 }

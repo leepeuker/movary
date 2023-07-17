@@ -350,22 +350,27 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/movies/{id:[0-9]+}/refresh-tmdb',
-        [\Movary\HttpController\MovieController::class, 'refreshTmdbData'],
+        [\Movary\HttpController\Movie\MovieController::class, 'refreshTmdbData'],
     );
     $routeCollector->addRoute(
         'GET',
         '/movies/{id:[0-9]+}/refresh-imdb',
-        [\Movary\HttpController\MovieController::class, 'refreshImdbRating'],
+        [\Movary\HttpController\Movie\MovieController::class, 'refreshImdbRating'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/movies/{id:[0-9]+}/watch-providers',
+        [\Movary\HttpController\Movie\MovieWatchProviderController::class, 'getWatchProviders'],
     );
     $routeCollector->addRoute(
         'GET',
         '/movies/{id:[0-9]+}/add-watchlist',
-        [\Movary\HttpController\MovieController::class, 'addToWatchlist'],
+        [\Movary\HttpController\Movie\MovieWatchlistController::class, 'addToWatchlist'],
     );
     $routeCollector->addRoute(
         'GET',
         '/movies/{id:[0-9]+}/remove-watchlist',
-        [\Movary\HttpController\MovieController::class, 'removeFromWatchlist'],
+        [\Movary\HttpController\Movie\MovieWatchlistController::class, 'removeFromWatchlist'],
     );
 
     ##############
@@ -404,7 +409,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}',
-        [\Movary\HttpController\MovieController::class, 'renderPage'],
+        [\Movary\HttpController\Movie\MovieController::class, 'renderPage'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -424,7 +429,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating',
-        [\Movary\HttpController\MovieController::class, 'updateRating'],
+        [\Movary\HttpController\Movie\MovieRatingController::class, 'updateRating'],
     );
     $routeCollector->addRoute(
         'POST',
@@ -439,7 +444,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/fetchMovieRatingByTmdbdId',
-        [\Movary\HttpController\MovieController::class, 'fetchMovieRatingByTmdbdId'],
+        [\Movary\HttpController\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'],
     );
 
     // Added last, so that more specific routes can be defined (possible username vs route collisions here!)
