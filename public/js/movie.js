@@ -233,24 +233,30 @@ async function refreshImdbRatingRequest() {
 //endregion refreshImdbRating
 
 //region whereToWatchModal
-async function showWhereToWatchModal(tmdbId) {
+async function showWhereToWatchModal() {
     const countrySelect = document.getElementById('countrySelect');
-    let country = countrySelect.value;
+    const countrySelectValue = countrySelect.value;
     const streamType = document.getElementById('streamTypeSelect').value;
 
-    if (country.length !== 2) {
-        const countryLocalStorage = localStorage.getItem('country');
+    if (countrySelectValue.length !== 2) {
+        const currentUserDefaultCountry = document.getElementById('currentUserCountry').value
 
-        if (countryLocalStorage === undefined) {
-            return
+        if (currentUserDefaultCountry.length === 2) {
+            countrySelect.value = currentUserDefaultCountry
+        } else {
+            const localStorageCountry = localStorage.getItem('country');
+
+            if (localStorageCountry === undefined) {
+                return
+            }
+
+            countrySelect.value = localStorageCountry
         }
-
-        countrySelect.value = countryLocalStorage
-        country = countrySelect.value
     }
 
-    loadWatchProviders(country, streamType)
+    loadWatchProviders(countrySelect.value, streamType)
 }
+
 async function loadWatchProviders(country, streamType) {
     document.getElementById('whereToWatchModalSearchSpinner').classList.remove('d-none')
     document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
@@ -327,4 +333,8 @@ function refreshWhereToWatchModal() {
     loadWatchProviders(country, streamType)
 }
 
+document.getElementById('whereToWatchModal').addEventListener('hide.bs.modal', event => {
+    document.getElementById('countrySelect').value = ''
+    document.getElementById('streamTypeSelect').value = 'all'
+});
 //endregion whereToWatchModal
