@@ -1,3 +1,5 @@
+const version = 1
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker
