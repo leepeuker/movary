@@ -1,0 +1,59 @@
+<div class="modal fade" id="whereToWatchModal" tabindex="-1" aria-labelledby="moreModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Where to watch</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="currentUserCountry" value="{{ currentUserCountry }}" type="hidden">
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="countrySelect">Country</label>
+                    <select class="form-select" aria-label="Country select" id="countrySelect">
+                        <option value=""></option>
+                        {% for ISO31661, name in countries %}
+                            <option value="{{ ISO31661 }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="streamTypeSelect">Type</label>
+                    <select class="form-select" aria-label="Stream type select" id="streamTypeSelect">
+                        <option value="all" selected>All</option>
+                        <option value="abo">Abo</option>
+                        <option value="rent">Rent</option>
+                        <option value="buy">Buy</option>
+                        <option value="ads">Ads</option>
+                        <option value="free">Free</option>
+                    </select>
+                </div>
+
+                <hr>
+
+                <div>
+                    <p class="d-none text-center" style="margin-top: 1rem;margin-bottom: 0;" id="whereToWatchModalProvidersInfo">No providers found.</p>
+                    <div class="d-none" style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalProvidersList"></div>
+                </div>
+
+                <div class="text-center d-none" style="margin-top: 1rem;margin-bottom: 0" id="whereToWatchModalSearchSpinner">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <div id="alertWhereToWatchModalDiv" style="margin-left: 1rem;margin-right: 1rem;text-align: center"></div>
+            </div>
+
+            <div class="modal-footer" id="logPlayModalFooter">
+                <button class="btn btn-outline-secondary me-auto" onclick="refreshWhereToWatchModal()" style="justify-content: right!important;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path>
+                    </svg>
+                </button>
+                <small>Data provided by <strong><a href="https://www.justwatch.com/" target="_blank" style="color: inherit;text-decoration: none;">JustWatch</a></strong></small>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,8 +2,12 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker
             .register('/serviceWorker.js')
-            .then(res => console.log('service worker registered'))
-            .catch(err => console.log('service worker not registered', err))
+            .then(function (registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(function (error) {
+                console.log('Service Worker registration failed:', error);
+            });
     })
 }
 
@@ -486,14 +490,14 @@ function toggleThemeSwitch() {
     setTheme('light')
 }
 
-function addAlert(parentDivId, message, color, withCloseButton = true) {
+function addAlert(parentDivId, message, color, withCloseButton = true, marginBottom = 1) {
     let closeButton = ''
     if (withCloseButton === true) {
         closeButton = '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'
     }
 
     document.getElementById(parentDivId).innerHTML =
-        '<div class="alert alert-' + color + ' alert-dismissible" role="alert">'
+        '<div class="alert alert-' + color + ' alert-dismissible" role="alert" style="margin-bottom: ' + marginBottom + 'rem">'
         + message +
         closeButton +
         '</div>'

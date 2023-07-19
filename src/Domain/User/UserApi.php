@@ -130,6 +130,11 @@ class UserApi
         return $this->repository->findTraktUserName($userId);
     }
 
+    public function findUserById(int $userId) : ?UserEntity
+    {
+        return $this->repository->findUserById($userId);
+    }
+
     public function findUserByName(string $name) : ?UserEntity
     {
         return $this->repository->findUserByName($name);
@@ -196,6 +201,11 @@ class UserApi
     public function updateCoreAccountChangesDisabled(int $userId, bool $updateCoreAccountChangesDisabled) : void
     {
         $this->repository->updateCoreAccountChangesDisabled($userId, $updateCoreAccountChangesDisabled);
+    }
+
+    public function updateCountry(int $userId, ?string $country) : void
+    {
+        $this->repository->updateCountry($userId, $country);
     }
 
     public function updateDateFormatId(int $userId, int $dateFormat) : void

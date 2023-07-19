@@ -5,6 +5,8 @@ var assets = [
   '/js/style.js'
 ];
 
+const version = 1
+
 self.addEventListener("install", installEvent => {
   installEvent.waitUntil(
     caches.open(staticDevCoffee).then(cache => {

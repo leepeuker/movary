@@ -2,6 +2,7 @@ const dateFormatInput = document.getElementById('dateFormatInput')
 const nameInput = document.getElementById('nameInput')
 const privacyInput = document.getElementById('privacyInput')
 const enableAutomaticWatchlistRemovalInput = document.getElementById('enableAutomaticWatchlistRemovalInput')
+const countryInput = document.getElementById('countryInput')
 
 document.getElementById('generalAccountUpdateButton').addEventListener('click', async () => {
     nameInput.classList.remove('invalid-input');
@@ -13,7 +14,12 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
         return
     }
 
-    const response = await updateGeneral(dateFormatInput.value, nameInput.value, privacyInput.value, enableAutomaticWatchlistRemovalInput.checked)
+    const response = await updateGeneral(dateFormatInput.value,
+        nameInput.value,
+        privacyInput.value,
+        enableAutomaticWatchlistRemovalInput.checked,
+        countryInput.value
+    )
 
     switch (response.status) {
         case 200:
@@ -32,7 +38,7 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
     }
 });
 
-function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval) {
+function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country) {
     return fetch('/settings/account', {
         method: 'POST',
         headers: {
@@ -43,6 +49,7 @@ function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchl
             'username': username,
             'privacyLevel': privacyLevel,
             'enableAutomaticWatchlistRemoval': enableAutomaticWatchlistRemoval,
+            'country': country,
         })
     })
 }

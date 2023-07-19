@@ -264,6 +264,7 @@ class Factory
             $container->get(JobQueueApi::class),
             $container->get(DashboardFactory::class),
             $container->get(EmailService::class),
+            $container->get(Tmdb\Cache\TmdbIsoCountryCache::class),
             self::getApplicationVersion($config),
         );
     }
@@ -302,14 +303,17 @@ class Factory
             $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
 
             /** @var User\UserEntity $user */
-            $user = $container->get(User\UserApi::class)->fetchUser($currentUserId);
+            $user = $container->get(User\UserApi::class)->findUserById($currentUserId);
 
-            $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
-            $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
+            if ($user !== null) {
+                $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
+                $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
+            }
         }
 
         $twig->addGlobal('currentUserName', $user?->getName());
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
+        $twig->addGlobal('currentUserCountry', $user?->getCountry());
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);

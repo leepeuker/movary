@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb\TmdbClient;
 use RuntimeException;
 
-class TmdbIso6931Cache
+class TmdbIsoLanguageCache
 {
     private array $languages = [];
 

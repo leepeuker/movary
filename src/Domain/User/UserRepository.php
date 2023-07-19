@@ -360,6 +360,19 @@ class UserRepository
         );
     }
 
+    public function updateCountry(int $userId, ?string $country) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'country' => $country,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateDateFormatId(int $userId, int $dateFormat) : void
     {
         $this->dbConnection->update(

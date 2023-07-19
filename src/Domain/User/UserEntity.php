@@ -30,6 +30,7 @@ class UserEntity
         private readonly bool $plexScrobbleWatches,
         private readonly bool $plexScrobbleRatings,
         private readonly bool $watchlistAutomaticRemovalEnabled,
+        private readonly ?string $country,
     ) {
     }
 
@@ -58,7 +59,13 @@ class UserEntity
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
             (bool)$data['watchlist_automatic_removal_enabled'],
+            $data['country'],
         );
+    }
+
+    public function getCountry() : ?string
+    {
+        return $this->country;
     }
 
     public function getDashboardExtendedRows() : ?string
