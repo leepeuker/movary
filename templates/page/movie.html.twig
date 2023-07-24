@@ -16,12 +16,17 @@
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
+        <div style="color:white; padding: 1rem;background-image: url('{{ movie.backdropPath }}')" class="hero bg-opacity-75">
+
         {{ include('component/user-select.html.twig') }}
+
+        <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
+        <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
 
         <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
 
-        <input type="hidden" id="movieId" value="{{ movie.id }}">
-        <input type="hidden" id="username" value="{{ routeUsername }}">
+            <input type="hidden" id="movieId" value="{{ movie.id }}">
+            <input type="hidden" id="username" value="{{ routeUsername }}">
 
         <div class="fw-light" id="ratingStars"
              style="color: rgb(255, 193, 7);font-size: 1.5rem;margin-bottom: 0.5rem;cursor: default">
@@ -39,33 +44,33 @@
                        id="editRatingButton"></i>
                 {% endif %}
             </span>
-        </div>
-
-        <div style="display: flex;">
-            <div style="text-align: center">
-                <img src="{{ movie.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
             </div>
 
-            <div style="padding-left: 1rem">
-                <h6 style="margin-bottom: 0.2rem">Genres</h6>
-                <div style="margin-bottom: 0.4rem">
+            <div style="display: flex;">
+                <div style="text-align: center">
+                    <img src="{{ movie.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
+                </div>
+
+                <div style="padding-left: 1rem">
+                    <h6 style="margin-bottom: 0.2rem">Genres</h6>
+                    <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% if movieGenres|length == 0 %} - {% endif %}
                         {% for movieGenre in movieGenres %}{{ movieGenre.name }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </span>
-                </div>
+                    </div>
 
-                <h6 style="margin-bottom: 0.2rem">Runtime</h6>
-                <div style="margin-bottom: 0.4rem">
+                    <h6 style="margin-bottom: 0.2rem">Runtime</h6>
+                    <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% if movie.runtime == '' %} - {% endif %}
                         {{ movie.runtime }}
                     </span>
-                </div>
+                    </div>
 
-                <h6 style="margin-bottom: 0.2rem">Language</h6>
-                <div style="margin-bottom: 0.4rem">
+                    <h6 style="margin-bottom: 0.2rem">Language</h6>
+                    <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
                         {% if movie.originalLanguage == '' %} - {% endif %}
                         {{ movie.originalLanguage }}
@@ -79,9 +84,12 @@
                 <div style="display: flex; align-items: center;cursor:pointer;" onclick="window.open('{{ movie.imdbUrl }}', '_blank')">
                     <img src="/images/imdb-logo.svg" style="width: 3rem">
                     <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
-                        {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
-                        <span class="fw-bold">{% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span
-                                class="fw-lighter">/{{ movie.imdbRatingVoteCount|default('-') }}</span>
+                        <span class="fw-bold">
+                            {% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
+                        </span>
+                        <span class="fw-lighter">
+                            /{{ movie.imdbRatingVoteCount|default('-') }}
+                        </span>
                     </p>
                 </div>
             {% endif %}
@@ -89,14 +97,17 @@
                  onclick="window.open('{{ movie.tmdbUrl }}', '_blank')">
                 <img src="/images/tmdb-logo.svg" style="width: 2rem">
                 <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
-                    {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
-                    <span class="fw-bold">{% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span
-                            class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
+                    <span class="fw-bold">
+                        {% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}
+                    </span>
+                    <span class="fw-lighter">
+                        /{{ movie.tmdbRatingVoteCount|default('-') }}
+                    </span>
                 </p>
             </div>
         </div>
 
-        {# --- Buttons --- #}
+            {# --- Buttons --- #}
 
         <div class="container text-center" id="toggleWatchDatesButtonDiv" style="margin-bottom: 0.5rem">
             <div class="row">
@@ -155,63 +166,64 @@
             {{ include('component/modal-more-options.html.twig') }}
         {% endif %}
 
-        {# --- Tagline --- #}
+            {# --- Tagline --- #}
 
-        {% if movie.tagline is not null %}
-            <h6 style="margin-bottom: 0.3rem;">Tagline</h6>
+            {% if movie.tagline is not null %}
+                <h6 style="margin-bottom: 0.3rem;">Tagline</h6>
+                <div class="carousel">
+                    <p class="fw-lighter" style="margin-bottom: 0">
+                        {{ movie.tagline }}
+                    </p>
+                </div>
+            {% endif %}
+
+            {# --- Plot --- #}
+
+            <h6 style="margin-bottom: 0.4rem;">Plot</h6>
             <div class="carousel">
-                <p class="fw-lighter" style="margin-bottom: 0">
-                    {{ movie.tagline }}
+                <p style="margin-bottom: 0rem">
+                    {% if movie.overview == '' %} - {% endif %}
+                    {{ movie.overview }}
                 </p>
             </div>
-        {% endif %}
 
-        {# --- Plot --- #}
+            {# --- Acting --- #}
 
-        <h6 style="margin-bottom: 0.4rem;">Plot</h6>
-        <div class="carousel">
-            <p style="margin-bottom: 0rem">
-                {% if movie.overview == '' %} - {% endif %}
-                {{ movie.overview }}
-            </p>
-        </div>
+            <h6 style="margin-bottom: 0.4rem">Acting</h6>
+            <div class="carousel">
+                {% if castMembers|length == 0 %} - {% endif %}
+                {% for castMember in castMembers|slice(0, 40) %}
+                    <div class="card" onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
+                         style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
+                        <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
+                            <small class="text-muted" style="font-size: 0.9rem;">
+                                {{ castMember.name }}
+                            </small>
+                        </div>
 
-        {# --- Acting --- #}
-
-        <h6 style="margin-bottom: 0.4rem">Acting</h6>
-        <div class="carousel">
-            {% if castMembers|length == 0 %} - {% endif %}
-            {% for castMember in castMembers|slice(0, 40) %}
-                <div class="card" onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
-                     style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
-                    <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
-                        <small class="text-muted" style="font-size: 0.9rem;">
-                            {{ castMember.name }}
-                        </small>
+                        <img src="{{ castMember.posterPath }}" class="card-img-bottom" alt="{{ castMember.name }} Poster">
                     </div>
+                {% endfor %}
+            </div>
 
-                    <img src="{{ castMember.posterPath }}" class="card-img-bottom" alt="{{ castMember.name }} Poster">
-                </div>
-            {% endfor %}
-        </div>
+            {# --- Director --- #}
 
-        {# --- Director --- #}
+            <h6 style="margin-bottom: 0.4rem;margin-top: 0.8rem">Director</h6>
+            <div class="carousel">
+                {% if directors|length == 0 %} - {% endif %}
+                {% for director in directors|slice(0, 25) %}
+                    <div class="card" onclick="window.location='/users/{{ routeUsername }}/persons/{{ director.id }}'"
+                         style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
+                        <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
+                            <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
+                        </div>
 
-        <h6 style="margin-bottom: 0.4rem;margin-top: 0.8rem">Director</h6>
-        <div class="carousel">
-            {% if directors|length == 0 %} - {% endif %}
-            {% for director in directors|slice(0, 25) %}
-                <div class="card" onclick="window.location='/users/{{ routeUsername }}/persons/{{ director.id }}'"
-                     style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
-                    <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
-                        <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
+                        <img src="{{ director.posterPath }}"
+                             class="card-img-bottom"
+                             alt="{{ director.name }} Poster">
                     </div>
-
-                    <img src="{{ director.posterPath }}"
-                         class="card-img-bottom"
-                         alt="{{ director.name }} Poster">
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
     </main>
 {% endblock %}

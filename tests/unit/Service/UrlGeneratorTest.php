@@ -93,7 +93,7 @@ class UrlGeneratorTest extends TestCase
 
         self::assertEquals(
             $expectedResult,
-            $this->subject->generateImageSrcUrlFromParameters($tmdbPosterPath, $posterPath),
+            $this->subject->generateImagePosterSrcUrlFromParameters($tmdbPosterPath, $posterPath),
         );
     }
 
