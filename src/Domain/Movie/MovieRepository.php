@@ -643,7 +643,6 @@ class MovieRepository
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
             'releaseDate' => 'release_date',
-            'watchDate' => 'watched_at',
             'runtime' => 'runtime',
             default => 'title'
         };
