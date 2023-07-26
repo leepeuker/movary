@@ -19,7 +19,7 @@
             <form action="/users/{{ routeUsername }}/movies" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
-                    <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3">
+                    <button class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3">
                         <i class="bi bi-chevron-down"></i>
                     </button>
                     <button class="btn btn-primary" type="submit">
@@ -32,6 +32,7 @@
                         <select class="form-control" name="sb" id="sort-by" style="width: 50%">
                             <option value="title" {{ sortBy == 'title' ? 'selected' }}>Title</option>
                             <option value="releaseDate" {{ sortBy == 'releaseDate' ? 'selected' }}>Release date</option>
+                            <option value="watchDate" {{ sortBy == 'watchDate' ? 'selected' }}>Watch date</option>
                             <option value="rating" {{ sortBy == 'rating' ? 'selected' }}>Rating</option>
                             <option value="runtime" {{ sortBy == 'runtime' ? 'selected' }}>Runtime</option>
                         </select>
