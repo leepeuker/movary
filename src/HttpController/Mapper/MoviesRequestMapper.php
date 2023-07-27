@@ -29,11 +29,11 @@ class MoviesRequestMapper
 
         $getParameters = $request->getGetParameters();
 
-	$_sortBy = isset($_COOKIE['movie-sort-by']) ? $_COOKIE['movie-sort-by'] : self::DEFAULT_SORT_BY;
+        $_sortBy = isset($_COOKIE['movie-sort-by']) ? $_COOKIE['movie-sort-by'] : self::DEFAULT_SORT_BY;
 
         $searchTerm = $getParameters['s'] ?? null;
         $page = $getParameters['p'] ?? 1;
-	$limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
+        $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sb'] ?? $_sortBy;
         $sortOrder = $this->mapSortOrder($getParameters);
         $releaseYear = $getParameters['ry'] ?? self::DEFAULT_RELEASE_YEAR;
@@ -57,9 +57,9 @@ class MoviesRequestMapper
     private function mapSortOrder(array $getParameters) : SortOrder
     {
         if (isset($getParameters['so']) === false) {
-	    if (!isset($_COOKIE['movie-sort-order'])) return SortOrder::createAsc();
-	    elseif ($_COOKIE['movie-sort-order'] == 'desc') return SortOrder::createDesc();
-	    else return SortOrder::createAsc();
+            if (!isset($_COOKIE['movie-sort-order'])) return SortOrder::createAsc();
+            elseif ($_COOKIE['movie-sort-order'] == 'desc') return SortOrder::createDesc();
+            else return SortOrder::createAsc();
         }
 
         return match ($getParameters['so']) {

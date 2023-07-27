@@ -44,8 +44,8 @@ class ActorsController
         $actorsCount = $this->movieHistoryApi->fetchMostWatchedActorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($actorsCount, $requestData->getLimit(), $requestData->getPage());
 
-	setcookie("person-sort-by", $requestData->getSortBy(), time() + 60 * 60 * 24 * 365, "/");
-	setcookie("person-sort-order", (string)$requestData->getSortOrder(), time() + 60 * 60 * 24 * 365, "/");
+        setcookie("person-sort-by", $requestData->getSortBy(), time() + 60 * 60 * 24 * 365, "/");
+        setcookie("person-sort-order", (string)$requestData->getSortOrder(), time() + 60 * 60 * 24 * 365, "/");
 
         return Response::create(
             StatusCode::createOk(),

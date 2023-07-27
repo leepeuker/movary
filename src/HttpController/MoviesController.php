@@ -57,8 +57,8 @@ class MoviesController
         );
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $requestData->getLimit(), $requestData->getPage());
 
-	setcookie('movie-sort-by', $requestData->getSortBy(), time() + 60 * 60 * 24 * 365, "/");
-	setcookie('movie-sort-order', (string)$requestData->getSortOrder(), time() + 60 * 60 * 24 * 365, "/");
+        setcookie('movie-sort-by', $requestData->getSortBy(), time() + 60 * 60 * 24 * 365, "/");
+        setcookie('movie-sort-order', (string)$requestData->getSortOrder(), time() + 60 * 60 * 24 * 365, "/");
 
         return Response::create(
             StatusCode::createOk(),
