@@ -672,16 +672,18 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
-            FROM movie m
-            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
-            LEFT JOIN movie_genre mg on m.id = mg.movie_id
-            LEFT JOIN genre g on mg.genre_id = g.id
-            $whereQuery
-            GROUP BY m.id, title, release_date, watched_at, rating
-            ORDER BY $sortBySanitized $sortOrder, title asc
-            LIMIT $offset, $limit
+            SELECT * FROM (
+                SELECT m.*, mur.rating as userRating, ROW_NUMBER() OVER(PARTITION BY m.id) rn
+                FROM movie m
+                JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+                LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?
+                LEFT JOIN movie_genre mg on m.id = mg.movie_id
+                LEFT JOIN genre g on mg.genre_id = g.id
+                GROUP BY m.id, title, release_date, watched_at, rating
+                ORDER BY $sortBySanitized $sortOrder, title asc
+                LIMIT $offset, $limit
+            ) a
+            WHERE rn = 1
             SQL,
             $payload,
         );
