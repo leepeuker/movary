@@ -48,9 +48,14 @@ class PersonsRequestMapper
     private function mapSortOrder(array $getParameters) : SortOrder
     {
         if (isset($getParameters['so']) === false) {
-            if (!isset($_COOKIE['person-sort-order'])) return SortOrder::createAsc();
-            elseif ($_COOKIE['person-sort-order'] == 'desc') return SortOrder::createDesc();
-            else return SortOrder::createAsc();
+	    if (!isset($_COOKIE['person-sort-order'])){
+                return SortOrder::createAsc();
+	    }
+	    elseif ($_COOKIE['person-sort-order'] == 'desc') {
+                return SortOrder::createDesc();
+	    }
+
+            return SortOrder::createAsc();
         }
 
         return match ($getParameters['so']) {
