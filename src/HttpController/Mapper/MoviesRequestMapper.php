@@ -58,7 +58,7 @@ class MoviesRequestMapper
     {
         if (isset($getParameters['so']) === false) {
 	    if (!isset($_COOKIE['movie-sort-order'])) return SortOrder::createAsc();
-	    else if ($_COOKIE['movie-sort-order'] == 'desc') return SortOrder::createDesc();
+	    elseif ($_COOKIE['movie-sort-order'] == 'desc') return SortOrder::createDesc();
 	    else return SortOrder::createAsc();
         }
 

@@ -49,7 +49,7 @@ class PersonsRequestMapper
     {
         if (isset($getParameters['so']) === false) {
 	    if (!isset($_COOKIE['person-sort-order'])) return SortOrder::createAsc();
-	    else if ($_COOKIE['person-sort-order'] == 'desc') return SortOrder::createDesc();
+	    elseif ($_COOKIE['person-sort-order'] == 'desc') return SortOrder::createDesc();
 	    else return SortOrder::createAsc();
         }
 
