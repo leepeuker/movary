@@ -643,6 +643,7 @@ class MovieRepository
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
             'releaseDate' => 'release_date',
+            'watchDate' => 'watched_at',
             'runtime' => 'runtime',
             default => 'title'
         };
@@ -678,7 +679,7 @@ class MovieRepository
             LEFT JOIN movie_genre mg on m.id = mg.movie_id
             LEFT JOIN genre g on mg.genre_id = g.id
             $whereQuery
-            GROUP BY m.id, title, release_date, rating
+            GROUP BY m.id, title, release_date, watched_at, rating
             ORDER BY $sortBySanitized $sortOrder, title asc
             LIMIT $offset, $limit
             SQL,
