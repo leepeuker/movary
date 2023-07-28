@@ -15,15 +15,16 @@
 
         <div style="text-align: center">
             {{ include('component/user-select.html.twig') }}
+            {{ include('component/modal-search-options-movie.html.twig') }}
 
             <form action="/users/{{ routeUsername }}/movies" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
-                    <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3">
-                        <i class="bi bi-chevron-down"></i>
-                    </button>
                     <button class="btn btn-primary" type="submit">
                         <i class="bi bi-search"></i>
+                    </button>
+                    <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#searchOptionsMovieModal" style="border-left-color: #aab0b3">
+                        <i class="bi bi-filter"></i>
                     </button>
                 </div>
                 <div style="display: none;border: #aab0b3 1px;margin-top:1em;margin-bottom:1em" id="searchOptions">
