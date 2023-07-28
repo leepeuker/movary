@@ -94,7 +94,6 @@ class JellyfinController
 
     public function removeJellyfinAuthentication() : Response
     {
-        // return Response::createOk();
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
@@ -139,8 +138,11 @@ class JellyfinController
         }
 
         try {
-            $this->jellyfinApi->fetchJellyfinServerInfo();
-            return Response::createOk();
+            $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo();
+            if($jellyfinServerInfo['ProductName'] === 'Jellyfin Server') {
+                return Response::createOk();
+            }
+            return Response::createBadRequest();
         } catch (Exception) {
             return Response::createBadRequest();
         }
