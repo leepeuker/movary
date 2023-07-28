@@ -21,7 +21,7 @@ class JellyfinClient
     private ?JellyfinAccessToken $jellyfinAccessToken;
     private array $authorizationString;
     private const APP_NAME = 'Movary';
-    private const DEFAULTPOSTANDGETHEADERS = [
+    private const DEFAULTHEADERS = [
         'Accept' => 'application/json',
     ];
     
@@ -56,7 +56,7 @@ class JellyfinClient
             return null;
         }
 
-        $headers = array_merge(self::DEFAULTPOSTANDGETHEADERS, $this->authorizationString);
+        $headers = array_merge(self::DEFAULTHEADERS, $this->authorizationString);
 
         $options = [
             'query' => $query,
@@ -86,7 +86,7 @@ class JellyfinClient
             return null;
         }
 
-        $headers = array_merge(self::DEFAULTPOSTANDGETHEADERS, $this->authorizationString);
+        $headers = array_merge(self::DEFAULTHEADERS, $this->authorizationString);
 
         $options = [
             'json' => $data,
@@ -104,5 +104,31 @@ class JellyfinClient
 
         /** @psalm-suppress PossiblyUndefinedVariable */
         return Json::decode((string)$response->getBody());
+    }
+
+    public function delete(string $relativeUrl, ?array $query = [], ?array $data = []) : ?string
+    {
+        if($this->jellyfinServerUrl === null) {
+            JellyfinInvalidServerUrl::create();
+            return null;
+        }
+
+        $headers = array_merge(self::DEFAULTHEADERS, $this->authorizationString);
+
+        $options = [
+            'headers' => $headers,
+            'query' => $query
+        ];
+
+        $url = $this->jellyfinServerUrl . $relativeUrl;
+
+        try {
+            $response = $this->httpClient->request('DELETE', (string)$url, $options);
+        } catch (ClientException $e) {
+            throw $this->convertException($e, Url::createFromString($url));
+        }
+
+        /** @psalm-suppress PossiblyUndefinedVariable */
+        return (string)$response->getBody();
     }
 }
