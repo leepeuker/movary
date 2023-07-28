@@ -46,6 +46,9 @@ class JellyfinController
         }
 
         $jellyfinAuthenticationData = $this->jellyfinApi->fetchJellyfinAuthenticationData($username, $password);
+        if($jellyfinAuthenticationData === null) {
+            return Response::createUnauthorized();
+        }
         $this->userApi->updateJellyfinAccessToken($this->authenticationService->getCurrentUserId(), $jellyfinAuthenticationData->getAccessTokenAsString());
         $this->userApi->updateJellyfinUserId($this->authenticationService->getCurrentUserId(), $jellyfinAuthenticationData->getUserIdAsString());
 
@@ -139,7 +142,9 @@ class JellyfinController
 
         try {
             $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo();
-            if($jellyfinServerInfo['ProductName'] === 'Jellyfin Server') {
+            if($jellyfinServerInfo === null) {
+                return Response::createBadRequest();
+            } else if($jellyfinServerInfo['ProductName'] === 'Jellyfin Server') {
                 return Response::createOk();
             }
             return Response::createBadRequest();

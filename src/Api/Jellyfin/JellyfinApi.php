@@ -34,6 +34,9 @@ class JellyfinApi
             'Pw' => $password
         ];
         $response = $this->jellyfinClient->post('/Users/authenticatebyname', [], $data);
+        if($response === null) {
+            return $response;
+        }
         return JellyfinAuthenticationData::create(
             JellyfinAccessToken::create((string)$response['AccessToken']),
             JellyfinUserid::create((string)$response['User']['Id'])
