@@ -92,7 +92,7 @@
             <input type="text" class="form-control mb-3" placeholder="Jellyfin server url" id="jellyfinServerUrlInput" value="{{ jellyfinServerUrl }}"/>
             <div class="btn-group mb-3">
                 <button type="button" class="btn btn-primary" onclick="saveServerUrl()">Save Jellyfin server URL</button>
-                <button type="button" class="btn btn-warning {% if jellyfinServerUrl == null %} disabled {% endif %}" onclick="verifyServerUrl()" {% if jellyfinServerUrl == null %} disabled {% endif %}>Verify Jellyfin server URL</button>
+                <button type="button" class="btn btn-warning {% if jellyfinServerUrl == null %} disabled {% endif %}" id="verifyServerUrlBtn" onclick="verifyServerUrl()" {% if jellyfinServerUrl == null %} disabled {% endif %}>Verify Jellyfin server URL</button>
             </div>
 
             {% if jellyfinAccessToken == false %}

@@ -1,3 +1,13 @@
+function disableElement(el) {
+    el.classList.add('disabled');
+    el.disabled = true; 
+}
+
+function enableElement(el) {
+    el.classList.remove('disabled');
+    el.disabled = false;    
+}
+
 function regenerateJellyfinWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return
@@ -103,7 +113,16 @@ async function saveServerUrl() {
             return;
         }
         addAlert('alertJellyfinImportDiv', 'Succesfully saved the server URL!', 'success');
-        window.location.reload();
+        
+        if(document.getElementById('jellyfinServerUrlInput').value.length > 0) {
+            enableElement(document.getElementById('verifyServerUrlBtn'));
+            enableElement(document.getElementById('JellyfinUsernameInput'))
+            enableElement(document.getElementById('JellyfinPasswordInput'))
+        } else {
+            disableElement(document.getElementById('verifyServerUrlBtn'));
+            disableElement(document.getElementById('JellyfinUsernameInput'))
+            disableElement(document.getElementById('JellyfinPasswordInput'))
+        }
     }).catch(function (error) {
         console.log(error)
         addAlert('alertJellyfinImportDiv', 'Could not save server URL', 'danger');
