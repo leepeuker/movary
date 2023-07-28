@@ -97,7 +97,7 @@ class JellyfinClient
         $url = $this->jellyfinServerUrl . $relativeUrl;
 
         try {
-            $response = $this->httpClient->request('POST', (string)$url, $options);
+            $response = $this->httpClient->request('POST', $url, $options);
         } catch (ClientException $e) {
             throw $this->convertException($e, Url::createFromString($url));
         }
@@ -123,7 +123,7 @@ class JellyfinClient
         $url = $this->jellyfinServerUrl . $relativeUrl;
 
         try {
-            $response = $this->httpClient->request('DELETE', (string)$url, $options);
+            $response = $this->httpClient->request('DELETE', $url, $options);
         } catch (ClientException $e) {
             throw $this->convertException($e, Url::createFromString($url));
         }
