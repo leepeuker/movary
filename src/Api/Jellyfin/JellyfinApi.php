@@ -2,8 +2,6 @@
 
 namespace Movary\Api\Jellyfin;
 
-use Movary\ValueObject\Url;
-
 class JellyfinApi
 {
     public function __construct(
@@ -12,6 +10,7 @@ class JellyfinApi
 
     public function fetchJellyfinServerInfo()
     {
-        return $this->jellyfinClient->get('/system/info/public');
+        $response = $this->jellyfinClient->get('/system/info/public');
+        return $response;
     }
 }
