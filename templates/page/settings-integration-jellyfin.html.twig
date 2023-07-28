@@ -117,7 +117,7 @@
                                 <label class="input-group-text" for="JellyfinPasswordInput">Jellyfin password</label>
                                 <input type="password" class="form-control disabled" id="JellyfinPasswordInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
                             </div>
-                            <button type="button" class="btn btn-success mb-3" onclick="authenticateJellyfinAccount()" id="jellyfinAuthenticationBtn">Authenticate with Jellyfin</button>
+                            <button type="button" class="btn btn-success mb-3" onclick="authenticateJellyfinAccount()" id="jellyfinAuthenticationBtn" {% if jellyfinServerUrl == null %} disabled {% endif %}>Authenticate with Jellyfin</button>
                             {% else %}
                             You're already authenticated :D <br/>
                             <button class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()" id="jellyfinRemoveAuthenticationBtn">Remove Jellyfin authentication</button>
