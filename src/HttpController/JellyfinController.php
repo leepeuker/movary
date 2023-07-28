@@ -94,6 +94,7 @@ class JellyfinController
 
     public function removeJellyfinAuthentication() : Response
     {
+        // return Response::createOk();
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
