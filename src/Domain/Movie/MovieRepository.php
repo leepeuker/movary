@@ -682,9 +682,9 @@ class MovieRepository
                 $whereQuery
                 GROUP BY m.id, title, release_date, watched_at, rating
                 ORDER BY $sortBySanitized $sortOrder, title asc
-                LIMIT $offset, $limit
             ) a
             WHERE rn = 1
+            LIMIT $offset, $limit
             SQL,
             $payload,
         );
