@@ -63,9 +63,7 @@
                 <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateJellyfinWebhook()">Regenerate url</button>
             </div>
 
-            <hr>
-
-            <h5>Scrobble Options</h5>
+            <h5 style="margin-top: 1rem">Options</h5>
 
             <div style="padding-bottom: 1rem;padding-top: 0.5rem">
                 <input class="form-check-input"
@@ -82,6 +80,21 @@
             <div id="alertWebhookOptionsDiv"></div>
 
             <button type="submit" class="btn btn-primary" {% if jellyfinWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
+
+            <hr>
+
+            <h5>Jellyfin Authentication</h5>
+
+            <p class="text-muted" style="padding-bottom: 0">
+                For personal data access you have to authenticate against Jellyfin.
+            </p>
+
+            <div id="authenticateWithPlexDiv" class="{% if jellyfinTokenExists == true %}d-none{% endif %}">
+                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithJellyfin()">Authenticate</button>
+            </div>
+            <div id="removeAuthenticationWithPlexDiv" class="{% if jellyfinTokenExists == false %}d-none{% endif %}">
+                <button type="button" class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">Remove Authentication</button>
+            </div>
         </div>
     </main>
 {% endblock %}
