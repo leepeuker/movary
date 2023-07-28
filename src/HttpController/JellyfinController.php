@@ -28,6 +28,22 @@ class JellyfinController
     ) {
     }
 
+    public function authenticateJellyfinAccount(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $username = Json::decode($request->getBody())['username'];
+        $password = Json::decode($request->getBody())['password'];
+
+        $jellyfinAuthenticationData = $this->jellyfinApi->fetchJellyfinAuthenticationData($username, $password);
+        $this->userApi->updateJellyfinAccessToken($this->authenticationService->getCurrentUserId(), $jellyfinAuthenticationData->getAccessTokenAsString());
+        $this->userApi->updateJellyfinUserId($this->authenticationService->getCurrentUserId(), $jellyfinAuthenticationData->getUserIdAsString());
+
+        return Response::createOk();
+    }
+
     public function deleteJellyfinWebhookUrl() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -66,6 +82,17 @@ class JellyfinController
         $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId)]));
+    }
+
+    public function removeJellyfinAuthentication() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $this->userApi->updateJellyfinAccessToken($this->authenticationService->getCurrentUserId(), null);
+        
+        return Response::createOk();        
     }
 
     public function saveJellyfinServerUrl(Request $request) : Response

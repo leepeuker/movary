@@ -95,16 +95,19 @@
                 <button type="button" class="btn btn-warning {% if jellyfinServerUrl == null %} disabled {% endif %}" id="verifyServerUrlBtn" onclick="verifyServerUrl()" {% if jellyfinServerUrl == null %} disabled {% endif %}>Verify Jellyfin server URL</button>
             </div>
 
-            {% if jellyfinAccessToken == false %}
+            <hr>
+
+            {% if jellyfinIsAuthenticated == false %}
             <div class="input-group mb-3">
                 <label class="input-group-text" for="JellyfinUsernameInput">Jellyfin username</label>
                 <input type="text" class="form-control disabled" id="JellyfinUsernameInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
                 <label class="input-group-text" for="JellyfinPasswordInput">Jellyfin password</label>
-                <input type="password" class="form-control disalbed" id="JellyfinPasswordInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
+                <input type="password" class="form-control disabled" id="JellyfinPasswordInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
             </div>
+            <button type="button" class="btn btn-success mb-3" onclick="authenticateJellyfinAccount()">Authenticate with Jellyfin</button>
             {% else %}
-            You're already authenticated :D
-            <button class="btn btn-danger">Remove Jellyfin authentication</button>
+            You're already authenticated :D <br/>
+            <button class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">Remove Jellyfin authentication</button>
             {% endif %}
         </div>
     </main>

@@ -460,6 +460,19 @@ class UserRepository
         );
     }
 
+    public function updateJellyfinAccessToken(int $userId, ?string $accessToken) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_access_token' => $accessToken,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->dbConnection->update(
@@ -479,6 +492,19 @@ class UserRepository
             'user',
             [
                 'jellyfin_server_url' => (string)$serverUrl,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateJellyfinUserId(int $userId, ?string $jellyfinUserId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_user_id' => $jellyfinUserId,
             ],
             [
                 'id' => $userId,

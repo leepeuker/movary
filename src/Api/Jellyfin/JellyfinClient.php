@@ -3,6 +3,7 @@
 namespace Movary\Api\Jellyfin;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\ClientException;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
 use Movary\Api\Jellyfin\Exception\JellyfinInvalidServerUrl;
@@ -23,9 +24,6 @@ class JellyfinClient
     private const DEFAULTPOSTANDGETHEADERS = [
         'Accept' => 'application/json',
     ];
-    private const DEFAULTPOSTHEADERS = [
-        'Content-Type' => 'application/json'
-    ];
     
     public function __construct(
         private readonly HttpClient $httpClient,
@@ -35,10 +33,20 @@ class JellyfinClient
     ) { 
         $this->jellyfinAccessToken = $this->userApi->findJellyfinAccessToken($this->authenticationService->getCurrentUserId());
         $this->jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($this->authenticationService->getCurrentUserId());
-        $this->authorizationString = ['X-Emby-Authorization' => 'MediaBrowser Client = "' . self::APP_NAME .'", Device = "' . php_uname('s') . '", Version = "' . $this->serverSettings->getApplicationVersion() . '"'];
+        $this->authorizationString = ['X-Emby-Authorization' => 'MediaBrowser Client ="' . self::APP_NAME .'", Device ="'. php_uname('s') .'", Version="' . $this->serverSettings->getApplicationVersion() . '", DeviceId="'. $this->serverSettings->getJellyfinDeviceId() . '"'];
         if($this->jellyfinAccessToken !== null) {
             $this->authorizationString['X-Emby-Authorization'] .= ', Token="'. $this->jellyfinAccessToken .'"';
         }
+    }
+
+    private function convertException(\Exception $e, Url $url) : \Exception
+    {
+        return match (true) {
+            $e->getCode() === 401 || $e->getCode() === 400 => JellyfinInvalidAuthentication::create(),
+            $e->getCode() === 404 => JellyfinNotFoundError::create($url),
+            $e->getCode() !== 200 => throw new RuntimeException('Api error. Response status code: ' . $e->getCode()),
+            default => $e
+        };
     }
 
     public function get(string $relativeUrl, ?array $query = []) : ?array
@@ -78,27 +86,23 @@ class JellyfinClient
             return null;
         }
 
-        $headers = array_merge(self::DEFAULTPOSTANDGETHEADERS, self::DEFAULTPOSTHEADERS, $this->authorizationString);
+        $headers = array_merge(self::DEFAULTPOSTANDGETHEADERS, $this->authorizationString);
 
         $options = [
-            'form_params' => $data,
+            'json' => $data,
             'query' => $query,
             'headers' => $headers
         ];
 
         $url = $this->jellyfinServerUrl . $relativeUrl;
 
-        $response = $this->httpClient->request('POST', $url, $options);
+        try {
+            $response = $this->httpClient->request('POST', (string)$url, $options);
+        } catch (ClientException $e) {
+            throw $this->convertException($e, Url::createFromString($url));
+        }
 
-        $statusCode = $response->getStatusCode();
-
-        match (true) {
-            $statusCode === 401 => JellyfinInvalidAuthentication::create(),
-            $statusCode === 404 => JellyfinNotFoundError::create(Url::createFromString($url)),
-            $statusCode !== 200 => throw new RuntimeException('Api error. Response status code: ' . $statusCode),
-            default => true
-        };
-
+        /** @psalm-suppress PossiblyUndefinedVariable */
         return Json::decode((string)$response->getBody());
     }
 }

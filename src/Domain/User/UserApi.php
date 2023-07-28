@@ -101,7 +101,7 @@ class UserApi
             return null;
         }
 
-        return PlexAccessToken::create($jellyfinAccessToken);
+        return JellyfinAccessToken::create($jellyfinAccessToken);
     }
 
     public function findJellyfinServerUrl(int $userId) : ?Url
@@ -258,6 +258,11 @@ class UserApi
         $this->repository->updateIsAdmin($userId, $isAdmin);
     }
 
+    public function updateJellyfinAccessToken(int $userId, ?string $accessToken) : void
+    {
+        $this->repository->updateJellyfinAccessToken($userId, $accessToken);
+    }
+
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
@@ -266,6 +271,11 @@ class UserApi
     public function updateJellyfinServerUrl(int $userId, ?Url $serverUrl) : void
     {
         $this->repository->updateJellyfinServerUrl($userId, $serverUrl);
+    }
+
+    public function updateJellyfinUserId(int $userId, ?string $jellyfinUserId) : void
+    {
+        $this->repository->updateJellyfinUserId($userId, $jellyfinUserId);
     }
 
     public function updateName(int $userId, string $name) : void
