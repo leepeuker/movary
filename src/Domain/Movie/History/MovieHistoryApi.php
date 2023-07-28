@@ -283,6 +283,9 @@ class MovieHistoryApi
             $uniqueLanguages[$index]['code'] = $item;
         }
 
+        $languageNames = array_column($uniqueLanguages, 'name');
+        array_multisort($languageNames, SORT_ASC, $uniqueLanguages);
+
         return $uniqueLanguages;
     }
 
