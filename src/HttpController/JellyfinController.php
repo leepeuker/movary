@@ -33,9 +33,17 @@ class JellyfinController
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
+        
+        if(empty($this->userApi->findJellyfinServerUrl($this->authenticationService->getCurrentUserId()))) {
+            return Response::createBadRequest();
+        }
 
         $username = Json::decode($request->getBody())['username'];
         $password = Json::decode($request->getBody())['password'];
+
+        if(empty($username) || empty($password)) {
+            return Response::createBadRequest();
+        }
 
         $jellyfinAuthenticationData = $this->jellyfinApi->fetchJellyfinAuthenticationData($username, $password);
         $this->userApi->updateJellyfinAccessToken($this->authenticationService->getCurrentUserId(), $jellyfinAuthenticationData->getAccessTokenAsString());
@@ -90,7 +98,10 @@ class JellyfinController
             return Response::createSeeOther('/');
         }
 
+        $this->jellyfinApi->deleteJellyfinAccessToken();
+
         $this->userApi->updateJellyfinAccessToken($this->authenticationService->getCurrentUserId(), null);
+        $this->userApi->updateJellyfinUserId($this->authenticationService->getCurrentUserId(), null);
         
         return Response::createOk();        
     }

@@ -8,6 +8,43 @@ function enableElement(el) {
     el.disabled = false;    
 }
 
+function insertAuthenticationForm() {
+    let jellyfinInputGroup = document.createElement('div');
+    let jellyfinUsernameInput = document.createElement('input');
+    let jellyfinPasswordInput = document.createElement('input');
+    let jellyfinButtonInput = document.createElement('button');
+    let jellyfinUsernameLabel = document.createElement('label');
+    let jellyfinPasswordLabel = document.createElement('label');
+
+    jellyfinUsernameInput.type = 'text';
+    jellyfinUsernameInput.classList.add('form-control', 'disabled');
+    jellyfinUsernameInput.id = 'JellyfinUsernameInput';
+    
+    jellyfinPasswordInput.type = 'password';
+    jellyfinPasswordInput.classList.add('form-control', 'disabled');
+    jellyfinPasswordInput.id = 'JellyfinPasswordInput';
+
+    jellyfinUsernameLabel.classList.add('input-group-text');
+    jellyfinUsernameLabel.for = 'JellyfinUsernameInput';
+    jellyfinUsernameLabel.innerText = 'Jellyfin username';
+
+    jellyfinPasswordLabel.classList.add('input-group-text');
+    jellyfinPasswordLabel.for = 'JellyfinPasswordInput';
+    jellyfinPasswordLabel.innerText = 'Jellyfin password';
+
+    jellyfinButtonInput.type = 'button';
+    jellyfinButtonInput.classList.add('btn', 'btn-success', 'mb-3');
+    jellyfinButtonInput.addEventListener('click', () => authenticateJellyfinAccount());
+    jellyfinInputGroup.id = 'jellyfinAuthenticationBtn';
+    jellyfinButtonInput.innerText = 'Authenticate with Jellyfin';
+
+    jellyfinInputGroup.classList.add('input-group', 'mb-3');
+
+    jellyfinInputGroup.append(jellyfinUsernameLabel, jellyfinUsernameInput, jellyfinPasswordLabel, jellyfinPasswordInput);
+
+    document.getElementById('jellyfinModalBody').append(jellyfinInputGroup, jellyfinButtonInput);
+}
+
 function regenerateJellyfinWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return
@@ -116,15 +153,17 @@ async function saveServerUrl() {
         
         if(document.getElementById('jellyfinServerUrlInput').value.length > 0) {
             enableElement(document.getElementById('verifyServerUrlBtn'));
-            enableElement(document.getElementById('JellyfinUsernameInput'))
-            enableElement(document.getElementById('JellyfinPasswordInput'))
+            enableElement(document.getElementById('JellyfinUsernameInput'));
+            enableElement(document.getElementById('JellyfinPasswordInput'));
+            enableElement(document.getElementById('jellyfinAuthenticationBtn'));
         } else {
             disableElement(document.getElementById('verifyServerUrlBtn'));
-            disableElement(document.getElementById('JellyfinUsernameInput'))
-            disableElement(document.getElementById('JellyfinPasswordInput'))
+            disableElement(document.getElementById('JellyfinUsernameInput'));
+            disableElement(document.getElementById('JellyfinPasswordInput'));
+            disableElement(document.getElementById('jellyfinAuthenticationBtn'));
         }
     }).catch(function (error) {
-        console.log(error)
+        console.log(error);
         addAlert('alertJellyfinImportDiv', 'Could not save server URL', 'danger');
     });
 }
@@ -166,6 +205,15 @@ async function authenticateJellyfinAccount() {
             return;
         }
         addAlert('alertJellyfinImportDiv', 'Succesfully authenticated with Jellyfin!', 'success');
+        
+        document.getElementById('jellyfinModalBody').getElementsByClassName('input-group')[0].remove();
+        document.getElementById('jellyfinAuthenticationBtn').remove();
+        
+        let removeAuthenticationBtn = document.createElement('button');
+        removeAuthenticationBtn.classList.add('btn', 'btn-danger', 'mb-3');
+        removeAuthenticationBtn.addEventListener('click', () => removeJellyfinAuthentication());
+        removeAuthenticationBtn.innerText = 'Authenticate with Jellyfin';
+        document.getElementById('jellyfinModalBody').append(removeAuthenticationBtn);
     }).catch(function (error) {
         console.log(error)
         addAlert('alertJellyfinImportDiv', 'Could not authenticate with Jellyfin', 'danger');
@@ -182,27 +230,13 @@ async function removeJellyfinAuthentication() {
         if(!response.ok) {
             addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
             return;
+        } else {
+            addAlert('alertJellyfinImportDiv', 'Authentication succesfully removed!', 'success');
+
+            insertAuthenticationForm();
+            document.getElementById('jellyfinRemoveAuthenticationBtn').remove();
+            
         }
-        addAlert('alertJellyfinImportDiv', 'Authentication succesfully removed!', 'success');
-
-        // let jellyfinInputGroup = document.createElement('div');
-        // let jellyfinUsernameInput = document.createElement('input');
-        // let jellyfinPasswordInput = document.createElement('input');
-        // let jellyfinButtonInput = document.createElement('button');
-        // let jellyfinUsernameLabel = document.createElement('label');
-        // let jellyfinPasswordLabel = document.createElement('label');
-
-        // jellyfinUsernameInput.type = 'text';
-        // jellyfinUsernameInput.classList.add('form-control', 'disabled');
-        // jellyfinUsernameInput.id = 'JellyfinUsernameInput';
-        
-        // jellyfinPasswordInput.type = 'password';
-        // jellyfinPasswordInput.classList.add('form-control', 'disabled');
-        // jellyfinPasswordInput.id = 'JellyfinPasswordInput';
-
-        // jellyfinUsernameLabel.classList.add('input-group-text');
-        // jellyfinUsernameLabel.for = 'JellyfinUsernameInput';
-        // jellyfinUsernameLabel.
     }).catch(function (error) {
         console.log(error)
         addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');

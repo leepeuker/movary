@@ -85,30 +85,47 @@
 
             <hr>
 
-            <h5>Import watched movies from Jellyfin</h5>
+            <h5>Jellyfin authentication</h5>
 
-            <div id="alertJellyfinImportDiv"></div>
+            <p class="text-muted" style="padding-bottom: 0">
+                For personal data access you have to authenticate against Jellyfin.
+            </p>
 
-            <input type="text" class="form-control mb-3" placeholder="Jellyfin server url" id="jellyfinServerUrlInput" value="{{ jellyfinServerUrl }}"/>
-            <div class="btn-group mb-3">
-                <button type="button" class="btn btn-primary" onclick="saveServerUrl()">Save Jellyfin server URL</button>
-                <button type="button" class="btn btn-warning {% if jellyfinServerUrl == null %} disabled {% endif %}" id="verifyServerUrlBtn" onclick="verifyServerUrl()" {% if jellyfinServerUrl == null %} disabled {% endif %}>Verify Jellyfin server URL</button>
+            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#jellyfinAuthenticationModal">Authenticate</button>
+
+            <div class="modal fade" id="jellyfinAuthenticationModal" tabindex="-1" aria-labelledby="jellyfinAuthenticationModal" aria-hidden="true" data-bs-keyboard="false">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Jellyfin authentication</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="jellyfinModalBody">
+                            <div id="alertJellyfinImportDiv"></div>
+                            <input type="text" class="form-control mb-3" placeholder="Jellyfin server url" id="jellyfinServerUrlInput" value="{{ jellyfinServerUrl }}"/>
+                            <div class="btn-group mb-3">
+                                <button type="button" class="btn btn-primary" onclick="saveServerUrl()">Save Jellyfin server URL</button>
+                                <button type="button" class="btn btn-warning {% if jellyfinServerUrl == null %} disabled {% endif %}" id="verifyServerUrlBtn" onclick="verifyServerUrl()" {% if jellyfinServerUrl == null %} disabled {% endif %}>Verify Jellyfin server URL</button>
+                            </div>
+
+                            <hr>
+
+                            {% if jellyfinIsAuthenticated == false %}
+                            <div class="input-group mb-3">
+                                <label class="input-group-text" for="JellyfinUsernameInput">Jellyfin username</label>
+                                <input type="text" class="form-control disabled" id="JellyfinUsernameInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
+                                <label class="input-group-text" for="JellyfinPasswordInput">Jellyfin password</label>
+                                <input type="password" class="form-control disabled" id="JellyfinPasswordInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
+                            </div>
+                            <button type="button" class="btn btn-success mb-3" onclick="authenticateJellyfinAccount()" id="jellyfinAuthenticationBtn">Authenticate with Jellyfin</button>
+                            {% else %}
+                            You're already authenticated :D <br/>
+                            <button class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()" id="jellyfinRemoveAuthenticationBtn">Remove Jellyfin authentication</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <hr>
-
-            {% if jellyfinIsAuthenticated == false %}
-            <div class="input-group mb-3">
-                <label class="input-group-text" for="JellyfinUsernameInput">Jellyfin username</label>
-                <input type="text" class="form-control disabled" id="JellyfinUsernameInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
-                <label class="input-group-text" for="JellyfinPasswordInput">Jellyfin password</label>
-                <input type="password" class="form-control disabled" id="JellyfinPasswordInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
-            </div>
-            <button type="button" class="btn btn-success mb-3" onclick="authenticateJellyfinAccount()">Authenticate with Jellyfin</button>
-            {% else %}
-            You're already authenticated :D <br/>
-            <button class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">Remove Jellyfin authentication</button>
-            {% endif %}
         </div>
     </main>
 {% endblock %}
