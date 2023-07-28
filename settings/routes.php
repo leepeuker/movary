@@ -279,6 +279,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'updateJellyfin'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/settings/jellyfin/server-url-save',
+        [\Movary\HttpController\JellyfinController::class, 'saveJellyfinServerUrl'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/jellyfin/server-url-verify',
+        [\Movary\HttpController\JellyfinController::class, 'verifyJellyfinServerUrl'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/settings/jellyfin/webhook',
         [\Movary\HttpController\JellyfinController::class, 'getJellyfinWebhookUrl'],

@@ -154,6 +154,28 @@ class UserRepository
         return DateTime::createFromString($expirationDate);
     }
 
+    public function findJellyfinServerUrl(int $userId) : ?string
+    {
+        $JellyfinServerUrl = $this->dbConnection->fetchOne('SELECT `jellyfin_server_url` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($JellyfinServerUrl === false) {
+            return null;
+        }
+
+        return $JellyfinServerUrl;
+    }
+
+    public function findJellyfinAccessToken(int $userId) : ?string
+    {
+        $jellyfinAccessToken = $this->dbConnection->fetchOne('SELECT `jellyfin_access_token` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($jellyfinAccessToken === false) {
+            return null;
+        }
+
+        return $jellyfinAccessToken;
+    }
+
     public function findPlexAccessToken(int $userId) : ?string
     {
         $plexAccessToken = $this->dbConnection->fetchOne('SELECT `plex_access_token` FROM `user` WHERE `id` = ?', [$userId]);
@@ -444,6 +466,19 @@ class UserRepository
             'user',
             [
                 'jellyfin_scrobble_views' => (int)$scrobbleWatches,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateJellyfinServerUrl(int $userId, ?Url $serverUrl) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_server_url' => (string)$serverUrl,
             ],
             [
                 'id' => $userId,

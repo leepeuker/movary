@@ -87,3 +87,46 @@ async function updateScrobbleOptions() {
         addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
     });
 }
+
+async function saveServerUrl() {
+    await fetch('/settings/jellyfin/server-url-save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'JellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
+        })
+    }).then(response => {
+        if(!response.ok) {
+            addAlert('alertJellyfinImportDiv', 'Could not save server URL', 'danger');
+            return;
+        }
+        addAlert('alertJellyfinImportDiv', 'Succesfully saved the server URL!', 'success');
+        window.location.reload();
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertJellyfinImportDiv', 'Could not save server URL', 'danger');
+    });
+}
+
+async function verifyServerUrl() {
+    await fetch('/settings/jellyfin/server-url-verify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'JellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
+        })
+    }).then(response => {
+        if(!response.ok) {
+            addAlert('alertJellyfinImportDiv', 'Could not verify server URL', 'danger');
+            return;
+        }
+        addAlert('alertJellyfinImportDiv', 'Succesfully verified the server URL!', 'success');
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertJellyfinImportDiv', 'Could not verify server URL', 'danger');
+    });
+}

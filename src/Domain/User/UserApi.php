@@ -2,6 +2,7 @@
 
 namespace Movary\Domain\User;
 
+use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\Url;
@@ -90,6 +91,24 @@ class UserApi
         }
 
         return $user;
+    }
+
+    public function findJellyfinAccessToken(int $userId) : ?JellyfinAccessToken
+    {
+        $jellyfinAccessToken = $this->repository->findJellyfinAccessToken($userId);
+
+        if ($jellyfinAccessToken === null) {
+            return null;
+        }
+
+        return PlexAccessToken::create($jellyfinAccessToken);
+    }
+
+    public function findJellyfinServerUrl(int $userId) : ?Url
+    {
+        $url = $this->repository->findJellyfinServerUrl($userId);
+
+        return empty($url) === false ? Url::createFromString($url) : null;
     }
 
     public function findPlexAccessToken(int $userId) : ?PlexAccessToken
@@ -242,6 +261,11 @@ class UserApi
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
+    }
+
+    public function updateJellyfinServerUrl(int $userId, ?Url $serverUrl) : void
+    {
+        $this->repository->updateJellyfinServerUrl($userId, $serverUrl);
     }
 
     public function updateName(int $userId, string $name) : void
