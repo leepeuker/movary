@@ -268,6 +268,9 @@ class SettingsController
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         $webhookId = $user->getJellyfinWebhookId();
+        
+        $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($user->getId());
+        $jellyfinIsAuthenticated = $this->userApi->findJellyfinAccessToken($user->getId()) === null ? false : true;
 
         if ($applicationUrl !== null && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId);
@@ -278,6 +281,8 @@ class SettingsController
             $this->twig->render('page/settings-integration-jellyfin.html.twig', [
                 'isActive' => $applicationUrl !== null,
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
+                'jellyfinServerUrl' => $jellyfinServerUrl,
+                'jellyfinIsAuthenticated' => $jellyfinIsAuthenticated,
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
             ]),
         );

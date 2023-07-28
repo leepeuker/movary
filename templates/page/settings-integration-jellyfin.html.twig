@@ -82,6 +82,30 @@
             <div id="alertWebhookOptionsDiv"></div>
 
             <button type="submit" class="btn btn-primary" {% if jellyfinWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
+
+            <hr>
+
+            <h5>Import watched movies from Jellyfin</h5>
+
+            <div id="alertJellyfinImportDiv"></div>
+
+            <input type="text" class="form-control mb-3" placeholder="Jellyfin server url" id="jellyfinServerUrlInput" value="{{ jellyfinServerUrl }}"/>
+            <div class="btn-group mb-3">
+                <button type="button" class="btn btn-primary" onclick="saveServerUrl()">Save Jellyfin server URL</button>
+                <button type="button" class="btn btn-warning {% if jellyfinServerUrl == null %} disabled {% endif %}" onclick="verifyServerUrl()" {% if jellyfinServerUrl == null %} disabled {% endif %}>Verify Jellyfin server URL</button>
+            </div>
+
+            {% if jellyfinAccessToken == false %}
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="JellyfinUsernameInput">Jellyfin username</label>
+                <input type="text" class="form-control disabled" id="JellyfinUsernameInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
+                <label class="input-group-text" for="JellyfinPasswordInput">Jellyfin password</label>
+                <input type="password" class="form-control disalbed" id="JellyfinPasswordInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
+            </div>
+            {% else %}
+            You're already authenticated :D
+            <button class="btn btn-danger">Remove Jellyfin authentication</button>
+            {% endif %}
         </div>
     </main>
 {% endblock %}
