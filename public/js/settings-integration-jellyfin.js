@@ -34,8 +34,8 @@ function insertAuthenticationForm() {
 
     jellyfinButtonInput.type = 'button';
     jellyfinButtonInput.classList.add('btn', 'btn-success', 'mb-3');
-    jellyfinButtonInput.addEventListener('click', () => authenticateJellyfinAccount());
-    jellyfinInputGroup.id = 'jellyfinAuthenticationBtn';
+    jellyfinButtonInput.addEventListener('click', authenticateJellyfinAccount);
+    jellyfinButtonInput.id = 'jellyfinAuthenticationBtn';
     jellyfinButtonInput.innerText = 'Authenticate with Jellyfin';
 
     jellyfinInputGroup.classList.add('input-group', 'mb-3');
@@ -211,11 +211,12 @@ async function authenticateJellyfinAccount() {
         
         let removeAuthenticationBtn = document.createElement('button');
         removeAuthenticationBtn.classList.add('btn', 'btn-danger', 'mb-3');
-        removeAuthenticationBtn.addEventListener('click', () => removeJellyfinAuthentication());
-        removeAuthenticationBtn.innerText = 'Authenticate with Jellyfin';
+        removeAuthenticationBtn.addEventListener('click', removeJellyfinAuthentication);
+        removeAuthenticationBtn.innerText = 'Remove Jellyfin authentication';
+        removeAuthenticationBtn.id = 'jellyfinRemoveAuthenticationBtn';
         document.getElementById('jellyfinModalBody').append(removeAuthenticationBtn);
     }).catch(function (error) {
-        console.log(error)
+        console.error(error)
         addAlert('alertJellyfinImportDiv', 'Could not authenticate with Jellyfin', 'danger');
     });
 }
@@ -232,13 +233,12 @@ async function removeJellyfinAuthentication() {
             return;
         } else {
             addAlert('alertJellyfinImportDiv', 'Authentication succesfully removed!', 'success');
-
-            insertAuthenticationForm();
             document.getElementById('jellyfinRemoveAuthenticationBtn').remove();
+            insertAuthenticationForm();
             
         }
     }).catch(function (error) {
-        console.log(error)
+        console.error(error)
         addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
     });
 }
