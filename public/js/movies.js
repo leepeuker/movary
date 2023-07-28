@@ -1,17 +1,24 @@
-document.getElementById('searchTermInput').addEventListener('keypress', function(event) {
+document.getElementById('searchTermInput').addEventListener('keypress', function (event) {
     if (event.key === "Enter" || event.keyCode === 13) {
         event.preventDefault();
         document.getElementById('directSearchButton').click();
     }
 });
 
+const searchSortBySelect = document.getElementById('searchSortBySelect');
+const searchSortOrderSelect = document.getElementById('searchSortOrderSelect');
+const searchGenreSelect = document.getElementById('searchGenreSelect');
+const searchLanugageSelect = document.getElementById('searchLanguageSelect');
+const searchReleaseYearSelect = document.getElementById('searchReleaseYearSelect');
+const searchPerPageSelect = document.getElementById('searchPerPageSelect');
+
 function search() {
-    let sortBy = document.getElementById('searchSortBySelect').value
-    let sortOrder = document.getElementById('searchSortOrderSelect').value
-    let searchGenre = document.getElementById('searchGenreSelect').value
-    let searchLanguage = document.getElementById('searchLanguageSelect').value
-    let searchReleaseYear = document.getElementById('searchReleaseYearSelect').value
-    let searchPerPage = document.getElementById('searchPerPageSelect').value
+    let sortBy = searchSortBySelect.value
+    let sortOrder = searchSortOrderSelect.value
+    let searchGenre = searchGenreSelect.value
+    let searchLanguage = searchLanugageSelect.value
+    let searchReleaseYear = searchReleaseYearSelect.value
+    let searchPerPage = searchPerPageSelect.value
     let searchTerm = document.getElementById('searchTermInput').value
 
     let getParameters = '?'
@@ -38,6 +45,12 @@ function search() {
     window.location.href = urlWithoutGetParameters + getParameters;
 }
 
-function resetSearchOptions() {
 
+function resetSearchOptions() {
+    searchSortBySelect.value = 'title'
+    searchSortOrderSelect.value = 'asc'
+    searchGenreSelect.value = ''
+    searchLanugageSelect.value = ''
+    searchReleaseYearSelect.value = ''
+    searchPerPageSelect.value = '24'
 }
