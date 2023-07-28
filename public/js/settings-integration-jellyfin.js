@@ -149,3 +149,62 @@ async function verifyServerUrl() {
         addAlert('alertJellyfinImportDiv', 'Could not verify server URL', 'danger');
     });
 }
+
+async function authenticateJellyfinAccount() {
+    await fetch('/settings/jellyfin/authenticate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'username': document.getElementById('JellyfinUsernameInput').value,
+            'password': document.getElementById('JellyfinPasswordInput').value,
+        })
+    }).then(response => {
+        if(!response.ok) {
+            addAlert('alertJellyfinImportDiv', 'Could not authenticate with Jellyfin', 'danger');
+            return;
+        }
+        addAlert('alertJellyfinImportDiv', 'Succesfully authenticated with Jellyfin!', 'success');
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertJellyfinImportDiv', 'Could not authenticate with Jellyfin', 'danger');
+    });
+}
+
+async function removeJellyfinAuthentication() {
+    await fetch('/settings/jellyfin/remove-authentication', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then(response => {
+        if(!response.ok) {
+            addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
+            return;
+        }
+        addAlert('alertJellyfinImportDiv', 'Authentication succesfully removed!', 'success');
+
+        // let jellyfinInputGroup = document.createElement('div');
+        // let jellyfinUsernameInput = document.createElement('input');
+        // let jellyfinPasswordInput = document.createElement('input');
+        // let jellyfinButtonInput = document.createElement('button');
+        // let jellyfinUsernameLabel = document.createElement('label');
+        // let jellyfinPasswordLabel = document.createElement('label');
+
+        // jellyfinUsernameInput.type = 'text';
+        // jellyfinUsernameInput.classList.add('form-control', 'disabled');
+        // jellyfinUsernameInput.id = 'JellyfinUsernameInput';
+        
+        // jellyfinPasswordInput.type = 'password';
+        // jellyfinPasswordInput.classList.add('form-control', 'disabled');
+        // jellyfinPasswordInput.id = 'JellyfinPasswordInput';
+
+        // jellyfinUsernameLabel.classList.add('input-group-text');
+        // jellyfinUsernameLabel.for = 'JellyfinUsernameInput';
+        // jellyfinUsernameLabel.
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
+    });
+}

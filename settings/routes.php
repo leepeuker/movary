@@ -280,6 +280,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
+        '/settings/jellyfin/authenticate',
+        [\Movary\HttpController\JellyfinController::class, 'authenticateJellyfinAccount'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/jellyfin/remove-authentication',
+        [\Movary\HttpController\JellyfinController::class, 'removeJellyfinAuthentication'],
+    );
+    $routeCollector->addRoute(
+        'POST',
         '/settings/jellyfin/server-url-save',
         [\Movary\HttpController\JellyfinController::class, 'saveJellyfinServerUrl'],
     );

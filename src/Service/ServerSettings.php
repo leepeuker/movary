@@ -9,6 +9,8 @@ use function PHPUnit\Framework\assertNotNull;
 
 class ServerSettings
 {
+    PRIVATE CONST JELLYFIN_DEVICEID = 'JELLYFIN_DEVICEID';
+
     private const PLEX_APP_NAME = 'PLEX_APP_NAME';
 
     private const PLEX_IDENTIFIER = 'PLEX_IDENTIFIER';
@@ -64,6 +66,11 @@ class ServerSettings
     public function getPlexIdentifier() : ?string
     {
         return $this->getByKey(self::PLEX_IDENTIFIER);
+    }
+
+    public function getJellyfinDeviceId() : ?string
+    {
+        return $this->getByKey(self::JELLYFIN_DEVICEID);
     }
 
     public function getSmtpEncryption() : ?string
