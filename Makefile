@@ -5,25 +5,25 @@ include .env
 # Container management
 ######################
 up:
-	docker-compose up -d
+	docker compose up -d
 
 up_mysql:
 	mkdir -p tmp/db
-	docker-compose up -d mysql
+	docker compose up -d mysql
 
 up_app: 
-	docker-compose up -d app
+	docker compose up -d app
 
 down:
-	docker-compose down
+	docker compose down
 
 reup: down up
 
 logs: 
-	docker-compose logs -f
+	docker compose logs -f
 
 build:
-	docker-compose build --no-cache
+	docker compose build --no-cache
 	make up
 	make db_mysql_create_database
 	make composer_install
@@ -33,16 +33,16 @@ build:
 # Container interaction
 #######################
 exec_app_bash:
-	docker-compose exec app bash
+	docker compose exec app bash
 
 exec_app_cmd:
-	docker-compose exec app bash -c "${CMD}"
+	docker compose exec app bash -c "${CMD}"
 
 exec_mysql_cli:
-	docker-compose exec mysql sh -c "mysql -u${DB_USER} -p${DB_PASSWORD} ${DATABASE_MYSQL_NAME}"
+	docker compose exec mysql sh -c "mysql -u${DB_USER} -p${DB_PASSWORD} ${DATABASE_MYSQL_NAME}"
 
 exec_mysql_query:
-	docker-compose exec mysql bash -c "mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} -e \"$(QUERY)\""
+	docker compose exec mysql bash -c "mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} -e \"$(QUERY)\""
 
 # Composer
 ##########
@@ -65,10 +65,10 @@ db_mysql_create_database:
 
 db_mysql_import:
 	docker cp storage/dump.sql movary_mysql_1:/tmp/dump.sql
-	docker-compose exec mysql bash -c 'mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} < /tmp/dump.sql'
+	docker compose exec mysql bash -c 'mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} < /tmp/dump.sql'
 
 db_mysql_export:
-	docker-compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_MYSQL_ROOT_PASSWORD) $(DATABASE_MYSQL_NAME) > /tmp/dump.sql'
+	docker compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_MYSQL_ROOT_PASSWORD) $(DATABASE_MYSQL_NAME) > /tmp/dump.sql'
 	docker cp movary_mysql_1:/tmp/dump.sql storage/dump.sql
 	chown $(USER_ID):$(USER_ID) storage/dump.sql
 

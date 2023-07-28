@@ -351,7 +351,7 @@ class SettingsController
 
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
 
-        if ($plexAccessToken !== null) {
+        if ($plexAccessToken !== null && $this->serverSettings->getPlexIdentifier() !== null) {
             $plexAccount = $this->plexApi->findPlexAccount($plexAccessToken);
             if ($plexAccount !== null) {
                 $plexUsername = $plexAccount->getPlexUsername();
