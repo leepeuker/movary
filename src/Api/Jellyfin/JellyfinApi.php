@@ -9,6 +9,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
 use Movary\ValueObject\RelativeUrl;
+use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
 
 class JellyfinApi
@@ -21,33 +22,31 @@ class JellyfinApi
     ) {
     }
 
-    public function deleteJellyfinAccessToken(int $userId) : void
+    public function deleteJellyfinAccessToken(JellyfinAuthenticationData $jellyfinAuthentication) : void
     {
-        $accessToken = $this->userApi->findJellyfinAccessToken($userId);
-        $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($userId);
-
-        $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/Users/'));
+        $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl(RelativeUrl::create('/Users/'));
 
         $query = [
             'id' => $this->serverSettings->requireJellyfinDeviceId()
         ];
-        $this->jellyfinClient->delete($url, $query, $accessToken);
+        $this->jellyfinClient->delete($url, $query, $jellyfinAuthentication->getAccessToken());
         $this->logger->info('Jellyfin access token has been invalidated');
     }
 
-    public function fetchJellyfinServerInfo() : ?array
+    public function fetchJellyfinServerInfo(Url $jellyfinServerUrl) : ?array
     {
-        return $this->jellyfinClient->get('/system/info/public');
+        $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/system/info/public'));
+
+        return $this->jellyfinClient->get($url);
     }
 
-    public function fetchJellyfinUser(int $userId) : ?JellyfinUser
+    public function fetchJellyfinUser(JellyfinAuthenticationData $jellyfinAuthentication) : ?JellyfinUser
     {
-        $jellyfinUserId = $this->userApi->fetchJellyfinUserId($userId);
-        $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($userId);
+        $relativeUrl = RelativeUrl::create('/Users/' . $jellyfinAuthentication->getUserId());
 
-        $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/Users/' . $jellyfinUserId));
+        $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
 
-        $userInformation = $this->jellyfinClient->get($url);
+        $userInformation = $this->jellyfinClient->get($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
 
         if ($userInformation === null) {
             return null;
@@ -59,6 +58,9 @@ class JellyfinApi
     public function createJellyfinAuthentication(int $userId, string $username, string $password) : ?JellyfinAuthenticationData
     {
         $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($userId);
+        if ($jellyfinServerUrl === null) {
+            throw new \RuntimeException('Server url required');
+        }
 
         $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/Users/authenticatebyname'));
 
@@ -76,6 +78,7 @@ class JellyfinApi
         return JellyfinAuthenticationData::create(
             JellyfinAccessToken::create((string)$response['AccessToken']),
             JellyfinUserId::create((string)$response['User']['Id']),
+            $jellyfinServerUrl,
         );
     }
 }

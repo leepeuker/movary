@@ -169,6 +169,21 @@ class UserRepository
         return DateTime::createFromString($expirationDate);
     }
 
+    public function findJellyfinAuthenticationData(int $userId) : ?array
+    {
+        $jellyfinAuthenticationData = $this->dbConnection->fetchAllAssociative(
+            'SELECT `jellyfin_access_token`, `jellyfin_user_id`, `jellyfin_server_url` 
+            FROM `user` WHERE `id` = ?',
+            [$userId],
+        );
+
+        if (empty($jellyfinAuthenticationData[0]) === true) {
+            return null;
+        }
+
+        return $jellyfinAuthenticationData[0];
+    }
+
     public function findJellyfinServerUrl(int $userId) : ?string
     {
         $JellyfinServerUrl = $this->dbConnection->fetchOne('SELECT `jellyfin_server_url` FROM `user` WHERE `id` = ?', [$userId]);

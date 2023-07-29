@@ -181,7 +181,7 @@ async function verifyJellyfinServerUrl() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            'JellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
+            'jellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
         })
     }).then(response => {
         document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')

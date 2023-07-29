@@ -272,10 +272,11 @@ class SettingsController
         $webhookId = $user->getJellyfinWebhookId();
 
         $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($user->getId());
-        $jellyfinIsAuthenticated = $this->userApi->findJellyfinAccessToken($user->getId()) === null ? false : true;
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($user->getId());
 
-        if ($jellyfinIsAuthenticated === true) {
-            $jellyfinUsername = ''; //todo
+        $jellyfinUsername = null;
+        if ($jellyfinAuthentication !== null) {
+            $jellyfinUsername = $this->jellyfinApi->fetchJellyfinUser($jellyfinAuthentication);
         }
 
         if ($applicationUrl !== null && $webhookId !== null) {
@@ -288,8 +289,8 @@ class SettingsController
                 'isActive' => $applicationUrl !== null,
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'jellyfinServerUrl' => $jellyfinServerUrl,
-                'jellyfinIsAuthenticated' => $jellyfinIsAuthenticated,
-                'jellyfinUsername' => $jellyfinUsername ?? null,
+                'jellyfinIsAuthenticated' => $jellyfinAuthentication !== null,
+                'jellyfinUsername' => $jellyfinUsername?->getUsername(),
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
             ]),
         );

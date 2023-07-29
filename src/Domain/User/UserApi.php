@@ -122,6 +122,21 @@ class UserApi
         return JellyfinUserId::create($jellyfinUserId);
     }
 
+    public function findJellyfinAuthentication(int $userId) : ?JellyfinAuthenticationData
+    {
+        $authData = $this->repository->findJellyfinAuthenticationData($userId);
+
+        if (isset($authData['jellyfin_access_token'], $authData['jellyfin_access_token'], $authData['jellyfin_access_token']) === false) {
+            return null;
+        }
+
+        return JellyfinAuthenticationData::create(
+            JellyfinAccessToken::create($authData['jellyfin_access_token']),
+            JellyfinUserId::create($authData['jellyfin_user_id']),
+            Url::createFromString($authData['jellyfin_server_url']),
+        );
+    }
+
     public function findJellyfinServerUrl(int $userId) : ?Url
     {
         $url = $this->repository->findJellyfinServerUrl($userId);

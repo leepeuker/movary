@@ -103,8 +103,18 @@ class JellyfinController
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
 
-        $this->jellyfinApi->deleteJellyfinAccessToken($userId);
+        if ($jellyfinAuthentication === null) {
+            return Response::createOk();
+        }
+
+        try {
+            $this->jellyfinApi->deleteJellyfinAccessToken($jellyfinAuthentication);
+        } catch (Exception) {
+            $this->logger->warning('Could not delete jellyfin remote access token for user: ' . $userId);
+        }
+
         $this->userApi->deleteJellyfinAuthentication($userId);
 
         $this->logger->info('Jellyfin authentication has been removed');
@@ -138,16 +148,14 @@ class JellyfinController
         return Response::createOk();
     }
 
-    public function verifyJellyfinServerUrl() : Response
+    public function verifyJellyfinServerUrl(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
 
-        $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo();
-        var_dump($jellyfinServerInfo);
-
-        return Response::createOk();
+        $jellyfinServerUrl = Url::createFromString(Json::decode($request->getBody())['jellyfinServerUrl']);
+        $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo($jellyfinServerUrl);
 
         try {
             if ($jellyfinServerInfo === null) {
