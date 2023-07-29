@@ -9,6 +9,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
@@ -259,6 +260,7 @@ class Factory
             $container->get(SessionWrapper::class),
             $container->get(LetterboxdExporter::class),
             $container->get(TraktApi::class),
+            $container->get(JellyfinApi::class),
             $container->get(ServerSettings::class),
             $container->get(WebhookUrlBuilder::class),
             $container->get(JobQueueApi::class),

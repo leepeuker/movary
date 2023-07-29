@@ -59,6 +59,11 @@ class Response
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
     }
 
+    public static function createUnauthorized() : self
+    {
+        return new self(StatusCode::createUnauthorized());
+    }
+
     public static function createUnsupportedMediaType() : self
     {
         return new self(StatusCode::createUnsupportedMediaType());
