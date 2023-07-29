@@ -105,6 +105,8 @@ class JellyfinController
         $this->jellyfinApi->deleteJellyfinAccessToken();
         $this->userApi->deleteJellyfinAuthentication($this->authenticationService->getCurrentUserId());
 
+        $this->logger->info('Jellyfin authentication has been removed');
+
         return Response::createOk();
     }
 

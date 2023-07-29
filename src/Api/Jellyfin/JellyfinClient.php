@@ -13,6 +13,7 @@ use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\ValueObject\Url;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class JellyfinClient
@@ -34,6 +35,7 @@ class JellyfinClient
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly ServerSettings $serverSettings,
+        private readonly LoggerInterface $logger
     ) {
         $this->jellyfinAccessToken = $this->userApi->findJellyfinAccessToken($this->authenticationService->getCurrentUserId());
         $this->jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($this->authenticationService->getCurrentUserId());
@@ -46,6 +48,11 @@ class JellyfinClient
     public function delete(string $relativeUrl, ?array $query = []) : ?string
     {
         if ($this->jellyfinServerUrl === null) {
+            $this->logger->error('No Jellyfin server URL set');
+            return null;
+        }
+        if($this->serverSettings->getJellyfinDeviceId() === null) {
+            $this->logger->error('No Jellyfin Device ID set');
             return null;
         }
 
@@ -71,8 +78,11 @@ class JellyfinClient
     public function get(string $relativeUrl, ?array $query = []) : ?array
     {
         if ($this->jellyfinServerUrl === null) {
-            JellyfinInvalidServerUrl::create();
-
+            $this->logger->error('No Jellyfin server URL set');
+            return null;
+        }
+        if($this->serverSettings->getJellyfinDeviceId() === null) {
+            $this->logger->error('No Jellyfin Device ID set');
             return null;
         }
 
@@ -84,17 +94,6 @@ class JellyfinClient
         ];
 
         $url = $this->jellyfinServerUrl . $relativeUrl;
-
-        // $response = $this->httpClient->request('GET', $url, $options);
-
-        // $statusCode = $response->getStatusCode();
-
-        // match (true) {
-        //     $statusCode === 401 => JellyfinInvalidAuthentication::create(),
-        //     $statusCode === 404 => JellyfinNotFoundError::create(Url::createFromString($url)),
-        //     $statusCode !== 200 => throw new RuntimeException('Api error. Response status code: ' . $statusCode),
-        //     default => true
-        // };
 
         try {
             $response = $this->httpClient->request('GET', $url, $options);
@@ -108,8 +107,11 @@ class JellyfinClient
     public function post(string $relativeUrl, ?array $query = [], ?array $data = []) : ?array
     {
         if ($this->jellyfinServerUrl === null) {
-            JellyfinInvalidServerUrl::create();
-
+            $this->logger->error('No Jellyfin server URL set');
+            return null;
+        }
+        if($this->serverSettings->getJellyfinDeviceId() === null) {
+            $this->logger->error('No Jellyfin Device ID set');
             return null;
         }
 

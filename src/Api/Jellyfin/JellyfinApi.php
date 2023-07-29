@@ -7,12 +7,14 @@ use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUser;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Service\ServerSettings;
+use Psr\Log\LoggerInterface;
 
 class JellyfinApi
 {
     public function __construct(
         private readonly JellyfinClient $jellyfinClient,
         private readonly ServerSettings $serverSettings,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -22,6 +24,7 @@ class JellyfinApi
             'id' => $this->serverSettings->getJellyfinDeviceId()
         ];
         $this->jellyfinClient->delete('/Devices', $query);
+        $this->logger->info('Jellyfin access token has been invalidated');
     }
 
     public function fetchJellyfinServerInfo() : ?array
@@ -48,6 +51,8 @@ class JellyfinApi
         if ($response === null) {
             return null;
         }
+
+        $this->logger->info('Jellyfin account has been authenticated');
 
         return JellyfinAuthenticationData::create(
             JellyfinAccessToken::create((string)$response['AccessToken']),
