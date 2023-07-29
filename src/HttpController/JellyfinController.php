@@ -33,7 +33,9 @@ class JellyfinController
             return Response::createSeeOther('/');
         }
 
-        if (empty($this->userApi->findJellyfinServerUrl($this->authenticationService->getCurrentUserId()))) {
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        if (empty($this->userApi->findJellyfinServerUrl($userId))) {
             return Response::createBadRequest();
         }
 
@@ -49,7 +51,7 @@ class JellyfinController
             return Response::createUnauthorized();
         }
 
-        $this->userApi->updateJellyfinAuthentication($this->authenticationService->getCurrentUserId(), $jellyfinAuthentication);
+        $this->userApi->updateJellyfinAuthentication($userId, $jellyfinAuthentication);
 
         return Response::createOk();
     }
@@ -101,9 +103,7 @@ class JellyfinController
         }
 
         $this->jellyfinApi->deleteJellyfinAccessToken();
-
-        $this->userApi->updateJellyfinAuthentication($this->authenticationService->getCurrentUserId(), null);
-        $this->userApi->updateJellyfinUserId($this->authenticationService->getCurrentUserId(), null);
+        $this->userApi->deleteJellyfinAuthentication($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
     }

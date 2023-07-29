@@ -5,17 +5,17 @@ namespace Movary\Api\Jellyfin\Dto;
 class JellyfinUserId
 {
     private function __construct(
-        private readonly string $jellyfinUserid,
+        private readonly string $jellyfinUserId,
     ) {
     }
 
-    public static function create(string $jellyfinUserid) : self
+    public static function create(string $jellyfinUserId) : self
     {
-        return new self($jellyfinUserid);
+        return new self($jellyfinUserId);
     }
 
     public function __toString() : string
     {
-        return $this->jellyfinUserid;
+        return $this->jellyfinUserId;
     }
 }
