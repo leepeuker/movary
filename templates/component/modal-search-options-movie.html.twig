@@ -11,7 +11,7 @@
 
                     <div class="input-group mb-3">
                         <span class="input-group-text">Sort by</span>
-                        <select class="form-control" name="sb" id="searchSortBySelect">
+                        <select onchange="enableSaveSortingOptionsButton()" class="form-control" name="sb" id="searchSortBySelect">
                             <option value="title" {{ sortBy == 'title' ? 'selected' }}>Title</option>
                             <option value="releaseDate" {{ sortBy == 'releaseDate' ? 'selected' }}>Release date</option>
                             <option value="watchDate" {{ sortBy == 'watchDate' ? 'selected' }}>Watch date</option>
@@ -21,7 +21,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Sort order</span>
-                        <select class="form-control" name="so" id="searchSortOrderSelect">
+                        <select onchange="enableSaveSortingOptionsButton()" class="form-control" name="so" id="searchSortOrderSelect">
                             <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>&uarr;</option>
                             <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>&darr;</option>
                         </select>
@@ -74,6 +74,7 @@
             <div class="modal-footer justify-content-between">
 {#                <button class="btn btn-outline-light float-start" id="appReleaseModalButtonViewGithub" target="_blank">Save</button>#}
                 <button class="btn btn-warning float-start" onclick="resetSearchOptions()">Reset</button>
+                <button class="btn btn-secondary float-start" id="saveSortingOptionsButton" onclick="setSortOptionsCookie()">Save Sorting</button>
                 <button class="btn btn-primary" onclick="search()">Search</button>
             </div>
         </div>

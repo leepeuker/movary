@@ -57,10 +57,10 @@ class MoviesRequestMapper
     private function mapSortOrder(array $getParameters) : SortOrder
     {
         if (isset($getParameters['so']) === false) {
-            if (!isset($_COOKIE['person-sort-order'])){
+            if (!isset($_COOKIE['movie-sort-order'])){
                  return SortOrder::createAsc();
             }
-            elseif ($_COOKIE['person-sort-order'] == 'desc') {
+            elseif ($_COOKIE['movie-sort-order'] == 'desc') {
                  return SortOrder::createDesc();
             }
 
