@@ -51,6 +51,20 @@ class UserRepository
         );
     }
 
+    public function deleteJellyfinAuthentication(int $userId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_access_token' => null,
+                'jellyfin_user_id' => null,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function deleteUser(int $userId) : void
     {
         $this->dbConnection->delete('user', ['id' => $userId]);
@@ -461,7 +475,7 @@ class UserRepository
         );
     }
 
-    public function updateJellyfinAuthentication(int $userId, ?JellyfinAuthenticationData $jellyfinAuthenticationData) : void
+    public function updateJellyfinAuthentication(int $userId, JellyfinAuthenticationData $jellyfinAuthenticationData) : void
     {
         $this->dbConnection->update(
             'user',

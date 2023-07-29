@@ -4,7 +4,6 @@ namespace Movary\Domain\User;
 
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
-use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\Url;
@@ -32,6 +31,11 @@ class UserApi
     public function deleteEmbyWebhookId(int $userId) : void
     {
         $this->repository->setEmbyWebhookId($userId, null);
+    }
+
+    public function deleteJellyfinAuthentication(int $userId) : void
+    {
+        $this->repository->deleteJellyfinAuthentication($userId);
     }
 
     public function deleteJellyfinWebhookId(int $userId) : void
@@ -260,7 +264,7 @@ class UserApi
         $this->repository->updateIsAdmin($userId, $isAdmin);
     }
 
-    public function updateJellyfinAuthentication(int $userId, ?JellyfinAuthenticationData $jellyfinAuthentication) : void
+    public function updateJellyfinAuthentication(int $userId, JellyfinAuthenticationData $jellyfinAuthentication) : void
     {
         $this->repository->updateJellyfinAuthentication($userId, $jellyfinAuthentication);
     }
@@ -273,11 +277,6 @@ class UserApi
     public function updateJellyfinServerUrl(int $userId, ?Url $serverUrl) : void
     {
         $this->repository->updateJellyfinServerUrl($userId, $serverUrl);
-    }
-
-    public function updateJellyfinUserId(int $userId, ?JellyfinUserId $jellyfinUserId) : void
-    {
-        $this->repository->updateJellyfinUserId($userId, $jellyfinUserId);
     }
 
     public function updateName(int $userId, string $name) : void

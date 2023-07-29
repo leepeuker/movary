@@ -9,9 +9,9 @@ class JellyfinAccessToken
     ) {
     }
 
-    public static function create(string $JellyfinAccessToken) : self
+    public static function create(string $jellyfinAccessToken) : self
     {
-        return new self($JellyfinAccessToken);
+        return new self($jellyfinAccessToken);
     }
 
     public function __toString() : string
