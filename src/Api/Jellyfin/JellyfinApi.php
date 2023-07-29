@@ -4,15 +4,16 @@ namespace Movary\Api\Jellyfin;
 
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
-use Movary\Api\Jellyfin\Dto\JellyfinUserid;
+use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Service\ServerSettings;
 
 class JellyfinApi
 {
     public function __construct(
         private readonly JellyfinClient $jellyfinClient,
-        private readonly ServerSettings $serverSettings
-    ) {}
+        private readonly ServerSettings $serverSettings,
+    ) {
+    }
 
     public function deleteJellyfinAccessToken() : void
     {
@@ -27,19 +28,20 @@ class JellyfinApi
         return $this->jellyfinClient->get('/system/info/public');
     }
 
-    public function fetchJellyfinAuthenticationData(string $username, string $password) : ?JellyfinAuthenticationData
+    public function createJellyfinAuthentication(string $username, string $password) : ?JellyfinAuthenticationData
     {
         $data = [
             'Username' => $username,
             'Pw' => $password
         ];
-        $response = $this->jellyfinClient->post('/Users/authenticatebyname', [], $data);
-        if($response === null) {
-            return $response;
+        $response = $this->jellyfinClient->post('/Users/authenticatebyname', data: $data);
+        if ($response === null) {
+            return null;
         }
+
         return JellyfinAuthenticationData::create(
             JellyfinAccessToken::create((string)$response['AccessToken']),
-            JellyfinUserid::create((string)$response['User']['Id'])
+            JellyfinUserId::create((string)$response['User']['Id']),
         );
     }
 }
