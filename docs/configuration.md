@@ -20,8 +20,8 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `TMDB_API_KEY`                              |        -        | **Required** (get key [here](https://www.themoviedb.org/settings/api))         |  yes   |
 | `APPLICATION_URL`                           |        -        | Public base url of the application (e.g. `htttp://localhost`)                  |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |       `0`       | More info [here](features/tmdb-data.md#image-cache)                            |        |
-| `PLEX_IDENTIFIER`                           |        -        | Required for Plex Authentication. Generate with e.g. `openssl rand -base64 32` |        |
-| `PLEX_APP_NAME`                             |    `Movary`     | Required for Plex Authentication                                               |        |
+| `PLEX_IDENTIFIER`                           |        -        | Required for Plex authentication. Generate with e.g. `openssl rand -base64 32` |        |
+| `PLEX_APP_NAME`                             |    `Movary`     | Required for Plex authentication                                               |        |
 | `ENABLE_REGISTRATION`                       |       `0`       | Enables public user registration                                               |        |
 | `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |      `15`       | Minimum time between background jobs processing                                |        |
 | `TIMEZONE`                                  | `Europe/Berlin` | Supported timezones [here](https://www.php.net/manual/en/timezones.php)        |        |

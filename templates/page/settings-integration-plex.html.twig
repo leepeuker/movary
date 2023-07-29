@@ -93,10 +93,15 @@
                      style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
                     Authentication disabled - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
                 </div>
+                <div class="alert alert-warning {% if hasServerPlexIdentifier == true %}d-none{% endif %}"
+                     role="alert"
+                     style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                    Authentication disabled - Plex client identifier required
+                </div>
             </div>
 
             <div id="authenticateWithPlexDiv" class="{% if plexTokenExists == true %}d-none{% endif %}">
-                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()" {% if isActive == '' %}disabled{% endif %}>Authenticate</button>
+                <button type="button" class="btn btn-primary mb-3" onclick="authenticateWithPlex()" {% if (isActive == '') or (hasServerPlexIdentifier == false) %}disabled{% endif %}>Authenticate</button>
             </div>
             <div id="removeAuthenticationWithPlexDiv" class="{% if plexTokenExists == false %}d-none{% endif %}">
                 <button type="button" class="btn btn-danger mb-3" onclick="removePlexAuthentication()">Remove Authentication</button>
