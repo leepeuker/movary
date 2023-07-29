@@ -191,6 +191,17 @@ class UserRepository
         return $jellyfinAccessToken;
     }
 
+    public function findJellyfinUserId(int $userId) : ?string
+    {
+        $jellyfinUserId = $this->dbConnection->fetchOne('SELECT `jellyfin_user_id` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($jellyfinUserId === false) {
+            return null;
+        }
+
+        return $jellyfinUserId;
+    }
+
     public function findPlexAccessToken(int $userId) : ?string
     {
         $plexAccessToken = $this->dbConnection->fetchOne('SELECT `plex_access_token` FROM `user` WHERE `id` = ?', [$userId]);

@@ -3,6 +3,9 @@
 namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
+use Movary\Api\Jellyfin\Exception\JellyfinNotFoundError;
+use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Api\Trakt\TraktApi;
@@ -41,6 +44,7 @@ class SettingsController
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
+        private readonly JellyfinApi $jellyfinApi,
         private readonly ServerSettings $serverSettings,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly JobQueueApi $jobQueueApi,
@@ -271,6 +275,15 @@ class SettingsController
         
         $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($user->getId());
         $jellyfinIsAuthenticated = $this->userApi->findJellyfinAccessToken($user->getId()) === null ? false : true;
+
+        if($jellyfinIsAuthenticated === true) {
+            try {
+                $this->jellyfinApi->fetchJellyfinUser($this->userApi->findJellyfinUserId($user->getId()));
+            } catch (JellyfinInvalidAuthentication | JellyfinNotFoundError $e) {
+                $jellyfinIsAuthenticated = false;
+                $this->userApi->deleteJellyfinAuthentication($user->getId());
+            }
+        }
 
         if ($applicationUrl !== null && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId);

@@ -4,6 +4,7 @@ namespace Movary\Domain\User;
 
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
+use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\Url;
@@ -108,6 +109,17 @@ class UserApi
         }
 
         return JellyfinAccessToken::create($jellyfinAccessToken);
+    }
+
+    public function findJellyfinUserId(int $userId) : ?JellyfinUserId
+    {
+        $jellyfinUserId = $this->repository->findJellyfinUserId($userId);
+
+        if ($jellyfinUserId === null) {
+            return null;
+        }
+
+        return JellyfinUserId::create($jellyfinUserId);
     }
 
     public function findJellyfinServerUrl(int $userId) : ?Url

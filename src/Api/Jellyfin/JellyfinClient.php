@@ -85,16 +85,22 @@ class JellyfinClient
 
         $url = $this->jellyfinServerUrl . $relativeUrl;
 
-        $response = $this->httpClient->request('GET', $url, $options);
+        // $response = $this->httpClient->request('GET', $url, $options);
 
-        $statusCode = $response->getStatusCode();
+        // $statusCode = $response->getStatusCode();
 
-        match (true) {
-            $statusCode === 401 => JellyfinInvalidAuthentication::create(),
-            $statusCode === 404 => JellyfinNotFoundError::create(Url::createFromString($url)),
-            $statusCode !== 200 => throw new RuntimeException('Api error. Response status code: ' . $statusCode),
-            default => true
-        };
+        // match (true) {
+        //     $statusCode === 401 => JellyfinInvalidAuthentication::create(),
+        //     $statusCode === 404 => JellyfinNotFoundError::create(Url::createFromString($url)),
+        //     $statusCode !== 200 => throw new RuntimeException('Api error. Response status code: ' . $statusCode),
+        //     default => true
+        // };
+
+        try {
+            $response = $this->httpClient->request('GET', $url, $options);
+        } catch (ClientException $e) {
+            throw $this->convertException($e, Url::createFromString($url));
+        }
 
         return Json::decode((string)$response->getBody());
     }
