@@ -354,13 +354,19 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
-        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+        $plexAccessToken = null;
+        $plexIdentifier = $this->serverSettings->getPlexIdentifier();
 
-        if ($plexAccessToken !== null) {
-            $plexAccount = $this->plexApi->findPlexAccount($plexAccessToken);
-            if ($plexAccount !== null) {
-                $plexUsername = $plexAccount->getPlexUsername();
-                $plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId());
+        if ($plexIdentifier !== null) {
+            $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+
+            if ($plexAccessToken !== null) {
+                $plexAccount = $this->plexApi->findPlexAccount($plexAccessToken);
+
+                if ($plexAccount !== null) {
+                    $plexUsername = $plexAccount->getPlexUsername();
+                    $plexServerUrl = $this->userApi->findPlexServerUrl($this->authenticationService->getCurrentUserId());
+                }
             }
         }
 
@@ -383,6 +389,7 @@ class SettingsController
                 'plexTokenExists' => $plexAccessToken !== null,
                 'plexServerUrl' => $plexServerUrl ?? '',
                 'plexUsername' => $plexUsername ?? '',
+                'hasServerPlexIdentifier' => $plexIdentifier !== null,
             ]),
         );
     }

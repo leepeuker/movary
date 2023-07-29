@@ -20,12 +20,13 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `TMDB_API_KEY`                              |        -        | **Required** (get key [here](https://www.themoviedb.org/settings/api))         |  yes   |
 | `APPLICATION_URL`                           |        -        | Public base url of the application (e.g. `htttp://localhost`)                  |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |       `0`       | More info [here](features/tmdb-data.md#image-cache)                            |        |
+| `PLEX_IDENTIFIER`                           |        -        | Required for Plex Authentication. Generate with e.g. `openssl rand -base64 32` |        |
+| `PLEX_APP_NAME`                             |    `Movary`     | Required for Plex Authentication                                               |        |
 | `ENABLE_REGISTRATION`                       |       `0`       | Enables public user registration                                               |        |
 | `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |      `15`       | Minimum time between background jobs processing                                |        |
 | `TIMEZONE`                                  | `Europe/Berlin` | Supported timezones [here](https://www.php.net/manual/en/timezones.php)        |        |
 | `DEFAULT_LOGIN_EMAIL`                       |        -        | Email address to always autofill on login page                                 |        |
 | `DEFAULT_LOGIN_PASSWORD`                    |        -        | Password to always autofill on login page                                      |        |
-
 
 ### Database
 
@@ -48,9 +49,9 @@ Required for some third party integrations. Only necessary if the relevant third
 
 | NAME                                        | DEFAULT VALUE | INFO                                                                           | Web UI |
 |:--------------------------------------------|:-------------:|:-------------------------------------------------------------------------------|:------:|
-| `PLEX_IDENTIFIER`                           |       -       | Required for Plex Authentication. Generate with e.g. `openssl rand -base64 32` |        |
-| `PLEX_APP_NAME`                             |   `Movary`    | Required for Plex Authentication                                               |        |
-| `JELLYFIN_DEVICE_ID`                        |       -       | Required for Jellyfin Authentication                                           |        |
+| `PLEX_IDENTIFIER`                           |       -       | Required for Plex authentication. Generate with e.g. `openssl rand -base64 32` |        |
+| `PLEX_APP_NAME`                             |   `Movary`    | Required for Plex authentication                                               |        |
+| `JELLYFIN_DEVICE_ID`                        |       -       | Required for Jellyfin authentication                                           |        |
 
 ### Email
 
