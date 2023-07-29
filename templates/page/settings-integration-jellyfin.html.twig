@@ -89,7 +89,52 @@
                 For personal data access you have to authenticate against Jellyfin.
             </p>
 
-            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#jellyfinAuthenticationModal">Authenticate</button>
+            <div id="alertJellyfinAuthenticationDiv"></div>
+
+            <div id="authenticateWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == true %}d-none{% endif %}">
+                <button type="button"
+                        class="btn btn-primary mb-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#jellyfinAuthenticationModal"
+                        {% if jellyfinServerUrl == null %}disabled{% endif %}>
+                    Authenticate
+                </button>
+            </div>
+            <div id="removeAuthenticationWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == false %}d-none{% endif %}">
+                <button type="button" class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">Remove Authentication</button>
+                <p>Username: {{ jellyfinUsername }}</p>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="jellyfinServerUrlInputPrefix">Server Url</span>
+                <input type="text"
+                       name="jellyfinServerUrlInput"
+                       id="jellyfinServerUrlInput"
+                       class="form-control"
+                       value="{{ jellyfinServerUrl }}"
+                       aria-describedby="jellyfinServerUrlInputPrefix">
+                <button class="btn btn-outline-secondary" type="button" id="jellyfinServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#jellyfinServerUrlHelpModal">
+                    <i class="bi bi-question-lg"></i>
+                </button>
+            </div>
+
+            <div class="spinner-border d-none" role="status" id="alertJellyfinServerUrlLoadingSpinner" style="margin-bottom: 1rem">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="alertJellyfinServerUrlDiv"></div>
+
+            <button type="submit"
+                    class="btn btn-outline-primary mb-3 {% if jellyfinServerUrl == null %} disabled {% endif %}"
+                    id="verifyServerUrlButton"
+                    onclick="verifyJellyfinServerUrl()"
+            >Test connection
+            </button>
+            <button type="submit"
+                    class="btn btn-primary mb-3"
+                    id="saveServerUrlButton"
+                    onclick="saveJellyfinServerUrl()"
+            >Save url
+            </button>
 
             <div class="modal fade" id="jellyfinAuthenticationModal" tabindex="-1" aria-labelledby="jellyfinAuthenticationModal" aria-hidden="true" data-bs-keyboard="false">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -99,27 +144,44 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" id="jellyfinModalBody">
-                            <div id="alertJellyfinImportDiv"></div>
-                            <input type="text" class="form-control mb-3" placeholder="Jellyfin server url" id="jellyfinServerUrlInput" value="{{ jellyfinServerUrl }}"/>
-                            <div class="btn-group mb-3">
-                                <button type="button" class="btn btn-primary" onclick="saveServerUrl()">Save Jellyfin server URL</button>
-                                <button type="button" class="btn btn-warning {% if jellyfinServerUrl == null %} disabled {% endif %}" id="verifyServerUrlBtn" onclick="verifyServerUrl()" {% if jellyfinServerUrl == null %} disabled {% endif %}>Verify Jellyfin server URL</button>
-                            </div>
-
-                            <hr>
-
-                            {% if jellyfinIsAuthenticated == false %}
                             <div class="input-group mb-3">
-                                <label class="input-group-text" for="JellyfinUsernameInput">Jellyfin username</label>
-                                <input type="text" class="form-control disabled" id="JellyfinUsernameInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
-                                <label class="input-group-text" for="JellyfinPasswordInput">Jellyfin password</label>
-                                <input type="password" class="form-control disabled" id="JellyfinPasswordInput" {% if jellyfinServerUrl == null %} disabled {% endif %}/>
+                                <input type="text" class="form-control disabled" id="JellyfinUsernameInput" placeholder="Jellyfin username"/>
                             </div>
-                            <button type="button" class="btn btn-success mb-3" onclick="authenticateJellyfinAccount()" id="jellyfinAuthenticationBtn" {% if jellyfinServerUrl == null %} disabled {% endif %}>Authenticate with Jellyfin</button>
-                            {% else %}
-                            You're already authenticated :D <br/>
-                            <button class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()" id="jellyfinRemoveAuthenticationBtn">Remove Jellyfin authentication</button>
-                            {% endif %}
+                            <div class="input-group mb-3" style="margin-bottom: 0!important">
+                                <input type="password" class="form-control disabled" id="JellyfinPasswordInput" placeholder="Jellyfin password"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="authenticateJellyfinAccount()"
+                                    id="jellyfinAuthenticationBtn" {% if jellyfinServerUrl == null %} disabled {% endif %}>Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="jellyfinServerUrlHelpModal" tabindex="-1" role="dialog" aria-labelledby="jellyfinServerUrlHelpModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered text-start">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="jellyfinServerUrlHelpModalTitle">Help: Jellyfin Server Url</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <p>
+                                    You have to provide a Jellyfin server url which can be accessed by Movary.
+                                    If your Jellyfin server is in a restricted network make sure Movary has access to it. Example urls:
+                                </p>
+                                <ul>
+                                    <li>http://localhost:32400</li>
+                                    <li>http://192.168.1.2:32400</li>
+                                    <li>https://jellyfin.yourDomain.com</li>
+                                </ul>
+                                <p>
+                                    Note: A valid url must start with the protocol (e.g. http://)
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

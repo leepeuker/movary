@@ -135,7 +135,10 @@ async function updateScrobbleOptions() {
     });
 }
 
-async function saveServerUrl() {
+async function saveJellyfinServerUrl() {
+    document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.remove('d-none')
+    removeAlert('alertJellyfinServerUrlDiv');
+
     await fetch('/settings/jellyfin/server-url-save', {
         method: 'POST',
         headers: {
@@ -145,30 +148,26 @@ async function saveServerUrl() {
             'JellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
         })
     }).then(response => {
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+
         if(!response.ok) {
-            addAlert('alertJellyfinImportDiv', 'Could not save server URL', 'danger');
+            addAlert('alertJellyfinServerUrlDiv', 'Could not save server url', 'danger');
             return;
         }
-        addAlert('alertJellyfinImportDiv', 'Succesfully saved the server URL!', 'success');
-        
-        if(document.getElementById('jellyfinServerUrlInput').value.length > 0) {
-            enableElement(document.getElementById('verifyServerUrlBtn'));
-            enableElement(document.getElementById('JellyfinUsernameInput'));
-            enableElement(document.getElementById('JellyfinPasswordInput'));
-            enableElement(document.getElementById('jellyfinAuthenticationBtn'));
-        } else {
-            disableElement(document.getElementById('verifyServerUrlBtn'));
-            disableElement(document.getElementById('JellyfinUsernameInput'));
-            disableElement(document.getElementById('JellyfinPasswordInput'));
-            disableElement(document.getElementById('jellyfinAuthenticationBtn'));
-        }
+
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+        addAlert('alertJellyfinServerUrlDiv', 'Server url was updated', 'success');
     }).catch(function (error) {
         console.log(error);
-        addAlert('alertJellyfinImportDiv', 'Could not save server URL', 'danger');
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+        addAlert('alertJellyfinServerUrlDiv', 'Could not save server url', 'danger');
     });
 }
 
-async function verifyServerUrl() {
+async function verifyJellyfinServerUrl() {
+    document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.remove('d-none')
+    removeAlert('alertJellyfinServerUrlDiv');
+
     await fetch('/settings/jellyfin/server-url-verify', {
         method: 'POST',
         headers: {
@@ -178,14 +177,17 @@ async function verifyServerUrl() {
             'JellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
         })
     }).then(response => {
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
         if(!response.ok) {
-            addAlert('alertJellyfinImportDiv', 'Could not verify server URL', 'danger');
+            addAlert('alertJellyfinServerUrlDiv', 'Could not verify server url', 'danger');
+
             return;
         }
-        addAlert('alertJellyfinImportDiv', 'Succesfully verified the server URL!', 'success');
+        addAlert('alertJellyfinServerUrlDiv', 'Server url was verified', 'success');
     }).catch(function (error) {
         console.log(error)
-        addAlert('alertJellyfinImportDiv', 'Could not verify server URL', 'danger');
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+        addAlert('alertJellyfinServerUrlDiv', 'Could not verify server url', 'danger');
     });
 }
 
@@ -230,12 +232,10 @@ async function removeJellyfinAuthentication() {
     }).then(response => {
         if(!response.ok) {
             addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
-            return;
         } else {
             addAlert('alertJellyfinImportDiv', 'Authentication succesfully removed!', 'success');
             document.getElementById('jellyfinRemoveAuthenticationBtn').remove();
             insertAuthenticationForm();
-            
         }
     }).catch(function (error) {
         console.error(error)
