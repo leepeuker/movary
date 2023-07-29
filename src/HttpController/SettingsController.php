@@ -3,8 +3,6 @@
 namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
-use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
-use Movary\Api\Jellyfin\Exception\JellyfinNotFoundError;
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
@@ -277,14 +275,7 @@ class SettingsController
         $jellyfinIsAuthenticated = $this->userApi->findJellyfinAccessToken($user->getId()) === null ? false : true;
 
         if ($jellyfinIsAuthenticated === true) {
-            $jellyfinUserId = $this->userApi->fetchJellyfinUserId($user->getId());
-
-            try {
-                $this->jellyfinApi->fetchJellyfinUser($jellyfinUserId);
-            } catch (JellyfinInvalidAuthentication|JellyfinNotFoundError) {
-                $jellyfinIsAuthenticated = false;
-                $this->userApi->deleteJellyfinAuthentication($user->getId());
-            }
+            $jellyfinUsername = ''; //todo
         }
 
         if ($applicationUrl !== null && $webhookId !== null) {
@@ -298,6 +289,7 @@ class SettingsController
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'jellyfinServerUrl' => $jellyfinServerUrl,
                 'jellyfinIsAuthenticated' => $jellyfinIsAuthenticated,
+                'jellyfinUsername' => $jellyfinUsername ?? null,
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
             ]),
         );

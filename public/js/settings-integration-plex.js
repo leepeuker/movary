@@ -248,11 +248,3 @@ async function importPlexWatchlist() {
 
     addAlert('alertPlexWatchlistImportDiv', 'Watchlist import scheduled', 'success')
 }
-
-async function authenticateWithJellyfin() {
-    // TODO
-}
-
-async function removeJellyfinAuthentication() {
-    // TODO
-}

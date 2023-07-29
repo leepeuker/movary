@@ -46,7 +46,7 @@ class JellyfinController
             return Response::createBadRequest();
         }
 
-        $jellyfinAuthentication = $this->jellyfinApi->createJellyfinAuthentication($username, $password);
+        $jellyfinAuthentication = $this->jellyfinApi->createJellyfinAuthentication($userId, $username, $password);
         if ($jellyfinAuthentication === null) {
             return Response::createUnauthorized();
         }
@@ -102,8 +102,10 @@ class JellyfinController
             return Response::createSeeOther('/');
         }
 
-        $this->jellyfinApi->deleteJellyfinAccessToken();
-        $this->userApi->deleteJellyfinAuthentication($this->authenticationService->getCurrentUserId());
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $this->jellyfinApi->deleteJellyfinAccessToken($userId);
+        $this->userApi->deleteJellyfinAuthentication($userId);
 
         $this->logger->info('Jellyfin authentication has been removed');
 
@@ -142,8 +144,12 @@ class JellyfinController
             return Response::createSeeOther('/');
         }
 
+        $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo();
+        var_dump($jellyfinServerInfo);
+
+        return Response::createOk();
+
         try {
-            $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo();
             if ($jellyfinServerInfo === null) {
                 return Response::createBadRequest();
             } elseif ($jellyfinServerInfo['ProductName'] === 'Jellyfin Server') {

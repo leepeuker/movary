@@ -12,6 +12,8 @@ class ServerSettings
 
     private const PLEX_APP_NAME = 'PLEX_APP_NAME';
 
+    private const JELLYFIN_APP_NAME = 'JELLYFIN_APP_NAME';
+
     private const PLEX_IDENTIFIER = 'PLEX_IDENTIFIER';
 
     private const APPLICATION_URL = 'APPLICATION_URL';
@@ -42,11 +44,6 @@ class ServerSettings
     ) {
     }
 
-    public function getAppName() : string
-    {
-        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';
-    }
-
     public function getApplicationUrl() : ?string
     {
         return $this->getByKey(self::APPLICATION_URL);
@@ -62,14 +59,19 @@ class ServerSettings
         return $this->getByKey(self::SMTP_FROM_ADDRESS);
     }
 
+    public function getJellyfinAppName() : string
+    {
+        return $this->getByKey(self::JELLYFIN_APP_NAME) ?? 'Movary';
+    }
+
+    public function getPlexAppName() : string
+    {
+        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';
+    }
+
     public function getPlexIdentifier() : ?string
     {
         return $this->getByKey(self::PLEX_IDENTIFIER);
-    }
-
-    public function getJellyfinDeviceId() : ?string
-    {
-        return $this->getByKey(self::JELLYFIN_DEVICE_ID);
     }
 
     public function getSmtpEncryption() : ?string
@@ -162,6 +164,16 @@ class ServerSettings
         $value = $this->getByKey(self::APPLICATION_URL, true);
         if ($value === null) {
             throw ConfigNotSetException::create(self::APPLICATION_URL);
+        }
+
+        return $value;
+    }
+
+    public function requireJellyfinDeviceId() : ?string
+    {
+        $value = $this->getByKey(self::JELLYFIN_DEVICE_ID, true);
+        if ($value === null) {
+            throw ConfigNotSetException::create(self::JELLYFIN_DEVICE_ID);
         }
 
         return $value;
