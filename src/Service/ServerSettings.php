@@ -5,11 +5,10 @@ namespace Movary\Service;
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Exception\ConfigNotSetException;
-use function PHPUnit\Framework\assertNotNull;
 
 class ServerSettings
 {
-    PRIVATE CONST JELLYFIN_DEVICEID = 'JELLYFIN_DEVICEID';
+    private const JELLYFIN_DEVICE_ID = 'JELLYFIN_DEVICE_ID';
 
     private const PLEX_APP_NAME = 'PLEX_APP_NAME';
 
@@ -70,7 +69,7 @@ class ServerSettings
 
     public function getJellyfinDeviceId() : ?string
     {
-        return $this->getByKey(self::JELLYFIN_DEVICEID);
+        return $this->getByKey(self::JELLYFIN_DEVICE_ID);
     }
 
     public function getSmtpEncryption() : ?string
