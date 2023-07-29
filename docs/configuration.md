@@ -26,7 +26,6 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `DEFAULT_LOGIN_EMAIL`                       |        -        | Email address to always autofill on login page                                 |        |
 | `DEFAULT_LOGIN_PASSWORD`                    |        -        | Password to always autofill on login page                                      |        |
 
-
 ### Database
 
 Required to run the application
