@@ -272,14 +272,16 @@ class SettingsController
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         $webhookId = $user->getJellyfinWebhookId();
-        
+
         $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($user->getId());
         $jellyfinIsAuthenticated = $this->userApi->findJellyfinAccessToken($user->getId()) === null ? false : true;
 
-        if($jellyfinIsAuthenticated === true) {
+        if ($jellyfinIsAuthenticated === true) {
+            $jellyfinUserId = $this->userApi->fetchJellyfinUserId($user->getId());
+
             try {
-                $this->jellyfinApi->fetchJellyfinUser($this->userApi->findJellyfinUserId($user->getId()));
-            } catch (JellyfinInvalidAuthentication | JellyfinNotFoundError $e) {
+                $this->jellyfinApi->fetchJellyfinUser($jellyfinUserId);
+            } catch (JellyfinInvalidAuthentication|JellyfinNotFoundError) {
                 $jellyfinIsAuthenticated = false;
                 $this->userApi->deleteJellyfinAuthentication($user->getId());
             }

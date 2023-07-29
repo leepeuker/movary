@@ -111,12 +111,12 @@ class UserApi
         return JellyfinAccessToken::create($jellyfinAccessToken);
     }
 
-    public function findJellyfinUserId(int $userId) : ?JellyfinUserId
+    public function fetchJellyfinUserId(int $userId) : JellyfinUserId
     {
         $jellyfinUserId = $this->repository->findJellyfinUserId($userId);
 
         if ($jellyfinUserId === null) {
-            return null;
+            throw new \RuntimeException('Missing jellyfin user id.');
         }
 
         return JellyfinUserId::create($jellyfinUserId);
