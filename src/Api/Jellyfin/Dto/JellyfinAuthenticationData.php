@@ -6,28 +6,18 @@ class JellyfinAuthenticationData
 {
     private function __construct(
         private readonly JellyfinAccessToken $jellyfinAccessToken,
-        private readonly JellyfinUserid $jellyfinUserid
+        private readonly JellyfinUserId $jellyfinUserId,
     ) {
     }
 
-    public static function create(JellyfinAccessToken $JellyfinAccessToken, JellyfinUserid $jellyfinUserid) : self
+    public static function create(JellyfinAccessToken $jellyfinAccessToken, JellyfinUserId $jellyfinUserId) : self
     {
-        return new self($JellyfinAccessToken, $jellyfinUserid);
+        return new self($jellyfinAccessToken, $jellyfinUserId);
     }
 
-    public function getUserIdAsString() : string
+    public function getUserId() : JellyfinUserId
     {
-        return (string)$this->jellyfinUserid;
-    }
-
-    public function getAccessTokenAsString() : string
-    {
-        return (string)$this->jellyfinAccessToken;
-    }
-
-    public function getUserId() : JellyfinUserid
-    {
-        return $this->jellyfinUserid;
+        return $this->jellyfinUserId;
     }
 
     public function getAccessToken() : JellyfinAccessToken

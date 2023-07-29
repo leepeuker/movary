@@ -9,12 +9,11 @@ use Movary\Domain\User\UserApi;
 use Movary\Service\Jellyfin\JellyfinScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
+use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Psr\Log\LoggerInterface;
 use Movary\ValueObject\Url;
-use Movary\ValueObject\Exception\InvalidUrl;
-use Movary\ValueObject\Http\StatusCode;
+use Psr\Log\LoggerInterface;
 
 class JellyfinController
 {
@@ -33,24 +32,24 @@ class JellyfinController
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
         }
-        
-        if(empty($this->userApi->findJellyfinServerUrl($this->authenticationService->getCurrentUserId()))) {
+
+        if (empty($this->userApi->findJellyfinServerUrl($this->authenticationService->getCurrentUserId()))) {
             return Response::createBadRequest();
         }
 
         $username = Json::decode($request->getBody())['username'];
         $password = Json::decode($request->getBody())['password'];
 
-        if(empty($username) || empty($password)) {
+        if (empty($username) || empty($password)) {
             return Response::createBadRequest();
         }
 
-        $jellyfinAuthenticationData = $this->jellyfinApi->fetchJellyfinAuthenticationData($username, $password);
-        if($jellyfinAuthenticationData === null) {
+        $jellyfinAuthentication = $this->jellyfinApi->createJellyfinAuthentication($username, $password);
+        if ($jellyfinAuthentication === null) {
             return Response::createUnauthorized();
         }
-        $this->userApi->updateJellyfinAccessToken($this->authenticationService->getCurrentUserId(), $jellyfinAuthenticationData->getAccessTokenAsString());
-        $this->userApi->updateJellyfinUserId($this->authenticationService->getCurrentUserId(), $jellyfinAuthenticationData->getUserIdAsString());
+
+        $this->userApi->updateJellyfinAuthentication($this->authenticationService->getCurrentUserId(), $jellyfinAuthentication);
 
         return Response::createOk();
     }
@@ -103,10 +102,10 @@ class JellyfinController
 
         $this->jellyfinApi->deleteJellyfinAccessToken();
 
-        $this->userApi->updateJellyfinAccessToken($this->authenticationService->getCurrentUserId(), null);
+        $this->userApi->updateJellyfinAuthentication($this->authenticationService->getCurrentUserId(), null);
         $this->userApi->updateJellyfinUserId($this->authenticationService->getCurrentUserId(), null);
-        
-        return Response::createOk();        
+
+        return Response::createOk();
     }
 
     public function saveJellyfinServerUrl(Request $request) : Response
@@ -118,7 +117,7 @@ class JellyfinController
         $jellyfinServerUrl = Json::decode($request->getBody())['JellyfinServerUrl'];
         $userId = $this->authenticationService->getCurrentUserId();
 
-        if(empty($jellyfinServerUrl)) {
+        if (empty($jellyfinServerUrl)) {
             $this->userApi->updateJellyfinServerUrl($userId, null);
 
             return Response::createOk();
@@ -131,6 +130,7 @@ class JellyfinController
         }
 
         $this->userApi->updateJellyfinServerUrl($userId, $jellyfinServerUrl);
+
         return Response::createOk();
     }
 
@@ -142,15 +142,15 @@ class JellyfinController
 
         try {
             $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo();
-            if($jellyfinServerInfo === null) {
+            if ($jellyfinServerInfo === null) {
                 return Response::createBadRequest();
-            } else if($jellyfinServerInfo['ProductName'] === 'Jellyfin Server') {
+            } elseif ($jellyfinServerInfo['ProductName'] === 'Jellyfin Server') {
                 return Response::createOk();
             }
+
             return Response::createBadRequest();
         } catch (Exception) {
             return Response::createBadRequest();
         }
-
     }
 }

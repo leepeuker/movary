@@ -3,6 +3,7 @@
 namespace Movary\Domain\User;
 
 use Doctrine\DBAL\Connection;
+use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Url;
 use RuntimeException;
@@ -460,12 +461,13 @@ class UserRepository
         );
     }
 
-    public function updateJellyfinAccessToken(int $userId, ?string $accessToken) : void
+    public function updateJellyfinAuthentication(int $userId, ?JellyfinAuthenticationData $jellyfinAuthenticationData) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'jellyfin_access_token' => $accessToken,
+                'jellyfin_access_token' => (string)$jellyfinAuthenticationData->getAccessToken(),
+                'jellyfin_user_id' => (string)$jellyfinAuthenticationData->getUserId(),
             ],
             [
                 'id' => $userId,
@@ -492,19 +494,6 @@ class UserRepository
             'user',
             [
                 'jellyfin_server_url' => (string)$serverUrl,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateJellyfinUserId(int $userId, ?string $jellyfinUserId) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'jellyfin_user_id' => $jellyfinUserId,
             ],
             [
                 'id' => $userId,

@@ -3,6 +3,8 @@
 namespace Movary\Domain\User;
 
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
+use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
+use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\Url;
@@ -258,9 +260,9 @@ class UserApi
         $this->repository->updateIsAdmin($userId, $isAdmin);
     }
 
-    public function updateJellyfinAccessToken(int $userId, ?string $accessToken) : void
+    public function updateJellyfinAuthentication(int $userId, ?JellyfinAuthenticationData $jellyfinAuthentication) : void
     {
-        $this->repository->updateJellyfinAccessToken($userId, $accessToken);
+        $this->repository->updateJellyfinAuthentication($userId, $jellyfinAuthentication);
     }
 
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
@@ -273,7 +275,7 @@ class UserApi
         $this->repository->updateJellyfinServerUrl($userId, $serverUrl);
     }
 
-    public function updateJellyfinUserId(int $userId, ?string $jellyfinUserId) : void
+    public function updateJellyfinUserId(int $userId, ?JellyfinUserId $jellyfinUserId) : void
     {
         $this->repository->updateJellyfinUserId($userId, $jellyfinUserId);
     }
