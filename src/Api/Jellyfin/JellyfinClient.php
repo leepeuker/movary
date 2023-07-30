@@ -4,9 +4,11 @@ namespace Movary\Api\Jellyfin;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
 use Movary\Api\Jellyfin\Exception\JellyfinNotFoundError;
+use Movary\Api\Jellyfin\Exception\JellyfinServerConnectionError;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\ValueObject\Url;
@@ -62,6 +64,8 @@ class JellyfinClient
             $response = $this->httpClient->request('POST', (string)$jellyfinServerUrl, $options);
         } catch (ClientException $e) {
             throw $this->convertException($e, $jellyfinServerUrl);
+        } catch (ConnectException) {
+            throw JellyfinServerConnectionError::create($jellyfinServerUrl);
         }
 
         /** @psalm-suppress PossiblyUndefinedVariable */

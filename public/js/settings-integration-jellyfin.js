@@ -152,28 +152,42 @@ async function verifyJellyfinServerUrl() {
 }
 
 async function authenticateJellyfinAccount() {
-    console.log(document.getElementById('jellyfinAuthenticationModalUsernameInput').value)
-    await fetch('/settings/jellyfin/authenticate', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            'username': document.getElementById('jellyfinAuthenticationModalUsernameInput').value,
-            'password': document.getElementById('jellyfinAuthenticationModalPasswordInput').value,
-        })
-    }).then(response => {
-        if (!response.ok) {
-            addAlert('alertJellyfinAuthenticationModalDiv', 'Could not authenticate with Jellyfin', 'danger', 0);
+    document.getElementById('jellyfinAuthenticationModalLoadingSpinner').classList.remove('d-none')
+    removeAlert('alertJellyfinAuthenticationModalDiv')
 
-            return;
+    const response = await fetch(
+        '/settings/jellyfin/authenticate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            signal: AbortSignal.timeout(4000),
+            body: JSON.stringify({
+                'username': document.getElementById('jellyfinAuthenticationModalUsernameInput').value,
+                'password': document.getElementById('jellyfinAuthenticationModalPasswordInput').value,
+            })
         }
-
-        location.reload();
-    }).catch(function (error) {
+    ).catch(function (error) {
         console.error(error)
+        document.getElementById('jellyfinAuthenticationModalLoadingSpinner').classList.add('d-none')
         addAlert('alertJellyfinAuthenticationModalDiv', 'Could not authenticate with Jellyfin', 'danger', 0);
     });
+
+    document.getElementById('jellyfinAuthenticationModalLoadingSpinner').classList.add('d-none')
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertJellyfinAuthenticationModalDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertJellyfinAuthenticationModalDiv', 'Authentication did not work', 'danger')
+
+        return
+    }
+
+    location.reload();
 }
 
 async function removeJellyfinAuthentication() {

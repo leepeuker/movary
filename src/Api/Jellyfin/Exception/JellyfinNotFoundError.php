@@ -9,6 +9,6 @@ class JellyfinNotFoundError extends RuntimeException
 {
     public static function create(Url $requestUrl) : self
     {
-        return new self('The requested url does not exist: ' . $requestUrl);
+        return new self('The requested Jellyfin url was not found: ' . $requestUrl);
     }
 }

@@ -6,6 +6,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUser;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
+use Movary\Api\Jellyfin\Exception\JellyfinServerUrlMissing;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
 use Movary\ValueObject\RelativeUrl;
@@ -59,7 +60,7 @@ class JellyfinApi
     {
         $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($userId);
         if ($jellyfinServerUrl === null) {
-            throw new \RuntimeException('Server url required');
+            throw JellyfinServerUrlMissing::create();
         }
 
         $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/Users/authenticatebyname'));
@@ -70,7 +71,7 @@ class JellyfinApi
         ];
         $response = $this->jellyfinClient->post($url, data: $data);
         if ($response === null) {
-            return null;
+            throw new \RuntimeException('Missing authentication response body');
         }
 
         $this->logger->info('Jellyfin account has been authenticated for user: ' . $userId);

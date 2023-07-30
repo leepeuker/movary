@@ -3,6 +3,10 @@
 namespace Movary\HttpController;
 
 use Exception;
+use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
+use Movary\Api\Jellyfin\Exception\JellyfinNotFoundError;
+use Movary\Api\Jellyfin\Exception\JellyfinServerConnectionError;
+use Movary\Api\Jellyfin\Exception\JellyfinServerUrlMissing;
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -35,20 +39,23 @@ class JellyfinController
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        if (empty($this->userApi->findJellyfinServerUrl($userId))) {
-            return Response::createBadRequest();
-        }
-
         $username = Json::decode($request->getBody())['username'];
         $password = Json::decode($request->getBody())['password'];
 
         if (empty($username) || empty($password)) {
-            return Response::createBadRequest();
+            return Response::createBadRequest('Could not authenticate: Username or password missing');
         }
 
-        $jellyfinAuthentication = $this->jellyfinApi->createJellyfinAuthentication($userId, $username, $password);
-        if ($jellyfinAuthentication === null) {
-            return Response::createUnauthorized();
+        try {
+            $jellyfinAuthentication = $this->jellyfinApi->createJellyfinAuthentication($userId, $username, $password);
+        } catch (JellyfinServerUrlMissing) {
+            return Response::createBadRequest('Could not authenticate: Server url missing');
+        } catch (JellyfinNotFoundError) {
+            return Response::createBadRequest('Could not authenticate: Page not found');
+        } catch (JellyfinServerConnectionError) {
+            return Response::createBadRequest('Could not authenticate: Cannot connect to server');
+        } catch (JellyfinInvalidAuthentication) {
+            return Response::createBadRequest('Could not authenticate');
         }
 
         $this->userApi->updateJellyfinAuthentication($userId, $jellyfinAuthentication);
