@@ -185,6 +185,7 @@ class SettingsController
 
         $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
         $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
+        $importWatchlistSuccessful = $this->sessionWrapper->find('importWatchlistSuccessful');
         $importHistoryError = $this->sessionWrapper->find('importHistoryError');
         $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
         $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
@@ -192,6 +193,7 @@ class SettingsController
         $this->sessionWrapper->unset(
             'importHistorySuccessful',
             'importRatingsSuccessful',
+            'importWatchlistSuccessful',
             'importHistoryError',
             'deletedUserHistory',
             'deletedUserRatings',
@@ -205,6 +207,7 @@ class SettingsController
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'importHistorySuccessful' => $importHistorySuccessful,
                 'importRatingsSuccessful' => $importRatingsSuccessful,
+                'importWatchlistSuccessful' => $importWatchlistSuccessful,
                 'importHistoryError' => $importHistoryError,
                 'deletedUserHistory' => $deletedUserHistory,
                 'deletedUserRatings' => $deletedUserRatings,
