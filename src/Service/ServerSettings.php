@@ -64,6 +64,11 @@ class ServerSettings
         return $this->getByKey(self::JELLYFIN_APP_NAME) ?? 'Movary';
     }
 
+    public function getJellyfinDeviceId() : ?string
+    {
+        return $this->getByKey(self::JELLYFIN_DEVICE_ID);
+    }
+
     public function getPlexAppName() : string
     {
         return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';

@@ -89,14 +89,20 @@
                 For personal data access you have to authenticate against Jellyfin.
             </p>
 
-            <div id="alertJellyfinAuthenticationDiv"></div>
+            <div id="alertJellyfinAuthenticationDiv">
+                <div class="alert alert-warning {% if jellyfinDeviceId == true %}d-none{% endif %}"
+                     role="alert"
+                     style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                    Authentication disabled - Jellyfin device id required
+                </div>
+            </div>
 
             <div id="authenticateWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == true %}d-none{% endif %}">
                 <button type="button"
                         class="btn btn-primary mb-3"
                         data-bs-toggle="modal"
                         data-bs-target="#jellyfinAuthenticationModal"
-                        id ="authenticateWithJellyfinButton"
+                        id="authenticateWithJellyfinButton"
                         {% if jellyfinServerUrl == null %}disabled{% endif %}>
                     Authenticate
                 </button>
@@ -113,7 +119,8 @@
                        id="jellyfinServerUrlInput"
                        class="form-control"
                        value="{{ jellyfinServerUrl }}"
-                       aria-describedby="jellyfinServerUrlInputPrefix">
+                       aria-describedby="jellyfinServerUrlInputPrefix"
+                        {% if jellyfinDeviceId == null %} disabled {% endif %}>
                 <button class="btn btn-outline-secondary" type="button" id="jellyfinServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#jellyfinServerUrlHelpModal">
                     <i class="bi bi-question-lg"></i>
                 </button>
@@ -125,15 +132,17 @@
             <div id="alertJellyfinServerUrlDiv"></div>
 
             <button type="submit"
-                    class="btn btn-outline-primary mb-3 {% if jellyfinServerUrl == null %} disabled {% endif %}"
+                    class="btn btn-outline-primary mb-3"
                     id="verifyServerUrlButton"
                     onclick="verifyJellyfinServerUrl()"
+                    {% if jellyfinServerUrl == null or jellyfinDeviceId == null %} disabled {% endif %}
             >Test connection
             </button>
             <button type="submit"
                     class="btn btn-primary mb-3"
                     id="saveServerUrlButton"
                     onclick="saveJellyfinServerUrl()"
+                    {% if jellyfinDeviceId == null %} disabled {% endif %}
             >Save url
             </button>
 
@@ -146,10 +155,16 @@
                         </div>
                         <div class="modal-body" id="jellyfinModalBody" style="padding-bottom: 0">
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control disabled" id="jellyfinUsernameInput" placeholder="Jellyfin username"/>
+                                <span class="input-group-text">Server Url</span>
+                                <input type="text" class="form-control disabled" id="jellyfinAuthenticationModalServerUrlInput" value="{{ jellyfinServerUrl }}" disabled/>
                             </div>
-                            <div class="input-group mb-3" style="">
-                                <input type="password" class="form-control disabled" id="jellyfinPasswordInput" placeholder="Jellyfin password"/>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Username</span>
+                                <input type="text" class="form-control disabled" id="jellyfinAuthenticationModalUsernameInput"/>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Password</span>
+                                <input type="text" class="form-control disabled" id="jellyfinAuthenticationModalPasswordInput"/>
                             </div>
                             <div id="alertJellyfinAuthenticationModalDiv"></div>
                         </div>

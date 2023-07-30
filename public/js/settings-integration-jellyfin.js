@@ -1,50 +1,3 @@
-function disableElement(el) {
-    el.classList.add('disabled');
-    el.disabled = true;
-}
-
-function enableElement(el) {
-    el.classList.remove('disabled');
-    el.disabled = false;
-}
-
-function insertAuthenticationForm() {
-    let jellyfinInputGroup = document.createElement('div');
-    let jellyfinUsernameInput = document.createElement('input');
-    let jellyfinPasswordInput = document.createElement('input');
-    let jellyfinButtonInput = document.createElement('button');
-    let jellyfinUsernameLabel = document.createElement('label');
-    let jellyfinPasswordLabel = document.createElement('label');
-
-    jellyfinUsernameInput.type = 'text';
-    jellyfinUsernameInput.classList.add('form-control', 'disabled');
-    jellyfinUsernameInput.id = 'JellyfinUsernameInput';
-
-    jellyfinPasswordInput.type = 'password';
-    jellyfinPasswordInput.classList.add('form-control', 'disabled');
-    jellyfinPasswordInput.id = 'JellyfinPasswordInput';
-
-    jellyfinUsernameLabel.classList.add('input-group-text');
-    jellyfinUsernameLabel.for = 'JellyfinUsernameInput';
-    jellyfinUsernameLabel.innerText = 'Jellyfin username';
-
-    jellyfinPasswordLabel.classList.add('input-group-text');
-    jellyfinPasswordLabel.for = 'JellyfinPasswordInput';
-    jellyfinPasswordLabel.innerText = 'Jellyfin password';
-
-    jellyfinButtonInput.type = 'button';
-    jellyfinButtonInput.classList.add('btn', 'btn-success', 'mb-3');
-    jellyfinButtonInput.addEventListener('click', authenticateJellyfinAccount);
-    jellyfinButtonInput.id = 'jellyfinAuthenticationBtn';
-    jellyfinButtonInput.innerText = 'Authenticate with Jellyfin';
-
-    jellyfinInputGroup.classList.add('input-group', 'mb-3');
-
-    jellyfinInputGroup.append(jellyfinUsernameLabel, jellyfinUsernameInput, jellyfinPasswordLabel, jellyfinPasswordInput);
-
-    document.getElementById('jellyfinModalBody').append(jellyfinInputGroup, jellyfinButtonInput);
-}
-
 function regenerateJellyfinWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return
@@ -159,11 +112,11 @@ async function saveJellyfinServerUrl() {
 
         document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
         addAlert('alertJellyfinServerUrlDiv', 'Server url was updated', 'success');
-        if (jellyfinServerUrl !== '') {
-            document.getElementById('authenticateWithJellyfinButton').disabled = false
-        } else {
-            document.getElementById('authenticateWithJellyfinButton').disabled = true
-        }
+
+        console.log(jellyfinServerUrl)
+        document.getElementById('jellyfinAuthenticationModalServerUrlInput').value = jellyfinServerUrl
+        document.getElementById('authenticateWithJellyfinButton').disabled = jellyfinServerUrl == ''
+        document.getElementById('verifyServerUrlButton').disabled = jellyfinServerUrl == ''
     }).catch(function (error) {
         console.log(error);
         document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
@@ -199,15 +152,15 @@ async function verifyJellyfinServerUrl() {
 }
 
 async function authenticateJellyfinAccount() {
-    console.log(document.getElementById('jellyfinUsernameInput').value)
+    console.log(document.getElementById('jellyfinAuthenticationModalUsernameInput').value)
     await fetch('/settings/jellyfin/authenticate', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            'username': document.getElementById('jellyfinUsernameInput').value,
-            'password': document.getElementById('jellyfinPasswordInput').value,
+            'username': document.getElementById('jellyfinAuthenticationModalUsernameInput').value,
+            'password': document.getElementById('jellyfinAuthenticationModalPasswordInput').value,
         })
     }).then(response => {
         if (!response.ok) {
