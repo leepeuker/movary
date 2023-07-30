@@ -57,6 +57,20 @@ class ExportWriter
             }
         }
     }
+    
+    /** @param resource $fileHandle */
+
+    public function writeWatchlistItemToCsv($filehandle, array $watchlistItem) : void
+    {
+        $lengthOfWrittenString = fputcsv($filehandle, [
+            $watchlistItem['title'],
+            $watchlistItem['tmdb_id'],
+            $watchlistItem['imdb_id']
+        ]);
+        if ($lengthOfWrittenString === false) {
+            throw new \RuntimeException('Could not write watch date to export csv');
+        }
+    }
 
     private function convertReleaseDate(?string $movieWatchDate) : ?Year
     {

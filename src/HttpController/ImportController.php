@@ -37,6 +37,7 @@ class ImportController
             match ($exportType) {
                 'history' => $this->importHistory($userId, $fileParameters),
                 'ratings' => $this->importRatings($userId, $fileParameters),
+                'watchlist' => $this->importWatchlist($userId, $fileParameters),
                 default => throw new RuntimeException('Export type not handled: ' . $exportType)
             };
         } catch (Throwable $t) {
@@ -71,5 +72,16 @@ class ImportController
         $this->importService->importRatings($userId, $fileParameter['ratings']['tmp_name']);
 
         $this->sessionWrapper->set('importRatingsSuccessful', true);
+    }
+
+    private function importWatchlist(int $userId, array $fileParameter) : void
+    {
+        if (empty($fileParameter['watchlist']['tmp_name']) === true) {
+            throw new RuntimeException('Import csv file missing');
+        }
+
+        $this->importService->importWatchlist($userId, $fileParameter['watchlist']['tmp_name']);
+
+        $this->sessionWrapper->set('importWatchlistSuccessful', true);
     }
 }

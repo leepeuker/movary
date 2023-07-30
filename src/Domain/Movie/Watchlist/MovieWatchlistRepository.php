@@ -23,6 +23,15 @@ class MovieWatchlistRepository
         );
     }
 
+    public function fetchAllWatchlistItems(int $userId) : ?array
+    {
+        $watchlist = $this->dbConnection->fetchAllAssociative('SELECT * FROM watchlist JOIN movie m ON movie_id = m.id WHERE user_id = ?', [$userId]);
+        if($watchlist === false) {
+            return null;
+        }
+        return $watchlist;
+    }
+
     public function fetchWatchlistCount(int $userId, ?string $searchTerm) : int
     {
         if ($searchTerm !== null) {
