@@ -25,7 +25,7 @@ You can authenticate Movary against Plex on the Plex integration settings page (
 
 During the authentication process a Plex access token is generated and stored in the database. 
 This token will be used in all further Plex API requests.
-When an authentication is removed in Movary, the token will be deleted from the database.
+When an authentication is removed in Movary, the token will be deleted from Movary only.
 
 !!! Info
 
