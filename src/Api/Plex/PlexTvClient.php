@@ -57,7 +57,7 @@ class PlexTvClient extends PlexClient
 
         return [
             'X-Plex-Client-Identifier' => $plexIdentifier,
-            'X-Plex-Product' => $this->serverSettings->getAppName(),
+            'X-Plex-Product' => $this->serverSettings->getPlexAppName(),
             'X-Plex-Product-Version' => $plexIdentifier,
             'X-Plex-Platform' => php_uname('s'),
             'X-Plex-Platform-Version' => php_uname('v'),

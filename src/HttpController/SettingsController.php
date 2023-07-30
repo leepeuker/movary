@@ -3,6 +3,7 @@
 namespace Movary\HttpController;
 
 use Movary\Api\Github\GithubApi;
+use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Api\Trakt\TraktApi;
@@ -41,6 +42,7 @@ class SettingsController
         private readonly SessionWrapper $sessionWrapper,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
+        private readonly JellyfinApi $jellyfinApi,
         private readonly ServerSettings $serverSettings,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly JobQueueApi $jobQueueApi,
@@ -269,6 +271,15 @@ class SettingsController
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         $webhookId = $user->getJellyfinWebhookId();
 
+        $jellyfinDeviceId = $this->serverSettings->getJellyfinDeviceId();
+        $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($user->getId());
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($user->getId());
+        $jellyfinUsername = null;
+
+        if ($jellyfinDeviceId !== null && $jellyfinServerUrl !== null && $jellyfinAuthentication !== null) {
+            $jellyfinUsername = $this->jellyfinApi->findJellyfinUser($jellyfinAuthentication);
+        }
+
         if ($applicationUrl !== null && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId);
         }
@@ -278,6 +289,10 @@ class SettingsController
             $this->twig->render('page/settings-integration-jellyfin.html.twig', [
                 'isActive' => $applicationUrl !== null,
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
+                'jellyfinServerUrl' => $jellyfinServerUrl,
+                'jellyfinIsAuthenticated' => $jellyfinAuthentication !== null,
+                'jellyfinUsername' => $jellyfinUsername?->getUsername(),
+                'jellyfinDeviceId' => $jellyfinDeviceId,
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
             ]),
         );

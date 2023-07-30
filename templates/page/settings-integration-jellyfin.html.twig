@@ -63,9 +63,7 @@
                 <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateJellyfinWebhook()">Regenerate url</button>
             </div>
 
-            <hr>
-
-            <h5>Scrobble Options</h5>
+            <h5 style="margin-top: 1rem">Options</h5>
 
             <div style="padding-bottom: 1rem;padding-top: 0.5rem">
                 <input class="form-check-input"
@@ -82,6 +80,132 @@
             <div id="alertWebhookOptionsDiv"></div>
 
             <button type="submit" class="btn btn-primary" {% if jellyfinWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
+
+            <hr>
+
+            <h5>Jellyfin authentication</h5>
+
+            <p class="text-muted" style="padding-bottom: 0">
+                For personal data access you have to authenticate against Jellyfin.
+            </p>
+
+            <div id="alertJellyfinAuthenticationDiv">
+                <div class="alert alert-warning {% if jellyfinDeviceId == true %}d-none{% endif %}"
+                     role="alert"
+                     style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                    Authentication disabled - Jellyfin device id required
+                </div>
+            </div>
+
+            <div id="authenticateWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == true %}d-none{% endif %}">
+                <button type="button"
+                        class="btn btn-primary mb-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#jellyfinAuthenticationModal"
+                        id="authenticateWithJellyfinButton"
+                        {% if jellyfinServerUrl == null %}disabled{% endif %}>
+                    Authenticate
+                </button>
+            </div>
+            <div id="removeAuthenticationWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == false %}d-none{% endif %}">
+                <button type="button" class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">Remove Authentication</button>
+                <p>Username: {{ jellyfinUsername }}</p>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="jellyfinServerUrlInputPrefix">Server Url</span>
+                <input type="text"
+                       name="jellyfinServerUrlInput"
+                       id="jellyfinServerUrlInput"
+                       class="form-control"
+                       value="{{ jellyfinServerUrl }}"
+                       aria-describedby="jellyfinServerUrlInputPrefix"
+                        {% if jellyfinDeviceId == null %} disabled {% endif %}>
+                <button class="btn btn-outline-secondary" type="button" id="jellyfinServerUrlInputPrefix" data-bs-toggle="modal" data-bs-target="#jellyfinServerUrlHelpModal">
+                    <i class="bi bi-question-lg"></i>
+                </button>
+            </div>
+
+            <div class="spinner-border d-none" role="status" id="alertJellyfinServerUrlLoadingSpinner" style="margin-bottom: 1rem">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="alertJellyfinServerUrlDiv"></div>
+
+            <button type="submit"
+                    class="btn btn-outline-primary mb-3"
+                    id="verifyServerUrlButton"
+                    onclick="verifyJellyfinServerUrl()"
+                    {% if jellyfinServerUrl == null or jellyfinDeviceId == null %} disabled {% endif %}
+            >Test connection
+            </button>
+            <button type="submit"
+                    class="btn btn-primary mb-3"
+                    id="saveServerUrlButton"
+                    onclick="saveJellyfinServerUrl()"
+                    {% if jellyfinDeviceId == null %} disabled {% endif %}
+            >Save url
+            </button>
+
+            <div class="modal fade" id="jellyfinAuthenticationModal" tabindex="-1" aria-labelledby="jellyfinAuthenticationModal" aria-hidden="true" data-bs-keyboard="false">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Jellyfin authentication</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="jellyfinModalBody" style="padding-bottom: 0">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Server Url</span>
+                                <input type="text" class="form-control disabled" id="jellyfinAuthenticationModalServerUrlInput" value="{{ jellyfinServerUrl }}" disabled/>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Username</span>
+                                <input type="text" class="form-control disabled" id="jellyfinAuthenticationModalUsernameInput"/>
+                            </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Password</span>
+                                <input type="password" class="form-control disabled" id="jellyfinAuthenticationModalPasswordInput"/>
+                            </div>
+                            <div class="spinner-border d-none" role="status" id="jellyfinAuthenticationModalLoadingSpinner" style="margin-bottom: .8rem">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div id="alertJellyfinAuthenticationModalDiv"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="authenticateJellyfinAccount()"
+                                    id="jellyfinAuthenticationModalAuthenticateButton" {% if jellyfinServerUrl == null %} disabled {% endif %}>Authenticate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="jellyfinServerUrlHelpModal" tabindex="-1" role="dialog" aria-labelledby="jellyfinServerUrlHelpModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered text-start">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="jellyfinServerUrlHelpModalTitle">Help: Jellyfin Server Url</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <p>
+                                    You have to provide a Jellyfin server url which can be accessed by Movary.
+                                    If your Jellyfin server is in a restricted network make sure Movary has access to it. Example urls:
+                                </p>
+                                <ul>
+                                    <li>http://localhost:8096</li>
+                                    <li>http://192.168.1.2:8096</li>
+                                    <li>https://jellyfin.yourDomain.com</li>
+                                </ul>
+                                <p>
+                                    Note: A valid url must start with the protocol (e.g. http://)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 {% endblock %}
