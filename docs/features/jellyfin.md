@@ -25,6 +25,10 @@ Automatically add new [Jellyin](https://jellyfin.org/) movie plays to Movary.
 Some features require access to protected personal Jellyfin data.
 You can authenticate Movary against Jellyfin on the Jellyfin integration settings page (`/settings/integrations/jellyfin`).
 
-During the authentication process a Jellyfin access token is generated and stored in the database.
+!!! Info
+
+    Requires the server configuration JELLYFIN_DEVICE_ID to be set.
+
+During the authentication process a Jellyfin access token is generated and stored in Movary.
 This token will be used in all further Jellyfin API requests.
-When an authentication is removed in Movary, the token will be deleted from Movary and the Jellyfin server.
+When an authentication is removed from Movary, the token will be deleted in Movary and the Jellyfin server.

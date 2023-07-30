@@ -23,9 +23,13 @@ You can select what you want to scrobble (movie plays and/or ratings) via the "S
 Some features require access to protected personal Plex data.
 You can authenticate Movary against Plex on the Plex integration settings page (`/settings/integrations/plex`).
 
-During the authentication process a Plex access token is generated and stored in the database. 
+!!! Info
+
+    Requires the server configuration PLEX_IDENTIFIER to be set.
+
+During the authentication process a Plex access token is generated and stored in Movary. 
 This token will be used in all further Plex API requests.
-When an authentication is removed in Movary, the token will be deleted from Movary only.
+When an authentication is removed from Movary, the token will be deleted only in Movary.
 
 !!! Info
 
