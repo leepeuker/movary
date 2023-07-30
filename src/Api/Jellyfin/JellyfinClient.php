@@ -16,6 +16,8 @@ use RuntimeException;
 
 class JellyfinClient
 {
+    private const DEFAULT_TIMEOUT = 4;
+
     public function __construct(
         private readonly HttpClient $httpClient,
         private readonly ServerSettings $serverSettings,
@@ -36,11 +38,12 @@ class JellyfinClient
         }
     }
 
-    public function get(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null) : ?array
+    public function get(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null, ?int $timeout = null) : ?array
     {
         $options = [
             'query' => $query,
-            'headers' => $this->generateHeaders($jellyfinAccessToken)
+            'headers' => $this->generateHeaders($jellyfinAccessToken),
+            'connect_timeout' => $timeout ?? self::DEFAULT_TIMEOUT,
         ];
 
         try {

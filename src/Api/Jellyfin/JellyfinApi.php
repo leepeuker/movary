@@ -41,13 +41,17 @@ class JellyfinApi
         return $this->jellyfinClient->get($url);
     }
 
-    public function fetchJellyfinUser(JellyfinAuthenticationData $jellyfinAuthentication) : ?JellyfinUser
+    public function findJellyfinUser(JellyfinAuthenticationData $jellyfinAuthentication) : ?JellyfinUser
     {
         $relativeUrl = RelativeUrl::create('/Users/' . $jellyfinAuthentication->getUserId());
 
         $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
 
-        $userInformation = $this->jellyfinClient->get($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
+        try {
+            $userInformation = $this->jellyfinClient->get($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken(), timeout: 2);
+        } catch (\Exception) {
+            return null;
+        }
 
         if ($userInformation === null) {
             return null;

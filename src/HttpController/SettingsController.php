@@ -272,17 +272,12 @@ class SettingsController
         $webhookId = $user->getJellyfinWebhookId();
 
         $jellyfinDeviceId = $this->serverSettings->getJellyfinDeviceId();
-        $jellyfinServerUrl = null;
-        $jellyfinAuthentication = null;
+        $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($user->getId());
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($user->getId());
         $jellyfinUsername = null;
 
-        if ($jellyfinDeviceId !== null) {
-            $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($user->getId());
-            $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($user->getId());
-
-            if ($jellyfinAuthentication !== null) {
-                $jellyfinUsername = $this->jellyfinApi->fetchJellyfinUser($jellyfinAuthentication);
-            }
+        if ($jellyfinDeviceId !== null && $jellyfinServerUrl !== null && $jellyfinAuthentication !== null) {
+            $jellyfinUsername = $this->jellyfinApi->findJellyfinUser($jellyfinAuthentication);
         }
 
         if ($applicationUrl !== null && $webhookId !== null) {
