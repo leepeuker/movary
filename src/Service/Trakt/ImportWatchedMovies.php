@@ -155,7 +155,7 @@ class ImportWatchedMovies
 
     private function replaceMovieWatchDate(MovieEntity $movie, int $userId, Date $watchedAt, int $plays) : void
     {
-        $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $userId, $watchedAt, playsPerDate: $plays);
+        $this->movieApi->replaceHistoryForMovieByDate($movie->getId(), $userId, $watchedAt, $plays);
 
         $this->logger->info('Trakt history import: Imported "' . $movie->getTitle() . "\" watch date $watchedAt  with \"$plays\" plays");
     }

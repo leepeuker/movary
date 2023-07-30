@@ -54,7 +54,7 @@ class HistoryController
         $plays = (int)$requestBody['plays'];
         $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
-        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $originalWatchDate, $plays, $comment);
+        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $originalWatchDate, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }
