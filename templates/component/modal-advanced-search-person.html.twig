@@ -1,0 +1,60 @@
+<div class="modal fade" id="searchOptionsPersonModal" tabindex="-1" aria-labelledby="searchOptionsPersonModal" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="searchOptionsPersonModalTitle">Advanced search</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="searchOptionsPersonModalBody" style="text-align: start;padding-bottom: 0">
+                <div style="border: #aab0b3 1px" id="searchOptions">
+                    <h6 class="text-center">Sorting</h6>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Sort by</span>
+                        <select class="form-control" name="sb" id="searchSortBySelect">
+                            <option value="uniqueAppearances" {{ sortBy == 'uniqueAppearances' ? 'selected' }}>Unique Appearances</option>
+                            <option value="totalAppearances" {{ sortBy == 'totalAppearances' ? 'selected' }}>Total Appearances</option>
+                            <option value="name" {{ sortBy == 'name' ? 'selected' }}>Name</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Sort order</span>
+                        <select class="form-control" name="so" id="searchSortOrderSelect">
+                            <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>&uarr;</option>
+                            <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>&darr;</option>
+                        </select>
+                    </div>
+
+                    <h6 class="text-center">Filter</h6>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Gender</span>
+                        <select class="form-control" name="ge" id="searchGenderSelect">
+                            <option value="" {{ filterGender is null ? 'selected' }}></option>
+                            {% for uniqueGender in uniqueGenders %}
+                                <option value="{{ uniqueGender.id }}" {{ uniqueGender.id == filterGender ? 'selected' }}>{{ uniqueGender.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <h6 class="text-center">Pagination</h6>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Per page</span>
+                        <select class="form-control" name="pp" id="searchPerPageSelect">
+                            <option value="24" {{ perPage == 24 ? 'selected' }}>24</option>
+                            <option value="48" {{ perPage == 48 ? 'selected' }}>48</option>
+                            <option value="72" {{ perPage == 72 ? 'selected' }}>72</option>
+                            <option value="96" {{ perPage == 96 ? 'selected' }}>96</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button class="btn btn-warning float-start" onclick="resetSearchOptions()">Reset</button>
+                <button class="btn btn-primary" onclick="search()">Search</button>
+            </div>
+        </div>
+    </div>
+</div>

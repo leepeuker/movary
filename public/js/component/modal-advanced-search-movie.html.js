@@ -8,7 +8,7 @@ document.getElementById('searchTermInput').addEventListener('keypress', function
 const searchSortBySelect = document.getElementById('searchSortBySelect');
 const searchSortOrderSelect = document.getElementById('searchSortOrderSelect');
 const searchGenreSelect = document.getElementById('searchGenreSelect');
-const searchLanugageSelect = document.getElementById('searchLanguageSelect');
+const searchLanguageSelect = document.getElementById('searchLanguageSelect');
 const searchReleaseYearSelect = document.getElementById('searchReleaseYearSelect');
 const searchPerPageSelect = document.getElementById('searchPerPageSelect');
 
@@ -16,7 +16,7 @@ function search() {
     let sortBy = searchSortBySelect.value
     let sortOrder = searchSortOrderSelect.value
     let searchGenre = searchGenreSelect.value
-    let searchLanguage = searchLanugageSelect.value
+    let searchLanguage = searchLanguageSelect.value
     let searchReleaseYear = searchReleaseYearSelect.value
     let searchPerPage = searchPerPageSelect.value
     let searchTerm = document.getElementById('searchTermInput').value
@@ -45,12 +45,11 @@ function search() {
     window.location.href = urlWithoutGetParameters + getParameters;
 }
 
-
 function resetSearchOptions() {
     searchSortBySelect.value = 'title'
     searchSortOrderSelect.value = 'asc'
     searchGenreSelect.value = ''
-    searchLanugageSelect.value = ''
+    searchLanguageSelect.value = ''
     searchReleaseYearSelect.value = ''
     searchPerPageSelect.value = '24'
 }

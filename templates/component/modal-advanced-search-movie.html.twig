@@ -32,7 +32,7 @@
                     <div class="input-group mb-3">
                         <span class="input-group-text">Genre</span>
                         <select class="form-control" name="ge" id="searchGenreSelect">
-                            <option value="" {{ genre is null ? 'selected' }}>All</option>
+                            <option value="" {{ genre is null ? 'selected' }}></option>
                             {% for uniqueGenre in uniqueGenres %}
                                 <option value="{{ uniqueGenre }}" {{ uniqueGenre == genre ? 'selected' }}>{{ uniqueGenre }}</option>
                             {% endfor %}
@@ -41,7 +41,7 @@
                     <div class="input-group mb-3">
                         <span class="input-group-text">Language</span>
                         <select class="form-control" name="la" id="searchLanguageSelect">
-                            <option value="" {{ language is null ? 'selected' }}>All</option>
+                            <option value="" {{ language is null ? 'selected' }}></option>
                             {% for uniqueLanguage in uniqueLanguages %}
                                 <option value="{{ uniqueLanguage.code }}" {{ uniqueLanguage.code == language ? 'selected' }}>{{ uniqueLanguage.name }}</option>
                             {% endfor %}
@@ -50,7 +50,7 @@
                     <div class="input-group mb-3">
                         <span class="input-group-text">Release year</span>
                         <select class="form-control" name="ry" id="searchReleaseYearSelect">
-                            <option value="" {{ releaseYear is null ? 'selected' }}>All</option>
+                            <option value="" {{ releaseYear is null ? 'selected' }}></option>
                             {% for uniqueReleaseYear in uniqueReleaseYears %}
                                 <option value="{{ uniqueReleaseYear }}" {{ releaseYear == uniqueReleaseYear ? 'selected' }}>{{ uniqueReleaseYear }}</option>
                             {% endfor %}
