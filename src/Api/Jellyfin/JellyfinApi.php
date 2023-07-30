@@ -60,7 +60,7 @@ class JellyfinApi
         return JellyfinUser::create(JellyfinUserId::create($userInformation['Id']), $userInformation['Name']);
     }
 
-    public function createJellyfinAuthentication(int $userId, string $username, string $password) : ?JellyfinAuthenticationData
+    public function createJellyfinAuthentication(int $userId, string $username, string $password) : JellyfinAuthenticationData
     {
         $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($userId);
         if ($jellyfinServerUrl === null) {
