@@ -117,6 +117,7 @@ async function saveJellyfinServerUrl() {
         document.getElementById('jellyfinAuthenticationModalServerUrlInput').value = jellyfinServerUrl
         document.getElementById('authenticateWithJellyfinButton').disabled = jellyfinServerUrl == ''
         document.getElementById('verifyServerUrlButton').disabled = jellyfinServerUrl == ''
+        document.getElementById('jellyfinAuthenticationModalAuthenticateButton').disabled = jellyfinServerUrl == ''
     }).catch(function (error) {
         console.log(error);
         document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
