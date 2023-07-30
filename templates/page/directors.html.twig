@@ -6,7 +6,7 @@
 
 {% block scripts %}
     <script src="/js/user-select.js"></script>
-    <script src="/js/search-options.js"></script>
+    <script src="/js/component/modal-advanced-search-person.html.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -15,50 +15,18 @@
 
         <div style="text-align: center;">
             {{ include('component/user-select.html.twig') }}
+            {{ include('component/modal-advanced-search-person.html.twig') }}
 
-            <form action="/users/{{ routeUsername }}/directors" method="GET">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
-                    <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" onclick="toggleSearchOptions()" style="background-color: #aab0b3;border-color: #aab0b3">
-                        <i class="bi bi-chevron-down"></i>
-                    </button>
-                    <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
-                </div>
-                <div style="display: none;border: #aab0b3 1px;margin-top:1em;margin-bottom:1em" id="searchOptions">
-
-
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Sort by</span>
-                        <select class="form-control" name="sb" id="sort-by" style="width: 50%">
-                            <option value="uniqueAppearances" {{ sortBy == 'uniqueAppearances' ? 'selected' }}>Unique Appearances</option>
-                            <option value="totalAppearances" {{ sortBy == 'totalAppearances' ? 'selected' }}>Total Appearances</option>
-                            <option value="name" {{ sortBy == 'name' ? 'selected' }}>Name</option>
-                        </select>
-                        <select class="form-control" name="so" id="sort-order" style="width: 5%">
-                            <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>&uarr;</option>
-                            <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>&darr;</option>
-                        </select>
-                    </div>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Gender</span>
-                        <select class="form-control" name="ge" id="gender">
-                            <option value="" {{ filterGender is null ? 'selected' }}>All</option>
-                            {% for uniqueGender in uniqueGenders %}
-                                <option value="{{ uniqueGender.id }}" {{ uniqueGender.id == filterGender ? 'selected' }}>{{ uniqueGender.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Per page</span>
-                        <select class="form-control" name="pp" id="per-page">
-                            <option value="24" {{ perPage == 24 ? 'selected' }}>24</option>
-                            <option value="48" {{ perPage == 48 ? 'selected' }}>48</option>
-                            <option value="72" {{ perPage == 72 ? 'selected' }}>72</option>
-                            <option value="96" {{ perPage == 96 ? 'selected' }}>96</option>
-                        </select>
-                    </div>
-                </div>
-            </form>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}" style="border-right-color: #aab0b3" id="searchTermInput">
+                <button class="btn btn-primary" type="button" onclick="search()" id="directSearchButton">
+                    <i class="bi bi-search"></i>
+                </button>
+                <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#searchOptionsPersonModal"
+                        style="border-left-color: #aab0b3">
+                    <i class="bi bi-filter"></i>
+                </button>
+            </div>
 
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedDirector in mostWatchedDirectors %}
