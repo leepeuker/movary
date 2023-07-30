@@ -92,7 +92,7 @@ class LetterboxdImportDiary
                     continue;
                 }
 
-                $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays);
+                $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, playsPerDate: $plays);
 
                 $this->logger->info(sprintf('Letterboxd import: Imported watch date for movie "%s": %s', $movie->getTitle(), $watchDate));
             }
