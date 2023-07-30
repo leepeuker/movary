@@ -6,7 +6,7 @@
 
 {% block scripts %}
     <script src="/js/user-select.js"></script>
-    <script src="/js/movies.js"></script>
+    <script src="/js/component/modal-advanced-search-movie.html.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -15,7 +15,7 @@
 
         <div style="text-align: center">
             {{ include('component/user-select.html.twig') }}
-            {{ include('component/modal-search-options-movie.html.twig') }}
+            {{ include('component/modal-advanced-search-movie.html.twig') }}
 
             <div class="input-group mb-3">
                 <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}" style="border-right-color: #aab0b3" id="searchTermInput">
