@@ -52,6 +52,8 @@ function resetSearchOptions() {
     searchLanguageSelect.value = ''
     searchReleaseYearSelect.value = ''
     searchPerPageSelect.value = '24'
+
+    enableSaveSortingOptionsButton();
 }
 
 function setSortOptionsCookie() {

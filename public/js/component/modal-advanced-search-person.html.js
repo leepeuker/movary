@@ -37,6 +37,8 @@ function resetSearchOptions() {
     searchSortOrderSelect.value = 'asc'
     searchGenderSelect.value = ''
     searchPerPageSelect.value = '24'
+
+    enableSaveSortingOptionsButton();
 }
 
 function setSortOptionsCookie() {
