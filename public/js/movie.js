@@ -102,7 +102,8 @@ function editWatchDate() {
         url: apiUrl,
         type: 'POST',
         data: JSON.stringify({
-            'watchDate': newWatchDate,
+            'newWatchDate': newWatchDate,
+            'originalWatchDate': originalWatchDate,
             'plays': newWatchDatePlays,
             'comment': comment,
             'dateFormat': document.getElementById('dateFormatPhp').value

@@ -343,7 +343,7 @@ class MovieApi
         );
     }
 
-    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate, ?string $comment = null) : void
+    public function replaceHistoryForMovieByDate(int $movieId, int $userId, Date $watchedAt, int $playsPerDate, ?Date $oldWatchDate = null, ?string $comment = null) : void
     {
         $existingHistoryEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
 
@@ -357,6 +357,10 @@ class MovieApi
                 $playsPerDate,
                 $comment,
             );
+
+            if ($oldWatchDate !== null) {
+                $this->historyApi->deleteHistoryByIdAndDate($movieId, $userId, $oldWatchDate);
+            }
 
             return;
         }

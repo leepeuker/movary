@@ -49,11 +49,12 @@ class HistoryController
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];
-        $watchDate = Date::createFromStringAndFormat($requestBody['watchDate'], $requestBody['dateFormat']);
+        $newWatchDate = Date::createFromStringAndFormat($requestBody['newWatchDate'], $requestBody['dateFormat']);
+        $originalWatchDate = Date::createFromStringAndFormat($requestBody['originalWatchDate'], $requestBody['dateFormat']);
         $plays = (int)$requestBody['plays'];
         $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
-        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $watchDate, $plays, $comment);
+        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $originalWatchDate, $comment);
 
         return Response::create(StatusCode::createNoContent());
     }
