@@ -5,11 +5,14 @@ namespace Movary\Service;
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Exception\ConfigNotSetException;
-use function PHPUnit\Framework\assertNotNull;
 
 class ServerSettings
 {
+    private const JELLYFIN_DEVICE_ID = 'JELLYFIN_DEVICE_ID';
+
     private const PLEX_APP_NAME = 'PLEX_APP_NAME';
+
+    private const JELLYFIN_APP_NAME = 'JELLYFIN_APP_NAME';
 
     private const PLEX_IDENTIFIER = 'PLEX_IDENTIFIER';
 
@@ -41,11 +44,6 @@ class ServerSettings
     ) {
     }
 
-    public function getAppName() : string
-    {
-        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';
-    }
-
     public function getApplicationUrl() : ?string
     {
         return $this->getByKey(self::APPLICATION_URL);
@@ -59,6 +57,21 @@ class ServerSettings
     public function getFromAddress() : ?string
     {
         return $this->getByKey(self::SMTP_FROM_ADDRESS);
+    }
+
+    public function getJellyfinAppName() : string
+    {
+        return $this->getByKey(self::JELLYFIN_APP_NAME) ?? 'Movary';
+    }
+
+    public function getJellyfinDeviceId() : ?string
+    {
+        return $this->getByKey(self::JELLYFIN_DEVICE_ID);
+    }
+
+    public function getPlexAppName() : string
+    {
+        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';
     }
 
     public function getPlexIdentifier() : ?string
@@ -156,6 +169,16 @@ class ServerSettings
         $value = $this->getByKey(self::APPLICATION_URL, true);
         if ($value === null) {
             throw ConfigNotSetException::create(self::APPLICATION_URL);
+        }
+
+        return $value;
+    }
+
+    public function requireJellyfinDeviceId() : ?string
+    {
+        $value = $this->getByKey(self::JELLYFIN_DEVICE_ID, true);
+        if ($value === null) {
+            throw ConfigNotSetException::create(self::JELLYFIN_DEVICE_ID);
         }
 
         return $value;

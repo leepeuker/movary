@@ -2,6 +2,9 @@
 
 namespace Movary\Domain\User;
 
+use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
+use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
+use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\Url;
@@ -29,6 +32,11 @@ class UserApi
     public function deleteEmbyWebhookId(int $userId) : void
     {
         $this->repository->setEmbyWebhookId($userId, null);
+    }
+
+    public function deleteJellyfinAuthentication(int $userId) : void
+    {
+        $this->repository->deleteJellyfinAuthentication($userId);
     }
 
     public function deleteJellyfinWebhookId(int $userId) : void
@@ -90,6 +98,50 @@ class UserApi
         }
 
         return $user;
+    }
+
+    public function findJellyfinAccessToken(int $userId) : ?JellyfinAccessToken
+    {
+        $jellyfinAccessToken = $this->repository->findJellyfinAccessToken($userId);
+
+        if ($jellyfinAccessToken === null) {
+            return null;
+        }
+
+        return JellyfinAccessToken::create($jellyfinAccessToken);
+    }
+
+    public function fetchJellyfinUserId(int $userId) : JellyfinUserId
+    {
+        $jellyfinUserId = $this->repository->findJellyfinUserId($userId);
+
+        if ($jellyfinUserId === null) {
+            throw new \RuntimeException('Missing jellyfin user id.');
+        }
+
+        return JellyfinUserId::create($jellyfinUserId);
+    }
+
+    public function findJellyfinAuthentication(int $userId) : ?JellyfinAuthenticationData
+    {
+        $authData = $this->repository->findJellyfinAuthenticationData($userId);
+
+        if (isset($authData['jellyfin_access_token'], $authData['jellyfin_access_token'], $authData['jellyfin_access_token']) === false) {
+            return null;
+        }
+
+        return JellyfinAuthenticationData::create(
+            JellyfinAccessToken::create($authData['jellyfin_access_token']),
+            JellyfinUserId::create($authData['jellyfin_user_id']),
+            Url::createFromString($authData['jellyfin_server_url']),
+        );
+    }
+
+    public function findJellyfinServerUrl(int $userId) : ?Url
+    {
+        $url = $this->repository->findJellyfinServerUrl($userId);
+
+        return empty($url) === false ? Url::createFromString($url) : null;
     }
 
     public function findPlexAccessToken(int $userId) : ?PlexAccessToken
@@ -239,9 +291,19 @@ class UserApi
         $this->repository->updateIsAdmin($userId, $isAdmin);
     }
 
+    public function updateJellyfinAuthentication(int $userId, JellyfinAuthenticationData $jellyfinAuthentication) : void
+    {
+        $this->repository->updateJellyfinAuthentication($userId, $jellyfinAuthentication);
+    }
+
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->repository->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
+    }
+
+    public function updateJellyfinServerUrl(int $userId, ?Url $serverUrl) : void
+    {
+        $this->repository->updateJellyfinServerUrl($userId, $serverUrl);
     }
 
     public function updateName(int $userId, string $name) : void

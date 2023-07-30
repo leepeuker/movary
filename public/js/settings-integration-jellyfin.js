@@ -87,3 +87,150 @@ async function updateScrobbleOptions() {
         addAlert('alertWebhookOptionsDiv', 'Could not update scrobble options', 'danger')
     });
 }
+
+async function saveJellyfinServerUrl() {
+    document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.remove('d-none')
+    removeAlert('alertJellyfinServerUrlDiv');
+
+    const jellyfinServerUrl = document.getElementById('jellyfinServerUrlInput').value;
+
+    await fetch('/settings/jellyfin/server-url-save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'JellyfinServerUrl': jellyfinServerUrl
+        })
+    }).then(response => {
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+
+        if (!response.ok) {
+            addAlert('alertJellyfinServerUrlDiv', 'Could not save server url', 'danger');
+            return;
+        }
+
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+        addAlert('alertJellyfinServerUrlDiv', 'Server url was updated', 'success');
+
+        console.log(jellyfinServerUrl)
+        document.getElementById('jellyfinAuthenticationModalServerUrlInput').value = jellyfinServerUrl
+        document.getElementById('authenticateWithJellyfinButton').disabled = jellyfinServerUrl == ''
+        document.getElementById('verifyServerUrlButton').disabled = jellyfinServerUrl == ''
+        document.getElementById('jellyfinAuthenticationModalAuthenticateButton').disabled = jellyfinServerUrl == ''
+    }).catch(function (error) {
+        console.log(error);
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+        addAlert('alertJellyfinServerUrlDiv', 'Could not save server url', 'danger');
+    });
+}
+
+async function verifyJellyfinServerUrl() {
+    document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.remove('d-none')
+    removeAlert('alertJellyfinServerUrlDiv');
+
+    const response = await fetch(
+        '/settings/jellyfin/server-url-verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            signal: AbortSignal.timeout(4000),
+            body: JSON.stringify({
+                'jellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
+            })
+        }
+    ).catch(function (error) {
+        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+        addAlert('alertJellyfinServerUrlDiv', 'Connection test failed: Cannot connect to server', 'danger');
+    });
+
+    document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertJellyfinAuthenticationModalDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertJellyfinServerUrlDiv', 'Connection test failed', 'danger');
+
+        return;
+    }
+
+    const verificationResult = await response.json();
+
+    if (verificationResult.serverUrlVerified === false) {
+        addAlert('alertJellyfinServerUrlDiv', 'Connection test failed: Cannot connect to server', 'danger');
+
+        return
+    }
+
+    if (verificationResult.authenticationVerified === false) {
+        addAlert('alertJellyfinServerUrlDiv', 'Can connect to server, but authentication is missing or invalid', 'warning');
+
+        return
+    }
+
+    addAlert('alertJellyfinServerUrlDiv', 'Connection test successful', 'success');
+}
+
+async function authenticateJellyfinAccount() {
+    document.getElementById('jellyfinAuthenticationModalLoadingSpinner').classList.remove('d-none')
+    removeAlert('alertJellyfinAuthenticationModalDiv')
+
+    const response = await fetch(
+        '/settings/jellyfin/authenticate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            signal: AbortSignal.timeout(4000),
+            body: JSON.stringify({
+                'username': document.getElementById('jellyfinAuthenticationModalUsernameInput').value,
+                'password': document.getElementById('jellyfinAuthenticationModalPasswordInput').value,
+            })
+        }
+    ).catch(function (error) {
+        console.error(error)
+        document.getElementById('jellyfinAuthenticationModalLoadingSpinner').classList.add('d-none')
+        addAlert('alertJellyfinAuthenticationModalDiv', 'Could not authenticate with Jellyfin', 'danger', 0);
+    });
+
+    document.getElementById('jellyfinAuthenticationModalLoadingSpinner').classList.add('d-none')
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertJellyfinAuthenticationModalDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertJellyfinAuthenticationModalDiv', 'Authentication did not work', 'danger')
+
+        return
+    }
+
+    location.reload();
+}
+
+async function removeJellyfinAuthentication() {
+    await fetch('/settings/jellyfin/remove-authentication', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then(response => {
+        if (!response.ok) {
+            addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
+
+            return
+        }
+
+        location.reload();
+    }).catch(function (error) {
+        console.error(error)
+        addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
+    });
+}

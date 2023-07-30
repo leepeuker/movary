@@ -3,6 +3,7 @@
 namespace Movary\Domain\User;
 
 use Doctrine\DBAL\Connection;
+use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Url;
 use RuntimeException;
@@ -46,6 +47,20 @@ class UserRepository
             'user_auth_token',
             [
                 'token' => $token,
+            ],
+        );
+    }
+
+    public function deleteJellyfinAuthentication(int $userId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_access_token' => null,
+                'jellyfin_user_id' => null,
+            ],
+            [
+                'id' => $userId,
             ],
         );
     }
@@ -152,6 +167,54 @@ class UserRepository
         }
 
         return DateTime::createFromString($expirationDate);
+    }
+
+    public function findJellyfinAuthenticationData(int $userId) : ?array
+    {
+        $jellyfinAuthenticationData = $this->dbConnection->fetchAllAssociative(
+            'SELECT `jellyfin_access_token`, `jellyfin_user_id`, `jellyfin_server_url` 
+            FROM `user` WHERE `id` = ?',
+            [$userId],
+        );
+
+        if (empty($jellyfinAuthenticationData[0]) === true) {
+            return null;
+        }
+
+        return $jellyfinAuthenticationData[0];
+    }
+
+    public function findJellyfinServerUrl(int $userId) : ?string
+    {
+        $JellyfinServerUrl = $this->dbConnection->fetchOne('SELECT `jellyfin_server_url` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($JellyfinServerUrl === false) {
+            return null;
+        }
+
+        return $JellyfinServerUrl;
+    }
+
+    public function findJellyfinAccessToken(int $userId) : ?string
+    {
+        $jellyfinAccessToken = $this->dbConnection->fetchOne('SELECT `jellyfin_access_token` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($jellyfinAccessToken === false) {
+            return null;
+        }
+
+        return $jellyfinAccessToken;
+    }
+
+    public function findJellyfinUserId(int $userId) : ?string
+    {
+        $jellyfinUserId = $this->dbConnection->fetchOne('SELECT `jellyfin_user_id` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($jellyfinUserId === false) {
+            return null;
+        }
+
+        return $jellyfinUserId;
     }
 
     public function findPlexAccessToken(int $userId) : ?string
@@ -438,12 +501,39 @@ class UserRepository
         );
     }
 
+    public function updateJellyfinAuthentication(int $userId, JellyfinAuthenticationData $jellyfinAuthenticationData) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_access_token' => (string)$jellyfinAuthenticationData->getAccessToken(),
+                'jellyfin_user_id' => (string)$jellyfinAuthenticationData->getUserId(),
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateJellyfinScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->dbConnection->update(
             'user',
             [
                 'jellyfin_scrobble_views' => (int)$scrobbleWatches,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateJellyfinServerUrl(int $userId, ?Url $serverUrl) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_server_url' => (string)$serverUrl,
             ],
             [
                 'id' => $userId,
