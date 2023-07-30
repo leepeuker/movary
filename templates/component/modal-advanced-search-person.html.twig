@@ -11,7 +11,7 @@
 
                     <div class="input-group mb-3">
                         <span class="input-group-text">Sort by</span>
-                        <select class="form-control" name="sb" id="searchSortBySelect">
+                        <select onchange="enableSaveSortingOptionsButton()" class="form-control" name="sb" id="searchSortBySelect">
                             <option value="uniqueAppearances" {{ sortBy == 'uniqueAppearances' ? 'selected' }}>Unique Appearances</option>
                             <option value="totalAppearances" {{ sortBy == 'totalAppearances' ? 'selected' }}>Total Appearances</option>
                             <option value="name" {{ sortBy == 'name' ? 'selected' }}>Name</option>
@@ -19,7 +19,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Sort order</span>
-                        <select class="form-control" name="so" id="searchSortOrderSelect">
+                        <select onchange="enableSaveSortingOptionsButton()" class="form-control" name="so" id="searchSortOrderSelect">
                             <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>&uarr;</option>
                             <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>&darr;</option>
                         </select>
@@ -53,6 +53,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button class="btn btn-warning float-start" onclick="resetSearchOptions()">Reset</button>
+                <button id="saveSortingOptionsButton" disabled="" class="btn btn-secondary float-start" onclick="setSortOptionsCookie()">Save Sorting</button>
                 <button class="btn btn-primary" onclick="search()">Search</button>
             </div>
         </div>

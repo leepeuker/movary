@@ -44,9 +44,6 @@ class DirectorsController
         $directorsCount = $this->movieHistoryApi->fetchDirectorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($directorsCount, $requestData->getLimit(), $requestData->getPage());
 
-        setcookie("person-sort-by", $requestData->getSortBy(), time() + 60 * 60 * 24 * 365, "/");
-        setcookie("person-sort-order", (string)$requestData->getSortOrder(), time() + 60 * 60 * 24 * 365, "/");
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/directors.html.twig', [
