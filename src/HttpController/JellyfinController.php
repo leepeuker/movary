@@ -162,18 +162,29 @@ class JellyfinController
         }
 
         $jellyfinServerUrl = Url::createFromString(Json::decode($request->getBody())['jellyfinServerUrl']);
-        $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo($jellyfinServerUrl);
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->getCurrentUserId());
+
+        $authenticationVerified = $jellyfinAuthentication !== null;
+        $jellyfinServerInfo = null;
 
         try {
-            if ($jellyfinServerInfo === null) {
-                return Response::createBadRequest();
-            } elseif ($jellyfinServerInfo['ProductName'] === 'Jellyfin Server') {
-                return Response::createOk();
+            if ($jellyfinAuthentication === null) {
+                $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfoPublic($jellyfinServerUrl);
+            } else {
+                $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo($jellyfinServerUrl, $jellyfinAuthentication->getAccessToken());
             }
-
-            return Response::createBadRequest();
-        } catch (Exception) {
-            return Response::createBadRequest();
+        } catch (JellyfinNotFoundError) {
+            return Response::createBadRequest('Connection test failed: Page not found');
+        } catch (JellyfinServerConnectionError) {
+            return Response::createBadRequest('Connection test failed: Cannot connect to server');
+        } catch (JellyfinInvalidAuthentication) {
+            $authenticationVerified = false;
         }
+
+        if ($jellyfinServerInfo === null || empty($jellyfinServerInfo['Id']) === true) {
+            return Response::createBadRequest('Connection test failed: Jellyfin response invalid');
+        }
+
+        return Response::createJson(Json::encode(['serverUrlVerified' => true, 'authenticationVerified' => $authenticationVerified]));
     }
 }

@@ -34,7 +34,14 @@ class JellyfinApi
         $this->logger->info('Jellyfin access token has been invalidated');
     }
 
-    public function fetchJellyfinServerInfo(Url $jellyfinServerUrl) : ?array
+    public function fetchJellyfinServerInfo(Url $jellyfinServerUrl, JellyfinAccessToken $jellyfinAccessToken) : ?array
+    {
+        $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/system/info'));
+
+        return $this->jellyfinClient->get($url, jellyfinAccessToken: $jellyfinAccessToken);
+    }
+
+    public function fetchJellyfinServerInfoPublic(Url $jellyfinServerUrl) : ?array
     {
         $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/system/info/public'));
 

@@ -129,27 +129,51 @@ async function verifyJellyfinServerUrl() {
     document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.remove('d-none')
     removeAlert('alertJellyfinServerUrlDiv');
 
-    await fetch('/settings/jellyfin/server-url-verify', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            'jellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
-        })
-    }).then(response => {
-        document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
-        if (!response.ok) {
-            addAlert('alertJellyfinServerUrlDiv', 'Could not verify server url', 'danger');
-
-            return;
+    const response = await fetch(
+        '/settings/jellyfin/server-url-verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            signal: AbortSignal.timeout(4000),
+            body: JSON.stringify({
+                'jellyfinServerUrl': document.getElementById('jellyfinServerUrlInput').value
+            })
         }
-        addAlert('alertJellyfinServerUrlDiv', 'Server url was verified', 'success');
-    }).catch(function (error) {
-        console.log(error)
+    ).catch(function (error) {
         document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
-        addAlert('alertJellyfinServerUrlDiv', 'Could not verify server url', 'danger');
+        addAlert('alertJellyfinServerUrlDiv', 'Connection test failed: Cannot connect to server', 'danger');
     });
+
+    document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertJellyfinAuthenticationModalDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertJellyfinServerUrlDiv', 'Connection test failed', 'danger');
+
+        return;
+    }
+
+    const verificationResult = await response.json();
+
+    if (verificationResult.serverUrlVerified === false) {
+        addAlert('alertJellyfinServerUrlDiv', 'Connection test failed: Cannot connect to server', 'danger');
+
+        return
+    }
+
+    if (verificationResult.authenticationVerified === false) {
+        addAlert('alertJellyfinServerUrlDiv', 'Can connect to server, but authentication is missing or invalid', 'warning');
+
+        return
+    }
+
+    addAlert('alertJellyfinServerUrlDiv', 'Connection test successful', 'success');
 }
 
 async function authenticateJellyfinAccount() {
