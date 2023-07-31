@@ -38,7 +38,7 @@ function resetSearchOptions() {
     searchGenderSelect.value = ''
     searchPerPageSelect.value = '24'
 
-    enableSaveSortingOptionsButton();
+    updateSaveSortingOptionsButton();
 }
 
 function setSortOptionsCookie() {
@@ -50,9 +50,19 @@ function setSortOptionsCookie() {
     document.cookie = "person-sort-by=" + searchSortBySelect.value + ";expires=" + expiration + ";path=/";
 }
 
-function enableSaveSortingOptionsButton() {
+function updateSaveSortingOptionsButton() {
+    var sortByCookie = document.cookie.match(new RegExp('(^| )person-sort-by=([^;]+)'));
+    var sortOrderCookie = document.cookie.match(new RegExp('(^| )person-sort-order=([^;]+)'));
+
     var saveSortingOptionsButton = document.getElementById("saveSortingOptionsButton");
-    if (saveSortingOptionsButton.hasAttribute("disabled")) {
-        saveSortingOptionsButton.removeAttribute("disabled");
+    if (sortByCookie[2] != searchSortBySelect.value || sortOrderCookie[2] != searchSortOrderSelect.value) {
+        if (saveSortingOptionsButton.hasAttribute("disabled")) {
+            saveSortingOptionsButton.removeAttribute("disabled");
+        }
+    }
+    else {
+        if (!saveSortingOptionsButton.hasAttribute("disabled")) {
+            saveSortingOptionsButton.setAttribute("disabled", "");
+        }
     }
 }

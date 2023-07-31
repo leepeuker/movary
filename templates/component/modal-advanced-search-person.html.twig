@@ -11,7 +11,7 @@
 
                     <div class="input-group mb-3">
                         <span class="input-group-text">Sort by</span>
-                        <select onchange="enableSaveSortingOptionsButton()" class="form-control" name="sb" id="searchSortBySelect">
+                        <select onchange="updateSaveSortingOptionsButton()" class="form-control" name="sb" id="searchSortBySelect">
                             <option value="uniqueAppearances" {{ sortBy == 'uniqueAppearances' ? 'selected' }}>Unique Appearances</option>
                             <option value="totalAppearances" {{ sortBy == 'totalAppearances' ? 'selected' }}>Total Appearances</option>
                             <option value="name" {{ sortBy == 'name' ? 'selected' }}>Name</option>
@@ -19,7 +19,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Sort order</span>
-                        <select onchange="enableSaveSortingOptionsButton()" class="form-control" name="so" id="searchSortOrderSelect">
+                        <select onchange="updateSaveSortingOptionsButton()" class="form-control" name="so" id="searchSortOrderSelect">
                             <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>Ascending</option>
                             <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>Descending</option>
                         </select>
