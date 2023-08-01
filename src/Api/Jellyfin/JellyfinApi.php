@@ -93,4 +93,9 @@ class JellyfinApi
             $jellyfinServerUrl,
         );
     }
+
+    public function setMovieWatchState(int $tmdbId, bool $watchedState) : void
+    {
+        $this->logger->info('Jellyfin movie watch state updated', ['tmdbId' => $tmdbId, 'watchedState' => $watchedState]);
+    }
 }

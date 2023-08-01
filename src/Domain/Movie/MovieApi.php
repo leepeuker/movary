@@ -17,6 +17,7 @@ use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\Person\PersonApi;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\UrlGenerator;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
@@ -44,6 +45,7 @@ class MovieApi
         private readonly MovieRepository $repository,
         private readonly ProductionCompanyApi $movieProductionCompanyApi,
         private readonly PersonApi $personApi,
+        private readonly JobQueueApi $jobQueueApi,
     ) {
     }
 
@@ -165,6 +167,11 @@ class MovieApi
     public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null, ?array $filterMovieIds = null) : array
     {
         return $this->movieRepository->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit, $filterMovieIds);
+    }
+
+    public function fetchTmdbIdsByMovieIds(array $movieIds) : array
+    {
+        return $this->movieRepository->fetchTmdbIdsByMovieIds($movieIds);
     }
 
     public function fetchUniqueMovieGenres(int $userId) : array
