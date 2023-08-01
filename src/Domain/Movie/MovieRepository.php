@@ -284,20 +284,6 @@ class MovieRepository
         );
     }
 
-    public function fetchHistoryForUserByMovieIds(int $userId, array $movieIds) : array
-    {
-        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
-
-        return $this->dbConnection->fetchAllAssociative(
-            <<<SQL
-            SELECT DISTINCT movie_id
-            FROM movie_user_watch_dates
-            WHERE user_id = 1 AND movie_id IN ($placeholders)
-            SQL,
-            [$userId, ...$movieIds],
-        );
-    }
-
     public function fetchMovieIdsWithUserWatchHistory(int $userId, array $movieIds) : array
     {
         $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
@@ -809,9 +795,9 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
-    public function findByTmdbId(int $moviesIds) : ?MovieEntity
+    public function findByTmdbId(int $movieIds) : ?MovieEntity
     {
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE tmdb_id = ?', [$moviesIds]);
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE tmdb_id = ?', [$movieIds]);
 
         return $data === false ? null : MovieEntity::createFromArray($data);
     }

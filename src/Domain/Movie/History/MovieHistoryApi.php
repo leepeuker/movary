@@ -157,10 +157,6 @@ class MovieHistoryApi
         return $this->movieRepository->fetchHistoryByMovieId($movieId, $userId);
     }
 
-    public function fetchHistoryForUserByMovieIds(int $userId, array $movieIds) : array
-    {
-    }
-
     public function fetchHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         return $this->movieRepository->fetchHistoryCount($userId, $searchTerm);
