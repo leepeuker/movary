@@ -8,7 +8,7 @@ final class AddJellyfinSyncEnabledToUserTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE user DROP COLUMN jellyfin_server_url;
+            ALTER TABLE user DROP COLUMN jellyfin_sync_enabled;
             SQL,
         );
     }
