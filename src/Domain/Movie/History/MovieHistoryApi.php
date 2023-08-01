@@ -22,7 +22,6 @@ class MovieHistoryApi
         private readonly UrlGenerator $urlGenerator,
         private readonly JobQueueApi $jobQueueApi,
         private readonly UserApi $userApi,
-        private readonly JellyfinApi $jellyfinApi,
     ) {
     }
 

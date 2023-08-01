@@ -45,7 +45,6 @@ class MovieApi
         private readonly MovieRepository $repository,
         private readonly ProductionCompanyApi $movieProductionCompanyApi,
         private readonly PersonApi $personApi,
-        private readonly JobQueueApi $jobQueueApi,
     ) {
     }
 
