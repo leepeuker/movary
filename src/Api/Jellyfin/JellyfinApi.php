@@ -97,11 +97,17 @@ class JellyfinApi
     public function setMovieWatchState(int $userId, int $tmdbId, bool $watchedState) : void
     {
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
+        $jellyfinAccessToken = $jellyfinAuthentication->getAccessToken();
 
         $itemId = null; // TODO find jellyfin item id matching to $tmdbId
 
         $relativeUrl = RelativeUrl::create(sprintf('/Users/%s/PlayedItems/%s', $jellyfinAuthentication->getUserId(), $itemId));
-        $response = $this->jellyfinClient->post($jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl));
+
+        if ($watchedState === true) {
+            $this->jellyfinClient->post($jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl), jellyfinAccessToken: $jellyfinAccessToken);
+        } else {
+            $this->jellyfinClient->delete($jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl), jellyfinAccessToken: $jellyfinAccessToken);
+        }
 
         $this->logger->info('Jellyfin movie watch state updated', ['tmdbId' => $tmdbId, 'watchedState' => $watchedState]);
     }
