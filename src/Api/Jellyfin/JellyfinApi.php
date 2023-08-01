@@ -94,8 +94,15 @@ class JellyfinApi
         );
     }
 
-    public function setMovieWatchState(int $tmdbId, bool $watchedState) : void
+    public function setMovieWatchState(int $userId, int $tmdbId, bool $watchedState) : void
     {
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
+
+        $itemId = null; // TODO find jellyfin item id matching to $tmdbId
+
+        $relativeUrl = RelativeUrl::create(sprintf('/Users/%s/PlayedItems/%s', $jellyfinAuthentication->getUserId(), $itemId));
+        $response = $this->jellyfinClient->post($jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl));
+
         $this->logger->info('Jellyfin movie watch state updated', ['tmdbId' => $tmdbId, 'watchedState' => $watchedState]);
     }
 }

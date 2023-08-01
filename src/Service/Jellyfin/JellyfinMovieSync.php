@@ -41,11 +41,11 @@ class JellyfinMovieSync
         $watchedMovieIds = $this->movieHistoryApi->fetchMovieIdsWithUserWatchHistory($userId, $movieIds);
 
         foreach ($watchedMovieIds as $watchedMovieId) {
-            $this->jellyfinApi->setMovieWatchState($movieToTmdbIdMap[(int)$watchedMovieId], true);
+            $this->jellyfinApi->setMovieWatchState($userId, $movieToTmdbIdMap[(int)$watchedMovieId], true);
         }
 
         foreach (array_diff($movieIds, $watchedMovieIds) as $notWatchedMovieId) {
-            $this->jellyfinApi->setMovieWatchState($movieToTmdbIdMap[$notWatchedMovieId], false);
+            $this->jellyfinApi->setMovieWatchState($userId, $movieToTmdbIdMap[$notWatchedMovieId], false);
         }
     }
 }
