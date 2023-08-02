@@ -2,6 +2,8 @@
 
 namespace Movary\Api\Jellyfin\Dto;
 
+use Movary\ValueObject\Date;
+
 class JellyfinMovieDto
 {
     private function __construct(
@@ -9,12 +11,13 @@ class JellyfinMovieDto
         private readonly string $jellyfinItemId,
         private readonly int $tmdbID,
         private readonly bool $watched,
+        private readonly ?Date $lastWatchDate,
     ) {
     }
 
-    public static function create(string $jellyfinUserId, string $jellyfinItemId, int $tmdbId, bool $watched) : self
+    public static function create(string $jellyfinUserId, string $jellyfinItemId, int $tmdbId, bool $watched, ?Date $lastWatchDate) : self
     {
-        return new self($jellyfinUserId, $jellyfinItemId, $tmdbId, $watched);
+        return new self($jellyfinUserId, $jellyfinItemId, $tmdbId, $watched, $lastWatchDate);
     }
 
     public static function createFromArray(array $movieData) : self
@@ -24,6 +27,7 @@ class JellyfinMovieDto
             $movieData['jellyfin_item_id'],
             $movieData['tmdb_id'],
             (bool)$movieData['watched'],
+            isset($movieData['last_watch_date']) === true ? Date::createFromString($movieData['last_watch_date']) : null,
         );
     }
 
@@ -35,6 +39,11 @@ class JellyfinMovieDto
     public function getJellyfinUserId() : string
     {
         return $this->jellyfinUserId;
+    }
+
+    public function getLastWatchDate() : ?Date
+    {
+        return $this->lastWatchDate;
     }
 
     public function getWatched() : bool

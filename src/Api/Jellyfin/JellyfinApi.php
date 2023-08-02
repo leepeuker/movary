@@ -7,6 +7,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUser;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
+use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
 use Movary\Api\Jellyfin\Exception\JellyfinServerUrlMissing;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
@@ -99,6 +100,10 @@ class JellyfinApi
     public function setMovieWatchState(int $userId, int $tmdbId, bool $watchedState) : void
     {
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
+        if ($jellyfinAuthentication === null) {
+            throw JellyfinInvalidAuthentication::create();
+        }
+
         $jellyfinAccessToken = $jellyfinAuthentication->getAccessToken();
 
         $jellyfinMovies = $this->jellyfinMovieCache->fetchJellyfinMoviesByTmdbId($userId, $tmdbId);
@@ -114,7 +119,6 @@ class JellyfinApi
 
             $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
 
-            // TODO check this
             if ($watchedState === true) {
                 $this->jellyfinClient->post($url, jellyfinAccessToken: $jellyfinAccessToken);
             } else {

@@ -4,8 +4,11 @@ namespace Movary\Api\Jellyfin\Cache;
 
 use Doctrine\DBAL\Connection;
 use Movary\Api\Jellyfin\Dto\JellyfinMovieDtoList;
+use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
 use Movary\Api\Jellyfin\JellyfinClient;
 use Movary\Domain\User\UserApi;
+use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\RelativeUrl;
 
 class JellyfinMovieCache
@@ -32,6 +35,10 @@ class JellyfinMovieCache
     public function loadFromJellyfin(int $userId) : void
     {
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
+
+        if ($jellyfinAuthentication === null) {
+            throw JellyfinInvalidAuthentication::create();
+        }
 
         $jellyfinPages = $this->client->getPaginated(
             $jellyfinAuthentication
@@ -66,14 +73,24 @@ class JellyfinMovieCache
                 }
 
                 $newWatched = $jellyfinMovie['UserData']['Played'];
+                $lastPlayedDate = isset($jellyfinMovie['UserData']['LastPlayedDate']) === true ? Date::createFromString($jellyfinMovie['UserData']['LastPlayedDate']) : null;
 
                 $cachedMovie = $cachedJellyfinMovies->getByItemId($jellyfinMovie['Id']);
 
-                if ($cachedMovie !== null && $cachedMovie->getWatched() === $newWatched && $cachedMovie->getTmdbId() === $tmdbId) {
+                if ($cachedMovie !== null &&
+                    $cachedMovie->getWatched() === $newWatched &&
+                    $cachedMovie->getTmdbId() === $tmdbId &&
+                    $cachedMovie->getWatched()) {
                     continue;
                 }
 
-                // TODO insert or update on duplicate
+                $this->dbConnection->delete(
+                    'user_jellyfin_cache',
+                    [
+                        'movary_user_id' => $userId,
+                        'jellyfin_item_id' => $jellyfinMovie['Id'],
+                    ],
+                );
                 $this->dbConnection->insert(
                     'user_jellyfin_cache',
                     [
@@ -81,6 +98,8 @@ class JellyfinMovieCache
                         'jellyfin_item_id' => $jellyfinMovie['Id'],
                         'tmdb_id' => $tmdbId,
                         'watched' => (int)$newWatched,
+                        'last_watch_date' => $lastPlayedDate === null ? null : (string)$lastPlayedDate,
+                        'created_at' => (string)DateTime::create(),
                     ],
                 );
             }

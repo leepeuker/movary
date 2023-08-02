@@ -16,6 +16,8 @@ use RuntimeException;
 
 class JellyfinClient
 {
+    private const DEFAULT_PAGINATION_LIMIT = 500;
+
     private const DEFAULT_TIMEOUT = 4;
 
     public function __construct(
@@ -59,10 +61,16 @@ class JellyfinClient
     {
         yield $response = $this->get($jellyfinServerUrl, $query, $jellyfinAccessToken, $timeout);
 
-        $limit = $query['limit'];
-        $totalMoviesCount = $response['TotalRecordCount'];
+        $limit = $query['limit'] ?? self::DEFAULT_PAGINATION_LIMIT;
+        $totalMoviesCount = $response['TotalRecordCount'] ?? null;
 
-        for ($i = 2; $i <= ceil($totalMoviesCount / $limit); $i++) {
+        if ($totalMoviesCount === null) {
+            throw new \RuntimeException('Could not extract total record count from response');
+        }
+
+        $pages = ceil($totalMoviesCount / $limit);
+
+        for ($i = 2; $i <= $pages; $i++) {
             $query['StartIndex'] = $limit * ($i - 1);
 
             yield $this->get($jellyfinServerUrl, $query, $jellyfinAccessToken, $timeout);

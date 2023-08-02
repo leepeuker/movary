@@ -29,6 +29,8 @@ final class AddJellyfinSyncEnabledToUserTable extends AbstractMigration
                 `jellyfin_item_id` VARCHAR(256) NOT NULL,
                 `tmdb_id` INT(10) UNSIGNED NOT NULL,
                 `watched` TINYINT(1) NOT NULL ,
+                `last_watch_date` DATETIME DEFAULT NULL,
+                `created_at` DATETIME NOT NULL DEFAULT NOW(),
                 PRIMARY KEY (`movary_user_id`, `jellyfin_item_id`),
                 FOREIGN KEY (`movary_user_id`) REFERENCES user (`id`) ON DELETE CASCADE
             ) COLLATE="utf8mb4_unicode_ci" ENGINE=InnoDB
