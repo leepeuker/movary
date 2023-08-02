@@ -55,6 +55,20 @@ class JellyfinClient
         return Json::decode((string)$response->getBody());
     }
 
+    public function getPaginated(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null, ?int $timeout = null) : \Generator
+    {
+        yield $response = $this->get($jellyfinServerUrl, $query, $jellyfinAccessToken, $timeout);
+
+        $limit = $query['limit'];
+        $totalMoviesCount = $response['TotalRecordCount'];
+
+        for ($i = 2; $i <= ceil($totalMoviesCount / $limit); $i++) {
+            $query['StartIndex'] = $limit * ($i - 1);
+
+            yield $this->get($jellyfinServerUrl, $query, $jellyfinAccessToken, $timeout);
+        }
+    }
+
     public function post(Url $jellyfinServerUrl, ?array $query = [], ?array $data = [], ?JellyfinAccessToken $jellyfinAccessToken = null) : ?array
     {
         $options = [

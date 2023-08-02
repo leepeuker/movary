@@ -115,6 +115,8 @@ final class AddJellyfinSyncEnabledToUserTable extends AbstractMigration
         );
         $this->execute('DROP TABLE `user`');
         $this->execute('ALTER TABLE `tmp_user` RENAME TO `user`');
+
+        $this->execute('DROP TABLE `user_jellyfin_cache`');
     }
 
     public function up() : void
@@ -197,5 +199,18 @@ final class AddJellyfinSyncEnabledToUserTable extends AbstractMigration
         );
         $this->execute('DROP TABLE `user`');
         $this->execute('ALTER TABLE `tmp_user` RENAME TO `user`');
+
+        $this->execute(
+            <<<SQL
+            CREATE TABLE `user_jellyfin_cache` (
+                `movary_user_id` INTEGER NOT NULL,
+                `jellyfin_item_id` TEXT NOT NULL,
+                `tmdb_id` INTEGER NOT NULL,
+                `watched` TINYINT(1) NOT NULL,
+                PRIMARY KEY (`movary_user_id`, `jellyfin_item_id`),
+                FOREIGN KEY (`movary_user_id`) REFERENCES user (`id`) ON DELETE CASCADE
+            )
+            SQL,
+        );
     }
 }

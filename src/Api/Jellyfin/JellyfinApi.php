@@ -2,6 +2,7 @@
 
 namespace Movary\Api\Jellyfin;
 
+use Movary\Api\Jellyfin\Cache\JellyfinMovieCache;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUser;
@@ -19,6 +20,7 @@ class JellyfinApi
         private readonly JellyfinClient $jellyfinClient,
         private readonly ServerSettings $serverSettings,
         private readonly UserApi $userApi,
+        private readonly JellyfinMovieCache $jellyfinMovieCache,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -99,16 +101,27 @@ class JellyfinApi
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
         $jellyfinAccessToken = $jellyfinAuthentication->getAccessToken();
 
-        $itemId = null; // TODO find jellyfin item id matching to $tmdbId
+        $jellyfinMovies = $this->jellyfinMovieCache->fetchJellyfinMoviesByTmdbId($userId, $tmdbId);
 
-        $relativeUrl = RelativeUrl::create(sprintf('/Users/%s/PlayedItems/%s', $jellyfinAuthentication->getUserId(), $itemId));
+        foreach ($jellyfinMovies as $jellyfinMovie) {
+            $relativeUrl = RelativeUrl::create(
+                sprintf(
+                    '/Users/%s/PlayedItems/%s',
+                    $jellyfinAuthentication->getUserId(),
+                    $jellyfinMovie->getJellyfinItemId(),
+                ),
+            );
 
-        if ($watchedState === true) {
-            $this->jellyfinClient->post($jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl), jellyfinAccessToken: $jellyfinAccessToken);
-        } else {
-            $this->jellyfinClient->delete($jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl), jellyfinAccessToken: $jellyfinAccessToken);
+            $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
+
+            // TODO check this
+            if ($watchedState === true) {
+                $this->jellyfinClient->post($url, jellyfinAccessToken: $jellyfinAccessToken);
+            } else {
+                $this->jellyfinClient->delete($url, jellyfinAccessToken: $jellyfinAccessToken);
+            }
+
+            $this->logger->info('Jellyfin movie watch state updated', ['tmdbId' => $tmdbId, 'itemId' => $jellyfinMovie->getJellyfinItemId(), 'watchedState' => $watchedState]);
         }
-
-        $this->logger->info('Jellyfin movie watch state updated', ['tmdbId' => $tmdbId, 'watchedState' => $watchedState]);
     }
 }
