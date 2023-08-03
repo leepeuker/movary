@@ -49,6 +49,10 @@ class MovieHistoryApi
     {
         $this->repository->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);
 
+        if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
+            return;
+        }
+
         $this->jobQueueApi->addJellyfinSyncMovieJob($userId, [$movieId]);
     }
 

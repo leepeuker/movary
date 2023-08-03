@@ -167,17 +167,6 @@ class MovieApi
         return $this->movieRepository->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit, $filterMovieIds);
     }
 
-    public function fetchMovieIdToTmdbIdMap(array $movieIds) : array
-    {
-        $movieIdToTmdbIdMap = [];
-
-        foreach ($this->movieRepository->fetchTmdbIdsByMovieIds($movieIds) as $tmdbIdAndMovieId) {
-            $movieIdToTmdbIdMap[(int)$tmdbIdAndMovieId['id']] = $tmdbIdAndMovieId['tmdb_id'];
-        }
-
-        return $movieIdToTmdbIdMap;
-    }
-
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->historyApi->fetchUniqueMovieGenres($userId);
