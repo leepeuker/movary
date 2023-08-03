@@ -66,7 +66,7 @@ class JellyfinCache
             $cachedMovie = $cachedJellyfinMovies->getByItemId($jellyfinItemId);
             $existingJellyfinItemIds[$jellyfinItemId] = true;
 
-            if ($cachedMovie !== null && $cachedMovie->isEqual($jellyfinMovieDto) === false) {
+            if ($cachedMovie !== null && $cachedMovie->isEqual($jellyfinMovieDto) === true) {
                 $this->logger->debug('Jellyfin cache: Skipped updating unchanged movie', [
                     'userId' => $userId,
                     'jellyfinItemId' => $jellyfinItemId

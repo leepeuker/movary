@@ -61,7 +61,7 @@ class JellyfinMovieDto
         return $this->watched === $jellyfinMovieDto->watched &&
             $this->jellyfinUserId === $jellyfinMovieDto->jellyfinUserId &&
             $this->tmdbId === $jellyfinMovieDto->tmdbId &&
-            $this->lastWatchDate === $jellyfinMovieDto->lastWatchDate &&
+            (string)$this->lastWatchDate === (string)$jellyfinMovieDto->lastWatchDate &&
             $this->jellyfinItemId === $jellyfinMovieDto->jellyfinItemId;
     }
 }
