@@ -9,7 +9,7 @@ class JellyfinMovieDto
     private function __construct(
         private readonly string $jellyfinUserId,
         private readonly string $jellyfinItemId,
-        private readonly int $tmdbID,
+        private readonly int $tmdbId,
         private readonly bool $watched,
         private readonly ?Date $lastWatchDate,
     ) {
@@ -53,6 +53,15 @@ class JellyfinMovieDto
 
     public function getTmdbId() : int
     {
-        return $this->tmdbID;
+        return $this->tmdbId;
+    }
+
+    public function isEqual(self $jellyfinMovieDto) : bool
+    {
+        return $this->watched === $jellyfinMovieDto->watched &&
+            $this->jellyfinUserId === $jellyfinMovieDto->jellyfinUserId &&
+            $this->tmdbId === $jellyfinMovieDto->tmdbId &&
+            $this->lastWatchDate === $jellyfinMovieDto->lastWatchDate &&
+            $this->jellyfinItemId === $jellyfinMovieDto->jellyfinItemId;
     }
 }

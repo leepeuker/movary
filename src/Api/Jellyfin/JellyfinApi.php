@@ -2,7 +2,7 @@
 
 namespace Movary\Api\Jellyfin;
 
-use Movary\Api\Jellyfin\Cache\JellyfinMovieCache;
+use Movary\Api\Jellyfin\Cache\JellyfinCache;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUser;
@@ -21,7 +21,7 @@ class JellyfinApi
         private readonly JellyfinClient $jellyfinClient,
         private readonly ServerSettings $serverSettings,
         private readonly UserApi $userApi,
-        private readonly JellyfinMovieCache $jellyfinMovieCache,
+        private readonly JellyfinCache $jellyfinMovieCache,
         private readonly LoggerInterface $logger,
     ) {
     }
