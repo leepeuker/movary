@@ -34,7 +34,7 @@ class JellyfinClient
         ];
 
         try {
-            $this->httpClient->request('GET', (string)$jellyfinServerUrl, $options);
+            $this->httpClient->request('DELETE', (string)$jellyfinServerUrl, $options);
         } catch (ClientException $e) {
             throw $this->convertException($e, $jellyfinServerUrl);
         }

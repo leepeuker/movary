@@ -284,17 +284,44 @@ class MovieRepository
         );
     }
 
-    public function fetchMovieIdsWithUserWatchHistory(int $userId, array $movieIds) : array
+    public function fetchTmdbIdsWithWatchHistoryByUserId(int $userId, array $movieIds) : array
     {
         $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
 
         return $this->dbConnection->fetchFirstColumn(
             <<<SQL
-            SELECT DISTINCT movie_id
+            SELECT DISTINCT tmdb_id
             FROM movie_user_watch_dates
+            JOIN movie m on movie_user_watch_dates.movie_id = m.id
             WHERE user_id = ? AND movie_id IN ($placeholders)
             SQL,
-            [$userId, ...$movieIds],
+            [
+                $userId,
+                ...$movieIds,
+            ],
+        );
+    }
+
+    public function fetchTmdbIdsWithoutWatchHistoryByUserId(int $userId, array $movieIds) : array
+    {
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT tmdb_id
+            FROM movie
+            WHERE id IN ($placeholders) AND id NOT IN (
+                SELECT DISTINCT id
+                FROM movie_user_watch_dates
+                JOIN movie m on movie_user_watch_dates.movie_id = m.id
+                WHERE user_id = ? AND movie_id IN ($placeholders)
+            )
+            SQL,
+            [
+                ...$movieIds,
+                $userId,
+                ...$movieIds,
+            ],
         );
     }
 

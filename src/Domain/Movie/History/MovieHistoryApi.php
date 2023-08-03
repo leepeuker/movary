@@ -2,7 +2,6 @@
 
 namespace Movary\Domain\Movie\History;
 
-use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Tmdb;
 use Movary\Domain\Movie;
 use Movary\Domain\User\UserApi;
@@ -223,9 +222,14 @@ class MovieHistoryApi
         return $this->movieRepository->fetchMostWatchedReleaseYears($userId);
     }
 
-    public function fetchMovieIdsWithUserWatchHistory(int $userId, array $movieIds) : array
+    public function fetchTmdbIdsWithWatchHistoryByUserId(int $userId, array $movieIds) : array
     {
-        return $this->movieRepository->fetchMovieIdsWithUserWatchHistory($userId, $movieIds);
+        return $this->movieRepository->fetchTmdbIdsWithWatchHistoryByUserId($userId, $movieIds);
+    }
+
+    public function fetchTmdbIdsWithoutWatchHistoryByUserId(int $userId, array $movieIds) : array
+    {
+        return $this->movieRepository->fetchTmdbIdsWithoutWatchHistoryByUserId($userId, $movieIds);
     }
 
     public function fetchTotalHoursWatched(int $userId) : int

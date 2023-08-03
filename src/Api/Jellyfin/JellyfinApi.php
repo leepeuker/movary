@@ -26,6 +26,33 @@ class JellyfinApi
     ) {
     }
 
+    public function createJellyfinAuthentication(int $userId, string $username, string $password) : JellyfinAuthenticationData
+    {
+        $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($userId);
+        if ($jellyfinServerUrl === null) {
+            throw JellyfinServerUrlMissing::create();
+        }
+
+        $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/Users/authenticatebyname'));
+
+        $data = [
+            'Username' => $username,
+            'Pw' => $password
+        ];
+        $response = $this->jellyfinClient->post($url, data: $data);
+        if ($response === null) {
+            throw new \RuntimeException('Missing authentication response body');
+        }
+
+        $this->logger->info('Jellyfin account has been authenticated for user: ' . $userId);
+
+        return JellyfinAuthenticationData::create(
+            JellyfinAccessToken::create((string)$response['AccessToken']),
+            JellyfinUserId::create((string)$response['User']['Id']),
+            $jellyfinServerUrl,
+        );
+    }
+
     public function deleteJellyfinAccessToken(JellyfinAuthenticationData $jellyfinAuthentication) : void
     {
         $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl(RelativeUrl::create('/Users/'));
@@ -70,62 +97,55 @@ class JellyfinApi
         return JellyfinUser::create(JellyfinUserId::create($userInformation['Id']), $userInformation['Name']);
     }
 
-    public function createJellyfinAuthentication(int $userId, string $username, string $password) : JellyfinAuthenticationData
-    {
-        $jellyfinServerUrl = $this->userApi->findJellyfinServerUrl($userId);
-        if ($jellyfinServerUrl === null) {
-            throw JellyfinServerUrlMissing::create();
-        }
-
-        $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/Users/authenticatebyname'));
-
-        $data = [
-            'Username' => $username,
-            'Pw' => $password
-        ];
-        $response = $this->jellyfinClient->post($url, data: $data);
-        if ($response === null) {
-            throw new \RuntimeException('Missing authentication response body');
-        }
-
-        $this->logger->info('Jellyfin account has been authenticated for user: ' . $userId);
-
-        return JellyfinAuthenticationData::create(
-            JellyfinAccessToken::create((string)$response['AccessToken']),
-            JellyfinUserId::create((string)$response['User']['Id']),
-            $jellyfinServerUrl,
-        );
-    }
-
-    public function setMovieWatchState(int $userId, int $tmdbId, bool $watchedState) : void
+    public function setMoviesWatchState(int $userId, array $watchedTmdbIds, array $unwatchedTmdbIds) : void
     {
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
         if ($jellyfinAuthentication === null) {
             throw JellyfinInvalidAuthentication::create();
         }
 
-        $jellyfinAccessToken = $jellyfinAuthentication->getAccessToken();
+        $combinedTmdbIds = array_merge($watchedTmdbIds, $unwatchedTmdbIds);
 
-        $jellyfinMovies = $this->jellyfinMovieCache->fetchJellyfinMoviesByTmdbId($userId, $tmdbId);
-
-        foreach ($jellyfinMovies as $jellyfinMovie) {
-            $relativeUrl = RelativeUrl::create(
-                sprintf(
-                    '/Users/%s/PlayedItems/%s',
-                    $jellyfinAuthentication->getUserId(),
-                    $jellyfinMovie->getJellyfinItemId(),
-                ),
+        foreach ($this->jellyfinMovieCache->fetchJellyfinMoviesByTmdbIds($userId, $combinedTmdbIds) as $jellyfinMovie) {
+            $this->setMovieWatchState(
+                $userId,
+                $jellyfinAuthentication,
+                $jellyfinMovie,
+                in_array($jellyfinMovie->getTmdbId(), $watchedTmdbIds),
             );
-
-            $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
-
-            if ($watchedState === true) {
-                $this->jellyfinClient->post($url, jellyfinAccessToken: $jellyfinAccessToken);
-            } else {
-                $this->jellyfinClient->delete($url, jellyfinAccessToken: $jellyfinAccessToken);
-            }
-
-            $this->logger->info('Jellyfin movie watch state updated', ['tmdbId' => $tmdbId, 'itemId' => $jellyfinMovie->getJellyfinItemId(), 'watchedState' => $watchedState]);
         }
+    }
+
+    private function setMovieWatchState(
+        int $userId,
+        JellyfinAuthenticationData $jellyfinAuthentication,
+        Dto\JellyfinMovieDto $jellyfinMovie,
+        bool $watched,
+    ) : void {
+        $relativeUrl = RelativeUrl::create(
+            sprintf(
+                '/Users/%s/PlayedItems/%s',
+                $jellyfinAuthentication->getUserId(),
+                $jellyfinMovie->getJellyfinItemId(),
+            ),
+        );
+
+        $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
+
+        if ($watched === true) {
+            $this->jellyfinClient->post($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
+        } else {
+            $this->jellyfinClient->delete($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
+        }
+
+        $this->logger->info(
+            'Jellyfin sync: Movie watch state updated',
+            [
+                'userId' => $userId,
+                'tmdbId' => $jellyfinMovie->getJellyfinItemId(),
+                'itemId' => $jellyfinMovie->getJellyfinItemId(),
+                'watchedState' => $watched
+            ],
+        );
     }
 }

@@ -4,14 +4,12 @@ namespace Movary\Service\Jellyfin;
 
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
-use Movary\Domain\Movie\MovieApi;
 use Movary\JobQueue\JobEntity;
 use RuntimeException;
 
 class JellyfinMovieSync
 {
     public function __construct(
-        private readonly MovieApi $movieApi,
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly JellyfinApi $jellyfinApi,
     ) {
@@ -26,26 +24,14 @@ class JellyfinMovieSync
 
         $movieIds = $job->getParameters()['movieIds'] ?? [];
 
-        $this->syncMovies($userId, $movieIds);
+        $this->syncMoviesWatchStateToJellyfin($userId, $movieIds);
     }
 
-    private function syncMovies(int $userId, array $movieIds) : void
+    private function syncMoviesWatchStateToJellyfin(int $userId, array $movieIds) : void
     {
-        $tmdbIdAndMovieIdList = $this->movieApi->fetchTmdbIdsByMovieIds($movieIds);
+        $watchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithWatchHistoryByUserId($userId, $movieIds);
+        $unwatchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithoutWatchHistoryByUserId($userId, $movieIds);
 
-        $movieToTmdbIdMap = [];
-        foreach ($tmdbIdAndMovieIdList as $tmdbIdAndMovieId) {
-            $movieToTmdbIdMap[(int)$tmdbIdAndMovieId['id']] = $tmdbIdAndMovieId['tmdb_id'];
-        }
-
-        $watchedMovieIds = $this->movieHistoryApi->fetchMovieIdsWithUserWatchHistory($userId, $movieIds);
-
-        foreach ($watchedMovieIds as $watchedMovieId) {
-            $this->jellyfinApi->setMovieWatchState($userId, $movieToTmdbIdMap[(int)$watchedMovieId], true);
-        }
-
-        foreach (array_diff($movieIds, $watchedMovieIds) as $notWatchedMovieId) {
-            $this->jellyfinApi->setMovieWatchState($userId, $movieToTmdbIdMap[$notWatchedMovieId], false);
-        }
+        $this->jellyfinApi->setMoviesWatchState($userId, $watchedTmdbIds, $unwatchedTmdbIds);
     }
 }
