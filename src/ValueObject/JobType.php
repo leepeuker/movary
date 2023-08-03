@@ -12,7 +12,7 @@ class JobType implements \JsonSerializable
 
     private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
 
-    private const TYPE_JELLYFIN_SYNC_MOVIE = 'jellyfin_update_movie';
+    private const TYPE_JELLYFIN_EXPORT_MOVIES = 'jellyfin_export_movies';
 
     private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
 
@@ -38,7 +38,7 @@ class JobType implements \JsonSerializable
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
                 self::TYPE_PLEX_IMPORT_WATCHLIST,
-                self::TYPE_JELLYFIN_SYNC_MOVIE,
+                self::TYPE_JELLYFIN_EXPORT_MOVIES,
             ]) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
@@ -59,9 +59,9 @@ class JobType implements \JsonSerializable
         return new self(self::TYPE_LETTERBOXD_IMPORT_HISTORY);
     }
 
-    public static function createJellyfinUpdatedMovie() : self
+    public static function createJellyfinExportMovies() : self
     {
-        return new self(self::TYPE_JELLYFIN_SYNC_MOVIE);
+        return new self(self::TYPE_JELLYFIN_EXPORT_MOVIES);
     }
 
     public static function createLetterboxdImportRatings() : self
@@ -109,9 +109,9 @@ class JobType implements \JsonSerializable
         return $this->type;
     }
 
-    public function isOfTypeJellyfinSyncMovie() : bool
+    public function isOfTypeJellyfinExportMovies() : bool
     {
-        return $this->type === self::TYPE_JELLYFIN_SYNC_MOVIE;
+        return $this->type === self::TYPE_JELLYFIN_EXPORT_MOVIES;
     }
 
     public function isOfTypeLetterboxdImportHistory() : bool

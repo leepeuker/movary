@@ -7,7 +7,7 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\JobQueue\JobEntity;
 use RuntimeException;
 
-class JellyfinMovieSync
+class JellyfinMoviesExporter
 {
     public function __construct(
         private readonly MovieHistoryApi $movieHistoryApi,
@@ -24,10 +24,10 @@ class JellyfinMovieSync
 
         $movieIds = $job->getParameters()['movieIds'] ?? [];
 
-        $this->syncMoviesWatchStateToJellyfin($userId, $movieIds);
+        $this->exportMoviesWatchStateToJellyfin($userId, $movieIds);
     }
 
-    private function syncMoviesWatchStateToJellyfin(int $userId, array $movieIds) : void
+    private function exportMoviesWatchStateToJellyfin(int $userId, array $movieIds) : void
     {
         $watchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithWatchHistoryByUserId($userId, $movieIds);
         $unwatchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithoutWatchHistoryByUserId($userId, $movieIds);

@@ -52,7 +52,7 @@ class JobQueueApi
     public function addJellyfinSyncMovieJob(int $userId, array $movieIds, ?JobStatus $jobStatus = null) : int
     {
         return $this->repository->addJob(
-            JobType::createJellyfinUpdatedMovie(),
+            JobType::createJellyfinExportMovies(),
             $jobStatus ?? JobStatus::createWaiting(),
             $userId,
             parameters: [
