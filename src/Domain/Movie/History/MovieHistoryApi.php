@@ -32,7 +32,7 @@ class MovieHistoryApi
             return;
         }
 
-        $this->jobQueueApi->addJellyfinSyncMovieJob($userId, [$movieId]);
+        $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
     }
 
     public function deleteByUserAndMovieId(int $userId, int $movieId) : void
@@ -53,7 +53,7 @@ class MovieHistoryApi
             return;
         }
 
-        $this->jobQueueApi->addJellyfinSyncMovieJob($userId, [$movieId]);
+        $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
     }
 
     public function fetchActors(

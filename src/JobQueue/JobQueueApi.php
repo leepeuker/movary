@@ -49,7 +49,7 @@ class JobQueueApi
         return $this->repository->addJob(JobType::createTmdbMovieSync(), $jobStatus);
     }
 
-    public function addJellyfinSyncMovieJob(int $userId, array $movieIds, ?JobStatus $jobStatus = null) : int
+    public function addJellyfinExportMoviesJob(int $userId, array $movieIds, ?JobStatus $jobStatus = null) : int
     {
         return $this->repository->addJob(
             JobType::createJellyfinExportMovies(),
