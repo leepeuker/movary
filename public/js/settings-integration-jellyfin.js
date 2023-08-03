@@ -234,3 +234,29 @@ async function removeJellyfinAuthentication() {
         addAlert('alertJellyfinImportDiv', 'The authentication could not be removed', 'danger');
     });
 }
+
+
+async function updateSyncOptions() {
+    removeAlert('alertJellyfinSyncDiv')
+
+    await fetch('/settings/jellyfin/sync', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            'syncWatches': document.getElementById('automaticWatchStateSyncCheckbox').checked,
+        })
+    }).then(response => {
+        if (!response.ok) {
+            addAlert('alertJellyfinSyncDiv', 'Could not update sync options', 'danger')
+
+            return
+        }
+
+        addAlert('alertJellyfinSyncDiv', 'Sync options were updated', 'success')
+    }).catch(function (error) {
+        console.log(error)
+        addAlert('alertJellyfinSyncDiv', 'Could not update sync options', 'danger')
+    });
+}

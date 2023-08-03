@@ -306,6 +306,11 @@ class UserApi
         $this->repository->updateJellyfinServerUrl($userId, $serverUrl);
     }
 
+    public function updateJellyfinSyncEnabled(int $userId, bool $enabledSync) : void
+    {
+        $this->repository->updateJellyfinSyncEnabled($userId, $enabledSync);
+    }
+
     public function updateName(int $userId, string $name) : void
     {
         $this->userValidator->ensureNameFormatIsValid($name);
