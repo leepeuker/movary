@@ -249,14 +249,64 @@ async function updateSyncOptions() {
         })
     }).then(response => {
         if (!response.ok) {
-            addAlert('alertJellyfinSyncDiv', 'Could not update sync options', 'danger')
+            addAlert('alertJellyfinSyncOptionsDiv', 'Could not update sync options', 'danger')
 
             return
         }
 
-        addAlert('alertJellyfinSyncDiv', 'Sync options were updated', 'success')
+        addAlert('alertJellyfinSyncOptionsDiv', 'Sync options were updated', 'success')
     }).catch(function (error) {
         console.log(error)
-        addAlert('alertJellyfinSyncDiv', 'Could not update sync options', 'danger')
+        addAlert('alertJellyfinSyncOptionsDiv', 'Could not update sync options', 'danger')
     });
+}
+
+async function exportJellyfin() {
+    const response = await fetch(
+        '/jobs/schedule/jellyfin-export-history',
+        {'method': 'get'}
+    ).catch(function (error) {
+        addAlert('alertJellyfinExportHistoryDiv', 'History export could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    });
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertJellyfinExportHistoryDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertJellyfinExportHistoryDiv', 'History export could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    addAlert('alertJellyfinExportHistoryDiv', 'History export scheduled', 'success')
+}
+
+async function importJellyfin() {
+    const response = await fetch(
+        '/jobs/schedule/jellyfin-import-history',
+        {'method': 'get'}
+    ).catch(function (error) {
+        addAlert('alertJellyfinImportHistoryDiv', 'History import could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    });
+
+    if (!response.ok) {
+        if (response.status === 400) {
+            addAlert('alertJellyfinImportHistoryDiv', await response.text(), 'danger')
+
+            return
+        }
+
+        addAlert('alertJellyfinImportHistoryDiv', 'History import could not be scheduled', 'danger')
+
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    addAlert('alertJellyfinImportHistoryDiv', 'History import scheduled', 'success')
 }

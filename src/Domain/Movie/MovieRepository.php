@@ -286,6 +286,10 @@ class MovieRepository
 
     public function fetchTmdbIdsWithWatchHistoryByUserId(int $userId, array $movieIds) : array
     {
+        if (count($movieIds) === 0) {
+            return [];
+        }
+
         $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
 
         return $this->dbConnection->fetchFirstColumn(

@@ -2,8 +2,10 @@
 
 namespace Movary\HttpController;
 
+use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
 use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
@@ -20,6 +22,7 @@ class JobController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly JobQueueApi $jobQueueApi,
+        private readonly UserApi $userApi,
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
         private readonly SessionWrapper $sessionWrapper,
         private readonly string $appStorageDirectory,
@@ -157,6 +160,50 @@ class JobController
         }
 
         $this->jobQueueApi->addPlexImportWatchlistJob($currentUser->getId());
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function scheduleJellyfinImportHistory() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $currentUserId = $this->authenticationService->getCurrentUserId();
+
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($currentUserId);
+        if ($jellyfinAuthentication === null) {
+            return Response::createBadRequest(JellyfinInvalidAuthentication::create()->getMessage());
+        }
+
+        $this->jobQueueApi->addJellyfinImportMoviesJob($currentUserId);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function scheduleJellyfinExportHistory() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $currentUserId = $this->authenticationService->getCurrentUserId();
+
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($currentUserId);
+        if ($jellyfinAuthentication === null) {
+            return Response::createBadRequest(JellyfinInvalidAuthentication::create()->getMessage());
+        }
+
+        $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId);
 
         return Response::create(
             StatusCode::createSeeOther(),
