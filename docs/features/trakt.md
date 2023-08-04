@@ -4,7 +4,7 @@
 
 You can import your watch history and ratings from Trakt.
 
-The Trakt account used in the import process must have a Trakt username and client id set (can be set via settings page `/settings/trakt` or via cli).
+The Trakt account used in the import process must have a Trakt username and client id set (can be set via settings page `/settings/integrations/trakt` or via cli).
 
 The import can be triggered via the settings page or via cli.
 

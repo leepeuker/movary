@@ -10,7 +10,7 @@ Automatically add new [Jellyin](https://jellyfin.org/) movie plays to Movary.
 
 ### Instruction
 
-- Generate a webhook url in Movary for your user on the Jellyfin integration settings page (`/settings/jellyfin/plex`)
+- Generate a webhook url in Movary for your user on the Jellyfin integration settings page (`/settings/integrations/jellyfin`)
 - Add the generated url in the Jellyfin webhook plugin as a `Generic Destination` and activate only:
     - Notification Type => "Playback Stop"
     - User Filter => Choose your user
