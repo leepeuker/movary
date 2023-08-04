@@ -541,6 +541,19 @@ class UserRepository
         );
     }
 
+    public function updateJellyfinSyncEnabled(int $userId, bool $enabledSync) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'jellyfin_sync_enabled' => (int)$enabledSync,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateName(int $userId, string $name) : void
     {
         $this->dbConnection->update(

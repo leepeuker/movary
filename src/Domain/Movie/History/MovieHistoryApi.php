@@ -4,6 +4,8 @@ namespace Movary\Domain\Movie\History;
 
 use Movary\Api\Tmdb;
 use Movary\Domain\Movie;
+use Movary\Domain\User\UserApi;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
@@ -17,12 +19,20 @@ class MovieHistoryApi
         private readonly Movie\MovieRepository $movieRepository,
         private readonly Tmdb\TmdbApi $tmdbApi,
         private readonly UrlGenerator $urlGenerator,
+        private readonly JobQueueApi $jobQueueApi,
+        private readonly UserApi $userApi,
     ) {
     }
 
     public function create(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment = null) : void
     {
         $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment);
+
+        if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
+            return;
+        }
+
+        $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
     }
 
     public function deleteByUserAndMovieId(int $userId, int $movieId) : void
@@ -38,6 +48,12 @@ class MovieHistoryApi
     public function deleteHistoryByIdAndDate(int $movieId, int $userId, Date $watchedAt) : void
     {
         $this->repository->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);
+
+        if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
+            return;
+        }
+
+        $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
     }
 
     public function fetchActors(
@@ -208,6 +224,16 @@ class MovieHistoryApi
     public function fetchMostWatchedReleaseYears(int $userId) : array
     {
         return $this->movieRepository->fetchMostWatchedReleaseYears($userId);
+    }
+
+    public function fetchTmdbIdsWithWatchHistoryByUserId(int $userId, array $movieIds) : array
+    {
+        return $this->movieRepository->fetchTmdbIdsWithWatchHistoryByUserId($userId, $movieIds);
+    }
+
+    public function fetchTmdbIdsWithoutWatchHistoryByUserId(int $userId, array $movieIds) : array
+    {
+        return $this->movieRepository->fetchTmdbIdsWithoutWatchHistoryByUserId($userId, $movieIds);
     }
 
     public function fetchTotalHoursWatched(int $userId) : int

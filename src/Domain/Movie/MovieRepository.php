@@ -284,6 +284,47 @@ class MovieRepository
         );
     }
 
+    public function fetchTmdbIdsWithWatchHistoryByUserId(int $userId, array $movieIds) : array
+    {
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT tmdb_id
+            FROM movie_user_watch_dates
+            JOIN movie m on movie_user_watch_dates.movie_id = m.id
+            WHERE user_id = ? AND movie_id IN ($placeholders)
+            SQL,
+            [
+                $userId,
+                ...$movieIds,
+            ],
+        );
+    }
+
+    public function fetchTmdbIdsWithoutWatchHistoryByUserId(int $userId, array $movieIds) : array
+    {
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT tmdb_id
+            FROM movie
+            WHERE id IN ($placeholders) AND id NOT IN (
+                SELECT DISTINCT id
+                FROM movie_user_watch_dates
+                JOIN movie m on movie_user_watch_dates.movie_id = m.id
+                WHERE user_id = ? AND movie_id IN ($placeholders)
+            )
+            SQL,
+            [
+                ...$movieIds,
+                $userId,
+                ...$movieIds,
+            ],
+        );
+    }
+
     public function fetchHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         if ($searchTerm !== null) {
@@ -749,9 +790,9 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
-    public function findByTmdbId(int $tmdbId) : ?MovieEntity
+    public function findByTmdbId(int $movieIds) : ?MovieEntity
     {
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE tmdb_id = ?', [$tmdbId]);
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE tmdb_id = ?', [$movieIds]);
 
         return $data === false ? null : MovieEntity::createFromArray($data);
     }

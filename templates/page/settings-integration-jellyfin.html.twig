@@ -206,6 +206,31 @@
                     </div>
                 </div>
             </div>
+            <hr>
+
+            <h5>Jellyfin sync</h5>
+
+            <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="1"
+                       id="automaticWatchStateSyncCheckbox"
+                       name="scrobbleWatches"
+                       {% if jellyfinIsAuthenticated == false %}disabled{% endif %}
+                       {% if jellyfinSyncEnabled == true %}checked{% endif %}
+                       style="margin-right: 0.2rem">
+                <label class="form-check-label" for="automaticWatchStateSyncCheckbox">Automatically sync watch state changes to Jellyfin</label>
+            </div>
+
+            <div id="alertJellyfinSyncDiv">
+                <div class="alert alert-warning {% if jellyfinIsAuthenticated == true %}d-none{% endif %}"
+                     role="alert"
+                     style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                    Sync disabled - Authentication required
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save</button>
         </div>
     </main>
 {% endblock %}

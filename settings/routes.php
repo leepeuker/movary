@@ -280,6 +280,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
+        '/settings/jellyfin/sync',
+        [\Movary\HttpController\JellyfinController::class, 'saveJellyfinSyncOptions'],
+    );
+    $routeCollector->addRoute(
+        'POST',
         '/settings/jellyfin/authenticate',
         [\Movary\HttpController\JellyfinController::class, 'authenticateJellyfinAccount'],
     );

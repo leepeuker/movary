@@ -12,6 +12,8 @@ class JobType implements \JsonSerializable
 
     private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
 
+    private const TYPE_JELLYFIN_EXPORT_MOVIES = 'jellyfin_export_movies';
+
     private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
 
     private const TYPE_TMDB_IMAGE_CACHE = 'tmdb_image_cache';
@@ -36,14 +38,10 @@ class JobType implements \JsonSerializable
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
                 self::TYPE_PLEX_IMPORT_WATCHLIST,
+                self::TYPE_JELLYFIN_EXPORT_MOVIES,
             ]) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
-    }
-
-    public static function addTmdbPersonSyncJob() : self
-    {
-        return new self(self::TYPE_TMDB_PERSON_SYNC);
     }
 
     public static function createFromString(string $status) : self
@@ -59,6 +57,11 @@ class JobType implements \JsonSerializable
     public static function createLetterboxdImportHistory() : self
     {
         return new self(self::TYPE_LETTERBOXD_IMPORT_HISTORY);
+    }
+
+    public static function createJellyfinExportMovies() : self
+    {
+        return new self(self::TYPE_JELLYFIN_EXPORT_MOVIES);
     }
 
     public static function createLetterboxdImportRatings() : self
@@ -86,6 +89,11 @@ class JobType implements \JsonSerializable
         return new self(self::TYPE_TMDB_PERSON_SYNC);
     }
 
+    public static function createTmdbPersonSyncJob() : self
+    {
+        return new self(self::TYPE_TMDB_PERSON_SYNC);
+    }
+
     public static function createTraktImportHistory() : self
     {
         return new self(self::TYPE_TRAKT_IMPORT_HISTORY);
@@ -99,6 +107,11 @@ class JobType implements \JsonSerializable
     public function __toString() : string
     {
         return $this->type;
+    }
+
+    public function isOfTypeJellyfinExportMovies() : bool
+    {
+        return $this->type === self::TYPE_JELLYFIN_EXPORT_MOVIES;
     }
 
     public function isOfTypeLetterboxdImportHistory() : bool

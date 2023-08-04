@@ -294,6 +294,7 @@ class SettingsController
                 'jellyfinUsername' => $jellyfinUsername?->getUsername(),
                 'jellyfinDeviceId' => $jellyfinDeviceId,
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
+                'jellyfinSyncEnabled' => $user->hasJellyfinSyncEnabled(),
             ]),
         );
     }
