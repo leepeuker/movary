@@ -27,7 +27,7 @@ You can authenticate Movary against Jellyfin on the Jellyfin integration setting
 
 !!! Info
 
-    Requires the server configuration JELLYFIN_DEVICE_ID to be set.
+    Requires the server configuration [JELLYFIN_DEVICE_ID](/configuration/#third-party-integrations) to be set.
 
 During the authentication process a Jellyfin access token is generated and stored in Movary.
 This token will be used in all further Jellyfin API requests.
@@ -43,7 +43,7 @@ You can keep your Jellyfin libraries automatically up to date with your latest M
 
 !!! Info
 
-    Requires active Jellyfin authencation
+    Jellyfin [authentication](#authentication) is required.  
 
 
 If the automatic sync is enabled, new plays added to Movary are automatically pushed to Jellyfin and the movies are marked as watched.
