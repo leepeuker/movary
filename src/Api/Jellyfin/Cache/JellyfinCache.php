@@ -36,6 +36,13 @@ class JellyfinCache
         $this->repository->delete($userId);
     }
 
+    public function fetchJellyfinPlayedMovies(int $userId) : JellyfinMovieDtoList
+    {
+        $this->loadFromJellyfin($userId);
+
+        return $this->repository->fetchJellyfinPlayedMovies($userId);
+    }
+
     public function fetchJellyfinMoviesByTmdbIds(int $userId, array $tmdbIds) : JellyfinMovieDtoList
     {
         $this->loadFromJellyfin($userId);

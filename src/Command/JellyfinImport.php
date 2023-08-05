@@ -21,7 +21,6 @@ class JellyfinImport extends Command
     public function __construct(
         private readonly JellyfinMoviesImporter $jellyfinMoviesImporter,
         private readonly JobQueueApi $jobQueueApi,
-        private readonly MovieHistoryApi $movieHistoryApi,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
