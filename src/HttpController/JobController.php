@@ -190,7 +190,7 @@ class JobController
         );
     }
 
-    public function scheduleJellyfinExportHistory(Request $request) : Response
+    public function scheduleJellyfinExportHistory() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -203,9 +203,7 @@ class JobController
             return Response::createBadRequest(JellyfinInvalidAuthentication::create()->getMessage());
         }
 
-        $forceExport = $request->getGetParameters()['forceExport'] ?? false;
-
-        $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId, force: (bool)$forceExport);
+        $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId);
 
         return Response::create(
             StatusCode::createSeeOther(),
