@@ -18,14 +18,14 @@ You can select what you want to scrobble (movie plays and/or ratings) via the "S
 
     Keep your webhook url private to prevent abuse.
 
-## Plex Authentication
+## Authentication
 
 Some features require access to protected personal Plex data.
 You can authenticate Movary against Plex on the Plex integration settings page (`/settings/integrations/plex`).
 
 !!! Info
 
-    Requires the server configuration PLEX_IDENTIFIER to be set.
+    Requires the server configuration [PLEX_IDENTIFIER](/configuration/#third-party-integrations) to be set.
 
 During the authentication process a Plex access token is generated and stored in Movary. 
 This token will be used in all further Plex API requests.
@@ -45,7 +45,7 @@ Missing movies imported to the Movary Watchlist are put at the beginning of the 
 
 !!! Info
 
-    Plex authentication is required. 
+    Plex [authentication](#authentication) is required.
 
 ### Instruction
 

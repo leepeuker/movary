@@ -155,6 +155,20 @@ class JellyfinController
         return Response::createOk();
     }
 
+    public function saveJellyfinSyncOptions(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $syncWatches = Json::decode($request->getBody())['syncWatches'];
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $this->userApi->updateJellyfinSyncEnabled($userId, $syncWatches);
+
+        return Response::createOk();
+    }
+
     public function verifyJellyfinServerUrl(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {

@@ -16,6 +16,8 @@ use RuntimeException;
 
 class JellyfinClient
 {
+    private const DEFAULT_PAGINATION_LIMIT = 500;
+
     private const DEFAULT_TIMEOUT = 4;
 
     public function __construct(
@@ -32,7 +34,7 @@ class JellyfinClient
         ];
 
         try {
-            $this->httpClient->request('GET', (string)$jellyfinServerUrl, $options);
+            $this->httpClient->request('DELETE', (string)$jellyfinServerUrl, $options);
         } catch (ClientException $e) {
             throw $this->convertException($e, $jellyfinServerUrl);
         }
@@ -53,6 +55,26 @@ class JellyfinClient
         }
 
         return Json::decode((string)$response->getBody());
+    }
+
+    public function getPaginated(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null, ?int $timeout = null) : \Generator
+    {
+        yield $response = $this->get($jellyfinServerUrl, $query, $jellyfinAccessToken, $timeout);
+
+        $limit = $query['limit'] ?? self::DEFAULT_PAGINATION_LIMIT;
+        $totalMoviesCount = $response['TotalRecordCount'] ?? null;
+
+        if ($totalMoviesCount === null) {
+            throw new \RuntimeException('Could not extract total record count from response');
+        }
+
+        $pages = ceil($totalMoviesCount / $limit);
+
+        for ($i = 2; $i <= $pages; $i++) {
+            $query['StartIndex'] = $limit * ($i - 1);
+
+            yield $this->get($jellyfinServerUrl, $query, $jellyfinAccessToken, $timeout);
+        }
     }
 
     public function post(Url $jellyfinServerUrl, ?array $query = [], ?array $data = [], ?JellyfinAccessToken $jellyfinAccessToken = null) : ?array

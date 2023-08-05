@@ -45,5 +45,6 @@ nav:
       - Emby: features/emby.md
       - Letterboxd: features/letterboxd.md
       - Trakt TV: features/trakt.md
+      - Netflix: features/netflix.md
   - Development: 'development.md'
   - FAQ: 'faq.md'

@@ -1,24 +1,39 @@
-You can import your watch history and ratings from trakt.tv (exporting from movary to trakt not supported yet).
+## Import
 
-The trakt account used in the import process must have a trakt username and client id set (can be set via settings page `/settings/trakt` or via cli `user:update`).
+### Description
 
-The import can be executed via the settings page `/settings/trakt` or via cli.
+You can import your watch history and ratings from Trakt.
 
-Example cli import (import history and ratings for user with id 1 and overwrite locally existing data if needed):
+The Trakt account used in the import process must have a Trakt username and client id set (can be set via settings page `/settings/integrations/trakt` or via cli).
 
-`php bin/console.php trakt:import --userId=1 --ratings --history --overwrite`
+The import can be triggered via the settings page or via cli.
 
-**Info:** Importing hundreds or thousands of movies for the first time can take a few minutes.
+!!! Info
 
-**Interesting flags:**
+    Importing hundreds or thousands of movies for the first time can take a few minutes. 
+
+### Command
+
+```shell
+php bin/console.php trakt:import
+```
+
+#### Interesting flags
 
 - `--userId`
   User to import data to
 - `--ratings`
-  Import trakt ratings
+  Import Trakt ratings
 - `--history`
-  Import trakt watch history (plays)
+  Import Trakt watch history (plays)
 - `--overwrite`
-  Use if you want to overwrite the local data with the data coming from trakt
+  Use if you want to overwrite the local data with the data coming from Trakt
 - `--ignore-cache`
   Use if you want to force import everything regardless if there was a change since the last import
+
+#### Example
+Import history and ratings for user with id 1 and overwrite locally existing data
+
+```shell
+php bin/console.php trakt:import --userId=1 --ratings --history --overwrite
+``` 

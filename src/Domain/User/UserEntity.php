@@ -31,6 +31,7 @@ class UserEntity
         private readonly bool $plexScrobbleRatings,
         private readonly bool $watchlistAutomaticRemovalEnabled,
         private readonly ?string $country,
+        private readonly bool $jellyfinSyncEnabled,
     ) {
     }
 
@@ -60,6 +61,7 @@ class UserEntity
             (bool)$data['plex_scrobble_ratings'],
             (bool)$data['watchlist_automatic_removal_enabled'],
             $data['country'],
+            (bool)$data['jellyfin_sync_enabled'],
         );
     }
 
@@ -156,6 +158,11 @@ class UserEntity
     public function hasJellyfinScrobbleWatchesEnabled() : bool
     {
         return $this->jellyfinScrobbleWatches;
+    }
+
+    public function hasJellyfinSyncEnabled() : bool
+    {
+        return $this->jellyfinSyncEnabled;
     }
 
     public function hasPlexScrobbleRatingsEnabled() : bool
