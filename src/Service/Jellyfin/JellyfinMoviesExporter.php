@@ -34,7 +34,7 @@ class JellyfinMoviesExporter
         $this->exportMoviesWatchStateToJellyfin($userId, $movieIds, $forceExport);
     }
 
-    private function exportMoviesWatchStateToJellyfin(int $userId, array $movieIds, bool $removeWatchDates) : void
+    public function exportMoviesWatchStateToJellyfin(int $userId, array $movieIds, bool $removeWatchDates) : void
     {
         $watchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithWatchHistoryByUserIdAndMovieIds($userId, $movieIds);
 

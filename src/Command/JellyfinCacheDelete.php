@@ -24,7 +24,7 @@ class JellyfinCacheDelete extends Command
 
     protected function configure() : void
     {
-        $this->setDescription('Delete the local cache of Jellyfin movies')
+        $this->setDescription('Delete the local cache of Jellyfin movies.')
             ->addArgument(self::OPTION_NAME_USER_ID, InputArgument::REQUIRED, 'Id of user.');
     }
 

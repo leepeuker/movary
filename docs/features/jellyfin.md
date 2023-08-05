@@ -35,9 +35,13 @@ When an authentication is removed from Movary, the token will be deleted in Mova
 
 ## Sync
 
-### Automatic Sync
+General notes:
 
-#### Description
+- Movies are matched via tmdb id. Movies without a tmdb id in Jellyfin are ignored.
+- Movies will be updated in all Jellyfin libraries.
+- Backup your Jellyfin database regularly in case something goes wrong!
+
+### Automatic sync
 
 You can keep your Jellyfin libraries automatically up to date with your latest Movary watch history changes.
 
@@ -45,17 +49,26 @@ You can keep your Jellyfin libraries automatically up to date with your latest M
 
     Jellyfin [authentication](#authentication) is required.  
 
+If the automatic sync is enabled (e.g. on `/settings/integrations/jellyfin`) new watch dates added to Movary are automatically pushed as plays to Jellyfin.
+If a movie has its last watch date removed in Movary it is set to unwatched in Jellyfin.
 
-If the automatic sync is enabled, new plays added to Movary are automatically pushed to Jellyfin and the movies are marked as watched.
-If a movie has its last play removed, Movary will set the movie to unwatched in Jellyfin.
+### Export
 
-Notes:
+#### Description
 
-- can be enabled on the Jellyfin integration settings page
-- movies will be updated in all Jellyfin libraries they exist
-- only movies with a tmdb id in Jellyfin are supported and handled
+You can export your Movary watch dates as plays to Jellyfin.
 
-#### CLI commands
+!!! Info
 
-- `php bin/console.php jellyfin:cache:refresh <userId>`
-- `php bin/console.php jellyfin:cache:delete <userId>`
+    Jellyfin [authentication](#authentication) is required.  
+
+Movary will compare its movie watch dates against the Jellyfin movie plays.
+Movies not marked as watched in Jellyfin but with watch dates in Movary are marked as watched and get the latest watch date set as the last play date.
+Movies already marked as watched are updated with the latest watch date as the last play date if the dates are not the same.
+
+#### CLI command
+
+```shell
+php bin/console.php jellyfin:export <userId>
+```
+
