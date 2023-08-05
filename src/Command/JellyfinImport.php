@@ -4,7 +4,6 @@ namespace Movary\Command;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\JobQueue\JobQueueApi;
-use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
@@ -30,7 +29,7 @@ class JellyfinImport extends Command
 
     protected function configure() : void
     {
-        $this->setDescription('Import Movary watch dates as plays to Jellyfin.')
+        $this->setDescription('Import Movary watch dates as plays from Jellyfin.')
             ->addArgument(self::OPTION_NAME_USER_ID, InputArgument::REQUIRED, 'Id of user.');
     }
 
@@ -43,7 +42,7 @@ class JellyfinImport extends Command
         try {
             $this->generateOutput($output, 'Importing movie plays from Jellyfin...');
 
-            $this->jellyfinMoviesImporter->importMoviesToJellyfin($userId);
+            $this->jellyfinMoviesImporter->importMoviesFromJellyfin($userId);
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete Jellyfin import.');
             $this->logger->error('Could not complete Jellyfin import', ['exception' => $t]);

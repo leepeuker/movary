@@ -5,6 +5,8 @@ namespace Movary\Api\Jellyfin;
 use Movary\Api\Jellyfin\Cache\JellyfinCache;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
+use Movary\Api\Jellyfin\Dto\JellyfinMovieDto;
+use Movary\Api\Jellyfin\Dto\JellyfinMovieDtoList;
 use Movary\Api\Jellyfin\Dto\JellyfinUser;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
@@ -72,6 +74,42 @@ class JellyfinApi
         $url = $jellyfinServerUrl->appendRelativeUrl(RelativeUrl::create('/system/info'));
 
         return $this->jellyfinClient->get($url, jellyfinAccessToken: $jellyfinAccessToken);
+    }
+
+    public function fetchWatchedMovies(int $userId) : ?JellyfinMovieDtoList
+    {
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
+        if ($jellyfinAuthentication === null) {
+            throw JellyfinInvalidAuthentication::create();
+        }
+
+        $relativeUrl = RelativeUrl::create('/Users/' . $jellyfinAuthentication->getUserId() . '/Items');
+        $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
+        $query = [
+            'IncludeItemTypes' => 'Movie',
+            'Filters' => 'isPlayed',
+            'hasTmdbId' => 'True',
+            'recursive' => 'True',
+            'fields' => 'ProviderIds'
+        ];
+
+        $response = $this->jellyfinClient->get($url, $query, $jellyfinAuthentication->getAccessToken(), 5);
+        if($response === null) {
+            return null;
+        }
+
+        $watchedMoviesList = JellyfinMovieDtoList::create();
+        foreach($response['Items'] as $movie) {
+            $jellyfinMovie = JellyfinMovieDto::create(
+                (string)$jellyfinAuthentication->getUserId(),
+                $movie['Id'],
+                (int)$movie['ProviderIds']['Tmdb'],
+                true,
+                Date::createFromString($movie['UserData']['LastPlayedDate'])
+            );
+            $watchedMoviesList->add($jellyfinMovie);
+        }
+        return $watchedMoviesList;
     }
 
     public function fetchJellyfinServerInfoPublic(Url $jellyfinServerUrl) : ?array
