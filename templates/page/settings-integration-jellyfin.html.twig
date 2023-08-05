@@ -225,7 +225,11 @@
                 <button type="button" class="btn btn-outline-primary" onclick="showJobModal('jellyfin_import_history')">
                     Show imports
                 </button>
-                <button type="button" class="btn btn-warning" onclick="importJellyfin()" id="jellyfinHistoryImportButton"
+                <button type="button"
+                        class="btn btn-warning"
+                        data-bs-target="#importHistoryModal"
+                        data-bs-toggle="modal"
+                        id="jellyfinHistoryImportButton"
                         {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>
                     Import history from Jellyfin
                 </button>
@@ -237,7 +241,11 @@
                 <button type="button" class="btn btn-outline-primary" onclick="showJobModal('jellyfin_export_history')">
                     Show exports
                 </button>
-                <button type="button" class="btn btn-warning" onclick="exportJellyfin()" id="jellyfinHistoryExportButton"
+                <button type="button"
+                        class="btn btn-warning"
+                        data-bs-target="#exportHistoryModal"
+                        data-bs-toggle="modal"
+                        id="jellyfinHistoryExportButton"
                         {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>
                     Export history to Jellyfin
                 </button>
@@ -262,5 +270,46 @@
         </div>
 
         {{ include('component/modal-job.html.twig') }}
+
+        <div class="modal fade" id="exportHistoryModal" tabindex="-1" role="dialog" aria-labelledby="exportHistoryModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm export</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <strong>Are you sure you want to export your history?</strong>
+                        <br>
+                        <p style="padding-top: 1rem;margin-bottom: 0">This will mark all movies with Movary watch dates as watched in Jellyfin and update their last play date to
+                            the latest watch
+                            date.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" onclick="exportJellyfin()">Submit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="importHistoryModal" tabindex="-1" role="dialog" aria-labelledby="importHistoryModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm import</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <strong>Are you sure you want to import your history?</strong>
+                        <br>
+                        <p style="padding-top: 1rem;margin-bottom: 0">This will add missing watch dates in Movary for all the Jellyfin movies plays. Movies with multiple plays are resulting in only one watch date, using the date of the latest play.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" onclick="importJellyfin()">Submit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
     </main>
 {% endblock %}

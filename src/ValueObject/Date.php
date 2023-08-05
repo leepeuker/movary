@@ -65,6 +65,11 @@ class Date implements JsonSerializable
         return (new \DateTime($this->date))->diff((new \DateTime($date->date)))->y;
     }
 
+    public function isEqual(self $lastWatchDate) : bool
+    {
+        return $this->date === $lastWatchDate->date;
+    }
+
     public function jsonSerialize() : string
     {
         return $this->date;

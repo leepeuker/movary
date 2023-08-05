@@ -9,8 +9,10 @@ use Movary\Api\Jellyfin\Dto\JellyfinUser;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
 use Movary\Api\Jellyfin\Exception\JellyfinServerUrlMissing;
+use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
+use Movary\ValueObject\Date;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
@@ -22,6 +24,7 @@ class JellyfinApi
         private readonly ServerSettings $serverSettings,
         private readonly UserApi $userApi,
         private readonly JellyfinCache $jellyfinMovieCache,
+        private readonly MovieHistoryApi $movieHistoryApi,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -105,13 +108,19 @@ class JellyfinApi
         }
 
         $combinedTmdbIds = array_merge($watchedTmdbIds, $unwatchedTmdbIds);
+        $tmdbIdsToLastWatchDateMap = $this->movieHistoryApi->fetchTmdbIdsToLastWatchDatesMap($userId, $watchedTmdbIds);
 
         foreach ($this->jellyfinMovieCache->fetchJellyfinMoviesByTmdbIds($userId, $combinedTmdbIds) as $jellyfinMovie) {
+            $tmdbId = $jellyfinMovie->getTmdbId();
+            $watched = in_array($tmdbId, $watchedTmdbIds);
+            $lastWatchDate = $tmdbIdsToLastWatchDateMap[$tmdbId] ?? null;
+
             $this->setMovieWatchState(
                 $userId,
                 $jellyfinAuthentication,
                 $jellyfinMovie,
-                in_array($jellyfinMovie->getTmdbId(), $watchedTmdbIds),
+                $watched,
+                $lastWatchDate,
             );
         }
     }
@@ -121,6 +130,7 @@ class JellyfinApi
         JellyfinAuthenticationData $jellyfinAuthentication,
         Dto\JellyfinMovieDto $jellyfinMovie,
         bool $watched,
+        ?Date $lastWatchDate,
     ) : void {
         $relativeUrl = RelativeUrl::create(
             sprintf(
@@ -132,19 +142,54 @@ class JellyfinApi
 
         $url = $jellyfinAuthentication->getServerUrl()->appendRelativeUrl($relativeUrl);
 
-        if ($watched === true) {
-            $this->jellyfinClient->post($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
-        } else {
-            $this->jellyfinClient->delete($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
+        $currentLastWatchDateJellyfin = $jellyfinMovie->getLastWatchDate();
+        if ($watched === true &&
+            $currentLastWatchDateJellyfin !== null &&
+            $lastWatchDate !== null &&
+            $currentLastWatchDateJellyfin->isEqual($lastWatchDate) === true) {
+            $this->logger->debug(
+                'Jellyfin sync: Skipped movie watch state update, no change',
+                [
+                    'userId' => $userId,
+                    'tmdbId' => $jellyfinMovie->getJellyfinItemId(),
+                    'itemId' => $jellyfinMovie->getJellyfinItemId(),
+                    'watchedState' => $watched,
+                    'lastWatchDate' => (string)$lastWatchDate,
+                ],
+            );
+
+            return;
         }
+
+        if ($watched === false) {
+            $this->jellyfinClient->delete($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
+
+            $this->logger->info(
+                'Jellyfin sync: Movie watch state deleted',
+                [
+                    'userId' => $userId,
+                    'tmdbId' => $jellyfinMovie->getJellyfinItemId(),
+                    'itemId' => $jellyfinMovie->getJellyfinItemId(),
+                ],
+            );
+
+            return;
+        }
+
+        $this->jellyfinClient->post(
+            $url,
+            ['datePlayed' => (string)$lastWatchDate],
+            jellyfinAccessToken: $jellyfinAuthentication->getAccessToken(),
+        );
 
         $this->logger->info(
             'Jellyfin sync: Movie watch state updated',
             [
                 'userId' => $userId,
-                'tmdbId' => $jellyfinMovie->getJellyfinItemId(),
+                'tmdbId' => $jellyfinMovie->getTmdbId(),
                 'itemId' => $jellyfinMovie->getJellyfinItemId(),
-                'watchedState' => $watched
+                'oldLastWatchDate' => (string)$currentLastWatchDateJellyfin,
+                'newLastWatchDate' => (string)$lastWatchDate,
             ],
         );
     }

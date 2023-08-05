@@ -59,6 +59,10 @@ class JellyfinCacheRepository
 
     public function fetchJellyfinMoviesByTmdbIds(int $userId, array $tmdbIds) : JellyfinMovieDtoList
     {
+        if (count($tmdbIds) === 0) {
+            return JellyfinMovieDtoList::create();
+        }
+
         $placeholders = trim(str_repeat('?, ', count($tmdbIds)), ', ');
 
         $result = $this->dbConnection->fetchAllAssociative(
