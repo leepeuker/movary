@@ -41,7 +41,7 @@ class JellyfinImport extends Command
         $jobId = $this->jobQueueApi->addJellyfinImportMoviesJob($userId, jobStatus: JobStatus::createInProgress());
 
         try {
-            $this->generateOutput($output, 'Importing movie watch dates to Jellyfin...');
+            $this->generateOutput($output, 'Importing movie plays from Jellyfin...');
 
             $this->jellyfinMoviesImporter->importMoviesToJellyfin($userId);
         } catch (Throwable $t) {
@@ -53,7 +53,7 @@ class JellyfinImport extends Command
             return Command::FAILURE;
         }
 
-        $this->generateOutput($output, 'Importing movie watch dates to Jellyfin done.');
+        $this->generateOutput($output, 'Importing movie plays from Jellyfin done.');
 
         return Command::SUCCESS;
     }
