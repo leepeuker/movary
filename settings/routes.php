@@ -94,6 +94,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/jobs/schedule/plex-watchlist-sync',
         [\Movary\HttpController\JobController::class, 'schedulePlexWatchlistImport'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/jobs/schedule/jellyfin-import-history',
+        [\Movary\HttpController\JobController::class, 'scheduleJellyfinImportHistory'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/jobs/schedule/jellyfin-export-history',
+        [\Movary\HttpController\JobController::class, 'scheduleJellyfinExportHistory'],
+    );
 
     ############
     # Settings #

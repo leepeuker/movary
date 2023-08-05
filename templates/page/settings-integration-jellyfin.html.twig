@@ -6,6 +6,7 @@
 
 {% block scripts %}
     <script src="/js/settings-integration-jellyfin.js"></script>
+    <script src="/js/component/modal-job.js"></script>
 {% endblock %}
 
 {% block stylesheets %}
@@ -210,18 +211,6 @@
 
             <h5>Jellyfin sync</h5>
 
-            <div style="padding-bottom: 1rem;padding-top: 0.5rem">
-                <input class="form-check-input"
-                       type="checkbox"
-                       value="1"
-                       id="automaticWatchStateSyncCheckbox"
-                       name="scrobbleWatches"
-                       {% if jellyfinIsAuthenticated == false %}disabled{% endif %}
-                       {% if jellyfinSyncEnabled == true %}checked{% endif %}
-                       style="margin-right: 0.2rem">
-                <label class="form-check-label" for="automaticWatchStateSyncCheckbox">Automatically sync watch state changes to Jellyfin</label>
-            </div>
-
             <div id="alertJellyfinSyncDiv">
                 <div class="alert alert-warning {% if jellyfinIsAuthenticated == true %}d-none{% endif %}"
                      role="alert"
@@ -230,7 +219,97 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save</button>
+{#            <div id="alertJellyfinImportHistoryDiv"></div>#}
+
+{#            <div style="margin-bottom: 1rem;margin-top: 1rem">#}
+{#                <button type="button" class="btn btn-outline-primary" onclick="showJobModal('jellyfin_import_history')">#}
+{#                    Show imports#}
+{#                </button>#}
+{#                <button type="button"#}
+{#                        class="btn btn-warning"#}
+{#                        data-bs-target="#importHistoryModal"#}
+{#                        data-bs-toggle="modal"#}
+{#                        id="jellyfinHistoryImportButton"#}
+{#                        {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>#}
+{#                    Import history from Jellyfin#}
+{#                </button>#}
+{#            </div>#}
+
+            <div id="alertJellyfinExportHistoryDiv"></div>
+
+            <div style="margin-bottom: 1rem;margin-top: 1rem">
+                <button type="button" class="btn btn-outline-primary" onclick="showJobModal('jellyfin_export_history')">
+                    Show exports
+                </button>
+                <button type="button"
+                        class="btn btn-warning"
+                        data-bs-target="#exportHistoryModal"
+                        data-bs-toggle="modal"
+                        id="jellyfinHistoryExportButton"
+                        {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>
+                    Export history to Jellyfin
+                </button>
+            </div>
+
+            <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="1"
+                       id="automaticWatchStateSyncCheckbox"
+                       name="scrobbleWatches"
+                       {% if jellyfinIsAuthenticated == false %}disabled{% endif %}
+                        {% if jellyfinSyncEnabled == true %}checked{% endif %}
+                       style="margin-right: 0.2rem">
+                <label class="form-check-label" for="automaticWatchStateSyncCheckbox">Automatically export history changes to Jellyfin</label>
+            </div>
+
+            <div id="alertJellyfinSyncOptionsDiv"></div>
+
+            <button type="submit" class="btn btn-primary" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save
+            </button>
         </div>
+
+        {{ include('component/modal-job.html.twig') }}
+
+        <div class="modal fade" id="exportHistoryModal" tabindex="-1" role="dialog" aria-labelledby="exportHistoryModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm export</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <strong>Are you sure you want to export your history?</strong>
+                        <br>
+                        <p style="padding-top: 1rem;margin-bottom: 0">This will mark all movies with Movary watch dates as watched in Jellyfin and update their last play date to
+                            the latest watch
+                            date.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" onclick="exportJellyfin()">Submit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="importHistoryModal" tabindex="-1" role="dialog" aria-labelledby="importHistoryModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm import</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <strong>Are you sure you want to import your history?</strong>
+                        <br>
+                        <p style="padding-top: 1rem;margin-bottom: 0">This will add missing watch dates in Movary for all the Jellyfin movies plays. Movies with multiple plays are resulting in only one watch date, using the date of the latest play.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" onclick="importJellyfin()">Submit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
     </main>
 {% endblock %}

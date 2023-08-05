@@ -78,7 +78,7 @@ class JellyfinCache
             if ($cachedMovie !== null) {
                 $this->repository->updateCacheEntry($userId, $jellyfinMovieDto);
 
-                $this->logger->debug('Jellyfin cache: Updated movie', [
+                $this->logger->info('Jellyfin cache: Updated movie', [
                     'userId' => $userId,
                     'jellyfinItemId' => $jellyfinItemId,
                     'watched' => $jellyfinMovieDto->getWatched()
@@ -89,7 +89,7 @@ class JellyfinCache
 
             $this->repository->addCacheEntry($userId, $jellyfinMovieDto);
 
-            $this->logger->debug('Jellyfin cache: Added movie', [
+            $this->logger->info('Jellyfin cache: Added movie', [
                 'userId' => $userId,
                 'jellyfinItemId' => $jellyfinItemId,
                 'watched' => $jellyfinMovieDto->getWatched()
@@ -112,7 +112,7 @@ class JellyfinCache
 
             $this->repository->deleteCacheEntry($userId, $cachedJellyfinItemId);
 
-            $this->logger->debug('Jellyfin cache: Removed movie', ['userId' => $userId, 'jellyfinItemId' => $cachedJellyfinItemId]);
+            $this->logger->info('Jellyfin cache: Removed movie', ['userId' => $userId, 'jellyfinItemId' => $cachedJellyfinItemId]);
         }
     }
 }

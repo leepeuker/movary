@@ -226,9 +226,26 @@ class MovieHistoryApi
         return $this->movieRepository->fetchMostWatchedReleaseYears($userId);
     }
 
-    public function fetchTmdbIdsWithWatchHistoryByUserId(int $userId, array $movieIds) : array
+    public function fetchTmdbIdsToLastWatchDatesMap(int $userId, array $tmdbIds) : array
     {
-        return $this->movieRepository->fetchTmdbIdsWithWatchHistoryByUserId($userId, $movieIds);
+        $map = [];
+
+        foreach ($this->movieRepository->fetchTmdbIdsToLastWatchDatesMap($userId, $tmdbIds) as $row) {
+            $map[$row['tmdb_id']] = Date::createFromString($row['latest_watched_at']);
+        }
+
+        return $map;
+    }
+
+    public function fetchTmdbIdsWithWatchHistoryByUserIdAndMovieIds(int $userId, array $movieIds) : array
+    {
+        return $this->movieRepository->fetchTmdbIdsWithWatchHistoryByUserIdAndMovieIds($userId, $movieIds);
+    }
+
+
+    public function fetchMovieIdsWithWatchHistoryByUserId(int $userId) : array
+    {
+        return $this->movieRepository->fetchMovieIdsWithWatchHistoryByUserId($userId);
     }
 
     public function fetchTmdbIdsWithoutWatchHistoryByUserId(int $userId, array $movieIds) : array

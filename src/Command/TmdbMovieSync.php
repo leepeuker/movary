@@ -54,8 +54,6 @@ class TmdbMovieSync extends Command
             $this->syncMovieDetails->syncMovies($maxAgeInHours, $maxSyncsThreshold, $movieIds);
 
             $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
-
-            $this->generateOutput($output, 'Syncing movie meta data done.');
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete tmdb sync.');
             $this->logger->error('Could not complete tmdb sync.', ['exception' => $t]);
@@ -64,6 +62,8 @@ class TmdbMovieSync extends Command
 
             return Command::FAILURE;
         }
+
+        $this->generateOutput($output, 'Syncing movie meta data done.');
 
         return Command::SUCCESS;
     }
