@@ -72,3 +72,23 @@ Movies already marked as watched are updated with the latest watch date as the l
 php bin/console.php jellyfin:export <userId>
 ```
 
+### Import
+
+#### Description
+
+You can import your Jellyfin plays as Movary watch dates.
+
+!!! Info
+
+    Jellyfin [authentication](#authentication) is required.  
+
+Movary will compare the Jellyfin movie plays against its movie watch dates.
+Movies with multiple plays in Jellyfin are handled as one watch date, using the date of the latest play.
+Watch dates are added to Movary if they are missing, existing watch dates are not changed. 
+
+#### CLI command
+
+```shell
+php bin/console.php jellyfin:import <userId>
+```
+
