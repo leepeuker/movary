@@ -30,6 +30,7 @@ class ExportController
         $exportCsvPath = match ($exportType) {
             'history' => $this->exportService->createExportHistoryCsv($userId),
             'ratings' => $this->exportService->createExportRatingsCsv($userId),
+            'watchlist' => $this->exportService->createExportWatchlistCsv($userId),
             default => null
         };
 

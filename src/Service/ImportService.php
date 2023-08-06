@@ -5,14 +5,18 @@ namespace Movary\Service;
 use League\Csv\Reader;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\PersonalRating;
 use RuntimeException;
 
 class ImportService
 {
-    public function __construct(private readonly MovieApi $movieApi)
-    {
+    public function __construct(
+        private readonly MovieApi $movieApi,
+        private readonly MovieWatchlistApi $watchlistApi,
+    ) {
     }
 
     public function findOrCreateMovie(int $tmdbId, string $title, ?string $imdbId) : MovieEntity
@@ -67,6 +71,22 @@ class ImportService
             $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
 
             $this->movieApi->updateUserRating($movie->getId(), $userId, PersonalRating::create((int)$record['userRating']));
+        }
+    }
+
+    public function importWatchlist(int $userId, string $importCsvPath) : void
+    {
+        $csv = Reader::createFromPath($importCsvPath, 'r');
+        $csv->setHeaderOffset(0);
+
+        foreach ($csv->getRecords() as $record) {
+            if (isset($record['title'], $record['tmdbId'], $record['imdbId'], $record['addedAt']) === false) {
+                throw new RuntimeException('Import csv is missing data');
+            }
+
+            $movie = $this->findOrCreateMovie((int)$record['tmdbId'], (string)$record['title'], (string)$record['imdbId']);
+
+            $this->watchlistApi->addMovieToWatchlist($userId, $movie->getId(), DateTime::createFromString((string)$record['addedAt']));
         }
     }
 }

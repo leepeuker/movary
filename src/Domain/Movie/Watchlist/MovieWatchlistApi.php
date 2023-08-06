@@ -30,6 +30,11 @@ class MovieWatchlistApi
         $this->repository->addMovieToWatchlist($userId, $movieId, $addedAt);
     }
 
+    public function fetchAllWatchlistItems(int $userId) : ?array
+    {
+        return $this->repository->fetchAllWatchlistItems($userId);
+    }
+
     public function fetchWatchlistCount(int $userId, ?string $searchTerm = null) : int
     {
         return $this->repository->fetchWatchlistCount($userId, $searchTerm);

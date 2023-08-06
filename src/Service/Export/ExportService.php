@@ -3,6 +3,7 @@
 namespace Movary\Service\Export;
 
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 
 class ExportService
 {
@@ -10,8 +11,11 @@ class ExportService
 
     private const CSV_HEADER_RATINGS = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
 
+    private const CSV_HEADER_WATCHLIST = 'title,tmdbId,imdbId,addedAt' . PHP_EOL;
+
     public function __construct(
         private readonly MovieApi $movieApi,
+        private readonly MovieWatchlistApi $watchlistApi,
         private readonly ExportWriter $dataMapper,
         private readonly string $storageDirectory,
     ) {
@@ -52,6 +56,31 @@ class ExportService
 
         foreach ($movies as $movie) {
             $this->dataMapper->writeUserRatingToCsv($exportFileHandle, $movie, $userId);
+        }
+
+        fclose($exportFileHandle);
+
+        return $fileName;
+    }
+
+    public function createExportWatchlistCsv(int $userId, ?string $fileName = null) : ?string
+    {
+        $watchlist = $this->watchlistApi->fetchAllWatchlistItems($userId);
+
+        if($fileName === null) {
+            $fileName = $this->generateFilename($userId, 'watchlist');
+        }
+
+        if($watchlist === null) {
+            return null;
+        }
+
+        $exportFileHandle = $this->createFileHandle($fileName);
+
+        fwrite($exportFileHandle, self::CSV_HEADER_WATCHLIST);
+
+        foreach ($watchlist as $watchlistItem) {
+            $this->dataMapper->writeWatchlistItemToCsv($exportFileHandle, $watchlistItem);
         }
 
         fclose($exportFileHandle);
