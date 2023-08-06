@@ -7,6 +7,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\PersonalRating;
 use RuntimeException;
 
@@ -77,13 +78,13 @@ class ImportService
         $csv->setHeaderOffset(0);
 
         foreach ($csv->getRecords() as $record) {
-            if (isset($record['title'], $record['tmdbId'], $record['imdbId'], $record['added_at']) === false) {
+            if (isset($record['title'], $record['tmdbId'], $record['imdbId'], $record['addedAt']) === false) {
                 throw new RuntimeException('Import csv is missing data');
             }
 
             $movie = $this->findOrCreateMovie((int)$record['tmdbId'], (string)$record['title'], (string)$record['imdbId']);
-            
-            $this->watchlistApi->addMovieToWatchlist($userId, $movie->getId());
+
+            $this->watchlistApi->addMovieToWatchlist($userId, $movie->getId(), DateTime::createFromString((string)$record['addedAt']));
         }
     }
 }

@@ -11,7 +11,7 @@ class ExportService
 
     private const CSV_HEADER_RATINGS = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
 
-    private const CSV_HEADER_WATCHLIST = 'title,tmdbId,imdbId' . PHP_EOL;
+    private const CSV_HEADER_WATCHLIST = 'title,tmdbId,imdbId,addedAt' . PHP_EOL;
 
     public function __construct(
         private readonly MovieApi $movieApi,

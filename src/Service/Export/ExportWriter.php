@@ -60,12 +60,13 @@ class ExportWriter
     
     /** @param resource $fileHandle */
 
-    public function writeWatchlistItemToCsv($filehandle, array $watchlistItem) : void
+    public function writeWatchlistItemToCsv($fileHandle, array $watchlistItem) : void
     {
-        $lengthOfWrittenString = fputcsv($filehandle, [
+        $lengthOfWrittenString = fputcsv($fileHandle, [
             $watchlistItem['title'],
             $watchlistItem['tmdb_id'],
-            $watchlistItem['imdb_id']
+            $watchlistItem['imdb_id'],
+            $watchlistItem['added_at'],
         ]);
         if ($lengthOfWrittenString === false) {
             throw new \RuntimeException('Could not write watch date to export csv');
