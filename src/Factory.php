@@ -197,6 +197,7 @@ class Factory
         return new JobController(
             $container->get(Authentication::class),
             $container->get(JobQueueApi::class),
+            $container->get(UserApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
             self::createDirectoryStorageApp()

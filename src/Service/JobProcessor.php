@@ -5,6 +5,7 @@ namespace Movary\Service;
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Jellyfin\JellyfinMoviesExporter;
+use Movary\Service\Jellyfin\JellyfinMoviesImporter;
 use Movary\Service\Letterboxd;
 use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\Tmdb\SyncMovies;
@@ -23,6 +24,7 @@ class JobProcessor
         private readonly TmdbImageCache $tmdbImageCache,
         private readonly PlexWatchlistImporter $plexWatchlistImporter,
         private readonly JellyfinMoviesExporter $jellyfinExporter,
+        private readonly JellyfinMoviesImporter $jellyfinImporter,
     ) {
     }
 
@@ -37,6 +39,7 @@ class JobProcessor
             $job->getType()->isOfTypeTmdbMovieSync() => $this->tmdbSyncMovies->syncMovies(),
             $job->getType()->isOfTypePlexImportWatchlist() => $this->plexWatchlistImporter->executeJob($job),
             $job->getType()->isOfTypeJellyfinExportMovies() => $this->jellyfinExporter->executeJob($job),
+            $job->getType()->isOfTypeJellyfinImportMovies() => $this->jellyfinImporter->executeJob($job),
 
             default => throw new RuntimeException('Job type not supported: ' . $job->getType()),
         };

@@ -12,7 +12,9 @@ class JobType implements \JsonSerializable
 
     private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
 
-    private const TYPE_JELLYFIN_EXPORT_MOVIES = 'jellyfin_export_movies';
+    private const TYPE_JELLYFIN_EXPORT_HISTORY = 'jellyfin_export_history';
+
+    private const TYPE_JELLYFIN_IMPORT_HISTORY = 'jellyfin_import_history';
 
     private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
 
@@ -38,7 +40,8 @@ class JobType implements \JsonSerializable
                 self::TYPE_TRAKT_IMPORT_RATINGS,
                 self::TYPE_IMDB_SYNC,
                 self::TYPE_PLEX_IMPORT_WATCHLIST,
-                self::TYPE_JELLYFIN_EXPORT_MOVIES,
+                self::TYPE_JELLYFIN_EXPORT_HISTORY,
+                self::TYPE_JELLYFIN_IMPORT_HISTORY,
             ]) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
@@ -54,14 +57,19 @@ class JobType implements \JsonSerializable
         return new self(self::TYPE_IMDB_SYNC);
     }
 
+    public static function createJellyfinExportMovies() : self
+    {
+        return new self(self::TYPE_JELLYFIN_EXPORT_HISTORY);
+    }
+
+    public static function createJellyfinImportMovies() : self
+    {
+        return new self(self::TYPE_JELLYFIN_IMPORT_HISTORY);
+    }
+
     public static function createLetterboxdImportHistory() : self
     {
         return new self(self::TYPE_LETTERBOXD_IMPORT_HISTORY);
-    }
-
-    public static function createJellyfinExportMovies() : self
-    {
-        return new self(self::TYPE_JELLYFIN_EXPORT_MOVIES);
     }
 
     public static function createLetterboxdImportRatings() : self
@@ -111,7 +119,12 @@ class JobType implements \JsonSerializable
 
     public function isOfTypeJellyfinExportMovies() : bool
     {
-        return $this->type === self::TYPE_JELLYFIN_EXPORT_MOVIES;
+        return $this->type === self::TYPE_JELLYFIN_EXPORT_HISTORY;
+    }
+
+    public function isOfTypeJellyfinImportMovies() : bool
+    {
+        return $this->type === self::TYPE_JELLYFIN_IMPORT_HISTORY;
     }
 
     public function isOfTypeLetterboxdImportHistory() : bool

@@ -27,5 +27,7 @@ $application->add($container->get(Movary\Command\ProcessJobs::class));
 $application->add($container->get(Movary\Command\ImdbSync::class));
 $application->add($container->get(Movary\Command\JellyfinCacheDelete::class));
 $application->add($container->get(Movary\Command\JellyfinCacheRefresh::class));
+$application->add($container->get(Movary\Command\JellyfinExport::class));
+$application->add($container->get(Movary\Command\JellyfinImport::class));
 
 $application->run();

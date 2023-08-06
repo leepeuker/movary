@@ -23,14 +23,25 @@ class JellyfinMoviesExporter
         }
 
         $movieIds = $job->getParameters()['movieIds'] ?? [];
+        $forceExport = true;
 
-        $this->exportMoviesWatchStateToJellyfin($userId, $movieIds);
+        if (count($movieIds) === 0) {
+            $movieIds = $this->movieHistoryApi->fetchMovieIdsWithWatchHistoryByUserId($userId);
+
+            $forceExport = false;
+        }
+
+        $this->exportMoviesWatchStateToJellyfin($userId, $movieIds, $forceExport);
     }
 
-    private function exportMoviesWatchStateToJellyfin(int $userId, array $movieIds) : void
+    public function exportMoviesWatchStateToJellyfin(int $userId, array $movieIds, bool $removeWatchDates) : void
     {
-        $watchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithWatchHistoryByUserId($userId, $movieIds);
-        $unwatchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithoutWatchHistoryByUserId($userId, $movieIds);
+        $watchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithWatchHistoryByUserIdAndMovieIds($userId, $movieIds);
+
+        $unwatchedTmdbIds = [];
+        if ($removeWatchDates === true) {
+            $unwatchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithoutWatchHistoryByUserId($userId, $movieIds);
+        }
 
         $this->jellyfinApi->setMoviesWatchState($userId, $watchedTmdbIds, $unwatchedTmdbIds);
     }
