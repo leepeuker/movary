@@ -1,4 +1,5 @@
 const exportHistoryModal = new bootstrap.Modal('#exportHistoryModal', {keyboard: false})
+const importHistoryModal = new bootstrap.Modal('#importHistoryModal', {keyboard: false})
 
 function regenerateJellyfinWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
@@ -300,8 +301,12 @@ async function importJellyfin() {
     ).catch(function (error) {
         addAlert('alertJellyfinImportHistoryDiv', 'History import could not be scheduled', 'danger')
 
+        importHistoryModal.hide()
+
         throw new Error(`HTTP error! status: ${response.status}`)
     });
+
+    importHistoryModal.hide()
 
     if (!response.ok) {
         if (response.status === 400) {
@@ -316,4 +321,5 @@ async function importJellyfin() {
     }
 
     addAlert('alertJellyfinImportHistoryDiv', 'History import scheduled', 'success')
+    importHistoryModal.hide()
 }

@@ -148,7 +148,7 @@ class JellyfinApi
             $lastWatchDate !== null &&
             $currentLastWatchDateJellyfin->isEqual($lastWatchDate) === true) {
             $this->logger->debug(
-                'Jellyfin sync: Skipped movie watch state update, no change',
+                'Jellyfin export: Skipped movie play, no change',
                 [
                     'userId' => $userId,
                     'tmdbId' => $jellyfinMovie->getJellyfinItemId(),
@@ -165,7 +165,7 @@ class JellyfinApi
             $this->jellyfinClient->delete($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken());
 
             $this->logger->info(
-                'Jellyfin sync: Movie watch state deleted',
+                'Jellyfin export: Movie play deleted',
                 [
                     'userId' => $userId,
                     'tmdbId' => $jellyfinMovie->getJellyfinItemId(),
@@ -183,7 +183,7 @@ class JellyfinApi
         );
 
         $this->logger->info(
-            'Jellyfin sync: Movie watch state updated',
+            'Jellyfin export: Movie play added',
             [
                 'userId' => $userId,
                 'tmdbId' => $jellyfinMovie->getTmdbId(),

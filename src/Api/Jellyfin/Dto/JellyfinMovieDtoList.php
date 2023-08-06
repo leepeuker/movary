@@ -41,4 +41,15 @@ class JellyfinMovieDtoList extends AbstractList
     {
         return $this->data[$itemId] ?? null;
     }
+
+    public function getTmdbIds() : array
+    {
+        $tmdbIds = [];
+
+        foreach ($this as $movie) {
+            $tmdbIds[] = $movie->getTmdbId();
+        }
+
+        return $tmdbIds;
+    }
 }

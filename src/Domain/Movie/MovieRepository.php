@@ -841,6 +841,17 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
+    public function findByTmdbIds(array $tmdbIds) : array
+    {
+        if (count($tmdbIds) === 0) {
+            return [];
+        }
+
+        $placeholders = trim(str_repeat('?, ', count($tmdbIds)), ', ');
+
+        return $this->dbConnection->fetchAllAssociative("SELECT * FROM `movie` WHERE tmdb_id IN ($placeholders)", [...$tmdbIds]);
+    }
+
     public function findByTraktId(TraktId $traktId) : ?MovieEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE trakt_id = ?', [$traktId->asInt()]);
