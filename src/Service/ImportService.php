@@ -13,8 +13,10 @@ use RuntimeException;
 
 class ImportService
 {
-    public function __construct(private readonly MovieApi $movieApi, private readonly MovieWatchlistApi $watchlistApi)
-    {
+    public function __construct(
+        private readonly MovieApi $movieApi,
+        private readonly MovieWatchlistApi $watchlistApi,
+    ) {
     }
 
     public function findOrCreateMovie(int $tmdbId, string $title, ?string $imdbId) : MovieEntity

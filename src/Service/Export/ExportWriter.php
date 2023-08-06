@@ -59,7 +59,6 @@ class ExportWriter
     }
     
     /** @param resource $fileHandle */
-
     public function writeWatchlistItemToCsv($fileHandle, array $watchlistItem) : void
     {
         $lengthOfWrittenString = fputcsv($fileHandle, [
