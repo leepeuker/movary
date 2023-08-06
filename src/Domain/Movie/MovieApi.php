@@ -282,6 +282,18 @@ class MovieApi
         return $this->repository->findByTitleAndYear($title, $releaseYear);
     }
 
+    public function findByTmdbIds(array $tmdbIds) : array
+    {
+        $tmdbIdToMovieMap = [];
+
+        foreach ($this->repository->findByTmdbIds($tmdbIds) as $movieData) {
+            $movie = MovieEntity::createFromArray($movieData);
+            $tmdbIdToMovieMap[$movie->getTmdbId()] = $movie;
+        }
+
+        return $tmdbIdToMovieMap;
+    }
+
     public function findByTmdbId(int $tmdbId) : ?MovieEntity
     {
         return $this->repository->findByTmdbId($tmdbId);

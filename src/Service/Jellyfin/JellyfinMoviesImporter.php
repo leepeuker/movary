@@ -34,18 +34,19 @@ class JellyfinMoviesImporter
 
     public function importMoviesFromJellyfin(int $userId) : void
     {
-        $watchedMoviesList = $this->jellyfinCache->fetchJellyfinPlayedMovies($userId);
+        $jellyfinPlayedMovies = $this->jellyfinCache->fetchJellyfinPlayedMovies($userId);
+        $tmdbIdToExistingMovieMap = $this->movieApi->findByTmdbIds($jellyfinPlayedMovies->getTmdbIds());
 
-        foreach ($watchedMoviesList as $watchedMovie) {
-            $date = $watchedMovie->getLastWatchDate();
-            if ($date === null) {
+        foreach ($jellyfinPlayedMovies as $jellyfinPlayedMovie) {
+            $jellyfinLastWatchDate = $jellyfinPlayedMovie->getLastWatchDate();
+            if ($jellyfinLastWatchDate === null) {
                 continue;
             }
 
-            $movie = $this->movieApi->findByTmdbId($watchedMovie->getTmdbId());
+            $movie = $tmdbIdToExistingMovieMap[$jellyfinPlayedMovie->getTmdbId()] ?? null;
 
             if ($movie === null) {
-                $movie = $this->tmdbMovieSyncService->syncMovie($watchedMovie->getTmdbId());
+                $movie = $this->tmdbMovieSyncService->syncMovie($jellyfinPlayedMovie->getTmdbId());
                 $this->logger->debug(
                     'Jellyfin import: Missing movie created during import',
                     [
@@ -58,7 +59,9 @@ class JellyfinMoviesImporter
 
             $needsUpdate = true;
             foreach ($this->movieHistoryApi->fetchHistoryByMovieId($movie->getId(), $userId) as $watchDate) {
-                if ($date->isEqual(Date::createFromString($watchDate['watched_at'])) === true) {
+                $movaryLastWatchDate = Date::createFromString($watchDate['watched_at']);
+
+                if ($jellyfinLastWatchDate->isEqual($movaryLastWatchDate) === true) {
                     $needsUpdate = false;
 
                     break;
@@ -70,18 +73,18 @@ class JellyfinMoviesImporter
                     'movieId' => $movie->getId(),
                     'moveTitle' => $movie->getTitle(),
                     'tmdbId' => $movie->getTmdbId(),
-                    'watchDate' => (string)$date,
+                    'watchDate' => (string)$jellyfinLastWatchDate,
                 ]);
 
                 continue;
             }
 
-            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $date);
+            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $jellyfinLastWatchDate);
             $this->logger->info('Jellyfin import: Movie watch date added', [
                 'movieId' => $movie->getId(),
                 'moveTitle' => $movie->getTitle(),
                 'tmdbId' => $movie->getTmdbId(),
-                'watchDate' => (string)$date,
+                'watchDate' => (string)$jellyfinLastWatchDate,
             ]);
         }
     }
