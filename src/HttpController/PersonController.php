@@ -64,6 +64,7 @@ class PersonController
                     'birthDate' => $person->getBirthDate(),
                     'deathDate' => $person->getDeathDate(),
                     'placeOfBirth' => $person->getPlaceOfBirth(),
+                    'tmdbId' => $person->getTmdbId()
                 ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
