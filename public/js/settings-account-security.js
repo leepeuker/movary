@@ -69,3 +69,15 @@ function updatePassword(currentPassword, newPassword) {
         })
     })
 }
+
+async function showAddTwoFactorAuthenticationModal() {
+    await fetch('/settings/account/security/addtwofactorauthentication', {
+        method: 'POST',
+        headers: {
+            
+        }
+    })
+
+    const modal = new bootstrap.Modal(document.getElementById('addTwoFactorAuthenticationModal'));
+    modal.show();
+}

@@ -65,6 +65,20 @@
                     Submit
                 </button>
             </div>
+
+            <hr>
+
+            <div style="padding-top: 1rem">
+                <h5>Two-Factor Authentication</h5>
+                <div class="mb-3">
+                    {% if totpEnabled == true %}
+                        <button type="button" class="btn btn-danger">Remove Two-Factor Authentication</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" onclick="showAddTwoFactorAuthenticationModal()">Set up Two-Factor Authentication</button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </main>
+    {{ include('component/modal-add-two-factor-authentication.html.twig') }}    
 {% endblock %}

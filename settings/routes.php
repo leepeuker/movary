@@ -121,7 +121,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'GET',
         '/settings/account/security',
-        [\Movary\HttpController\SettingsController::class, 'renderPasswordAccountPage'],
+        [\Movary\HttpController\SettingsController::class, 'renderSecurityAccountPage'],
     );
     $routeCollector->addRoute(
         'GET',
