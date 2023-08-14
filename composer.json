@@ -22,6 +22,7 @@
     "psr/http-client": "^1.0",
     "ramsey/uuid": "^4.7",
     "robmorgan/phinx": "^0.13",
+    "spomky-labs/otphp": "^11.2",
     "symfony/console": "^6.2",
     "twig/twig": "^3.5",
     "vlucas/phpdotenv": "^5.5"
