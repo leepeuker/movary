@@ -58,7 +58,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 });
 
 function updatePassword(currentPassword, newPassword) {
-    return fetch('/settings/account/password', {
+    return fetch('/settings/account/security', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

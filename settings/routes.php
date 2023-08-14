@@ -120,7 +120,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
-        '/settings/account/password',
+        '/settings/account/security',
         [\Movary\HttpController\SettingsController::class, 'renderPasswordAccountPage'],
     );
     $routeCollector->addRoute(
@@ -170,7 +170,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/account/password',
+        '/settings/account/security',
         [\Movary\HttpController\SettingsController::class, 'updatePassword'],
     );
     $routeCollector->addRoute(

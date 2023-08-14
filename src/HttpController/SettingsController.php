@@ -356,7 +356,7 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-account-password.html.twig', [
+            $this->twig->render('page/settings-account-security.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
             ]),
         );
