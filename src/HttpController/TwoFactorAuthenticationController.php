@@ -5,6 +5,7 @@ namespace Movary\HttpController;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthentication;
 use Movary\Util\Json;
+use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -12,7 +13,8 @@ class TwoFactorAuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly TwoFactorAuthentication $twoFactorAuthenticationService
+        private readonly TwoFactorAuthentication $twoFactorAuthenticationService,
+        private readonly SessionWrapper $sessionWrapper
     ){ }
 
     public function createTotpUri() : Response
@@ -35,6 +37,7 @@ class TwoFactorAuthenticationController
             return Response::createSeeOther('/');
         }
         $this->twoFactorAuthenticationService->deleteTotp($this->authenticationService->getCurrentUserId());
+        $this->sessionWrapper->set('twoFactorAuthenticationDisabled', true);
         return Response::createOk();
     }
 
@@ -46,13 +49,14 @@ class TwoFactorAuthenticationController
 
         $userId = $this->authenticationService->getCurrentUserId();
         $data = JSON::decode($request->getBody());
-        $input = $data['input'];
+        $input = (int)$data['input'];
         $uri = $data['uri'];
         $valid = $this->twoFactorAuthenticationService->verifyTotpUri($userId, $input, $uri);
         if($valid === false) {
             return Response::createBadRequest();
         }
         $this->twoFactorAuthenticationService->updateTotpUri($uri, $userId);
+        $this->sessionWrapper->set('twoFactorAuthenticationEnabled', true);
         return Response::createOk();
     }
 }

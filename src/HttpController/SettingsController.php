@@ -358,11 +358,21 @@ class SettingsController
 
         $totpEnabled = $this->twoFactorAuthenticationService->getTotpUri($user->getId()) === null ? false : true;
 
+        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
+        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
+
+        $this->sessionWrapper->unset(
+            'twoFactorAuthenticationDisabled',
+            'twoFactorAuthenticationEnabled'
+        );
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-security.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'totpEnabled' => $totpEnabled
+                'totpEnabled' => $totpEnabled,
+                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
+                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
             ]),
         );
     }

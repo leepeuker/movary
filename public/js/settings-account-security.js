@@ -104,7 +104,7 @@ async function showAddTwoFactorAuthenticationModal() {
 
 async function enableTOTP() {
     let input = document.getElementById('authenticationCodeInput').value;
-    let onlyNumbersPattern = /^[0-9]{6}$/; // Checks whether the input is only has numbers and is exactly 6 characters
+    let onlyNumbersPattern = /^[0-9]{6}$/; // Checks whether the input only has numbers and is exactly 6 characters
     if(onlyNumbersPattern.test(input) === false) {
         addAlert('addTwoFactorAuthenticationErrorLog', 'Input is incorrect, please try again', 'danger');
         return false;
@@ -115,10 +115,10 @@ async function enableTOTP() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: {
+        body: JSON.stringify({
             'input': input,
             'uri': document.getElementById('qrcode').title
-        }
+        })
     }).then(function(response) {
         if(response.ok) {
             window.location.reload();

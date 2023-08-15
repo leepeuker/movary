@@ -7,9 +7,11 @@ use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
 use OTPHP\TOTP;
 use OTPHP\Factory;
+use ParagonIE\ConstantTime\Base32;
 
 class TwoFactorAuthentication
 {
+    private const SECRET_LENGTH = 32;
     private const REGENERATION_TIME = 30;
     private const DIGEST_ALGORITHM = 'sha1';
     private const DIGITS = 6;
@@ -26,7 +28,8 @@ class TwoFactorAuthentication
 
     public function createTotpUri(string $userName) : ?TOTP
     {
-        $totp = TOTP::generate();
+        $secret = Base32::encodeUpper(random_bytes(self::SECRET_LENGTH));
+        $totp = TOTP::createFromSecret($secret);
         $totp->setPeriod(self::REGENERATION_TIME);
         $totp->setDigest(self::DIGEST_ALGORITHM);
         $totp->setDigits(self::DIGITS);

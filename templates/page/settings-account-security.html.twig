@@ -71,6 +71,17 @@
 
             <div style="padding-top: 1rem">
                 <h5>Two-Factor Authentication</h5>
+                {% if twoFactorAuthenticationEnabled == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Two-Factor authentication has been enabled.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% elseif twoFactorAuthenticationDisabled == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Two-Factor authentication has been disabled.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
                 <div class="mb-3">
                     {% if totpEnabled == true %}
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTwoFactorAuthenticationModal">Remove Two-Factor Authentication</button>
