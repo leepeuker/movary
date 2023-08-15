@@ -36,8 +36,15 @@ class LandingPageController
 
         $failedLogin = $this->sessionWrapper->has('failedLogin');
         $deletedAccount = $this->sessionWrapper->has('deletedAccount');
+        $invalidTOTPCode = $this->sessionWrapper->has('InvalidTOTPCode');
+        $useTwoFactorAuthentication = $this->sessionWrapper->has('useTwoFactorAuthentication');
 
         $this->sessionWrapper->unset('failedLogin', 'deletedAccount');
+        $this->sessionWrapper->unset('InvalidTOTPCode');
+        $this->sessionWrapper->unset('useTwoFactorAuthentication');
+        if($invalidTOTPCode === true) {
+            $useTwoFactorAuthentication = true;
+        }
 
         return Response::create(
             StatusCode::createOk(),
@@ -47,6 +54,8 @@ class LandingPageController
                 'registrationEnabled' => $this->registrationEnabled,
                 'defaultEmail' => $this->defaultEmail,
                 'defaultPassword' => $this->defaultPassword,
+                'useTwoFactorAuthentication' => $useTwoFactorAuthentication,
+                'invalidTOTPCode' => $invalidTOTPCode
             ]),
         );
     }

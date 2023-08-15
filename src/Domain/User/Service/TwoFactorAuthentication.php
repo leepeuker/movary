@@ -20,13 +20,8 @@ class TwoFactorAuthentication
         private readonly UserApi $userApi,
         private readonly ServerSettings $serverSettings,
     ) {}
-    
-    public function getTotpUri(int $userId) : ?string
-    {
-        return $this->userApi->findTotpUri($userId);
-    }
 
-    public function createTotpUri(string $userName) : ?TOTP
+    public function createTOTPUri(string $userName) : ?TOTP
     {
         $secret = Base32::encodeUpper(random_bytes(self::SECRET_LENGTH));
         $totp = TOTP::createFromSecret($secret);
@@ -38,23 +33,42 @@ class TwoFactorAuthentication
         return $totp;
     }
 
-    public function verifyTotpUri(int $userId, int $userInput, ?string $uri = null) : bool
-    {
-        if($uri !== null) {
-            $totp = Factory::loadFromProvisioningUri($uri);
-        } else {
-            $totp = Factory::loadFromProvisioningUri($this->userApi->findTotpUri($userId));
-        }
-        return $totp->verify($userInput);
-    }
-
-    public function deleteTotp(int $userId) : void
+    public function deleteTOTP(int $userId) : void
     {
         $this->userApi->deleteTotpUri($userId);
     }
 
-    public function updateTotpUri(string $uri, int $userId) : void
+    public function getTOTPUri(int $userId) : ?string
+    {
+        return $this->userApi->findTOTPUri($userId);
+    }
+
+    public function getTOTPObject(int $userId) : ?TOTP
+    {
+        return Factory::loadFromProvisioningUri($this->getTOTPUri($userId));
+    }
+
+    public function isValidTOTPCookie($TOTPUri, $TOTPCookieValue) : bool
+    {
+        $TOTPObject = Factory::loadFromProvisioningUri($TOTPUri);
+        if($TOTPObject->getSecret() !== $TOTPCookieValue) {
+            return false;
+        }
+        return true;
+    }
+
+    public function updateTOTPUri(string $uri, int $userId) : void
     {
         $this->userApi->updateTotpUri($userId, $uri);
+    }
+
+    public function verifyTOTPUri(int $userId, int $userInput, ?string $uri = null) : bool
+    {
+        if($uri !== null) {
+            $totp = Factory::loadFromProvisioningUri($uri);
+        } else {
+            $totp = Factory::loadFromProvisioningUri($this->userApi->findTOTPUri($userId));
+        }
+        return $totp->verify($userInput);
     }
 }

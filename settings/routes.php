@@ -17,6 +17,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\AuthenticationController::class, 'renderLoginPage'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/verify-totp',
+        [\Movary\HttpController\TwoFactorAuthenticationController::class, 'verifyTOTP'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/logout',
         [\Movary\HttpController\AuthenticationController::class, 'logout'],

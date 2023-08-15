@@ -4,6 +4,7 @@ namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Exception\EmailNotFound;
 use Movary\Domain\User\Exception\InvalidPassword;
+use Movary\Domain\User\Exception\NoVerificationCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
@@ -15,11 +16,14 @@ class Authentication
 {
     private const AUTHENTICATION_COOKIE_NAME = 'id';
 
+    private const TOTP_COOKIE_NAME = 'RememberTOTP';
+
     private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
     public function __construct(
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
+        private readonly TwoFactorAuthentication $twoFactorAuthenticationService,
         private readonly SessionWrapper $sessionWrapper,
     ) {
     }
@@ -100,6 +104,25 @@ class Authentication
             throw InvalidPassword::create();
         }
 
+        $TOTPUri = $this->userApi->findTOTPUri($user->getId());
+        $TOTPCookieValue = filter_input(INPUT_COOKIE, self::TOTP_COOKIE_NAME);
+
+        if($TOTPUri !== null) {
+            if(empty($TOTPCookieValue) === true || $this->twoFactorAuthenticationService->isValidTOTPCookie($TOTPUri, $TOTPCookieValue) === false) {
+                $this->sessionWrapper->set('TOTPUserId', $user->getId());
+                $this->sessionWrapper->set('RememberMe', $rememberMe);
+                setcookie(self::TOTP_COOKIE_NAME, '', -1);
+                throw NoVerificationCode::create();
+            }
+        } else if(empty($TOTPCookieValue) === false) {
+            setcookie(self::TOTP_COOKIE_NAME, '', -1);
+        }
+
+        $this->createAuthenticationCookie($user, $rememberMe);
+    }
+
+    public function createAuthenticationCookie(UserEntity $user, bool $rememberMe)
+    {
         $authTokenExpirationDate = $this->createExpirationDate();
         $cookieExpiration = 0;
 
@@ -130,7 +153,7 @@ class Authentication
         $this->sessionWrapper->start();
     }
 
-    private function createExpirationDate(int $days = 1) : DateTime
+    public function createExpirationDate(int $days = 1) : DateTime
     {
         $timestamp = strtotime('+' . $days . ' day');
 

@@ -261,7 +261,7 @@ class UserRepository
         return $plexCode;
     }
 
-    public function findTotpUri(int $userId) : ?string
+    public function findTOTPUri(int $userId) : ?string
     {
         $totpUri = $this->dbConnection->fetchOne('SELECT `totp_uri` FROM `user` WHERE `id` = ?', [$userId]);
 
