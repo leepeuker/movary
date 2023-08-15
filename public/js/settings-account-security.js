@@ -87,6 +87,7 @@ async function showAddTwoFactorAuthenticationModal() {
 
     await request.json().then(function(response) {
         let uri = response['uri'];
+        document.getElementById('qrcode').innerHTML = '';
         new QRCode(document.getElementById('qrcode'), {
             text: uri,
             width: 256,
