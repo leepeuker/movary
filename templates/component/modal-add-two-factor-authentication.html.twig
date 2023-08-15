@@ -5,10 +5,17 @@
                 <h5 class="modal-title" id="addTwoFactorAuthenticationModalTitle">Add Two-Factor Authentication</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="padding-bottom: 0">
-                
-            </div>
-            <div class="modal-footer d-none" id="logPlayModalFooter">
+            <div class="modal-body text-center pb-3" style="padding-bottom: 0">
+                <div id="TOTPInformation" class="d-none">
+                    <p class="text-danger" id="addTwoFactorAuthenticationErrorLog"></p>
+                    <p class="text-success" id="addTwoFactorAuthenticationSuccessLog"></p>
+                    <p>Scan the following QR code with your authentication app or manually enter the secret below the QR code.</p>
+                    <div id="qrcode" class="mb-2 justify-content-center d-flex"></div>
+                    <p id="TOTPSecret" class="text-break" style="font-size: 0.5rem;"></p>
+                    <p>Enter your authentication code below to enable Two-Factor Authentication</p>
+                    <input type="text" class="form-control mb-2" id="authenticationCodeInput" maxlength="6" pattern="[0-9]" placeholder="Authentication Code..." />
+                    <button type="button" class="btn btn-success" onclick="enableTOTP()">Enable authentication code</button>
+                </div>
             </div>
         </div>
     </div>

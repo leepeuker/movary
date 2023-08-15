@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="/js/qrcode.min.js"></script>
     <script src="/js/settings-account-security.js"></script>
 {% endblock %}
 
@@ -72,7 +73,7 @@
                 <h5>Two-Factor Authentication</h5>
                 <div class="mb-3">
                     {% if totpEnabled == true %}
-                        <button type="button" class="btn btn-danger">Remove Two-Factor Authentication</button>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTwoFactorAuthenticationModal">Remove Two-Factor Authentication</button>
                     {% else %}
                         <button type="button" class="btn btn-primary" onclick="showAddTwoFactorAuthenticationModal()">Set up Two-Factor Authentication</button>
                     {% endif %}
@@ -80,5 +81,6 @@
             </div>
         </div>
     </main>
-    {{ include('component/modal-add-two-factor-authentication.html.twig') }}    
+    {{ include('component/modal-add-two-factor-authentication.html.twig') }}
+    {{ include('component/modal-delete-two-factor-authentication.html.twig') }}
 {% endblock %}

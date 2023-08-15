@@ -2,16 +2,16 @@
 
 namespace Movary\Domain\User\Service;
 
+use InvalidArgumentException;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ServerSettings;
 use OTPHP\TOTP;
 use OTPHP\Factory;
-use ParagonIE\ConstantTime\Base32;
 
 class TwoFactorAuthentication
 {
-    private const REGENERATION_TIME = 10;
-    private const DIGEST_ALGORITHM = 'sha-1';
+    private const REGENERATION_TIME = 30;
+    private const DIGEST_ALGORITHM = 'sha1';
     private const DIGITS = 6;
 
     public function __construct(
@@ -35,9 +35,13 @@ class TwoFactorAuthentication
         return $totp;
     }
 
-    public function verifyTotpUri(int $userId, int $userInput) : bool
+    public function verifyTotpUri(int $userId, int $userInput, ?string $uri = null) : bool
     {
-        $totp = Factory::loadFromProvisioningUri($this->userApi->findTotpUri($userId));
+        if($uri !== null) {
+            $totp = Factory::loadFromProvisioningUri($uri);
+        } else {
+            $totp = Factory::loadFromProvisioningUri($this->userApi->findTotpUri($userId));
+        }
         return $totp->verify($userInput);
     }
 
@@ -46,8 +50,8 @@ class TwoFactorAuthentication
         $this->userApi->deleteTotpUri($userId);
     }
 
-    public function updateTotpUri(TOTP $totp, int $userId) : void
+    public function updateTotpUri(string $uri, int $userId) : void
     {
-        $this->userApi->updateTotpUri($userId, $totp->getProvisioningUri());
+        $this->userApi->updateTotpUri($userId, $uri);
     }
 }

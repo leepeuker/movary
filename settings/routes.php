@@ -170,8 +170,23 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/account/security',
+        '/settings/account/security/updatepassword',
         [\Movary\HttpController\SettingsController::class, 'updatePassword'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/account/security/createtotpuri',
+        [\Movary\HttpController\TwoFactorAuthenticationController::class, 'createTotpUri'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/account/security/disabletotp',
+        [\Movary\HttpController\TwoFactorAuthenticationController::class, 'disableTotp'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/account/security/enabletotp',
+        [\Movary\HttpController\TwoFactorAuthenticationController::class, 'enableTotp'],
     );
     $routeCollector->addRoute(
         'GET',

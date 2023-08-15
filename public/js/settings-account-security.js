@@ -58,7 +58,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 });
 
 function updatePassword(currentPassword, newPassword) {
-    return fetch('/settings/account/security', {
+    return fetch('/settings/account/security/updatepassword', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -71,13 +71,78 @@ function updatePassword(currentPassword, newPassword) {
 }
 
 async function showAddTwoFactorAuthenticationModal() {
-    await fetch('/settings/account/security/addtwofactorauthentication', {
+    const request = await fetch('/settings/account/security/createtotpuri', {
         method: 'POST',
         headers: {
-            
+            'Content-Type': 'application/json'
         }
-    })
+    }).catch(function(error) { 
+        console.error(error);
+        addAlert('addTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary or the browser console and try again', 'danger');
+    });
+
+    if(!request.ok) {
+        addAlert('addTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+    }
+
+    await request.json().then(function(response) {
+        let uri = response['uri'];
+        new QRCode(document.getElementById('qrcode'), {
+            text: uri,
+            width: 256,
+            height: 256
+        });
+        document.getElementById('TOTPSecret').innerText = response['secret'];
+        document.getElementById('TOTPInformation').classList.remove('d-none');
+    });
 
     const modal = new bootstrap.Modal(document.getElementById('addTwoFactorAuthenticationModal'));
     modal.show();
+
+}
+
+async function enableTOTP() {
+    let input = document.getElementById('authenticationCodeInput').value;
+    let onlyNumbersPattern = /^[0-9]{6}$/; // Checks whether the input is only has numbers and is exactly 6 characters
+    if(onlyNumbersPattern.test(input) === false) {
+        addAlert('addTwoFactorAuthenticationErrorLog', 'Input is incorrect, please try again', 'danger');
+        return false;
+    }
+
+    await fetch('/settings/account/security/enabletotp', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: {
+            'input': input,
+            'uri': document.getElementById('qrcode').title
+        }
+    }).then(function(response) {
+        if(response.ok) {
+            window.location.reload();
+        } else if(response.status === 400) {
+            addAlert('addTwoFactorAuthenticationErrorLog', 'Input is incorrect, please try again', 'danger');
+        } else if(400 < response.status < 600) {
+            addAlert('addTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+        }
+    }).catch(function(error) {
+        addAlert('addTwoFactorAuthenticationErrorLog', 'Input is incorrect, please try again', 'danger');
+    });
+}
+
+async function disableTOTP() {
+    await fetch('/settings/account/security/disabletotp', {
+        method: 'POST'
+    }).then(function(response) {
+        if(response.ok) {
+            window.location.reload();
+        } else if(response.status === 400) {
+            addAlert('deleteTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+        } else if(400 < response.status < 600) {
+            addAlert('deleteTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+        }
+    }).catch(function(error) {
+        addAlert('deleteTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+    });
 }
