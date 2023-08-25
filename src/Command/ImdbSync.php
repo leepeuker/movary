@@ -14,7 +14,7 @@ use Throwable;
 
 class ImdbSync extends Command
 {
-    const OPTION_NAME_NEVER_SYNC = 'never-synced';
+    private const OPTION_NAME_NEVER_SYNC = 'never-synced';
 
     private const OPTION_NAME_HOURS = 'hours';
 

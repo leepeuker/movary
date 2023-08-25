@@ -25,6 +25,8 @@ php bin/console.php imdb:sync
   Maximum number of movies to sync
 - `--movieIds`
   Comma separated string of movie ids to force sync for
+- `--never-synced`
+  Use to sync only movies which were never synced before
 
 ### Example
 
