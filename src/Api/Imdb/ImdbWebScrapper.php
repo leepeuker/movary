@@ -23,7 +23,6 @@ class ImdbWebScrapper
     public function findRating(string $imdbId) : ?ImdbRating
     {
         $imdbMovieRatingPage = $this->findImdbMovieRatingPageContent($imdbId);
-
         if ($imdbMovieRatingPage === null) {
             return null;
         }
