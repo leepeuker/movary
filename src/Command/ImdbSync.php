@@ -14,7 +14,9 @@ use Throwable;
 
 class ImdbSync extends Command
 {
-    private const OPTION_NAME_FORCE_HOURS = 'hours';
+    const OPTION_NAME_NEVER_SYNC = 'never-synced';
+
+    private const OPTION_NAME_HOURS = 'hours';
 
     private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
@@ -37,21 +39,23 @@ class ImdbSync extends Command
             ->setDescription('Sync imdb ratings for local movies, sorted by how outdated they are (oldest first).')
             ->addOption(self::OPTION_NAME_MOVIE_IDS, 'movieIds', InputOption::VALUE_REQUIRED, 'Comma separated string of movie ids to force sync.')
             ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Maximum number of movies to sync.')
-            ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Number of hours required to have elapsed since last sync.');
+            ->addOption(self::OPTION_NAME_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Number of hours required to have elapsed since last sync.')
+            ->addOption(self::OPTION_NAME_NEVER_SYNC, 'never-synced', InputOption::VALUE_NONE, 'Only sync ratings for movies which where never synced before.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $movieCountSyncThreshold = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_THRESHOLD);
-        $maxAgeInHours = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_HOURS);
+        $maxAgeInHours = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_HOURS);
         $movieIds = $this->inputMapper->mapOptionToIds($input, self::OPTION_NAME_MOVIE_IDS);
+        $onlyNeverSynced = (bool)$input->getOption(self::OPTION_NAME_NEVER_SYNC);
 
         $jobId = $this->jobQueueApi->addImdbSyncJob(JobStatus::createInProgress());
 
         try {
             $this->generateOutput($output, 'Syncing imdb movie ratings...');
 
-            $this->imdbMovieRatingSync->syncMultipleMovieRatings($maxAgeInHours, $movieCountSyncThreshold, $movieIds);
+            $this->imdbMovieRatingSync->syncMultipleMovieRatings($maxAgeInHours, $movieCountSyncThreshold, $movieIds, onlyNeverSynced: $onlyNeverSynced);
 
             $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 
