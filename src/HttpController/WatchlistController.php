@@ -18,8 +18,6 @@ use Twig\Environment;
 
 class WatchlistController
 {
-    private const DEFAULT_LIMIT = 24;
-
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieWatchlistApi $movieWatchlistApi,
@@ -68,18 +66,27 @@ class WatchlistController
 
         $requestData = $this->watchlistRequestMapper->mapRenderPageRequest($request);
 
-        // TODO add missing request data filters to query
         $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated(
             $userId,
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
+            $requestData->getSortBy(),
+            $requestData->getSortOrder(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
         );
-        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount($userId, $requestData->getSearchTerm());
+        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
+            $userId,
+            $requestData->getSearchTerm(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
+        );
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $requestData->getLimit(), $requestData->getPage());
 
-        // TODO add missing request data filter options
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/watchlist.html.twig', [
@@ -93,9 +100,9 @@ class WatchlistController
                 'releaseYear' => (string)$requestData->getReleaseYear(),
                 'language' => (string)$requestData->getLanguage(),
                 'genre' => (string)$requestData->getGenre(),
-//                'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
-//                'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($userId),
-//                'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($userId),
+                'uniqueReleaseYears' => $this->movieWatchlistApi->fetchUniqueMovieReleaseYears($userId),
+                'uniqueLanguages' => $this->movieWatchlistApi->fetchUniqueMovieLanguages($userId),
+                'uniqueGenres' => $this->movieWatchlistApi->fetchUniqueMovieGenres($userId),
             ]),
         );
     }

@@ -16,6 +16,8 @@ class WatchlistRequestMapper
 
     private const DEFAULT_LIMIT = 24;
 
+    private const DEFAULT_PAGE = 1;
+
     private const DEFAULT_SORT_BY = 'addedAt';
 
     public function __construct(
@@ -30,7 +32,7 @@ class WatchlistRequestMapper
         $getParameters = $request->getGetParameters();
 
         $searchTerm = $getParameters['s'] ?? null;
-        $page = $getParameters['p'] ?? 1;
+        $page = $getParameters['p'] ?? self::DEFAULT_PAGE;
         $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sb'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $this->mapSortOrder($getParameters);

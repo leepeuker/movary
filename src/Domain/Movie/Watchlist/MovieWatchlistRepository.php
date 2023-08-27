@@ -3,7 +3,10 @@
 namespace Movary\Domain\Movie\Watchlist;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\SortOrder;
+use Movary\ValueObject\Year;
 
 class MovieWatchlistRepository
 {
@@ -30,36 +33,144 @@ class MovieWatchlistRepository
         );
     }
 
-    public function fetchWatchlistCount(int $userId, ?string $searchTerm) : int
+    public function fetchUniqueMovieGenres(int $userId) : array
     {
-        if ($searchTerm !== null) {
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT g.name
+            FROM watchlist w
+            JOIN movie m on w.movie_id = m.id
+            JOIN movie_genre mg on m.id = mg.movie_id
+            JOIN genre g on mg.genre_id = g.id
+            WHERE user_id = ?
+            ORDER BY g.name
+            SQL,
+            [$userId],
+        );
+    }
+
+    public function fetchUniqueMovieLanguages(int $userId) : array
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+                SELECT DISTINCT m.original_language
+                FROM watchlist mh
+                JOIN movie m on mh.movie_id = m.id
+                WHERE user_id = ?
+                ORDER BY original_language DESC
+                SQL,
+            [$userId],
+        );
+    }
+
+    public function fetchUniqueMovieReleaseYears(int $userId) : array
+    {
+        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
             return $this->dbConnection->fetchFirstColumn(
                 <<<SQL
-                SELECT COUNT(*)
-                FROM watchlist
-                JOIN movie m on movie_id = m.id
-                WHERE m.title LIKE ? AND user_id = ?
+                SELECT DISTINCT strftime('%Y',release_date)
+                FROM watchlist w
+                JOIN movie m on w.movie_id = m.id
+                WHERE user_id = ?
+                ORDER BY strftime('%Y',release_date) DESC
                 SQL,
-                ["%$searchTerm%", $userId],
-            )[0];
+                [$userId],
+            );
         }
 
         return $this->dbConnection->fetchFirstColumn(
-            'SELECT COUNT(*) FROM watchlist JOIN movie m on movie_id = m.id WHERE user_id = ?',
+            <<<SQL
+                SELECT DISTINCT YEAR(m.release_date)
+                FROM watchlist w
+                JOIN movie m on w.movie_id = m.id
+                WHERE user_id = ?
+                ORDER BY YEAR(m.release_date) DESC
+                SQL,
             [$userId],
+        );
+    }
+
+    public function fetchWatchlistCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    {
+        $payload = [$userId, "%$searchTerm%"];
+
+        $whereQuery = 'WHERE m.title LIKE ? ';
+
+        if (empty($releaseYear) === false) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
+            } else {
+                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            }
+            $payload[] = (string)$releaseYear;
+        }
+
+        if (empty($language) === false) {
+            $whereQuery .= 'AND m.original_language = ? ';
+            $payload[] = $language;
+        }
+
+        if (empty($genre) === false) {
+            $whereQuery .= 'AND g.name = ? ';
+            $payload[] = $genre;
+        }
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT COUNT(DISTINCT m.id)
+            FROM movie m
+            JOIN watchlist w on w.movie_id = m.id and w.user_id = ?
+            LEFT JOIN movie_genre mg on m.id = mg.movie_id
+            LEFT JOIN genre g on mg.genre_id = g.id
+            $whereQuery
+            SQL,
+            $payload,
         )[0];
     }
 
-    public function fetchWatchlistPaginated(int $userId, int $limit, int $page, ?string $searchTerm) : array
-    {
-        $payload = [$userId, $userId];
+    public function fetchWatchlistPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm,
+        string $sortBy,
+        SortOrder $sortOrder,
+        ?Year $releaseYear,
+        ?string $language,
+        ?string $genre,
+    ) : array {
+        $payload = [$userId, $userId, "%$searchTerm%"];
 
         $offset = ($limit * $page) - $limit;
 
-        $whereQuery = '';
-        if ($searchTerm !== null) {
-            $payload[] = "%$searchTerm%";
-            $whereQuery .= 'WHERE  m.title LIKE ?';
+        $sortBySanitized = match ($sortBy) {
+            'rating' => 'rating',
+            'releaseDate' => 'release_date',
+            'addedAt' => 'added_at',
+            'runtime' => 'runtime',
+            default => 'title'
+        };
+
+        $whereQuery = 'WHERE m.title LIKE ? ';
+
+        if (empty($releaseYear) === false) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                $whereQuery .= 'AND strftime("%Y",m.release_date) = ? ';
+            } else {
+                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            }
+
+            $payload[] = (string)$releaseYear;
+        }
+
+        if (empty($language) === false) {
+            $whereQuery .= 'AND original_language = ? ';
+            $payload[] = $language;
+        }
+
+        if (empty($genre) === false) {
+            $whereQuery .= 'AND g.name = ? ';
+            $payload[] = $genre;
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -68,8 +179,11 @@ class MovieWatchlistRepository
             FROM movie m
             JOIN watchlist wl on wl.movie_id = m.id and wl.user_id = ?
             LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
+            LEFT JOIN movie_genre mg on m.id = mg.movie_id
+            LEFT JOIN genre g on mg.genre_id = g.id
             $whereQuery
-            ORDER BY added_at DESC
+            GROUP BY m.id, title, release_date, added_at, rating
+            ORDER BY $sortBySanitized $sortOrder, title asc
             LIMIT $offset, $limit
             SQL,
             $payload,
