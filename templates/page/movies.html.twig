@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    History
+    Movies
 {% endblock %}
 
 {% block scripts %}
@@ -77,9 +77,7 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link"
-                           href="{{ baseUrl }}p={{ paginationElements.next }}"
-                        >
+                        <a class="page-link" href="{{ baseUrl }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>

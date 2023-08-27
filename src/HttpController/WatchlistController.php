@@ -6,6 +6,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\HttpController\Mapper\WatchlistRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
@@ -27,6 +28,7 @@ class WatchlistController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
         private readonly SyncMovie $tmdbMovieSyncService,
+        private readonly WatchlistRequestMapper $watchlistRequestMapper
     ) {
     }
 
@@ -64,22 +66,36 @@ class WatchlistController
             return Response::createNotFound();
         }
 
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-        $page = $request->getGetParameters()['p'] ?? 1;
-        $limit = self::DEFAULT_LIMIT;
+        $requestData = $this->watchlistRequestMapper->mapRenderPageRequest($request);
 
-        $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated($userId, $limit, (int)$page, $searchTerm);
-        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount($userId, $searchTerm);
+        // TODO add missing request data filters to query
+        $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated(
+            $userId,
+            $requestData->getLimit(),
+            $requestData->getPage(),
+            $requestData->getSearchTerm(),
+        );
+        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount($userId, $requestData->getSearchTerm());
 
-        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $limit, (int)$page);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $requestData->getLimit(), $requestData->getPage());
 
+        // TODO add missing request data filter options
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/watchlist.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'watchlistEntries' => $watchlistPaginated,
                 'paginationElements' => $paginationElements,
-                'searchTerm' => $searchTerm,
+                'searchTerm' => $requestData->getSearchTerm(),
+                'perPage' => $requestData->getLimit(),
+                'sortBy' => $requestData->getSortBy(),
+                'sortOrder' => (string)$requestData->getSortOrder(),
+                'releaseYear' => (string)$requestData->getReleaseYear(),
+                'language' => (string)$requestData->getLanguage(),
+                'genre' => (string)$requestData->getGenre(),
+//                'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
+//                'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($userId),
+//                'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($userId),
             ]),
         );
     }
