@@ -33,8 +33,8 @@ function search() {
 }
 
 function resetSearchOptions() {
-    searchSortBySelect.value = 'name'
-    searchSortOrderSelect.value = 'asc'
+    searchSortBySelect.value = 'uniqueAppearances'
+    searchSortOrderSelect.value = 'desc'
     searchGenderSelect.value = ''
     searchPerPageSelect.value = '24'
 }
