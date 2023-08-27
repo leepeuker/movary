@@ -1,4 +1,5 @@
 const optionsModal = new bootstrap.Modal('#optionsModal');
+optionsModal.hide()
 
 async function removeFromWatchList() {
     let movieId = document.getElementById('optionsModal').dataset.movieid;

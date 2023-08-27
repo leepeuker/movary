@@ -1,0 +1,81 @@
+<div class="modal fade" id="searchOptionsMovieModal" tabindex="-1" aria-labelledby="searchOptionsMovieModal" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="searchOptionsMovieModalTitle">Advanced search</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="searchOptionsMovieModalBody" style="text-align: start;padding-bottom: 0">
+                <div style="border: #aab0b3 1px" id="searchOptions">
+                    <h6 class="text-center">Sorting</h6>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Sort by</span>
+                        <select class="form-control" name="sb" id="searchSortBySelect">
+                            <option value="addedAt" {{ sortBy == 'addedAt' ? 'selected' }}>Added at</option>
+                            <option value="title" {{ sortBy == 'title' ? 'selected' }}>Title</option>
+                            <option value="releaseDate" {{ sortBy == 'releaseDate' ? 'selected' }}>Release date</option>
+                            <option value="rating" {{ sortBy == 'rating' ? 'selected' }}>Rating</option>
+                            <option value="runtime" {{ sortBy == 'runtime' ? 'selected' }}>Runtime</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Sort order</span>
+                        <select class="form-control" name="so" id="searchSortOrderSelect">
+                            <option value="asc" {{ sortOrder == 'asc' ? 'selected' }}>Ascending</option>
+                            <option value="desc" {{ sortOrder == 'desc' ? 'selected' }}>Descending</option>
+                        </select>
+                    </div>
+
+                    <h6 class="text-center">Filter</h6>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Genre</span>
+                        <select class="form-control" name="ge" id="searchGenreSelect">
+                            <option value="" {{ genre is null ? 'selected' }}></option>
+                            {% for uniqueGenre in uniqueGenres %}
+                                <option value="{{ uniqueGenre }}" {{ uniqueGenre == genre ? 'selected' }}>{{ uniqueGenre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Language</span>
+                        <select class="form-control" name="la" id="searchLanguageSelect">
+                            <option value="" {{ language is null ? 'selected' }}></option>
+                            {% for uniqueLanguage in uniqueLanguages %}
+                                <option value="{{ uniqueLanguage.code }}" {{ uniqueLanguage.code == language ? 'selected' }}>{{ uniqueLanguage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Release year</span>
+                        <select class="form-control" name="ry" id="searchReleaseYearSelect">
+                            <option value="" {{ releaseYear is null ? 'selected' }}></option>
+                            {% for uniqueReleaseYear in uniqueReleaseYears %}
+                                <option value="{{ uniqueReleaseYear }}" {{ releaseYear == uniqueReleaseYear ? 'selected' }}>{{ uniqueReleaseYear }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <h6 class="text-center">Pagination</h6>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Per page</span>
+                        <select class="form-control" name="pp" id="searchPerPageSelect">
+                            <option value="24" {{ perPage == 24 ? 'selected' }}>24</option>
+                            <option value="48" {{ perPage == 48 ? 'selected' }}>48</option>
+                            <option value="72" {{ perPage == 72 ? 'selected' }}>72</option>
+                            <option value="96" {{ perPage == 96 ? 'selected' }}>96</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer justify-content-between">
+{#                <button class="btn btn-outline-light float-start" id="appReleaseModalButtonViewGithub" target="_blank">Save</button>#}
+                <button class="btn btn-warning float-start" onclick="resetSearchOptions()">Reset</button>
+                <button class="btn btn-primary" onclick="search()">Search</button>
+            </div>
+        </div>
+    </div>
+</div>

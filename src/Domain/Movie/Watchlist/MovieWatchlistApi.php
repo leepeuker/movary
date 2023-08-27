@@ -2,9 +2,12 @@
 
 namespace Movary\Domain\Movie\Watchlist;
 
+use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\User\UserApi;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\SortOrder;
+use Movary\ValueObject\Year;
 use Psr\Log\LoggerInterface;
 
 class MovieWatchlistApi
@@ -13,6 +16,7 @@ class MovieWatchlistApi
         private readonly MovieWatchlistRepository $repository,
         private readonly UrlGenerator $urlGenerator,
         private readonly UserApi $userApi,
+        private readonly TmdbApi $tmdbApi,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -35,14 +39,66 @@ class MovieWatchlistApi
         return $this->repository->fetchAllWatchlistItems($userId);
     }
 
-    public function fetchWatchlistCount(int $userId, ?string $searchTerm = null) : int
+    public function fetchUniqueMovieGenres(int $userId) : array
     {
-        return $this->repository->fetchWatchlistCount($userId, $searchTerm);
+        return $this->repository->fetchUniqueMovieGenres($userId);
     }
 
-    public function fetchWatchlistPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null) : array
+    public function fetchUniqueMovieLanguages(int $userId) : array
     {
-        $watchlistEntries = $this->repository->fetchWatchlistPaginated($userId, $limit, $page, $searchTerm);
+        $uniqueLanguages = [];
+
+        foreach ($this->repository->fetchUniqueMovieLanguages($userId) as $index => $item) {
+            if (empty($item) === true) {
+                continue;
+            }
+
+            $uniqueLanguages[$index]['name'] = $this->tmdbApi->getLanguageByCode($item);
+            $uniqueLanguages[$index]['code'] = $item;
+        }
+
+        $languageNames = array_column($uniqueLanguages, 'name');
+        array_multisort($languageNames, SORT_ASC, $uniqueLanguages);
+
+        return $uniqueLanguages;
+    }
+
+    public function fetchUniqueMovieReleaseYears(int $userId) : array
+    {
+        return $this->repository->fetchUniqueMovieReleaseYears($userId);
+    }
+
+    public function fetchWatchlistCount(int $userId, ?string $searchTerm = null, ?Year $releaseYear = null, ?string $language = null, ?string $genre = null) : int
+    {
+        return $this->repository->fetchWatchlistCount($userId, $searchTerm, $releaseYear, $language, $genre);
+    }
+
+    public function fetchWatchlistPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm = null,
+        string $sortBy = 'addedAt',
+        ?SortOrder $sortOrder = null,
+        ?Year $releaseYear = null,
+        ?string $language = null,
+        ?string $genre = null,
+    ) : array {
+        if ($sortOrder === null) {
+            $sortOrder = SortOrder::createDesc();
+        }
+
+        $watchlistEntries = $this->repository->fetchWatchlistPaginated(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $releaseYear,
+            $language,
+            $genre,
+        );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($watchlistEntries);
     }

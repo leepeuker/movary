@@ -515,11 +515,15 @@ class MovieRepository
         );
     }
 
-    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(?int $maxAgeInHours = null, ?int $limit = null, ?array $filterMovieIds = null) : array
-    {
+    public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(
+        ?int $maxAgeInHours = null,
+        ?int $limit = null,
+        ?array $filterMovieIds = null,
+        bool $onlyNeverSynced = false,
+    ) : array {
         $limitQuery = '';
         if ($limit !== null) {
-            $limitQuery = " LIMIT $limit";
+            $limitQuery = "LIMIT $limit";
         }
 
         $filterMovieIdsQuery = '';
@@ -527,23 +531,21 @@ class MovieRepository
             $filterMovieIdsQuery = ' AND movie.id IN (' . implode(',', $filterMovieIds) . ')';
         }
 
-        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-            $maxAgeInHours = $maxAgeInHours ?? 0;
-
-            return $this->dbConnection->fetchFirstColumn(
-                'SELECT movie.id
-                FROM `movie` 
-                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= datetime("now","-' . $maxAgeInHours . ' hours"))' . $filterMovieIdsQuery . ' 
-                ORDER BY updated_at_imdb ASC' . $limitQuery,
-            );
+        $syncedFilter = '';
+        if ($onlyNeverSynced === false) {
+            $syncedFilter = match ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                true => 'OR updated_at_imdb <= datetime("now","-' . (int)$maxAgeInHours . ' hours")',
+                false => 'OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ' . (int)$maxAgeInHours . ' HOUR)',
+            };
         }
 
         return $this->dbConnection->fetchFirstColumn(
-            'SELECT movie.id
-                FROM `movie` 
-                WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL OR updated_at_imdb <= DATE_SUB(NOW(), INTERVAL ? HOUR))' . $filterMovieIdsQuery . ' 
-                ORDER BY updated_at_imdb ASC' . $limitQuery,
-            [(int)$maxAgeInHours],
+            <<<SQL
+            SELECT movie.id
+            FROM `movie` 
+            WHERE movie.imdb_id IS NOT NULL AND (updated_at_imdb IS NULL $syncedFilter) $filterMovieIdsQuery
+            ORDER BY updated_at_imdb ASC $limitQuery
+            SQL,
         );
     }
 

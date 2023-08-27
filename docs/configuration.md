@@ -45,12 +45,12 @@ Required to run the application
 
 Required for some third party integrations. Only necessary if the relevant third party integrations should be enabled.
 
-| NAME                 | DEFAULT VALUE | INFO                                                                           | Web UI |
-|:---------------------|:-------------:|:-------------------------------------------------------------------------------|:------:|
-| `PLEX_IDENTIFIER`    |       -       | Required for Plex Authentication. Generate with e.g. `openssl rand -base64 32` |        |
-| `PLEX_APP_NAME`      |   `Movary`    | Used for Plex Authentication                                                   |        |
-| `JELLYFIN_DEVICE_ID` |       -       | Required for Jellyfin Authentication                                           |        |
-| `JELLYFIN_APP_NAME`  |   `Movary`    | Used for Jellyfin Authentication                                               |        |
+| NAME                 | DEFAULT VALUE | INFO                                                                               | Web UI |
+|:---------------------|:-------------:|:-----------------------------------------------------------------------------------|:------:|
+| `PLEX_IDENTIFIER`    |       -       | Required for Plex Authentication. Generate with e.g. `openssl rand -base64 32`     |        |
+| `PLEX_APP_NAME`      |   `Movary`    | Used for Plex Authentication                                                       |        |
+| `JELLYFIN_DEVICE_ID` |       -       | Required for Jellyfin Authentication. Generate with e.g. `openssl rand -base64 32` |        |
+| `JELLYFIN_APP_NAME`  |   `Movary`    | Used for Jellyfin Authentication                                                   |        |
 
 ### Email
 
