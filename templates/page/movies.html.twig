@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    History
+    Movies
 {% endblock %}
 
 {% block scripts %}
@@ -18,7 +18,7 @@
             {{ include('component/modal-advanced-search-movie.html.twig') }}
 
             <div class="input-group mb-3">
-                <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}" style="border-right-color: #aab0b3" id="searchTermInput">
+                <input type="text" class="form-control" name="s" placeholder="Search watched movies" value="{{ (searchTerm is null) ? '' : searchTerm }}" style="border-right-color: #aab0b3" id="searchTermInput">
                 <button class="btn btn-primary" type="button" onclick="search()" id="directSearchButton">
                     <i class="bi bi-search"></i>
                 </button>
@@ -77,9 +77,7 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link"
-                           href="{{ baseUrl }}p={{ paginationElements.next }}"
-                        >
+                        <a class="page-link" href="{{ baseUrl }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>

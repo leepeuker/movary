@@ -17,7 +17,7 @@
 
             <form action="/users/{{ routeUsername }}/history" method="GET">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="s" placeholder="Search" value="{{ (searchTerm is null) ? '' : searchTerm }}">
+                    <input type="text" class="form-control" name="s" placeholder="Search history" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="submit">Search</button>
                 </div>
             </form>

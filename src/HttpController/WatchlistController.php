@@ -6,6 +6,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\HttpController\Mapper\WatchlistRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
@@ -17,8 +18,6 @@ use Twig\Environment;
 
 class WatchlistController
 {
-    private const DEFAULT_LIMIT = 24;
-
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieWatchlistApi $movieWatchlistApi,
@@ -27,6 +26,7 @@ class WatchlistController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
         private readonly SyncMovie $tmdbMovieSyncService,
+        private readonly WatchlistRequestMapper $watchlistRequestMapper
     ) {
     }
 
@@ -64,14 +64,28 @@ class WatchlistController
             return Response::createNotFound();
         }
 
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-        $page = $request->getGetParameters()['p'] ?? 1;
-        $limit = self::DEFAULT_LIMIT;
+        $requestData = $this->watchlistRequestMapper->mapRenderPageRequest($request);
 
-        $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated($userId, $limit, (int)$page, $searchTerm);
-        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount($userId, $searchTerm);
+        $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated(
+            $userId,
+            $requestData->getLimit(),
+            $requestData->getPage(),
+            $requestData->getSearchTerm(),
+            $requestData->getSortBy(),
+            $requestData->getSortOrder(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
+        );
+        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
+            $userId,
+            $requestData->getSearchTerm(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
+        );
 
-        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $limit, (int)$page);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(
             StatusCode::createOk(),
@@ -79,7 +93,16 @@ class WatchlistController
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'watchlistEntries' => $watchlistPaginated,
                 'paginationElements' => $paginationElements,
-                'searchTerm' => $searchTerm,
+                'searchTerm' => $requestData->getSearchTerm(),
+                'perPage' => $requestData->getLimit(),
+                'sortBy' => $requestData->getSortBy(),
+                'sortOrder' => (string)$requestData->getSortOrder(),
+                'releaseYear' => (string)$requestData->getReleaseYear(),
+                'language' => (string)$requestData->getLanguage(),
+                'genre' => (string)$requestData->getGenre(),
+                'uniqueReleaseYears' => $this->movieWatchlistApi->fetchUniqueMovieReleaseYears($userId),
+                'uniqueLanguages' => $this->movieWatchlistApi->fetchUniqueMovieLanguages($userId),
+                'uniqueGenres' => $this->movieWatchlistApi->fetchUniqueMovieGenres($userId),
             ]),
         );
     }
