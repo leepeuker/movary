@@ -40,13 +40,41 @@
                     </table>
                 </div>
                 <div class="spinner-border d-none" role="status" id="userTableLoadingSpinner">
+                    <span class="visually-hidden" style="margin-top: 1rem">Loading...</span>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateUserModal()">Create User</button>
+
+                <hr>
+
+                <h5 style="margin-bottom: 1rem;">Password resets</h5>
+
+                <p class="text-muted">List of all existing password resets. Click on table row to edit/delete reset.</p>
+
+                <div id="passwordResetAlerts"></div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="passwordResetTable">
+                        <thead>
+                        <tr>
+                            <th scope="col">User Id</th>
+                            <th scope="col">Token</th>
+                            <th scope="col">Expiration Date</th>
+                            <th scope="col">Creation Date</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="spinner-border d-none" role="status" id="passwordResetTableLoadingSpinner" style="margin-bottom: .7rem!important;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreatePasswordResetModal()">Create password reset</button>
             </div>
         </div>
 
-        <button type="button" class="btn btn-primary float-end" style="width: 100%" onclick="showCreateUserModal()">Create User</button>
-
         {{ include('component/modal-user.html.twig') }}
+        {{ include('component/modal-password-reset.html.twig') }}
     </main>
 {% endblock %}

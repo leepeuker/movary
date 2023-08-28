@@ -1,15 +1,18 @@
 const userModal = new bootstrap.Modal('#userModal', {keyboard: false})
+const passwordResetModal = new bootstrap.Modal('#passwordResetModal', {keyboard: false})
 
-const table = document.getElementById('usersTable');
-const rows = table.getElementsByTagName('tr');
+const userTable = document.getElementById('usersTable');
+const userTableRows = userTable.getElementsByTagName('tr');
+const passwordResetTable = document.getElementById('passwordResetTable');
 
-reloadTable()
+reloadUserTable()
+reloadPasswordResetTable()
 
 function registerTableRowClickEvent() {
-    for (let i = 0; i < rows.length; i++) {
+    for (let i = 0; i < userTableRows.length; i++) {
         if (i === 0) continue
 
-        rows[i].onclick = function () {
+        userTableRows[i].onclick = function () {
             prepareEditUserModal(
                 this.cells[0].innerHTML,
                 this.cells[1].innerHTML,
@@ -25,6 +28,11 @@ function registerTableRowClickEvent() {
 function showCreateUserModal() {
     prepareCreateUserModal()
     userModal.show()
+}
+
+function showCreatePasswordResetModal() {
+    // prepareCreatePasswordResetModal()
+    passwordResetModal.show()
 }
 
 function prepareCreateUserModal(name) {
@@ -124,6 +132,26 @@ function validateCreateUserInput() {
     return error
 }
 
+function validateCreatePasswordResetInput() {
+    let error = false
+
+    const passwordResetModalUserIdSelect = document.getElementById('passwordResetModalUserIdSelect');
+    const expirationInHours = document.getElementById('expirationInHours');
+
+    let mustNotBeEmptyInputs = [passwordResetModalUserIdSelect, expirationInHours]
+
+    mustNotBeEmptyInputs.forEach((input) => {
+        input.classList.remove('invalid-input');
+        if (input.value.toString() === '') {
+            input.classList.add('invalid-input');
+
+            error = true
+        }
+    })
+
+    return error
+}
+
 document.getElementById('createUserButton').addEventListener('click', async () => {
     if (validateCreateUserInput() === true) {
         return;
@@ -149,8 +177,35 @@ document.getElementById('createUserButton').addEventListener('click', async () =
 
     setUserManagementAlert('User was created: ' + document.getElementById('userModalNameInput').value)
 
-    reloadTable()
+    reloadUserTable()
     userModal.hide()
+})
+
+document.getElementById('createPasswordResetButton').addEventListener('click', async () => {
+    if (validateCreatePasswordResetInput() === true) {
+        return;
+    }
+
+    const response = await fetch('/settings/server/users/password-reset', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'userId': document.getElementById('passwordResetModalUserIdSelect').value,
+            'expirationInHours': document.getElementById('expirationInHours').value,
+        })
+    })
+
+    if (response.status !== 200) {
+        // setUserModalAlertServerError(await response.text())
+        return
+    }
+
+    addAlert('passwordResetAlerts', 'Created password reset', 'success')
+
+    reloadPasswordResetTable()
+    passwordResetModal.hide()
 })
 
 function setUserModalAlertServerError(message = "Server error, please try again.") {
@@ -188,7 +243,7 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
 
     setUserManagementAlert('User was updated: ' + document.getElementById('userModalNameInput').value)
 
-    reloadTable()
+    reloadUserTable()
     userModal.hide()
 })
 
@@ -208,7 +263,7 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
 
     setUserManagementAlert('User was deleted: ' + document.getElementById('userModalNameInput').value)
 
-    reloadTable()
+    reloadUserTable()
     userModal.hide()
 })
 
@@ -220,8 +275,8 @@ function setUserManagementAlert(message, type = 'success') {
     userManagementAlerts.style.textAlign = 'center'
 }
 
-async function reloadTable() {
-    table.getElementsByTagName('tbody')[0].innerHTML = ''
+async function reloadUserTable() {
+    userTable.getElementsByTagName('tbody')[0].innerHTML = ''
     document.getElementById('userTableLoadingSpinner').classList.remove('d-none')
 
     const response = await fetch('/api/users');
@@ -245,8 +300,37 @@ async function reloadTable() {
         row.innerHTML += '<td>' + user.isAdmin + '</td>';
         row.style.cursor = 'pointer'
 
-        table.getElementsByTagName('tbody')[0].appendChild(row);
+        userTable.getElementsByTagName('tbody')[0].appendChild(row);
     })
 
     registerTableRowClickEvent()
+}
+
+async function reloadPasswordResetTable() {
+    passwordResetTable.getElementsByTagName('tbody')[0].innerHTML = ''
+    document.getElementById('passwordResetTableLoadingSpinner').classList.remove('d-none')
+
+    const response = await fetch('/settings/server/users/password-reset');
+
+    if (response.status !== 200) {
+        addAlert('passwordResetAlerts', 'Could not load password resets', 'danger')
+        document.getElementById('passwordResetTableLoadingSpinner').classList.add('d-none')
+
+        return
+    }
+
+    const passwordResets = await response.json();
+
+    document.getElementById('passwordResetTableLoadingSpinner').classList.add('d-none')
+
+    passwordResets.forEach((user) => {
+        let row = document.createElement('tr');
+        row.innerHTML = '<td>' + user.id + '</td>';
+        row.innerHTML += '<td>' + user.name + '</td>';
+        row.innerHTML += '<td>' + user.email + '</td>';
+        row.innerHTML += '<td>' + user.isAdmin + '</td>';
+        row.style.cursor = 'pointer'
+
+        passwordResetTable.getElementsByTagName('tbody')[0].appendChild(row);
+    })
 }

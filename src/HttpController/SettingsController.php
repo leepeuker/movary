@@ -55,6 +55,21 @@ class SettingsController
     ) {
     }
 
+    public function createPasswordReset(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $userId = $request->getPostParameters()['userId'] ?? null;
+        $expirationInHours = $request->getPostParameters()['expirationInHours'] ?? null;
+
+        // TODO create password reset
+
+        return Response::createOk();
+    }
+
     public function deleteAccount() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -113,6 +128,17 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
+    }
+
+    public function fetchAllPasswordResets() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        // TODO fetch all password resets
+        return Response::createJson(Json::encode([]));
     }
 
     public function generateLetterboxdExportData() : Response
@@ -348,35 +374,6 @@ class SettingsController
         );
     }
 
-    public function renderSecurityAccountPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $user = $this->authenticationService->getCurrentUser();
-
-        $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
-
-        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
-        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
-
-        $this->sessionWrapper->unset(
-            'twoFactorAuthenticationDisabled',
-            'twoFactorAuthenticationEnabled'
-        );
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-account-security.html.twig', [
-                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'totpEnabled' => $totpEnabled,
-                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
-                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
-            ]),
-        );
-    }
-
     public function renderPlexPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -419,6 +416,35 @@ class SettingsController
                 'plexServerUrl' => $plexServerUrl ?? '',
                 'plexUsername' => $plexUsername ?? '',
                 'hasServerPlexIdentifier' => $plexIdentifier !== null,
+            ]),
+        );
+    }
+
+    public function renderSecurityAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $user = $this->authenticationService->getCurrentUser();
+
+        $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
+
+        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
+        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
+
+        $this->sessionWrapper->unset(
+            'twoFactorAuthenticationDisabled',
+            'twoFactorAuthenticationEnabled',
+        );
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-security.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'totpEnabled' => $totpEnabled,
+                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
+                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
             ]),
         );
     }
@@ -510,7 +536,9 @@ class SettingsController
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-server-users.html.twig'),
+            $this->twig->render('page/settings-server-users.html.twig', [
+                'users' => $this->userApi->fetchAll()
+            ]),
         );
     }
 
