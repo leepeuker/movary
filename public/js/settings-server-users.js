@@ -4,11 +4,12 @@ const passwordResetModal = new bootstrap.Modal('#passwordResetModal', {keyboard:
 const userTable = document.getElementById('usersTable');
 const userTableRows = userTable.getElementsByTagName('tr');
 const passwordResetTable = document.getElementById('passwordResetTable');
+const passwordResetTableRows = passwordResetTable.getElementsByTagName('tr');
 
 reloadUserTable()
 reloadPasswordResetTable()
 
-function registerTableRowClickEvent() {
+function registerUserTableRowClickEvent() {
     for (let i = 0; i < userTableRows.length; i++) {
         if (i === 0) continue
 
@@ -25,17 +26,33 @@ function registerTableRowClickEvent() {
     }
 }
 
+function registerPasswordResetTableRowClickEvent() {
+    for (let i = 0; i < passwordResetTableRows.length; i++) {
+        if (i === 0) continue
+
+        passwordResetTableRows[i].onclick = function () {
+            prepareEditPasswordResetModal(
+                this.cells[0].innerHTML,
+                this.cells[1].innerHTML,
+                this.cells[2].innerHTML,
+            )
+
+            passwordResetModal.show()
+        };
+    }
+}
+
 function showCreateUserModal() {
     prepareCreateUserModal()
     userModal.show()
 }
 
 function showCreatePasswordResetModal() {
-    // prepareCreatePasswordResetModal()
+    prepareCreatePasswordResetModal()
     passwordResetModal.show()
 }
 
-function prepareCreateUserModal(name) {
+function prepareCreateUserModal() {
     document.getElementById('userModalHeaderTitle').innerHTML = 'Create User'
 
     document.getElementById('userModalPasswordInput').required = true
@@ -59,7 +76,25 @@ function prepareCreateUserModal(name) {
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
 
-function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword) {
+function prepareCreatePasswordResetModal() {
+    document.getElementById('userModalIdInput').value = ''
+    document.getElementById('userModalNameInput').value = ''
+
+    document.getElementById('passwordResetModalUserIdSelect').disabled = false
+    document.getElementById('passwordResetExpirationDateDiv').classList.add('d-none')
+    document.getElementById('passwordResetExpirationHoursDiv').classList.remove('d-none')
+    document.getElementById('passwordResetTokenDiv').classList.add('d-none')
+    document.getElementById('passwordResetUrlDiv').classList.add('d-none')
+
+    document.getElementById('createPasswordResetButton').classList.remove('d-none')
+    document.getElementById('deletePasswordResetButton').classList.add('d-none')
+    document.getElementById('emailPasswordResetButton').classList.add('d-none')
+    document.getElementById('copyPasswordResetButton').classList.add('d-none')
+
+    Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
+}
+
+function prepareEditUserModal(id, name, email, isAdmin) {
     document.getElementById('userModalHeaderTitle').innerHTML = 'Edit User'
 
     document.getElementById('userModalPasswordInput').required = false
@@ -80,6 +115,26 @@ function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword
     document.getElementById('userModalAlerts').innerHTML = ''
 
     // Remove class invalid-input from all (input) elements
+    Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
+}
+
+function prepareEditPasswordResetModal(userId, token, expirationDate) {
+    document.getElementById('passwordResetModalUserIdSelect').value = userId
+    document.getElementById('passwordResetToken').value = token
+    document.getElementById('expirationDate').value = expirationDate
+    document.getElementById('passwordResetUrl').value = document.getElementById('applicationUrl').value + 'password-reset/' + token
+
+    document.getElementById('passwordResetModalUserIdSelect').disabled = true
+    document.getElementById('passwordResetExpirationDateDiv').classList.remove('d-none')
+    document.getElementById('passwordResetExpirationHoursDiv').classList.add('d-none')
+    document.getElementById('passwordResetTokenDiv').classList.remove('d-none')
+    document.getElementById('passwordResetUrlDiv').classList.remove('d-none')
+
+    document.getElementById('createPasswordResetButton').classList.add('d-none')
+    document.getElementById('deletePasswordResetButton').classList.remove('d-none')
+    document.getElementById('emailPasswordResetButton').classList.remove('d-none')
+    document.getElementById('copyPasswordResetButton').classList.remove('d-none')
+
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
 
@@ -267,6 +322,34 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
     userModal.hide()
 })
 
+document.getElementById('deletePasswordResetButton').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to delete the password reset?') === false) {
+        return
+    }
+
+    const response = await fetch('/settings/server/users/password-reset/' + document.getElementById('passwordResetToken').value, {
+        method: 'DELETE'
+    });
+
+    if (response.status !== 200) {
+        addAlert('passwordResetAlerts', 'Could not delete password reset', 'danger')
+        passwordResetModal.hide()
+
+        return
+    }
+
+    addAlert('passwordResetAlerts', 'Password reset was deleted', 'success')
+
+    reloadPasswordResetTable()
+    passwordResetModal.hide()
+})
+document.getElementById('copyPasswordResetButton').addEventListener('click', async () => {
+    navigator.clipboard.writeText(document.getElementById('passwordResetUrl').value);
+
+    addAlert('passwordResetModalAlerts', 'Copied url to clipboard', 'success')
+
+})
+
 function setUserManagementAlert(message, type = 'success') {
     const userManagementAlerts = document.getElementById('userManagementAlerts');
     userManagementAlerts.classList.remove('d-none')
@@ -303,7 +386,7 @@ async function reloadUserTable() {
         userTable.getElementsByTagName('tbody')[0].appendChild(row);
     })
 
-    registerTableRowClickEvent()
+    registerUserTableRowClickEvent()
 }
 
 async function reloadPasswordResetTable() {
@@ -323,14 +406,15 @@ async function reloadPasswordResetTable() {
 
     document.getElementById('passwordResetTableLoadingSpinner').classList.add('d-none')
 
-    passwordResets.forEach((user) => {
+    passwordResets.forEach((passwordReset) => {
         let row = document.createElement('tr');
-        row.innerHTML = '<td>' + user.id + '</td>';
-        row.innerHTML += '<td>' + user.name + '</td>';
-        row.innerHTML += '<td>' + user.email + '</td>';
-        row.innerHTML += '<td>' + user.isAdmin + '</td>';
+        row.innerHTML = '<td>' + passwordReset.user_id + '</td>';
+        row.innerHTML += '<td>' + passwordReset.token + '</td>';
+        row.innerHTML += '<td>' + passwordReset.expires_at + '</td>';
         row.style.cursor = 'pointer'
 
         passwordResetTable.getElementsByTagName('tbody')[0].appendChild(row);
     })
+
+    registerPasswordResetTableRowClickEvent()
 }

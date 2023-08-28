@@ -62,10 +62,30 @@ class SettingsController
             return Response::createForbidden();
         }
 
-        $userId = $request->getPostParameters()['userId'] ?? null;
-        $expirationInHours = $request->getPostParameters()['expirationInHours'] ?? null;
+        $requestData = Json::decode($request->getBody());
 
-        // TODO create password reset
+        $userId = $requestData['userId'] ?? null;
+        if ($userId === null) {
+            throw new \RuntimeException('User id must be submitted');
+        }
+
+        $expirationInHours = $requestData['expirationInHours'] ?? null;
+
+        $this->userApi->createPasswordReset((int)$userId, (int)$expirationInHours);
+
+        return Response::createOk();
+    }
+
+    public function deletePasswordReset(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $token = $request->getRouteParameters()['token'];
+
+        $this->userApi->deletePasswordReset($token);
 
         return Response::createOk();
     }
@@ -137,8 +157,9 @@ class SettingsController
             return Response::createForbidden();
         }
 
-        // TODO fetch all password resets
-        return Response::createJson(Json::encode([]));
+        $passwordResets = $this->userApi->fetchAllPasswordResets();
+
+        return Response::createJson(Json::encode($passwordResets));
     }
 
     public function generateLetterboxdExportData() : Response
@@ -534,10 +555,13 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-users.html.twig', [
-                'users' => $this->userApi->fetchAll()
+                'users' => $this->userApi->fetchAll(),
+                'applicationUrl' => $applicationUrl,
             ]),
         );
     }
