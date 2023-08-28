@@ -19,7 +19,7 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addRoute(
         'POST',
         '/verify-totp',
-        [\Movary\HttpController\TwoFactorAuthenticationController::class, 'verifyTOTP'],
+        [\Movary\HttpController\TwoFactorAuthenticationController::class, 'verifyTotp'],
     );
     $routeCollector->addRoute(
         'GET',
@@ -175,22 +175,22 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/account/security/updatepassword',
+        '/settings/account/security/update-password',
         [\Movary\HttpController\SettingsController::class, 'updatePassword'],
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/account/security/createtotpuri',
+        '/settings/account/security/create-totp-uri',
         [\Movary\HttpController\TwoFactorAuthenticationController::class, 'createTotpUri'],
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/account/security/disabletotp',
+        '/settings/account/security/disable-totp',
         [\Movary\HttpController\TwoFactorAuthenticationController::class, 'disableTotp'],
     );
     $routeCollector->addRoute(
         'POST',
-        '/settings/account/security/enabletotp',
+        '/settings/account/security/enable-totp',
         [\Movary\HttpController\TwoFactorAuthenticationController::class, 'enableTotp'],
     );
     $routeCollector->addRoute(

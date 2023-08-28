@@ -78,7 +78,7 @@ class TwoFactorAuthenticationController
         return Response::createOk();
     }
 
-    public function verifyTOTP(Request $request) : Response
+    public function verifyTotp(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === true) {
             return Response::create(
