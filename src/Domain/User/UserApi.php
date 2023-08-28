@@ -177,7 +177,7 @@ class UserApi
         return $this->repository->findTemporaryPlexCode($userId);
     }
 
-    public function findTOTPUri(int $userId) : ?string
+    public function findTotpUri(int $userId) : ?string
     {
         return $this->repository->findTOTPUri($userId);
     }

@@ -17,11 +17,13 @@
             <form action="/login" method="post" enctype="multipart/form-data">
                 <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">Movary</h1>
                 <div class="form-floating">
-                    <input type="email" name="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingInput" placeholder="name@example.com" required>
+                    <input type="email" name="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingInput"
+                           placeholder="name@example.com" required>
                     <label for="floatingInput">Email address</label>
                 </div>
                 <div class="form-floating">
-                    <input type="password" name="password" value="{{ defaultPassword }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingPassword" placeholder="Password" required>
+                    <input type="password" name="password" value="{{ defaultPassword }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingPassword"
+                           placeholder="Password" required>
                     <label for="floatingPassword">Password</label>
                 </div>
 
@@ -48,25 +50,24 @@
             </form>
         {% elseif useTwoFactorAuthentication == true %}
             <form action="/verify-totp" method="post">
-                <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">Movary</h1>
+                <p style="margin-bottom: 0">Enter the 6 digit verification code from your authenticator app.</p>
+                <input type="text"
+                       name="TOTPCode"
+                       class="form-control form-control-lg text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingVerificationCode"
+                       placeholder="Verification code"
+                       maxlength="6"
+                       autocomplete="off"
+                       style="margin-bottom: .7rem;margin-top: .7rem"
+                       required>
                 {% if invalidTOTPCode == true %}
-                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                        Invalid verification code. Please try again.
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-bottom: 0.7rem!important;margin-top: .7rem">
+                        Invalid verification code
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                {% endif %}                
-                <div class="form-floating">
-                    <input type="text" name="TOTPCode" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingVerificationCode" placeholder="Temporary verification code" maxlength="6" autocomplete="off" required>
-                    <label for="floatingVerificationCode">Verification code</label>
-                </div>
-                <div class="checkbox mb-3" style="margin-bottom: 0.7rem!important;">
-                    <label class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">
-                        <input type="checkbox" name="rememberTOTP" value="true"> Remember verification code
-                    </label>
-                </div>
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">Verify verification code</button>
+                {% endif %}
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="submit" style="margin-bottom: .7rem!important;">Continue</button>
             </form>
-            <a href="/">Return to login page</a>
+            <a href="/">Back</a>
         {% endif %}
 
     </main>

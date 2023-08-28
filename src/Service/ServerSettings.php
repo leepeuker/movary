@@ -8,7 +8,7 @@ use Movary\ValueObject\Exception\ConfigNotSetException;
 
 class ServerSettings
 {
-    PRIVATE CONST TOTP_Issuer = 'TOTP_ISSUER';
+    private const TOTP_ISSUER = 'TOTP_ISSUER';
 
     private const JELLYFIN_DEVICE_ID = 'JELLYFIN_DEVICE_ID';
 
@@ -121,9 +121,9 @@ class ServerSettings
         return (string)$this->getByKey(self::TMDB_API_KEY);
     }
 
-    public function getTotpIssuer() : ?string
+    public function getTotpIssuer() : string
     {
-        return $this->getByKey(self::TOTP_Issuer) ?? 'Movary';
+        return $this->getByKey(self::TOTP_ISSUER) ?? 'Movary';
     }
 
     public function isApplicationUrlSetInEnvironment() : bool

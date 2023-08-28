@@ -22,7 +22,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\Service\TwoFactorAuthentication;
+use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\CreateUserController;
 use Movary\HttpController\JobController;
@@ -257,7 +257,7 @@ class Factory
         return new SettingsController(
             $container->get(Twig\Environment::class),
             $container->get(Authentication::class),
-            $container->get(TwoFactorAuthentication::class),
+            $container->get(TwoFactorAuthenticationApi::class),
             $container->get(UserApi::class),
             $container->get(MovieApi::class),
             $container->get(GithubApi::class),

@@ -23,7 +23,7 @@ class Authentication
     public function __construct(
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
-        private readonly TwoFactorAuthentication $twoFactorAuthenticationService,
+        private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationService,
         private readonly SessionWrapper $sessionWrapper,
     ) {
     }
@@ -104,24 +104,24 @@ class Authentication
             throw InvalidPassword::create();
         }
 
-        $TOTPUri = $this->userApi->findTOTPUri($user->getId());
-        $TOTPCookieValue = filter_input(INPUT_COOKIE, self::TOTP_COOKIE_NAME);
+        $totpUri = $this->userApi->findTotpUri($user->getId());
+        $totpCookieValue = filter_input(INPUT_COOKIE, self::TOTP_COOKIE_NAME);
 
-        if($TOTPUri !== null) {
-            if(empty($TOTPCookieValue) === true || $this->twoFactorAuthenticationService->isValidTOTPCookie($TOTPUri, $TOTPCookieValue) === false) {
+        if ($totpUri !== null) {
+            if (empty($totpCookieValue) === true || $this->twoFactorAuthenticationService->isValidTOTPCookie($totpUri, $totpCookieValue) === false) {
                 $this->sessionWrapper->set('TOTPUserId', $user->getId());
                 $this->sessionWrapper->set('RememberMe', $rememberMe);
                 setcookie(self::TOTP_COOKIE_NAME, '', -1);
                 throw NoVerificationCode::create();
             }
-        } else if(empty($TOTPCookieValue) === false) {
+        } elseif (empty($totpCookieValue) === false) {
             setcookie(self::TOTP_COOKIE_NAME, '', -1);
         }
 
-        $this->createAuthenticationCookie($user, $rememberMe);
+        $this->createAuthenticationCookie($user->getId(), $rememberMe);
     }
 
-    public function createAuthenticationCookie(UserEntity $user, bool $rememberMe)
+    public function createAuthenticationCookie(int $userId, bool $rememberMe) : void
     {
         $authTokenExpirationDate = $this->createExpirationDate();
         $cookieExpiration = 0;
@@ -131,12 +131,12 @@ class Authentication
             $cookieExpiration = (int)$authTokenExpirationDate->format('U');
         }
 
-        $token = $this->generateToken($user->getId(), DateTime::createFromString((string)$authTokenExpirationDate));
+        $token = $this->generateToken($userId, DateTime::createFromString((string)$authTokenExpirationDate));
 
         session_regenerate_id();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration);
 
-        $this->sessionWrapper->set('userId', $user->getId());
+        $this->sessionWrapper->set('userId', $userId);
     }
 
     public function logout() : void
