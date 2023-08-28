@@ -1,0 +1,15 @@
+<div class="modal fade" id="deleteTwoFactorAuthenticationModal" tabindex="-1" role="dialog" data-bs-backdrop="static" aria-labelledby="deleteTwoFactorAuthenticationModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="deleteTwoFactorAuthenticationModalTitle">Are you sure you want to disable two-factor authentication?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center pb-3" style="padding-bottom: 0">
+                <div id="deleteTwoFactorAuthenticationErrorLog"></div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" onclick="disableTOTP()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>

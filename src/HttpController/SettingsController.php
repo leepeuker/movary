@@ -10,6 +10,7 @@ use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Dashboard\DashboardFactory;
@@ -35,6 +36,7 @@ class SettingsController
     public function __construct(
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
+        private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationService,
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,
         private readonly GithubApi $githubApi,
@@ -346,7 +348,7 @@ class SettingsController
         );
     }
 
-    public function renderPasswordAccountPage() : Response
+    public function renderSecurityAccountPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther('/');
@@ -354,10 +356,23 @@ class SettingsController
 
         $user = $this->authenticationService->getCurrentUser();
 
+        $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
+
+        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
+        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
+
+        $this->sessionWrapper->unset(
+            'twoFactorAuthenticationDisabled',
+            'twoFactorAuthenticationEnabled'
+        );
+
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-account-password.html.twig', [
+            $this->twig->render('page/settings-account-security.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'totpEnabled' => $totpEnabled,
+                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
+                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
             ]),
         );
     }

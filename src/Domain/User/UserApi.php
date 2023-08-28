@@ -49,6 +49,11 @@ class UserApi
         $this->repository->setPlexWebhookId($userId, null);
     }
 
+    public function deleteTotpUri(int $userId) : void
+    {
+        $this->repository->updateTotpUri($userId, null);
+    }
+
     public function deleteUser(int $userId) : void
     {
         $this->repository->deleteUser($userId);
@@ -170,6 +175,11 @@ class UserApi
     public function findTemporaryPlexCode(int $userId) : ?string
     {
         return $this->repository->findTemporaryPlexCode($userId);
+    }
+
+    public function findTotpUri(int $userId) : ?string
+    {
+        return $this->repository->findTOTPUri($userId);
     }
 
     public function findTraktClientId(int $userId) : ?string
@@ -374,6 +384,11 @@ class UserApi
     public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void
     {
         $this->repository->updateTemporaryPlexClientCode($userId, $plexClientCode);
+    }
+
+    public function updateTotpUri(int $userId, ?string $totpUri) : void
+    {
+        $this->repository->updateTotpUri($userId, $totpUri);
     }
 
     public function updateTraktClientId(int $userId, ?string $traktClientId) : void

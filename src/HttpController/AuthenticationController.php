@@ -4,6 +4,7 @@ namespace Movary\HttpController;
 
 use Movary\Domain\SessionService;
 use Movary\Domain\User\Exception\InvalidCredentials;
+use Movary\Domain\User\Exception\NoVerificationCode;
 use Movary\Domain\User\Service;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
@@ -31,6 +32,8 @@ class AuthenticationController
                 $postParameters['password'],
                 isset($postParameters['rememberMe']) === true,
             );
+        } catch (NoVerificationCode) {
+            $this->sessionWrapper->set('useTwoFactorAuthentication', true);
         } catch (InvalidCredentials) {
             $this->sessionWrapper->set('failedLogin', true);
         }

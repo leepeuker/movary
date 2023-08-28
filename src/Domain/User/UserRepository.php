@@ -261,6 +261,17 @@ class UserRepository
         return $plexCode;
     }
 
+    public function findTOTPUri(int $userId) : ?string
+    {
+        $totpUri = $this->dbConnection->fetchOne('SELECT `totp_uri` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($totpUri === false) {
+            return null;
+        }
+
+        return $totpUri;
+    }
+
     public function findTraktClientId(int $userId) : ?string
     {
         $plexWebhookId = $this->dbConnection->fetchOne('SELECT `trakt_client_id` FROM `user` WHERE `id` = ?', [$userId]);
@@ -681,6 +692,19 @@ class UserRepository
             ],
             [
                 'id' => $userId
+            ],
+        );
+    }
+
+    public function updateTotpUri(int $userId, ?string $totpUri) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'totp_uri' => $totpUri,
+            ],
+            [
+                'id' => $userId,
             ],
         );
     }

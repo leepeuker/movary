@@ -25,6 +25,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `TIMEZONE`                                  | `Europe/Berlin` | Supported timezones [here](https://www.php.net/manual/en/timezones.php) |        |
 | `DEFAULT_LOGIN_EMAIL`                       |        -        | Email address to always autofill on login page                          |        |
 | `DEFAULT_LOGIN_PASSWORD`                    |        -        | Password to always autofill on login page                               |        |
+| `TOTP_ISSUER`                               |    `Movary`     | The issuer used when setting up two factor authentication               |        |
 
 ### Database
 

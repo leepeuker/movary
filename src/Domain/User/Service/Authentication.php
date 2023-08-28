@@ -4,6 +4,7 @@ namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Exception\EmailNotFound;
 use Movary\Domain\User\Exception\InvalidPassword;
+use Movary\Domain\User\Exception\NoVerificationCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
@@ -100,6 +101,19 @@ class Authentication
             throw InvalidPassword::create();
         }
 
+        $totpUri = $this->userApi->findTotpUri($user->getId());
+
+        if ($totpUri !== null) {
+            $this->sessionWrapper->set('totpUserId', $user->getId());
+            $this->sessionWrapper->set('rememberMe', $rememberMe);
+            throw NoVerificationCode::create();
+        }
+
+        $this->createAuthenticationCookie($user->getId(), $rememberMe);
+    }
+
+    public function createAuthenticationCookie(int $userId, bool $rememberMe) : void
+    {
         $authTokenExpirationDate = $this->createExpirationDate();
         $cookieExpiration = 0;
 
@@ -108,12 +122,12 @@ class Authentication
             $cookieExpiration = (int)$authTokenExpirationDate->format('U');
         }
 
-        $token = $this->generateToken($user->getId(), DateTime::createFromString((string)$authTokenExpirationDate));
+        $token = $this->generateToken($userId, DateTime::createFromString((string)$authTokenExpirationDate));
 
         session_regenerate_id();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration);
 
-        $this->sessionWrapper->set('userId', $user->getId());
+        $this->sessionWrapper->set('userId', $userId);
     }
 
     public function logout() : void
@@ -130,7 +144,7 @@ class Authentication
         $this->sessionWrapper->start();
     }
 
-    private function createExpirationDate(int $days = 1) : DateTime
+    public function createExpirationDate(int $days = 1) : DateTime
     {
         $timestamp = strtotime('+' . $days . ' day');
 
