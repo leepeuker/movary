@@ -350,6 +350,23 @@ document.getElementById('copyPasswordResetButton').addEventListener('click', asy
 
 })
 
+document.getElementById('emailPasswordResetButton').addEventListener('click', async () => {
+    const response = await fetch('/settings/server/users/password-reset/' + document.getElementById('passwordResetToken').value + '/send-email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+
+    if (response.status !== 200) {
+        addAlert('passwordResetModalAlerts', 'Email sending failed', 'danger')
+
+        return
+    }
+
+    addAlert('passwordResetModalAlerts', 'Email successfully sent', 'success')
+})
+
 function setUserManagementAlert(message, type = 'success') {
     const userManagementAlerts = document.getElementById('userManagementAlerts');
     userManagementAlerts.classList.remove('d-none')

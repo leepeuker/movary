@@ -186,6 +186,17 @@ class UserRepository
         );
     }
 
+    public function fetchPasswordResetEmailDataByPasswordResetToken(string $token) : array
+    {
+        return $this->dbConnection->fetchAssociative(
+            'SELECT user.email, user_password_reset.expires_at
+            FROM user
+            JOIN user_password_reset on user.id = user_id
+            WHERE token = ?',
+            [$token],
+        );
+    }
+
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);

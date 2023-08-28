@@ -90,6 +90,20 @@ class SettingsController
         return Response::createOk();
     }
 
+    public function sendPasswordResetEmail(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $token = $request->getRouteParameters()['token'];
+
+        $this->userApi->sendPasswordResetEmail($token);
+
+        return Response::createOk();
+    }
+
     public function deleteAccount() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -636,7 +650,7 @@ class SettingsController
             $this->emailService->sendEmail(
                 $requestData['recipient'],
                 'Movary: Test Email',
-                'This is a test email sent to check the currently set email settings. It seems to work!',
+                'This is a test email sent to check the current email configuration. It seems to work!',
                 $smtpConfig,
             );
         } catch (CannotSendEmailException $e) {

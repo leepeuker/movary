@@ -169,6 +169,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         [\Movary\HttpController\SettingsController::class, 'deletePasswordReset'],
     );
     $routeCollector->addRoute(
+        'POST',
+        '/settings/server/users/password-reset/{token:.+}/send-email',
+        [\Movary\HttpController\SettingsController::class, 'sendPasswordResetEmail'],
+    );
+    $routeCollector->addRoute(
         'GET',
         '/settings/server/email',
         handler: [\Movary\HttpController\SettingsController::class, 'renderServerEmailPage'],
