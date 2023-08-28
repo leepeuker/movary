@@ -78,11 +78,11 @@ async function showAddTwoFactorAuthenticationModal() {
         }
     }).catch(function(error) { 
         console.error(error);
-        addAlert('addTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary or the browser console and try again', 'danger');
+        addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary or the browser console and try again', 'danger');
     });
 
     if(!request.ok) {
-        addAlert('addTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+        addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
     }
 
     await request.json().then(function(response) {
@@ -106,7 +106,7 @@ async function enableTOTP() {
     let input = document.getElementById('authenticationCodeInput').value;
     let onlyNumbersPattern = /^[0-9]{6}$/; // Checks whether the input only has numbers and is exactly 6 characters
     if(onlyNumbersPattern.test(input) === false) {
-        addAlert('addTwoFactorAuthenticationErrorLog', 'Input is incorrect, please try again', 'danger');
+        addAlert('twoFactorAuthenticationAlertDiv', 'Authentication code not valid', 'danger');
         return false;
     }
 
@@ -123,12 +123,12 @@ async function enableTOTP() {
         if(response.ok) {
             window.location.reload();
         } else if(response.status === 400) {
-            addAlert('addTwoFactorAuthenticationErrorLog', 'Input is incorrect, please try again', 'danger');
+            addAlert('twoFactorAuthenticationAlertDiv', 'Authentication code not valid', 'danger');
         } else if(400 < response.status < 600) {
-            addAlert('addTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+            addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
         }
     }).catch(function(error) {
-        addAlert('addTwoFactorAuthenticationErrorLog', 'Input is incorrect, please try again', 'danger');
+        addAlert('twoFactorAuthenticationAlertDiv', 'Authentication code not valid', 'danger');
     });
 }
 
@@ -139,11 +139,11 @@ async function disableTOTP() {
         if(response.ok) {
             window.location.reload();
         } else if(response.status === 400) {
-            addAlert('deleteTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+            addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
         } else if(400 < response.status < 600) {
-            addAlert('deleteTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+            addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
         }
     }).catch(function(error) {
-        addAlert('deleteTwoFactorAuthenticationErrorLog', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+        addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
     });
 }
