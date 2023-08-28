@@ -52,14 +52,14 @@
             <form action="/verify-totp" method="post">
                 <p style="margin-bottom: 0">Enter the 6 digit verification code from your authenticator app.</p>
                 <input type="text"
-                       name="TOTPCode"
+                       name="totpCode"
                        class="form-control form-control-lg text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingVerificationCode"
                        placeholder="Verification code"
                        maxlength="6"
                        autocomplete="off"
                        style="margin-bottom: .7rem;margin-top: .7rem"
                        required>
-                {% if invalidTOTPCode == true %}
+                {% if invalidTotpCode == true %}
                     <div class="alert alert-danger alert-dismissible" role="alert" style="margin-bottom: 0.7rem!important;margin-top: .7rem">
                         Invalid verification code
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

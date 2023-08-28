@@ -16,14 +16,11 @@ class Authentication
 {
     private const AUTHENTICATION_COOKIE_NAME = 'id';
 
-    private const TOTP_COOKIE_NAME = 'RememberTOTP';
-
     private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
     public function __construct(
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
-        private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationService,
         private readonly SessionWrapper $sessionWrapper,
     ) {
     }
@@ -105,17 +102,11 @@ class Authentication
         }
 
         $totpUri = $this->userApi->findTotpUri($user->getId());
-        $totpCookieValue = filter_input(INPUT_COOKIE, self::TOTP_COOKIE_NAME);
 
         if ($totpUri !== null) {
-            if (empty($totpCookieValue) === true || $this->twoFactorAuthenticationService->isValidTOTPCookie($totpUri, $totpCookieValue) === false) {
-                $this->sessionWrapper->set('TOTPUserId', $user->getId());
-                $this->sessionWrapper->set('RememberMe', $rememberMe);
-                setcookie(self::TOTP_COOKIE_NAME, '', -1);
-                throw NoVerificationCode::create();
-            }
-        } elseif (empty($totpCookieValue) === false) {
-            setcookie(self::TOTP_COOKIE_NAME, '', -1);
+            $this->sessionWrapper->set('totpUserId', $user->getId());
+            $this->sessionWrapper->set('rememberMe', $rememberMe);
+            throw NoVerificationCode::create();
         }
 
         $this->createAuthenticationCookie($user->getId(), $rememberMe);

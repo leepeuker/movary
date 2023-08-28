@@ -14,10 +14,6 @@ use Movary\ValueObject\Http\StatusCode;
 
 class TwoFactorAuthenticationController
 {
-    private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
-
-    private const TOTP_COOKIE_NAME = 'RememberTOTP';
-
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
@@ -88,13 +84,12 @@ class TwoFactorAuthenticationController
             );
         }
 
-        $inputTOTP = $request->getPostParameters()['TOTPCode'];
-        $rememberMe = $this->sessionWrapper->find('RememberMe');
-        $rememberTOTP = isset($request->getPostParameters()['rememberTOTP']) === true;
-        $userId = (int)$this->sessionWrapper->find('TOTPUserId');
+        $userTotpInput = $request->getPostParameters()['totpCode'];
+        $rememberMe = $this->sessionWrapper->find('rememberMe') ?? false;
+        $userId = (int)$this->sessionWrapper->find('totpUserId');
 
-        if ($this->twoFactorAuthenticationApi->verifyTotpUri($userId, (int)$inputTOTP) === false) {
-            $this->sessionWrapper->set('InvalidTOTPCode', true);
+        if ($this->twoFactorAuthenticationApi->verifyTotpUri($userId, (int)$userTotpInput) === false) {
+            $this->sessionWrapper->set('invalidTotpCode', true);
 
             return Response::create(
                 StatusCode::createSeeOther(),
@@ -103,15 +98,7 @@ class TwoFactorAuthenticationController
             );
         }
 
-        $TOTPSecret = $this->twoFactorAuthenticationApi->fetchTotpUriSecretByUserId($userId);
         $this->authenticationService->createAuthenticationCookie($userId, $rememberMe);
-        $expirationDate = (int)$this->authenticationService->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS)->format('U');
-        if ($rememberTOTP === true) {
-            setcookie(self::TOTP_COOKIE_NAME, $TOTPSecret, $expirationDate);
-        }
-
-        $this->sessionWrapper->unset('TOTPUserId');
-        $this->sessionWrapper->unset('RememberMe');
 
         return Response::create(
             StatusCode::createSeeOther(),
