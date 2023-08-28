@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/css/login.css">
+{% endblock %}
+
+{% block body %}
+    <script>
+        if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
+    </script>
+    <main role="main" class="form-signin w-100 m-auto text-center">
+        <p style="margin-bottom: 0">Enter the 6 digit verification code from your authenticator app.</p>
+        <input type="text"
+               name="totpCode"
+               class="form-control form-control-lg text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingVerificationCode"
+               placeholder="Verification code"
+               maxlength="6"
+               autocomplete="off"
+               style="margin-bottom: .7rem;margin-top: .7rem"
+               required>
+        {% if invalidTotpCode == true %}
+            <div class="alert alert-danger alert-dismissible" role="alert" style="margin-bottom: 0.7rem!important;margin-top: .7rem">
+                Invalid verification code
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+        <button class="w-100 btn btn-lg btn-primary mb-3" type="submit" style="margin-bottom: .7rem!important;">Continue</button>
+
+        <a href="/">Login</a>
+    </main>
+{% endblock %}

@@ -172,7 +172,8 @@ class UserRepository
         return $this->dbConnection->fetchAllAssociative(
             'SELECT *
             FROM `user_password_reset` 
-            ORDER BY created_at DESC',
+            ORDER BY created_at DESC
+            LIMIT 50',
         );
     }
 

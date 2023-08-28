@@ -36,6 +36,11 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/create-user',
         [\Movary\HttpController\CreateUserController::class, 'renderPage'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/password-reset/{token:.+}',
+        [\Movary\HttpController\PasswordResetController::class, 'renderPage'],
+    );
 
     #####################
     # Webhook listeners #
