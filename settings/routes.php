@@ -36,6 +36,16 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         '/create-user',
         [\Movary\HttpController\CreateUserController::class, 'renderPage'],
     );
+    $routeCollector->addRoute(
+        'GET',
+        '/password-reset/{token:.+}',
+        [\Movary\HttpController\PasswordResetController::class, 'renderPage'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/password-reset',
+        [\Movary\HttpController\PasswordResetController::class, 'resetPassword'],
+    );
 
     #####################
     # Webhook listeners #
@@ -152,6 +162,26 @@ return static function (FastRoute\RouteCollector $routeCollector) {
         'GET',
         '/settings/server/users',
         [\Movary\HttpController\SettingsController::class, 'renderServerUsersPage'],
+    );
+    $routeCollector->addRoute(
+        'GET',
+        '/settings/server/users/password-reset',
+        [\Movary\HttpController\SettingsController::class, 'fetchAllPasswordResets'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/server/users/password-reset',
+        [\Movary\HttpController\SettingsController::class, 'createPasswordReset'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/settings/server/users/password-reset/{token:.+}',
+        [\Movary\HttpController\SettingsController::class, 'deletePasswordReset'],
+    );
+    $routeCollector->addRoute(
+        'POST',
+        '/settings/server/users/password-reset/{token:.+}/send-email',
+        [\Movary\HttpController\SettingsController::class, 'sendPasswordResetEmail'],
     );
     $routeCollector->addRoute(
         'GET',

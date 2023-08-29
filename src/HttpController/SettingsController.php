@@ -55,6 +55,55 @@ class SettingsController
     ) {
     }
 
+    public function createPasswordReset(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+
+        $userId = $requestData['userId'] ?? null;
+        if ($userId === null) {
+            throw new \RuntimeException('User id must be submitted');
+        }
+
+        $expirationInHours = $requestData['expirationInHours'] ?? null;
+
+        $this->userApi->createPasswordReset((int)$userId, (int)$expirationInHours);
+
+        return Response::createOk();
+    }
+
+    public function deletePasswordReset(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $token = $request->getRouteParameters()['token'];
+
+        $this->userApi->deletePasswordReset($token);
+
+        return Response::createOk();
+    }
+
+    public function sendPasswordResetEmail(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $token = $request->getRouteParameters()['token'];
+
+        $this->userApi->sendPasswordResetEmail($token);
+
+        return Response::createOk();
+    }
+
     public function deleteAccount() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -113,6 +162,18 @@ class SettingsController
             null,
             [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
+    }
+
+    public function fetchAllPasswordResets() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false
+            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $passwordResets = $this->userApi->fetchAllPasswordResets();
+
+        return Response::createJson(Json::encode($passwordResets));
     }
 
     public function generateLetterboxdExportData() : Response
@@ -348,35 +409,6 @@ class SettingsController
         );
     }
 
-    public function renderSecurityAccountPage() : Response
-    {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        $user = $this->authenticationService->getCurrentUser();
-
-        $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
-
-        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
-        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
-
-        $this->sessionWrapper->unset(
-            'twoFactorAuthenticationDisabled',
-            'twoFactorAuthenticationEnabled'
-        );
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-account-security.html.twig', [
-                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'totpEnabled' => $totpEnabled,
-                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
-                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
-            ]),
-        );
-    }
-
     public function renderPlexPage() : Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
@@ -419,6 +451,35 @@ class SettingsController
                 'plexServerUrl' => $plexServerUrl ?? '',
                 'plexUsername' => $plexUsername ?? '',
                 'hasServerPlexIdentifier' => $plexIdentifier !== null,
+            ]),
+        );
+    }
+
+    public function renderSecurityAccountPage() : Response
+    {
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return Response::createSeeOther('/');
+        }
+
+        $user = $this->authenticationService->getCurrentUser();
+
+        $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
+
+        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
+        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
+
+        $this->sessionWrapper->unset(
+            'twoFactorAuthenticationDisabled',
+            'twoFactorAuthenticationEnabled',
+        );
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-security.html.twig', [
+                'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'totpEnabled' => $totpEnabled,
+                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
+                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
             ]),
         );
     }
@@ -508,9 +569,16 @@ class SettingsController
             return Response::createSeeOther('/');
         }
 
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $isEmailEnabled = $this->serverSettings->getEmailEnabled();
+
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-server-users.html.twig'),
+            $this->twig->render('page/settings-server-users.html.twig', [
+                'users' => $this->userApi->fetchAll(),
+                'applicationUrl' => $applicationUrl,
+                'isEmailEnabled' => $isEmailEnabled,
+            ]),
         );
     }
 
@@ -584,7 +652,7 @@ class SettingsController
             $this->emailService->sendEmail(
                 $requestData['recipient'],
                 'Movary: Test Email',
-                'This is a test email sent to check the currently set email settings. It seems to work!',
+                'This is a test email sent to check the current email configuration. It seems to work!',
                 $smtpConfig,
             );
         } catch (CannotSendEmailException $e) {

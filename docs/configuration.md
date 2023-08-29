@@ -55,17 +55,18 @@ Required for some third party integrations. Only necessary if the relevant third
 
 ### Email
 
-Required when email support is wanted
+Required when email sending is wanted.
 
-| NAME                | DEFAULT VALUE | INFO                                 | Web UI |
-|:--------------------|:-------------:|:-------------------------------------|:------:|
-| `SMTP_HOST`         |       -       |                                      |  yes   |
-| `SMTP_PORT`         |       -       |                                      |  yes   |
-| `SMTP_FROM_ADDRESS` |       -       | Email address used as sender address |  yes   |
-| `SMTP_ENCRYPTION`   |       -       | `SSL` and `TSL` supported            |  yes   |
-| `SMTP_WITH_AUTH`    |       -       | `0` or `1`                           |  yes   |
-| `SMTP_USER`         |       -       | Required if auth is enabled          |  yes   |
-| `SMTP_PASSWORD`     |       -       | Required if auth is enabled          |  yes   |
+| NAME                | DEFAULT VALUE | INFO                                         | Web UI |
+|:--------------------|:-------------:|:---------------------------------------------|:------:|
+| `EMAIL_ENABLED`     |      `0`      | Enable sending of emails for the application |  yes   |
+| `SMTP_HOST`         |       -       |                                              |  yes   |
+| `SMTP_PORT`         |       -       |                                              |  yes   |
+| `SMTP_FROM_ADDRESS` |       -       | Email address used as sender address         |  yes   |
+| `SMTP_ENCRYPTION`   |       -       | `SSL` and `TSL` supported                    |  yes   |
+| `SMTP_WITH_AUTH`    |       -       | `0` or `1`                                   |  yes   |
+| `SMTP_USER`         |       -       | Required if auth is enabled                  |  yes   |
+| `SMTP_PASSWORD`     |       -       | Required if auth is enabled                  |  yes   |
 
 ### Logging
 

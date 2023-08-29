@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Url;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 
 class UserRepository
@@ -22,6 +23,19 @@ class UserRepository
                 'user_id' => $userId,
                 'token' => $token,
                 'expiration_date' => (string)$expirationDate,
+                'created_at' => (string)DateTime::create(),
+            ],
+        );
+    }
+
+    public function createPasswordReset(int $userId, DateTime $expirationDate) : void
+    {
+        $this->dbConnection->insert(
+            'user_password_reset',
+            [
+                'user_id' => $userId,
+                'token' => Uuid::uuid4()->toString(),
+                'expires_at' => (string)$expirationDate,
                 'created_at' => (string)DateTime::create(),
             ],
         );
@@ -63,6 +77,11 @@ class UserRepository
                 'id' => $userId,
             ],
         );
+    }
+
+    public function deletePasswordReset(string $token) : void
+    {
+        $this->dbConnection->delete('user_password_reset', ['token' => $token]);
     }
 
     public function deleteUser(int $userId) : void
@@ -148,6 +167,16 @@ class UserRepository
         );
     }
 
+    public function fetchAllPasswordResets() : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT *
+            FROM `user_password_reset` 
+            ORDER BY created_at DESC
+            LIMIT 50',
+        );
+    }
+
     public function fetchAllPublicVisibleUsernames() : array
     {
         return $this->dbConnection->fetchAllAssociative(
@@ -156,6 +185,23 @@ class UserRepository
             WHERE privacy_level >= 2
             ORDER BY name',
         );
+    }
+
+    public function fetchPasswordResetEmailDataByPasswordResetToken(string $token) : array
+    {
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT user.id, user.email, user_password_reset.expires_at
+            FROM user
+            JOIN user_password_reset on user.id = user_id
+            WHERE token = ?',
+            [$token],
+        );
+
+        if ($result === false) {
+            throw new \RuntimeException('Could not find token: ' . $token);
+        }
+
+        return $result;
     }
 
     public function findAuthTokenExpirationDate(string $token) : ?DateTime

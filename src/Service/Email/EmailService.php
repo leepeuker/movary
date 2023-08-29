@@ -2,6 +2,7 @@
 
 namespace Movary\Service\Email;
 
+use Movary\Service\ServerSettings;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
@@ -9,7 +10,21 @@ class EmailService
 {
     public function __construct(
         private PHPMailer $phpMailer,
+        private readonly ServerSettings $serverSettings,
     ) {
+    }
+
+    public function getSmtpConfig() : SmtpConfig
+    {
+        return SmtpConfig::create(
+            $this->serverSettings->getSmtpHost(),
+            $this->serverSettings->getSmtpPort(),
+            $this->serverSettings->getFromAddress(),
+            $this->serverSettings->getSmtpEncryption(),
+            $this->serverSettings->getSmtpWithAuthentication(),
+            $this->serverSettings->getSmtpUser(),
+            $this->serverSettings->getSmtpPassword(),
+        );
     }
 
     public function sendEmail(string $targetEmailAddress, string $subject, string $htmlMessage, SmtpConfig $smtpConfig) : void

@@ -7,6 +7,9 @@ use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
+use Movary\Service\Email\EmailService;
+use Movary\Service\ServerSettings;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Url;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
@@ -16,7 +19,20 @@ class UserApi
     public function __construct(
         private readonly UserRepository $repository,
         private readonly Validator $userValidator,
+        private readonly EmailService $emailService,
+        private readonly ServerSettings $serverSettings,
     ) {
+    }
+
+    public function createPasswordReset(int $userId, int $expirationInHours = 24) : void
+    {
+        $timestamp = strtotime('+' . $expirationInHours . ' hour');
+
+        if ($timestamp === false) {
+            throw new RuntimeException('Could not generate timestamp for auth token expiration date.');
+        }
+
+        $this->repository->createPasswordReset($userId, DateTime::createFromString(date('Y-m-d H:i:s', $timestamp)));
     }
 
     public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
@@ -42,6 +58,11 @@ class UserApi
     public function deleteJellyfinWebhookId(int $userId) : void
     {
         $this->repository->setJellyfinWebhookId($userId, null);
+    }
+
+    public function deletePasswordReset(string $token) : void
+    {
+        $this->repository->deletePasswordReset($token);
     }
 
     public function deletePlexWebhookId(int $userId) : void
@@ -87,6 +108,11 @@ class UserApi
     public function fetchAllInternVisibleUsernames() : array
     {
         return $this->repository->fetchAllInternVisibleUsernames();
+    }
+
+    public function fetchAllPasswordResets() : array
+    {
+        return $this->repository->fetchAllPasswordResets();
     }
 
     public function fetchAllPublicVisibleUsernames() : array
@@ -260,6 +286,21 @@ class UserApi
         return $plexWebhookId;
     }
 
+    public function sendPasswordResetEmail(string $token) : void
+    {
+        $user = $this->fetchPasswordResetEmailDataByPasswordResetToken($token);
+
+        $passwordResetUrl = $this->serverSettings->getApplicationUrl() . 'password-reset/' . $token;
+
+        $smtpConfig = $this->emailService->getSmtpConfig();
+        $this->emailService->sendEmail(
+            $user['email'],
+            'Movary: Password reset',
+            'Reset your password here: ' . $passwordResetUrl,
+            $smtpConfig,
+        );
+    }
+
     public function updateCoreAccountChangesDisabled(int $userId, bool $updateCoreAccountChangesDisabled) : void
     {
         $this->repository->updateCoreAccountChangesDisabled($userId, $updateCoreAccountChangesDisabled);
@@ -413,5 +454,10 @@ class UserApi
     public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void
     {
         $this->repository->updateWatchlistAutomaticRemovalEnabled($userId, $watchlistAutomaticRemovalEnabled);
+    }
+
+    public function fetchPasswordResetEmailDataByPasswordResetToken(string $token) : array
+    {
+        return $this->repository->fetchPasswordResetEmailDataByPasswordResetToken($token);
     }
 }
