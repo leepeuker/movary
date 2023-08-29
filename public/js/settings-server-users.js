@@ -398,7 +398,18 @@ document.getElementById('emailPasswordResetButton').addEventListener('click', as
         headers: {
             'Content-Type': 'application/json'
         },
-    })
+        signal: AbortSignal.timeout(10000)
+    }).catch(function (error) {
+        if (document.getElementById('emailEnabled').value === '1') {
+            document.getElementById('emailPasswordResetButton').disabled = false
+        }
+        document.getElementById('copyPasswordResetButton').disabled = false
+        document.getElementById('deletePasswordResetButton').disabled = false
+        document.getElementById('passwordResetModalLoadingSpinner').classList.add('d-none')
+
+        addAlert('passwordResetModalAlerts', 'Email sending failed', 'danger')
+    });
+
 
     if (document.getElementById('emailEnabled').value === '1') {
         document.getElementById('emailPasswordResetButton').disabled = false
