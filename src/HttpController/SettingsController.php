@@ -570,12 +570,14 @@ class SettingsController
         }
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $isEmailEnabled = $this->serverSettings->getEmailEnabled();
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-users.html.twig', [
                 'users' => $this->userApi->fetchAll(),
                 'applicationUrl' => $applicationUrl,
+                'isEmailEnabled' => $isEmailEnabled,
             ]),
         );
     }

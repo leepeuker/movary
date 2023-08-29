@@ -8,6 +8,8 @@ use Movary\ValueObject\Exception\ConfigNotSetException;
 
 class ServerSettings
 {
+    private const EMAIL_ENABLED = 'EMAIL_ENABLED';
+
     private const TOTP_ISSUER = 'TOTP_ISSUER';
 
     private const JELLYFIN_DEVICE_ID = 'JELLYFIN_DEVICE_ID';
@@ -54,6 +56,11 @@ class ServerSettings
     public function getApplicationVersion() : ?string
     {
         return $this->getByKey(self::APPLICATION_VERSION);
+    }
+
+    public function getEmailEnabled() : bool
+    {
+        return (bool)$this->getByKey(self::EMAIL_ENABLED);
     }
 
     public function getFromAddress() : ?string

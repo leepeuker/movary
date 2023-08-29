@@ -121,7 +121,6 @@ function prepareEditUserModal(id, name, email, isAdmin) {
 }
 
 function prepareEditPasswordResetModal(userId, token, expirationDate) {
-
     document.getElementById('passwordResetModalUserIdSelect').value = userId
     document.getElementById('passwordResetToken').value = token
     document.getElementById('expirationDate').value = expirationDate
@@ -138,7 +137,8 @@ function prepareEditPasswordResetModal(userId, token, expirationDate) {
     document.getElementById('emailPasswordResetButton').classList.remove('d-none')
     document.getElementById('copyPasswordResetButton').classList.remove('d-none')
 
-    document.getElementById('emailPasswordResetButton').disabled = false
+    console.log(document.getElementById('emailEnabled').value)
+    document.getElementById('emailPasswordResetButton').disabled = document.getElementById('emailEnabled').value !== '1'
     document.getElementById('copyPasswordResetButton').disabled = false
     document.getElementById('deletePasswordResetButton').disabled = false
     document.getElementById('passwordResetModalLoadingSpinner').classList.add('remove')
@@ -346,7 +346,9 @@ document.getElementById('deletePasswordResetButton').addEventListener('click', a
     removeAlert('passwordResetModalAlerts')
 
     if (confirm('Are you sure you want to delete the password reset?') === false) {
-        document.getElementById('emailPasswordResetButton').disabled = false
+        if (document.getElementById('emailEnabled').value === '1') {
+            document.getElementById('emailPasswordResetButton').disabled = false
+        }
         document.getElementById('copyPasswordResetButton').disabled = false
         document.getElementById('deletePasswordResetButton').disabled = false
         document.getElementById('passwordResetModalLoadingSpinner').classList.add('d-none')
@@ -358,7 +360,9 @@ document.getElementById('deletePasswordResetButton').addEventListener('click', a
         method: 'DELETE'
     });
 
-    document.getElementById('emailPasswordResetButton').disabled = false
+    if (document.getElementById('emailEnabled').value === '1') {
+        document.getElementById('emailPasswordResetButton').disabled = false
+    }
     document.getElementById('copyPasswordResetButton').disabled = false
     document.getElementById('deletePasswordResetButton').disabled = false
     document.getElementById('passwordResetModalLoadingSpinner').classList.add('d-none')
@@ -396,7 +400,9 @@ document.getElementById('emailPasswordResetButton').addEventListener('click', as
         },
     })
 
-    document.getElementById('emailPasswordResetButton').disabled = false
+    if (document.getElementById('emailEnabled').value === '1') {
+        document.getElementById('emailPasswordResetButton').disabled = false
+    }
     document.getElementById('copyPasswordResetButton').disabled = false
     document.getElementById('deletePasswordResetButton').disabled = false
     document.getElementById('passwordResetModalLoadingSpinner').classList.add('d-none')
