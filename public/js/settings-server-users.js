@@ -204,6 +204,11 @@ function validateCreatePasswordResetInput() {
         }
     })
 
+    if (/^\d+$/.test(expirationInHours.value) === false) {
+        expirationInHours.classList.add('invalid-input');
+        error = true
+    }
+
     return error
 }
 
@@ -253,11 +258,11 @@ document.getElementById('createPasswordResetButton').addEventListener('click', a
     })
 
     if (response.status !== 200) {
-        // setUserModalAlertServerError(await response.text())
+        addAlert('passwordResetAlerts', 'Could not create password reset', 'danger')
         return
+    } else {
+        addAlert('passwordResetAlerts', 'Created password reset', 'success')
     }
-
-    addAlert('passwordResetAlerts', 'Created password reset', 'success')
 
     reloadPasswordResetTable()
     passwordResetModal.hide()

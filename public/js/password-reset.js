@@ -22,8 +22,6 @@ document.getElementById('updatePassword').addEventListener('click', async () => 
         })
     })
 
-    console.log(response.status)
-
     if (response.status === 400) {
         addAlert('alertPasswordResetDiv', await response.text(), 'danger', true, .7)
         return
