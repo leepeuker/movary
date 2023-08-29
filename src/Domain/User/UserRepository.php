@@ -189,13 +189,19 @@ class UserRepository
 
     public function fetchPasswordResetEmailDataByPasswordResetToken(string $token) : array
     {
-        return $this->dbConnection->fetchAssociative(
-            'SELECT user.email, user_password_reset.expires_at
+        $result = $this->dbConnection->fetchAssociative(
+            'SELECT user.id, user.email, user_password_reset.expires_at
             FROM user
             JOIN user_password_reset on user.id = user_id
             WHERE token = ?',
             [$token],
         );
+
+        if ($result === false) {
+            throw new \RuntimeException('Could not find token: ' . $token);
+        }
+
+        return $result;
     }
 
     public function findAuthTokenExpirationDate(string $token) : ?DateTime

@@ -303,13 +303,25 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
 })
 
 document.getElementById('deleteUserButton').addEventListener('click', async () => {
+    document.getElementById('emailPasswordResetButton').disabled = true
+    document.getElementById('copyPasswordResetButton').disabled = true
+    document.getElementById('deletePasswordResetButton').disabled = true
+
     if (confirm('Are you sure you want to delete the user?') === false) {
+        document.getElementById('emailPasswordResetButton').disabled = false
+        document.getElementById('copyPasswordResetButton').disabled = false
+        document.getElementById('deletePasswordResetButton').disabled = false
+
         return
     }
 
     const response = await fetch('/api/users/' + document.getElementById('userModalIdInput').value, {
         method: 'DELETE'
     });
+
+    document.getElementById('emailPasswordResetButton').disabled = false
+    document.getElementById('copyPasswordResetButton').disabled = false
+    document.getElementById('deletePasswordResetButton').disabled = false
 
     if (response.status !== 200) {
         setUserModalAlertServerError()
@@ -351,12 +363,20 @@ document.getElementById('copyPasswordResetButton').addEventListener('click', asy
 })
 
 document.getElementById('emailPasswordResetButton').addEventListener('click', async () => {
+    document.getElementById('emailPasswordResetButton').disabled = true
+    document.getElementById('copyPasswordResetButton').disabled = true
+    document.getElementById('deletePasswordResetButton').disabled = true
+
     const response = await fetch('/settings/server/users/password-reset/' + document.getElementById('passwordResetToken').value + '/send-email', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
     })
+
+    document.getElementById('emailPasswordResetButton').disabled = false
+    document.getElementById('copyPasswordResetButton').disabled = false
+    document.getElementById('deletePasswordResetButton').disabled = false
 
     if (response.status !== 200) {
         addAlert('passwordResetModalAlerts', 'Email sending failed', 'danger')

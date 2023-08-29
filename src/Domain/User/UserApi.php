@@ -456,7 +456,7 @@ class UserApi
         $this->repository->updateWatchlistAutomaticRemovalEnabled($userId, $watchlistAutomaticRemovalEnabled);
     }
 
-    private function fetchPasswordResetEmailDataByPasswordResetToken(string $token) : array
+    public function fetchPasswordResetEmailDataByPasswordResetToken(string $token) : array
     {
         return $this->repository->fetchPasswordResetEmailDataByPasswordResetToken($token);
     }
