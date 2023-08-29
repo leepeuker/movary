@@ -91,6 +91,8 @@ function prepareCreatePasswordResetModal() {
     document.getElementById('emailPasswordResetButton').classList.add('d-none')
     document.getElementById('copyPasswordResetButton').classList.add('d-none')
 
+    removeAlert('passwordResetModalAlerts')
+
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
 
@@ -119,6 +121,7 @@ function prepareEditUserModal(id, name, email, isAdmin) {
 }
 
 function prepareEditPasswordResetModal(userId, token, expirationDate) {
+
     document.getElementById('passwordResetModalUserIdSelect').value = userId
     document.getElementById('passwordResetToken').value = token
     document.getElementById('expirationDate').value = expirationDate
@@ -134,6 +137,12 @@ function prepareEditPasswordResetModal(userId, token, expirationDate) {
     document.getElementById('deletePasswordResetButton').classList.remove('d-none')
     document.getElementById('emailPasswordResetButton').classList.remove('d-none')
     document.getElementById('copyPasswordResetButton').classList.remove('d-none')
+
+    document.getElementById('emailPasswordResetButton').disabled = false
+    document.getElementById('copyPasswordResetButton').disabled = false
+    document.getElementById('deletePasswordResetButton').disabled = false
+    document.getElementById('passwordResetModalLoadingSpinner').classList.add('remove')
+    removeAlert('passwordResetModalAlerts')
 
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
@@ -308,25 +317,15 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
 })
 
 document.getElementById('deleteUserButton').addEventListener('click', async () => {
-    document.getElementById('emailPasswordResetButton').disabled = true
-    document.getElementById('copyPasswordResetButton').disabled = true
-    document.getElementById('deletePasswordResetButton').disabled = true
+    removeAlert('passwordResetModalAlerts')
 
     if (confirm('Are you sure you want to delete the user?') === false) {
-        document.getElementById('emailPasswordResetButton').disabled = false
-        document.getElementById('copyPasswordResetButton').disabled = false
-        document.getElementById('deletePasswordResetButton').disabled = false
-
         return
     }
 
     const response = await fetch('/api/users/' + document.getElementById('userModalIdInput').value, {
         method: 'DELETE'
     });
-
-    document.getElementById('emailPasswordResetButton').disabled = false
-    document.getElementById('copyPasswordResetButton').disabled = false
-    document.getElementById('deletePasswordResetButton').disabled = false
 
     if (response.status !== 200) {
         setUserModalAlertServerError()
@@ -340,7 +339,18 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
 })
 
 document.getElementById('deletePasswordResetButton').addEventListener('click', async () => {
+    document.getElementById('emailPasswordResetButton').disabled = true
+    document.getElementById('copyPasswordResetButton').disabled = true
+    document.getElementById('deletePasswordResetButton').disabled = true
+    document.getElementById('passwordResetModalLoadingSpinner').classList.add('remove')
+    removeAlert('passwordResetModalAlerts')
+
     if (confirm('Are you sure you want to delete the password reset?') === false) {
+        document.getElementById('emailPasswordResetButton').disabled = false
+        document.getElementById('copyPasswordResetButton').disabled = false
+        document.getElementById('deletePasswordResetButton').disabled = false
+        document.getElementById('passwordResetModalLoadingSpinner').classList.add('d-none')
+
         return
     }
 
@@ -348,9 +358,13 @@ document.getElementById('deletePasswordResetButton').addEventListener('click', a
         method: 'DELETE'
     });
 
+    document.getElementById('emailPasswordResetButton').disabled = false
+    document.getElementById('copyPasswordResetButton').disabled = false
+    document.getElementById('deletePasswordResetButton').disabled = false
+    document.getElementById('passwordResetModalLoadingSpinner').classList.add('d-none')
+
     if (response.status !== 200) {
-        addAlert('passwordResetAlerts', 'Could not delete password reset', 'danger')
-        passwordResetModal.hide()
+        addAlert('passwordResetModalAlerts', 'Could not delete password reset', 'danger')
 
         return
     }
@@ -362,6 +376,7 @@ document.getElementById('deletePasswordResetButton').addEventListener('click', a
 })
 document.getElementById('copyPasswordResetButton').addEventListener('click', async () => {
     navigator.clipboard.writeText(document.getElementById('passwordResetUrl').value);
+    removeAlert('passwordResetModalAlerts')
 
     addAlert('passwordResetModalAlerts', 'Copied url to clipboard', 'success')
 
@@ -371,6 +386,8 @@ document.getElementById('emailPasswordResetButton').addEventListener('click', as
     document.getElementById('emailPasswordResetButton').disabled = true
     document.getElementById('copyPasswordResetButton').disabled = true
     document.getElementById('deletePasswordResetButton').disabled = true
+    document.getElementById('passwordResetModalLoadingSpinner').classList.remove('d-none')
+    removeAlert('passwordResetModalAlerts')
 
     const response = await fetch('/settings/server/users/password-reset/' + document.getElementById('passwordResetToken').value + '/send-email', {
         method: 'POST',
@@ -382,6 +399,7 @@ document.getElementById('emailPasswordResetButton').addEventListener('click', as
     document.getElementById('emailPasswordResetButton').disabled = false
     document.getElementById('copyPasswordResetButton').disabled = false
     document.getElementById('deletePasswordResetButton').disabled = false
+    document.getElementById('passwordResetModalLoadingSpinner').classList.add('d-none')
 
     if (response.status !== 200) {
         addAlert('passwordResetModalAlerts', 'Email sending failed', 'danger')
