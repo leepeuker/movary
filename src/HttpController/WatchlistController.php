@@ -85,6 +85,8 @@ class WatchlistController
             $requestData->getGenre(),
         );
 
+        $viewType = $_COOKIE['watchlistView'] === 'table' ? 'table' : 'posters';
+
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(
@@ -103,6 +105,7 @@ class WatchlistController
                 'uniqueReleaseYears' => $this->movieWatchlistApi->fetchUniqueMovieReleaseYears($userId),
                 'uniqueLanguages' => $this->movieWatchlistApi->fetchUniqueMovieLanguages($userId),
                 'uniqueGenres' => $this->movieWatchlistApi->fetchUniqueMovieGenres($userId),
+                'viewType' => $viewType
             ]),
         );
     }

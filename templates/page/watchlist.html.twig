@@ -23,23 +23,46 @@
                 <button class="btn btn-primary" type="button" onclick="search()" id="directSearchButton">
                     <i class="bi bi-search"></i>
                 </button>
-                <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#searchOptionsMovieModal"
-                        style="border-left-color: #aab0b3">
+                <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#searchOptionsMovieModal" style="border-left-color: #aab0b3">
                     <i class="bi bi-filter"></i>
                 </button>
+                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-left-color: #aab0b3">
+                    <i class="bi bi-eye"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" onclick="toggleWatchlistViewCookie('posters')" id="posterViewBtn" href="#">Posters</a></li>
+                    <li><a class="dropdown-item" onclick="toggleWatchlistViewCookie('table')" id="tabelViewBtn" href="#">Table</a></li>
+                </ul>      
             </div>
 
 
             <div id="watchlistAlert" role="alert"></div>
-            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
-                {% for watchlistEntry in watchlistEntries %}
-                    <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100" style="cursor: pointer; position: relative;" id="card-{{ watchlistEntry.id }}">
-                            <img onclick="openOptionsModal(this)" data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
-                       </div>
-                    </div>
-                {% endfor %}
-            </div>
+            {% if viewType == 'posters' %}
+                <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+                    {% for watchlistEntry in watchlistEntries %}
+                        <div class="col" style="padding-bottom: 1rem;">
+                            <div class="card h-100" style="cursor: pointer; position: relative;" id="card-{{ watchlistEntry.id }}">
+                                <img onclick="openOptionsModal(this)" data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
+                        </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elseif viewType == 'table' %}
+                <table class="table">
+                    <thead>
+                        <th scope="col">Movie title</th>
+                        <th scope="col">Release date</th>
+                    </thead>
+                    <tbody>
+                        {% for watchlistEntry in watchlistEntries %}
+                            <tr>
+                                <td>{{ watchlistEntry.title }}</td>
+                                <td>{{ watchlistEntry.release_date }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
 
             {% set searchTermQuery = (searchTerm is null) ? '' : "s=#{searchTerm}&" %}
             {% set sortByQuery = (sortBy is null) ? '' : "sb=#{sortBy}&" %}

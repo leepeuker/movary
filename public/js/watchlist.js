@@ -40,3 +40,8 @@ document.getElementById('optionsModal').addEventListener('hidden.bs.modal', () =
         element.style.filter = 'brightness(100%)'
     });
 })
+
+function toggleWatchlistViewCookie(view) {
+    document.cookie = "watchlistView=" + view;
+    window.location.reload();
+}
