@@ -52,4 +52,33 @@ function resetSearchOptions() {
     searchLanguageSelect.value = ''
     searchReleaseYearSelect.value = ''
     searchPerPageSelect.value = '24'
+
+    updateSaveSortingOptionsButton();
+}
+
+function setSortOptionsCookie() {
+    document.getElementById("saveSortingOptionsButton").setAttribute("disabled", "");
+
+    var date = new Date();
+    var expiration = date.setTime(date.getTime() + 60 * 60 * 24 * 365);
+    document.cookie = "movie-sort-order=" + searchSortOrderSelect.value + ";expires=" + expiration + ";path=/";
+    document.cookie = "movie-sort-by=" + searchSortBySelect.value + ";expires=" + expiration + ";path=/";
+}
+
+function updateSaveSortingOptionsButton() {
+    var sortByCookie = document.cookie.match(new RegExp('(^| )movie-sort-by=([^;]+)'));
+    var sortOrderCookie = document.cookie.match(new RegExp('(^| )movie-sort-order=([^;]+)'));
+
+    var saveSortingOptionsButton = document.getElementById("saveSortingOptionsButton");
+  
+    if (sortByCookie[2] != searchSortBySelect.value || sortOrderCookie[2] != searchSortOrderSelect.value) {
+        if (saveSortingOptionsButton.hasAttribute("disabled")) {
+            saveSortingOptionsButton.removeAttribute("disabled");
+        }
+    }
+    else {
+        if (!saveSortingOptionsButton.hasAttribute("disabled")) {
+            saveSortingOptionsButton.setAttribute("disabled", "");
+        }
+    }
 }

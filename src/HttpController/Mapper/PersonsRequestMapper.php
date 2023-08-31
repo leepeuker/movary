@@ -25,10 +25,12 @@ class PersonsRequestMapper
 
         $getParameters = $request->getGetParameters();
 
+        $_sortBy = isset($_COOKIE['person-sort-by']) ? $_COOKIE['person-sort-by'] : self::DEFAULT_SORT_BY;
+
         $searchTerm = $getParameters['s'] ?? null;
         $page = $getParameters['p'] ?? 1;
         $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
-        $sortBy = $getParameters['sb'] ?? self::DEFAULT_SORT_BY;
+        $sortBy = $getParameters['sb'] ?? $_sortBy;
         $sortOrder = $this->mapSortOrder($getParameters);
         $gender = isset($getParameters['ge']) === false || $getParameters['ge'] === '' ? null : Gender::createFromInt((int)$getParameters['ge']);
 
@@ -46,7 +48,14 @@ class PersonsRequestMapper
     private function mapSortOrder(array $getParameters) : SortOrder
     {
         if (isset($getParameters['so']) === false) {
-            return SortOrder::createDesc();
+            if (!isset($_COOKIE['person-sort-order'])){
+                return SortOrder::createAsc();
+            }
+            elseif ($_COOKIE['person-sort-order'] == 'desc') {
+                return SortOrder::createDesc();
+            }
+
+            return SortOrder::createAsc();
         }
 
         return match ($getParameters['so']) {
