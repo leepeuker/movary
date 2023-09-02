@@ -4,10 +4,9 @@ session_start();
 
 /** @var DI\Container $container */
 
-use Movary\HttpController\ErrorController;
+use Movary\HttpController\Web\ErrorController;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Movary\ValueObject\Http\StatusCode;
 use Psr\Log\LoggerInterface;
 
 $container = require(__DIR__ . '/../bootstrap.php');
