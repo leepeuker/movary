@@ -1,0 +1,160 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Movary",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "\/api"
+    }
+  ],
+  "paths": {
+    "\/users\/{username}\/history": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get the latest plays of a user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search term",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "movies": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "nullable": false
+                        },
+                        "title": {
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "trakt_id": {
+                          "type": "integer"
+                        },
+                        "imdb_id": {
+                          "type": "string"
+                        },
+                        "tmdb_id": {
+                          "type": "integer",
+                          "nullable": false
+                        },
+                        "letterboxd_id": {
+                          "type": "string"
+                        },
+                        "tagline": {
+                          "type": "string"
+                        },
+                        "overview": {
+                          "type": "string"
+                        },
+                        "original_language": {
+                          "type": "string"
+                        },
+                        "runtime": {
+                          "type": "integer"
+                        },
+                        "tmdb_vote_average": {
+                          "type": "string"
+                        },
+                        "tmdb_vote_count": {
+                          "type": "integer"
+                        },
+                        "tmdb_poster_path": {
+                          "type": "string"
+                        },
+                        "tmdb_backdrop_path": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "updated_at_tmdb": {
+                          "type": "string"
+                        },
+                        "updated_at_imdb": {
+                          "type": "string"
+                        },
+                        "watched_at": {
+                          "type": "string"
+                        },
+                        "userRating": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "currentPage": {
+                      "type": "integer"
+                    },
+                    "maxPage": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to see the users history"
+          },
+          "404": {
+            "description": "The username was not found"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "authToken": {
+        "type": "apiKey",
+        "name": "X-Auth-Token",
+        "in": "header"
+      }
+    }
+  }
+}

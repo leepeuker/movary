@@ -315,6 +315,23 @@ class UserRepository
         return $plexWebhookId;
     }
 
+    public function findUserByApiToken(string $apiToken) : ?UserEntity
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT user.*
+            FROM user
+            JOIN user_api_token ON user.id = user_api_token.user_id
+            WHERE user_api_token.token = ?',
+            [$apiToken],
+        );
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return UserEntity::createFromArray($data);
+    }
+
     public function findUserByEmail(string $email) : ?UserEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `email` = ?', [$email]);

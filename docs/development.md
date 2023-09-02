@@ -6,6 +6,12 @@ Clone the repository and follow these steps for a local development setup:
 
 The application should be up-to-date and running locally now.
 
+### Api docs
+
+Checkout the API docs via the url path `/docs/api`.
+
+This uses the schema defined in the file `/docs/openapi.json`
+
 ### Useful links
 
 - [Trakt API docs](https://trakt.docs.apiary.io/)

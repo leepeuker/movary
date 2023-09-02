@@ -14,6 +14,7 @@ class Request
         private readonly array $postParameters,
         private readonly string $body,
         private readonly array $filesParameters,
+        private readonly array $headers,
     ) {
     }
 
@@ -25,10 +26,11 @@ class Request
         $getParameters = self::extractGetParameter();
         $postParameters = self::extractPostParameter();
         $filesParameters = self::extractFilesParameter();
+        $headers = self::extractHeaders();
 
         $body = (string)file_get_contents('php://input');
 
-        return new self($path, $getParameters, $postParameters, $body, $filesParameters);
+        return new self($path, $getParameters, $postParameters, $body, $filesParameters, $headers);
     }
 
     private static function extractFilesParameter() : array
@@ -46,6 +48,11 @@ class Request
         }
 
         return $getParameters;
+    }
+
+    private static function extractHeaders() : array
+    {
+        return getallheaders();
     }
 
     private static function extractPath(string $uri) : string
@@ -103,6 +110,11 @@ class Request
     public function getGetParameters() : array
     {
         return $this->getParameters;
+    }
+
+    public function getHeaders() : array
+    {
+        return $this->headers;
     }
 
     public function getPath() : string
