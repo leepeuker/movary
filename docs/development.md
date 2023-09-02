@@ -10,7 +10,7 @@ The application should be up-to-date and running locally now.
 
 Checkout the API docs via the url path `/docs/api`.
 
-This uses the schema defined in `/docs/openapi.json`
+This uses the schema defined in the file `/docs/openapi.json`
 
 ### Useful links
 

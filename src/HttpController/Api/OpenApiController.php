@@ -7,12 +7,12 @@ use Movary\Util\File;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Response;
 
-readonly class OpenApiController
+class OpenApiController
 {
     public function __construct(
-        private File $fileUtil,
-        private ServerSettings $serverSettings,
-        private string $docsPath,
+        private readonly File $fileUtil,
+        private readonly ServerSettings $serverSettings,
+        private readonly string $docsPath,
     ) {
     }
 

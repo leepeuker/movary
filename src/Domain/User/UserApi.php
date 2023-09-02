@@ -126,7 +126,7 @@ class UserApi
         return $this->repository->findApiToken($userId);
     }
 
-    public function findByApiToken(string $apiToken) : UserEntity
+    public function findByApiToken(string $apiToken) : ?UserEntity
     {
         return $this->repository->findUserByApiToken($apiToken);
     }

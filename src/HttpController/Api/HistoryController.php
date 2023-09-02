@@ -10,15 +10,15 @@ use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
-readonly class HistoryController
+class HistoryController
 {
     private const DEFAULT_LIMIT = 24;
 
     public function __construct(
-        private UserApi $userApi,
-        private Authentication $authenticationService,
-        private MovieHistoryApi $movieHistoryApi,
-        private PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly UserApi $userApi,
+        private readonly Authentication $authenticationService,
+        private readonly MovieHistoryApi $movieHistoryApi,
+        private readonly PaginationElementsCalculator $paginationElementsCalculator,
     ) {
     }
 
@@ -27,7 +27,7 @@ readonly class HistoryController
         $visitorUserId = null;
         $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
         if ($apiToken !== null) {
-            $visitorUserId = $this->userApi->findByApiToken($apiToken)->getId();
+            $visitorUserId = $this->userApi->findByApiToken($apiToken)?->getId();
         }
 
         $requestedUsername = (string)$request->getRouteParameters()['username'];
