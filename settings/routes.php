@@ -120,6 +120,21 @@ return static function (FastRoute\RouteCollector $routeCollector) {
     );
     $routeCollector->addRoute(
         'GET',
+        '/settings/account/general/api-token',
+        [\Movary\HttpController\Web\SettingsController::class, 'getApiToken'],
+    );
+    $routeCollector->addRoute(
+        'DELETE',
+        '/settings/account/general/api-token',
+        [\Movary\HttpController\Web\SettingsController::class, 'deleteApiToken'],
+    );
+    $routeCollector->addRoute(
+        'PUT',
+        '/settings/account/general/api-token',
+        [\Movary\HttpController\Web\SettingsController::class, 'regenerateApiToken'],
+    );
+    $routeCollector->addRoute(
+        'GET',
         '/settings/account/dashboard',
         [\Movary\HttpController\Web\SettingsController::class, 'renderDashboardAccountPage'],
     );

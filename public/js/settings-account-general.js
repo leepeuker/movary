@@ -53,3 +53,75 @@ function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchl
         })
     })
 }
+
+function deleteApiToken() {
+    if (confirm('Do you really want to delete the api token?') === false) {
+        return
+    }
+
+    removeAlert('alertApiTokenDiv')
+
+    deleteApiTokenRequest().then(() => {
+        setApiToken('')
+        addAlert('alertApiTokenDiv', 'Deleted api token', 'success')
+    }).catch((error) => {
+        console.log(error)
+        addAlert('alertApiTokenDiv', 'Could not delete api token', 'danger')
+    })
+}
+
+function regenerateApiToken() {
+    if (confirm('Do you really want to regenerate the api token?') === false) {
+        return
+    }
+
+    removeAlert('alertApiTokenDiv')
+
+    regenerateApiTokenRequest().then(response => {
+        setApiToken(response.token)
+        addAlert('alertApiTokenDiv', 'Generated new api token', 'success')
+    }).catch((error) => {
+        console.log(error)
+        addAlert('alertApiTokenDiv', 'Could not generate api token', 'danger')
+    })
+}
+
+async function deleteApiTokenRequest() {
+    const response = await fetch('/settings/account/general/api-token', {'method': 'delete'})
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+}
+
+async function regenerateApiTokenRequest() {
+    const response = await fetch('/settings/account/general/api-token', {'method': 'put'})
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return await response.json()
+}
+
+function setApiToken(apiToken) {
+    document.getElementById('apiToken').value = apiToken
+
+    document.getElementById('deleteApiTokenButton').disabled = apiToken === null || apiToken.length === 0
+}
+
+fetch(
+    '/settings/account/general/api-token'
+).then(async function (response) {
+    if (response.status === 200) {
+        const responseData = await response.json();
+
+        setApiToken(responseData.token)
+        return
+    }
+
+    addAlert('alertApiTokenDiv', 'Could not load api token', 'danger')
+}).catch(function (error) {
+    console.log(error)
+    addAlert('alertApiTokenDiv', 'Could not load api token', 'danger')
+})
