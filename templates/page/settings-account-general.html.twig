@@ -21,15 +21,6 @@
 
             <div style="padding-top: 1rem">
                 <h5>General account settings</h5>
-                <div class="mb-3">
-                    <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
-                    <select class="form-select" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
-                        {% for dateFormatOffset, dateFormat in dateFormats %}
-                            <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
-                        {% endfor %}
-                    </select>
-                    <div id="emailHelp" class="form-text">Format used when displaying dates</div>
-                </div>
 
                 <div class="mb-3">
                     <label for="nameInput" class="form-label"><b>Username</b> <span class="text-danger">*</span></label>
@@ -43,6 +34,16 @@
                            aria-describedby="usernameHelp"
                            style="text-align: center;">
                     <div id="usernameHelp" class="form-text">Must consist of only letters and numbers</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dateFormatInput" class="form-label"><b>Date format</b></label>
+                    <select class="form-select" style="text-align: center;padding-right:0;" required id="dateFormatInput" aria-describedby="emailHelp">
+                        {% for dateFormatOffset, dateFormat in dateFormats %}
+                            <option {% if dateFormatSelected == dateFormatOffset %}selected{% endif %} value="{{ dateFormatOffset }}">{{ dateFormat.javascript }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="emailHelp" class="form-text">Format used when displaying dates</div>
                 </div>
 
                 <div class="mb-3">
@@ -71,7 +72,7 @@
                            type="checkbox"
                            value="1"
                            id="enableAutomaticWatchlistRemovalInput"
-                            {% if enableAutomaticWatchlistRemoval == true %}checked{% endif %}
+                           {% if enableAutomaticWatchlistRemoval == true %}checked{% endif %}
                            style="margin-right: 0.2rem">
                     <label class="form-check-label" for="scrobbleWatchesCheckbox">Enable automatic removals from watchlist</label>
                 </div>
@@ -79,6 +80,33 @@
                 <div id="alertGeneralAccountDiv"></div>
 
                 <button type="submit" class="btn btn-primary" id="generalAccountUpdateButton">Submit</button>
+
+                <hr>
+
+                <h5>Api token</h5>
+
+                <p>Used for authentication against the Movary API.</p>
+
+                <div class="mb-3">
+                    <input type="text"
+                           class="form-control"
+                           value="{{ apiToken }}"
+                           id="apiToken"
+                           style="text-align: center;"
+                           disabled>
+                </div>
+
+                <div id="alertApiTokenDiv"></div>
+
+                <button id="deleteApiTokenButton"
+                        type="button"
+                        class="btn btn-danger "
+                        onclick="deleteApiToken()"
+                        {% if apiToken == '' %}disabled{% endif %}>
+                    Delete token
+                </button>
+                <button type="button" class="btn btn-primary" onclick="regenerateApiToken()">Regenerate token</button>
+
             </div>
         </div>
     </main>
