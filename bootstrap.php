@@ -14,6 +14,7 @@ $builder->addDefinitions(
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\Service\Export\ExportService::class => DI\factory([Factory::class, 'createExportService']),
+        \Movary\HttpController\Api\OpenApiController::class => DI\factory([Factory::class, 'createOpenApiController']),
         \Movary\HttpController\Web\CreateUserController::class => DI\factory([Factory::class, 'createCreateUserController']),
         \Movary\HttpController\Web\JobController::class => DI\factory([Factory::class, 'createJobController']),
         \Movary\HttpController\Web\LandingPageController::class => DI\factory([Factory::class, 'createLandingPageController']),

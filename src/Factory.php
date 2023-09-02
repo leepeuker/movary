@@ -24,6 +24,7 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
@@ -173,6 +174,15 @@ class Factory
             $container->get(MovieWatchlistApi::class),
             $container->get(ExportWriter::class),
             self::createDirectoryStorage(),
+        );
+    }
+
+    public static function createOpenApiController(ContainerInterface $container) : OpenApiController
+    {
+        return new OpenApiController(
+            $container->get(File::class),
+            $container->get(ServerSettings::class),
+            self::createDirectoryDocs(),
         );
     }
 
@@ -367,6 +377,11 @@ class Factory
     private static function createDirectoryStorage() : string
     {
         return self::createDirectoryAppRoot() . 'storage/';
+    }
+
+    private static function createDirectoryDocs() : string
+    {
+        return self::createDirectoryAppRoot() . 'docs/';
     }
 
     private static function createDirectoryStorageApp() : string

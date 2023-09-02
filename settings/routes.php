@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
 
+use Movary\HttpController\Api;
 use Movary\HttpController\Web;
 
 return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addGroup('', fn(FastRoute\RouteCollector $routeCollector) => addWebRoutes($routeCollector));
-    $routeCollector->addGroup('', fn(FastRoute\RouteCollector $routeCollector) => addApiRoutes($routeCollector));
+    $routeCollector->addGroup('/api', fn(FastRoute\RouteCollector $routeCollector) => addApiRoutes($routeCollector));
 };
 
 function addWebRoutes(FastRoute\RouteCollector $routeCollector) : void
@@ -16,6 +17,7 @@ function addWebRoutes(FastRoute\RouteCollector $routeCollector) : void
     $routeCollector->addRoute('GET', '/logout', [Web\AuthenticationController::class, 'logout']);
     $routeCollector->addRoute('POST', '/create-user', [Web\CreateUserController::class, 'createUser']);
     $routeCollector->addRoute('GET', '/create-user', [Web\CreateUserController::class, 'renderPage']);
+    $routeCollector->addRoute('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
 
     #####################
     # Webhook listeners #
@@ -136,4 +138,6 @@ function addWebRoutes(FastRoute\RouteCollector $routeCollector) : void
 
 function addApiRoutes(FastRoute\RouteCollector $routeCollector) : void
 {
+    $routeCollector->addRoute('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
+    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory']);
 }

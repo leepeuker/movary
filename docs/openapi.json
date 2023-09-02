@@ -1,0 +1,74 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Movary",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "\/api"
+    }
+  ],
+  "paths": {
+    "\/users\/{username}\/history": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get the latest plays of a user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "s",
+            "in": "query",
+            "description": "Search term",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "p",
+            "in": "query",
+            "description": "Page",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "movies": {
+                      "type": "object"
+                    },
+                    "currentPage": {
+                      "type": "integer"
+                    },
+                    "maxPage": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
