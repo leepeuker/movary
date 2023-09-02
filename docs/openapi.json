@@ -54,7 +54,73 @@
                   "type": "object",
                   "properties": {
                     "movies": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "nullable": false
+                        },
+                        "title": {
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "trakt_id": {
+                          "type": "integer"
+                        },
+                        "imdb_id": {
+                          "type": "string"
+                        },
+                        "tmdb_id": {
+                          "type": "integer",
+                          "nullable": false
+                        },
+                        "letterboxd_id": {
+                          "type": "string"
+                        },
+                        "tagline": {
+                          "type": "string"
+                        },
+                        "overview": {
+                          "type": "string"
+                        },
+                        "original_language": {
+                          "type": "string"
+                        },
+                        "runtime": {
+                          "type": "integer"
+                        },
+                        "tmdb_vote_average": {
+                          "type": "string"
+                        },
+                        "tmdb_vote_count": {
+                          "type": "integer"
+                        },
+                        "tmdb_poster_path": {
+                          "type": "string"
+                        },
+                        "tmdb_backdrop_path": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "updated_at_tmdb": {
+                          "type": "string"
+                        },
+                        "updated_at_imdb": {
+                          "type": "string"
+                        },
+                        "watched_at": {
+                          "type": "string"
+                        },
+                        "userRating": {
+                          "type": "integer"
+                        }
+                      }
                     },
                     "currentPage": {
                       "type": "integer"
