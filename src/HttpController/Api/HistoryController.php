@@ -40,8 +40,8 @@ class HistoryController
             return Response::createForbidden();
         }
 
-        $searchTerm = $request->getGetParameters()['s'] ?? null;
-        $page = $request->getGetParameters()['p'] ?? 1;
+        $searchTerm = $request->getGetParameters()['search'] ?? null;
+        $page = $request->getGetParameters()['page'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
         $historyPaginated = $this->movieHistoryApi->fetchHistoryPaginated($requestedUser->getId(), $limit, (int)$page, $searchTerm);

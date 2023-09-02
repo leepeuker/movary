@@ -1,4 +1,4 @@
-GET http://127.0.0.1/api/users/lee/history
+GET http://127.0.0.1/api/users/lee/history?search=parasite
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
