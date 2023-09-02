@@ -139,7 +139,21 @@
           "404": {
             "description": "The username was not found"
           }
-        }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "authToken": {
+        "type": "apiKey",
+        "name": "X-Auth-Token",
+        "in": "header"
       }
     }
   }
