@@ -132,6 +132,12 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not authorized to see the users history"
+          },
+          "404": {
+            "description": "The username was not found"
           }
         }
       }
