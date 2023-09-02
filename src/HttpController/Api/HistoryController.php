@@ -24,19 +24,12 @@ class HistoryController
 
     public function getHistory(Request $request) : Response
     {
-        $visitorUserId = null;
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
-        if ($apiToken !== null) {
-            $visitorUserId = $this->userApi->findByApiToken($apiToken)?->getId();
-        }
-
-        $requestedUsername = (string)$request->getRouteParameters()['username'];
-        $requestedUser = $this->userApi->findUserByName($requestedUsername);
+        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
         if ($requestedUser === null) {
             return Response::createNotFound();
         }
 
-        if ($this->authenticationService->isUserPageVisible($visitorUserId, $requestedUser) === false) {
+        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
             return Response::createForbidden();
         }
 

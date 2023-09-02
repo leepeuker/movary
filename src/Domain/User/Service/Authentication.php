@@ -10,12 +10,12 @@ use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\Http\Request;
 use RuntimeException;
 
 class Authentication
 {
     private const AUTHENTICATION_COOKIE_NAME = 'id';
-
     private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
     public function __construct(
@@ -52,6 +52,16 @@ class Authentication
         return $userId;
     }
 
+    public function getUserIdByApiToken(Request $request) : ?int
+    {
+        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        if ($apiToken === null) {
+            return null;
+        }
+
+        return $this->userApi->findByApiToken($apiToken)?->getId();
+    }
+
     public function isUserAuthenticated() : bool
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
@@ -81,8 +91,10 @@ class Authentication
         return $this->isUserAuthenticated() === true && $this->getCurrentUserId() === $userId;
     }
 
-    public function isUserPageVisible(?int $userId, UserEntity $targetUser) : bool
+    public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
     {
+        $userId = $this->getUserIdByApiToken($request);
+
         $privacyLevel = $targetUser->getPrivacyLevel();
 
         if ($privacyLevel === 2) {
