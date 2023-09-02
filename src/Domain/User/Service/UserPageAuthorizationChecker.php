@@ -54,7 +54,7 @@ class UserPageAuthorizationChecker
 
         $userId = $user->getId();
 
-        if ($this->authenticationService->isUserPageVisible($user->getPrivacyLevel(), $userId) === false) {
+        if ($this->authenticationService->isUserPageVisibleForCurrentUser($user->getPrivacyLevel(), $userId) === false) {
             return null;
         }
 

@@ -68,7 +68,7 @@ class Authentication
         return false;
     }
 
-    public function isUserPageVisible(int $privacyLevel, int $userId) : bool
+    public function isUserPageVisibleForCurrentUser(int $privacyLevel, int $userId) : bool
     {
         if ($privacyLevel === 2) {
             return true;
@@ -78,11 +78,22 @@ class Authentication
             return true;
         }
 
-        if ($this->isUserAuthenticated() === true && $this->getCurrentUserId() === $userId) {
+        return $this->isUserAuthenticated() === true && $this->getCurrentUserId() === $userId;
+    }
+
+    public function isUserPageVisible(?int $userId, UserEntity $targetUser) : bool
+    {
+        $privacyLevel = $targetUser->getPrivacyLevel();
+
+        if ($privacyLevel === 2) {
             return true;
         }
 
-        return false;
+        if ($privacyLevel === 1 && $userId !== null) {
+            return true;
+        }
+
+        return $targetUser->getId() === $userId;
     }
 
     public function login(string $email, string $password, bool $rememberMe) : void

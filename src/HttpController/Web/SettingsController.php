@@ -158,7 +158,7 @@ class SettingsController
 
         $userId = $this->authenticationService->getCurrentUserId();
 
-        return Response::createJson(Json::encode(['token' => $this->userApi->findApiToken($userId)]));
+        return Response::createJson(Json::encode(['token' => $this->userApi->findApiTokenByUserId($userId)]));
     }
 
     public function regenerateApiToken() : Response
@@ -172,7 +172,7 @@ class SettingsController
         $this->userApi->deleteApiToken($userId);
         $this->userApi->generateApiToken($userId);
 
-        return Response::createJson(Json::encode(['token' => $this->userApi->findApiToken($userId)]));
+        return Response::createJson(Json::encode(['token' => $this->userApi->findApiTokenByUserId($userId)]));
     }
 
     public function renderAppPage() : Response
@@ -297,7 +297,7 @@ class SettingsController
                 'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
                 'countries' => $this->countryCache->fetchAll(),
                 'userCountry' => $user->getCountry(),
-                'apiToken' => $this->userApi->findApiToken($user->getId()),
+                'apiToken' => $this->userApi->findApiTokenByUserId($user->getId()),
             ]),
         );
     }

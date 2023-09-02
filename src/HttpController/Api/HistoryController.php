@@ -3,37 +3,49 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
-use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
-class HistoryController
+readonly class HistoryController
 {
     private const DEFAULT_LIMIT = 24;
 
     public function __construct(
-        private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private UserApi $userApi,
+        private Authentication $authenticationService,
+        private MovieHistoryApi $movieHistoryApi,
+        private PaginationElementsCalculator $paginationElementsCalculator,
     ) {
     }
 
     public function getHistory(Request $request) : Response
     {
-        // TODO refactor to use x-auth-token instead of session
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
+        $visitorUserId = null;
+        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        if ($apiToken !== null) {
+            $visitorUserId = $this->userApi->findByApiToken($apiToken)->getId();
+        }
+
+        $requestedUsername = (string)$request->getRouteParameters()['username'];
+        $requestedUser = $this->userApi->findUserByName($requestedUsername);
+        if ($requestedUser === null) {
             return Response::createNotFound();
+        }
+
+        if ($this->authenticationService->isUserPageVisible($visitorUserId, $requestedUser) === false) {
+            return Response::createForbidden();
         }
 
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
         $limit = self::DEFAULT_LIMIT;
 
-        $historyPaginated = $this->movieHistoryApi->fetchHistoryPaginated($userId, $limit, (int)$page, $searchTerm);
-        $historyCount = $this->movieHistoryApi->fetchHistoryCount($userId, $searchTerm);
+        $historyPaginated = $this->movieHistoryApi->fetchHistoryPaginated($requestedUser->getId(), $limit, (int)$page, $searchTerm);
+        $historyCount = $this->movieHistoryApi->fetchHistoryCount($requestedUser->getId(), $searchTerm);
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $limit, (int)$page);
 
