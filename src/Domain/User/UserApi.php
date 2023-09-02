@@ -29,6 +29,11 @@ class UserApi
         $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
     }
 
+    public function deleteApiToken(int $userId) : void
+    {
+        $this->repository->deleteApiToken($userId);
+    }
+
     public function deleteEmbyWebhookId(int $userId) : void
     {
         $this->repository->setEmbyWebhookId($userId, null);
@@ -94,6 +99,17 @@ class UserApi
         return $this->repository->fetchAllPublicVisibleUsernames();
     }
 
+    public function fetchJellyfinUserId(int $userId) : JellyfinUserId
+    {
+        $jellyfinUserId = $this->repository->findJellyfinUserId($userId);
+
+        if ($jellyfinUserId === null) {
+            throw new \RuntimeException('Missing jellyfin user id.');
+        }
+
+        return JellyfinUserId::create($jellyfinUserId);
+    }
+
     public function fetchUser(int $userId) : UserEntity
     {
         $user = $this->repository->findUserById($userId);
@@ -105,26 +121,9 @@ class UserApi
         return $user;
     }
 
-    public function findJellyfinAccessToken(int $userId) : ?JellyfinAccessToken
+    public function findApiToken(int $userId) : ?string
     {
-        $jellyfinAccessToken = $this->repository->findJellyfinAccessToken($userId);
-
-        if ($jellyfinAccessToken === null) {
-            return null;
-        }
-
-        return JellyfinAccessToken::create($jellyfinAccessToken);
-    }
-
-    public function fetchJellyfinUserId(int $userId) : JellyfinUserId
-    {
-        $jellyfinUserId = $this->repository->findJellyfinUserId($userId);
-
-        if ($jellyfinUserId === null) {
-            throw new \RuntimeException('Missing jellyfin user id.');
-        }
-
-        return JellyfinUserId::create($jellyfinUserId);
+        return $this->repository->findApiToken($userId);
     }
 
     public function findJellyfinAuthentication(int $userId) : ?JellyfinAuthenticationData
@@ -215,6 +214,13 @@ class UserApi
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByPlexWebhookId($webhookId);
+    }
+
+    public function generateApiToken(int $userId) : void
+    {
+        $token = bin2hex(random_bytes(16));
+
+        $this->repository->createApiToken($userId, $token);
     }
 
     public function hasUsers() : bool

@@ -14,6 +14,18 @@ class UserRepository
     {
     }
 
+    public function createApiToken(int $userId, string $token) : void
+    {
+        $this->dbConnection->insert(
+            'user_api_token',
+            [
+                'user_id' => $userId,
+                'token' => $token,
+                'created_at' => (string)DateTime::create(),
+            ],
+        );
+    }
+
     public function createAuthToken(int $userId, string $token, DateTime $expirationDate) : void
     {
         $this->dbConnection->insert(
@@ -37,6 +49,16 @@ class UserRepository
                 'is_admin' => (int)$isAdmin,
                 'name' => $name,
                 'created_at' => (string)DateTime::create(),
+            ],
+        );
+    }
+
+    public function deleteApiToken(int $userId) : void
+    {
+        $this->dbConnection->delete(
+            'user_api_token',
+            [
+                'user_id' => $userId,
             ],
         );
     }
@@ -158,6 +180,16 @@ class UserRepository
         );
     }
 
+    public function findApiToken(int $userId) : ?string
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT token
+            FROM `user_api_token` 
+            WHERE user_id = ?',
+            [$userId],
+        )[0] ?? null;
+    }
+
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);
@@ -193,17 +225,6 @@ class UserRepository
         }
 
         return $JellyfinServerUrl;
-    }
-
-    public function findJellyfinAccessToken(int $userId) : ?string
-    {
-        $jellyfinAccessToken = $this->dbConnection->fetchOne('SELECT `jellyfin_access_token` FROM `user` WHERE `id` = ?', [$userId]);
-
-        if ($jellyfinAccessToken === false) {
-            return null;
-        }
-
-        return $jellyfinAccessToken;
     }
 
     public function findJellyfinUserId(int $userId) : ?string
@@ -250,17 +271,6 @@ class UserRepository
         return $plexServerUrl;
     }
 
-    public function findTemporaryPlexCode(int $userId) : ?string
-    {
-        $plexCode = $this->dbConnection->fetchOne('SELECT `plex_client_temporary_code` FROM `user` WHERE `id` = ?', [$userId]);
-
-        if ($plexCode === false) {
-            return null;
-        }
-
-        return $plexCode;
-    }
-
     public function findTOTPUri(int $userId) : ?string
     {
         $totpUri = $this->dbConnection->fetchOne('SELECT `totp_uri` FROM `user` WHERE `id` = ?', [$userId]);
@@ -270,6 +280,17 @@ class UserRepository
         }
 
         return $totpUri;
+    }
+
+    public function findTemporaryPlexCode(int $userId) : ?string
+    {
+        $plexCode = $this->dbConnection->fetchOne('SELECT `plex_client_temporary_code` FROM `user` WHERE `id` = ?', [$userId]);
+
+        if ($plexCode === false) {
+            return null;
+        }
+
+        return $plexCode;
     }
 
     public function findTraktClientId(int $userId) : ?string

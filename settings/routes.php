@@ -44,6 +44,9 @@ function addWebRoutes(FastRoute\RouteCollector $routeCollector) : void
     # Settings #
     ############
     $routeCollector->addRoute('GET', '/settings/account/general', [Web\SettingsController::class, 'renderGeneralAccountPage']);
+    $routeCollector->addRoute('GET', '/settings/account/general/api-token', [Web\SettingsController::class, 'getApiToken'],);
+    $routeCollector->addRoute('DELETE', '/settings/account/general/api-token', [Web\SettingsController::class, 'deleteApiToken'],);
+    $routeCollector->addRoute('PUT', '/settings/account/general/api-token', [Web\SettingsController::class, 'regenerateApiToken'],);
     $routeCollector->addRoute('GET', '/settings/account/dashboard', [Web\SettingsController::class, 'renderDashboardAccountPage']);
     $routeCollector->addRoute('GET', '/settings/account/security', [Web\SettingsController::class, 'renderSecurityAccountPage']);
     $routeCollector->addRoute('GET', '/settings/account/data', [Web\SettingsController::class, 'renderDataAccountPage']);
