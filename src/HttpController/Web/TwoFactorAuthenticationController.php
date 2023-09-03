@@ -76,14 +76,6 @@ class TwoFactorAuthenticationController
 
     public function verifyTotp(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
-        }
-
         $userTotpInput = $request->getPostParameters()['totpCode'];
         $rememberMe = $this->sessionWrapper->find('rememberMe') ?? false;
         $userId = (int)$this->sessionWrapper->find('totpUserId');

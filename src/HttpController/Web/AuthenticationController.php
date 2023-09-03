@@ -58,14 +58,6 @@ class AuthenticationController
 
     public function renderLoginPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation('/')],
-            );
-        }
-
         $failedLogin = $this->sessionWrapper->has('failedLogin');
         $this->sessionWrapper->unset('failedLogin');
 

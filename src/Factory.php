@@ -25,6 +25,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
+use Movary\HttpController\Middleware;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
@@ -260,6 +261,11 @@ class Factory
         }
 
         return $logger;
+    }
+
+    public static function createRegistrationEnabledCheck(Config $config) : Middleware\RegistrationEnabledCheck
+    {
+        return new Middleware\RegistrationEnabledCheck($config->getAsBool('ENABLE_REGISTRATION', false));
     }
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController

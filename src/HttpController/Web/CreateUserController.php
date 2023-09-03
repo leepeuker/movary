@@ -30,16 +30,7 @@ class CreateUserController
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function createUser(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            return Response::createSeeOther('/');
-        }
-
         $hasUsers = $this->userApi->hasUsers();
-
-        if ($hasUsers === true && $this->registrationEnabled === false) {
-            return Response::createSeeOther('/');
-        }
-
         $postParameters = $request->getPostParameters();
 
         $email = empty($postParameters['email']) === true ? null : (string)$postParameters['email'];
@@ -92,15 +83,7 @@ class CreateUserController
 
     public function renderPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            return Response::createSeeOther('/');
-        }
-
         $hasUsers = $this->userApi->hasUsers();
-
-        if ($hasUsers === true && $this->registrationEnabled === false) {
-            return Response::createSeeOther('/');
-        }
 
         $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
         $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');

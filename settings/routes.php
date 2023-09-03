@@ -2,6 +2,7 @@
 
 use Movary\HttpController\Api;
 use Movary\HttpController\Web;
+use Movary\HttpController\Middleware;
 
 return static function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addGroup('', fn(FastRoute\RouteCollector $routeCollector) => addWebRoutes($routeCollector));
@@ -10,13 +11,13 @@ return static function (FastRoute\RouteCollector $routeCollector) {
 
 function addWebRoutes(FastRoute\RouteCollector $routeCollector) : void
 {
-    $routeCollector->addRoute('GET', '/', [Web\LandingPageController::class, 'render']);
+    $routeCollector->addRoute('GET', '/', [[Web\LandingPageController::class, 'render'], 'middleware' => [Middleware\isUnauthenticated::class, Middleware\DoesNotHaveUsers::class]]);
     $routeCollector->addRoute('POST', '/login', [Web\AuthenticationController::class, 'login']);
-    $routeCollector->addRoute('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage']);
-    $routeCollector->addRoute('POST', '/verify-totp', [Web\TwoFactorAuthenticationController::class, 'verifyTotp']);
+    $routeCollector->addRoute('GET', '/login', [[Web\AuthenticationController::class, 'renderLoginPage'], 'middleware' => [Middleware\isUnauthenticated::class]]);
+    $routeCollector->addRoute('POST', '/verify-totp', [[Web\TwoFactorAuthenticationController::class, 'verifyTotp'], 'middleware' => [Middleware\isUnauthenticated::class]]);
     $routeCollector->addRoute('GET', '/logout', [Web\AuthenticationController::class, 'logout']);
-    $routeCollector->addRoute('POST', '/create-user', [Web\CreateUserController::class, 'createUser']);
-    $routeCollector->addRoute('GET', '/create-user', [Web\CreateUserController::class, 'renderPage']);
+    $routeCollector->addRoute('POST', '/create-user', [[Web\CreateUserController::class, 'createUser'], 'middleware' => [Middleware\isUnauthenticated::class, Middleware\HasUsersCheck::class, Middleware\RegistrationEnabledCheck::class]]);
+    $routeCollector->addRoute('GET', '/create-user', [[Web\CreateUserController::class, 'renderPage'], 'middleware' => [Middleware\isUnauthenticated::class, Middleware\HasUsersCheck::class, Middleware\RegistrationEnabledCheck::class]]);
     $routeCollector->addRoute('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
 
     #####################
@@ -29,21 +30,21 @@ function addWebRoutes(FastRoute\RouteCollector $routeCollector) : void
     #############
     # Job Queue #
     #############
-    $routeCollector->addRoute('GET', '/jobs', [Web\JobController::class, 'getJobs']);
-    $routeCollector->addRoute('GET', '/job-queue/purge-processed', [Web\JobController::class, 'purgeProcessedJobs']);
-    $routeCollector->addRoute('GET', '/job-queue/purge-all', [Web\JobController::class, 'purgeAllJobs']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync']);
-    $routeCollector->addRoute('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport']);
-    $routeCollector->addRoute('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/jellyfin-export-history', [Web\JobController::class, 'scheduleJellyfinExportHistory']);
+    $routeCollector->addRoute('GET', '/jobs', [[Web\JobController::class, 'getJobs'], 'middleware' => [Middleware\isAuthenticated::class]]);
+    $routeCollector->addRoute('GET', '/job-queue/purge-processed', [[Web\JobController::class, 'purgeProcessedJobs'], 'middleware' => [Middleware\isAuthenticated::class]]);
+    $routeCollector->addRoute('GET', '/job-queue/purge-all', [[Web\JobController::class, 'purgeAllJobs'], 'middleware' => [Middleware\isAuthenticated::class]]);
+    $routeCollector->addRoute('GET', '/jobs/schedule/trakt-history-sync', [[Web\JobController::class, 'scheduleTraktHistorySync'], 'middleware' => [Middleware\isAuthenticated::class]]);
+    $routeCollector->addRoute('GET', '/jobs/schedule/trakt-ratings-sync', [[Web\JobController::class, 'scheduleTraktRatingsSync'], 'middleware' => [Middleware\isAuthenticated::class]]);
+    $routeCollector->addRoute('POST', '/jobs/schedule/letterboxd-diary-sync', [[Web\JobController::class, 'scheduleLetterboxdDiaryImport'], 'middleware' => [Middleware\isAuthenticated::class]]);
+    $routeCollector->addRoute('POST', '/jobs/schedule/letterboxd-ratings-sync', [[Web\JobController::class, 'scheduleLetterboxdRatingsImport'], 'middleware' => [Middleware\isAuthenticated::class]]);
+    $routeCollector->addRoute('GET', '/jobs/schedule/plex-watchlist-sync', [[Web\JobController::class, 'schedulePlexWatchlistImport'], 'middleware' => [Middleware\isAuthenticated::class, Middleware\HasPlexAccessToken::class]]);
+    $routeCollector->addRoute('GET', '/jobs/schedule/jellyfin-import-history', [[Web\JobController::class, 'scheduleJellyfinImportHistory'], 'middleware' => [Middleware\isAuthenticated::class, Middleware\HasJellyfinToken::class]]);
+    $routeCollector->addRoute('GET', '/jobs/schedule/jellyfin-export-history', [[Web\JobController::class, 'scheduleJellyfinExportHistory'], 'middleware' => [Middleware\isAuthenticated::class, Middleware\HasJellyfinToken::class]]);
 
     ############
     # Settings #
     ############
-    $routeCollector->addRoute('GET', '/settings/account/general', [Web\SettingsController::class, 'renderGeneralAccountPage']);
+    $routeCollector->addRoute('GET', '/settings/account/general', [[Web\SettingsController::class, 'renderGeneralAccountPage'], 'middleware' => [Middleware\isUnauthenticated::class]]);
     $routeCollector->addRoute('GET', '/settings/account/general/api-token', [Web\SettingsController::class, 'getApiToken'],);
     $routeCollector->addRoute('DELETE', '/settings/account/general/api-token', [Web\SettingsController::class, 'deleteApiToken'],);
     $routeCollector->addRoute('PUT', '/settings/account/general/api-token', [Web\SettingsController::class, 'regenerateApiToken'],);

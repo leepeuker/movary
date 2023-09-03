@@ -332,7 +332,7 @@ class SettingsController
                 'isActive' => $applicationUrl !== null,
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'jellyfinServerUrl' => $jellyfinServerUrl,
-                'jellyfinIsAuthenticated' => $jellyfinAuthentication !== null,
+                'jellyfinisAuthenticated' => $jellyfinAuthentication !== null,
                 'jellyfinUsername' => $jellyfinUsername?->getUsername(),
                 'jellyfinDeviceId' => $jellyfinDeviceId,
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
@@ -493,10 +493,6 @@ class SettingsController
 
     public function renderServerGeneralPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
             return Response::createSeeOther('/');
         }

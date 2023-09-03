@@ -24,15 +24,15 @@ class LandingPageController
 
     public function render() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            $userName = $this->authenticationService->getCurrentUser()->getName();
+        // if ($this->authenticationService->isUserAuthenticated() === true) {
+        //     $userName = $this->authenticationService->getCurrentUser()->getName();
 
-            return Response::createSeeOther("/users/$userName/dashboard");
-        }
+        //     return Response::createSeeOther("/users/$userName/dashboard");
+        // }
 
-        if ($this->userApi->hasUsers() === false) {
-            return Response::createSeeOther('/create-user');
-        }
+        // if ($this->userApi->hasUsers() === false) {
+        //     return Response::createSeeOther('/create-user');
+        // }
 
         $failedLogin = $this->sessionWrapper->has('failedLogin');
         $deletedAccount = $this->sessionWrapper->has('deletedAccount');

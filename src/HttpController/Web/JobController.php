@@ -31,10 +31,6 @@ class JobController
 
     public function getJobs(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $parameters = $request->getGetParameters();
 
         $jobType = JobType::createFromString($parameters['type']);
@@ -46,10 +42,6 @@ class JobController
 
     public function purgeAllJobs() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->jobQueueApi->purgeAllJobs();
 
         return Response::createSeeOther('/settings/server/jobs');
@@ -57,10 +49,6 @@ class JobController
 
     public function purgeProcessedJobs() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->jobQueueApi->purgeProcessedJobs();
 
         return Response::createSeeOther('/settings/server/jobs');
@@ -68,10 +56,6 @@ class JobController
 
     public function scheduleLetterboxdDiaryImport(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['diaryCsv']['tmp_name']) === true) {
@@ -106,10 +90,6 @@ class JobController
 
     public function scheduleLetterboxdRatingsImport(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['ratingsCsv']['tmp_name']) === true) {
@@ -150,14 +130,7 @@ class JobController
 
     public function schedulePlexWatchlistImport() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $currentUser = $this->authenticationService->getCurrentUser();
-        if ($currentUser->getPlexAccessToken() === null) {
-            return Response::createBadRequest(PlexAuthenticationMissing::create()->getMessage());
-        }
 
         $this->jobQueueApi->addPlexImportWatchlistJob($currentUser->getId());
 
@@ -170,16 +143,7 @@ class JobController
 
     public function scheduleJellyfinImportHistory() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $currentUserId = $this->authenticationService->getCurrentUserId();
-
-        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($currentUserId);
-        if ($jellyfinAuthentication === null) {
-            return Response::createBadRequest(JellyfinInvalidAuthentication::create()->getMessage());
-        }
 
         $this->jobQueueApi->addJellyfinImportMoviesJob($currentUserId);
 
@@ -192,16 +156,7 @@ class JobController
 
     public function scheduleJellyfinExportHistory() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $currentUserId = $this->authenticationService->getCurrentUserId();
-
-        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($currentUserId);
-        if ($jellyfinAuthentication === null) {
-            return Response::createBadRequest(JellyfinInvalidAuthentication::create()->getMessage());
-        }
 
         $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId);
 
@@ -214,10 +169,6 @@ class JobController
 
     public function scheduleTraktHistorySync() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
         $this->sessionWrapper->set('scheduledTraktHistoryImport', true);
@@ -231,10 +182,6 @@ class JobController
 
     public function scheduleTraktRatingsSync() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
         $this->sessionWrapper->set('scheduledTraktRatingsImport', true);
