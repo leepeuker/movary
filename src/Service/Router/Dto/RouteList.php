@@ -12,17 +12,6 @@ class RouteList extends AbstractList
         return new self();
     }
 
-    public function addRoute(Route $route) : Route
-    {
-        $this->data[] = $route;
-        return end($this->data);
-    }
-
-    public function addRoutes(...$routes) : void
-    {
-        $this->data = array_merge($this->data, $routes);
-    }
-
     public function createNewRoute(string $httpMethod, string $route, array $handler) : Route
     {
         $route = Route::create($httpMethod, $route, $handler);
