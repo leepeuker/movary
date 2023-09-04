@@ -5,16 +5,17 @@ namespace Movary\HttpController\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
-class isAuthenticated
+class isUnauthenticated
 {
     public function __construct(
-        private readonly Authentication $authenticationService,
+        private readonly Authentication $authenticationService
     ) {}
 
     public function main() : ?Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther("/login");
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            $userName = $this->authenticationService->getCurrentUser()->getName();
+            return Response::createSeeOther("/users/$userName/dashboard");
         }
         return null;
     }

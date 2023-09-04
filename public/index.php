@@ -34,20 +34,14 @@ try {
             $response = Response::createMethodNotAllowed();
             break;
         case FastRoute\Dispatcher::FOUND:
-            $handler = is_array($routeInfo[1][0]) ? $routeInfo[1][0] : $routeInfo[1];
+            $handler = $routeInfo[1]['handler'];
             $httpRequest->addRouteParameters($routeInfo[2]);
-            
-            if(array_key_exists('middleware', $routeInfo[1])) {
-                foreach($routeInfo[1]['middleware'] as $middleware) {
-                    if(class_exists($middleware)) { 
-                        $middlewareResponse = $container->call([$middleware, 'main']);
-                        if($middlewareResponse instanceof Response) {
-                            $response = $middlewareResponse;
-                            break 2;
-                        }
-                    } else {
-                        $container->get(LoggerInterface::class)->warning('The class '. $middleware . 'does not exist!');
-                    }
+
+            foreach($routeInfo[1]['middleware'] as $middleware) {
+                $middlewareResponse = $container->call([$middleware, 'main']);
+                if($middlewareResponse instanceof Response) {
+                    $response = $middlewareResponse;
+                    break 2;
                 }
             }
             

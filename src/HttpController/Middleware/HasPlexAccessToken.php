@@ -4,7 +4,6 @@ namespace Movary\HttpController\Middleware;
 
 use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Response;
 
 class HasPlexAccessToken
