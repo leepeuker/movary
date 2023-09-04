@@ -23,6 +23,13 @@ class RouteList extends AbstractList
         $this->data = array_merge($this->data, $routes);
     }
 
+    public function createNewRoute(string $httpMethod, string $route, array $handler) : Route
+    {
+        $route = Route::create($httpMethod, $route, $handler);
+        $this->data[] = $route;
+        return $route;
+    }
+
     public function getRoutes() : array
     {
         return $this->data;

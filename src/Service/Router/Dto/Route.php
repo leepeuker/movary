@@ -40,9 +40,8 @@ class Route
         return $this->middleware;
     }
 
-    public function addMiddleware(...$middlewares) : self
+    public function addMiddleware(...$middlewares) : void
     {
         $this->middleware = $middlewares;
-        return $this;
     }
 }

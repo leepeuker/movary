@@ -8,12 +8,6 @@ use Movary\Service\Router\Dto\RouteList;
 
 class RouterService
 {
-    public function createNewRoute(string $httpMethod, string $route, array $handler) : Route
-    {
-        return Route::create($httpMethod, $route, $handler);
-    }
-
-
     public function createRouteList() : RouteList
     {
         return RouteList::create();
