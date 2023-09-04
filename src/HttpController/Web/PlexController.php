@@ -32,10 +32,6 @@ class PlexController
 
     public function deletePlexWebhookUrl() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->userApi->deletePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
@@ -43,10 +39,6 @@ class PlexController
 
     public function generatePlexAuthenticationUrl() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
         if ($plexAccessToken !== null) {
             return Response::createBadRequest('User is already authenticated');
@@ -84,10 +76,6 @@ class PlexController
 
     public function processPlexCallback() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $plexClientId = $this->userApi->findPlexClientId($this->authenticationService->getCurrentUserId());
         $plexClientCode = $this->userApi->findTemporaryPlexCode($this->authenticationService->getCurrentUserId());
         if ($plexClientId === null || $plexClientCode === null) {
@@ -112,10 +100,6 @@ class PlexController
 
     public function regeneratePlexWebhookUrl() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $webhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildPlexWebhookUrl($webhookId)]));
@@ -123,10 +107,6 @@ class PlexController
 
     public function removePlexAccessTokens() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $this->userApi->updatePlexAccessToken($userId, null);
@@ -139,10 +119,6 @@ class PlexController
 
     public function savePlexServerUrl(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $plexServerUrl = Json::decode($request->getBody())['plexServerUrl'];
@@ -165,10 +141,6 @@ class PlexController
 
     public function verifyPlexServerUrl(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $plexAccessToken = $this->authenticationService->getCurrentUser()->getPlexAccessToken();
         if ($plexAccessToken === null) {
             return Response::createBadRequest('Plex authentication is missing');

@@ -5,7 +5,7 @@ namespace Movary\HttpController\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
-class HasUsersCheck
+class IsAdmin
 {
     public function __construct(
         private readonly Authentication $authenticationService

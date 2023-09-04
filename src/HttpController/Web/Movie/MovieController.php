@@ -30,10 +30,6 @@ class MovieController
 
     public function refreshImdbRating(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $movieId = (int)$request->getRouteParameters()['id'];
         $movie = $this->movieApi->findByIdFormatted($movieId);
 
@@ -48,10 +44,6 @@ class MovieController
 
     public function refreshTmdbData(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $movie = $this->movieApi->findByIdFormatted($movieId);

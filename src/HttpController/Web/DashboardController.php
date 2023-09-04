@@ -40,10 +40,6 @@ class DashboardController
     public function render(Request $request) : Response
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
-            return Response::createSeeOther('/');
-        }
-
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
 
         return Response::create(

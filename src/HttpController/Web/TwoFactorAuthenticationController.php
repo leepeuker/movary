@@ -24,10 +24,6 @@ class TwoFactorAuthenticationController
 
     public function createTotpUri() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $currentUserName = $this->authenticationService->getCurrentUser()->getName();
         $totp = $this->twoFactorAuthenticationFactory->createTotp($currentUserName);
 
@@ -41,10 +37,6 @@ class TwoFactorAuthenticationController
 
     public function disableTOTP() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->twoFactorAuthenticationApi->deleteTotp($this->authenticationService->getCurrentUserId());
         $this->sessionWrapper->set('twoFactorAuthenticationDisabled', true);
 
@@ -53,10 +45,6 @@ class TwoFactorAuthenticationController
 
     public function enableTOTP(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());

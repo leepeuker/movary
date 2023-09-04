@@ -25,10 +25,6 @@ class ImportController
 
     public function handleCsvImport(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/login');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $exportType = $request->getRouteParameters()['exportType'];
         $fileParameters = $request->getFileParameters();

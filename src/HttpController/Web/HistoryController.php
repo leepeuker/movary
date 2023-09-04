@@ -36,10 +36,6 @@ class HistoryController
 
     public function createHistoryEntry(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
@@ -61,10 +57,6 @@ class HistoryController
 
     public function deleteHistoryEntry(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
@@ -83,10 +75,6 @@ class HistoryController
 
     public function logMovie(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());
@@ -116,9 +104,7 @@ class HistoryController
     public function renderHistory(Request $request) : Response
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
+
 
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;

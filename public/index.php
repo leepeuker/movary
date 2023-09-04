@@ -12,6 +12,8 @@ use Psr\Log\LoggerInterface;
 $container = require(__DIR__ . '/../bootstrap.php');
 $httpRequest = $container->get(Request::class);
 
+$middlewareMethodName = 'main';
+
 try {
     $dispatcher = FastRoute\simpleDispatcher(
         require(__DIR__ . '/../settings/routes.php')
@@ -38,7 +40,7 @@ try {
             $httpRequest->addRouteParameters($routeInfo[2]);
 
             foreach($routeInfo[1]['middleware'] as $middleware) {
-                $middlewareResponse = $container->call([$middleware, 'main']);
+                $middlewareResponse = $container->call([$middleware, $middlewareMethodName]);
                 if($middlewareResponse instanceof Response) {
                     $response = $middlewareResponse;
                     break 2;
