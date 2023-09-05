@@ -17,13 +17,9 @@ class OpenApiController
 
     public function renderPage() : Response
     {
-        $openAiJsonUrl = '/api/openapi.json';
-
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/api.html.twig', [
-                'openAiJsonUrl' => $openAiJsonUrl
-            ]),
+            $this->twig->render('page/api.html.twig'),
         );
     }
 }
