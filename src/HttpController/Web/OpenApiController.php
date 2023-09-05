@@ -11,7 +11,6 @@ class OpenApiController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly ServerSettings $serverSettings,
     ) {
     }
 
