@@ -35,12 +35,12 @@ class HistoryController
 
         $searchTerm = $request->getGetParameters()['search'] ?? null;
         $page = $request->getGetParameters()['page'] ?? 1;
-        $limit = self::DEFAULT_LIMIT;
+        $limit = $request->getGetParameters()['limit'] ?? self::DEFAULT_LIMIT;
 
-        $historyPaginated = $this->movieHistoryApi->fetchHistoryPaginated($requestedUser->getId(), $limit, (int)$page, $searchTerm);
+        $historyPaginated = $this->movieHistoryApi->fetchHistoryPaginated($requestedUser->getId(), (int)$limit, (int)$page, $searchTerm);
         $historyCount = $this->movieHistoryApi->fetchHistoryCount($requestedUser->getId(), $searchTerm);
 
-        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $limit, (int)$page);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, (int)$limit, (int)$page);
 
         return Response::createJson(
             Json::encode([

@@ -28,8 +28,8 @@ class MoviesRequestDto
         string $sortBy,
         SortOrder $sortOrder,
         ?Year $releaseYear,
-        ?string $language,
-        ?string $genre,
+        ?string $language = null,
+        ?string $genre = null,
     ) : self {
         return new self(
             $userId,

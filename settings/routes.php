@@ -143,4 +143,5 @@ function addApiRoutes(FastRoute\RouteCollector $routeCollector) : void
 {
     $routeCollector->addRoute('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
     $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory']);
+    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist']);
 }

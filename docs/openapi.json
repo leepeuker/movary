@@ -41,7 +41,18 @@
             "description": "Page",
             "required": false,
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 24
             }
           }
         ],
@@ -134,10 +145,115 @@
             }
           },
           "401": {
-            "description": "Not authorized to see the users history"
+            "$ref": "#/components/responses/401"
           },
           "404": {
-            "description": "The username was not found"
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "\/users\/{username}\/watchlist": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get the watchlist of a user",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "movies": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "nullable": false
+                        },
+                        "title": {
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "trakt_id": {
+                          "type": "integer"
+                        },
+                        "imdb_id": {
+                          "type": "string"
+                        },
+                        "tmdb_id": {
+                          "type": "integer",
+                          "nullable": false
+                        },
+                        "letterboxd_id": {
+                          "type": "string"
+                        },
+                        "tagline": {
+                          "type": "string"
+                        },
+                        "overview": {
+                          "type": "string"
+                        },
+                        "original_language": {
+                          "type": "string"
+                        },
+                        "runtime": {
+                          "type": "integer"
+                        },
+                        "tmdb_vote_average": {
+                          "type": "string"
+                        },
+                        "tmdb_vote_count": {
+                          "type": "integer"
+                        },
+                        "tmdb_poster_path": {
+                          "type": "string"
+                        },
+                        "tmdb_backdrop_path": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "nullable": false
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        },
+                        "updated_at_tmdb": {
+                          "type": "string"
+                        },
+                        "updated_at_imdb": {
+                          "type": "string"
+                        },
+                        "userRating": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "currentPage": {
+                      "type": "integer"
+                    },
+                    "maxPage": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
           }
         },
         "security": [
@@ -149,6 +265,14 @@
     }
   },
   "components": {
+    "responses": {
+      "401": {
+        "description": "Not authorized to see the resource"
+      },
+      "404": {
+        "description": "The username was not found"
+      }
+    },
     "securitySchemes": {
       "authToken": {
         "type": "apiKey",
