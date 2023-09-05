@@ -19,10 +19,10 @@ class OpenApiController
     {
         $openAiJsonUrl = '/api/openapi.json';
 
-//        $applicationUrl = $this->serverSettings->getApplicationUrl();
-//        if ($applicationUrl !== null) {
-//            $openAiJsonUrl = trim($applicationUrl, '/') . $openAiJsonUrl;
-//        }
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        if ($applicationUrl !== null) {
+            $openAiJsonUrl = trim($applicationUrl, '/') . $openAiJsonUrl;
+        }
 
         return Response::create(
             StatusCode::createOk(),
