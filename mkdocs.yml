@@ -46,5 +46,10 @@ nav:
       - Letterboxd: features/letterboxd.md
       - Trakt TV: features/trakt.md
       - Netflix: features/netflix.md
-  - Development: 'development.md'
+  - Development: 
+      - Set up: development/set-up.md
+      - Directory structure: development/file-structure.md
+      - How does the backend work?: development/structure.md
+      - Making migrations: development/migrations.md
+      - Bootstrapping: development/bootstrap.md
   - FAQ: 'faq.md'
