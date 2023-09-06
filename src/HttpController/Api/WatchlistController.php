@@ -6,6 +6,7 @@ use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\RequestMapper\WatchlistRequestMapper;
+use Movary\HttpController\Api\ResponseMapper\WatchlistResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -19,6 +20,7 @@ class WatchlistController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
+        private readonly WatchlistResponseMapper $watchlistResponseMapper,
     ) {
     }
 
@@ -33,9 +35,9 @@ class WatchlistController
             return Response::createForbidden();
         }
 
-        $requestData = $this->watchlistRequestMapper->mapRenderPageRequest($request);
+        $requestData = $this->watchlistRequestMapper->mapRequest($request);
 
-        $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated(
+        $watchlistEntries = $this->movieWatchlistApi->fetchWatchlistPaginated(
             $requestedUser->getId(),
             $requestData->getLimit(),
             $requestData->getPage(),
@@ -46,6 +48,7 @@ class WatchlistController
             $requestData->getLanguage(),
             $requestData->getGenre(),
         );
+
         $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
             $requestedUser->getId(),
             $requestData->getSearchTerm(),
@@ -54,11 +57,15 @@ class WatchlistController
             $requestData->getGenre(),
         );
 
-        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $requestData->getLimit(), $requestData->getPage());
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $watchlistCount,
+            $requestData->getLimit(),
+            $requestData->getPage(),
+        );
 
         return Response::createJson(
             Json::encode([
-                'movies' => $watchlistPaginated,
+                'watchlist' => $this->watchlistResponseMapper->mapWatchlistEntries($watchlistEntries),
                 'currentPage' => $paginationElements->getCurrentPage(),
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),

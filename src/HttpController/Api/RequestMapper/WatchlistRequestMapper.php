@@ -2,8 +2,7 @@
 
 namespace Movary\HttpController\Api\RequestMapper;
 
-use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\HttpController\Web\Dto\MoviesRequestDto;
+use Movary\HttpController\Api\Dto\WatchlistRequestDto;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -18,15 +17,8 @@ class WatchlistRequestMapper
 
     private const DEFAULT_SORT_BY = 'addedAt';
 
-    public function __construct(
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-    ) {
-    }
-
-    public function mapRenderPageRequest(Request $request) : MoviesRequestDto
+    public function mapRequest(Request $request) : WatchlistRequestDto
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-
         $getParameters = $request->getGetParameters();
 
         $searchTerm = $getParameters['search'] ?? null;
@@ -34,11 +26,9 @@ class WatchlistRequestMapper
         $limit = $getParameters['limit'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sortBy'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $this->mapSortOrder($getParameters);
-        $releaseYear = $getParameters['releaseYear'] ?? self::DEFAULT_RELEASE_YEAR;
-        $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
+        $releaseYear = $this->mapReleaseYear($getParameters);
 
-        return MoviesRequestDto::createFromParameters(
-            $userId,
+        return WatchlistRequestDto::create(
             $searchTerm,
             (int)$page,
             (int)$limit,
@@ -46,6 +36,17 @@ class WatchlistRequestMapper
             $sortOrder,
             $releaseYear,
         );
+    }
+
+    private function mapReleaseYear(array $getParameters) : ?Year
+    {
+        $releaseYear = $getParameters['releaseYear'] ?? self::DEFAULT_RELEASE_YEAR;
+
+        if (empty($releaseYear) === true) {
+            return null;
+        }
+
+        return Year::createFromString($releaseYear);
     }
 
     private function mapSortOrder(array $getParameters) : SortOrder
