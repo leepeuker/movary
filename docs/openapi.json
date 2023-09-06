@@ -73,8 +73,7 @@
                             "$ref": "#/components/schemas/movie"
                           },
                           "watchedAt": {
-                            "type": "string",
-                            "nullable": false
+                            "type": "string"
                           }
                         }
                       }
@@ -112,6 +111,87 @@
           "Users"
         ],
         "summary": "Get the watchlist of a user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search term",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 24
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sort by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "addedAt",
+              "enum": [
+                "addedAt",
+                "rating",
+                "releaseDate",
+                "runtime",
+                "title"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Sort order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "releaseYear",
+            "in": "query",
+            "description": "Release year",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 2017
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -129,21 +209,18 @@
                             "$ref": "#/components/schemas/movie"
                           },
                           "addedAt": {
-                            "type": "string",
-                            "nullable": false
+                            "type": "string"
                           }
                         }
                       }
                     },
                     "currentPage": {
                       "type": "integer",
-                      "example": 1,
-                      "nullable": false
+                      "example": 1
                     },
                     "maxPage": {
                       "type": "integer",
-                      "example": 10,
-                      "nullable": false
+                      "example": 10
                     }
                   }
                 }
@@ -169,36 +246,42 @@
     "schemas": {
       "movie": {
         "type": "object",
-        "nullable": false,
         "properties": {
           "id": {
-            "type": "integer",
-            "nullable": false
+            "type": "integer"
           },
           "title": {
-            "type": "string",
-            "nullable": false
+            "type": "string"
           },
           "tagline": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "overview": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "originalLanguage": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "runtime": {
-            "type": "integer"
+            "type": "integer",
+            "nullable": true
           },
           "posterPath": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "releaseDate": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "userRating": {
-            "type": "integer"
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 10
           },
           "externalRatings": {
             "type": "object",
@@ -234,22 +317,27 @@
                 "type": "integer"
               },
               "trakt": {
-                "type": "integer"
+                "type": "integer",
+                "nullable": true
               },
               "imdb": {
-                "type": "string"
+                "type": "string",
+                "nullable": true
               },
               "letterboxd": {
-                "type": "string"
+                "type": "string",
+                "nullable": true
               }
             }
           },
           "updatedAt": {
-            "type": "string"
+            "type": "string",
+            "nullable": true,
+            "example": "2023-07-02 18:00:00"
           },
           "createdAt": {
             "type": "string",
-            "nullable": false
+            "example": "2023-07-01 17:00:00"
           }
         }
       }
