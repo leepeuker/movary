@@ -175,7 +175,7 @@ class MovieWatchlistRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.*, mur.rating as userRating
+            SELECT m.*, mur.rating as userRating, added_at
             FROM movie m
             JOIN watchlist wl on wl.movie_id = m.id and wl.user_id = ?
             LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?

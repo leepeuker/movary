@@ -41,7 +41,18 @@
             "description": "Page",
             "required": false,
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 24
             }
           }
         ],
@@ -53,80 +64,27 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "movies": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "nullable": false
-                        },
-                        "title": {
-                          "type": "string",
-                          "nullable": false
-                        },
-                        "trakt_id": {
-                          "type": "integer"
-                        },
-                        "imdb_id": {
-                          "type": "string"
-                        },
-                        "tmdb_id": {
-                          "type": "integer",
-                          "nullable": false
-                        },
-                        "letterboxd_id": {
-                          "type": "string"
-                        },
-                        "tagline": {
-                          "type": "string"
-                        },
-                        "overview": {
-                          "type": "string"
-                        },
-                        "original_language": {
-                          "type": "string"
-                        },
-                        "runtime": {
-                          "type": "integer"
-                        },
-                        "tmdb_vote_average": {
-                          "type": "string"
-                        },
-                        "tmdb_vote_count": {
-                          "type": "integer"
-                        },
-                        "tmdb_poster_path": {
-                          "type": "string"
-                        },
-                        "tmdb_backdrop_path": {
-                          "type": "string"
-                        },
-                        "created_at": {
-                          "type": "string",
-                          "nullable": false
-                        },
-                        "updated_at": {
-                          "type": "string"
-                        },
-                        "updated_at_tmdb": {
-                          "type": "string"
-                        },
-                        "updated_at_imdb": {
-                          "type": "string"
-                        },
-                        "watched_at": {
-                          "type": "string"
-                        },
-                        "userRating": {
-                          "type": "integer"
+                    "watchlist": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "movie": {
+                            "$ref": "#/components/schemas/movie"
+                          },
+                          "watchedAt": {
+                            "$ref": "#/components/schemas/date"
+                          }
                         }
                       }
                     },
                     "currentPage": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": 1
                     },
                     "maxPage": {
-                      "type": "integer"
+                      "type": "integer",
+                      "example": 10
                     }
                   }
                 }
@@ -134,10 +92,146 @@
             }
           },
           "401": {
-            "description": "Not authorized to see the users history"
+            "$ref": "#/components/responses/401"
           },
           "404": {
-            "description": "The username was not found"
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "\/users\/{username}\/watchlist": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get the watchlist of a user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search term",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 24
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sort by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "addedAt",
+              "enum": [
+                "addedAt",
+                "rating",
+                "releaseDate",
+                "runtime",
+                "title"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Sort order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "releaseYear",
+            "in": "query",
+            "description": "Release year",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 2017
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "history": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "movie": {
+                            "$ref": "#/components/schemas/movie"
+                          },
+                          "addedAt": {
+                            "$ref": "#/components/schemas/date"
+                          }
+                        }
+                      }
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "maxPage": {
+                      "type": "integer",
+                      "example": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
           }
         },
         "security": [
@@ -149,6 +243,119 @@
     }
   },
   "components": {
+    "schemas": {
+      "movie": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "tagline": {
+            "type": "string",
+            "nullable": true
+          },
+          "overview": {
+            "type": "string",
+            "nullable": true
+          },
+          "originalLanguage": {
+            "type": "string",
+            "nullable": true
+          },
+          "runtime": {
+            "type": "integer",
+            "nullable": true
+          },
+          "posterPath": {
+            "type": "string",
+            "nullable": true
+          },
+          "releaseDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "userRating": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "maximum": 10
+          },
+          "externalRatings": {
+            "type": "object",
+            "properties": {
+              "tmdb": {
+                "type": "object",
+                "properties": {
+                  "average": {
+                    "type": "number"
+                  },
+                  "count": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "imdb": {
+                "type": "object",
+                "properties": {
+                  "average": {
+                    "type": "number"
+                  },
+                  "count": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
+          "externalIds": {
+            "type": "object",
+            "properties": {
+              "tmdb": {
+                "type": "integer"
+              },
+              "trakt": {
+                "type": "integer",
+                "nullable": true
+              },
+              "imdb": {
+                "type": "string",
+                "nullable": true
+              },
+              "letterboxd": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/dateNullable"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/date"
+          }
+        }
+      },
+      "date": {
+        "type": "string",
+        "example": "2023-07-02 18:00:00"
+      },
+      "dateNullable": {
+        "type": "string",
+        "nullable": true,
+        "example": "2023-07-02 18:00:00"
+      }
+    },
+    "responses": {
+      "401": {
+        "description": "Not authorized to see the resource"
+      },
+      "404": {
+        "description": "The username was not found"
+      }
+    },
     "securitySchemes": {
       "authToken": {
         "type": "apiKey",

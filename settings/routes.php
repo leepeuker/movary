@@ -148,5 +148,6 @@ function addApiRoutes(FastRoute\RouteCollector $routeCollector) : void
     $routes = $routerService->createRouteList();
     $routes->createNewRoute('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
     $routes->createNewRoute('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory']);
+    $routes->createNewRoute('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist']);
     $routerService->generateRouteCallback($routeCollector, $routes);
 }
