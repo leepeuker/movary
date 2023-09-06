@@ -1,0 +1,15 @@
+GET http://127.0.0.1/api/users/lee/watchlist
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+
+####
+
+GET http://127.0.0.1/api/users/lee/watchlist?limit=5
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+
+####

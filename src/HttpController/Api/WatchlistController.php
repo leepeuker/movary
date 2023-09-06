@@ -2,29 +2,29 @@
 
 namespace Movary\HttpController\Api;
 
-use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
-use Movary\HttpController\Api\RequestMapper\HistoryRequestMapper;
-use Movary\HttpController\Api\ResponseMapper\HistoryResponseMapper;
+use Movary\HttpController\Api\RequestMapper\WatchlistRequestMapper;
+use Movary\HttpController\Api\ResponseMapper\WatchlistResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
-class HistoryController
+class WatchlistController
 {
     public function __construct(
+        private readonly MovieWatchlistApi $movieWatchlistApi,
         private readonly UserApi $userApi,
-        private readonly Authentication $authenticationService,
-        private readonly MovieHistoryApi $movieHistoryApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
-        private readonly HistoryRequestMapper $historyRequestMapper,
-        private readonly HistoryResponseMapper $historyResponseMapper,
+        private readonly Authentication $authenticationService,
+        private readonly WatchlistRequestMapper $watchlistRequestMapper,
+        private readonly WatchlistResponseMapper $watchlistResponseMapper,
     ) {
     }
 
-    public function getHistory(Request $request) : Response
+    public function getWatchlist(Request $request) : Response
     {
         $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
         if ($requestedUser === null) {
@@ -35,29 +35,37 @@ class HistoryController
             return Response::createForbidden();
         }
 
-        $requestData = $this->historyRequestMapper->mapRequest($request);
+        $requestData = $this->watchlistRequestMapper->mapRequest($request);
 
-        $historyEntries = $this->movieHistoryApi->fetchHistoryPaginated(
+        $watchlistEntries = $this->movieWatchlistApi->fetchWatchlistPaginated(
             $requestedUser->getId(),
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
+            $requestData->getSortBy(),
+            $requestData->getSortOrder(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
         );
 
-        $historyCount = $this->movieHistoryApi->fetchHistoryCount(
+        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
             $requestedUser->getId(),
             $requestData->getSearchTerm(),
+            $requestData->getReleaseYear(),
+            $requestData->getLanguage(),
+            $requestData->getGenre(),
         );
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
-            $historyCount,
+            $watchlistCount,
             $requestData->getLimit(),
             $requestData->getPage(),
         );
 
         return Response::createJson(
             Json::encode([
-                'history' => $this->historyResponseMapper->mapHistoryEntries($historyEntries),
+                'watchlist' => $this->watchlistResponseMapper->mapWatchlistEntries($watchlistEntries),
                 'currentPage' => $paginationElements->getCurrentPage(),
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),
