@@ -244,10 +244,10 @@
               }
             }
           },
-          "updated_at": {
+          "updatedAt": {
             "type": "string"
           },
-          "created_at": {
+          "createdAt": {
             "type": "string",
             "nullable": false
           }
