@@ -73,7 +73,7 @@
                             "$ref": "#/components/schemas/movie"
                           },
                           "watchedAt": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/date"
                           }
                         }
                       }
@@ -209,7 +209,7 @@
                             "$ref": "#/components/schemas/movie"
                           },
                           "addedAt": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/date"
                           }
                         }
                       }
@@ -331,15 +331,21 @@
             }
           },
           "updatedAt": {
-            "type": "string",
-            "nullable": true,
-            "example": "2023-07-02 18:00:00"
+            "$ref": "#/components/schemas/dateNullable"
           },
           "createdAt": {
-            "type": "string",
-            "example": "2023-07-01 17:00:00"
+            "$ref": "#/components/schemas/date"
           }
         }
+      },
+      "date": {
+        "type": "string",
+        "example": "2023-07-02 18:00:00"
+      },
+      "dateNullable": {
+        "type": "string",
+        "nullable": true,
+        "example": "2023-07-02 18:00:00"
       }
     },
     "responses": {
