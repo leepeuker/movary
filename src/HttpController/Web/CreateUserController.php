@@ -23,7 +23,6 @@ class CreateUserController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
-        private readonly bool $registrationEnabled,
     ) {
     }
 

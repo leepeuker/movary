@@ -1,23 +1,20 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Movary\Service\Router\Dto;
 
 class Route
 {
-    private array $handler;
-    private array $middleware = [];
-    private string $httpMethod;
-    private string $route;
-    
-    public function __construct($httpMethod, $route, array $handler) {
-        $this->handler = $handler;
-        $this->httpMethod = $httpMethod;
-        $this->route = $route;
+    public function __construct(
+        private readonly string $httpMethod,
+        private readonly string $route,
+        private readonly array $handler,
+        private readonly array $middleware,
+    ) {
     }
 
-    public static function create(string $httpMethod, string $route, array $handler)
+    public static function create(string $httpMethod, string $route, array $handler, array $middleware = []) : self
     {
-        return new self($httpMethod, $route, $handler);
+        return new self($httpMethod, $route, $handler, $middleware);
     }
 
     public function getHandler() : array
@@ -35,13 +32,8 @@ class Route
         return $this->route;
     }
 
-    public function getMiddleware() :?array
+    public function getMiddleware() : ?array
     {
         return $this->middleware;
-    }
-
-    public function addMiddleware(...$middlewares) : void
-    {
-        $this->middleware = $middlewares;
     }
 }

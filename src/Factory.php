@@ -98,14 +98,13 @@ class Factory
         );
     }
 
-    public static function createCreateUserController(ContainerInterface $container, Config $config) : CreateUserController
+    public static function createCreateUserController(ContainerInterface $container) : CreateUserController
     {
         return new CreateUserController(
             $container->get(Twig\Environment::class),
             $container->get(Authentication::class),
             $container->get(UserApi::class),
             $container->get(SessionWrapper::class),
-            $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
 
@@ -209,7 +208,6 @@ class Factory
         return new JobController(
             $container->get(Authentication::class),
             $container->get(JobQueueApi::class),
-            $container->get(UserApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
             self::createDirectoryStorageApp()
@@ -228,8 +226,6 @@ class Factory
     {
         return new LandingPageController(
             $container->get(Twig\Environment::class),
-            $container->get(Authentication::class),
-            $container->get(UserApi::class),
             $container->get(SessionWrapper::class),
             $config->getAsBool('ENABLE_REGISTRATION', false),
             $config->getAsStringNullable('DEFAULT_LOGIN_EMAIL'),
@@ -263,9 +259,9 @@ class Factory
         return $logger;
     }
 
-    public static function createRegistrationEnabledCheck(Config $config) : Middleware\RegistrationEnabledCheck
+    public static function createRegistrationEnabledCheck(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
     {
-        return new Middleware\RegistrationEnabledCheck($config->getAsBool('ENABLE_REGISTRATION', false));
+        return new HttpController\Web\Middleware\ServerHasRegistrationEnabled($config->getAsBool('ENABLE_REGISTRATION', false));
     }
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController

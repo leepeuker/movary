@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Movary\HttpController\Middleware;
+namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
-class CanUserBeViewed
+class UserCanViewUser
 {
     public function __construct(
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker
-    ) {}
+        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+    ) {
+    }
 
     public function main(Request $request) : ?Response
     {
@@ -19,6 +19,7 @@ class CanUserBeViewed
         if ($userId === null) {
             return Response::createSeeOther('/');
         }
+
         return null;
     }
 }

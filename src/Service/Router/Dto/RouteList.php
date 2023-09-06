@@ -1,10 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Movary\Service\Router\Dto;
 
-use Movary\Service\Router\Dto\Route;
 use Movary\ValueObject\AbstractList;
 
+/**
+ * @method Route[] getIterator()
+ * @psalm-suppress ImplementedReturnTypeMismatch
+ */
 class RouteList extends AbstractList
 {
     public static function create() : self
@@ -12,15 +15,11 @@ class RouteList extends AbstractList
         return new self();
     }
 
-    public function createNewRoute(string $httpMethod, string $route, array $handler) : Route
+    public function add(string $httpMethod, string $route, array $handler, array $middleware = []) : Route
     {
-        $route = Route::create($httpMethod, $route, $handler);
+        $route = Route::create($httpMethod, $route, $handler, $middleware);
         $this->data[] = $route;
-        return $route;
-    }
 
-    public function getRoutes() : array
-    {
-        return $this->data;
+        return $route;
     }
 }

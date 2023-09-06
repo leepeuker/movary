@@ -20,7 +20,6 @@ class MovieController
         private readonly Environment $twig,
         private readonly MovieApi $movieApi,
         private readonly MovieWatchlistApi $movieWatchlistApi,
-        private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,

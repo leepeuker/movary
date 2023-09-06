@@ -22,7 +22,6 @@ class JobController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly JobQueueApi $jobQueueApi,
-        private readonly UserApi $userApi,
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
         private readonly SessionWrapper $sessionWrapper,
         private readonly string $appStorageDirectory,
