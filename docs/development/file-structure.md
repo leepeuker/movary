@@ -10,6 +10,8 @@ Within the `/src` directory, various other directories are located.
 - `/src/Service` - This directory contains files related to various components of Movary, such as the routing system, the processing of external API data and some other stuff. Note: The `/src/api` directory is mainly meant for *connecting* with the external APIs and sending HTTP requests, whereas the external API stuff in `/src/Service` mainly handles how to process the data from those external APIs.
 - `/src/Util` - Some useful utilities which helps keep consistency throughout the project.
 
+<!-- TODO: Clarify what the `/src/Domain` directory is for -->
+
 ### Templates
 
 The frontend of Movary is mainly regular HTML5, but it also uses the [twig framework](https://twig.symfony.com/) from Symfony, to use dynamic templates. This allows us to use cleaner code when injecting PHP code in HTML. So instead of using `<?php echo $variable ?>`, we can now use `{{ $variable }}` and the twig engine will automatically translate the clean code into the PHP code. See their documentation for more information.
