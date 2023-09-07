@@ -51,9 +51,9 @@ class ServerSettings
         return $this->getByKey(self::APPLICATION_URL);
     }
 
-    public function getApplicationVersion() : ?string
+    public function getApplicationVersion() : string
     {
-        return $this->getByKey(self::APPLICATION_VERSION);
+        return $this->getByKey(self::APPLICATION_VERSION) ?? 'unknown';
     }
 
     public function getFromAddress() : ?string

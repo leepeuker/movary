@@ -51,7 +51,6 @@ class SettingsController
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
         private readonly TmdbIsoCountryCache $countryCache,
-        private readonly string $currentApplicationVersion,
     ) {
     }
 
@@ -152,7 +151,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
-                'currentApplicationVersion' => $this->currentApplicationVersion,
+                'currentApplicationVersion' => $this->serverSettings->getApplicationVersion(),
                 'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
                 'timeZone' => date_default_timezone_get(),
             ]),

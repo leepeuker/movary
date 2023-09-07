@@ -4,11 +4,7 @@
     "title": "Movary",
     "version": ""
   },
-  "servers": [
-    {
-      "url": "\/api"
-    }
-  ],
+  "servers": [],
   "paths": {
     "\/users\/{username}\/history": {
       "get": {

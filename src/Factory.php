@@ -266,30 +266,6 @@ class Factory
         );
     }
 
-    public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
-    {
-        return new SettingsController(
-            $container->get(Twig\Environment::class),
-            $container->get(Authentication::class),
-            $container->get(TwoFactorAuthenticationApi::class),
-            $container->get(UserApi::class),
-            $container->get(MovieApi::class),
-            $container->get(GithubApi::class),
-            $container->get(PlexApi::class),
-            $container->get(SessionWrapper::class),
-            $container->get(LetterboxdExporter::class),
-            $container->get(TraktApi::class),
-            $container->get(JellyfinApi::class),
-            $container->get(ServerSettings::class),
-            $container->get(WebhookUrlBuilder::class),
-            $container->get(JobQueueApi::class),
-            $container->get(DashboardFactory::class),
-            $container->get(EmailService::class),
-            $container->get(Tmdb\Cache\TmdbIsoCountryCache::class),
-            self::getApplicationVersion($config),
-        );
-    }
-
     public static function createTmdbApiClient(ContainerInterface $container) : Tmdb\TmdbClient
     {
         return new Tmdb\TmdbClient(
