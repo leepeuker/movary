@@ -5,6 +5,8 @@ namespace Movary\HttpController\Api;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\RequestMapper\HistoryRequestMapper;
+use Movary\HttpController\Api\ResponseMapper\HistoryResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -12,13 +14,13 @@ use Movary\ValueObject\Http\Response;
 
 class HistoryController
 {
-    private const DEFAULT_LIMIT = 24;
-
     public function __construct(
         private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly HistoryRequestMapper $historyRequestMapper,
+        private readonly HistoryResponseMapper $historyResponseMapper,
     ) {
     }
 
@@ -33,18 +35,29 @@ class HistoryController
             return Response::createForbidden();
         }
 
-        $searchTerm = $request->getGetParameters()['search'] ?? null;
-        $page = $request->getGetParameters()['page'] ?? 1;
-        $limit = self::DEFAULT_LIMIT;
+        $requestData = $this->historyRequestMapper->mapRequest($request);
 
-        $historyPaginated = $this->movieHistoryApi->fetchHistoryPaginated($requestedUser->getId(), $limit, (int)$page, $searchTerm);
-        $historyCount = $this->movieHistoryApi->fetchHistoryCount($requestedUser->getId(), $searchTerm);
+        $historyEntries = $this->movieHistoryApi->fetchHistoryPaginated(
+            $requestedUser->getId(),
+            $requestData->getLimit(),
+            $requestData->getPage(),
+            $requestData->getSearchTerm(),
+        );
 
-        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $limit, (int)$page);
+        $historyCount = $this->movieHistoryApi->fetchHistoryCount(
+            $requestedUser->getId(),
+            $requestData->getSearchTerm(),
+        );
+
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $historyCount,
+            $requestData->getLimit(),
+            $requestData->getPage(),
+        );
 
         return Response::createJson(
             Json::encode([
-                'movies' => $historyPaginated,
+                'history' => $this->historyResponseMapper->mapHistoryEntries($historyEntries),
                 'currentPage' => $paginationElements->getCurrentPage(),
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),

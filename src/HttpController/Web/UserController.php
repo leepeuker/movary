@@ -51,10 +51,6 @@ class UserController
 
     public function deleteUser(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = (int)$request->getRouteParameters()['userId'];
         $currentUser = $this->authenticationService->getCurrentUser();
 
@@ -79,10 +75,6 @@ class UserController
 
     public function updateUser(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $userId = (int)$request->getRouteParameters()['userId'];
         $currentUser = $this->authenticationService->getCurrentUser();
 

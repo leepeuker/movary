@@ -20,7 +20,6 @@ class MovieController
         private readonly Environment $twig,
         private readonly MovieApi $movieApi,
         private readonly MovieWatchlistApi $movieWatchlistApi,
-        private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
@@ -30,10 +29,6 @@ class MovieController
 
     public function refreshImdbRating(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $movieId = (int)$request->getRouteParameters()['id'];
         $movie = $this->movieApi->findByIdFormatted($movieId);
 
@@ -48,10 +43,6 @@ class MovieController
 
     public function refreshTmdbData(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $movie = $this->movieApi->findByIdFormatted($movieId);

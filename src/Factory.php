@@ -8,9 +8,6 @@ use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Movary\Api\Github\GithubApi;
-use Movary\Api\Jellyfin\JellyfinApi;
-use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -22,26 +19,20 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
-use Movary\HttpController\Web\SettingsController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
-use Movary\Service\Dashboard\DashboardFactory;
-use Movary\Service\Email\EmailService;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
-use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
-use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -65,8 +56,6 @@ class Factory
     private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
 
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
-
-    private const DEFAULT_APPLICATION_VERSION = 'unknown';
 
     private const DEFAULT_TMDB_IMAGE_CACHING = false;
 
@@ -97,14 +86,13 @@ class Factory
         );
     }
 
-    public static function createCreateUserController(ContainerInterface $container, Config $config) : CreateUserController
+    public static function createCreateUserController(ContainerInterface $container) : CreateUserController
     {
         return new CreateUserController(
             $container->get(Twig\Environment::class),
             $container->get(Authentication::class),
             $container->get(UserApi::class),
             $container->get(SessionWrapper::class),
-            $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
 
@@ -177,15 +165,6 @@ class Factory
         );
     }
 
-    public static function createOpenApiController(ContainerInterface $container) : OpenApiController
-    {
-        return new OpenApiController(
-            $container->get(File::class),
-            $container->get(ServerSettings::class),
-            self::createDirectoryDocs(),
-        );
-    }
-
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client(['timeout' => 4]);
@@ -208,7 +187,6 @@ class Factory
         return new JobController(
             $container->get(Authentication::class),
             $container->get(JobQueueApi::class),
-            $container->get(UserApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
             self::createDirectoryStorageApp()
@@ -227,8 +205,6 @@ class Factory
     {
         return new LandingPageController(
             $container->get(Twig\Environment::class),
-            $container->get(Authentication::class),
-            $container->get(UserApi::class),
             $container->get(SessionWrapper::class),
             $config->getAsBool('ENABLE_REGISTRATION', false),
             $config->getAsStringNullable('DEFAULT_LOGIN_EMAIL'),
@@ -262,27 +238,19 @@ class Factory
         return $logger;
     }
 
-    public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
+    public static function createMiddlewareServerHasRegistrationEnabled(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
     {
-        return new SettingsController(
-            $container->get(Twig\Environment::class),
-            $container->get(Authentication::class),
-            $container->get(TwoFactorAuthenticationApi::class),
-            $container->get(UserApi::class),
-            $container->get(MovieApi::class),
-            $container->get(GithubApi::class),
-            $container->get(PlexApi::class),
-            $container->get(SessionWrapper::class),
-            $container->get(LetterboxdExporter::class),
-            $container->get(TraktApi::class),
-            $container->get(JellyfinApi::class),
+        return new HttpController\Web\Middleware\ServerHasRegistrationEnabled(
+            $config->getAsBool('ENABLE_REGISTRATION', false)
+        );
+    }
+
+    public static function createOpenApiController(ContainerInterface $container) : OpenApiController
+    {
+        return new OpenApiController(
+            $container->get(File::class),
             $container->get(ServerSettings::class),
-            $container->get(WebhookUrlBuilder::class),
-            $container->get(JobQueueApi::class),
-            $container->get(DashboardFactory::class),
-            $container->get(EmailService::class),
-            $container->get(Tmdb\Cache\TmdbIsoCountryCache::class),
-            self::getApplicationVersion($config),
+            self::createDirectoryDocs(),
         );
     }
 
@@ -374,14 +342,14 @@ class Factory
         return substr(__DIR__, 0, -strlen(self::SRC_DIRECTORY_NAME));
     }
 
-    private static function createDirectoryStorage() : string
-    {
-        return self::createDirectoryAppRoot() . 'storage/';
-    }
-
     private static function createDirectoryDocs() : string
     {
         return self::createDirectoryAppRoot() . 'docs/';
+    }
+
+    private static function createDirectoryStorage() : string
+    {
+        return self::createDirectoryAppRoot() . 'storage/';
     }
 
     private static function createDirectoryStorageApp() : string
@@ -411,11 +379,6 @@ class Factory
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
         return $streamHandler;
-    }
-
-    private static function getApplicationVersion(Config $config) : string
-    {
-        return $config->getAsString('APPLICATION_VERSION', self::DEFAULT_APPLICATION_VERSION);
     }
 
     private static function getLogLevel(Config $config) : string

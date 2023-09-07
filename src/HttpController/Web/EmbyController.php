@@ -24,10 +24,6 @@ class EmbyController
 
     public function deleteEmbyWebhookUrl() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->userApi->deleteEmbyWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
@@ -53,10 +49,6 @@ class EmbyController
 
     public function regenerateEmbyWebhookUrl() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $webhookId = $this->userApi->regenerateEmbyWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildEmbyWebhookUrl($webhookId)]));

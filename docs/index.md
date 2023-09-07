@@ -20,6 +20,7 @@
 <a href="https://movary.org" target="_blank" rel="noopener noreferrer">Website</a> •
 <a href="https://docs.movary.org/install/docker/" target="_blank" rel="noopener noreferrer">Installation</a> •
 <a href="https://docs.movary.org/" target="_blank" rel="noopener noreferrer">Docs</a> •
+<a href="https://api.movary.org/" target="_blank" rel="noopener noreferrer">Api</a> •
 <a href="https://demo.movary.org/" target="_blank" rel="noopener noreferrer">Demo</a>
 </p>
 

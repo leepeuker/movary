@@ -1,4 +1,4 @@
-name: Deploy mkdocs
+name: Deploy mkdocs to https://docs.movary.org
 
 on:
   release:

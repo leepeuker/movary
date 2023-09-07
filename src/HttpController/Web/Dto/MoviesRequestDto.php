@@ -27,9 +27,9 @@ class MoviesRequestDto
         int $limit,
         string $sortBy,
         SortOrder $sortOrder,
-        ?Year $releaseYear,
-        ?string $language,
-        ?string $genre,
+        ?Year $releaseYear = null,
+        ?string $language = null,
+        ?string $genre = null,
     ) : self {
         return new self(
             $userId,

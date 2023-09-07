@@ -24,10 +24,6 @@ class TwoFactorAuthenticationController
 
     public function createTotpUri() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $currentUserName = $this->authenticationService->getCurrentUser()->getName();
         $totp = $this->twoFactorAuthenticationFactory->createTotp($currentUserName);
 
@@ -41,10 +37,6 @@ class TwoFactorAuthenticationController
 
     public function disableTOTP() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->twoFactorAuthenticationApi->deleteTotp($this->authenticationService->getCurrentUserId());
         $this->sessionWrapper->set('twoFactorAuthenticationDisabled', true);
 
@@ -53,10 +45,6 @@ class TwoFactorAuthenticationController
 
     public function enableTOTP(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());
@@ -76,14 +64,6 @@ class TwoFactorAuthenticationController
 
     public function verifyTotp(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
-            );
-        }
-
         $userTotpInput = $request->getPostParameters()['totpCode'];
         $rememberMe = $this->sessionWrapper->find('rememberMe') ?? false;
         $userId = (int)$this->sessionWrapper->find('totpUserId');

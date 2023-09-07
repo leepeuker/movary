@@ -110,7 +110,7 @@ class JellyfinClient
     private function generateHeaders(?JellyfinAccessToken $jellyfinAccessToken = null) : array
     {
         $appName = $this->serverSettings->getJellyfinAppName();
-        $appVersion = $this->serverSettings->getApplicationVersion() ?? 'dev';
+        $appVersion = $this->serverSettings->getApplicationVersion();
         $deviceId = $this->serverSettings->requireJellyfinDeviceId();
 
         $authorizationString = 'MediaBrowser Client ="' . $appName . '", Device ="' . php_uname('s') . '", Version="' . $appVersion . '", DeviceId="' . $deviceId . '"';
