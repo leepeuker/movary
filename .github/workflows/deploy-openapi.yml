@@ -1,10 +1,6 @@
 name: Deploy openapi.json to https://api.movary.org
 
 on:
-  push:
-    branches:
-      - main
-      - add-actions-to-deploy-openapi-changes
   release:
     types: [published]
     paths:
@@ -38,4 +34,4 @@ jobs:
           username: ${{ secrets.DOCS_SSH_USER }}
           key: ${{ secrets.DOCS_SSH_KEY }}
           script: >
-            sed -i 's/"version": ""/"version": "1"/g' ${{ secrets.API_DEPLOYMENT_DIRECTORY }}/openapi.json
+            sed -i 's/"version": ""/"version": "${{ github.ref_name }}"/g' ${{ secrets.API_DEPLOYMENT_DIRECTORY }}/openapi.json
