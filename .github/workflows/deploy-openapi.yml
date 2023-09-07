@@ -1,0 +1,27 @@
+name: Deploy openapi.json to https://api.movary.org
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+    paths:
+      - docs/openapi.json
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: copy files
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.DOCS_SSH_HOST }}
+          username: ${{ secrets.DOCS_SSH_USER }}
+          key: ${{ secrets.DOCS_SSH_KEY }}
+          source: "docs/openapi.json"
+          target: ${{ secrets.API_DEPLOYMENT_DIRECTORY }}
+          strip_components: 1
