@@ -5,14 +5,14 @@ namespace Movary\HttpController\Web\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
-class UserIsAuthenticated
+class UserIsAuthenticated implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authentication $authenticationService,
     ) {
     }
 
-    public function main() : ?Response
+    public function __invoke() : ?Response
     {
         if ($this->authenticationService->isUserAuthenticated() === false) {
             return Response::createSeeOther("/login");

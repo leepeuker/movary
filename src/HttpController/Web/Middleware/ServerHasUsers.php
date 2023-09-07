@@ -5,19 +5,19 @@ namespace Movary\HttpController\Web\Middleware;
 use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Response;
 
-class ServerHasUsers
+class ServerHasUsers implements MiddlewareInterface
 {
     public function __construct(
         private readonly UserApi $userApi,
     ) {
     }
 
-    public function main() : ?Response
+    public function __invoke() : ?Response
     {
-        if ($this->userApi->hasUsers() === true) {
-            return Response::createSeeOther('/');
+        if ($this->userApi->hasUsers() === false) {
+            return null;
         }
 
-        return null;
+        return Response::createSeeOther('/');
     }
 }

@@ -27,19 +27,13 @@ class DashboardController
     ) {
     }
 
-    public function redirectToDashboard(Request $request) : Response
-    {
-        $user = $this->userPageAuthorizationChecker->findUserIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($user === null) {
-            return Response::createSeeOther('/');
-        }
-
-        return Response::createSeeOther('/users/' . $user->getName() . '/dashboard');
-    }
-
     public function render(Request $request) : Response
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        if ($userId === null) {
+            return Response::createSeeOther('/');
+        }
+
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
 
         return Response::create(

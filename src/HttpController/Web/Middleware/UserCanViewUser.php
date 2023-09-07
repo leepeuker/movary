@@ -3,23 +3,16 @@
 namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
-class UserCanViewUser
+class UserCanViewUser implements MiddlewareInterface
 {
     public function __construct(
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
     ) {
     }
 
-    public function main(Request $request) : ?Response
+    public function __invoke() : ?Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
-            return Response::createSeeOther('/');
-        }
-
-        return null;
     }
 }

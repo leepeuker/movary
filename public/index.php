@@ -16,7 +16,7 @@ $middlewareMethodName = 'main';
 
 try {
     $dispatcher = FastRoute\simpleDispatcher(
-        require(__DIR__ . '/../settings/routes.php')
+        require(__DIR__ . '/../settings/routes.php'),
     );
 
     $uri = $_SERVER['REQUEST_URI'];
@@ -39,14 +39,15 @@ try {
             $handler = $routeInfo[1]['handler'];
             $httpRequest->addRouteParameters($routeInfo[2]);
 
-            foreach($routeInfo[1]['middleware'] as $middleware) {
-                $middlewareResponse = $container->call([$middleware, $middlewareMethodName]);
-                if($middlewareResponse instanceof Response) {
+            foreach ($routeInfo[1]['middleware'] as $middleware) {
+                $middlewareResponse = $container->call($middleware, [$httpRequest]);
+
+                if ($middlewareResponse instanceof Response) {
                     $response = $middlewareResponse;
                     break 2;
                 }
             }
-            
+
             $response = $container->call($handler, [$httpRequest]);
             break;
         default:

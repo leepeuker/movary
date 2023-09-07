@@ -5,14 +5,14 @@ namespace Movary\HttpController\Web\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
-class UserIsUnauthenticated
+class UserIsUnauthenticated implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authentication $authenticationService,
     ) {
     }
 
-    public function main() : ?Response
+    public function __invoke() : ?Response
     {
         if ($this->authenticationService->isUserAuthenticated() === true) {
             $userName = $this->authenticationService->getCurrentUser()->getName();

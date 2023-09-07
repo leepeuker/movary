@@ -7,7 +7,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Response;
 
-class UserHasJellyfinToken
+class UserHasJellyfinToken implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authentication $authenticationService,
@@ -15,7 +15,8 @@ class UserHasJellyfinToken
     ) {
     }
 
-    public function main() : ?Response
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+    public function __invoke() : ?Response
     {
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->getCurrentUserId());
         if ($jellyfinAuthentication === null) {

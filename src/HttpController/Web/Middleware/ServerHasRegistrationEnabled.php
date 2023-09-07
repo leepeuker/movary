@@ -4,19 +4,19 @@ namespace Movary\HttpController\Web\Middleware;
 
 use Movary\ValueObject\Http\Response;
 
-class ServerHasRegistrationEnabled
+class ServerHasRegistrationEnabled implements MiddlewareInterface
 {
     public function __construct(
-        private bool $registrationEnabled,
+        private readonly bool $registrationEnabled,
     ) {
     }
 
     public function __invoke() : ?Response
     {
-        if ($this->registrationEnabled === true) {
-            return Response::createSeeOther("/");
+        if ($this->registrationEnabled === false) {
+            return null;
         }
 
-        return null;
+        return Response::createSeeOther("/");
     }
 }
