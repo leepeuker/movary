@@ -22,10 +22,6 @@ class MovieRatingController
 
     public function fetchMovieRatingByTmdbdId(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $tmdbId = $request->getGetParameters()['tmdbId'] ?? null;
 
@@ -43,10 +39,6 @@ class MovieRatingController
 
     public function updateRating(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {

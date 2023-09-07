@@ -25,10 +25,6 @@ class NetflixController
 
     public function importNetflixData(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $items = Json::decode($request->getBody());
 
@@ -43,10 +39,6 @@ class NetflixController
      */
     public function matchNetflixActivityCsvWithTmdbMovies(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $files = $request->getFileParameters();
         $postParameters = $request->getPostParameters();
         if (empty($files['netflixActivityCsv']) === true || empty($postParameters['netflixActivityCsvDateFormat']) === true) {
@@ -74,10 +66,6 @@ class NetflixController
 
     public function searchTmbd(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $input = Json::decode($request->getBody());
 
         $tmdbSearchResult = $this->tmdbApi->searchMovie($input['query']);

@@ -33,10 +33,6 @@ class JellyfinController
 
     public function authenticateJellyfinAccount(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $username = Json::decode($request->getBody())['username'];
@@ -65,10 +61,6 @@ class JellyfinController
 
     public function deleteJellyfinWebhookUrl() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->userApi->deleteJellyfinWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
@@ -94,10 +86,6 @@ class JellyfinController
 
     public function regenerateJellyfinWebhookUrl() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->getCurrentUserId());
 
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId)]));
@@ -105,10 +93,6 @@ class JellyfinController
 
     public function removeJellyfinAuthentication() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
 
@@ -131,10 +115,6 @@ class JellyfinController
 
     public function saveJellyfinServerUrl(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $jellyfinServerUrl = Json::decode($request->getBody())['JellyfinServerUrl'];
         $userId = $this->authenticationService->getCurrentUserId();
 
@@ -157,10 +137,6 @@ class JellyfinController
 
     public function saveJellyfinSyncOptions(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $syncWatches = Json::decode($request->getBody())['syncWatches'];
         $userId = $this->authenticationService->getCurrentUserId();
 
@@ -171,10 +147,6 @@ class JellyfinController
 
     public function verifyJellyfinServerUrl(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $jellyfinServerUrl = Url::createFromString(Json::decode($request->getBody())['jellyfinServerUrl']);
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->getCurrentUserId());
 

@@ -25,6 +25,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
+use Movary\HttpController\Middleware;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
@@ -97,14 +98,13 @@ class Factory
         );
     }
 
-    public static function createCreateUserController(ContainerInterface $container, Config $config) : CreateUserController
+    public static function createCreateUserController(ContainerInterface $container) : CreateUserController
     {
         return new CreateUserController(
             $container->get(Twig\Environment::class),
             $container->get(Authentication::class),
             $container->get(UserApi::class),
             $container->get(SessionWrapper::class),
-            $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
 
@@ -177,15 +177,6 @@ class Factory
         );
     }
 
-    public static function createOpenApiController(ContainerInterface $container) : OpenApiController
-    {
-        return new OpenApiController(
-            $container->get(File::class),
-            $container->get(ServerSettings::class),
-            self::createDirectoryDocs(),
-        );
-    }
-
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client(['timeout' => 4]);
@@ -208,7 +199,6 @@ class Factory
         return new JobController(
             $container->get(Authentication::class),
             $container->get(JobQueueApi::class),
-            $container->get(UserApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
             self::createDirectoryStorageApp()
@@ -227,8 +217,6 @@ class Factory
     {
         return new LandingPageController(
             $container->get(Twig\Environment::class),
-            $container->get(Authentication::class),
-            $container->get(UserApi::class),
             $container->get(SessionWrapper::class),
             $config->getAsBool('ENABLE_REGISTRATION', false),
             $config->getAsStringNullable('DEFAULT_LOGIN_EMAIL'),
@@ -260,6 +248,22 @@ class Factory
         }
 
         return $logger;
+    }
+
+    public static function createMiddlewareServerHasRegistrationEnabled(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
+    {
+        return new HttpController\Web\Middleware\ServerHasRegistrationEnabled(
+            $config->getAsBool('ENABLE_REGISTRATION', false)
+        );
+    }
+
+    public static function createOpenApiController(ContainerInterface $container) : OpenApiController
+    {
+        return new OpenApiController(
+            $container->get(File::class),
+            $container->get(ServerSettings::class),
+            self::createDirectoryDocs(),
+        );
     }
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
@@ -374,14 +378,14 @@ class Factory
         return substr(__DIR__, 0, -strlen(self::SRC_DIRECTORY_NAME));
     }
 
-    private static function createDirectoryStorage() : string
-    {
-        return self::createDirectoryAppRoot() . 'storage/';
-    }
-
     private static function createDirectoryDocs() : string
     {
         return self::createDirectoryAppRoot() . 'docs/';
+    }
+
+    private static function createDirectoryStorage() : string
+    {
+        return self::createDirectoryAppRoot() . 'storage/';
     }
 
     private static function createDirectoryStorageApp() : string

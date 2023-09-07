@@ -57,10 +57,6 @@ class SettingsController
 
     public function deleteAccount() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
 
@@ -83,10 +79,6 @@ class SettingsController
 
     public function deleteApiToken() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->userApi->deleteApiToken($this->authenticationService->getCurrentUserId());
 
         return Response::createOk();
@@ -94,10 +86,6 @@ class SettingsController
 
     public function deleteHistory() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
 
         $this->sessionWrapper->set('deletedUserHistory', true);
@@ -111,10 +99,6 @@ class SettingsController
 
     public function deleteRatings() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
 
         $this->sessionWrapper->set('deletedUserRatings', true);
@@ -128,10 +112,6 @@ class SettingsController
 
     public function generateLetterboxdExportData() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $options = new ZipStream\Option\Archive();
@@ -152,10 +132,6 @@ class SettingsController
 
     public function getApiToken() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         return Response::createJson(Json::encode(['token' => $this->userApi->findApiTokenByUserId($userId)]));
@@ -163,10 +139,6 @@ class SettingsController
 
     public function regenerateApiToken() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $this->userApi->deleteApiToken($userId);
@@ -177,10 +149,6 @@ class SettingsController
 
     public function renderAppPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-app.html.twig', [
@@ -193,10 +161,6 @@ class SettingsController
 
     public function renderDashboardAccountPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $user = $this->authenticationService->getCurrentUser();
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($user);
@@ -215,10 +179,6 @@ class SettingsController
 
     public function renderDataAccountPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
@@ -255,10 +215,6 @@ class SettingsController
 
     public function renderEmbyPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
@@ -280,10 +236,6 @@ class SettingsController
 
     public function renderGeneralAccountPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $user = $this->authenticationService->getCurrentUser();
 
         return Response::create(
@@ -304,10 +256,6 @@ class SettingsController
 
     public function renderJellyfinPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
@@ -343,10 +291,6 @@ class SettingsController
 
     public function renderLetterboxdPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         $letterboxdDiarySyncSuccessful = $this->sessionWrapper->find('letterboxdDiarySyncSuccessful');
@@ -375,10 +319,6 @@ class SettingsController
 
     public function renderNetflixPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-netflix.html.twig'),
@@ -387,10 +327,6 @@ class SettingsController
 
     public function renderPlexPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $plexAccessToken = null;
         $plexIdentifier = $this->serverSettings->getPlexIdentifier();
 
@@ -433,10 +369,6 @@ class SettingsController
 
     public function renderSecurityAccountPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $user = $this->authenticationService->getCurrentUser();
 
         $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
@@ -462,14 +394,6 @@ class SettingsController
 
     public function renderServerEmailPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-email.html.twig', [
@@ -493,14 +417,6 @@ class SettingsController
 
     public function renderServerGeneralPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-general.html.twig', [
@@ -514,14 +430,6 @@ class SettingsController
 
     public function renderServerJobsPage(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
 
         $jobs = $this->jobQueueApi->fetchJobsForStatusPage((int)$jobsPerPage);
@@ -537,14 +445,6 @@ class SettingsController
 
     public function renderServerUsersPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-users.html.twig'),
@@ -553,10 +453,6 @@ class SettingsController
 
     public function renderTraktPage() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $traktCredentialsUpdated = $this->sessionWrapper->find('traktCredentialsUpdated');
         $scheduledTraktHistoryImport = $this->sessionWrapper->find('scheduledTraktHistoryImport');
         $scheduledTraktRatingsImport = $this->sessionWrapper->find('scheduledTraktRatingsImport');
@@ -580,10 +476,6 @@ class SettingsController
 
     public function resetDashboardRows() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $this->userApi->updateVisibleDashboardRows($userId, null);
@@ -597,14 +489,6 @@ class SettingsController
 
     public function sendTestEmail(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $requestData = Json::decode($request->getBody());
 
         $smtpConfig = SmtpConfig::create(
@@ -633,10 +517,6 @@ class SettingsController
 
     public function traktVerifyCredentials(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $requestData = Json::decode($request->getBody());
 
         $clientId = $requestData['clientId'] ?? '';
@@ -651,10 +531,6 @@ class SettingsController
 
     public function updateDashboardRows(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $bodyData = Json::decode($request->getBody());
 
@@ -675,10 +551,6 @@ class SettingsController
 
     public function updateEmby(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $postParameters = Json::decode($request->getBody());
@@ -692,10 +564,6 @@ class SettingsController
 
     public function updateGeneral(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $requestData = Json::decode($request->getBody());
 
         $privacyLevel = isset($requestData['privacyLevel']) === false ? 1 : (int)$requestData['privacyLevel'];
@@ -721,10 +589,6 @@ class SettingsController
 
     public function updateJellyfin(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
 
         $postParameters = Json::decode($request->getBody());
@@ -738,10 +602,6 @@ class SettingsController
 
     public function updatePassword(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
 
@@ -769,10 +629,6 @@ class SettingsController
 
     public function updatePlex(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = Json::decode($request->getBody());
 
@@ -787,14 +643,6 @@ class SettingsController
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function updateServerEmail(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createForbidden();
-        }
-
         $requestData = Json::decode($request->getBody());
 
         $smtpHost = isset($requestData['smtpHost']) === false ? null : $requestData['smtpHost'];
@@ -832,14 +680,6 @@ class SettingsController
 
     public function updateServerGeneral(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createForbidden();
-        }
-
         $requestData = Json::decode($request->getBody());
 
         $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
@@ -857,10 +697,6 @@ class SettingsController
 
     public function updateTrakt(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther('/');
-        }
-
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 

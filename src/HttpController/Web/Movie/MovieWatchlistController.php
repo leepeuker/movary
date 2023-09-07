@@ -17,10 +17,6 @@ class MovieWatchlistController
 
     public function addToWatchlist(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $movieId = (int)$request->getRouteParameters()['id'];
         $userId = $this->authenticationService->getCurrentUser()->getId();
 
@@ -31,10 +27,6 @@ class MovieWatchlistController
 
     public function removeFromWatchlist(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createForbidden();
-        }
-
         $movieId = (int)$request->getRouteParameters()['id'];
         $userId = $this->authenticationService->getCurrentUser()->getId();
 

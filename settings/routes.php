@@ -1,147 +1,174 @@
 <?php declare(strict_types=1);
 
 use Movary\HttpController\Api;
+use Movary\HttpController\Middleware;
 use Movary\HttpController\Web;
+use Movary\Service\Router\Dto\RouteList;
+use Movary\Service\Router\RouterService;
 
-return static function (FastRoute\RouteCollector $routeCollector) {
-    $routeCollector->addGroup('', fn(FastRoute\RouteCollector $routeCollector) => addWebRoutes($routeCollector));
-    $routeCollector->addGroup('/api', fn(FastRoute\RouteCollector $routeCollector) => addApiRoutes($routeCollector));
+return function (FastRoute\RouteCollector $routeCollector) {
+    $routerService = new RouterService();
+
+    $routeCollector->addGroup('', fn($routeCollector) => addWebRoutes($routerService, $routeCollector));
+    $routeCollector->addGroup('/api', fn($routeCollector) => addApiRoutes($routerService, $routeCollector));
 };
 
-function addWebRoutes(FastRoute\RouteCollector $routeCollector) : void
+function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
 {
-    $routeCollector->addRoute('GET', '/', [Web\LandingPageController::class, 'render']);
-    $routeCollector->addRoute('POST', '/login', [Web\AuthenticationController::class, 'login']);
-    $routeCollector->addRoute('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage']);
-    $routeCollector->addRoute('POST', '/verify-totp', [Web\TwoFactorAuthenticationController::class, 'verifyTotp']);
-    $routeCollector->addRoute('GET', '/logout', [Web\AuthenticationController::class, 'logout']);
-    $routeCollector->addRoute('POST', '/create-user', [Web\CreateUserController::class, 'createUser']);
-    $routeCollector->addRoute('GET', '/create-user', [Web\CreateUserController::class, 'renderPage']);
-    $routeCollector->addRoute('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
+    $routes = RouteList::create();
+
+    $routes->add('GET', '/', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
+    $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
+    $routes->add('POST', '/login', [Web\AuthenticationController::class, 'login']);
+    $routes->add('POST', '/verify-totp', [Web\TwoFactorAuthenticationController::class, 'verifyTotp'], [Web\Middleware\UserIsUnauthenticated::class]);
+    $routes->add('GET', '/logout', [Web\AuthenticationController::class, 'logout']);
+    $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
+        Web\Middleware\UserIsUnauthenticated::class,
+        Web\Middleware\ServerHasUsers::class,
+        Web\Middleware\ServerHasRegistrationEnabled::class
+    ]);
+    $routes->add('GET', '/create-user', [Web\CreateUserController::class, 'renderPage'], [
+        Web\Middleware\UserIsUnauthenticated::class,
+        Web\Middleware\ServerHasUsers::class,
+        Web\Middleware\ServerHasRegistrationEnabled::class
+    ]);
+    $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
 
     #####################
     # Webhook listeners #
     #####################
-    $routeCollector->addRoute('POST', '/plex/{id:.+}', [Web\PlexController::class, 'handlePlexWebhook']);
-    $routeCollector->addRoute('POST', '/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook']);
-    $routeCollector->addRoute('POST', '/emby/{id:.+}', [Web\EmbyController::class, 'handleEmbyWebhook']);
+    $routes->add('POST', '/plex/{id:.+}', [Web\PlexController::class, 'handlePlexWebhook']);
+    $routes->add('POST', '/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook']);
+    $routes->add('POST', '/emby/{id:.+}', [Web\EmbyController::class, 'handleEmbyWebhook']);
 
     #############
     # Job Queue #
     #############
-    $routeCollector->addRoute('GET', '/jobs', [Web\JobController::class, 'getJobs']);
-    $routeCollector->addRoute('GET', '/job-queue/purge-processed', [Web\JobController::class, 'purgeProcessedJobs']);
-    $routeCollector->addRoute('GET', '/job-queue/purge-all', [Web\JobController::class, 'purgeAllJobs']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync']);
-    $routeCollector->addRoute('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport']);
-    $routeCollector->addRoute('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory']);
-    $routeCollector->addRoute('GET', '/jobs/schedule/jellyfin-export-history', [Web\JobController::class, 'scheduleJellyfinExportHistory']);
+    $routes->add('GET', '/jobs', [Web\JobController::class, 'getJobs'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/job-queue/purge-processed', [Web\JobController::class, 'purgeProcessedJobs'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/job-queue/purge-all', [Web\JobController::class, 'purgeAllJobs'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/jobs/schedule/jellyfin-export-history', [Web\JobController::class, 'scheduleJellyfinExportHistory'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserHasJellyfinToken::class
+    ]);
 
     ############
     # Settings #
     ############
-    $routeCollector->addRoute('GET', '/settings/account/general', [Web\SettingsController::class, 'renderGeneralAccountPage']);
-    $routeCollector->addRoute('GET', '/settings/account/general/api-token', [Web\SettingsController::class, 'getApiToken'],);
-    $routeCollector->addRoute('DELETE', '/settings/account/general/api-token', [Web\SettingsController::class, 'deleteApiToken'],);
-    $routeCollector->addRoute('PUT', '/settings/account/general/api-token', [Web\SettingsController::class, 'regenerateApiToken'],);
-    $routeCollector->addRoute('GET', '/settings/account/dashboard', [Web\SettingsController::class, 'renderDashboardAccountPage']);
-    $routeCollector->addRoute('GET', '/settings/account/security', [Web\SettingsController::class, 'renderSecurityAccountPage']);
-    $routeCollector->addRoute('GET', '/settings/account/data', [Web\SettingsController::class, 'renderDataAccountPage']);
-    $routeCollector->addRoute('GET', '/settings/server/general', [Web\SettingsController::class, 'renderServerGeneralPage']);
-    $routeCollector->addRoute('GET', '/settings/server/jobs', [Web\SettingsController::class, 'renderServerJobsPage']);
-    $routeCollector->addRoute('POST', '/settings/server/general', [Web\SettingsController::class, 'updateServerGeneral']);
-    $routeCollector->addRoute('GET', '/settings/server/users', [Web\SettingsController::class, 'renderServerUsersPage']);
-    $routeCollector->addRoute('GET', '/settings/server/email', [Web\SettingsController::class, 'renderServerEmailPage']);
-    $routeCollector->addRoute('POST', '/settings/server/email', [Web\SettingsController::class, 'updateServerEmail']);
-    $routeCollector->addRoute('POST', '/settings/server/email-test', [Web\SettingsController::class, 'sendTestEmail']);
-    $routeCollector->addRoute('POST', '/settings/account', [Web\SettingsController::class, 'updateGeneral']);
-    $routeCollector->addRoute('POST', '/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword']);
-    $routeCollector->addRoute('POST', '/settings/account/security/create-totp-uri', [Web\TwoFactorAuthenticationController::class, 'createTotpUri']);
-    $routeCollector->addRoute('POST', '/settings/account/security/disable-totp', [Web\TwoFactorAuthenticationController::class, 'disableTotp']);
-    $routeCollector->addRoute('POST', '/settings/account/security/enable-totp', [Web\TwoFactorAuthenticationController::class, 'enableTotp']);
-    $routeCollector->addRoute('GET', '/settings/account/export/csv/{exportType:.+}', [Web\ExportController::class, 'getCsvExport']);
-    $routeCollector->addRoute('POST', '/settings/account/import/csv/{exportType:.+}', [Web\ImportController::class, 'handleCsvImport']);
-    $routeCollector->addRoute('GET', '/settings/account/delete-ratings', [Web\SettingsController::class, 'deleteRatings']);
-    $routeCollector->addRoute('GET', '/settings/account/delete-history', [Web\SettingsController::class, 'deleteHistory']);
-    $routeCollector->addRoute('GET', '/settings/account/delete-account', [Web\SettingsController::class, 'deleteAccount']);
-    $routeCollector->addRoute('POST', '/settings/account/update-dashboard-rows', [Web\SettingsController::class, 'updateDashboardRows']);
-    $routeCollector->addRoute('POST', '/settings/account/reset-dashboard-rows', [Web\SettingsController::class, 'resetDashboardRows']);
-    $routeCollector->addRoute('GET', '/settings/integrations/trakt', [Web\SettingsController::class, 'renderTraktPage']);
-    $routeCollector->addRoute('POST', '/settings/trakt', [Web\SettingsController::class, 'updateTrakt']);
-    $routeCollector->addRoute('POST', '/settings/trakt/verify-credentials', [Web\SettingsController::class, 'traktVerifyCredentials']);
-    $routeCollector->addRoute('GET', '/settings/integrations/letterboxd', [Web\SettingsController::class, 'renderLetterboxdPage']);
-    $routeCollector->addRoute('GET', '/settings/letterboxd-export', [Web\SettingsController::class, 'generateLetterboxdExportData']);
-    $routeCollector->addRoute('GET', '/settings/integrations/plex', [Web\SettingsController::class, 'renderPlexPage']);
-    $routeCollector->addRoute('GET', '/settings/plex/logout', [Web\PlexController::class, 'removePlexAccessTokens']);
-    $routeCollector->addRoute('POST', '/settings/plex/server-url-save', [Web\PlexController::class, 'savePlexServerUrl']);
-    $routeCollector->addRoute('POST', '/settings/plex/server-url-verify', [Web\PlexController::class, 'verifyPlexServerUrl']);
-    $routeCollector->addRoute('GET', '/settings/plex/authentication-url', [Web\PlexController::class, 'generatePlexAuthenticationUrl']);
-    $routeCollector->addRoute('GET', '/settings/plex/callback', [Web\PlexController::class, 'processPlexCallback']);
-    $routeCollector->addRoute('POST', '/settings/plex', [Web\SettingsController::class, 'updatePlex']);
-    $routeCollector->addRoute('PUT', '/settings/plex/webhook', [Web\PlexController::class, 'regeneratePlexWebhookUrl']);
-    $routeCollector->addRoute('DELETE', '/settings/plex/webhook', [Web\PlexController::class, 'deletePlexWebhookUrl']);
-    $routeCollector->addRoute('GET', '/settings/integrations/jellyfin', [Web\SettingsController::class, 'renderJellyfinPage']);
-    $routeCollector->addRoute('POST', '/settings/jellyfin', [Web\SettingsController::class, 'updateJellyfin']);
-    $routeCollector->addRoute('POST', '/settings/jellyfin/sync', [Web\JellyfinController::class, 'saveJellyfinSyncOptions']);
-    $routeCollector->addRoute('POST', '/settings/jellyfin/authenticate', [Web\JellyfinController::class, 'authenticateJellyfinAccount']);
-    $routeCollector->addRoute('POST', '/settings/jellyfin/remove-authentication', [Web\JellyfinController::class, 'removeJellyfinAuthentication']);
-    $routeCollector->addRoute('POST', '/settings/jellyfin/server-url-save', [Web\JellyfinController::class, 'saveJellyfinServerUrl']);
-    $routeCollector->addRoute('POST', '/settings/jellyfin/server-url-verify', [Web\JellyfinController::class, 'verifyJellyfinServerUrl']);
-    $routeCollector->addRoute('GET', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'getJellyfinWebhookUrl']);
-    $routeCollector->addRoute('PUT', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'regenerateJellyfinWebhookUrl']);
-    $routeCollector->addRoute('DELETE', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'deleteJellyfinWebhookUrl']);
-    $routeCollector->addRoute('GET', '/settings/integrations/emby', [Web\SettingsController::class, 'renderEmbyPage']);
-    $routeCollector->addRoute('POST', '/settings/emby', [Web\SettingsController::class, 'updateEmby']);
-    $routeCollector->addRoute('GET', '/settings/emby/webhook', [Web\EmbyController::class, 'getEmbyWebhookUrl']);
-    $routeCollector->addRoute('PUT', '/settings/emby/webhook', [Web\EmbyController::class, 'regenerateEmbyWebhookUrl']);
-    $routeCollector->addRoute('DELETE', '/settings/emby/webhook', [Web\EmbyController::class, 'deleteEmbyWebhookUrl']);
-    $routeCollector->addRoute('GET', '/settings/app', [Web\SettingsController::class, 'renderAppPage']);
-    $routeCollector->addRoute('GET', '/settings/integrations/netflix', [Web\SettingsController::class, 'renderNetflixPage']);
-    $routeCollector->addRoute('POST', '/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies']);
-    $routeCollector->addRoute('POST', '/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData']);
-    $routeCollector->addRoute('POST', '/settings/netflix/search', [Web\NetflixController::class, 'searchTmbd']);
-    $routeCollector->addRoute('GET', '/settings/users', [Web\UserController::class, 'fetchUsers']);
-    $routeCollector->addRoute('POST', '/settings/users', [Web\UserController::class, 'createUser']);
-    $routeCollector->addRoute('PUT', '/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser']);
-    $routeCollector->addRoute('DELETE', '/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser']);
+    $routes->add('GET', '/settings/account/general', [Web\SettingsController::class, 'renderGeneralAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/general/api-token', [Web\SettingsController::class, 'getApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/account/general/api-token', [Web\SettingsController::class, 'deleteApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/account/general/api-token', [Web\SettingsController::class, 'regenerateApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/dashboard', [Web\SettingsController::class, 'renderDashboardAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/security', [Web\SettingsController::class, 'renderSecurityAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/data', [Web\SettingsController::class, 'renderDataAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/server/general', [Web\SettingsController::class, 'renderServerGeneralPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/server/jobs', [Web\SettingsController::class, 'renderServerJobsPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/settings/server/general', [Web\SettingsController::class, 'updateServerGeneral'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('GET', '/settings/server/users', [Web\SettingsController::class, 'renderServerUsersPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/settings/server/email', [Web\SettingsController::class, 'renderServerEmailPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/settings/server/email', [Web\SettingsController::class, 'updateServerEmail'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/settings/server/email-test', [Web\SettingsController::class, 'sendTestEmail'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('POST', '/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/security/create-totp-uri', [Web\TwoFactorAuthenticationController::class, 'createTotpUri'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/security/disable-totp', [Web\TwoFactorAuthenticationController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/security/enable-totp', [Web\TwoFactorAuthenticationController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/export/csv/{exportType:.+}', [Web\ExportController::class, 'getCsvExport'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/import/csv/{exportType:.+}', [Web\ImportController::class, 'handleCsvImport'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/delete-ratings', [Web\SettingsController::class, 'deleteRatings'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/delete-history', [Web\SettingsController::class, 'deleteHistory'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/delete-account', [Web\SettingsController::class, 'deleteAccount'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/update-dashboard-rows', [Web\SettingsController::class, 'updateDashboardRows'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/reset-dashboard-rows', [Web\SettingsController::class, 'resetDashboardRows'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/trakt', [Web\SettingsController::class, 'renderTraktPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/trakt', [Web\SettingsController::class, 'updateTrakt'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/trakt/verify-credentials', [Web\SettingsController::class, 'traktVerifyCredentials'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/letterboxd', [Web\SettingsController::class, 'renderLetterboxdPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/letterboxd-export', [Web\SettingsController::class, 'generateLetterboxdExportData'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/plex', [Web\SettingsController::class, 'renderPlexPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/plex/logout', [Web\PlexController::class, 'removePlexAccessTokens'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/plex/server-url-save', [Web\PlexController::class, 'savePlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/plex/server-url-verify', [Web\PlexController::class, 'verifyPlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/plex/authentication-url', [Web\PlexController::class, 'generatePlexAuthenticationUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/plex/callback', [Web\PlexController::class, 'processPlexCallback'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/plex', [Web\SettingsController::class, 'updatePlex'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/plex/webhook', [Web\PlexController::class, 'regeneratePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/plex/webhook', [Web\PlexController::class, 'deletePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/jellyfin', [Web\SettingsController::class, 'renderJellyfinPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/jellyfin', [Web\SettingsController::class, 'updateJellyfin'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/jellyfin/sync', [Web\JellyfinController::class, 'saveJellyfinSyncOptions'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/jellyfin/authenticate', [Web\JellyfinController::class, 'authenticateJellyfinAccount'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/jellyfin/remove-authentication', [Web\JellyfinController::class, 'removeJellyfinAuthentication'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/jellyfin/server-url-save', [Web\JellyfinController::class, 'saveJellyfinServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/jellyfin/server-url-verify', [Web\JellyfinController::class, 'verifyJellyfinServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'getJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'regenerateJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'deleteJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/emby', [Web\SettingsController::class, 'renderEmbyPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/emby', [Web\SettingsController::class, 'updateEmby'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/emby/webhook', [Web\EmbyController::class, 'getEmbyWebhookUrl']);
+    $routes->add('PUT', '/settings/emby/webhook', [Web\EmbyController::class, 'regenerateEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/emby/webhook', [Web\EmbyController::class, 'deleteEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/app', [Web\SettingsController::class, 'renderAppPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/netflix', [Web\SettingsController::class, 'renderNetflixPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/netflix/search', [Web\NetflixController::class, 'searchTmbd'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/users', [Web\UserController::class, 'fetchUsers']);
+    $routes->add('POST', '/settings/users', [Web\UserController::class, 'createUser']);
+    $routes->add('PUT', '/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class]);
 
     ##########
     # Movies #
     ##########
-    $routeCollector->addRoute('GET', '/movies/{id:[0-9]+}/refresh-tmdb', [Web\Movie\MovieController::class, 'refreshTmdbData']);
-    $routeCollector->addRoute('GET', '/movies/{id:[0-9]+}/refresh-imdb', [Web\Movie\MovieController::class, 'refreshImdbRating']);
-    $routeCollector->addRoute('GET', '/movies/{id:[0-9]+}/watch-providers', [Web\Movie\MovieWatchProviderController::class, 'getWatchProviders']);
-    $routeCollector->addRoute('GET', '/movies/{id:[0-9]+}/add-watchlist', [Web\Movie\MovieWatchlistController::class, 'addToWatchlist']);
-    $routeCollector->addRoute('GET', '/movies/{id:[0-9]+}/remove-watchlist', [Web\Movie\MovieWatchlistController::class, 'removeFromWatchlist']);
+    $routes->add('GET', '/movies/{id:[0-9]+}/refresh-tmdb', [Web\Movie\MovieController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/movies/{id:[0-9]+}/refresh-imdb', [Web\Movie\MovieController::class, 'refreshImdbRating'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/movies/{id:[0-9]+}/watch-providers', [Web\Movie\MovieWatchProviderController::class, 'getWatchProviders']);
+    $routes->add('GET', '/movies/{id:[0-9]+}/add-watchlist', [Web\Movie\MovieWatchlistController::class, 'addToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/movies/{id:[0-9]+}/remove-watchlist', [Web\Movie\MovieWatchlistController::class, 'removeFromWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
 
     ##############
     # User media #
     ##############
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard', [Web\DashboardController::class, 'render']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Web\HistoryController::class, 'renderHistory']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Web\WatchlistController::class, 'renderWatchlist']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/movies', [Web\MoviesController::class, 'renderPage']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/actors', [Web\ActorsController::class, 'renderPage']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/directors', [Web\DirectorsController::class, 'renderPage']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}', [Web\Movie\MovieController::class, 'renderPage']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}', [Web\PersonController::class, 'renderPage']);
-    $routeCollector->addRoute('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [Web\HistoryController::class, 'deleteHistoryEntry']);
-    $routeCollector->addRoute('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [Web\HistoryController::class, 'createHistoryEntry']);
-    $routeCollector->addRoute('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [Web\Movie\MovieRatingController::class, 'updateRating']);
-    $routeCollector->addRoute('POST', '/log-movie', [Web\HistoryController::class, 'logMovie']);
-    $routeCollector->addRoute('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist']);
-    $routeCollector->addRoute('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard', [Web\DashboardController::class, 'render']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Web\HistoryController::class, 'renderHistory']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Web\WatchlistController::class, 'renderWatchlist']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies', [Web\MoviesController::class, 'renderPage']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/actors', [Web\ActorsController::class, 'renderPage']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/directors', [Web\DirectorsController::class, 'renderPage']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}', [Web\Movie\MovieController::class, 'renderPage']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}', [Web\PersonController::class, 'renderPage']);
+    $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [Web\HistoryController::class, 'deleteHistoryEntry'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [Web\HistoryController::class, 'createHistoryEntry'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [
+        Web\Movie\MovieRatingController::class,
+        'updateRating'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class]);
 
-    // Added last, so that more specific routes can be defined (possible username vs route collisions here!)
-    $routeCollector->addRoute('GET', '/{username:[a-zA-Z0-9]+}[/]', [Web\DashboardController::class, 'redirectToDashboard']);
+    $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }
 
-function addApiRoutes(FastRoute\RouteCollector $routeCollector) : void
+function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
 {
-    $routeCollector->addRoute('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory']);
-    $routeCollector->addRoute('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist']);
+    $routes = RouteList::create();
+
+    $routes->add('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist']);
+
+    $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

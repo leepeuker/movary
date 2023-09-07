@@ -13,8 +13,6 @@ class LandingPageController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Authentication $authenticationService,
-        private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly bool $registrationEnabled,
         private readonly ?string $defaultEmail,
@@ -24,16 +22,6 @@ class LandingPageController
 
     public function render() : Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            $userName = $this->authenticationService->getCurrentUser()->getName();
-
-            return Response::createSeeOther("/users/$userName/dashboard");
-        }
-
-        if ($this->userApi->hasUsers() === false) {
-            return Response::createSeeOther('/create-user');
-        }
-
         $failedLogin = $this->sessionWrapper->has('failedLogin');
         $deletedAccount = $this->sessionWrapper->has('deletedAccount');
         $invalidTotpCode = $this->sessionWrapper->has('invalidTotpCode');
