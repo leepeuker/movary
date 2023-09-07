@@ -1,6 +1,10 @@
 name: Deploy openapi.json to https://api.movary.org
 
 on:
+  push:
+    branches:
+      - main
+      - add-actions-to-deploy-openapi-changes
   release:
     types: [published]
     paths:
