@@ -104,6 +104,9 @@ class HistoryController
     public function renderHistory(Request $request) : Response
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        if ($userId === null) {
+            return Response::createNotFound();
+        }
 
         $searchTerm = $request->getGetParameters()['s'] ?? null;
         $page = $request->getGetParameters()['p'] ?? 1;
