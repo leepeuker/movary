@@ -280,7 +280,7 @@ class SettingsController
                 'isActive' => $applicationUrl !== null,
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'jellyfinServerUrl' => $jellyfinServerUrl,
-                'jellyfinisAuthenticated' => $jellyfinAuthentication !== null,
+                'jellyfinIsAuthenticated' => $jellyfinAuthentication !== null,
                 'jellyfinUsername' => $jellyfinUsername?->getUsername(),
                 'jellyfinDeviceId' => $jellyfinDeviceId,
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),

@@ -98,7 +98,7 @@
                 </div>
             </div>
 
-            <div id="authenticateWithJellyfinDiv" class="{% if jellyfinisAuthenticated == true %}d-none{% endif %}">
+            <div id="authenticateWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == true %}d-none{% endif %}">
                 <button type="button"
                         class="btn btn-primary mb-3"
                         data-bs-toggle="modal"
@@ -108,7 +108,7 @@
                     Authenticate
                 </button>
             </div>
-            <div id="removeAuthenticationWithJellyfinDiv" class="{% if jellyfinisAuthenticated == false %}d-none{% endif %}">
+            <div id="removeAuthenticationWithJellyfinDiv" class="{% if jellyfinIsAuthenticated == false %}d-none{% endif %}">
                 <button type="button" class="btn btn-danger mb-3" onclick="removeJellyfinAuthentication()">Remove Authentication</button>
                 <p>Username: {{ jellyfinUsername }}</p>
             </div>
@@ -212,7 +212,7 @@
             <h5>Jellyfin sync</h5>
 
             <div id="alertJellyfinSyncDiv">
-                <div class="alert alert-warning {% if jellyfinisAuthenticated == true %}d-none{% endif %}"
+                <div class="alert alert-warning {% if jellyfinIsAuthenticated == true %}d-none{% endif %}"
                      role="alert"
                      style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
                     Sync disabled - Authentication required
@@ -230,7 +230,7 @@
                         data-bs-target="#importHistoryModal"
                         data-bs-toggle="modal"
                         id="jellyfinHistoryImportButton"
-                        {% if jellyfinisAuthenticated == false %}disabled{% endif %}>
+                        {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>
                     Import history from Jellyfin
                 </button>
             </div>
@@ -246,7 +246,7 @@
                         data-bs-target="#exportHistoryModal"
                         data-bs-toggle="modal"
                         id="jellyfinHistoryExportButton"
-                        {% if jellyfinisAuthenticated == false %}disabled{% endif %}>
+                        {% if jellyfinIsAuthenticated == false %}disabled{% endif %}>
                     Export history to Jellyfin
                 </button>
             </div>
@@ -257,7 +257,7 @@
                        value="1"
                        id="automaticWatchStateSyncCheckbox"
                        name="scrobbleWatches"
-                       {% if jellyfinisAuthenticated == false %}disabled{% endif %}
+                       {% if jellyfinIsAuthenticated == false %}disabled{% endif %}
                         {% if jellyfinSyncEnabled == true %}checked{% endif %}
                        style="margin-right: 0.2rem">
                 <label class="form-check-label" for="automaticWatchStateSyncCheckbox">Automatically export history changes to Jellyfin</label>
@@ -265,7 +265,7 @@
 
             <div id="alertJellyfinSyncOptionsDiv"></div>
 
-            <button type="submit" class="btn btn-primary" {% if jellyfinisAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save
+            <button type="submit" class="btn btn-primary" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save
             </button>
         </div>
 
