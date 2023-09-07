@@ -1,6 +1,6 @@
 version: 2
 updates:
   - package-ecosystem: "composer"
-    directory: "/" # Location of package manifests
+    directory: "/"
     schedule:
       interval: "weekly"
