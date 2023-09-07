@@ -1,13 +1,13 @@
-name: Deploy mkdocs to https://docs.movary.org
+name: Deploy openapi.json to https://api.movary.org
 
 on:
   release:
     types: [published]
     paths:
-      - docs/**
-      - mkdocs.yml
+      - docs/openapi.json
 
 jobs:
+
 
   build:
     name: Build
@@ -20,14 +20,15 @@ jobs:
           host: ${{ secrets.DOCS_SSH_HOST }}
           username: ${{ secrets.DOCS_SSH_USER }}
           key: ${{ secrets.DOCS_SSH_KEY }}
-          source: "mkdocs.yml,docs/*"
-          target: ${{ secrets.DOCS_DEPLOYMENT_DIRECTORY }}
-          rm: true
+          source: "docs/openapi.json"
+          target: ${{ secrets.API_DEPLOYMENT_DIRECTORY }}
+          strip_components: 1
       - uses: actions/checkout@v3
-      - name: restart docker containers
+      - name: update openapi application version
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.DOCS_SSH_HOST }}
           username: ${{ secrets.DOCS_SSH_USER }}
           key: ${{ secrets.DOCS_SSH_KEY }}
-          script: cd ${{ secrets.DOCS_DEPLOYMENT_DIRECTORY }}/.. && docker compose restart
+          script: >
+            sed -i 's/"version": ""/"version": "${{ github.ref_name }}"/g' ${{ secrets.API_DEPLOYMENT_DIRECTORY }}/openapi.json

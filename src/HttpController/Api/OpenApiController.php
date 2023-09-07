@@ -22,6 +22,7 @@ class OpenApiController
 
         $openapiData['info']['version'] = $this->serverSettings->getApplicationVersion();
 
+        $openapiData['servers'][0]['url'] = '/api';
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         if ($applicationUrl !== null) {
             $openapiData['servers'][0]['url'] = trim($applicationUrl, '/') . '/api';
