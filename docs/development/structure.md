@@ -69,7 +69,7 @@ A DTO that is frequently used and accesssed, is the `UserEntity`, which is the c
 
 Why not just use an associative (or JSON?) array instead of this complicated class? Well, this ensures that the received information will always be send and received in the same shape, with no modifications at all. Every single class property will always exist, 100% guaranteed (though the values sometimes don't exist if they're nullable) which can't be said for a JSON array or a normal associative array.
 
-For a different (perhaps better) explanation, visit this [Stackoverflow thread])(https://stackoverflow.com/q/1051182/12096297)
+For a different (perhaps better) explanation, visit this [Stackoverflow thread](https://stackoverflow.com/q/1051182/12096297)
 
 ### Dependency injections, bootstrapping and the Factory
 <!-- TODO: Please add some explanation how this works --> 
