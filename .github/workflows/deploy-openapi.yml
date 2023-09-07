@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - add-actions-to-deploy-openapi-changes
   release:
     types: [published]
     paths:
