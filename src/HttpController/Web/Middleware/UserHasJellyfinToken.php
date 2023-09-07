@@ -15,14 +15,14 @@ class UserHasJellyfinToken implements MiddlewareInterface
     ) {
     }
 
-    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function __invoke() : ?Response
     {
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->getCurrentUserId());
-        if ($jellyfinAuthentication === null) {
-            return Response::createBadRequest(JellyfinInvalidAuthentication::create()->getMessage());
+
+        if ($jellyfinAuthentication !== null) {
+            return null;
         }
 
-        return null;
+        return Response::createBadRequest(JellyfinInvalidAuthentication::create()->getMessage());
     }
 }

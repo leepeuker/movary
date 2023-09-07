@@ -14,10 +14,10 @@ class UserIsAdmin implements MiddlewareInterface
 
     public function __invoke() : ?Response
     {
-        if ($this->authenticationService->getCurrentUser()->isAdmin() === false) {
-            return Response::createSeeOther('/');
+        if ($this->authenticationService->getCurrentUser()->isAdmin() === true) {
+            return null;
         }
 
-        return null;
+        return Response::createForbidden();
     }
 }

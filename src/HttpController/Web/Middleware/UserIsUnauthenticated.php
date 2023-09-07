@@ -14,12 +14,12 @@ class UserIsUnauthenticated implements MiddlewareInterface
 
     public function __invoke() : ?Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            $userName = $this->authenticationService->getCurrentUser()->getName();
-
-            return Response::createSeeOther("/users/$userName/dashboard");
+        if ($this->authenticationService->isUserAuthenticated() === false) {
+            return null;
         }
 
-        return null;
+        $userName = $this->authenticationService->getCurrentUser()->getName();
+
+        return Response::createSeeOther("/users/$userName/dashboard");
     }
 }

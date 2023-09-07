@@ -17,6 +17,6 @@ class ServerHasRegistrationEnabled implements MiddlewareInterface
             return null;
         }
 
-        return Response::createSeeOther("/");
+        return Response::createForbidden();
     }
 }

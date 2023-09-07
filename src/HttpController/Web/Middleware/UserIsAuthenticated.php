@@ -14,10 +14,10 @@ class UserIsAuthenticated implements MiddlewareInterface
 
     public function __invoke() : ?Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
-            return Response::createSeeOther("/login");
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            return null;
         }
 
-        return null;
+        return Response::createForbidden();
     }
 }

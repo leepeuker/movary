@@ -177,15 +177,6 @@ class Factory
         );
     }
 
-    public static function createOpenApiController(ContainerInterface $container) : OpenApiController
-    {
-        return new OpenApiController(
-            $container->get(File::class),
-            $container->get(ServerSettings::class),
-            self::createDirectoryDocs(),
-        );
-    }
-
     public static function createHttpClient() : ClientInterface
     {
         return new GuzzleHttp\Client(['timeout' => 4]);
@@ -259,9 +250,20 @@ class Factory
         return $logger;
     }
 
-    public static function createRegistrationEnabledCheck(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
+    public static function createMiddlewareServerHasRegistrationEnabled(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
     {
-        return new HttpController\Web\Middleware\ServerHasRegistrationEnabled($config->getAsBool('ENABLE_REGISTRATION', false));
+        return new HttpController\Web\Middleware\ServerHasRegistrationEnabled(
+            $config->getAsBool('ENABLE_REGISTRATION', false)
+        );
+    }
+
+    public static function createOpenApiController(ContainerInterface $container) : OpenApiController
+    {
+        return new OpenApiController(
+            $container->get(File::class),
+            $container->get(ServerSettings::class),
+            self::createDirectoryDocs(),
+        );
     }
 
     public static function createSettingsController(ContainerInterface $container, Config $config) : SettingsController
@@ -376,14 +378,14 @@ class Factory
         return substr(__DIR__, 0, -strlen(self::SRC_DIRECTORY_NAME));
     }
 
-    private static function createDirectoryStorage() : string
-    {
-        return self::createDirectoryAppRoot() . 'storage/';
-    }
-
     private static function createDirectoryDocs() : string
     {
         return self::createDirectoryAppRoot() . 'docs/';
+    }
+
+    private static function createDirectoryStorage() : string
+    {
+        return self::createDirectoryAppRoot() . 'storage/';
     }
 
     private static function createDirectoryStorageApp() : string
