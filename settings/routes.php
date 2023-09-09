@@ -3,6 +3,7 @@
 use Movary\HttpController\Api;
 use Movary\HttpController\Middleware;
 use Movary\HttpController\Web;
+use Movary\HttpController\Web\RadarrController;
 use Movary\Service\Router\Dto\RouteList;
 use Movary\Service\Router\RouterService;
 
@@ -129,6 +130,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('PUT', '/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class]);
 
+    $routes->add('GET', '/settings/integrations/radarr', [Web\SettingsController::class, 'renderRadarrPage'], [Web\Middleware\UserIsAuthenticated::class]);
     ##########
     # Movies #
     ##########
@@ -169,6 +171,10 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory']);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist']);
+
+    $routes->add('GET', '/radarr/{id:.+}', [RadarrController::class, 'renderRadarrFeed']);
+    $routes->add('PUT', '/radarr/regeneratefeedid', [RadarrController::class, 'regenerateRadarrFeedId'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/radarr/deletefeedid', [RadarrController::class, 'deleteRadarrFeedId'], [Web\Middleware\UserIsAuthenticated::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

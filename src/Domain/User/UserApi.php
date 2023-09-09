@@ -54,6 +54,11 @@ class UserApi
         $this->repository->setPlexWebhookId($userId, null);
     }
 
+    public function deleteRadarrFeedId(int $userId) : void
+    {
+        $this->repository->setRadarrFeedId($userId, null);
+    }
+
     public function deleteTotpUri(int $userId) : void
     {
         $this->repository->updateTotpUri($userId, null);
@@ -221,6 +226,11 @@ class UserApi
         return $this->repository->findUserIdByPlexWebhookId($webhookId);
     }
 
+    public function findUserIdByRadarrFeedId(string $feedId) : ?int
+    {
+        return $this->repository->findUserIdByRadarrFeedId($feedId);
+    }
+
     public function generateApiToken(int $userId) : void
     {
         $token = bin2hex(random_bytes(16));
@@ -269,6 +279,15 @@ class UserApi
         $this->repository->setPlexWebhookId($userId, $plexWebhookId);
 
         return $plexWebhookId;
+    }
+
+    public function regenerateRadarrFeedId(int $userId) : string
+    {
+        $radarrFeedId = (string)Uuid::uuid4();
+
+        $this->repository->setRadarrFeedId($userId, $radarrFeedId);
+
+        return $radarrFeedId;
     }
 
     public function updateCoreAccountChangesDisabled(int $userId, bool $updateCoreAccountChangesDisabled) : void

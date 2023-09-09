@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Radarr
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-integration-radarr.js"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-top: 1rem">
+                <h5>Radarr list url</h5>
+
+                <p class="text-muted" style="margin-bottom: 0.5rem">
+                    Automatically sync the watchlist with radarr using radarr's list feature.
+                </p>
+
+                <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
+                    <b>Configuration</b>
+                    <br style="margin-bottom: 0.5rem">
+                    Adding the watchlist URL in radarr:
+                    <ul style="margin-bottom: 0">
+                        <li>Go to Radarr settings -> lists.</li>
+                        <li>Click on the plus to add a new list.</li>
+                        <li>Scroll down to the bottom and click on StevenLu custom.</li>
+                        <li>Copy the list URL from Movary into the URL input field at the bottom of the list modal and save.</li>
+                    </ul>
+                </div>
+
+                <div id="radarrFeedUrl"
+                     class="overflow-auto text-nowrap feedUrl"
+                     data-active="{{ isActive }}"
+                     style="font-size:1rem;margin-top: 1rem;margin-bottom: 1rem;">
+                    {{ radarrFeedUrl }}
+                </div>
+
+
+                <div id="alertFeedUrlDiv">
+                    <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
+                         role="alert"
+                         style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                        Radarr feed disabled - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
+                    </div>
+                </div>
+
+                <button id="deleteRadarrFeedButton" type="button" class="btn btn-danger {% if radarrFeedUrl == '-' %}disabled{% endif %}" data-bs-target="#confirmDeleteModal" data-bs-toggle="modal">
+                    Delete url
+                </button>
+                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" data-bs-target="#confirmRegenerationModal" data-bs-toggle="modal">Regenerate url</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="confirmRegenerationModal" tabindex="-1" role="dialog" aria-labelledby="confirmRegenerationModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm regeneration</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to regenerate your Radarr feed URL?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" onclick="regenerateRadarrFeedId()">Submit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <strong>Are you sure you want to delete your Radarr feed URL?</strong>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" onclick="deleteRadarrFeedId()">Submit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

@@ -366,6 +366,26 @@ class SettingsController
         );
     }
 
+    public function renderRadarrPage() : Response
+    {
+        $user = $this->authenticationService->getCurrentUser();
+
+        $radarrFeedId = $user->getRadarrFeedId();
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+
+        if($applicationUrl !== null && $radarrFeedId !== null) {
+            $radarrFeedUrl = $this->webhookUrlBuilder->buildRadarrFeedUrl($radarrFeedId);
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-integration-radarr.html.twig', [
+                'radarrFeedUrl' => $radarrFeedUrl ?? '-',
+                'isActive' => $applicationUrl !== null
+            ])
+        );
+    }
+
     public function renderSecurityAccountPage() : Response
     {
         $user = $this->authenticationService->getCurrentUser();
