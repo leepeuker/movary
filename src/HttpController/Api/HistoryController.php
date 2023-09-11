@@ -3,7 +3,6 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
-use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\RequestMapper\HistoryRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\HistoryResponseMapper;
@@ -16,7 +15,6 @@ class HistoryController
 {
     public function __construct(
         private readonly UserApi $userApi,
-        private readonly Authentication $authenticationService,
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly HistoryRequestMapper $historyRequestMapper,
@@ -26,14 +24,8 @@ class HistoryController
 
     public function getHistory(Request $request) : Response
     {
-        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
-        if ($requestedUser === null) {
-            return Response::createNotFound();
-        }
-
-        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
-            return Response::createForbidden();
-        }
+        $routeParameterUserName = $request->getRouteParameters()['username'] ?? null;
+        $requestedUser = $this->userApi->fetchUserByName((string)$routeParameterUserName);
 
         $requestData = $this->historyRequestMapper->mapRequest($request);
 

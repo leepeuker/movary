@@ -18,7 +18,6 @@ class WatchlistController
         private readonly MovieWatchlistApi $movieWatchlistApi,
         private readonly UserApi $userApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
-        private readonly Authentication $authenticationService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
         private readonly WatchlistResponseMapper $watchlistResponseMapper,
     ) {
@@ -26,14 +25,8 @@ class WatchlistController
 
     public function getWatchlist(Request $request) : Response
     {
-        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
-        if ($requestedUser === null) {
-            return Response::createNotFound();
-        }
-
-        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
-            return Response::createForbidden();
-        }
+        $routeParameterUserName = $request->getRouteParameters()['username'] ?? null;
+        $requestedUser = $this->userApi->fetchUserByName((string)$routeParameterUserName);
 
         $requestData = $this->watchlistRequestMapper->mapRequest($request);
 

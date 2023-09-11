@@ -1,15 +1,15 @@
-GET http://127.0.0.1/api/users/lee/watchlist
+GET http://127.0.0.1/api/ussers/{{username}}/watchlist
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
 
 ####
 
-GET http://127.0.0.1/api/users/lee/watchlist?limit=5
+GET http://127.0.0.1/api/users/{{username}}/watchlist?limit=5
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
 
 ####

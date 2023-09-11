@@ -1,23 +1,23 @@
-GET http://127.0.0.1/api/users/lee/history
+GET http://127.0.0.1/api/users/{{username}}/history
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
 
 ####
 
-GET http://127.0.0.1/api/users/lee/history?search=Matrix
+GET http://127.0.0.1/api/users/{{username}}/history?search=Matrix
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
 
 ####
 
-GET http://127.0.0.1/api/users/lee/history?limit=5
+GET http://127.0.0.1/api/users/{{username}}/history?limit=5
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
 
 ####
