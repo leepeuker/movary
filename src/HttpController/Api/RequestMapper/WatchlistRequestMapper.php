@@ -17,6 +17,10 @@ class WatchlistRequestMapper
 
     private const DEFAULT_SORT_BY = 'addedAt';
 
+    public function __construct(private readonly RequestMapper $requestMapper)
+    {
+    }
+
     public function mapRequest(Request $request) : WatchlistRequestDto
     {
         $getParameters = $request->getGetParameters();
@@ -29,6 +33,7 @@ class WatchlistRequestMapper
         $releaseYear = $this->mapReleaseYear($getParameters);
 
         return WatchlistRequestDto::create(
+            $this->requestMapper->mapUsernameFromRoute($request)->getId(),
             $searchTerm,
             (int)$page,
             (int)$limit,

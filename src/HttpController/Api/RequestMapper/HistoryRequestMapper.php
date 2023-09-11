@@ -14,6 +14,10 @@ class HistoryRequestMapper
 
     private const DEFAULT_SORT_BY = 'watchedAt';
 
+    public function __construct(private readonly RequestMapper $requestMapper)
+    {
+    }
+
     public function mapRequest(Request $request) : HistoryRequestDto
     {
         $getParameters = $request->getGetParameters();
@@ -23,6 +27,7 @@ class HistoryRequestMapper
         $limit = $getParameters['limit'] ?? self::DEFAULT_LIMIT;
 
         return HistoryRequestDto::create(
+            $this->requestMapper->mapUsernameFromRoute($request)->getId(),
             $searchTerm,
             (int)$page,
             (int)$limit,
