@@ -45,7 +45,7 @@ class ImportService
             }
 
             $tmdbId = (int)$record['tmdbId'];
-            $watchDate = empty($record['watchedAt']) === false ? Date::createFromString((string)$record['watchedAt']) : null;
+            $watchDate = empty($record['watchedAt']) === false ? Date::createFromString($record['watchedAt']) : null;
 
             $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
 
