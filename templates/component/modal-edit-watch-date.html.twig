@@ -13,6 +13,7 @@
                     <i class="bi bi-calendar-date input-group-text"></i>
                     <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" id="editWatchDateModalInput" required
                            onfocusout="validateWatchDate(this.value)">
+                    <button class="btn btn-primary rounded-end" onclick="document.getElementById('editWatchDateModalInput').value = null"><i class="bi bi-x-lg"></i></button>
                     <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
                         Watch date is required!
                     </div>

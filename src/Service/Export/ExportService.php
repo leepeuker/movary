@@ -23,7 +23,7 @@ class ExportService
 
     public function createExportHistoryCsv(int $userId, ?string $fileName = null) : string
     {
-        $movieWatchDates = $this->movieApi->fetchHistoryOrderedByWatchedAtDesc($userId);
+        $movieWatchDates = $this->movieApi->fetchWatchDatesOrderedByWatchedAtDesc($userId);
 
         if ($fileName === null) {
             $fileName = $this->generateFilename($userId, 'history');
