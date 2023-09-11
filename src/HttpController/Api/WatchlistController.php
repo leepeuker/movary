@@ -3,7 +3,6 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
-use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\RequestMapper\WatchlistRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\WatchlistResponseMapper;
@@ -16,9 +15,7 @@ class WatchlistController
 {
     public function __construct(
         private readonly MovieWatchlistApi $movieWatchlistApi,
-        private readonly UserApi $userApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
-        private readonly Authentication $authenticationService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
         private readonly WatchlistResponseMapper $watchlistResponseMapper,
     ) {
@@ -26,19 +23,10 @@ class WatchlistController
 
     public function getWatchlist(Request $request) : Response
     {
-        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
-        if ($requestedUser === null) {
-            return Response::createNotFound();
-        }
-
-        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
-            return Response::createForbidden();
-        }
-
         $requestData = $this->watchlistRequestMapper->mapRequest($request);
 
         $watchlistEntries = $this->movieWatchlistApi->fetchWatchlistPaginated(
-            $requestedUser->getId(),
+            $requestData->getRequestedUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
@@ -50,7 +38,7 @@ class WatchlistController
         );
 
         $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
-            $requestedUser->getId(),
+            $requestData->getRequestedUserId(),
             $requestData->getSearchTerm(),
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),

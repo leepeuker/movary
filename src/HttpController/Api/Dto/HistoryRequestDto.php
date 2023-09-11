@@ -7,6 +7,7 @@ use Movary\ValueObject\SortOrder;
 class HistoryRequestDto
 {
     private function __construct(
+        private readonly int $requestedUserId,
         private readonly ?string $searchTerm,
         private readonly int $page,
         private readonly int $limit,
@@ -16,6 +17,7 @@ class HistoryRequestDto
     }
 
     public static function create(
+        int $requestedUserId,
         ?string $searchTerm,
         int $page,
         int $limit,
@@ -23,6 +25,7 @@ class HistoryRequestDto
         SortOrder $sortOrder,
     ) : self {
         return new self(
+            $requestedUserId,
             $searchTerm,
             $page,
             $limit,
@@ -54,5 +57,10 @@ class HistoryRequestDto
     public function getSortOrder() : SortOrder
     {
         return $this->sortOrder;
+    }
+
+    public function getRequestedUserId() : int
+    {
+        return $this->requestedUserId;
     }
 }

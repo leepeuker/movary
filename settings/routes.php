@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 use Movary\HttpController\Api;
-use Movary\HttpController\Middleware;
 use Movary\HttpController\Web;
 use Movary\Service\Router\Dto\RouteList;
 use Movary\Service\Router\RouterService;
@@ -167,8 +166,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes = RouteList::create();
 
     $routes->add('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory']);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist']);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory'], [Api\Middleware\UserIsAuthorized::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\UserIsAuthorized::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }
