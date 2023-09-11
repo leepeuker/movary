@@ -48,10 +48,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-function clearWatchDateInput() {
-    document.getElementById('logPlayModalWatchDateInput').value = null
-}
-
 function setLogPlayModalSearchSpinner(visible) {
     if (visible === true) {
         document.getElementById('logPlayModalSearchSpinner').classList.remove('d-none')
