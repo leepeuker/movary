@@ -55,6 +55,7 @@
                                    id="logPlayModalWatchDateInput"
                                    required
                                    onfocusout="validateWatchDate('logPlayModal', this.value)">
+                            <button class="btn btn-primary rounded-end" onclick="document.getElementById('logPlayModalWatchDateInput').value = null"><i class="bi bi-x-lg"></i></button>
                             <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
                                 Watch date is required!
                             </div>

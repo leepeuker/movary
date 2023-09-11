@@ -8,7 +8,7 @@ class MovieHistoryEntity
 {
     private function __construct(
         private readonly int $movieId,
-        private readonly Date $watchedAt,
+        private readonly ?Date $watchedAt,
         private readonly int $plays,
         private readonly ?string $comment,
     ) {
@@ -18,7 +18,7 @@ class MovieHistoryEntity
     {
         return new self(
             (int)$data['movie_id'],
-            Date::createFromString($data['watched_at']),
+            $data['watched_at'] == null ? null : Date::createFromString($data['watched_at']),
             $data['plays'],
             $data['comment'],
         );
@@ -39,7 +39,7 @@ class MovieHistoryEntity
         return $this->plays;
     }
 
-    public function getWatchedAt() : Date
+    public function getWatchedAt() : ?Date
     {
         return $this->watchedAt;
     }

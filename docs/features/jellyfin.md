@@ -47,6 +47,7 @@ You can keep your Jellyfin libraries automatically up to date with your latest M
 
 !!! Info
 
+<<<<<<< Updated upstream
     Jellyfin [authentication](#authentication) is required.  
 
 If the automatic sync is enabled (e.g. on `/settings/integrations/jellyfin`) new watch dates added to Movary are automatically pushed as plays to Jellyfin.
@@ -73,6 +74,9 @@ php bin/console.php jellyfin:export <userId>
 ```
 
 ### Import
+=======
+    Requires Jellyfin [authencation](#authentication).
+>>>>>>> Stashed changes
 
 #### Description
 

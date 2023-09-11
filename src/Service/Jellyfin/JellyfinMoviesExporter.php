@@ -26,7 +26,7 @@ class JellyfinMoviesExporter
         $forceExport = true;
 
         if (count($movieIds) === 0) {
-            $movieIds = $this->movieHistoryApi->fetchMovieIdsWithWatchHistoryByUserId($userId);
+            $movieIds = $this->movieHistoryApi->fetchMovieIdsWithWatchDatesByUserId($userId);
 
             $forceExport = false;
         }
@@ -36,11 +36,11 @@ class JellyfinMoviesExporter
 
     public function exportMoviesWatchStateToJellyfin(int $userId, array $movieIds, bool $removeWatchDates) : void
     {
-        $watchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithWatchHistoryByUserIdAndMovieIds($userId, $movieIds);
+        $watchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithWatchDatesByUserIdAndMovieIds($userId, $movieIds);
 
         $unwatchedTmdbIds = [];
         if ($removeWatchDates === true) {
-            $unwatchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithoutWatchHistoryByUserId($userId, $movieIds);
+            $unwatchedTmdbIds = $this->movieHistoryApi->fetchTmdbIdsWithoutWatchDateByUserId($userId, $movieIds);
         }
 
         $this->jellyfinApi->setMoviesWatchState($userId, $watchedTmdbIds, $unwatchedTmdbIds);
