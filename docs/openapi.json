@@ -87,8 +87,8 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -146,8 +146,8 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -205,8 +205,8 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -258,8 +258,8 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -354,8 +354,7 @@
             "description": "Release year",
             "required": false,
             "schema": {
-              "type": "integer",
-              "example": 2017
+              "type": "integer"
             }
           }
         ],
@@ -367,7 +366,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "history": {
+                    "watchlist": {
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -394,8 +393,8 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -425,15 +424,27 @@
         ],
         "requestBody": {
           "content": {
-            "application\/json": {}
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -463,15 +474,27 @@
         ],
         "requestBody": {
           "content": {
-            "application\/json": {}
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -621,7 +644,7 @@
       "204": {
         "description": "Successful operation, response has no content"
       },
-      "401": {
+      "403": {
         "description": "Not authorized to access resource"
       },
       "404": {
