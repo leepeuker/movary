@@ -45,6 +45,17 @@ class MovieHistoryApi
         $this->repository->deleteByUserId($userId);
     }
 
+    public function deleteHistoryById(int $movieId, int $userId) : void
+    {
+        $this->repository->deleteHistoryById($movieId, $userId);
+
+        if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
+            return;
+        }
+
+        $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
+    }
+
     public function deleteHistoryByIdAndDate(int $movieId, int $userId, ?Date $watchedAt) : void
     {
         $this->repository->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);
@@ -399,6 +410,20 @@ class MovieHistoryApi
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
+    }
+
+    public function fetchWatchDatesForMovieIds(int $userId, array $movieIds) : array
+    {
+        $watchDates = [];
+
+        foreach ($this->movieRepository->fetchWatchDatesForMovieIds($userId, $movieIds) as $watchDateData) {
+            $watchDates[$watchDateData['movie_id']][$watchDateData['watched_at']] = [
+                'plays' => $watchDateData['plays'],
+                'comment' => $watchDateData['comment'],
+            ];
+        }
+
+        return $watchDates;
     }
 
     public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array

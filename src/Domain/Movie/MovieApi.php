@@ -106,6 +106,11 @@ class MovieApi
         );
     }
 
+    public function deleteHistoryById(int $movieId, int $userId) : void
+    {
+        $this->historyApi->deleteHistoryById($movieId, $userId);
+    }
+
     public function deleteHistoryByIdAndDate(int $movieId, int $userId, ?Date $watchedAt) : void
     {
         $this->historyApi->deleteHistoryByIdAndDate($movieId, $userId, $watchedAt);
@@ -264,6 +269,17 @@ class MovieApi
             $language,
             $genre,
         );
+    }
+
+    public function fetchWatchDatesForMovies(int $userId, array $playedEntries) : array
+    {
+        $movieIds = [];
+
+        foreach ($playedEntries as $playedEntry) {
+            $movieIds[] = $playedEntry['id'];
+        }
+
+        return $this->historyApi->fetchWatchDatesForMovieIds($userId, $movieIds);
     }
 
     public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array

@@ -38,6 +38,11 @@ class MovieHistoryRepository
         $this->dbConnection->delete('movie_user_watch_dates', ['user_id' => $userId]);
     }
 
+    public function deleteHistoryById(int $movieId, int $userId) : void
+    {
+        $this->dbConnection->delete('movie_user_watch_dates', ['user_id' => $userId, 'movie_id' => $movieId]);
+    }
+
     public function deleteHistoryByIdAndDate(int $movieId, int $userId, ?Date $watchedAt) : void
     {
         if ($watchedAt === null) {

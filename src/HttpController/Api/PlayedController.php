@@ -28,7 +28,7 @@ class PlayedController
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
         $watchlistAdditions = Json::decode($request->getBody());
 
-        // TODO add movie plays
+        // TODO
 
         return Response::createNoContent();
     }
@@ -39,10 +39,9 @@ class PlayedController
         $historyAdditions = Json::decode($request->getBody());
 
         foreach ($historyAdditions as $historyAddition) {
-            $this->movieApi->deleteHistoryByIdAndDate(
+            $this->movieApi->deleteHistoryById(
                 (int)$historyAddition['movaryId'],
                 $userId,
-                isset($historyAddition['watchedAt']) === true ? Date::createFromString($historyAddition['watchedAt']) : null,
             );
         }
 
@@ -53,7 +52,7 @@ class PlayedController
     {
         $requestData = $this->playedRequestMapper->mapRequest($request);
 
-        $watchlistEntries = $this->movieApi->fetchPlayedMoviesPaginated(
+        $playedEntries = $this->movieApi->fetchPlayedMoviesPaginated(
             $requestData->getRequestedUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
@@ -64,6 +63,8 @@ class PlayedController
             $requestData->getLanguage(),
             $requestData->getGenre(),
         );
+
+        $watchDates = $this->movieApi->fetchWatchDatesForMovies($requestData->getRequestedUserId(), $playedEntries);
 
         $watchlistCount = $this->movieApi->fetchPlayedMoviesCount(
             $requestData->getRequestedUserId(),
@@ -81,7 +82,7 @@ class PlayedController
 
         return Response::createJson(
             Json::encode([
-                'played' => $this->playedResponseMapper->mapPlayedEntries($watchlistEntries),
+                'played' => $this->playedResponseMapper->mapPlayedEntries($playedEntries, $watchDates),
                 'currentPage' => $paginationElements->getCurrentPage(),
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),
@@ -92,6 +93,8 @@ class PlayedController
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
         $historyAdditions = Json::decode($request->getBody());
+
+        // TODO
 
         foreach ($historyAdditions as $historyAddition) {
             $this->movieApi->replaceHistoryForMovieByDate(

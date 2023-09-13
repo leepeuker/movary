@@ -304,6 +304,22 @@ class MovieRepository
         )[0];
     }
 
+    public function fetchWatchDatesForMovieIds(int $userId, array $movieIds) : array
+    {
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
+
+        return $this->dbConnection->fetchAllAssociative(
+            "SELECT watched_at, plays, comment, movie_id
+            FROM movie_user_watch_dates
+            WHERE user_id = ? and movie_id in ($placeholders)
+            ORDER BY watched_at DESC",
+            [
+                $userId,
+                ...$movieIds
+            ],
+        );
+    }
+
     public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(

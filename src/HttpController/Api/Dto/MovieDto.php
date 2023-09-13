@@ -75,6 +75,11 @@ class MovieDto implements \JsonSerializable
         );
     }
 
+    public function getId() : int
+    {
+        return $this->id;
+    }
+
     public function jsonSerialize() : array
     {
         return [
