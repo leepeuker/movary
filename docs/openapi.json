@@ -6,12 +6,12 @@
   },
   "servers": [],
   "paths": {
-    "\/users\/{username}\/history": {
+    "\/users\/{username}\/history/movies": {
       "get": {
         "tags": [
-          "Users"
+          "History"
         ],
-        "summary": "Get the latest plays of a user",
+        "summary": "Get watch dates from user history (sorted by most recent)",
         "parameters": [
           {
             "name": "username",
@@ -87,6 +87,96 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Add watch dates to user history",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Replace watch dates in user history",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Delete watch dates from user history",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
           "401": {
             "$ref": "#/components/responses/401"
           },

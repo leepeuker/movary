@@ -92,7 +92,7 @@ class PlexScrobbler
 
         $watchDate = Date::createFromString($dateTime->format('Y-m-d'));
 
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $user->getId(), $watchDate);
+        $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $user->getId(), $watchDate);
 
         $this->logger->debug('Plex: Scrobbled view [' . $watchDate . '] for movie "' . $movie->getTitle() . '" with id: ' . $movie->getId());
     }

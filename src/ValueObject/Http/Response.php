@@ -44,6 +44,11 @@ class Response
         return new self(StatusCode::createMethodNotAllowed());
     }
 
+    public static function createNoContent() : self
+    {
+        return new self(StatusCode::createMethodNoContent());
+    }
+
     public static function createNotFound() : self
     {
         return new self(StatusCode::createNotFound());

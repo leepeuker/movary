@@ -59,7 +59,7 @@ class HistoryController
             return Response::create(StatusCode::createNoContent());
         }
 
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays);
+        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays);
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
 
         if ($comment !== null) {
@@ -109,7 +109,7 @@ class HistoryController
         }
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+        $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createOk());

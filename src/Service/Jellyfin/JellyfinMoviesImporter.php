@@ -79,7 +79,7 @@ class JellyfinMoviesImporter
                 continue;
             }
 
-            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $jellyfinLastWatchDate);
+            $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $jellyfinLastWatchDate);
             $this->logger->info('Jellyfin import: Movie watch date added', [
                 'movieId' => $movie->getId(),
                 'moveTitle' => $movie->getTitle(),

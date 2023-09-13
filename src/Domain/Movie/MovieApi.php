@@ -333,7 +333,7 @@ class MovieApi
         return $this->repository->findUserRating($movieId, $userId);
     }
 
-    public function increaseHistoryPlaysForMovieOnDate(int $movieId, int $userId, ?Date $watchedDate, int $playsToAdd = 1) : void
+    public function addPlaysForMovieOnDate(int $movieId, int $userId, ?Date $watchedDate, int $playsToAdd = 1, ?string $comment = null) : void
     {
         $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
 
@@ -345,6 +345,7 @@ class MovieApi
                 $userId,
                 $watchedDate,
                 $playsToAdd,
+                $comment,
             );
 
             return;
@@ -355,7 +356,7 @@ class MovieApi
             $userId,
             $watchedDate,
             $historyEntry->getPlays() + $playsToAdd,
-            $historyEntry->getComment(),
+            $comment ?? $historyEntry->getComment(),
         );
     }
 

@@ -3,20 +3,25 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\MovieApi;
 use Movary\HttpController\Api\RequestMapper\HistoryRequestMapper;
+use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\HistoryResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
+use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
 class HistoryController
 {
     public function __construct(
+        private readonly MovieApi $movieApi,
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly HistoryRequestMapper $historyRequestMapper,
         private readonly HistoryResponseMapper $historyResponseMapper,
+        private readonly RequestMapper $requestMapper,
     ) {
     }
 
@@ -49,5 +54,57 @@ class HistoryController
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),
         );
+    }
+
+    public function addToHistory(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $historyAdditions = Json::decode($request->getBody());
+
+        foreach ($historyAdditions as $historyAddition) {
+            $this->movieApi->addPlaysForMovieOnDate(
+                (int)$historyAddition['movieId'],
+                $userId,
+                Date::createFromString($historyAddition['watchedAt']),
+                $historyAddition['plays'] ?? 1,
+                $historyAddition['comment'] ?? null,
+            );
+        }
+
+        return Response::createNoContent();
+    }
+
+    public function updateHistory(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $historyAdditions = Json::decode($request->getBody());
+
+        foreach ($historyAdditions as $historyAddition) {
+            $this->movieApi->replaceHistoryForMovieByDate(
+                (int)$historyAddition['movieId'],
+                $userId,
+                Date::createFromString($historyAddition['watchedAt']),
+                $historyAddition['plays'],
+                $historyAddition['comment'],
+            );
+        }
+
+        return Response::createNoContent();
+    }
+
+    public function deleteFromHistory(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $historyAdditions = Json::decode($request->getBody());
+
+        foreach ($historyAdditions as $historyAddition) {
+            $this->movieApi->deleteHistoryByIdAndDate(
+                (int)$historyAddition['movieId'],
+                $userId,
+                Date::createFromString($historyAddition['watchedAt']),
+            );
+        }
+
+        return Response::createNoContent();
     }
 }
