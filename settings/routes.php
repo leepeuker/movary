@@ -166,8 +166,13 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes = RouteList::create();
 
     $routes->add('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Api\HistoryController::class, 'getHistory'], [Api\Middleware\UserIsAuthorized::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\UserIsAuthorized::class]);
+
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'addToHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'deleteFromHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('PUT', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'updateHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

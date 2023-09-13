@@ -25,6 +25,11 @@ class StatusCode
         return new self(500, 'Internal Server Error');
     }
 
+    public static function createMethodNoContent() : self
+    {
+        return new self(204, 'No content');
+    }
+
     public static function createMethodNotAllowed() : self
     {
         return new self(405, 'Method Not Allowed');

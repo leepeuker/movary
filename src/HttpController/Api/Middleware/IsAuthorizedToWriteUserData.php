@@ -2,12 +2,12 @@
 
 namespace Movary\HttpController\Api\Middleware;
 
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Request;
-use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
-class UserIsAuthorized implements MiddlewareInterface
+class IsAuthorizedToWriteUserData implements MiddlewareInterface
 {
     public function __construct(
         private readonly UserApi $userApi,
@@ -22,7 +22,7 @@ class UserIsAuthorized implements MiddlewareInterface
             return Response::createNotFound();
         }
 
-        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
+        if ($this->authenticationService->getUserIdByApiToken($request) !== $requestedUser->getId()) {
             return Response::createForbidden();
         }
 
