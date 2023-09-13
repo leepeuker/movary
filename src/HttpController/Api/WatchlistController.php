@@ -3,7 +3,6 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
-use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\RequestMapper\WatchlistRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\WatchlistResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
@@ -19,6 +18,16 @@ class WatchlistController
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
         private readonly WatchlistResponseMapper $watchlistResponseMapper,
     ) {
+    }
+
+    public function addToWatchlist(Request $request) : Response
+    {
+        return Response::createNoContent();
+    }
+
+    public function deleteFromWatchlist(Request $request) : Response
+    {
+        return Response::createNoContent();
     }
 
     public function getWatchlist(Request $request) : Response

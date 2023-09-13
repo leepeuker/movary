@@ -25,6 +25,40 @@ class HistoryController
     ) {
     }
 
+    public function addToHistory(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $historyAdditions = Json::decode($request->getBody());
+
+        foreach ($historyAdditions as $historyAddition) {
+            $this->movieApi->addPlaysForMovieOnDate(
+                (int)$historyAddition['movieId'],
+                $userId,
+                Date::createFromString($historyAddition['watchedAt']),
+                $historyAddition['plays'] ?? 1,
+                $historyAddition['comment'] ?? null,
+            );
+        }
+
+        return Response::createNoContent();
+    }
+
+    public function deleteFromHistory(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $historyAdditions = Json::decode($request->getBody());
+
+        foreach ($historyAdditions as $historyAddition) {
+            $this->movieApi->deleteHistoryByIdAndDate(
+                (int)$historyAddition['movieId'],
+                $userId,
+                Date::createFromString($historyAddition['watchedAt']),
+            );
+        }
+
+        return Response::createNoContent();
+    }
+
     public function getHistory(Request $request) : Response
     {
         $requestData = $this->historyRequestMapper->mapRequest($request);
@@ -56,24 +90,6 @@ class HistoryController
         );
     }
 
-    public function addToHistory(Request $request) : Response
-    {
-        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $historyAdditions = Json::decode($request->getBody());
-
-        foreach ($historyAdditions as $historyAddition) {
-            $this->movieApi->addPlaysForMovieOnDate(
-                (int)$historyAddition['movieId'],
-                $userId,
-                Date::createFromString($historyAddition['watchedAt']),
-                $historyAddition['plays'] ?? 1,
-                $historyAddition['comment'] ?? null,
-            );
-        }
-
-        return Response::createNoContent();
-    }
-
     public function updateHistory(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
@@ -86,22 +102,6 @@ class HistoryController
                 Date::createFromString($historyAddition['watchedAt']),
                 $historyAddition['plays'],
                 $historyAddition['comment'],
-            );
-        }
-
-        return Response::createNoContent();
-    }
-
-    public function deleteFromHistory(Request $request) : Response
-    {
-        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $historyAdditions = Json::decode($request->getBody());
-
-        foreach ($historyAdditions as $historyAddition) {
-            $this->movieApi->deleteHistoryByIdAndDate(
-                (int)$historyAddition['movieId'],
-                $userId,
-                Date::createFromString($historyAddition['watchedAt']),
             );
         }
 

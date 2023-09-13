@@ -6,12 +6,12 @@
   },
   "servers": [],
   "paths": {
-    "\/users\/{username}\/history/movies": {
+    "\/users\/{username}\/history\/movies": {
       "get": {
         "tags": [
           "History"
         ],
-        "summary": "Get watch dates from user history (sorted by most recent)",
+        "summary": "Get watch dates from user history (sorted by most recently watched)",
         "parameters": [
           {
             "name": "username",
@@ -272,12 +272,12 @@
         ]
       }
     },
-    "\/users\/{username}\/watchlist": {
+    "\/users\/{username}\/watchlist\/movies": {
       "get": {
         "tags": [
-          "Users"
+          "Watchlist"
         ],
-        "summary": "Get the watchlist of a user",
+        "summary": "Get movies from user watchlist (sorted by most recently added)",
         "parameters": [
           {
             "name": "username",
@@ -393,6 +393,82 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Watchlist"
+        ],
+        "summary": "Add movies to user watchlist",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {}
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Watchlist"
+        ],
+        "summary": "Delete movies from user watchlist",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {}
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
           },
           "401": {
             "$ref": "#/components/responses/401"
