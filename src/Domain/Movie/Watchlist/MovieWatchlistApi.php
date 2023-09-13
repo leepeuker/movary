@@ -3,6 +3,7 @@
 namespace Movary\Domain\Movie\Watchlist;
 
 use Movary\Api\Tmdb\TmdbApi;
+use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\UserApi;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\DateTime;
@@ -13,7 +14,7 @@ use Psr\Log\LoggerInterface;
 class MovieWatchlistApi
 {
     public function __construct(
-        private readonly MovieWatchlistRepository $repository,
+        private readonly MovieHistoryApi $repository,
         private readonly UrlGenerator $urlGenerator,
         private readonly UserApi $userApi,
         private readonly TmdbApi $tmdbApi,

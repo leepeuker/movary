@@ -178,5 +178,11 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', $routeUserWatchlist, [Api\WatchlistController::class, 'addToWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('DELETE', $routeUserWatchlist, [Api\WatchlistController::class, 'deleteFromWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
+    $routeUserWatchlist = '/users/{username:[a-zA-Z0-9]+}/played/movies';
+    $routes->add('GET', $routeUserWatchlist , [Api\PlayedController::class, 'getPlayed'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('POST', $routeUserWatchlist, [Api\PlayedController::class, 'addToPlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', $routeUserWatchlist, [Api\PlayedController::class, 'deleteFromPlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('PUT', $routeUserHistory, [Api\PlayedController::class, 'updatePlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }
