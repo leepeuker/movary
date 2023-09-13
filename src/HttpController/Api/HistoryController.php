@@ -32,7 +32,7 @@ class HistoryController
 
         foreach ($historyAdditions as $historyAddition) {
             $this->movieApi->addPlaysForMovieOnDate(
-                (int)$historyAddition['movieId'],
+                (int)$historyAddition['movaryId'],
                 $userId,
                 Date::createFromString($historyAddition['watchedAt']),
                 $historyAddition['plays'] ?? 1,
@@ -50,7 +50,7 @@ class HistoryController
 
         foreach ($historyAdditions as $historyAddition) {
             $this->movieApi->deleteHistoryByIdAndDate(
-                (int)$historyAddition['movieId'],
+                (int)$historyAddition['movaryId'],
                 $userId,
                 Date::createFromString($historyAddition['watchedAt']),
             );
@@ -97,7 +97,7 @@ class HistoryController
 
         foreach ($historyAdditions as $historyAddition) {
             $this->movieApi->replaceHistoryForMovieByDate(
-                (int)$historyAddition['movieId'],
+                (int)$historyAddition['movaryId'],
                 $userId,
                 Date::createFromString($historyAddition['watchedAt']),
                 $historyAddition['plays'],

@@ -124,7 +124,7 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "movieId": {
+                    "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
                     "watchedAt": {
@@ -183,7 +183,7 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "movieId": {
+                    "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
                     "watchedAt": {
@@ -242,7 +242,7 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "movieId": {
+                    "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
                     "watchedAt": {
@@ -430,7 +430,7 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "movieId": {
+                    "movaryId": {
                       "$ref": "#/components/schemas/id"
                     }
                   }
@@ -480,7 +480,7 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "movieId": {
+                    "movaryId": {
                       "$ref": "#/components/schemas/id"
                     }
                   }
@@ -513,11 +513,12 @@
       "movie": {
         "type": "object",
         "properties": {
-          "id": {
-            "$ref": "#/components/schemas/id"
-          },
           "title": {
             "type": "string"
+          },
+          "releaseDate": {
+            "type": "string",
+            "nullable": true
           },
           "tagline": {
             "type": "string",
@@ -539,9 +540,27 @@
             "type": "string",
             "nullable": true
           },
-          "releaseDate": {
-            "type": "string",
-            "nullable": true
+          "ids": {
+            "type": "object",
+            "properties": {
+              "movary": {
+                "$ref": "#/components/schemas/id"
+              },
+              "tmdb": {
+                "$ref": "#/components/schemas/idNullable"
+              },
+              "trakt": {
+                "$ref": "#/components/schemas/idNullable"
+              },
+              "imdb": {
+                "type": "string",
+                "nullable": true
+              },
+              "letterboxd": {
+                "type": "string",
+                "nullable": true
+              }
+            }
           },
           "userRating": {
             "type": "integer",
@@ -576,26 +595,6 @@
               }
             }
           },
-          "externalIds": {
-            "type": "object",
-            "properties": {
-              "tmdb": {
-                "type": "integer"
-              },
-              "trakt": {
-                "type": "integer",
-                "nullable": true
-              },
-              "imdb": {
-                "type": "string",
-                "nullable": true
-              },
-              "letterboxd": {
-                "type": "string",
-                "nullable": true
-              }
-            }
-          },
           "updatedAt": {
             "$ref": "#/components/schemas/dateNullable"
           },
@@ -607,6 +606,11 @@
       "id": {
         "type": "integer",
         "example": 42
+      },
+      "idNullable": {
+        "type": "integer",
+        "example": 42,
+        "nullable": true
       },
       "plays": {
         "type": "integer",

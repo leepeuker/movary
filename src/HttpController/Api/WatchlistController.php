@@ -28,7 +28,7 @@ class WatchlistController
         $watchlistAdditions = Json::decode($request->getBody());
 
         foreach ($watchlistAdditions as $watchlistAddition) {
-            $movieId = (int)$watchlistAddition['movieId'];
+            $movieId = (int)$watchlistAddition['movaryId'];
 
             $this->movieWatchlistApi->addMovieToWatchlist($userId, $movieId);
         }
@@ -42,7 +42,7 @@ class WatchlistController
         $watchlistRemovals = Json::decode($request->getBody());
 
         foreach ($watchlistRemovals as $watchlistRemoval) {
-            $movieId = (int)$watchlistRemoval['movieId'];
+            $movieId = (int)$watchlistRemoval['movaryId'];
 
             $this->movieWatchlistApi->removeMovieFromWatchlist($userId, $movieId);
         }
