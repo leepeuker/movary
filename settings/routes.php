@@ -167,12 +167,16 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/openapi.json', [Api\OpenApiController::class, 'getSchema']);
 
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'addToHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
-    $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'deleteFromHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
-    $routes->add('PUT', '/users/{username:[a-zA-Z0-9]+}/history/movies', [Api\HistoryController::class, 'updateHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routeUserHistory = '/users/{username:[a-zA-Z0-9]+}/history/movies';
+    $routes->add('GET', $routeUserHistory, [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('POST', $routeUserHistory, [Api\HistoryController::class, 'addToHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', $routeUserHistory, [Api\HistoryController::class, 'deleteFromHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('PUT', $routeUserHistory, [Api\HistoryController::class, 'updateHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routeUserWatchlist = '/users/{username:[a-zA-Z0-9]+}/watchlist/movies';
+    $routes->add('GET', $routeUserWatchlist , [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('POST', $routeUserWatchlist, [Api\WatchlistController::class, 'addToWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', $routeUserWatchlist, [Api\WatchlistController::class, 'deleteFromWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

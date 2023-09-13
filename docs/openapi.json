@@ -6,12 +6,12 @@
   },
   "servers": [],
   "paths": {
-    "\/users\/{username}\/history/movies": {
+    "\/users\/{username}\/history\/movies": {
       "get": {
         "tags": [
           "History"
         ],
-        "summary": "Get watch dates from user history (sorted by most recent)",
+        "summary": "Get watch dates from user history (sorted by most recently watched)",
         "parameters": [
           {
             "name": "username",
@@ -87,8 +87,8 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -146,8 +146,8 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -205,8 +205,8 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -258,8 +258,8 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -272,12 +272,12 @@
         ]
       }
     },
-    "\/users\/{username}\/watchlist": {
+    "\/users\/{username}\/watchlist\/movies": {
       "get": {
         "tags": [
-          "Users"
+          "Watchlist"
         ],
-        "summary": "Get the watchlist of a user",
+        "summary": "Get movies from user watchlist (sorted by most recently added)",
         "parameters": [
           {
             "name": "username",
@@ -354,8 +354,7 @@
             "description": "Release year",
             "required": false,
             "schema": {
-              "type": "integer",
-              "example": 2017
+              "type": "integer"
             }
           }
         ],
@@ -367,7 +366,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "history": {
+                    "watchlist": {
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -394,8 +393,108 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Watchlist"
+        ],
+        "summary": "Add movies to user watchlist",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Watchlist"
+        ],
+        "summary": "Delete movies from user watchlist",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -545,7 +644,7 @@
       "204": {
         "description": "Successful operation, response has no content"
       },
-      "401": {
+      "403": {
         "description": "Not authorized to access resource"
       },
       "404": {

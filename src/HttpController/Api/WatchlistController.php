@@ -3,7 +3,7 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
-use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\RequestMapper\WatchlistRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\WatchlistResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
@@ -18,7 +18,36 @@ class WatchlistController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
         private readonly WatchlistResponseMapper $watchlistResponseMapper,
+        private readonly RequestMapper $requestMapper,
     ) {
+    }
+
+    public function addToWatchlist(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $watchlistAdditions = Json::decode($request->getBody());
+
+        foreach ($watchlistAdditions as $watchlistAddition) {
+            $movieId = (int)$watchlistAddition['movieId'];
+
+            $this->movieWatchlistApi->addMovieToWatchlist($userId, $movieId);
+        }
+
+        return Response::createNoContent();
+    }
+
+    public function deleteFromWatchlist(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $watchlistRemovals = Json::decode($request->getBody());
+
+        foreach ($watchlistRemovals as $watchlistRemoval) {
+            $movieId = (int)$watchlistRemoval['movieId'];
+
+            $this->movieWatchlistApi->removeMovieFromWatchlist($userId, $movieId);
+        }
+
+        return Response::createNoContent();
     }
 
     public function getWatchlist(Request $request) : Response
