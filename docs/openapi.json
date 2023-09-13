@@ -116,7 +116,36 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchedAt": {
+                      "$ref": "#/components/schemas/date"
+                    },
+                    "plays": {
+                      "$ref": "#/components/schemas/playsOptional"
+                    },
+                    "comment": {
+                      "$ref": "#/components/schemas/commentOptional"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
           "401": {
             "$ref": "#/components/responses/401"
           },
@@ -146,7 +175,36 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchedAt": {
+                      "$ref": "#/components/schemas/date"
+                    },
+                    "plays": {
+                      "$ref": "#/components/schemas/plays"
+                    },
+                    "comment": {
+                      "$ref": "#/components/schemas/comment"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
           "401": {
             "$ref": "#/components/responses/401"
           },
@@ -176,7 +234,30 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movieId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchedAt": {
+                      "$ref": "#/components/schemas/date"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
           "401": {
             "$ref": "#/components/responses/401"
           },
@@ -334,7 +415,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer"
+            "$ref": "#/components/schemas/id"
           },
           "title": {
             "type": "string"
@@ -424,22 +505,51 @@
           }
         }
       },
+      "id": {
+        "type": "integer",
+        "example": 42
+      },
+      "plays": {
+        "type": "integer",
+        "example": 1
+      },
+      "playsOptional": {
+        "type": "integer",
+        "example": 1,
+        "default": 1,
+        "required": false
+      },
+      "comment": {
+        "type": "string",
+        "example": "This is a comment",
+        "nullable": true
+      },
+      "commentOptional": {
+        "type": "string",
+        "example": "This is a comment",
+        "nullable": true,
+        "default": null,
+        "required": false
+      },
       "date": {
         "type": "string",
-        "example": "2023-07-02 18:00:00"
+        "example": "2023-07-02"
       },
       "dateNullable": {
         "type": "string",
         "nullable": true,
-        "example": "2023-07-02 18:00:00"
+        "example": "2023-07-02"
       }
     },
     "responses": {
+      "204": {
+        "description": "Successful operation, response has no content"
+      },
       "401": {
-        "description": "Not authorized to see the resource"
+        "description": "Not authorized to access resource"
       },
       "404": {
-        "description": "The username was not found"
+        "description": "The resource was not found"
       }
     },
     "securitySchemes": {
