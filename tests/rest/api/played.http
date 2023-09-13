@@ -1,0 +1,37 @@
+GET http://127.0.0.1/api/users/{{username}}/played/movies?limit=10
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+####
+
+PUT http://127.0.0.1/api/users/{{username}}/played/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+//[{"movieId" : 1, "watchedAt" : "2011-05-06", "plays" :  1, "comment" :  "comment"}]
+
+####
+
+POST http://127.0.0.1/api/users/{{username}}/played/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+//[{"movieId" : 1, "watchedAt" : "2011-05-06"}]
+
+####
+
+DELETE http://127.0.0.1/api/users/{{username}}/played/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+//[{"movieId" : 1, "watchedAt" : "2011-05-06"}]
+
+####

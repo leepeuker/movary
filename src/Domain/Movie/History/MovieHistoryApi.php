@@ -371,6 +371,36 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
     }
 
+    public function fetchPlayedMoviesPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm = null,
+        string $sortBy = 'title',
+        ?SortOrder $sortOrder = null,
+        ?Year $releaseYear = null,
+        ?string $language = null,
+        ?string $genre = null,
+    ) : array {
+        if ($sortOrder === null) {
+            $sortOrder = SortOrder::createAsc();
+        }
+
+        $movies = $this->movieRepository->fetchUniqueWatchedMoviesPaginated(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $releaseYear,
+            $language,
+            $genre,
+        );
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
+    }
+
     public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->movieRepository->fetchWatchDatesOrderedByWatchedAtDesc($userId);
