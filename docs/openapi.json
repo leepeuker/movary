@@ -11,7 +11,8 @@
         "tags": [
           "History"
         ],
-        "summary": "Get watch dates from user history (sorted by most recently watched)",
+        "summary": "Get played movies with watch dates of user",
+        "description": "Get all played movies with watch dates set. Sorted by most recently watch dates on default.",
         "parameters": [
           {
             "name": "username",
@@ -104,7 +105,8 @@
         "tags": [
           "History"
         ],
-        "summary": "Add watch dates to user history",
+        "summary": "Add movie play with watch date set to user",
+        "description": "Create or update the provided watch dates for the specified movies. A date for plays is required.",
         "parameters": [
           {
             "name": "username",
@@ -163,7 +165,8 @@
         "tags": [
           "History"
         ],
-        "summary": "Replace watch dates in user history",
+        "summary": "Replace movie play with watch date set for user",
+        "description": "Create or replace the provided watch dates for the specified movies. A date for plays is required.",
         "parameters": [
           {
             "name": "username",
@@ -222,7 +225,8 @@
         "tags": [
           "History"
         ],
-        "summary": "Delete watch dates from user history",
+        "summary": "Delete movie watch dates from user history",
+        "description": "Delete all watch dates of specified movies if no specific watch dates are provided. A date for plays is required.",
         "parameters": [
           {
             "name": "username",
@@ -277,7 +281,8 @@
         "tags": [
           "Watchlist"
         ],
-        "summary": "Get movies from user watchlist (sorted by most recently added)",
+        "summary": "Get movies in watchlist of user",
+        "description": "Get all movies on the user watchlist. Sorted by most recently added on default.",
         "parameters": [
           {
             "name": "username",
@@ -410,7 +415,7 @@
         "tags": [
           "Watchlist"
         ],
-        "summary": "Add movies to user watchlist",
+        "summary": "Add movie to watchlist of user",
         "parameters": [
           {
             "name": "username",
@@ -460,7 +465,7 @@
         "tags": [
           "Watchlist"
         ],
-        "summary": "Delete movies from user watchlist",
+        "summary": "Delete movie from watchlist of user",
         "parameters": [
           {
             "name": "username",
