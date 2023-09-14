@@ -26,9 +26,22 @@ class PlayedController
     public function addToPlayed(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $watchlistAdditions = Json::decode($request->getBody());
+        $playedAdditions = Json::decode($request->getBody());
 
-        // TODO
+        foreach ($playedAdditions as $playAddition) {
+            $movieId = (int)$playAddition['movaryId'];
+            $watchDates = $playAddition['watchDates'] ?? [];
+
+            foreach ($watchDates as $watchDate) {
+                $this->movieApi->addPlaysForMovieOnDate(
+                    $movieId,
+                    $userId,
+                    $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
+                    $watchDate['plays'] ?? 1,
+                    $watchDate['comment'] ?? null,
+                );
+            }
+        }
 
         return Response::createNoContent();
     }
@@ -36,13 +49,28 @@ class PlayedController
     public function deleteFromPlayed(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $historyAdditions = Json::decode($request->getBody());
+        $playedDeletions = Json::decode($request->getBody());
 
-        foreach ($historyAdditions as $historyAddition) {
-            $this->movieApi->deleteHistoryById(
-                (int)$historyAddition['movaryId'],
-                $userId,
-            );
+        foreach ($playedDeletions as $playedDeletion) {
+            $movieId = (int)$playedDeletion['movaryId'];
+            $watchDates = $playedDeletion['watchDates'] ?? [];
+
+            if (count($watchDates) === 0) {
+                $this->movieApi->deleteHistoryById(
+                    $movieId,
+                    $userId,
+                );
+
+                continue;
+            }
+
+            foreach ($watchDates as $date) {
+                $this->movieApi->deleteHistoryByIdAndDate(
+                    $movieId,
+                    $userId,
+                    empty($date) === true ? null : Date::createFromString($date),
+                );
+            }
         }
 
         return Response::createNoContent();
@@ -92,18 +120,21 @@ class PlayedController
     public function updatePlayed(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $historyAdditions = Json::decode($request->getBody());
+        $playedUpdates = Json::decode($request->getBody());
 
-        // TODO
+        foreach ($playedUpdates as $playedUpdate) {
+            $movieId = (int)$playedUpdate['movaryId'];
+            $watchDates = $playedUpdate['watchDates'] ?? [];
 
-        foreach ($historyAdditions as $historyAddition) {
-            $this->movieApi->replaceHistoryForMovieByDate(
-                (int)$historyAddition['movaryId'],
-                $userId,
-                isset($historyAddition['watchedAt']) === true ? Date::createFromString($historyAddition['watchedAt']) : null,
-                $historyAddition['plays'],
-                $historyAddition['comment'],
-            );
+            foreach ($watchDates as $watchDate) {
+                $this->movieApi->replaceHistoryForMovieByDate(
+                    $movieId,
+                    $userId,
+                    $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
+                    $watchDate['plays'],
+                    $watchDate['comment'],
+                );
+            }
         }
 
         return Response::createNoContent();

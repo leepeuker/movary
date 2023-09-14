@@ -513,6 +513,7 @@
           "Played"
         ],
         "summary": "Get played movies of user",
+        "description": "Get all played movies and their watch dates.",
         "parameters": [
           {
             "name": "username",
@@ -660,6 +661,7 @@
           "Played"
         ],
         "summary": "Add movie plays to user",
+        "description": "Create or update the provided watch dates for the specified movies.",
         "parameters": [
           {
             "name": "username",
@@ -682,14 +684,22 @@
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
-                    "watchedAt": {
-                      "$ref": "#/components/schemas/dateNullable"
-                    },
-                    "plays": {
-                      "$ref": "#/components/schemas/playsOptional"
-                    },
-                    "comment": {
-                      "$ref": "#/components/schemas/commentOptional"
+                    "watchDates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "watchedAt": {
+                            "$ref": "#/components/schemas/dateNullable"
+                          },
+                          "plays": {
+                            "$ref": "#/components/schemas/playsOptional"
+                          },
+                          "comment": {
+                            "$ref": "#/components/schemas/commentOptional"
+                          }
+                        }
+                      }
                     }
                   }
                 }
@@ -719,6 +729,7 @@
           "Played"
         ],
         "summary": "Replace movie plays for user",
+        "description": "Create or replace the provided watch dates for the specified movies.",
         "parameters": [
           {
             "name": "username",
@@ -741,14 +752,22 @@
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
-                    "watchedAt": {
-                      "$ref": "#/components/schemas/dateNullable"
-                    },
-                    "plays": {
-                      "$ref": "#/components/schemas/plays"
-                    },
-                    "comment": {
-                      "$ref": "#/components/schemas/comment"
+                    "watchDates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "watchedAt": {
+                            "$ref": "#/components/schemas/dateNullable"
+                          },
+                          "plays": {
+                            "$ref": "#/components/schemas/plays"
+                          },
+                          "comment": {
+                            "$ref": "#/components/schemas/comment"
+                          }
+                        }
+                      }
                     }
                   }
                 }
@@ -778,6 +797,7 @@
           "Played"
         ],
         "summary": "Delete movie plays from user",
+        "description": "Delete all watch dates of specified movies if no specific watch dates are provided.",
         "parameters": [
           {
             "name": "username",
@@ -799,6 +819,13 @@
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
+                    },
+                    "watchDates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/dateNullable"
+                      },
+                      "required": false
                     }
                   }
                 }
