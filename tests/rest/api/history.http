@@ -12,7 +12,7 @@ Cache-Control: no-cache
 Content-Type: application/json
 X-Auth-Token: {{xAuthToken}}
 
-[{"movieId" : 1, "watchedAt" : "2011-05-06", "plays" :  1, "comment" :  "comment"}]
+[{"movaryId" : 1, "watchedAt" : "2011-05-06", "plays" :  1, "comment" :  "comment"}]
 
 ####
 
@@ -22,7 +22,7 @@ Cache-Control: no-cache
 Content-Type: application/json
 X-Auth-Token: {{xAuthToken}}
 
-[{"movieId" : 1, "watchedAt" : "2011-05-06"}]
+[{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
 
 ####
 
@@ -32,6 +32,6 @@ Cache-Control: no-cache
 Content-Type: application/json
 X-Auth-Token: {{xAuthToken}}
 
-[{"movieId" : 1, "watchedAt" : "2011-05-06"}]
+[{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
 
 ####

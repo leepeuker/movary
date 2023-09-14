@@ -68,18 +68,36 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/settings/account/security', [Web\SettingsController::class, 'renderSecurityAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/data', [Web\SettingsController::class, 'renderDataAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/server/general', [Web\SettingsController::class, 'renderServerGeneralPage'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/server/jobs', [Web\SettingsController::class, 'renderServerJobsPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/settings/server/jobs', [Web\SettingsController::class, 'renderServerJobsPage'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
     $routes->add('POST', '/settings/server/general', [Web\SettingsController::class, 'updateServerGeneral'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
     ]);
-    $routes->add('GET', '/settings/server/users', [Web\SettingsController::class, 'renderServerUsersPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('GET', '/settings/server/email', [Web\SettingsController::class, 'renderServerEmailPage'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/settings/server/email', [Web\SettingsController::class, 'updateServerEmail'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
-    $routes->add('POST', '/settings/server/email-test', [Web\SettingsController::class, 'sendTestEmail'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\UserIsAdmin::class]);
+    $routes->add('GET', '/settings/server/users', [Web\SettingsController::class, 'renderServerUsersPage'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('GET', '/settings/server/email', [Web\SettingsController::class, 'renderServerEmailPage'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/settings/server/email', [Web\SettingsController::class, 'updateServerEmail'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
+    $routes->add('POST', '/settings/server/email-test', [Web\SettingsController::class, 'sendTestEmail'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class
+    ]);
     $routes->add('POST', '/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/security/update-password', [Web\SettingsController::class, 'updatePassword'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/settings/account/security/create-totp-uri', [Web\TwoFactorAuthenticationController::class, 'createTotpUri'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/security/create-totp-uri', [
+        Web\TwoFactorAuthenticationController::class,
+        'createTotpUri'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/security/disable-totp', [Web\TwoFactorAuthenticationController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/security/enable-totp', [Web\TwoFactorAuthenticationController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/export/csv/{exportType:.+}', [Web\ExportController::class, 'getCsvExport'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -148,8 +166,14 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/directors', [Web\DirectorsController::class, 'renderPage']);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}', [Web\Movie\MovieController::class, 'renderPage']);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}', [Web\PersonController::class, 'renderPage']);
-    $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [Web\HistoryController::class, 'deleteHistoryEntry'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [Web\HistoryController::class, 'createHistoryEntry'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
+        Web\HistoryController::class,
+        'deleteHistoryEntry'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
+        Web\HistoryController::class,
+        'createHistoryEntry'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [
         Web\Movie\MovieRatingController::class,
         'updateRating'
@@ -174,9 +198,15 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('PUT', $routeUserHistory, [Api\HistoryController::class, 'updateHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
     $routeUserWatchlist = '/users/{username:[a-zA-Z0-9]+}/watchlist/movies';
-    $routes->add('GET', $routeUserWatchlist , [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', $routeUserWatchlist, [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('POST', $routeUserWatchlist, [Api\WatchlistController::class, 'addToWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('DELETE', $routeUserWatchlist, [Api\WatchlistController::class, 'deleteFromWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+
+    $routeUserPlayed = '/users/{username:[a-zA-Z0-9]+}/played/movies';
+    $routes->add('GET', $routeUserPlayed, [Api\PlayedController::class, 'getPlayed'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('POST', $routeUserPlayed, [Api\PlayedController::class, 'addToPlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', $routeUserPlayed, [Api\PlayedController::class, 'deleteFromPlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('PUT', $routeUserPlayed, [Api\PlayedController::class, 'updatePlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

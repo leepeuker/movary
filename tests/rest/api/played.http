@@ -1,0 +1,72 @@
+GET http://127.0.0.1/api/users/{{username}}/played/movies?limit=10
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+####
+
+PUT http://127.0.0.1/api/users/{{username}}/played/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+[
+  {
+    "movaryId": 1,
+    "watchDates": [
+      {
+        "watchedAt": null,
+        "plays": 2,
+        "comment": "Test comment"
+      },
+      {
+        "watchedAt": "2024-05-06",
+        "plays": 2,
+        "comment": "Test comment"
+      }
+    ]
+  }
+]
+
+####
+
+POST http://127.0.0.1/api/users/{{username}}/played/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+[
+  {
+    "movaryId": 1,
+    "watchDates": [
+      {
+        "watchedAt": null
+      },
+      {
+        "watchedAt": "2024-05-06",
+        "plays": 2,
+        "comment": "Test comment"
+      }
+    ]
+  }
+]
+
+####
+
+DELETE http://127.0.0.1/api/users/{{username}}/played/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+[
+  {
+    "movaryId": 1,
+    "watchDates": []
+  }
+]
+
+####

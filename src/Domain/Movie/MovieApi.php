@@ -47,6 +47,33 @@ class MovieApi
     ) {
     }
 
+    public function addPlaysForMovieOnDate(int $movieId, int $userId, ?Date $watchedDate, int $playsToAdd = 1, ?string $comment = null) : void
+    {
+        $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
+
+        $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
+
+        if ($historyEntry === null) {
+            $this->historyApi->create(
+                $movieId,
+                $userId,
+                $watchedDate,
+                $playsToAdd,
+                $comment,
+            );
+
+            return;
+        }
+
+        $this->historyApi->update(
+            $movieId,
+            $userId,
+            $watchedDate,
+            $historyEntry->getPlays() + $playsToAdd,
+            $comment ?? $historyEntry->getComment(),
+        );
+    }
+
     public function create(
         string $title,
         int $tmdbId,
@@ -77,6 +104,11 @@ class MovieApi
             $traktId,
             $imdbId,
         );
+    }
+
+    public function deleteHistoryById(int $movieId, int $userId) : void
+    {
+        $this->historyApi->deleteHistoryById($movieId, $userId);
     }
 
     public function deleteHistoryByIdAndDate(int $movieId, int $userId, ?Date $watchedAt) : void
@@ -147,11 +179,6 @@ class MovieApi
         return $this->historyApi->fetchTotalPlaysForMovieAndUserId($movieId, $userId);
     }
 
-    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
-    {
-        return $this->historyApi->fetchWatchDatesOrderedByWatchedAtDesc($userId);
-    }
-
     public function fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(
         ?int $maxAgeInHours = null,
         ?int $limit = null,
@@ -159,6 +186,30 @@ class MovieApi
         bool $onlyNeverSynced = false,
     ) : array {
         return $this->movieRepository->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit, $filterMovieIds, $onlyNeverSynced);
+    }
+
+    public function fetchPlayedMoviesPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm,
+        string $sortBy,
+        SortOrder $sortOrder,
+        ?Year $releaseYear,
+        ?string $language,
+        ?string $genre,
+    ) : array {
+        return $this->historyApi->fetchPlayedMoviesPaginated(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $releaseYear,
+            $language,
+            $genre,
+        );
     }
 
     public function fetchTotalPlayCount(int $userId) : int
@@ -186,6 +237,16 @@ class MovieApi
         return $this->historyApi->fetchUniqueMovieReleaseYears($userId);
     }
 
+    public function fetchUniqueWatchedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    {
+        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
+    }
+
+    public function fetchPlayedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    {
+        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
+    }
+
     public function fetchUniqueWatchedMoviesPaginated(
         int $userId,
         int $limit,
@@ -210,9 +271,20 @@ class MovieApi
         );
     }
 
-    public function fetchUniqueWatchedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    public function fetchWatchDatesForMovies(int $userId, array $playedEntries) : array
     {
-        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
+        $movieIds = [];
+
+        foreach ($playedEntries as $playedEntry) {
+            $movieIds[] = $playedEntry['id'];
+        }
+
+        return $this->historyApi->fetchWatchDatesForMovieIds($userId, $movieIds);
+    }
+
+    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
+    {
+        return $this->historyApi->fetchWatchDatesOrderedByWatchedAtDesc($userId);
     }
 
     public function fetchWithActor(int $personId, int $userId) : array
@@ -331,33 +403,6 @@ class MovieApi
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         return $this->repository->findUserRating($movieId, $userId);
-    }
-
-    public function addPlaysForMovieOnDate(int $movieId, int $userId, ?Date $watchedDate, int $playsToAdd = 1, ?string $comment = null) : void
-    {
-        $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
-
-        $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
-
-        if ($historyEntry === null) {
-            $this->historyApi->create(
-                $movieId,
-                $userId,
-                $watchedDate,
-                $playsToAdd,
-                $comment,
-            );
-
-            return;
-        }
-
-        $this->historyApi->update(
-            $movieId,
-            $userId,
-            $watchedDate,
-            $historyEntry->getPlays() + $playsToAdd,
-            $comment ?? $historyEntry->getComment(),
-        );
     }
 
     public function replaceHistoryForMovieByDate(int $movieId, int $userId, ?Date $watchedAt, int $playsPerDate, ?string $comment = null) : void
