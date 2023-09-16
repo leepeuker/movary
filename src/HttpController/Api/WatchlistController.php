@@ -3,8 +3,7 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
-use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\RequestMapper\WatchlistRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\WatchlistResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
@@ -16,29 +15,47 @@ class WatchlistController
 {
     public function __construct(
         private readonly MovieWatchlistApi $movieWatchlistApi,
-        private readonly UserApi $userApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
-        private readonly Authentication $authenticationService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
         private readonly WatchlistResponseMapper $watchlistResponseMapper,
+        private readonly RequestMapper $requestMapper,
     ) {
+    }
+
+    public function addToWatchlist(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $watchlistAdditions = Json::decode($request->getBody());
+
+        foreach ($watchlistAdditions as $watchlistAddition) {
+            $movieId = (int)$watchlistAddition['movaryId'];
+
+            $this->movieWatchlistApi->addMovieToWatchlist($userId, $movieId);
+        }
+
+        return Response::createNoContent();
+    }
+
+    public function deleteFromWatchlist(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $watchlistRemovals = Json::decode($request->getBody());
+
+        foreach ($watchlistRemovals as $watchlistRemoval) {
+            $movieId = (int)$watchlistRemoval['movaryId'];
+
+            $this->movieWatchlistApi->removeMovieFromWatchlist($userId, $movieId);
+        }
+
+        return Response::createNoContent();
     }
 
     public function getWatchlist(Request $request) : Response
     {
-        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
-        if ($requestedUser === null) {
-            return Response::createNotFound();
-        }
-
-        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
-            return Response::createForbidden();
-        }
-
         $requestData = $this->watchlistRequestMapper->mapRequest($request);
 
         $watchlistEntries = $this->movieWatchlistApi->fetchWatchlistPaginated(
-            $requestedUser->getId(),
+            $requestData->getRequestedUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
@@ -50,7 +67,7 @@ class WatchlistController
         );
 
         $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
-            $requestedUser->getId(),
+            $requestData->getRequestedUserId(),
             $requestData->getSearchTerm(),
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),

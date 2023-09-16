@@ -211,6 +211,17 @@ class UserApi
         return $this->repository->findUserByName($name);
     }
 
+    public function fetchUserByName(string $name) : UserEntity
+    {
+        $user = $this->findUserByName($name);
+
+        if ($user === null) {
+            throw new RuntimeException('There is no user with name: ' . $name);
+        }
+
+        return $user;
+    }
+
     public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByEmbyWebhookId($webhookId);

@@ -6,12 +6,13 @@
   },
   "servers": [],
   "paths": {
-    "\/users\/{username}\/history": {
+    "\/users\/{username}\/history\/movies": {
       "get": {
         "tags": [
-          "Users"
+          "History"
         ],
-        "summary": "Get the latest plays of a user",
+        "summary": "Get played movies with watch dates of user",
+        "description": "Get all played movies with watch dates set. Sorted by most recently watch dates on default.",
         "parameters": [
           {
             "name": "username",
@@ -87,8 +88,182 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Add movie play with watch date set to user",
+        "description": "Create or update the provided watch dates for the specified movies. A date for plays is required.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchedAt": {
+                      "$ref": "#/components/schemas/date"
+                    },
+                    "plays": {
+                      "$ref": "#/components/schemas/playsOptional"
+                    },
+                    "comment": {
+                      "$ref": "#/components/schemas/commentOptional"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Replace movie play with watch date set for user",
+        "description": "Create or replace the provided watch dates for the specified movies. A date for plays is required.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchedAt": {
+                      "$ref": "#/components/schemas/date"
+                    },
+                    "plays": {
+                      "$ref": "#/components/schemas/plays"
+                    },
+                    "comment": {
+                      "$ref": "#/components/schemas/comment"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Delete movie watch dates from user history",
+        "description": "Delete all watch dates of specified movies if no specific watch dates are provided. A date for plays is required.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchedAt": {
+                      "$ref": "#/components/schemas/date"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -101,12 +276,13 @@
         ]
       }
     },
-    "\/users\/{username}\/watchlist": {
+    "\/users\/{username}\/watchlist\/movies": {
       "get": {
         "tags": [
-          "Users"
+          "Watchlist"
         ],
-        "summary": "Get the watchlist of a user",
+        "summary": "Get movies in watchlist of user",
+        "description": "Get all movies on the user watchlist. Sorted by most recently added on default.",
         "parameters": [
           {
             "name": "username",
@@ -183,8 +359,7 @@
             "description": "Release year",
             "required": false,
             "schema": {
-              "type": "integer",
-              "example": 2017
+              "type": "integer"
             }
           }
         ],
@@ -196,7 +371,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "history": {
+                    "watchlist": {
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -223,8 +398,452 @@
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/401"
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Watchlist"
+        ],
+        "summary": "Add movie to watchlist of user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Watchlist"
+        ],
+        "summary": "Delete movie from watchlist of user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
+    },
+    "\/users\/{username}\/played\/movies": {
+      "get": {
+        "tags": [
+          "Played"
+        ],
+        "summary": "Get played movies of user",
+        "description": "Get all played movies and their watch dates.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search term",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 24
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sort by",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "title",
+              "enum": [
+                "addedAt",
+                "rating",
+                "releaseDate",
+                "runtime",
+                "title"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Sort order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "releaseYear",
+            "in": "query",
+            "description": "Release year",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "played": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "movie": {
+                            "$ref": "#/components/schemas/movie"
+                          },
+                          "watchedDates": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "date": {
+                                  "$ref": "#/components/schemas/dateNullable"
+                                },
+                                "plays": {
+                                  "$ref": "#/components/schemas/plays"
+                                },
+                                "comment": {
+                                  "$ref": "#/components/schemas/comment"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "maxPage": {
+                      "type": "integer",
+                      "example": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Played"
+        ],
+        "summary": "Add movie plays to user",
+        "description": "Create or update the provided watch dates for the specified movies.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchDates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "watchedAt": {
+                            "$ref": "#/components/schemas/dateNullable"
+                          },
+                          "plays": {
+                            "$ref": "#/components/schemas/playsOptional"
+                          },
+                          "comment": {
+                            "$ref": "#/components/schemas/commentOptional"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Played"
+        ],
+        "summary": "Replace movie plays for user",
+        "description": "Create or replace the provided watch dates for the specified movies.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchDates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "watchedAt": {
+                            "$ref": "#/components/schemas/dateNullable"
+                          },
+                          "plays": {
+                            "$ref": "#/components/schemas/plays"
+                          },
+                          "comment": {
+                            "$ref": "#/components/schemas/comment"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Played"
+        ],
+        "summary": "Delete movie plays from user",
+        "description": "Delete all watch dates of specified movies if no specific watch dates are provided.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "watchDates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/dateNullable"
+                      },
+                      "required": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -243,11 +862,12 @@
       "movie": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer"
-          },
           "title": {
             "type": "string"
+          },
+          "releaseDate": {
+            "type": "string",
+            "nullable": true
           },
           "tagline": {
             "type": "string",
@@ -269,9 +889,27 @@
             "type": "string",
             "nullable": true
           },
-          "releaseDate": {
-            "type": "string",
-            "nullable": true
+          "ids": {
+            "type": "object",
+            "properties": {
+              "movary": {
+                "$ref": "#/components/schemas/id"
+              },
+              "tmdb": {
+                "$ref": "#/components/schemas/idNullable"
+              },
+              "trakt": {
+                "$ref": "#/components/schemas/idNullable"
+              },
+              "imdb": {
+                "type": "string",
+                "nullable": true
+              },
+              "letterboxd": {
+                "type": "string",
+                "nullable": true
+              }
+            }
           },
           "userRating": {
             "type": "integer",
@@ -306,26 +944,6 @@
               }
             }
           },
-          "externalIds": {
-            "type": "object",
-            "properties": {
-              "tmdb": {
-                "type": "integer"
-              },
-              "trakt": {
-                "type": "integer",
-                "nullable": true
-              },
-              "imdb": {
-                "type": "string",
-                "nullable": true
-              },
-              "letterboxd": {
-                "type": "string",
-                "nullable": true
-              }
-            }
-          },
           "updatedAt": {
             "$ref": "#/components/schemas/dateNullable"
           },
@@ -334,22 +952,56 @@
           }
         }
       },
+      "id": {
+        "type": "integer",
+        "example": 42
+      },
+      "idNullable": {
+        "type": "integer",
+        "example": 42,
+        "nullable": true
+      },
+      "plays": {
+        "type": "integer",
+        "example": 1
+      },
+      "playsOptional": {
+        "type": "integer",
+        "example": 1,
+        "default": 1,
+        "required": false
+      },
+      "comment": {
+        "type": "string",
+        "example": "This is a comment",
+        "nullable": true
+      },
+      "commentOptional": {
+        "type": "string",
+        "example": "This is a comment",
+        "nullable": true,
+        "default": null,
+        "required": false
+      },
       "date": {
         "type": "string",
-        "example": "2023-07-02 18:00:00"
+        "example": "2023-07-02"
       },
       "dateNullable": {
         "type": "string",
         "nullable": true,
-        "example": "2023-07-02 18:00:00"
+        "example": "2023-07-02"
       }
     },
     "responses": {
-      "401": {
-        "description": "Not authorized to see the resource"
+      "204": {
+        "description": "Successful operation, response has no content"
+      },
+      "403": {
+        "description": "Not authorized to access resource"
       },
       "404": {
-        "description": "The username was not found"
+        "description": "The resource was not found"
       }
     },
     "securitySchemes": {

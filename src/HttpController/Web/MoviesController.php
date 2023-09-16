@@ -36,7 +36,7 @@ class MoviesController
             return Response::createNotFound();
         }
 
-        $uniqueMovies = $this->movieApi->fetchUniqueMoviesPaginated(
+        $uniqueMovies = $this->movieApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
             $requestData->getLimit(),
             $requestData->getPage(),
@@ -48,14 +48,14 @@ class MoviesController
             $requestData->getGenre(),
         );
 
-        $historyCount = $this->movieApi->fetchUniqueMoviesCount(
+        $watchedMoviesCount = $this->movieApi->fetchUniqueWatchedMoviesCount(
             $userId,
             $requestData->getSearchTerm(),
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
             $requestData->getGenre(),
         );
-        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($historyCount, $requestData->getLimit(), $requestData->getPage());
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchedMoviesCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(
             StatusCode::createOk(),

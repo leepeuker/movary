@@ -11,14 +11,14 @@ class MovieHistoryRepository
     {
     }
 
-    public function create(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment) : void
+    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment) : void
     {
         $this->dbConnection->executeStatement(
             'INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`) VALUES (?, ?, ?, ?, ?)',
             [
                 $movieId,
                 $userId,
-                (string)$watchedAt,
+                $watchedAt !== null ? (string)$watchedAt : null,
                 (string)$plays,
                 $comment,
             ],
@@ -38,8 +38,24 @@ class MovieHistoryRepository
         $this->dbConnection->delete('movie_user_watch_dates', ['user_id' => $userId]);
     }
 
-    public function deleteHistoryByIdAndDate(int $movieId, int $userId, Date $watchedAt) : void
+    public function deleteHistoryById(int $movieId, int $userId) : void
     {
+        $this->dbConnection->delete('movie_user_watch_dates', ['user_id' => $userId, 'movie_id' => $movieId]);
+    }
+
+    public function deleteHistoryByIdAndDate(int $movieId, int $userId, ?Date $watchedAt) : void
+    {
+        if ($watchedAt === null) {
+            $this->dbConnection->executeStatement(
+                'DELETE
+            FROM movie_user_watch_dates
+            WHERE movie_id = ? AND watched_at IS NULL AND user_id = ?',
+                [$movieId, $userId],
+            );
+
+            return;
+        }
+
         $this->dbConnection->executeStatement(
             'DELETE
             FROM movie_user_watch_dates
@@ -48,8 +64,22 @@ class MovieHistoryRepository
         );
     }
 
-    public function update(int $movieId, int $userId, Date $watchedAt, int $plays, ?string $comment) : void
+    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment) : void
     {
+        if ($watchedAt === null) {
+            $this->dbConnection->executeStatement(
+                'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',
+                [
+                    $comment,
+                    $plays,
+                    $movieId,
+                    $userId,
+                ],
+            );
+
+            return;
+        }
+
         $this->dbConnection->executeStatement(
             'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
             [
@@ -62,8 +92,21 @@ class MovieHistoryRepository
         );
     }
 
-    public function updateHistoryComment(int $movieId, int $userId, Date $watchedAt, ?string $comment) : void
+    public function updateHistoryComment(int $movieId, int $userId, ?Date $watchedAt, ?string $comment) : void
     {
+        if ($watchedAt === null) {
+            $this->dbConnection->executeStatement(
+                'UPDATE movie_user_watch_dates SET `comment` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL ',
+                [
+                    $comment,
+                    $movieId,
+                    $userId,
+                ],
+            );
+
+            return;
+        }
+
         $this->dbConnection->executeStatement(
             'UPDATE movie_user_watch_dates SET `comment` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
             [

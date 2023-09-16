@@ -44,7 +44,7 @@ class JellyfinExport extends Command
 
             $this->jellyfinMoviesExporter->exportMoviesWatchStateToJellyfin(
                 $userId,
-                $this->movieHistoryApi->fetchMovieIdsWithWatchHistoryByUserId($userId), false,
+                $this->movieHistoryApi->fetchMovieIdsWithWatchDatesByUserId($userId), false,
             );
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not complete Jellyfin export.');

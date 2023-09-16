@@ -75,17 +75,28 @@ class MovieDto implements \JsonSerializable
         );
     }
 
+    public function getId() : int
+    {
+        return $this->id;
+    }
+
     public function jsonSerialize() : array
     {
         return [
-            'id' => $this->id,
             'title' => $this->title,
+            'releaseDate' => $this->releaseDate,
             'tagline' => $this->tagline,
             'overview' => $this->overview,
             'originalLanguage' => $this->originalLanguage,
             'runtime' => $this->runtime,
             'posterPath' => $this->posterPath,
-            'releaseDate' => $this->releaseDate,
+            'ids' => [
+                'movary' => $this->id,
+                'tmdb' => $this->tmdbId,
+                'trakt' => $this->traktId,
+                'imdb' => $this->imdbId,
+                'letterboxd' => $this->letterboxdId,
+            ],
             'userRating' => $this->userRating,
             'externalRatings' => [
                 'tmdb' => [
@@ -96,12 +107,6 @@ class MovieDto implements \JsonSerializable
                     'average' => $this->imdbRatingAverage,
                     'count' => $this->imdbRatingCount,
                 ],
-            ],
-            'externalIds' => [
-                'tmdb' => $this->tmdbId,
-                'trakt' => $this->traktId,
-                'imdb' => $this->imdbId,
-                'letterboxd' => $this->letterboxdId,
             ],
             'updatedAt' => $this->updatedAt,
             'createdAt' => $this->createdAt,

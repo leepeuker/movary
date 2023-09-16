@@ -7,7 +7,7 @@ use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 
-class WatchlistRequestMapper
+class PlayedRequestMapper
 {
     private const DEFAULT_RELEASE_YEAR = null;
 
@@ -15,7 +15,7 @@ class WatchlistRequestMapper
 
     private const DEFAULT_PAGE = 1;
 
-    private const DEFAULT_SORT_BY = 'addedAt';
+    private const DEFAULT_SORT_BY = 'title';
 
     public function __construct(private readonly RequestMapper $requestMapper)
     {
@@ -57,7 +57,7 @@ class WatchlistRequestMapper
     private function mapSortOrder(array $getParameters) : SortOrder
     {
         if (isset($getParameters['sortOrder']) === false) {
-            return SortOrder::createDesc();
+            return SortOrder::createAsc();
         }
 
         return match ($getParameters['sortOrder']) {

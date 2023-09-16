@@ -40,8 +40,8 @@ class DashboardController
             StatusCode::createOk(),
             $this->twig->render('page/dashboard.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
-                'totalPlayCount' => $this->movieApi->fetchHistoryCount($userId),
-                'uniqueMoviesCount' => $this->movieApi->fetchHistoryCountUnique($userId),
+                'totalPlayCount' => $this->movieApi->fetchTotalPlayCount($userId),
+                'uniqueMoviesCount' => $this->movieApi->fetchTotalPlayCountUnique($userId),
                 'totalHoursWatched' => $this->movieHistoryApi->fetchTotalHoursWatched($userId),
                 'averagePersonalRating' => $this->movieHistoryApi->fetchAveragePersonalRating($userId),
                 'averagePlaysPerDay' => $this->movieHistoryApi->fetchAveragePlaysPerDay($userId),

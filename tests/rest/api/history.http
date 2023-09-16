@@ -1,23 +1,37 @@
-GET http://127.0.0.1/api/users/lee/history
+GET http://127.0.0.1/api/users/{{username}}/history/movies?search=Matrix&limit=10
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
 
 ####
 
-GET http://127.0.0.1/api/users/lee/history?search=Matrix
+PUT http://127.0.0.1/api/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
+
+[{"movaryId" : 1, "watchedAt" : "2011-05-06", "plays" :  1, "comment" :  "comment"}]
 
 ####
 
-GET http://127.0.0.1/api/users/lee/history?limit=5
+POST http://127.0.0.1/api/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: 74703f2e0a54e2535ad7db589bb8ceaa
+X-Auth-Token: {{xAuthToken}}
+
+[{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
+
+####
+
+DELETE http://127.0.0.1/api/users/{{username}}/history/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+[{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
 
 ####

@@ -263,7 +263,7 @@ class MovieRepository
     public function fetchFirstHistoryWatchDate(int $userId) : ?Date
     {
         $stmt = $this->dbConnection->prepare(
-            'SELECT watched_at FROM movie_user_watch_dates WHERE user_id = ? ORDER BY watched_at ASC',
+            'SELECT watched_at FROM movie_user_watch_dates WHERE user_id = ? AND watched_at IS NOT NULL ORDER BY watched_at ASC',
         );
 
         $stmt->bindValue(1, $userId);
@@ -284,91 +284,6 @@ class MovieRepository
         );
     }
 
-    public function fetchTmdbIdsToLastWatchDatesMap(int $userId, array $tmdbIds) : array
-    {
-        if (count($tmdbIds) === 0) {
-            return [];
-        }
-
-        $placeholders = trim(str_repeat('?, ', count($tmdbIds)), ', ');
-
-        return $this->dbConnection->fetchAllAssociative(
-            <<<SQL
-            SELECT tmdb_id, MAX(watched_at) as latest_watched_at
-            FROM movie_user_watch_dates
-            JOIN movie m on m.id = movie_user_watch_dates.movie_id
-            WHERE user_id = ? AND tmdb_id IN ($placeholders)
-            GROUP by tmdb_id
-            SQL,
-            [
-                $userId,
-                ...$tmdbIds
-            ],
-        );
-    }
-
-    public function fetchMovieIdsWithWatchHistoryByUserId(int $userId) : array
-    {
-        return $this->dbConnection->fetchFirstColumn(
-            <<<SQL
-            SELECT movie_id, MAX(watched_at)
-            FROM movie_user_watch_dates
-            WHERE user_id = ?
-            GROUP by movie_id
-            SQL,
-            [$userId],
-        );
-    }
-
-    public function fetchTmdbIdsWithWatchHistoryByUserIdAndMovieIds(int $userId, array $movieIds) : array
-    {
-        if (count($movieIds) === 0) {
-            return [];
-        }
-
-        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
-
-        return $this->dbConnection->fetchFirstColumn(
-            <<<SQL
-            SELECT DISTINCT tmdb_id
-            FROM movie_user_watch_dates
-            JOIN movie m on movie_user_watch_dates.movie_id = m.id
-            WHERE user_id = ? AND movie_id IN ($placeholders)
-            SQL,
-            [
-                $userId,
-                ...$movieIds,
-            ],
-        );
-    }
-
-    public function fetchTmdbIdsWithoutWatchHistoryByUserId(int $userId, array $movieIds) : array
-    {
-        if (count($movieIds) === 0) {
-            return [];
-        }
-
-        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
-
-        return $this->dbConnection->fetchFirstColumn(
-            <<<SQL
-            SELECT DISTINCT tmdb_id
-            FROM movie
-            WHERE id IN ($placeholders) AND id NOT IN (
-                SELECT DISTINCT id
-                FROM movie_user_watch_dates
-                JOIN movie m on movie_user_watch_dates.movie_id = m.id
-                WHERE user_id = ? AND movie_id IN ($placeholders)
-            )
-            SQL,
-            [
-                ...$movieIds,
-                $userId,
-                ...$movieIds,
-            ],
-        );
-    }
-
     public function fetchHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         if ($searchTerm !== null) {
@@ -376,7 +291,7 @@ class MovieRepository
                 <<<SQL
                 SELECT COUNT(*)
                 FROM movie_user_watch_dates mh
-                JOIN movie m on mh.movie_id = m.id
+                JOIN movie m on mh.movie_id = m.id AND watched_at IS NOT NULL
                 WHERE m.title LIKE ? AND user_id = ?
                 SQL,
                 ["%$searchTerm%", $userId],
@@ -384,12 +299,28 @@ class MovieRepository
         }
 
         return $this->dbConnection->fetchFirstColumn(
-            'SELECT COUNT(*) FROM movie_user_watch_dates JOIN movie m on movie_id = m.id WHERE user_id = ?',
+            'SELECT COUNT(*) FROM movie_user_watch_dates JOIN movie m on movie_id = m.id AND watched_at IS NOT NULL WHERE user_id = ?',
             [$userId],
         )[0];
     }
 
-    public function fetchHistoryOrderedByWatchedAtDesc(int $userId) : array
+    public function fetchWatchDatesForMovieIds(int $userId, array $movieIds) : array
+    {
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
+
+        return $this->dbConnection->fetchAllAssociative(
+            "SELECT watched_at, plays, comment, movie_id
+            FROM movie_user_watch_dates
+            WHERE user_id = ? and movie_id in ($placeholders)
+            ORDER BY watched_at DESC",
+            [
+                $userId,
+                ...$movieIds
+            ],
+        );
+    }
+
+    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
             'SELECT m.*, muwd.watched_at, muwd.plays, comment
@@ -417,8 +348,8 @@ class MovieRepository
             <<<SQL
             SELECT m.*, mh.watched_at, mur.rating as userRating
             FROM movie m
-            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
+            JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
+            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
             $whereQuery
             ORDER BY watched_at DESC
             LIMIT $offset, $limit
@@ -430,10 +361,10 @@ class MovieRepository
     public function fetchLastPlays(int $userId) : array
     {
         return $this->dbConnection->executeQuery(
-            'SELECT m.*, mh.watched_at, mur.rating as user_rating
+            'SELECT m.*, mh.watched_at, mur.rating AS user_rating
             FROM movie m
-            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id and mur.user_id = ?
+            JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
+            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
             ORDER BY watched_at DESC
             LIMIT 6',
             [$userId, $userId],
@@ -549,6 +480,19 @@ class MovieRepository
         );
     }
 
+    public function fetchMovieIdsWithWatchDatesByUserId(int $userId) : array
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT UNIQUE(movie_id)
+            FROM movie_user_watch_dates
+            WHERE user_id = ?
+            GROUP by movie_id
+            SQL,
+            [$userId],
+        );
+    }
+
     public function fetchMoviesByProductionCompany(int $productionCompanyId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
@@ -557,6 +501,78 @@ class MovieRepository
             JOIN movie_production_company mpc ON m.id = mpc.movie_id
             WHERE mpc.company_id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)',
             [$productionCompanyId, $userId],
+        );
+    }
+
+    public function fetchTmdbIdsToLastWatchDatesMap(int $userId, array $tmdbIds) : array
+    {
+        if (count($tmdbIds) === 0) {
+            return [];
+        }
+
+        $placeholders = trim(str_repeat('?, ', count($tmdbIds)), ', ');
+
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT tmdb_id, MAX(watched_at) as latest_watched_at
+            FROM movie_user_watch_dates
+            JOIN movie m on m.id = movie_user_watch_dates.movie_id
+            WHERE user_id = ? AND tmdb_id IN ($placeholders)
+            GROUP by tmdb_id
+            SQL,
+            [
+                $userId,
+                ...$tmdbIds
+            ],
+        );
+    }
+
+    public function fetchTmdbIdsWithWatchDatesByUserIdAndMovieIds(int $userId, array $movieIds) : array
+    {
+        if (count($movieIds) === 0) {
+            return [];
+        }
+
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT tmdb_id
+            FROM movie_user_watch_dates
+            JOIN movie m on movie_user_watch_dates.movie_id = m.id
+            WHERE user_id = ? AND movie_id IN ($placeholders)
+            SQL,
+            [
+                $userId,
+                ...$movieIds,
+            ],
+        );
+    }
+
+    public function fetchTmdbIdsWithoutWatchDateByUserId(int $userId, array $movieIds) : array
+    {
+        if (count($movieIds) === 0) {
+            return [];
+        }
+
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT DISTINCT tmdb_id
+            FROM movie
+            WHERE id IN ($placeholders) AND id NOT IN (
+                SELECT DISTINCT id
+                FROM movie_user_watch_dates
+                JOIN movie m on movie_user_watch_dates.movie_id = m.id
+                WHERE user_id = ? AND movie_id IN ($placeholders)
+            )
+            SQL,
+            [
+                ...$movieIds,
+                $userId,
+                ...$movieIds,
+            ],
         );
     }
 
@@ -569,6 +585,26 @@ class MovieRepository
             WHERE mh.user_id = ?',
             [$userId],
         )->fetchFirstColumn()[0];
+    }
+
+    public function fetchTotalPlayCount(int $userId) : int
+    {
+        return (int)$this->dbConnection->fetchFirstColumn(
+            'SELECT SUM(plays) FROM movie_user_watch_dates JOIN movie m on movie_id = m.id WHERE user_id = ?',
+            [$userId],
+        )[0];
+    }
+
+    public function fetchTotalPlayCountUnique(int $userId) : int
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT COUNT(DISTINCT m.id)
+            FROM movie m
+            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+            SQL,
+            [$userId],
+        )[0];
     }
 
     public function fetchTotalPlaysForMovieAndUserId(int $movieId, int $userId) : int
@@ -633,44 +669,6 @@ class MovieRepository
         );
     }
 
-    public function fetchUniqueMovieInHistoryCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
-    {
-        $payload = [$userId, "%$searchTerm%"];
-
-        $whereQuery = 'WHERE m.title LIKE ? ';
-
-        if (empty($releaseYear) === false) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-                $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
-            } else {
-                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
-            }
-            $payload[] = (string)$releaseYear;
-        }
-
-        if (empty($language) === false) {
-            $whereQuery .= 'AND m.original_language = ? ';
-            $payload[] = $language;
-        }
-
-        if (empty($genre) === false) {
-            $whereQuery .= 'AND g.name = ? ';
-            $payload[] = $genre;
-        }
-
-        return $this->dbConnection->fetchFirstColumn(
-            <<<SQL
-            SELECT COUNT(DISTINCT m.id)
-            FROM movie m
-            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            LEFT JOIN movie_genre mg on m.id = mg.movie_id
-            LEFT JOIN genre g on mg.genre_id = g.id
-            $whereQuery
-            SQL,
-            $payload,
-        )[0];
-    }
-
     public function fetchUniqueMovieLanguages(int $userId) : array
     {
         return $this->dbConnection->fetchFirstColumn(
@@ -712,7 +710,7 @@ class MovieRepository
         );
     }
 
-    public function fetchUniqueMoviesPaginated(
+    public function fetchUniqueWatchedMoviesPaginated(
         int $userId,
         int $limit,
         int $page,
@@ -775,6 +773,44 @@ class MovieRepository
             SQL,
             $payload,
         );
+    }
+
+    public function fetchUniqueWatchedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    {
+        $payload = [$userId, "%$searchTerm%"];
+
+        $whereQuery = 'WHERE m.title LIKE ? ';
+
+        if (empty($releaseYear) === false) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
+            } else {
+                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            }
+            $payload[] = (string)$releaseYear;
+        }
+
+        if (empty($language) === false) {
+            $whereQuery .= 'AND m.original_language = ? ';
+            $payload[] = $language;
+        }
+
+        if (empty($genre) === false) {
+            $whereQuery .= 'AND g.name = ? ';
+            $payload[] = $genre;
+        }
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT COUNT(DISTINCT m.id)
+            FROM movie m
+            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+            LEFT JOIN movie_genre mg on m.id = mg.movie_id
+            LEFT JOIN genre g on mg.genre_id = g.id
+            $whereQuery
+            SQL,
+            $payload,
+        )[0];
     }
 
     public function fetchWithActor(int $personId, int $userId) : array
@@ -861,12 +897,19 @@ class MovieRepository
         return $data === false ? null : MovieEntity::createFromArray($data);
     }
 
-    public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, Date $watchedAt) : ?MovieHistoryEntity
+    public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, ?Date $watchedAt) : ?MovieHistoryEntity
     {
-        $result = $this->dbConnection->fetchAssociative(
-            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
-            [$movieId, $watchedAt, $userId],
-        );
+        if ($watchedAt === null) {
+            $result = $this->dbConnection->fetchAssociative(
+                'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',
+                [$movieId, $userId],
+            );
+        } else {
+            $result = $this->dbConnection->fetchAssociative(
+                'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
+                [$movieId, $watchedAt, $userId],
+            );
+        }
 
         if ($result === false) {
             return null;
@@ -883,20 +926,6 @@ class MovieRepository
         );
 
         return $data === false ? null : PersonalRating::create($data);
-    }
-
-    public function findPlaysForMovieIdAndDate(int $movieId, int $userId, Date $watchedAt) : ?int
-    {
-        $result = $this->dbConnection->fetchFirstColumn(
-            <<<SQL
-            SELECT plays
-            FROM movie_user_watch_dates
-            WHERE movie_id = ? AND watched_at = ? AND user_id = ?
-            SQL,
-            [$movieId, $watchedAt, $userId],
-        );
-
-        return $result[0] ?? null;
     }
 
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating

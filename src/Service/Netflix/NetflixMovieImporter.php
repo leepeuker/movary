@@ -62,7 +62,7 @@ class NetflixMovieImporter
             return;
         }
 
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+        $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
 
         $this->logger->info('Netflix: Movie watch date imported', [

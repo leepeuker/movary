@@ -40,7 +40,7 @@ class ExportWriter
     public function writeWatchDateToCsv($fileHandle, array $movieWatchDate) : void
     {
         $releaseDate = $this->convertReleaseDate($movieWatchDate['release_date']);
-        $watchDate = Date::createFromString($movieWatchDate['watched_at']);
+        $watchDate = empty($movieWatchDate['watched_at']) === false ? Date::createFromString($movieWatchDate['watched_at']) : null;
 
         for ($i = 1; $i <= $movieWatchDate['plays']; $i++) {
             $lengthOfWrittenString = fputcsv($fileHandle, [
@@ -57,7 +57,7 @@ class ExportWriter
             }
         }
     }
-    
+
     /** @param resource $fileHandle */
     public function writeWatchlistItemToCsv($fileHandle, array $watchlistItem) : void
     {

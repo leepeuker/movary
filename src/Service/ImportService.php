@@ -40,16 +40,16 @@ class ImportService
         $csv->setHeaderOffset(0);
 
         foreach ($csv->getRecords() as $record) {
-            if (isset($record['tmdbId'], $record['imdbId'], $record['title'], $record['watchedAt']) === false) {
+            if (isset($record['tmdbId'], $record['imdbId'], $record['title']) === false || array_key_exists('watchedAt', $record) === false) {
                 throw new RuntimeException('Import csv is missing data');
             }
 
             $tmdbId = (int)$record['tmdbId'];
-            $watchDate = Date::createFromString((string)$record['watchedAt']);
+            $watchDate = empty($record['watchedAt']) === false ? Date::createFromString($record['watchedAt']) : null;
 
             $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
 
-            $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+            $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
             if (empty($record['comment']) === false) {
                 $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $record['comment']);
             }

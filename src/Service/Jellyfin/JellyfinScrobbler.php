@@ -56,7 +56,7 @@ class JellyfinScrobbler
             $this->logger->debug('Jellyfin: Created not yet existing watched movie', ['movieId' => $movie->getId(), 'movieTitle' => $movie->getTitle()]);
         }
 
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $user->getId(), $webhookDto->getWatchDate());
+        $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $user->getId(), $webhookDto->getWatchDate());
 
         $this->logger->info('Jellyfin: Scrobbled movie watch date', [
             'movieId' => $movie->getId(),

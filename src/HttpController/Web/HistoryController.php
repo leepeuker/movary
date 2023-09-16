@@ -45,12 +45,26 @@ class HistoryController
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];
-        $newWatchDate = Date::createFromStringAndFormat($requestBody['newWatchDate'], $requestBody['dateFormat']);
-        $originalWatchDate = Date::createFromStringAndFormat($requestBody['originalWatchDate'], $requestBody['dateFormat']);
+
+        $dateFormat = $requestBody['dateFormat'];
+        $newWatchDate = empty($requestBody['newWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['newWatchDate'], $dateFormat) : null;
+        $originalWatchDate = empty($requestBody['originalWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['originalWatchDate'], $dateFormat) : null;
+
         $plays = (int)$requestBody['plays'];
         $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
 
-        $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $originalWatchDate, $comment);
+        if ($originalWatchDate == $newWatchDate) {
+            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $comment);
+
+            return Response::create(StatusCode::createNoContent());
+        }
+
+        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays);
+        $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
+
+        if ($comment !== null) {
+            $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
+        }
 
         return Response::create(StatusCode::createNoContent());
     }
@@ -66,7 +80,7 @@ class HistoryController
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];
-        $date = Date::createFromStringAndFormat($requestBody['date'], $requestBody['dateFormat']);
+        $date = empty($requestBody['date']) === false ? Date::createFromStringAndFormat($requestBody['date'], $requestBody['dateFormat']) : null;
 
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date);
 
@@ -83,7 +97,7 @@ class HistoryController
             throw new RuntimeException('Missing parameters');
         }
 
-        $watchDate = Date::createFromStringAndFormat($requestData['watchDate'], $requestData['dateFormat']);
+        $watchDate = empty($requestData['watchDate']) === false ? Date::createFromStringAndFormat($requestData['watchDate'], $requestData['dateFormat']) : null;
         $tmdbId = (int)$requestData['tmdbId'];
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
         $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
@@ -95,7 +109,7 @@ class HistoryController
         }
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
-        $this->movieApi->increaseHistoryPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+        $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
 
         return Response::create(StatusCode::createOk());

@@ -366,14 +366,6 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
  * Watch date logic starting here
  */
 function validateWatchDate(context, watchDate) {
-    if (!watchDate) {
-        document.getElementById(context + 'WatchDateInput').style.borderStyle = 'solid'
-        document.getElementById(context + 'WatchDateInput').style.borderColor = '#dc3545'
-        document.getElementById(context + 'RatingStars').style.marginTop = '0'
-
-        return false
-    }
-
     if (isValidDate(watchDate) === false) {
         document.getElementById(context + 'WatchDateInput').style.borderStyle = 'solid'
         document.getElementById(context + 'WatchDateInput').style.borderColor = '#dc3545'

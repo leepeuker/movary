@@ -4,6 +4,6 @@
 /vendor
 /public/storage
 docker-compose.override.yml
-.phpunit.result.cache
 tmp/*
 .vscode
+http-client.private.env.json
