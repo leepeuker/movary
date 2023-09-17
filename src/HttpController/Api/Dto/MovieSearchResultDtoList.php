@@ -24,4 +24,9 @@ class MovieSearchResultDtoList extends AbstractList
     {
         return $this->data[$tmdbId];
     }
+
+    public function jsonSerialize() : array
+    {
+        return array_values($this->data);
+    }
 }
