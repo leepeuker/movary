@@ -15,8 +15,13 @@ class MovieSearchResultDtoList extends AbstractList
         return new self();
     }
 
-    public function add(MovieSearchResultDto $dto) : void
+    public function set(MovieSearchResultDto $dto) : void
     {
         $this->data[$dto->getTmdbId()] = $dto;
+    }
+
+    public function get(int $tmdbId) : MovieSearchResultDto
+    {
+        return $this->data[$tmdbId];
     }
 }

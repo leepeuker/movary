@@ -19,13 +19,16 @@ class MovieSearchResponseMapper
         $tmdbIds = [];
 
         foreach ($tmdbResponse['results'] as $result) {
-            $searchResults->add($this->mapSearchResult($result));
+            $searchResults->set($this->mapSearchResult($result));
             $tmdbIds[] = $result['id'];
         }
 
-//        foreach ($this->movieApi->findByTmdbIds($tmdbIds) as $movie) {
-//            $searchResults[$movie->getTmdbId()]['ids']['movary'] = $movie->getId();
-//        }
+        foreach ($this->movieApi->findByTmdbIds($tmdbIds) as $movie) {
+            $searchResult = $searchResults->get($movie->getTmdbId());
+            $searchResult = $searchResult->withMovaryId($movie->getId());
+
+            $searchResults->set($searchResult);
+        }
 
         return $searchResults;
     }

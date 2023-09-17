@@ -23,7 +23,7 @@ class MovieSearchResultDto implements \JsonSerializable
         ?string $overview = null,
         ?Date $releaseDate = null,
         ?string $originalLanguage = null,
-        ?string $posterPath = null,
+        ?string $tmdbPosterPath = null,
         ?int $movaryId = null,
     ) : self {
         return new self(
@@ -32,7 +32,7 @@ class MovieSearchResultDto implements \JsonSerializable
             $overview,
             $releaseDate,
             $originalLanguage,
-            $posterPath,
+            $tmdbPosterPath,
             $movaryId,
         );
     }
@@ -55,5 +55,18 @@ class MovieSearchResultDto implements \JsonSerializable
                 'tmdb' => $this->tmdbId,
             ],
         ];
+    }
+
+    public function withMovaryId(int $id) : self
+    {
+        return MovieSearchResultDto::create(
+            $this->tmdbId,
+            $this->title,
+            $this->overview,
+            $this->releaseDate,
+            $this->originalLanguage,
+            $this->tmdbPosterPath,
+            $id,
+        );
     }
 }
