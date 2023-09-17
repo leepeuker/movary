@@ -47,7 +47,7 @@ class NetflixActivityItemsConverter
 
             $search = $this->tmdbApi->searchMovie($movieName);
             $tmdbSearchResults[] = [
-                'tmdbMatch' => $search[0] ?? null,
+                'tmdbMatch' => $search['results'][0] ?? null,
                 'netflixWatchDate' => (string)$activityItem->getDate(),
                 'netflixMovieName' => $movieName
             ];

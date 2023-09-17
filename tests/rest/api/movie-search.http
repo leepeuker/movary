@@ -1,0 +1,7 @@
+GET http://127.0.0.1/api/movies/search?query=Matrix&page=1
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+####
