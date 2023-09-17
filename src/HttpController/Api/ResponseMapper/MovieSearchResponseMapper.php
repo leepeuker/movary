@@ -3,6 +3,9 @@
 namespace Movary\HttpController\Api\ResponseMapper;
 
 use Movary\Domain\Movie\MovieApi;
+use Movary\HttpController\Api\Dto\MovieSearchResultDto;
+use Movary\HttpController\Api\Dto\MovieSearchResultDtoList;
+use Movary\ValueObject\Date;
 
 class MovieSearchResponseMapper
 {
@@ -10,35 +13,32 @@ class MovieSearchResponseMapper
     {
     }
 
-    public function mapMovieSearchResults(array $tmdbResponse) : array
+    public function mapMovieSearchResults(array $tmdbResponse) : MovieSearchResultDtoList
     {
-        $searchResults = [];
+        $searchResults = MovieSearchResultDtoList::create();
         $tmdbIds = [];
 
         foreach ($tmdbResponse['results'] as $result) {
-            $searchResults[$result['id']] = $this->mapSearchResult($result);
+            $searchResults->add($this->mapSearchResult($result));
             $tmdbIds[] = $result['id'];
         }
 
-        foreach ($this->movieApi->findByTmdbIds($tmdbIds) as $movie) {
-            $searchResults[$movie->getTmdbId()]['ids']['movary'] = $movie->getId();
-        }
+//        foreach ($this->movieApi->findByTmdbIds($tmdbIds) as $movie) {
+//            $searchResults[$movie->getTmdbId()]['ids']['movary'] = $movie->getId();
+//        }
 
         return $searchResults;
     }
 
-    private function mapSearchResult(array $tmdbResponse) : array
+    private function mapSearchResult(array $tmdbResponse) : MovieSearchResultDto
     {
-        return [
-            'title' => $tmdbResponse['title'],
-            'releaseDate' => $tmdbResponse['release_date'],
-            'overview' => $tmdbResponse['overview'],
-            'originalLanguage' => $tmdbResponse['original_language'],
-            'tmdbPosterPath' => $tmdbResponse['poster_path'],
-            'ids' => [
-                'movary' => null,
-                'tmdb' => $tmdbResponse['id'],
-            ],
-        ];
+        return MovieSearchResultDto::create(
+            $tmdbResponse['id'],
+            $tmdbResponse['title'],
+            $tmdbResponse['overview'],
+            empty($tmdbResponse['release_date']) === true ? null : Date::createFromString($tmdbResponse['release_date']),
+            $tmdbResponse['original_language'],
+            $tmdbResponse['poster_path'],
+        );
     }
 }

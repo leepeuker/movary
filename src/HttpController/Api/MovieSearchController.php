@@ -3,7 +3,6 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Api\Tmdb\TmdbApi;
-use Movary\Domain\Movie\MovieApi;
 use Movary\HttpController\Api\RequestMapper\SearchRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\MovieSearchResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
