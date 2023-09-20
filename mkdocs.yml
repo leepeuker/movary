@@ -47,9 +47,8 @@ nav:
       - Trakt TV: features/trakt.md
       - Netflix: features/netflix.md
   - Development: 
-      - Set up: development/set-up.md
+      - Setup: development/setup.md
       - Directory structure: development/file-structure.md
       - How does the backend work?: development/structure.md
-      - Making migrations: development/migrations.md
-      - Bootstrapping: development/bootstrap.md
+      - Database migrations: development/database-migrations.md
   - FAQ: 'faq.md'
