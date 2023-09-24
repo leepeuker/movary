@@ -70,6 +70,6 @@ class NetflixController
 
         $tmdbSearchResult = $this->tmdbApi->searchMovie($input['query']);
 
-        return Response::createJson(Json::encode($tmdbSearchResult));
+        return Response::createJson(Json::encode($tmdbSearchResult['results']));
     }
 }

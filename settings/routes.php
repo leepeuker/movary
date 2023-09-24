@@ -213,6 +213,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/radarr/{id:.+}', [RadarrController::class, 'renderRadarrFeed']);
     $routes->add('PUT', '/radarr/regeneratefeedid', [RadarrController::class, 'regenerateRadarrFeedId'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/radarr/deletefeedid', [RadarrController::class, 'deleteRadarrFeedId'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

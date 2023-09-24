@@ -855,6 +855,115 @@
           }
         ]
       }
+    },
+    "\/movies\/search": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "Search for movies remotely",
+        "description": "Search remotely on tmdb for the movie with the specified search filters. Movies already existing locally will have a Movary id set.",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The search query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Search result page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Filter by release year",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 2012
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "$ref": "#/components/schemas/title"
+                          },
+                          "releaseDate": {
+                            "$ref": "#/components/schemas/releaseDateNullable"
+                          },
+                          "overview": {
+                            "$ref": "#/components/schemas/overview"
+                          },
+                          "originalLanguage": {
+                            "type": "string",
+                            "example": "en"
+                          },
+                          "tmdbPosterPath": {
+                            "type": "string",
+                            "example": "/gb7C4oRzYWXWCuZMR1cwtHa53Pz.jpg"
+                          },
+                          "ids": {
+                            "type": "object",
+                            "properties": {
+                              "movary": {
+                                "$ref": "#/components/schemas/idNullable"
+                              },
+                              "tmdb": {
+                                "$ref": "#/components/schemas/id"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "maxPage": {
+                      "type": "integer",
+                      "example": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -863,19 +972,17 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "$ref": "#/components/schemas/title"
           },
           "releaseDate": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/releaseDateNullable"
           },
           "tagline": {
             "type": "string",
             "nullable": true
           },
           "overview": {
-            "type": "string",
-            "nullable": true
+            "$ref": "#/components/schemas/overview"
           },
           "originalLanguage": {
             "type": "string",
@@ -970,6 +1077,20 @@
         "example": 1,
         "default": 1,
         "required": false
+      },
+      "title": {
+        "type": "string",
+        "example": "Matrix"
+      },
+      "releaseDateNullable": {
+        "type": "string",
+        "example": "2004-12-07",
+        "nullable": true
+      },
+      "overview": {
+        "type": "string",
+        "example": "Lorem ipsum",
+        "nullable": true
       },
       "comment": {
         "type": "string",

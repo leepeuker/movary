@@ -8,6 +8,7 @@ use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbPerson;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderCollection;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderList;
+use Movary\ValueObject\Year;
 
 class TmdbApi
 {
@@ -58,10 +59,18 @@ class TmdbApi
         );
     }
 
-    public function searchMovie(string $searchTerm) : array
+    public function searchMovie(string $searchTerm, ?Year $year = null, ?int $page = null) : array
     {
-        $data = $this->client->get('/search/movie', ['query' => urlencode($searchTerm)]);
+        $getParameters = ['query' => urlencode($searchTerm)];
 
-        return $data['results'];
+        if ($year !== null) {
+            $getParameters['year'] = (string)$year;
+        }
+
+        if ($page !== null) {
+            $getParameters['page'] = (string)$page;
+        }
+
+        return $this->client->get('/search/movie', $getParameters);
     }
 }
