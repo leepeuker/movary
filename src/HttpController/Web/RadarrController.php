@@ -17,8 +17,9 @@ class RadarrController
         private readonly UserApi $userApi,
         private readonly MovieWatchlistApi $movieWatchlistApi,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
-    ) { }
-    
+    ) {
+    }
+
     public function deleteRadarrFeedId() : Response
     {
         $this->userApi->deleteRadarrFeedId($this->authenticationService->getCurrentUserId());
@@ -39,7 +40,7 @@ class RadarrController
 
         $userId = $this->userApi->findUserIdByRadarrFeedId($feedId);
 
-        if($userId === null) {
+        if ($userId === null) {
             return Response::createNotFound();
         }
         $watchlist = $this->movieWatchlistApi->fetchAllWatchlistItems($userId);
