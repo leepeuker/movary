@@ -33,11 +33,6 @@ namespace Movary\HttpController\Web\Middleware;
 
 class MyNewMiddleware implements MiddlewareInterface
 {
-    public function __construct(
-        // Any other things you need like an authentication service,
-    ) {
-    }
-
     public function __invoke() : ?Response
     {
         // Add your own code here
@@ -66,18 +61,15 @@ The controllers for the website have the namespace `namespace Movary\HttpControl
 
 Data Transfer Objects (DTO) are frequently used in Movary and can be found throughout the whole backend.
 
-To put it simply, a DTO is an object that holds a lot of (meta)data about a certain thing. Whether it's a Jellyfin account, a movie or a user itself, the DTOs will be used to
-communicate this information between classes and methods.
-
-A DTO that is frequently used and accesssed, is the `UserEntity`, which is the class that holds information an user. When one method requests information from another class (or
-method) about a certain user, they will receive this information as a `UserEntity` object.
-
-Why not just use an associative (or JSON?) array instead of this complicated class? Well, this ensures that the received information will always be send and received in the same
-shape, with no modifications at all. Every single class property will always exist, 100% guaranteed (though the values sometimes don't exist if they're nullable) which can't be
-said for a JSON array or a normal associative array.
+A DOT is used to transfer data between classes and processes in a statically defined typesafe manner (in opposite to for example arrays).
 
 For a different (perhaps better) explanation, visit this [Stackoverflow thread](https://stackoverflow.com/q/1051182/12096297)
 
 ### Dependency injections, bootstrapping and the Factory
 
-<!-- TODO: Please add some explanation how this works --> 
+The basic bootstrapping of the application is configured in the `bootstrap.php`. 
+
+The `bootstrap.php` will create and return a PSR7 confirm ContainerInterface, containing the dynamic and manually configured dependency wiring.
+This is loaded in the `public/index.php` when processing a HTTP request or in the `bin/console.php` when processing cli commands.
+
+If you need to wire a dependency manually (e.g. which implementation of an interface to use or depending on a scalar type) extend the definitions array in the `bootstrap.php` and create a factory method if necessary.
