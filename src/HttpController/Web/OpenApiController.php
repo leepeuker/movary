@@ -17,7 +17,7 @@ class OpenApiController
 
     public function renderPage() : Response
     {
-        $openAiJsonUrl = '/api/openapi.json';
+        $openAiJsonUrl = '/api/openapi';
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         if ($applicationUrl !== null) {
