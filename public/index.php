@@ -26,6 +26,7 @@ try {
     $uri = rawurldecode($uri);
 
     $routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $uri);
+
     switch ($routeInfo[0]) {
         case FastRoute\Dispatcher::NOT_FOUND:
             $response = Response::createNotFound();
@@ -52,13 +53,15 @@ try {
             throw new LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
     }
 
-    if ($response->getStatusCode()->getCode() === 404) {
+    if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
-    $response = $container->get(ErrorController::class)->renderInternalServerError();
+    if (str_starts_with($uri, '/api') === false) {
+        $response = $container->get(ErrorController::class)->renderInternalServerError();
+    }
 }
 
 header((string)$response->getStatusCode());
