@@ -29,24 +29,6 @@ class EmbyController
         return Response::createOk();
     }
 
-    public function handleEmbyWebhook(Request $request) : Response
-    {
-        $webhookId = $request->getRouteParameters()['id'];
-
-        $userId = $this->userApi->findUserIdByEmbyWebhookId($webhookId);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
-        $requestPayload = $request->getPostParameters()['data'];
-
-        $this->logger->debug('Emby: Webhook triggered with payload: ' . $requestPayload);
-
-        $this->embyScrobbler->processEmbyWebhook($userId, Json::decode($requestPayload));
-
-        return Response::createOk();
-    }
-
     public function regenerateEmbyWebhookUrl() : Response
     {
         $webhookId = $this->userApi->regenerateEmbyWebhookId($this->authenticationService->getCurrentUserId());
