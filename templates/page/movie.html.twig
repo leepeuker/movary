@@ -43,7 +43,7 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ movie.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="{{ movie.posterPath }}" width="200rem" style="width: 13rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -69,6 +69,14 @@
                     <span class="fw-light">
                         {% if movie.originalLanguage == '' %} - {% endif %}
                         {{ movie.originalLanguage }}
+                    </span>
+                </div>
+
+                <h6 style="margin-bottom: 0.2rem">Release</h6>
+                <div style="margin-bottom: 0.4rem">
+                    <span class="fw-light">
+                        {% if movie.releaseDate == '' %} - {% endif %}
+                        {{ movie.releaseDate|date(dateFormatPhp) }}
                     </span>
                 </div>
             </div>
