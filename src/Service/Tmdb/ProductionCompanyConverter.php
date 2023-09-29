@@ -12,7 +12,7 @@ use Movary\Domain\Company\CompanyEntityList;
 
 class ProductionCompanyConverter
 {
-    public function __construct(private readonly CompanyApi $companyApi, private readonly Tmdb\TmdbApi $tmdbApi)
+    public function __construct(private readonly CompanyApi $companyApi)
     {
     }
 
@@ -35,33 +35,6 @@ class ProductionCompanyConverter
 
     private function createMissingCompany(TmdbProductionCompany $tmdbCompany) : CompanyEntity
     {
-        try {
-            return $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
-        } catch (UniqueConstraintViolationException $e) {
-            $companyCausingConstraintViolation = $this->companyApi->findByNameAndOriginCountry($tmdbCompany->getName(), $tmdbCompany->getOriginCountry());
-
-            if ($companyCausingConstraintViolation === null) {
-                throw $e;
-            }
-
-            $this->fixUniqueConstraintViolation($companyCausingConstraintViolation);
-        }
-
         return $this->companyApi->create($tmdbCompany->getName(), $tmdbCompany->getOriginCountry(), $tmdbCompany->getId());
-    }
-
-    private function fixUniqueConstraintViolation(CompanyEntity $companyCausingConstraintViolation) : void
-    {
-        try {
-            // The unique constraint violation indicates that the local company is no longer matching the remote tmdb company
-            $tmdbCompany = $this->tmdbApi->fetchCompany($companyCausingConstraintViolation->getTmdbId());
-        } catch (Tmdb\Exception\TmdbResourceNotFound $e) {
-            // Remote company no longer exists, so we can delete it locally
-            $this->companyApi->deleteByTmdbId($companyCausingConstraintViolation->getTmdbId());
-
-            return;
-        }
-
-        $this->companyApi->update($tmdbCompany->getId(), $tmdbCompany->getName(), $tmdbCompany->getOriginCountry());
     }
 }
