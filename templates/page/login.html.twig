@@ -43,6 +43,12 @@
                         Invalid credentials
                     </div>
                 {% endif %}
+                {% if redirect != false %}
+                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
+                        Log in to enter view this page
+                    </div>
+                    <input type="hidden" value="{{ redirect }}" name="redirect" />
+                {% endif %}
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">Sign in</button>
                 {% if registrationEnabled == true %}
                     <a href="/create-user">Create new user</a>

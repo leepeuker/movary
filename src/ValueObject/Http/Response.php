@@ -34,6 +34,12 @@ class Response
         return new self(StatusCode::createForbidden());
     }
 
+    public static function createForbiddenRedirect(string $redirectTarget) : self
+    {
+        $query = urlencode($redirectTarget);
+        return new self(StatusCode::createForbidden(), null, [Header::createLocation('/login?redirect='.$query)]);
+    }
+
     public static function createJson(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);

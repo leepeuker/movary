@@ -18,6 +18,6 @@ class UserIsAuthenticated implements MiddlewareInterface
             return null;
         }
 
-        return Response::createForbidden();
+        return Response::createForbiddenRedirect($_SERVER['REQUEST_URI']);
     }
 }
