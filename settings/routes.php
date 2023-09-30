@@ -33,7 +33,14 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
 
-    #############
+    #####################
+    # Webhook listeners # !!! Deprecated use new api routes
+    #####################
+    $routes->add('POST', '/plex/{id:.+}', [Web\PlexController::class, 'handlePlexWebhook']);
+    $routes->add('POST', '/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook']);
+    $routes->add('POST', '/emby/{id:.+}', [Web\EmbyController::class, 'handleEmbyWebhook']);
+
+    ############
     # Job Queue #
     #############
     $routes->add('GET', '/jobs', [Web\JobController::class, 'getJobs'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -203,12 +210,9 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
 
-    #####################
-    # Webhook listeners #
-    #####################
-    $routes->add('POST', '/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
-    $routes->add('POST', '/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
-    $routes->add('POST', '/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
+    $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
+    $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
+    $routes->add('POST', '/webhook/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

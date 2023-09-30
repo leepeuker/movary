@@ -66,6 +66,31 @@ class JellyfinController
         return Response::createOk();
     }
 
+
+    /**
+     * @deprecated
+     * @see \Movary\HttpController\Api\JellyfinController::handleJellyfinWebhook()
+     */
+    public function handleJellyfinWebhook(Request $request) : Response
+    {
+        $webhookId = $request->getRouteParameters()['id'];
+
+        $userId = $this->userApi->findUserIdByJellyfinWebhookId($webhookId);
+        if ($userId === null) {
+            return Response::createNotFound();
+        }
+
+        $requestPayload = $request->getBody();
+
+        $this->logger->debug('Jellyfin: Webhook triggered with payload: ' . $requestPayload);
+        $this->logger->warning('This jellyfin webhook url is deprecated and will stop to work soon, regenerate the url');
+
+        $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode($requestPayload));
+
+        return Response::createOk();
+    }
+
+
     public function regenerateJellyfinWebhookUrl() : Response
     {
         $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->getCurrentUserId());

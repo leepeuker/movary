@@ -29,6 +29,29 @@ class EmbyController
         return Response::createOk();
     }
 
+    /**
+     * @deprecated
+     * @see \Movary\HttpController\Api\EmbyController::handleEmbyWebhook()
+     */
+    public function handleEmbyWebhook(Request $request) : Response
+    {
+        $webhookId = $request->getRouteParameters()['id'];
+
+        $userId = $this->userApi->findUserIdByEmbyWebhookId($webhookId);
+        if ($userId === null) {
+            return Response::createNotFound();
+        }
+
+        $requestPayload = $request->getPostParameters()['data'];
+
+        $this->logger->debug('Emby: Webhook triggered with payload: ' . $requestPayload);
+        $this->logger->warning('This emby webhook url is deprecated and will stop to work soon, regenerate the url');
+
+        $this->embyScrobbler->processEmbyWebhook($userId, Json::decode($requestPayload));
+
+        return Response::createOk();
+    }
+
     public function regenerateEmbyWebhookUrl() : Response
     {
         $webhookId = $this->userApi->regenerateEmbyWebhookId($this->authenticationService->getCurrentUserId());

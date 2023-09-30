@@ -1,4 +1,4 @@
-POST http://127.0.0.1/plex/16914287-329d-4f3b-ba57-4a092f13058d
+POST http://127.0.0.1/api/webhook/plex/14f14d6b-695f-41b9-a856-5ba401bcc040
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/x-www-form-urlencoded
