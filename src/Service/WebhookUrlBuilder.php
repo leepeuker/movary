@@ -25,7 +25,7 @@ class WebhookUrlBuilder
 
     public function buildRadarrFeedUrl(string $feedId) : ?string
     {
-        return $this->buildUrl('api/radarr', $feedId);
+        return $this->buildUrl('api/feed/radarr', $feedId);
     }
 
     private function buildUrl(string $webhookType, string $webhookId) : ?string
