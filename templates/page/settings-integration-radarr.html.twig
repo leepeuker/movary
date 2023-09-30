@@ -39,7 +39,7 @@
                 </div>
 
                 <div id="radarrFeedUrl"
-                     class="overflow-auto text-nowrap feedUrl"
+                     class="overflow-auto text-nowrap webhookUrl"
                      data-active="{{ isActive }}"
                      style="font-size:1rem;margin-top: 1rem;margin-bottom: 1rem;">
                     {{ radarrFeedUrl }}
@@ -69,10 +69,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to regenerate your Radarr feed URL?</p>
+                        Are you sure you want to regenerate your Radarr feed url?
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" onclick="regenerateRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmRegenerationModal">Submit</a>
+                        <a class="btn btn-primary" onclick="regenerateRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmRegenerationModal">Confirm</a>
                     </div>
                 </div>
             </div>
@@ -85,10 +85,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <strong>Are you sure you want to delete your Radarr feed URL?</strong>
+                        Are you sure you want to delete your Radarr feed url?
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" onclick="deleteRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmDeleteModal">Submit</a>
+                        <a class="btn btn-danger" onclick="deleteRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmDeleteModal">Confirm</a>
                     </div>
                 </div>
             </div>
