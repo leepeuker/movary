@@ -68,6 +68,11 @@ class MovieWatchlistApi
         return $this->repository->fetchWatchlistCount($userId, $searchTerm, $releaseYear, $language, $genre);
     }
 
+    public function fetchAllWatchlistItems(int $userId) : array
+    {
+        return $this->repository->fetchAllWatchlistItems($userId);
+    }
+
     public function fetchWatchlistPaginated(
         int $userId,
         int $limit,

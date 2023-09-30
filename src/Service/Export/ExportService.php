@@ -65,7 +65,7 @@ class ExportService
 
     public function createExportWatchlistCsv(int $userId, ?string $fileName = null) : ?string
     {
-        $watchlist = $this->watchlistApi->fetchWatchlistPaginated($userId, 10000, 1);
+        $watchlist = $this->watchlistApi->fetchAllWatchlistItems($userId);
 
         if ($fileName === null) {
             $fileName = $this->generateFilename($userId, 'watchlist');

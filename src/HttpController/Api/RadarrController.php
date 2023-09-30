@@ -26,16 +26,8 @@ class RadarrController
             return Response::createNotFound();
         }
 
-        $responseData = [];
-        foreach ($this->movieWatchlistApi->fetchWatchlistPaginated($userId, 10000, 1) as $watchlistEntry) {
-            $responseData[] = [
-                'title' => $watchlistEntry['title'],
-                'tmdb_id' => $watchlistEntry['tmdb_id'],
-                'imdb_id' => $watchlistEntry['imdb_id'],
-                'added_at' => $watchlistEntry['added_at'],
-            ];
-        }
+        $response = Json::encode($this->movieWatchlistApi->fetchAllWatchlistItems($userId));
 
-        return Response::createJson(Json::encode($responseData));
+        return Response::createJson($response);
     }
 }
