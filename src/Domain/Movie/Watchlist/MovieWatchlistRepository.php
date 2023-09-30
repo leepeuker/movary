@@ -26,13 +26,6 @@ class MovieWatchlistRepository
         );
     }
 
-    public function fetchAllWatchlistItems(int $userId) : ?array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT title, tmdb_id, imdb_id, added_at FROM watchlist JOIN movie m ON movie_id = m.id WHERE user_id = ?', [$userId],
-        );
-    }
-
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->dbConnection->fetchFirstColumn(

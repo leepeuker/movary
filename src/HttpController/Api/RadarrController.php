@@ -25,10 +25,17 @@ class RadarrController
         if ($userId === null) {
             return Response::createNotFound();
         }
-        $watchlist = $this->movieWatchlistApi->fetchAllWatchlistItems($userId);
 
-        $response = Json::encode($watchlist);
+        $responseData = [];
+        foreach ($this->movieWatchlistApi->fetchWatchlistPaginated($userId, 10000, 1) as $watchlistEntry) {
+            $responseData[] = [
+                'title' => $watchlistEntry['title'],
+                'tmdb_id' => $watchlistEntry['tmdb_id'],
+                'imdb_id' => $watchlistEntry['imdb_id'],
+                'added_at' => $watchlistEntry['added_at'],
+            ];
+        }
 
-        return Response::createJson($response);
+        return Response::createJson(Json::encode($responseData));
     }
 }
