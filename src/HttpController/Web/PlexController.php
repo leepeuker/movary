@@ -53,6 +53,10 @@ class PlexController
         return Response::createJson(Json::encode(['authenticationUrl' => $plexAuthenticationUrl]));
     }
 
+    /**
+     * @deprecated
+     * @see \Movary\HttpController\Api\PlexController::handlePlexWebhook()
+     */
     public function handlePlexWebhook(Request $request) : Response
     {
         $webhookId = $request->getRouteParameters()['id'];
@@ -68,6 +72,7 @@ class PlexController
         }
 
         $this->logger->debug('Plex: Webhook triggered with payload: ' . $requestPayload);
+        $this->logger->warning('This plex webhook url is deprecated and will stop to work soon, regenerate the url');
 
         $this->plexScrobbler->processPlexWebhook($userId, Json::decode((string)$requestPayload));
 

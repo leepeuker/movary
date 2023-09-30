@@ -90,7 +90,6 @@ class JellyfinController
         return Response::createOk();
     }
 
-
     public function regenerateJellyfinWebhookUrl() : Response
     {
         $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->getCurrentUserId());
