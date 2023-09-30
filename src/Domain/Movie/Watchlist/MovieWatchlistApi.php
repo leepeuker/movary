@@ -34,6 +34,11 @@ class MovieWatchlistApi
         $this->repository->addMovieToWatchlist($userId, $movieId, $addedAt);
     }
 
+    public function fetchAllWatchlistItems(int $userId) : array
+    {
+        return $this->repository->fetchAllWatchlistItems($userId);
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->repository->fetchUniqueMovieGenres($userId);
@@ -66,11 +71,6 @@ class MovieWatchlistApi
     public function fetchWatchlistCount(int $userId, ?string $searchTerm = null, ?Year $releaseYear = null, ?string $language = null, ?string $genre = null) : int
     {
         return $this->repository->fetchWatchlistCount($userId, $searchTerm, $releaseYear, $language, $genre);
-    }
-
-    public function fetchAllWatchlistItems(int $userId) : array
-    {
-        return $this->repository->fetchAllWatchlistItems($userId);
     }
 
     public function fetchWatchlistPaginated(
