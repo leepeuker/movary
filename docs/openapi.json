@@ -965,7 +965,7 @@
         ]
       }
     },
-    "/plex/{uuid}": {
+    "/webhook/plex/{uuid}": {
       "post": {
         "tags": [
           "Webhooks"
@@ -992,7 +992,7 @@
         }
       }
     },
-    "/jellyfin/{uuid}": {
+    "/webhook/jellyfin/{uuid}": {
       "post": {
         "tags": [
           "Webhooks"
@@ -1019,7 +1019,7 @@
         }
       }
     },
-    "/emby/{uuid}": {
+    "/webhook/emby/{uuid}": {
       "post": {
         "tags": [
           "Webhooks"
