@@ -8,4 +8,9 @@ class ImdbUrlGenerator
     {
         return "https://www.imdb.com/title/$imdbId";
     }
+
+    public function generatePersonUrl(string $imdbId) : string
+    {
+        return "https://www.imdb.com/name/$imdbId";
+    }
 }
