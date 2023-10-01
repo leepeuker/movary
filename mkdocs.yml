@@ -47,7 +47,7 @@ nav:
       - Trakt TV: features/trakt.md
       - Netflix: features/netflix.md
       - Radarr: features/radarr.md
-  - Development: 'development.md'
+  - Development:
       - Setup: development/setup.md
       - Directory structure: development/file-structure.md
       - How does the backend work?: development/structure.md

@@ -20,21 +20,20 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>Radarr list url</h5>
+                <h5>Radarr Watchlist sync</h5>
 
                 <p class="text-muted" style="margin-bottom: 0.5rem">
-                    Automatically sync the watchlist with radarr using radarr's list feature.
+                    Automatically sync your watchlist with Radarr using its <a href="https://wiki.servarr.com/radarr/supported#stevenluimport" target="_blank">lists import feature</a>.
                 </p>
 
                 <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
-                    <b>Configuration</b>
+                    <b>How to add the watchlist feed url in radarr</b>
                     <br style="margin-bottom: 0.5rem">
-                    Adding the watchlist URL in radarr:
                     <ul style="margin-bottom: 0">
-                        <li>Go to Radarr settings -> lists.</li>
-                        <li>Click on the plus to add a new list.</li>
-                        <li>Scroll down to the bottom and click on StevenLu custom.</li>
-                        <li>Copy the list URL from Movary into the URL input field at the bottom of the list modal and save.</li>
+                        <li>Go to your Radarr Settings and select "Lists"</li>
+                        <li>Click on the plus to add a new list</li>
+                        <li>In the section Advanced List select "StevenLu Custom"</li>
+                        <li>Copy the Movary feed URL to the "URL" input in Radarr and save</li>
                     </ul>
                 </div>
 
