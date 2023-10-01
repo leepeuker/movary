@@ -66,6 +66,11 @@ class JellyfinController
         return Response::createOk();
     }
 
+
+    /**
+     * @deprecated
+     * @see \Movary\HttpController\Api\JellyfinController::handleJellyfinWebhook()
+     */
     public function handleJellyfinWebhook(Request $request) : Response
     {
         $webhookId = $request->getRouteParameters()['id'];
@@ -78,6 +83,7 @@ class JellyfinController
         $requestPayload = $request->getBody();
 
         $this->logger->debug('Jellyfin: Webhook triggered with payload: ' . $requestPayload);
+        $this->logger->warning('This jellyfin webhook url is deprecated and will stop to work soon, regenerate the url');
 
         $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode($requestPayload));
 

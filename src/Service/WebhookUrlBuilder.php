@@ -36,6 +36,6 @@ class WebhookUrlBuilder
             return null;
         }
 
-        return rtrim($applicationUrl, '/') . '/' . $webhookType . '/' . $webhookId;
+        return rtrim($applicationUrl, '/') . '/api/webhook/' . $webhookType . '/' . $webhookId;
     }
 }
