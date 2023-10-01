@@ -46,5 +46,6 @@ nav:
       - Letterboxd: features/letterboxd.md
       - Trakt TV: features/trakt.md
       - Netflix: features/netflix.md
+      - Radarr: features/radarr.md
   - Development: 'development.md'
   - FAQ: 'faq.md'
