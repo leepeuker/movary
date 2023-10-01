@@ -2,6 +2,7 @@
 
 use Movary\HttpController\Api;
 use Movary\HttpController\Web;
+use Movary\HttpController\Web\RadarrController;
 use Movary\Service\Router\Dto\RouteList;
 use Movary\Service\Router\RouterService;
 
@@ -146,6 +147,11 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('PUT', '/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class]);
 
+    $routes->add('GET', '/settings/integrations/radarr', [Web\SettingsController::class, 'renderRadarrPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/radarr/feed', [RadarrController::class, 'regenerateRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/radarr/feed', [RadarrController::class, 'deleteRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+
+
     ##########
     # Movies #
     ##########
@@ -209,6 +215,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('PUT', $routeUserPlayed, [Api\PlayedController::class, 'updatePlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
+
+    $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

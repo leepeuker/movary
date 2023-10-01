@@ -23,6 +23,11 @@ class WebhookUrlBuilder
         return $this->buildUrl('plex', $webhookId);
     }
 
+    public function buildRadarrFeedUrl(string $feedId) : ?string
+    {
+        return $this->buildUrl('api/feed/radarr', $feedId);
+    }
+
     private function buildUrl(string $webhookType, string $webhookId) : ?string
     {
         $applicationUrl = $this->serverSettings->getApplicationUrl();

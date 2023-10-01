@@ -409,6 +409,17 @@ class UserRepository
         return (int)$id;
     }
 
+    public function findUserIdByRadarrFeedId(string $feedId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `radarr_feed_uuid` = ?', [$feedId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
     public function getCountOfUsers() : int
     {
         $count = $this->dbConnection->fetchOne('SELECT COUNT(*) FROM user');
@@ -452,6 +463,19 @@ class UserRepository
             'user',
             [
                 'plex_webhook_uuid' => $plexWebhookId,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function setRadarrFeedId(int $userId, ?string $radarrFeedId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'radarr_feed_uuid' => $radarrFeedId,
             ],
             [
                 'id' => $userId,

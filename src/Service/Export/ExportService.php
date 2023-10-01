@@ -11,7 +11,7 @@ class ExportService
 
     private const CSV_HEADER_RATINGS = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
 
-    private const CSV_HEADER_WATCHLIST = 'title,tmdbId,imdbId,addedAt' . PHP_EOL;
+    private const CSV_HEADER_WATCHLIST = 'title,year,tmdbId,imdbId,addedAt' . PHP_EOL;
 
     public function __construct(
         private readonly MovieApi $movieApi,
@@ -67,12 +67,8 @@ class ExportService
     {
         $watchlist = $this->watchlistApi->fetchAllWatchlistItems($userId);
 
-        if($fileName === null) {
+        if ($fileName === null) {
             $fileName = $this->generateFilename($userId, 'watchlist');
-        }
-
-        if($watchlist === null) {
-            return null;
         }
 
         $exportFileHandle = $this->createFileHandle($fileName);

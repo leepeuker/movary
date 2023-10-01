@@ -63,6 +63,7 @@ class ExportWriter
     {
         $lengthOfWrittenString = fputcsv($fileHandle, [
             $watchlistItem['title'],
+            $this->convertReleaseDate($watchlistItem['release_date']),
             $watchlistItem['tmdb_id'],
             $watchlistItem['imdb_id'],
             $watchlistItem['added_at'],
