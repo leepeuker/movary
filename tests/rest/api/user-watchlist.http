@@ -1,4 +1,4 @@
-GET http://127.0.0.1/api/ussers/{{username}}/watchlist
+GET http://127.0.0.1/api/users/{{username}}/watchlist/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -6,10 +6,38 @@ X-Auth-Token: {{xAuthToken}}
 
 ####
 
-GET http://127.0.0.1/api/users/{{username}}/watchlist?limit=5
+GET http://127.0.0.1/api/users/{{username}}/watchlist/movies?limit=5
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
 X-Auth-Token: {{xAuthToken}}
+
+####
+
+POST http://127.0.0.1/api/users/{{username}}/watchlist/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+[
+  {
+    "movaryId": 1
+  }
+]
+
+####
+
+DELETE http://127.0.0.1/api/users/{{username}}/watchlist/movies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{xAuthToken}}
+
+[
+  {
+    "movaryId": 1
+  }
+]
 
 ####

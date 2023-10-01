@@ -22,6 +22,7 @@ function search() {
     getParameters += 'sb=' + sortBy
     getParameters += '&so=' + sortOrder
     getParameters += '&pp=' + searchPerPage
+    getParameters += '&s=' + searchTerm
 
     if (searchGender != '') {
         getParameters += '&ge=' + searchGender
