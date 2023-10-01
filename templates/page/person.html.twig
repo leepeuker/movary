@@ -26,29 +26,29 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ person.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="{{ person.posterPath }}" style="width: 13rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
                 <h6 style="margin-bottom: 0.1rem">Known for</h6>
-                <p style="margin-bottom: 0.4rem">{{ person.knownForDepartment }}</p>
+                <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.knownForDepartment }}</p>
 
                 <h6 style="margin-bottom: 0.1rem">Gender</h6>
-                <p style="margin-bottom: 0.4rem">{{ person.gender == '0' ? '-' }}{{ person.gender == '1' ? 'Female' }}{{ person.gender == '2' ? 'Male' }}{{ person.gender == '3' ? 'Non-Binary' }}</p>
+                <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.gender == '0' ? '-' }}{{ person.gender == '1' ? 'Female' }}{{ person.gender == '2' ? 'Male' }}{{ person.gender == '3' ? 'Non-Binary' }}</p>
 
                 {% if person.birthDate is not null %}
                     <h6 style="margin-bottom: 0.1rem">Birth date</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.birthDate }} {% if person.deathDate is null %}({{ person.age }}){% endif %}</p>
+                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.birthDate }} {% if person.deathDate is null %}({{ person.age }}){% endif %}</p>
                 {% endif %}
 
                 {% if person.deathDate is not null %}
                     <h6 style="margin-bottom: 0.1rem">Day of Death</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.deathDate }} ({{ person.age }})</p>
+                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.deathDate }} ({{ person.age }})</p>
                 {% endif %}
 
                 {% if person.placeOfBirth is not null %}
                     <h6 style="margin-bottom: 0.1rem">Place of Birth</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
+                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
                 {% endif %}
             </div>
         </div>
