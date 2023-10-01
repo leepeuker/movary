@@ -26,31 +26,43 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ person.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="{{ person.posterPath }}" style="width: 13rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
                 <h6 style="margin-bottom: 0.1rem">Known for</h6>
-                <p style="margin-bottom: 0.4rem">{{ person.knownForDepartment }}</p>
+                <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.knownForDepartment }}</p>
 
                 <h6 style="margin-bottom: 0.1rem">Gender</h6>
-                <p style="margin-bottom: 0.4rem">{{ person.gender == '0' ? '-' }}{{ person.gender == '1' ? 'Female' }}{{ person.gender == '2' ? 'Male' }}{{ person.gender == '3' ? 'Non-Binary' }}</p>
+                <p class="fw-light"
+                   style="margin-bottom: 0.4rem">{{ person.gender == '0' ? '-' }}{{ person.gender == '1' ? 'Female' }}{{ person.gender == '2' ? 'Male' }}{{ person.gender == '3' ? 'Non-Binary' }}</p>
 
                 {% if person.birthDate is not null %}
                     <h6 style="margin-bottom: 0.1rem">Birth date</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.birthDate }} {% if person.deathDate is null %}({{ person.age }}){% endif %}</p>
+                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.birthDate }} {% if person.deathDate is null %}({{ person.age }}){% endif %}</p>
                 {% endif %}
 
                 {% if person.deathDate is not null %}
                     <h6 style="margin-bottom: 0.1rem">Day of Death</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.deathDate }} ({{ person.age }})</p>
+                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.deathDate }} ({{ person.age }})</p>
                 {% endif %}
 
                 {% if person.placeOfBirth is not null %}
                     <h6 style="margin-bottom: 0.1rem">Place of Birth</h6>
-                    <p style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
+                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
                 {% endif %}
             </div>
+        </div>
+
+        <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
+            {% if person.imdbUrl is not null %}
+                <a style="display: flex; align-items: center;cursor:pointer;margin-right: 0.6rem" href="{{ person.imdbUrl }}" target="_blank">
+                    <img src="/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
+                </a>
+            {% endif %}
+            <a style="display: flex; align-items: center;cursor:pointer;" href="{{ person.tmdbUrl }}" target="_blank">
+                <img src="/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
+            </a>
         </div>
 
         <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">Biography</h6>
@@ -65,7 +77,7 @@
             <p>No biography available.</p>
         {% endif %}
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist" >
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' or moviesAsDirector is empty %}active{% endif %}"
                         id="home-tab"
@@ -91,7 +103,8 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                         {% for movieAsActor in moviesAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
+                                <div class="card h-100 position-relative" style="cursor: pointer"
+                                     onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -113,7 +126,8 @@
                 <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative" style="padding-bottom: 1rem">
-                            <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                            <div class="card h-100 position-relative" style="cursor: pointer"
+                                 onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
                                     <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 

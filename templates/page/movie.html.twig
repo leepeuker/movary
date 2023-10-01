@@ -43,7 +43,7 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ movie.posterPath }}" width="200rem" style="width: 11rem;align-self: start;">
+                <img src="{{ movie.posterPath }}" style="width: 13rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -71,29 +71,42 @@
                         {{ movie.originalLanguage }}
                     </span>
                 </div>
+
+                <h6 style="margin-bottom: 0.2rem">Release</h6>
+                <div style="margin-bottom: 0.4rem">
+                    <span class="fw-light">
+                        {% if movie.releaseDate == '' %} - {% endif %}
+                        {{ movie.releaseDate|date(dateFormatPhp) }}
+                    </span>
+                </div>
             </div>
         </div>
 
         <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
-            {% if movie.imdbRatingAverage is not null %}
-                <div style="display: flex; align-items: center;cursor:pointer;" onclick="window.open('{{ movie.imdbUrl }}', '_blank')">
-                    <img src="/images/imdb-logo.svg" style="width: 3rem">
-                    <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
+            {% if movie.imdbId is not null %}
+                <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.imdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %}"
+                   href="{{ movie.imdbUrl }}" target="_blank">
+                    <img src="/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
+                </a>
+                {% if movie.imdbRatingAverage is not empty %}
+                    <p style="margin-bottom: 0;margin-right: 0.5rem;text-align: center">
                         {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
-                        <span class="fw-bold">{% if movie.imdbRatingAverage is null %}-{% else %}{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span
+                        <span class="fw-bold">{{ movie.imdbRatingAverage|number_format(1, '.', ',') }}</span><span
                                 class="fw-lighter">/{{ movie.imdbRatingVoteCount|default('-') }}</span>
                     </p>
-                </div>
+                {% endif %}
             {% endif %}
-            <div style="display: flex; align-items: center;{% if movie.imdbRatingAverage is not null %}margin-left: 0.8rem;{% endif %}cursor:pointer;"
-                 onclick="window.open('{{ movie.tmdbUrl }}', '_blank')">
-                <img src="/images/tmdb-logo.svg" style="width: 2rem">
-                <p style="margin-bottom: 0;margin-left: 0.3rem;text-align: center">
+            <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.tmdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %};text-align: center"
+               href="{{ movie.tmdbUrl }}" target="_blank">
+                <img src="/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
+            </a>
+            {% if movie.tmdbRatingAverage is not empty and movie.tmdbRatingAverage != 0.0 %}
+                <p style="margin-bottom: 0;margin-right: .5rem">
                     {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
-                    <span class="fw-bold">{% if movie.tmdbRatingAverage is null %}-{% else %}{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}{% endif %}</span><span
+                    <span class="fw-bold">{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}</span><span
                             class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
                 </p>
-            </div>
+            {% endif %}
         </div>
 
         {# --- Buttons --- #}

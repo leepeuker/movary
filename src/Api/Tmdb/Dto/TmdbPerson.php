@@ -9,6 +9,7 @@ class TmdbPerson
 {
     private function __construct(
         private readonly int $tmdbId,
+        private readonly ?string $imdbId,
         private readonly string $name,
         private readonly ?string $biography,
         private readonly ?Date $birthDate,
@@ -25,6 +26,7 @@ class TmdbPerson
     {
         return new self(
             $data['id'],
+            $data['imdb_id'],
             $data['name'],
             empty($data['biography']) === true ? null : $data['biography'],
             empty($data['birthday']) === true ? null : Date::createFromString($data['birthday']),
@@ -55,6 +57,11 @@ class TmdbPerson
     public function getGender() : Gender
     {
         return $this->gender;
+    }
+
+    public function getImdbId() : ?string
+    {
+        return $this->imdbId;
     }
 
     public function getKnownForDepartment() : ?string

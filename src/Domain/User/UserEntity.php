@@ -29,6 +29,7 @@ class UserEntity
         private readonly bool $embyScrobbleWatches,
         private readonly bool $plexScrobbleWatches,
         private readonly bool $plexScrobbleRatings,
+        private readonly ?string $radarrFeedUuid,
         private readonly bool $watchlistAutomaticRemovalEnabled,
         private readonly ?string $country,
         private readonly bool $jellyfinSyncEnabled,
@@ -59,6 +60,7 @@ class UserEntity
             (bool)$data['emby_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
+            $data['radarr_feed_uuid'],
             (bool)$data['watchlist_automatic_removal_enabled'],
             $data['country'],
             (bool)$data['jellyfin_sync_enabled'],
@@ -133,6 +135,11 @@ class UserEntity
     public function getPrivacyLevel() : int
     {
         return $this->privacyLevel;
+    }
+
+    public function getRadarrFeedId() : ?string
+    {
+        return $this->radarrFeedUuid;
     }
 
     public function getTraktClientId() : ?string

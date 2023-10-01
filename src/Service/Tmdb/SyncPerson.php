@@ -49,6 +49,7 @@ class SyncPerson
                 $tmdbPerson->getDeathDate(),
                 $tmdbPerson->getPlaceOfBirth(),
                 updatedAtTmdb: DateTime::create(),
+                imdbId: $tmdbPerson->getImdbId()
             );
 
             $this->logger->debug('TMDB: Created person meta data', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
@@ -72,6 +73,7 @@ class SyncPerson
             $tmdbPerson->getDeathDate(),
             $tmdbPerson->getPlaceOfBirth(),
             DateTime::create(),
+            $tmdbPerson->getImdbId()
         );
 
         $this->logger->debug('TMDB: Updated person meta data', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
