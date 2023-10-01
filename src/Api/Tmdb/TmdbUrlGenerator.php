@@ -15,4 +15,9 @@ class TmdbUrlGenerator
     {
         return Url::createFromString("https://www.themoviedb.org/movie/$tmdbId/");
     }
+
+    public function generatePersonUrl(int $tmdbId) : Url
+    {
+        return Url::createFromString("https://www.themoviedb.org/person/$tmdbId/");
+    }
 }

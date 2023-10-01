@@ -24,6 +24,7 @@ class PersonApi
         ?Date $deathDate = null,
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
+        ?string $imdbId = null,
     ) : PersonEntity {
         return $this->repository->create(
             $tmdbId,
@@ -36,6 +37,7 @@ class PersonApi
             $deathDate,
             $placeOfBirth,
             $updatedAtTmdb,
+            $imdbId,
         );
     }
 
@@ -113,6 +115,7 @@ class PersonApi
         ?Date $deathDate = null,
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
+        ?string $imdbId = null,
     ) : PersonEntity {
         return $this->repository->update(
             $id,
@@ -126,6 +129,7 @@ class PersonApi
             $deathDate,
             $placeOfBirth,
             $updatedAtTmdb,
+            $imdbId,
         );
     }
 }

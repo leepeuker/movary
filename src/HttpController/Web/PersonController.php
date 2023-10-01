@@ -2,6 +2,8 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Api\Imdb;
+use Movary\Api\Tmdb;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Person;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
@@ -20,6 +22,8 @@ class PersonController
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly UrlGenerator $urlGenerator,
+        private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
+        private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
     ) {
     }
 
@@ -50,6 +54,13 @@ class PersonController
             }
         }
 
+        $imdbId = $person->getImdbId();
+
+        $imdbUrl = null;
+        if ($imdbId !== null) {
+            $imdbUrl = $this->imdbUrlGenerator->generatePersonUrl($imdbId);
+        }
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/person.html.twig', [
@@ -64,6 +75,8 @@ class PersonController
                     'birthDate' => $person->getBirthDate(),
                     'deathDate' => $person->getDeathDate(),
                     'placeOfBirth' => $person->getPlaceOfBirth(),
+                    'tmdbUrl' => $this->tmdbUrlGenerator->generatePersonUrl($person->getTmdbId()),
+                    'imdbUrl' => $imdbUrl,
                 ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),

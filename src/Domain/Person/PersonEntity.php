@@ -14,6 +14,7 @@ class PersonEntity
         private readonly Gender $gender,
         private readonly ?string $knownForDepartment,
         private readonly int $tmdbId,
+        private readonly ?string $imdbId,
         private readonly ?string $posterPath,
         private readonly ?string $tmdbPosterPath,
         private readonly ?string $biography,
@@ -32,6 +33,7 @@ class PersonEntity
             Gender::createFromInt((int)$data['gender']),
             $data['known_for_department'],
             $data['tmdb_id'],
+            $data['imdb_id'],
             $data['poster_path'],
             $data['tmdb_poster_path'],
             empty($data['biography']) === true ? null : $data['biography'],
@@ -65,6 +67,11 @@ class PersonEntity
     public function getId() : int
     {
         return $this->id;
+    }
+
+    public function getImdbId() : ?string
+    {
+        return $this->imdbId;
     }
 
     public function getKnownForDepartment() : ?string

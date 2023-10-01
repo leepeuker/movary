@@ -25,6 +25,7 @@ class PersonRepository
         ?Date $deathDate = null,
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
+        ?string $imdbId = null,
     ) : PersonEntity {
         $this->dbConnection->insert(
             'person',
@@ -33,6 +34,7 @@ class PersonRepository
                 'gender' => $gender->asInt(),
                 'known_for_department' => $knownForDepartment,
                 'tmdb_id' => $tmdbId,
+                'imdb_id' => $imdbId,
                 'tmdb_poster_path' => $tmdbPosterPath,
                 'biography' => $biography === null ? null : $biography,
                 'birth_date' => $birthDate === null ? null : (string)$birthDate,
@@ -117,12 +119,14 @@ class PersonRepository
         ?Date $deathDate = null,
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
+        ?string $imdbId = null,
     ) : PersonEntity {
         $payload = [
             'name' => $name,
             'gender' => $gender->asInt(),
             'known_for_department' => $knownForDepartment,
             'tmdb_id' => $tmdbId,
+            'imdb_id' => $imdbId,
             'tmdb_poster_path' => $tmdbPosterPath,
             'biography' => $biography === null ? null : $biography,
             'birth_date' => $birthDate === null ? null : (string)$birthDate,
