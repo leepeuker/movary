@@ -39,10 +39,19 @@ class AuthenticationController
         }
         $redirect = $postParameters['redirect'];
         $target = $redirect ?? $_SERVER['HTTP_REFERER'];
+
+        $urlParts = parse_url($target);
+        if (is_array($urlParts) === false) {
+            $urlParts = ['path' => '/'];
+        }
+
+        /* @phpstan-ignore-next-line */
+        $targetRelativeUrl = $urlParts['path'] . $urlParts['query'] ?? '';
+
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($target)],
+            [Header::createLocation($targetRelativeUrl)],
         );
     }
 
