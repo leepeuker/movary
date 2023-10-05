@@ -37,11 +37,21 @@ class AuthenticationController
         } catch (InvalidCredentials) {
             $this->sessionWrapper->set('failedLogin', true);
         }
+        $redirect = $postParameters['redirect'];
+        $target = $redirect ?? $_SERVER['HTTP_REFERER'];
+
+        $urlParts = parse_url($target);
+        if (is_array($urlParts) === false) {
+            $urlParts = ['path' => '/'];
+        }
+
+        /* @phpstan-ignore-next-line */
+        $targetRelativeUrl = $urlParts['path'] . $urlParts['query'] ?? '';
 
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation($targetRelativeUrl)],
         );
     }
 
@@ -56,19 +66,19 @@ class AuthenticationController
         );
     }
 
-    public function renderLoginPage() : Response
+    public function renderLoginPage(Request $request) : Response
     {
         $failedLogin = $this->sessionWrapper->has('failedLogin');
+        $redirect = $request->getGetParameters()['redirect'] ?? false;
         $this->sessionWrapper->unset('failedLogin');
 
         $renderedTemplate = $this->twig->render(
             'page/login.html.twig',
             [
-                'failedLogin' => $failedLogin
+                'failedLogin' => $failedLogin,
+                'redirect' => $redirect
             ],
         );
-
-        $this->sessionWrapper->unset('failedLogin');
 
         return Response::create(
             StatusCode::createOk(),
