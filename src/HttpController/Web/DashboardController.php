@@ -31,7 +31,7 @@ class DashboardController
     {
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
         if ($userId === null) {
-            return Response::createSeeOther('/');
+            return Response::createForbiddenRedirect($request->getPath());
         }
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
