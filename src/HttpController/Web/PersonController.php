@@ -7,6 +7,7 @@ use Movary\Api\Tmdb;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Person;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Service\Tmdb\SyncPerson;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -24,7 +25,50 @@ class PersonController
         private readonly UrlGenerator $urlGenerator,
         private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
         private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
+        private readonly SyncPerson $tmdbPersonSync,
     ) {
+    }
+
+    public function refreshTmdbData(Request $request) : Response
+    {
+        $personId = (int)$request->getRouteParameters()['id'];
+
+        $person = $this->personApi->findById($personId);
+        if ($person === null) {
+            return Response::createNotFound();
+        }
+
+        $this->tmdbPersonSync->syncPerson($person->getTmdbId());
+
+        return Response::createOk();
+    }
+
+    public function hideInTopLists(Request $request) : Response
+    {
+        $personId = (int)$request->getRouteParameters()['id'];
+
+        $person = $this->personApi->findById($personId);
+        if ($person === null) {
+            return Response::createNotFound();
+        }
+
+        $this->personApi->updateHideInTopLists($person->getId(), true);
+
+        return Response::createOk();
+    }
+
+    public function showInTopLists(Request $request) : Response
+    {
+        $personId = (int)$request->getRouteParameters()['id'];
+
+        $person = $this->personApi->findById($personId);
+        if ($person === null) {
+            return Response::createNotFound();
+        }
+
+        $this->personApi->updateHideInTopLists($person->getId(), false);
+
+        return Response::createOk();
     }
 
     public function renderPage(Request $request) : Response
@@ -66,6 +110,7 @@ class PersonController
             $this->twig->render('page/person.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieWithPersonVisibleUsernamesForCurrentVisitor($personId),
                 'person' => [
+                    'id' => $person->getId(),
                     'name' => $person->getName(),
                     'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
                     'knownForDepartment' => $person->getKnownForDepartment(),
@@ -77,6 +122,7 @@ class PersonController
                     'placeOfBirth' => $person->getPlaceOfBirth(),
                     'tmdbUrl' => $this->tmdbUrlGenerator->generatePersonUrl($person->getTmdbId()),
                     'imdbUrl' => $imdbUrl,
+                    'isHiddenInTopLists' => $person->isHiddenInTopLists(),
                 ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),

@@ -107,6 +107,13 @@ class PersonRepository
         return PersonEntity::createFromArray($data);
     }
 
+    public function hideInTopLists(int $personId, bool $isHidden) : void
+    {
+        $this->dbConnection->update('person', [
+            'hide_in_top_lists' => (string)$isHidden,
+        ], ['id' => $personId]);
+    }
+
     public function update(
         int $id,
         int $tmdbId,
