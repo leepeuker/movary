@@ -6,7 +6,9 @@ use Movary\Api\Imdb;
 use Movary\Api\Tmdb;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Person;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\Service\Tmdb\SyncPerson;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Date;
@@ -26,7 +28,25 @@ class PersonController
         private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
         private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly SyncPerson $tmdbPersonSync,
+        private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi,
     ) {
+    }
+
+    public function hideInTopLists(Request $request) : Response
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $personId = (int)$request->getRouteParameters()['id'];
+
+        $person = $this->personApi->findById($personId);
+        if ($person === null) {
+            return Response::createNotFound();
+        }
+
+        $this->personApi->updateHideInTopLists($userId, $person->getId(), true);
+
+        return Response::createOk();
     }
 
     public function refreshTmdbData(Request $request) : Response
@@ -39,34 +59,6 @@ class PersonController
         }
 
         $this->tmdbPersonSync->syncPerson($person->getTmdbId());
-
-        return Response::createOk();
-    }
-
-    public function hideInTopLists(Request $request) : Response
-    {
-        $personId = (int)$request->getRouteParameters()['id'];
-
-        $person = $this->personApi->findById($personId);
-        if ($person === null) {
-            return Response::createNotFound();
-        }
-
-        $this->personApi->updateHideInTopLists($person->getId(), true);
-
-        return Response::createOk();
-    }
-
-    public function showInTopLists(Request $request) : Response
-    {
-        $personId = (int)$request->getRouteParameters()['id'];
-
-        $person = $this->personApi->findById($personId);
-        if ($person === null) {
-            return Response::createNotFound();
-        }
-
-        $this->personApi->updateHideInTopLists($person->getId(), false);
 
         return Response::createOk();
     }
@@ -105,6 +97,12 @@ class PersonController
             $imdbUrl = $this->imdbUrlGenerator->generatePersonUrl($imdbId);
         }
 
+        $isHiddenInTopLists = false;
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            $userId = $this->authenticationService->getCurrentUserId();
+            $isHiddenInTopLists = $this->userApi->hasHiddenPerson($userId, $personId);
+        }
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/person.html.twig', [
@@ -122,11 +120,27 @@ class PersonController
                     'placeOfBirth' => $person->getPlaceOfBirth(),
                     'tmdbUrl' => $this->tmdbUrlGenerator->generatePersonUrl($person->getTmdbId()),
                     'imdbUrl' => $imdbUrl,
-                    'isHiddenInTopLists' => $person->isHiddenInTopLists(),
+                    'isHiddenInTopLists' => $isHiddenInTopLists,
                 ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
             ]),
         );
+    }
+
+    public function showInTopLists(Request $request) : Response
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $personId = (int)$request->getRouteParameters()['id'];
+
+        $person = $this->personApi->findById($personId);
+        if ($person === null) {
+            return Response::createNotFound();
+        }
+
+        $this->personApi->updateHideInTopLists($userId, $person->getId(), false);
+
+        return Response::createOk();
     }
 }

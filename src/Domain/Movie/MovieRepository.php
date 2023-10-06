@@ -81,8 +81,17 @@ class MovieRepository
         string $sortBy,
         SortOrder $sortOrder,
         ?Gender $gender,
+        ?int $personFilterUserId,
     ) : array {
-        $payload = [$userId, "%$searchTerm%"];
+        $payload = [$userId];
+
+        $personFilterJoin = '';
+        if ($personFilterUserId !== null) {
+            $personFilterJoin = 'LEFT JOIN user_person_settings ups ON ups.person_id = p.id AND ups.user_id = ?';
+            $payload[] = $personFilterUserId;
+        }
+
+        $payload[] = "%$searchTerm%";
 
         $offset = ($limit * $page) - $limit;
 
@@ -92,11 +101,14 @@ class MovieRepository
             default => 'name'
         };
 
-        $whereQuery = 'WHERE p.name LIKE ? AND p.name != "Stan Lee" ';
+        $whereQuery = 'WHERE p.name LIKE ? ';
 
         if (empty($gender) === false) {
             $whereQuery .= 'AND p.gender = ? ';
             $payload[] = $gender;
+        }
+        if ($personFilterUserId !== null) {
+            $whereQuery .= 'AND ups.is_hidden_in_top_lists IS NULL OR ups.is_hidden_in_top_lists != 1';
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -106,6 +118,7 @@ class MovieRepository
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
             JOIN movie_user_watch_dates muwd on mc.movie_id = muwd.movie_id and muwd.user_id = ?
+            $personFilterJoin
             $whereQuery
             GROUP BY mc.person_id, name
             ORDER BY $sortBySanitized $sortOrder, name asc

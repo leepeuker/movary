@@ -8,9 +8,8 @@
             <div class="modal-body">
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-primary" id="refreshTmdbDataButton" onclick="refreshTmdbData()">Refresh TMDB data</button>
-                    <button type="button" class="btn btn-primary {% if isHiddenInTopLists == false %}d-none{% endif %}" id="showInTopListsButton" onclick="showInTopLists()">Show in Top Lists</button>
-                    <button type="button" class="btn btn-primary {% if isHiddenInTopLists == true %}d-none{% endif %}" id="hideInTopListsButton" onclick="hideInTopLists()">Hide in Top Lists</button>
-
+                    <button type="button" class="btn btn-primary {% if person.isHiddenInTopLists == false %}d-none{% endif %}" id="showInTopListsButton" onclick="showInTopLists()">Show in Top Lists</button>
+                    <button type="button" class="btn btn-primary {% if person.isHiddenInTopLists == true %}d-none{% endif %}" id="hideInTopListsButton" onclick="hideInTopLists()">Hide in Top Lists</button>
                 </div>
             </div>
 

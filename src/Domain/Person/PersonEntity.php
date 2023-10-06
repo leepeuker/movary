@@ -21,7 +21,6 @@ class PersonEntity
         private readonly ?Date $birthDate,
         private readonly ?Date $deathDate,
         private readonly ?string $placeOfBirth,
-        private readonly bool $hiddenInTopLists,
         private readonly ?DateTime $updatedAtTmdb,
     ) {
     }
@@ -41,7 +40,6 @@ class PersonEntity
             empty($data['birth_date']) === true ? null : Date::createFromString($data['birth_date']),
             empty($data['death_date']) === true ? null : Date::createFromString($data['death_date']),
             $data['place_of_birth'],
-            $data['hidden_in_top_lists'] ?? false,
             empty($data['updated_at_tmdb']) === true ? null : DateTime::createFromString($data['updated_at_tmdb']),
         );
     }
@@ -109,10 +107,5 @@ class PersonEntity
     public function getUpdatedAtTmdb() : ?DateTime
     {
         return $this->updatedAtTmdb;
-    }
-
-    public function isHiddenInTopLists() : bool
-    {
-        return $this->hiddenInTopLists;
     }
 }

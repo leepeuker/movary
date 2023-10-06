@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\PersonsRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
@@ -19,6 +20,7 @@ class ActorsController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PersonsRequestMapper $requestMapper,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -31,6 +33,11 @@ class ActorsController
 
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
+        $currentUserId = null;
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            $currentUserId = $this->authenticationService->getCurrentUserId();
+        }
+
         $actors = $this->movieHistoryApi->fetchActors(
             $userId,
             $requestData->getLimit(),
@@ -39,6 +46,7 @@ class ActorsController
             $requestData->getSortBy(),
             $requestData->getSortOrder(),
             $requestData->getGender(),
+            personFilterUserId: $currentUserId,
         );
 
         $actorsCount = $this->movieHistoryApi->fetchMostWatchedActorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());

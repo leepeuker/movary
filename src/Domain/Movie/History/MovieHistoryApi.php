@@ -75,6 +75,7 @@ class MovieHistoryApi
         string $sortBy = 'uniqueAppearances',
         ?SortOrder $sortOrder = null,
         ?Gender $gender = null,
+        ?int $personFilterUserId = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createDesc();
@@ -88,6 +89,7 @@ class MovieHistoryApi
             $sortBy,
             $sortOrder,
             $gender,
+            $personFilterUserId,
         );
 
         foreach ($actors as $index => $actor) {

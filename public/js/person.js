@@ -31,6 +31,8 @@ function refreshTmdbData() {
     refreshTmdbDataRequest().then(() => {
         location.reload()
     }).catch(() => {
+        // add error alert
+    }).finally(() => {
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('hideInTopListsButton').disabled = false;
         document.getElementById('showInTopListsButton').disabled = false;
@@ -46,6 +48,8 @@ function hideInTopLists() {
         document.getElementById('hideInTopListsButton').classList.add('d-none');
         document.getElementById('showInTopListsButton').classList.remove('d-none');
     }).catch(() => {
+        // add error alert
+    }).finally(() => {
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('hideInTopListsButton').disabled = false;
         document.getElementById('showInTopListsButton').disabled = false;
@@ -61,6 +65,8 @@ function showInTopLists() {
         document.getElementById('hideInTopListsButton').classList.remove('d-none');
         document.getElementById('showInTopListsButton').classList.add('d-none');
     }).catch(() => {
+        // add error alert
+    }).finally(() => {
         document.getElementById('refreshTmdbDataButton').disabled = false;
         document.getElementById('hideInTopListsButton').disabled = false;
         document.getElementById('showInTopListsButton').disabled = false;
@@ -79,6 +85,16 @@ async function hideInTopListsRequest() {
 
 async function showInTopListsRequest() {
     const response = await fetch('/persons/' + getPersonId() + '/show-in-top-lists')
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return true
+}
+
+async function refreshTmdbDataRequest() {
+    const response = await fetch('/persons/' + getPersonId() + '/refresh-tmdb')
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
