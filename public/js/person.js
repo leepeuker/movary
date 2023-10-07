@@ -1,7 +1,6 @@
-function toggleBiography()
-{
+function toggleBiography() {
     let expandContainer = document.getElementById('expandContainer');
-    if(document.getElementsByClassName('truncated').length > 0) {
+    if (document.getElementsByClassName('truncated').length > 0) {
         document.getElementById('biographyParagraph').classList.remove('truncated');
         expandContainer.getElementsByTagName('i')[0].classList.remove('bi-chevron-down');
         expandContainer.getElementsByTagName('i')[0].classList.add('bi-chevron-up');
@@ -17,64 +16,58 @@ function toggleBiography()
 document.addEventListener("DOMContentLoaded", () => {
     let biographyHeight = document.getElementById('biographyParagraph').offsetHeight;
     let windowHeight = window.outerHeight;
-    if(((biographyHeight / windowHeight) * 100) > 20) {
+    if (((biographyHeight / windowHeight) * 100) > 20) {
         document.getElementById('biographyParagraph').classList.add('truncated');
         document.getElementById('expandContainer').classList.remove('d-none');
     }
 });
 
 function refreshTmdbData() {
-    document.getElementById('refreshTmdbDataButton').disabled = true;
-    document.getElementById('hideInTopListsButton').disabled = true;
-    document.getElementById('showInTopListsButton').disabled = true;
+    disableMoreModalButtons(true)
+    removeAlert('alertPersonOptionModalDiv')
 
-    refreshTmdbDataRequest().then(() => {
+    sendRequest('refresh-tmdb').then(() => {
         location.reload()
     }).catch(() => {
-        // add error alert
+        addAlert('alertPersonOptionModalDiv', 'Cannot refresh TMDB data', 'danger')
     }).finally(() => {
-        document.getElementById('refreshTmdbDataButton').disabled = false;
-        document.getElementById('hideInTopListsButton').disabled = false;
-        document.getElementById('showInTopListsButton').disabled = false;
+        disableMoreModalButtons(false)
     })
 }
 
 function hideInTopLists() {
-    document.getElementById('refreshTmdbDataButton').disabled = true;
-    document.getElementById('hideInTopListsButton').disabled = true;
-    document.getElementById('showInTopListsButton').disabled = true;
+    disableMoreModalButtons(true)
+    removeAlert('alertPersonOptionModalDiv')
 
-    hideInTopListsRequest().then(() => {
+    sendRequest('hide-in-top-lists').then(() => {
         document.getElementById('hideInTopListsButton').classList.add('d-none');
         document.getElementById('showInTopListsButton').classList.remove('d-none');
+        addAlert('alertPersonOptionModalDiv', 'Person not visible in top lists anymore', 'success')
     }).catch(() => {
-        // add error alert
+        addAlert('alertPersonOptionModalDiv', 'Cannot hide person in top lists', 'danger')
     }).finally(() => {
-        document.getElementById('refreshTmdbDataButton').disabled = false;
-        document.getElementById('hideInTopListsButton').disabled = false;
-        document.getElementById('showInTopListsButton').disabled = false;
+        disableMoreModalButtons(false)
     })
 }
 
 function showInTopLists() {
-    document.getElementById('refreshTmdbDataButton').disabled = true;
-    document.getElementById('hideInTopListsButton').disabled = true;
-    document.getElementById('showInTopListsButton').disabled = true;
+    disableMoreModalButtons(true)
+    removeAlert('alertPersonOptionModalDiv')
 
-    showInTopListsRequest().then(() => {
+    sendRequest('show-in-top-lists').then(() => {
         document.getElementById('hideInTopListsButton').classList.remove('d-none');
         document.getElementById('showInTopListsButton').classList.add('d-none');
+        addAlert('alertPersonOptionModalDiv', 'Person visible in top lists again', 'success')
     }).catch(() => {
-        // add error alert
+        addAlert('alertPersonOptionModalDiv', 'Cannot show person in top lists', 'danger')
     }).finally(() => {
-        document.getElementById('refreshTmdbDataButton').disabled = false;
-        document.getElementById('hideInTopListsButton').disabled = false;
-        document.getElementById('showInTopListsButton').disabled = false;
+        disableMoreModalButtons(false)
     })
 }
 
-async function hideInTopListsRequest() {
-    const response = await fetch('/persons/' + getPersonId() + '/hide-in-top-lists')
+async function sendRequest(action) {
+    const personId = document.getElementById('personId').value;
+    const response = await fetch('/persons/' + personId + '/' + action)
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -83,26 +76,8 @@ async function hideInTopListsRequest() {
     return true
 }
 
-async function showInTopListsRequest() {
-    const response = await fetch('/persons/' + getPersonId() + '/show-in-top-lists')
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    return true
-}
-
-async function refreshTmdbDataRequest() {
-    const response = await fetch('/persons/' + getPersonId() + '/refresh-tmdb')
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    return true
-}
-
-function getPersonId() {
-    return document.getElementById('personId').value
+function disableMoreModalButtons(disable) {
+    document.getElementById('refreshTmdbDataButton').disabled = disable;
+    document.getElementById('hideInTopListsButton').disabled = disable;
+    document.getElementById('showInTopListsButton').disabled = disable;
 }
