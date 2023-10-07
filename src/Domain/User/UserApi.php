@@ -249,6 +249,11 @@ class UserApi
         $this->repository->createApiToken($userId, $token);
     }
 
+    public function hasHiddenPerson(int $userId, int $personId) : bool
+    {
+        return $this->repository->hasHiddenPerson($userId, $personId);
+    }
+
     public function hasUsers() : bool
     {
         return $this->repository->getCountOfUsers() > 0;

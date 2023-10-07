@@ -22,6 +22,8 @@
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
 
+        <input type="hidden" id="personId" value="{{ person.id }}">
+
         <h2 style="display: flex;">{{ person.name }}</h2>
 
         <div style="display: flex;">
@@ -65,6 +67,22 @@
             </a>
         </div>
 
+        {% if currentUserName is not null %}
+            <div class="container" style="margin-bottom: .8rem">
+                <div class="row">
+                    <button type="button"
+                            id="moreSpecificMovieButton"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#moreModal">
+                        More
+                    </button>
+                </div>
+            </div>
+
+            {{ include('component/modal-person-more-options.html.twig') }}
+        {% endif %}
+
         <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">Biography</h6>
         {% if person.biography is not null %}
             <p id="biographyParagraph" style="margin-bottom: 1rem">{{ person.biography|nl2br }}</p>
@@ -74,7 +92,7 @@
                 <br>
             </div>
         {% else %}
-            <p>No biography available.</p>
+            <p id="biographyParagraph">No biography available.</p>
         {% endif %}
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -144,6 +162,5 @@
             </div>
         </div>
         <br>
-
     </main>
 {% endblock %}

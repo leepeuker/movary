@@ -431,6 +431,20 @@ class UserRepository
         return $count;
     }
 
+    public function hasHiddenPerson(int $userId, int $personId) : bool
+    {
+        $userPersonSettings = $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM user_person_settings WHERE user_id = ? AND person_id = ?',
+            [$userId, $personId],
+        );
+
+        if (isset($userPersonSettings[0]['is_hidden_in_top_lists']) === false) {
+            return false;
+        }
+
+        return (bool)$userPersonSettings[0]['is_hidden_in_top_lists'];
+    }
+
     public function setEmbyWebhookId(int $userId, ?string $embyWebhookId) : void
     {
         $this->dbConnection->update(

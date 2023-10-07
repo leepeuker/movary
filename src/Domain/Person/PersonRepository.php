@@ -146,6 +146,25 @@ class PersonRepository
         return $this->fetchById($id);
     }
 
+    public function updateHideInTopLists(int $userId, int $personId, bool $isHidden) : void
+    {
+        $this->dbConnection->executeQuery('DELETE FROM user_person_settings WHERE user_id = ? AND person_id = ?', [$userId, $personId]);
+
+        if ($isHidden === false) {
+            return;
+        }
+
+        $this->dbConnection->insert(
+            'user_person_settings',
+            [
+                'user_id' => $userId,
+                'person_id' => $personId,
+                'is_hidden_in_top_lists' => 1,
+                'updated_at' => (string)DateTime::create()
+            ],
+        );
+    }
+
     private function fetchById(int $id) : PersonEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `person` WHERE id = ?', [$id]);

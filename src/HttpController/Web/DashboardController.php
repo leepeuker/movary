@@ -5,6 +5,7 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Dashboard\DashboardFactory;
@@ -24,6 +25,7 @@ class DashboardController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly DashboardFactory $dashboardFactory,
         private readonly UserApi $userApi,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -32,6 +34,11 @@ class DashboardController
         $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
         if ($userId === null) {
             return Response::createForbiddenRedirect($request->getPath());
+        }
+
+        $currentUserId = null;
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            $currentUserId = $this->authenticationService->getCurrentUserId();
         }
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
@@ -48,8 +55,8 @@ class DashboardController
                 'averageRuntime' => $this->movieHistoryApi->fetchAverageRuntime($userId),
                 'firstDiaryEntry' => $this->movieHistoryApi->fetchFirstHistoryWatchDate($userId),
                 'lastPlays' => $this->movieHistoryApi->fetchLastPlays($userId),
-                'mostWatchedActors' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale()),
-                'mostWatchedActresses' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale()),
+                'mostWatchedActors' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale(), personFilterUserId: $currentUserId),
+                'mostWatchedActresses' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $currentUserId),
                 'mostWatchedDirectors' => $this->movieHistoryApi->fetchDirectors($userId, 6, 1),
                 'mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($userId),
                 'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),

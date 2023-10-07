@@ -103,6 +103,11 @@ class PersonApi
         return $this->repository->findByTmdbId($tmdbId);
     }
 
+    public function updateHideInTopLists(int $userId, int $personId, bool $isHidden) : void
+    {
+        $this->repository->updateHideInTopLists($userId, $personId, $isHidden);
+    }
+
     public function update(
         int $id,
         int $tmdbId,
