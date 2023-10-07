@@ -3,6 +3,7 @@ const nameInput = document.getElementById('nameInput')
 const privacyInput = document.getElementById('privacyInput')
 const enableAutomaticWatchlistRemovalInput = document.getElementById('enableAutomaticWatchlistRemovalInput')
 const countryInput = document.getElementById('countryInput')
+const displayCharacterNamesInput = document.getElementById('displayCharacterNamesInput')
 
 document.getElementById('generalAccountUpdateButton').addEventListener('click', async () => {
     nameInput.classList.remove('invalid-input');
@@ -18,7 +19,8 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
         nameInput.value,
         privacyInput.value,
         enableAutomaticWatchlistRemovalInput.checked,
-        countryInput.value
+        countryInput.value,
+        displayCharacterNamesInput.checked
     )
 
     switch (response.status) {
@@ -38,7 +40,7 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
     }
 });
 
-function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country) {
+function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country, displayCharacterNames) {
     return fetch('/settings/account', {
         method: 'POST',
         headers: {
@@ -50,6 +52,7 @@ function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchl
             'privacyLevel': privacyLevel,
             'enableAutomaticWatchlistRemoval': enableAutomaticWatchlistRemoval,
             'country': country,
+            'displayCharacterNames': displayCharacterNames,
         })
     })
 }

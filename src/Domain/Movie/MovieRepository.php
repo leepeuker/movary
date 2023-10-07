@@ -269,7 +269,7 @@ class MovieRepository
         );
     }
 
-    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null, ?int $personFilterUserId) : int
+    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null, ?int $personFilterUserId = null) : int
     {
         $payload = [$userId];
 

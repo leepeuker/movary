@@ -195,18 +195,23 @@
         <div class="carousel">
             {% if castMembers|length == 0 %} - {% endif %}
             {% for castMember in castMembers|slice(0, 40) %}
-                <div class="card" onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
-                     style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
+                <div class="card" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">
                             {{ castMember.name }}
                         </small>
                     </div>
 
-                    <img src="{{ castMember.posterPath }}" alt="{{ castMember.name }} Poster">
-                    <div class="card-footer text-truncate" style="padding: 0.1rem;text-align: center">
-                        <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.characterName }}</small>
-                    </div>
+                    <img src="{{ castMember.posterPath }}"
+                         alt="{{ castMember.name }} Poster"
+                         class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
+                         onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
+                         style="cursor: pointer">
+                    {% if displayCharacterNames == true %}
+                        <div class="card-footer text-truncate" style="padding: 0.1rem;text-align: center">
+                            <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.characterName }}</small>
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

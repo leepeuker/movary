@@ -562,6 +562,19 @@ class UserRepository
         );
     }
 
+    public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_character_names' => (int)$displayCharacterNames,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateExtendedDashboardRows(int $userId, ?string $extendedRows) : void
     {
         $this->dbConnection->update(

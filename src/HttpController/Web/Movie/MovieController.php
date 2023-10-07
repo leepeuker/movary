@@ -24,6 +24,7 @@ class MovieController
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
         private readonly TmdbIsoCountryCache $tmdbIsoCountryCache,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -67,6 +68,11 @@ class MovieController
             return Response::createNotFound();
         }
 
+        $currentUser = null;
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            $currentUser = $this->authenticationService->getCurrentUser();
+        }
+
         $movieId = (int)$request->getRouteParameters()['id'];
 
         $movie = $this->movieApi->findByIdFormatted($movieId);
@@ -89,6 +95,7 @@ class MovieController
                 'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
                 'countries' => $this->tmdbIsoCountryCache->fetchAll(),
+                'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
             ]),
         );
     }

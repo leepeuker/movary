@@ -33,6 +33,7 @@ class UserEntity
         private readonly bool $watchlistAutomaticRemovalEnabled,
         private readonly ?string $country,
         private readonly bool $jellyfinSyncEnabled,
+        private readonly bool $displayCharacterNames,
     ) {
     }
 
@@ -64,6 +65,7 @@ class UserEntity
             (bool)$data['watchlist_automatic_removal_enabled'],
             $data['country'],
             (bool)$data['jellyfin_sync_enabled'],
+            (bool)$data['display_character_names'],
         );
     }
 
@@ -90,6 +92,11 @@ class UserEntity
     public function getDateFormatId() : int
     {
         return $this->dateFormatId;
+    }
+
+    public function getDisplayCharacterNames() : bool
+    {
+        return $this->displayCharacterNames;
     }
 
     public function getEmbyWebhookId() : ?string
