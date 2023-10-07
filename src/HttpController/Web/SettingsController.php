@@ -249,6 +249,7 @@ class SettingsController
                 'countries' => $this->countryCache->fetchAll(),
                 'userCountry' => $user->getCountry(),
                 'apiToken' => $this->userApi->findApiTokenByUserId($user->getId()),
+                'displayCharacterNamesInput' => $user->getDisplayCharacterNames(),
             ]),
         );
     }
@@ -373,7 +374,7 @@ class SettingsController
         $radarrFeedId = $user->getRadarrFeedId();
         $applicationUrl = $this->serverSettings->getApplicationUrl();
 
-        if($applicationUrl !== null && $radarrFeedId !== null) {
+        if ($applicationUrl !== null && $radarrFeedId !== null) {
             $radarrFeedUrl = $this->webhookUrlBuilder->buildRadarrFeedUrl($radarrFeedId);
         }
 
@@ -382,7 +383,7 @@ class SettingsController
             $this->twig->render('page/settings-integration-radarr.html.twig', [
                 'radarrFeedUrl' => $radarrFeedUrl ?? '-',
                 'isActive' => $applicationUrl !== null
-            ])
+            ]),
         );
     }
 
@@ -590,13 +591,17 @@ class SettingsController
         $name = $requestData['username'] ?? '';
         $country = $requestData['country'] ?? null;
         $enableAutomaticWatchlistRemoval = isset($requestData['enableAutomaticWatchlistRemoval']) === false ? false : (bool)$requestData['enableAutomaticWatchlistRemoval'];
+        $displayCharacterNames = isset($requestData['displayCharacterNames']) === false ? false : (bool)$requestData['displayCharacterNames'];
+
+        $userId = $this->authenticationService->getCurrentUserId();
 
         try {
-            $this->userApi->updatePrivacyLevel($this->authenticationService->getCurrentUserId(), $privacyLevel);
-            $this->userApi->updateDateFormatId($this->authenticationService->getCurrentUserId(), $dateFormat);
-            $this->userApi->updateCountry($this->authenticationService->getCurrentUserId(), $country);
-            $this->userApi->updateName($this->authenticationService->getCurrentUserId(), (string)$name);
-            $this->userApi->updateWatchlistAutomaticRemovalEnabled($this->authenticationService->getCurrentUserId(), $enableAutomaticWatchlistRemoval);
+            $this->userApi->updatePrivacyLevel($userId, $privacyLevel);
+            $this->userApi->updateDateFormatId($userId, $dateFormat);
+            $this->userApi->updateCountry($userId, $country);
+            $this->userApi->updateName($userId, (string)$name);
+            $this->userApi->updateWatchlistAutomaticRemovalEnabled($userId, $enableAutomaticWatchlistRemoval);
+            $this->userApi->updateDisplayCharacterNames($userId, $displayCharacterNames);
         } catch (User\Exception\UsernameInvalidFormat) {
             return Response::createBadRequest('Username not meeting requirements');
         } catch (User\Exception\UsernameNotUnique) {

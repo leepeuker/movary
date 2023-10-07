@@ -333,6 +333,11 @@ class UserApi
         $this->repository->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
     }
 
+    public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
+    {
+        $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
+    }
+
     public function updateExtendedDashboardRows(int $userId, ?string $extendedRows) : void
     {
         if ($this->repository->findUserById($userId) === null) {
