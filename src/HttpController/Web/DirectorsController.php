@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\PersonsRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
@@ -19,6 +20,7 @@ class DirectorsController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PersonsRequestMapper $requestMapper,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -31,6 +33,13 @@ class DirectorsController
 
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
+        $currentUserId = null;
+        if ($this->authenticationService->isUserAuthenticated() === true) {
+            $currentUserId = $this->authenticationService->getCurrentUserId();
+        }
+
+        $personFilterUserId = $requestData->getSortBy() !== 'name' ? $currentUserId : null;
+
         $directors = $this->movieHistoryApi->fetchDirectors(
             $userId,
             $requestData->getLimit(),
@@ -39,9 +48,15 @@ class DirectorsController
             $requestData->getSortBy(),
             $requestData->getSortOrder(),
             $requestData->getGender(),
+            personFilterUserId: $personFilterUserId,
         );
 
-        $directorsCount = $this->movieHistoryApi->fetchDirectorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());
+        $directorsCount = $this->movieHistoryApi->fetchDirectorsCount(
+            $userId,
+            $requestData->getSearchTerm(),
+            $requestData->getGender(),
+            personFilterUserId: $personFilterUserId,
+        );
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($directorsCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(

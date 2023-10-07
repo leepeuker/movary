@@ -135,6 +135,7 @@ class MovieHistoryApi
         string $sortBy = 'uniqueAppearances',
         ?SortOrder $sortOrder = null,
         ?Gender $gender = null,
+        ?int $personFilterUserId = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createDesc();
@@ -148,6 +149,7 @@ class MovieHistoryApi
             $sortBy,
             $sortOrder,
             $gender,
+            $personFilterUserId,
         );
 
         foreach ($directors as $index => $director) {
@@ -157,9 +159,9 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($directors);
     }
 
-    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null) : int
+    public function fetchDirectorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null, ?int $personFilterUserId = null) : int
     {
-        return $this->movieRepository->fetchDirectorsCount($userId, $searchTerm, $gender);
+        return $this->movieRepository->fetchDirectorsCount($userId, $searchTerm, $gender, $personFilterUserId);
     }
 
     public function fetchFirstHistoryWatchDate(int $userId) : ?Date
@@ -191,9 +193,9 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
     }
 
-    public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null) : int
+    public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null, ?int $personFilterUserId = null) : int
     {
-        return $this->movieRepository->fetchActorsCount($userId, $searchTerm, $gender);
+        return $this->movieRepository->fetchActorsCount($userId, $searchTerm, $gender, $personFilterUserId);
     }
 
     public function fetchMostWatchedGenres(int $userId) : array
