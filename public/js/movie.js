@@ -255,6 +255,40 @@ async function showWhereToWatchModal() {
         }
     }
 
+    document.getElementById('countrySelect').addEventListener('change', (e) => {
+        const country = document.getElementById('countrySelect').value;
+        const streamType = document.getElementById('streamTypeSelect').value;
+
+        if (country === '') {
+            document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+            document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
+            document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
+            document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
+
+            return;
+        }
+
+        localStorage.setItem('country', country)
+
+        loadWatchProviders(country, streamType)
+    })
+
+    document.getElementById('streamTypeSelect').addEventListener('change', (e) => {
+        const country = document.getElementById('countrySelect').value;
+        const streamType = document.getElementById('streamTypeSelect').value;
+
+        if (country === '') {
+            return;
+        }
+
+        loadWatchProviders(country, streamType)
+    })
+
+    document.getElementById('whereToWatchModal').addEventListener('hide.bs.modal', event => {
+        document.getElementById('countrySelect').value = ''
+        document.getElementById('streamTypeSelect').value = 'all'
+    });
+
     loadWatchProviders(countrySelect.value, streamType)
 }
 
@@ -281,35 +315,6 @@ async function loadWatchProviders(country, streamType) {
     document.getElementById('whereToWatchModalSearchSpinner').classList.add('d-none')
 }
 
-document.getElementById('countrySelect').addEventListener('change', (e) => {
-    const country = document.getElementById('countrySelect').value;
-    const streamType = document.getElementById('streamTypeSelect').value;
-
-    if (country === '') {
-        document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
-        document.getElementById('whereToWatchModalProvidersInfo').classList.add('d-none')
-        document.getElementById('whereToWatchModalProvidersList').classList.add('d-none')
-        document.getElementById('whereToWatchModalProvidersList').innerHTML = ''
-
-        return;
-    }
-
-    localStorage.setItem('country', country)
-
-    loadWatchProviders(country, streamType)
-})
-
-document.getElementById('streamTypeSelect').addEventListener('change', (e) => {
-    const country = document.getElementById('countrySelect').value;
-    const streamType = document.getElementById('streamTypeSelect').value;
-
-    if (country === '') {
-        return;
-    }
-
-    loadWatchProviders(country, streamType)
-})
-
 async function fetchWatchProviders(country, streamType) {
     const response = await fetch(
         '/movies/' + getMovieId() + '/watch-providers?country=' + country + '&streamType=' + streamType,
@@ -333,11 +338,6 @@ function refreshWhereToWatchModal() {
 
     loadWatchProviders(country, streamType)
 }
-
-document.getElementById('whereToWatchModal').addEventListener('hide.bs.modal', event => {
-    document.getElementById('countrySelect').value = ''
-    document.getElementById('streamTypeSelect').value = 'all'
-});
 //endregion whereToWatchModal
 
 function isTruncated(el) {
