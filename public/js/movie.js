@@ -339,3 +339,21 @@ document.getElementById('whereToWatchModal').addEventListener('hide.bs.modal', e
     document.getElementById('streamTypeSelect').value = 'all'
 });
 //endregion whereToWatchModal
+
+function isTruncated(el) {
+    return el.scrollWidth > el.clientWidth
+}
+
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+    if (isTruncated(tooltipTriggerEl) === false) {
+        return
+    }
+
+    let placement = 'bottom';
+    if (tooltipTriggerEl.classList.contains('card-header') === true) {
+        placement = 'top'
+    }
+
+    new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
+})
