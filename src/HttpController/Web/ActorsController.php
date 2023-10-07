@@ -38,6 +38,8 @@ class ActorsController
             $currentUserId = $this->authenticationService->getCurrentUserId();
         }
 
+        $personFilterUserId = $requestData->getSortBy() !== 'name' ? $currentUserId : null;
+
         $actors = $this->movieHistoryApi->fetchActors(
             $userId,
             $requestData->getLimit(),
@@ -46,10 +48,15 @@ class ActorsController
             $requestData->getSortBy(),
             $requestData->getSortOrder(),
             $requestData->getGender(),
-            personFilterUserId: $currentUserId,
+            personFilterUserId: $personFilterUserId,
         );
 
-        $actorsCount = $this->movieHistoryApi->fetchMostWatchedActorsCount($userId, $requestData->getSearchTerm(), $requestData->getGender());
+        $actorsCount = $this->movieHistoryApi->fetchMostWatchedActorsCount(
+            $userId,
+            $requestData->getSearchTerm(),
+            $requestData->getGender(),
+            $personFilterUserId,
+        );
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($actorsCount, $requestData->getLimit(), $requestData->getPage());
 
         return Response::create(
