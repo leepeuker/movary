@@ -33,6 +33,7 @@ class CastApi
                 'id' => $cast['id'],
                 'name' => $cast['name'],
                 'posterPath' => $posterPath,
+                'characterName' => $cast['character_name'],
             ];
         }
 

@@ -191,7 +191,7 @@
 
         {# --- Acting --- #}
 
-        <h6 style="margin-bottom: 0.4rem">Acting</h6>
+        <h6 style="margin-bottom: 0.4rem">Cast</h6>
         <div class="carousel">
             {% if castMembers|length == 0 %} - {% endif %}
             {% for castMember in castMembers|slice(0, 40) %}
@@ -203,7 +203,10 @@
                         </small>
                     </div>
 
-                    <img src="{{ castMember.posterPath }}" class="card-img-bottom" alt="{{ castMember.name }} Poster">
+                    <img src="{{ castMember.posterPath }}" alt="{{ castMember.name }} Poster">
+                    <div class="card-footer text-truncate" style="padding: 0.1rem;text-align: center">
+                        <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.characterName }}</small>
+                    </div>
                 </div>
             {% endfor %}
         </div>

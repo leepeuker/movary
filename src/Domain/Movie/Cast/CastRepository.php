@@ -31,7 +31,7 @@ class CastRepository
     public function findByMovieId(int $movieId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT p.id, p.name, p.poster_path, p.tmdb_poster_path
+            'SELECT p.id, p.name, p.poster_path, p.tmdb_poster_path, c.character_name
             FROM movie_cast c
             JOIN person p on c.person_id = p.id
             WHERE c.movie_id = ?
