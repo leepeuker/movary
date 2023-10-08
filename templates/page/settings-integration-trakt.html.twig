@@ -17,9 +17,9 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5>Trakt.tv API</h5>
+                <h5>Trakt.tv API Access</h5>
 
-                <p class="text-muted" style="margin-bottom: 0.5rem">To get your username and client id from trakt visit <a href="https://trakt.tv/oauth/applications"
+                <p class="text-muted" style="margin-bottom: 0.5rem">To get your username and client id from Trakt visit <a href="https://trakt.tv/oauth/applications"
                                                                                                                            target="_blank">this url</a>.</p>
 
                 <form action="/settings/trakt" method="post">
@@ -69,8 +69,8 @@
 
                 <h5>Import data</h5>
 
-                <p class="text-muted">You must have your trakt username and client id set to be able to import your data from trakt. <br>
-                    The import only adds data missing in movary, it will not overwrite or remove existing data.
+                <p class="text-muted">Requires Trakt username and client id to be set.<br>
+                    The import only adds missing data, it will not change existing data.
                 </p>
 
                 {% if traktScheduleHistorySyncSuccessful == true %}

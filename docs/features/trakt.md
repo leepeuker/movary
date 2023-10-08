@@ -1,18 +1,33 @@
+## Trakt.tv API Access
+
+Movary needs a Trakt **username** and **Client ID** to access its api. 
+You can configure them in Movary via the user settings page at `/settings/integrations/trakt` or via cli (user update command).
+
+#### How to get a Client ID
+Go to your trakt.tv <a href="https://trakt.tv/oauth/applications" target="_blank">application settings</a> and create an application for Movary.
+Trakt requires a redirect uri which is not used by Movary, you can enter a placeholder like `http://movary`:
+<img src="/assets/trakt-new-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/>
+
+You should be able to see your Client ID now on your applications page:
+<img src="/assets/trakt-view-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/>
+
+Enter the Client ID and your username in Movary, verify the access and save your changes. 
+
 ## Import
 
 ### Description
 
-You can import your watch history and ratings from Trakt.
+You can import your watch history and ratings from Trakt (only from public profiles currently).
 
-The Trakt account used in the import process must have a Trakt username and client id set (can be set via settings page `/settings/integrations/trakt` or via cli).
+The import will only add data missing in Movary on default, it will not overwrite or remove existing data.
 
-The import can be triggered via the settings page or via cli.
+The import can be triggered via the user settings page at `/settings/integrations/trakt` or via cli.
 
 !!! Info
 
-    Importing hundreds or thousands of movies for the first time can take a few minutes. 
+    Importing hundreds or thousands of movies for the first time can take a few minutes.
 
-### Command
+### CLI Command
 
 ```shell
 php bin/console.php trakt:import
