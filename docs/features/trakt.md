@@ -17,7 +17,7 @@ Enter the Client ID and your username in Movary, verify the access and save your
 
 ### Description
 
-You can import your watch history and ratings from Trakt (only from public profiles currently).
+You can import your watch history and ratings from Trakt.
 
 The import will only add data missing in Movary on default, it will not overwrite or remove existing data.
 
@@ -26,6 +26,10 @@ The import can be triggered via the user settings page at `/settings/integration
 !!! Info
 
     Importing hundreds or thousands of movies for the first time can take a few minutes.
+
+!!! Warning
+
+    Currently Movary only supports import from public Trakt accounts. Make sure your account is not set to private during the import.
 
 ### CLI Command
 
