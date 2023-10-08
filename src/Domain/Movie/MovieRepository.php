@@ -535,7 +535,7 @@ class MovieRepository
     {
         return $this->dbConnection->fetchFirstColumn(
             <<<SQL
-            SELECT UNIQUE(movie_id)
+            SELECT DISTINCT movie_id
             FROM movie_user_watch_dates
             WHERE user_id = ?
             GROUP by movie_id
