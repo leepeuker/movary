@@ -6,7 +6,7 @@ X-Auth-Token: {{xAuthToken}}
 
 ####
 
-GET http://127.0.0.1/api/users/{{username}}/watchlist/movies?limit=5
+GET http://127.0.0.1/api/users/{{username}}/watchlist/movies?limit=1&page=2
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

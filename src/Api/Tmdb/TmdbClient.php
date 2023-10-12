@@ -32,6 +32,7 @@ class TmdbClient
         $getParametersRendered .= 'api_key=' . $this->serverSettingsService->getTmdbApiKey();
 
         $url = self::BASE_URL . $relativeUrl . $getParametersRendered;
+
         $request = new Request('GET', $url);
 
         $response = $this->httpClient->sendRequest($request);
