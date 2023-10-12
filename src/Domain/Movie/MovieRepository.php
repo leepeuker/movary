@@ -383,7 +383,7 @@ class MovieRepository
         );
     }
 
-    public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm) : array
+    public function fetchHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
     {
         $payload = [$userId, $userId];
 
@@ -402,7 +402,7 @@ class MovieRepository
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
             $whereQuery
-            ORDER BY watched_at DESC
+            ORDER BY watched_at $sortOrder
             LIMIT $offset, $limit
             SQL,
             $payload,
@@ -781,7 +781,7 @@ class MovieRepository
             'releaseDate' => 'release_date',
             'watchDate' => 'watched_at',
             'runtime' => 'runtime',
-            default => 'title'
+            default => 'LOWER(title)'
         };
 
         $whereQuery = 'WHERE m.title LIKE ? ';
@@ -817,7 +817,7 @@ class MovieRepository
                 LEFT JOIN genre g on mg.genre_id = g.id
                 $whereQuery
                 GROUP BY m.id, title, release_date, watched_at, rating
-                ORDER BY $sortBySanitized $sortOrder, title asc
+                ORDER BY $sortBySanitized $sortOrder, LOWER(title) asc
             ) a
             WHERE rn = 1
             LIMIT $offset, $limit
@@ -875,7 +875,7 @@ class MovieRepository
             JOIN movie_user_watch_dates muwd ON m.id = muwd.movie_id
             LEFT JOIN movie_user_rating mur ON muwd.movie_id = mur.movie_id and mur.user_id = ?
             WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh) AND muwd.user_id = ?
-            ORDER BY m.title
+            ORDER BY LOWER(m.title)
             SQL,
             [$userId, $personId, $userId],
         );
@@ -892,7 +892,7 @@ class MovieRepository
             JOIN movie_user_watch_dates muwd ON m.id = muwd.movie_id and muwd.user_id = ?
             LEFT JOIN movie_user_rating mur ON muwd.movie_id = mur.movie_id and mur.user_id = ?
             WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh)
-            ORDER BY m.title
+            ORDER BY LOWER(m.title)
             SQL,
             [$userId, $userId, $personId],
         );

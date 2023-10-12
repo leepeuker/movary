@@ -4,15 +4,12 @@ namespace Movary\HttpController\Api\RequestMapper;
 
 use Movary\HttpController\Api\Dto\HistoryRequestDto;
 use Movary\ValueObject\Http\Request;
-use Movary\ValueObject\SortOrder;
 
 class HistoryRequestMapper
 {
-    private const DEFAULT_LIMIT = 24;
-
-    private const DEFAULT_PAGE = 1;
-
     private const DEFAULT_SORT_BY = 'watchedAt';
+
+    private const DEFAULT_SORT_ORDER = 'desc';
 
     public function __construct(private readonly RequestMapper $requestMapper)
     {
@@ -20,19 +17,13 @@ class HistoryRequestMapper
 
     public function mapRequest(Request $request) : HistoryRequestDto
     {
-        $getParameters = $request->getGetParameters();
-
-        $searchTerm = $getParameters['search'] ?? null;
-        $page = $getParameters['page'] ?? self::DEFAULT_PAGE;
-        $limit = $getParameters['limit'] ?? self::DEFAULT_LIMIT;
-
         return HistoryRequestDto::create(
             $this->requestMapper->mapUsernameFromRoute($request)->getId(),
-            $searchTerm,
-            (int)$page,
-            (int)$limit,
+            $this->requestMapper->mapSearchTerm($request),
+            $this->requestMapper->mapPage($request),
+            $this->requestMapper->mapLimit($request),
             self::DEFAULT_SORT_BY,
-            SortOrder::createAsc(),
+            $this->requestMapper->mapSortOrder($request, self::DEFAULT_SORT_ORDER),
         );
     }
 }

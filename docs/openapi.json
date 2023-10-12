@@ -26,7 +26,7 @@
           {
             "name": "search",
             "in": "query",
-            "description": "Search term",
+            "description": "The search term",
             "required": false,
             "schema": {
               "type": "string"
@@ -50,6 +50,20 @@
             "schema": {
               "type": "integer",
               "default": 24
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Sort order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc",
+              "enum": [
+                "asc",
+                "desc"
+              ]
             }
           }
         ],
@@ -296,7 +310,7 @@
           {
             "name": "search",
             "in": "query",
-            "description": "Search term",
+            "description": "The search term",
             "required": false,
             "schema": {
               "type": "string"
@@ -532,7 +546,7 @@
           {
             "name": "search",
             "in": "query",
-            "description": "Search term",
+            "description": "The search term",
             "required": false,
             "schema": {
               "type": "string"
@@ -865,9 +879,9 @@
         "description": "Search remotely on tmdb for the movie with the specified search filters. Movies already existing locally will have a Movary id set.",
         "parameters": [
           {
-            "name": "query",
+            "name": "search",
             "in": "query",
-            "description": "The search query",
+            "description": "The search term",
             "required": true,
             "schema": {
               "type": "string"
@@ -884,7 +898,7 @@
             }
           },
           {
-            "name": "year",
+            "name": "releaseYear",
             "in": "query",
             "description": "Filter by release year",
             "required": false,

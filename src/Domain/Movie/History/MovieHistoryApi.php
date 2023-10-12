@@ -179,9 +179,9 @@ class MovieHistoryApi
         return $this->movieRepository->fetchHistoryCount($userId, $searchTerm);
     }
 
-    public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null) : array
+    public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null, ?SortOrder $sortOrder = null) : array
     {
-        $historyEntries = $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $searchTerm);
+        $historyEntries = $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $sortOrder ?? SortOrder::createDesc(), $searchTerm);
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($historyEntries);
     }
