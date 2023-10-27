@@ -59,6 +59,11 @@ class TmdbApi
         );
     }
 
+    public function getImages(int $tmdbId) : array
+    {
+        return $this->client->get("/movie/$tmdbId/images");
+    }
+
     public function searchMovie(string $searchTerm, ?Year $year = null, ?int $page = null) : array
     {
         $getParameters = ['query' => urlencode($searchTerm)];

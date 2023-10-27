@@ -107,6 +107,9 @@
                             class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
                 </p>
             {% endif %}
+            {% if canChangePoster == true %}
+                <button class="btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-title="Change movie poster" onclick="toggleChangeMoviePosterModal()"><i class="bi bi-pencil-square"></i></button>
+            {% endif %}
         </div>
 
         {# --- Buttons --- #}
@@ -166,6 +169,7 @@
             {{ include('component/modal-edit-rating.html.twig') }}
             {{ include('component/modal-edit-watch-date.html.twig') }}
             {{ include('component/modal-more-options.html.twig') }}
+            {{ include('component/modal-change-movie-poster.html.twig') }}
         {% endif %}
 
         {# --- Tagline --- #}

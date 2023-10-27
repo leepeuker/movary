@@ -340,6 +340,52 @@ function refreshWhereToWatchModal() {
 }
 //endregion whereToWatchModal
 
+function toggleChangeMoviePosterModal() {
+    const modal = new bootstrap.Modal(document.getElementById('changePosterModal'));
+    document.getElementById('changePosterModalHeader').innerText = 'Change poster for ' + document.getElementsByTagName('h2')[0].innerText;
+    modal.show();
+}
+
+function toggleChangePosterSection(el) {
+    if(el.id == 'searchTMDBOption') {
+        searchTMDBForPoster();
+    } else if(el.id == 'pasteUrlOption') {
+        document.getElementById('PosterOptionsContainer').classList.add('d-none');
+        document.getElementById('searchTMDBSection').classList.add('d-none');
+        document.getElementById('pasteUrlSection').classList.remove('d-none');
+        document.getElementById('uploadImageSection').classList.add('d-none');
+        document.getElementById('returnToOptionsBtn').classList.remove('d-none');
+    } else if(el.id == 'uploadImageOption') {
+        document.getElementById('PosterOptionsContainer').classList.add('d-none');
+        document.getElementById('searchTMDBSection').classList.add('d-none');
+        document.getElementById('pasteUrlSection').classList.add('d-none');
+        document.getElementById('uploadImageSection').classList.remove('d-none');
+        document.getElementById('returnToOptionsBtn').classList.remove('d-none');
+    }
+}
+
+function showOptions() {
+    document.getElementById('PosterOptionsContainer').classList.remove('d-none');
+    document.getElementById('searchTMDBSection').classList.add('d-none');
+    document.getElementById('pasteUrlSection').classList.add('d-none');
+    document.getElementById('uploadImageSection').classList.add('d-none');
+    document.getElementById('returnToOptionsBtn').classList.add('d-none');
+}
+
+async function searchTMDBForPoster() {
+    let movieId = document.getElementById('movieId').value;
+    const posterRequest = await fetch('/api/movies/' + movieId + '/search-posters');
+    
+}
+
+async function processImageUrl() {
+
+}
+
+async function processUploadedPoster() {
+
+}
+
 function isTruncated(el) {
     return el.scrollWidth > el.clientWidth
 }

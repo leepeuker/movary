@@ -13,3 +13,18 @@
     border: black solid;
     border-width: 0.1rem;
 }
+
+.PosterOptionsDiv {
+    border: var(--bs-tertiary-color) 2px solid;
+    width: 20vh;
+    height: 10vh;
+    /* color: var(--bs-tertiary-bg); */
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5%;
+    margin: 0 5px 0 5px;
+}
+
+.PosterOptionsDiv:hover {
+    background-color: var(--bs-tertiary-color);
+}

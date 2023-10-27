@@ -44,4 +44,6 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-chevron-expand::before { content: "\f283"; }
 .bi-chevron-contract::before { content: "\f27d"; }
 .bi-question-lg::before { content: "\f64e"; }
-.bi-filter::before{content:"\f3ca"}
+.bi-filter::before{content:"\f3ca"; }
+.bi-upload::before {content:"\f603"; }
+.bi-search::before {content: "\F52A"; }

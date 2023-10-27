@@ -229,5 +229,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 
+    $routes->add('GET', '/movies/{id:[0-9]+}/search-posters', [Api\Movie\MovieController::class, 'getPosters']);
+
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

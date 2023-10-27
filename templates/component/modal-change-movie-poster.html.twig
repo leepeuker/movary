@@ -1,0 +1,39 @@
+
+<div class="modal fade" id="changePosterModal" tabindex="-1" aria-labelledby="changePosterModal" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="changePosterModalHeader"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-around" id="PosterOptionsContainer">
+                    <div class="PosterOptionsDiv" onclick="toggleChangePosterSection(this)" id="searchTMDBOption">Search TMDB for posters <br/> <i class="bi bi-search"></i></div>
+                    <div class="PosterOptionsDiv" onclick="toggleChangePosterSection(this)" id="pasteUrlOption">Manually paste an URL to a poster <br/> <span style="font-style: italic; ">https://</span></div>
+                    <div class="PosterOptionsDiv" onclick="toggleChangePosterSection(this)" id="uploadImageOption">Manually upload your own poster <br/> <i class="bi bi-upload"></i></div>
+                </div>
+                <div class="d-none" id="searchTMDBSection">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Movie name" />
+                        <span class="input-group-text bg-success"><i class="bi bi-search"></i></span>
+                        <div id="TMDBPosterResults"></div>
+                    </div>
+                </div>
+                <div class="d-none" id="pasteUrlSection">
+                    <label for="imageInput" class="form-label">Paste the URL to your image below</label>
+                    <input type="text" class="form-control" id="urlInput" placeholder="https://..."/>
+                    <button class="btn btn-primary mt-3">Process URL</button>
+                </div>
+                <div class="d-none" id="uploadImageSection">
+                    <label for="imageInput" class="form-label">Upload your image file below</label>
+                    <input type="file" class="form-control" id="uploadInput" />
+                    <button class="btn btn-primary mt-3">Upload image</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary d-none" id="returnToOptionsBtn" onclick="showOptions()">Return</button>
+                <button type="button" class="btn btn-primary" id="updatePosterButton">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

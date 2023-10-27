@@ -72,6 +72,7 @@ class MovieController
         if ($this->authenticationService->isUserAuthenticated() === true) {
             $currentUser = $this->authenticationService->getCurrentUser();
         }
+        $canChangePoster = $currentUser->isAdmin();
 
         $movieId = (int)$request->getRouteParameters()['id'];
 
@@ -96,6 +97,7 @@ class MovieController
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
                 'countries' => $this->tmdbIsoCountryCache->fetchAll(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
+                'canChangePoster' => $canChangePoster,
             ]),
         );
     }
