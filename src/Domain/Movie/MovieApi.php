@@ -17,12 +17,14 @@ use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\Person\PersonApi;
+use Movary\Service\ImageCacheService;
 use Movary\Service\UrlGenerator;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
 use Movary\ValueObject\PersonalRating;
+use Movary\ValueObject\ResourceType;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 use RuntimeException;
@@ -44,6 +46,7 @@ class MovieApi
         private readonly MovieRepository $repository,
         private readonly ProductionCompanyApi $movieProductionCompanyApi,
         private readonly PersonApi $personApi,
+        private readonly ImageCacheService $imageCacheService,
     ) {
     }
 
@@ -530,6 +533,19 @@ class MovieApi
     public function updateLetterboxdId(int $movieId, string $letterboxdId) : void
     {
         $this->repository->updateLetterboxdId($movieId, $letterboxdId);
+    }
+
+    public function updatePosterPath(int $movieId, string $posterPath, ?string $oldPosterPath) : void
+    {
+        if($oldPosterPath !== null) {
+            $this->imageCacheService->deleteImageByPosterPath($oldPosterPath);
+        }
+        $this->repository->updateTmdbPosterPath($movieId, $posterPath);
+
+        $tmdbPosterUrl = $this->tmdbUrlGenerator->generateImageUrl($posterPath);
+        $newPosterPath = $this->imageCacheService->cacheImage($tmdbPosterUrl, $movieId, ResourceType::createMovie(), true);
+
+        $this->repository->updatePosterPath($movieId, $newPosterPath);
     }
 
     public function updateProductionCompanies(int $movieId, CompanyEntityList $productionCompanies) : void

@@ -347,20 +347,20 @@ function toggleChangeMoviePosterModal() {
 }
 
 function toggleChangePosterSection(el) {
+    document.getElementById('PosterOptionsContainer').classList.add('d-none');
+    document.getElementById('searchTMDBSection').classList.add('d-none');
+    document.getElementById('pasteUrlSection').classList.add('d-none');
+    document.getElementById('uploadImageSection').classList.add('d-none');
+    document.getElementById('updatePosterButton').classList.add('d-none');
+    document.getElementById('returnToOptionsBtn').classList.remove('d-none');
     if(el.id == 'searchTMDBOption') {
+        document.getElementById('searchTMDBSection').classList.remove('d-none');
+        document.getElementById('updatePosterButton').classList.remove('d-none');
         searchTMDBForPoster();
     } else if(el.id == 'pasteUrlOption') {
-        document.getElementById('PosterOptionsContainer').classList.add('d-none');
-        document.getElementById('searchTMDBSection').classList.add('d-none');
         document.getElementById('pasteUrlSection').classList.remove('d-none');
-        document.getElementById('uploadImageSection').classList.add('d-none');
-        document.getElementById('returnToOptionsBtn').classList.remove('d-none');
     } else if(el.id == 'uploadImageOption') {
-        document.getElementById('PosterOptionsContainer').classList.add('d-none');
-        document.getElementById('searchTMDBSection').classList.add('d-none');
-        document.getElementById('pasteUrlSection').classList.add('d-none');
         document.getElementById('uploadImageSection').classList.remove('d-none');
-        document.getElementById('returnToOptionsBtn').classList.remove('d-none');
     }
 }
 
@@ -372,10 +372,81 @@ function showOptions() {
     document.getElementById('returnToOptionsBtn').classList.add('d-none');
 }
 
+function processTMDBPosters(TMDBData) {
+    document.getElementById('TMDBPosterResults').innerHTML = '';
+    TMDBData.forEach(imageData => {
+        let image = document.createElement('img');
+        image.classList.add('img-fluid', 'm-1', 'TMDBPosterImage');
+        image.src = 'https://image.tmdb.org/t/p/w154' + imageData['file_path'];
+        image.dataset.filepath = imageData['file_path'];
+        image.addEventListener('click', function() {
+            if(document.getElementsByClassName('SelectedPoster').length > 0) {
+                document.querySelector('.SelectedPoster').className = 'img-fluid m-1 TMDBPosterImage';
+            }
+            this.className = 'img-fluid m-1 SelectedPoster';
+        });
+        document.getElementById('TMDBPosterResults').append(image);
+    });
+}
+
+function updateSelectedPoster() {
+    let movieId = document.getElementById('movieId').value;
+    let selectedPoster = document.querySelector('.SelectedPoster');
+    let filePath = selectedPoster.dataset.filepath;
+
+    const updatePosterRequest = fetch('/movies/' + movieId + '/update-poster', {
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        method: 'PUT',
+        body: filePath
+    });
+    
+    let errorMessage = document.createElement('p');
+    errorMessage.innerText = 'Something has gone wrong. Check the logs in Docker or your browser console and please try again.';
+    createSpinner(document.getElementById('TMDBPosterResults'));
+
+    updatePosterRequest.then(response => {
+        if(response.ok) {
+            window.location.reload();
+        } else {
+            if(response.status === 400) {
+                errorMessage.innerText = 'Choose a different poster; this one is already in use.'
+            } else {
+                console.error(response.body);
+            }
+            document.getElementById('TMDBPosterResults').innerHTML = '';
+            document.getElementById('TMDBPosterResults').append(errorMessage);
+        }
+    }).catch(error => {
+        console.error(error);
+        document.getElementById('TMDBPosterResults').append(errorMessage);
+    });
+}
+
 async function searchTMDBForPoster() {
     let movieId = document.getElementById('movieId').value;
-    const posterRequest = await fetch('/api/movies/' + movieId + '/search-posters');
-    
+    const posterRequest = fetch('/movies/' + movieId + '/search-posters', {
+        headers: {
+            'accept': 'application/json'
+        }
+    });
+
+    createSpinner(document.getElementById('TMDBPosterResults'));
+    let errorMessage = document.createElement('p');
+    errorMessage.innerText = 'Something has gone wrong. Check the logs in Docker or your browser console and please try again.';
+
+    posterRequest.then(response => {
+        if(response.ok) {
+            return response.json();
+        } else {
+            console.error(response.body);
+            document.getElementById('TMDBPosterResults').append(errorMessage);
+        }
+    }).then(data => processTMDBPosters(data)).catch(error => {
+        console.error(error);
+        document.getElementById('TMDBPosterResults').append(errorMessage);
+    });
 }
 
 async function processImageUrl() {
@@ -403,3 +474,14 @@ const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
 
     new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
 })
+
+function createSpinner(parent) {
+    parent.innerHTML = '';
+    let div = document.createElement('div');
+    let span = document.createElement('span');
+    div.className = 'spinner-border';
+    span.className = 'visually-hidden';
+    span.innerText = 'Loading...';
+    div.append(span);
+    parent.append(div);    
+}

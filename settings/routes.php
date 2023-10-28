@@ -160,7 +160,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/movies/{id:[0-9]+}/watch-providers', [Web\Movie\MovieWatchProviderController::class, 'getWatchProviders']);
     $routes->add('GET', '/movies/{id:[0-9]+}/add-watchlist', [Web\Movie\MovieWatchlistController::class, 'addToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/movies/{id:[0-9]+}/remove-watchlist', [Web\Movie\MovieWatchlistController::class, 'removeFromWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
-
+    $routes->add('GET', '/movies/{id:[0-9]+}/search-posters', [Web\Movie\MovieController::class, 'getPosters']);
+    $routes->add('PUT', '/movies/{id:[0-9]+}/update-poster', [Web\Movie\MovieController::class, 'updatePoster']);
     ##########
     # Person #
     ##########
@@ -227,9 +228,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
     $routes->add('POST', '/webhook/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
 
-    $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
-
-    $routes->add('GET', '/movies/{id:[0-9]+}/search-posters', [Api\Movie\MovieController::class, 'getPosters']);
+    $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);    
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

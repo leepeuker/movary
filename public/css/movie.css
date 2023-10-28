@@ -28,3 +28,11 @@
 .PosterOptionsDiv:hover {
     background-color: var(--bs-tertiary-color);
 }
+
+.TMDBPosterImage, .SelectedPoster {
+    cursor: pointer;
+}
+
+.TMDBPosterImage:hover, .SelectedPoster {
+    filter: brightness(50%);
+}

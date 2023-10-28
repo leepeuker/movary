@@ -3,12 +3,14 @@
 namespace Movary\HttpController\Web\Movie;
 
 use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
+use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\Service\Tmdb\SyncMovie;
+use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -24,6 +26,7 @@ class MovieController
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
         private readonly TmdbIsoCountryCache $tmdbIsoCountryCache,
+        private readonly TmdbApi $tmdbApi,
         private readonly Authentication $authenticationService,
     ) {
     }
@@ -100,5 +103,36 @@ class MovieController
                 'canChangePoster' => $canChangePoster,
             ]),
         );
+    }
+
+    public function getPosters(Request $request) : Response
+    {
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $movie = $this->movieApi->findById($movieId);
+        if($movie === null) {
+            return Response::createNotFound();
+        }
+        $tmdbId = $movie->getTmdbId();
+        if($tmdbId === null) {
+            return Response::createBadRequest();
+        }
+        $images = $this->tmdbApi->getImages($tmdbId)['posters'];
+        return Response::createJson(Json::encode($images));
+    }
+
+    public function updatePoster(Request $request) : Response
+    {
+        $movieId = (int)$request->getRouteParameters()['id'];
+        $movie = $this->movieApi->findById($movieId);
+        if($movie === null) {
+            return Response::createNotFound();
+        }
+        $posterFilepath = $request->getBody();
+        $oldPosterPath = $movie->getPosterPath();
+        if($posterFilepath === $movie->getTmdbPosterPath()) {
+            return Response::createBadRequest();
+        }
+        $this->movieApi->updatePosterPath($movieId, $posterFilepath, $oldPosterPath);
+        return Response::createOk();
     }
 }
