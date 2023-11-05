@@ -1,11 +1,10 @@
-ARG ALPINE_VERSION=3.18
-FROM alpine:${ALPINE_VERSION} as base
-LABEL Maintainer="Tim de Pater <code@trafex.nl>"
-LABEL Description="Lightweight container with Nginx 1.24 & PHP 8.2 based on Alpine Linux."
-# Setup document root
+##############
+# Base image #
+##############
+FROM alpine:3.18 as base
+
 WORKDIR /app
 
-# Install packages and remove default server definition
 RUN apk add --no-cache \
   curl \
   nano \
@@ -33,17 +32,16 @@ RUN apk add --no-cache \
   php82-xmlwriter \
   supervisor
 
-# build/configure nginx - http
+# Configure nginx
 COPY build/config/nginx.conf /etc/nginx/nginx.conf
-# build/configure nginx - default server
 COPY build/config/conf.d /etc/nginx/conf.d/
 
-# build/configure PHP-FPM
+# Configure PHP-FPM
 ENV PHP_INI_DIR /etc/php82
 COPY build/config/fpm-pool.conf ${PHP_INI_DIR}/php-fpm.d/www.conf
 COPY build/config/php.ini ${PHP_INI_DIR}/conf.d/custom.ini
 
-# build/configure supervisord
+# Configure supervisord
 COPY build/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Make sure files/folders needed by the processes are accessable when they run under the nobody user
@@ -64,10 +62,15 @@ EXPOSE 8080
 # Let supervisord start nginx & php-fpm
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-# configure a healthcheck to validate that everything is up&running
+# Configure a healthcheck to validate that everything is up & running
 HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
 
+#####################
+# Development image #
+#####################
 FROM base as development
 
-#FROM base as production
-#COPY --chown=nobody ./ /var/www/html/
+####################
+# Production image #
+####################
+FROM base as production
