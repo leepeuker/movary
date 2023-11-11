@@ -137,10 +137,10 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {% if moviesAsActorFromWatchlist is not empty %}
-                    <h4>From your watchlist</h4>
+                {% if moviesFromWatchlistAsActor is not empty %}
+                    <h4>From your watch list</h4>
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
-                        {% for movieAsActor in moviesAsActorFromWatchlist %}
+                        {% for movieAsActor in moviesFromWatchlistAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer"
                                      onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
