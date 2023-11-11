@@ -309,6 +309,14 @@ class MovieApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
     }
 
+
+    public function fetchFromWatchlistWithDirector(int $personId, int $userId) : array
+    {
+        $movies = $this->repository->fetchFromWatchlistWithDirector($personId, $userId);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
+    }
+
     public function findById(int $movieId) : ?MovieEntity
     {
         return $this->repository->findById($movieId);

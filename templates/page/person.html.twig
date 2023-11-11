@@ -180,6 +180,28 @@
                         </div>
                     {% endfor %}
                 </div>
+
+                {% if moviesFromWatchlistAsDirector is not empty %}
+                  <h4>From your watch list</h4>
+                  <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                      {% for movieAsDirector in moviesFromWatchlistAsDirector %}
+                          <div class="col position-relative" style="padding-bottom: 1rem">
+                              <div class="card h-100 position-relative" style="cursor: pointer"
+                                   onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                                  <div class="position-relative">
+                                      <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
+
+                                  </div>
+                                  {% if movieAsDirector.userRating is not null %}
+                                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                          {{ movieAsDirector.userRating }}
+                                      </span>
+                                  {% endif %}
+                              </div>
+                          </div>
+                      {% endfor %}
+                      </div>
+                  {% endif %}
             </div>
         </div>
         <br>
