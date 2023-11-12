@@ -113,7 +113,7 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.tmdb_poster_path
+            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.tmdb_poster_path, p.poster_path
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
@@ -254,7 +254,7 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.tmdb_poster_path
+            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.tmdb_poster_path, p.poster_path
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
