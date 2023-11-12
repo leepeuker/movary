@@ -898,6 +898,42 @@ class MovieRepository
         );
     }
 
+
+    public function fetchFromWatchlistWithActor(int $personId, int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT m.*, mur.rating as userRating
+            FROM movie m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            JOIN person p ON mc.person_id = p.id
+            JOIN watchlist wl ON m.id = wl.movie_id
+            LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
+            WHERE p.id = ? AND m.id IN (wl.movie_id) AND wl.user_id = ?
+            ORDER BY LOWER(m.title)
+            SQL,
+            [$userId, $personId, $userId],
+        );
+    }
+
+
+    public function fetchFromWatchlistWithDirector(int $personId, int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT m.*, mur.rating as userRating
+            FROM movie m
+            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
+            JOIN person p ON mc.person_id = p.id
+            JOIN watchlist wl ON m.id = wl.movie_id and wl.user_id = ?
+            LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
+            WHERE p.id = ? AND m.id IN (wl.movie_id)
+            ORDER BY LOWER(m.title)
+            SQL,
+            [$userId, $userId, $personId],
+        );
+    }
+
     public function findById(int $movieId) : ?MovieEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE id = ?', [$movieId]);
