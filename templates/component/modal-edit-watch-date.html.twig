@@ -27,7 +27,11 @@
                 </div>
                 <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
                     <i class="input-group-text">Plays</i>
-                    <input type="number" class="datepicker_input form-control" placeholder="" aria-label="Plays" id="editWatchDateModalPlaysInput">
+                    <input type="number" class="form-control" aria-label="Plays" id="editWatchDateModalPlaysInput" min="1" required>
+                </div>
+                <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
+                    <i class="input-group-text">Position</i>
+                    <input type="number" class="form-control" aria-label="Position" id="editWatchDateModalPositionInput" min="1" required>
                 </div>
                 <div id="alertMovieModalDiv"></div>
             </div>

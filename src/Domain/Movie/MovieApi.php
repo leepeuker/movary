@@ -47,7 +47,7 @@ class MovieApi
     ) {
     }
 
-    public function addPlaysForMovieOnDate(int $movieId, int $userId, ?Date $watchedDate, int $playsToAdd = 1, ?string $comment = null) : void
+    public function addPlaysForMovieOnDate(int $movieId, int $userId, ?Date $watchedDate, int $playsToAdd = 1, ?int $position = null, ?string $comment = null) : void
     {
         $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
 
@@ -59,6 +59,7 @@ class MovieApi
                 $userId,
                 $watchedDate,
                 $playsToAdd,
+                $position,
                 $comment,
             );
 
@@ -70,6 +71,7 @@ class MovieApi
             $userId,
             $watchedDate,
             $historyEntry->getPlays() + $playsToAdd,
+            $position ?? $historyEntry->getPosition(),
             $comment ?? $historyEntry->getComment(),
         );
     }
@@ -405,7 +407,7 @@ class MovieApi
         return $this->repository->findUserRating($movieId, $userId);
     }
 
-    public function replaceHistoryForMovieByDate(int $movieId, int $userId, ?Date $watchedAt, int $playsPerDate, ?string $comment = null) : void
+    public function replaceHistoryForMovieByDate(int $movieId, int $userId, ?Date $watchedAt, int $playsPerDate, ?int $position = null, ?string $comment = null) : void
     {
         $existingHistoryEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
 
@@ -417,6 +419,7 @@ class MovieApi
                 $userId,
                 $watchedAt,
                 $playsPerDate,
+                $position,
                 $comment,
             );
 
@@ -432,7 +435,8 @@ class MovieApi
             $userId,
             $watchedAt,
             $playsPerDate,
-            $comment,
+            $position ?? $existingHistoryEntry->getPosition(),
+            $comment ?? $existingHistoryEntry->getComment(),
         );
     }
 

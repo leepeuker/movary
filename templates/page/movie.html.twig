@@ -131,7 +131,8 @@
                             {% if currentUserName == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
                             data-watch-date="{{ watchDate.watched_at is null ? '' : watchDate.watched_at|date(dateFormatPhp) }}"
                             data-plays="{{ watchDate.plays }}"
-                            data-comment="{{ watchDate.comment }}">
+                            data-comment="{{ watchDate.comment }}"
+                            data-position="{{ watchDate.position }}">
                             {{ watchDate.watched_at is null ? 'Unkown date' : watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
                             {% if watchDate.comment != '' %}<i class="bi bi-chat-square-text" style="position: absolute; right:.7rem; top:25%;">{% endif %}</i>
                         </li>

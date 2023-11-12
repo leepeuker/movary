@@ -10,6 +10,7 @@ class MovieHistoryEntity
         private readonly int $movieId,
         private readonly ?Date $watchedAt,
         private readonly int $plays,
+        private readonly int $position,
         private readonly ?string $comment,
     ) {
     }
@@ -20,6 +21,7 @@ class MovieHistoryEntity
             (int)$data['movie_id'],
             $data['watched_at'] == null ? null : Date::createFromString($data['watched_at']),
             $data['plays'],
+            $data['position'],
             $data['comment'],
         );
     }
@@ -37,6 +39,11 @@ class MovieHistoryEntity
     public function getPlays() : int
     {
         return $this->plays;
+    }
+
+    public function getPosition() : int
+    {
+        return $this->position;
     }
 
     public function getWatchedAt() : ?Date
