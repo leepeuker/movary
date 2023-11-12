@@ -107,9 +107,6 @@
                             class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
                 </p>
             {% endif %}
-            {% if canChangePoster == true %}
-                <button class="btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-title="Change movie poster" onclick="toggleChangeMoviePosterModal()"><i class="bi bi-pencil-square"></i></button>
-            {% endif %}
         </div>
 
         {# --- Buttons --- #}

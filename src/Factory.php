@@ -177,6 +177,7 @@ class Factory
             $container->get(LoggerInterface::class),
             $container->get(ClientInterface::class),
             $container->get(DBAL\Connection::class),
+            $container->get(ServerSettings::class),
             self::createDirectoryAppRoot() . 'public/',
             '/storage/images/',
         );

@@ -543,9 +543,10 @@ class MovieApi
         $this->repository->updateTmdbPosterPath($movieId, $posterPath);
 
         $tmdbPosterUrl = $this->tmdbUrlGenerator->generateImageUrl($posterPath);
-        $newPosterPath = $this->imageCacheService->cacheImage($tmdbPosterUrl, $movieId, ResourceType::createMovie(), true);
-
-        $this->repository->updatePosterPath($movieId, $newPosterPath);
+        if($this->imageCacheService->isImageCachingEnabled() === true) {
+            $newPosterPath = $this->imageCacheService->cacheImage($tmdbPosterUrl, $movieId, ResourceType::createMovie(), true);
+            $this->repository->updatePosterPath($movieId, $newPosterPath);
+        }
     }
 
     public function updateProductionCompanies(int $movieId, CompanyEntityList $productionCompanies) : void

@@ -342,7 +342,6 @@ function refreshWhereToWatchModal() {
 
 function toggleChangeMoviePosterModal() {
     const modal = new bootstrap.Modal(document.getElementById('changePosterModal'));
-    document.getElementById('changePosterModalHeader').innerText = 'Change poster for ' + document.getElementsByTagName('h2')[0].innerText;
     modal.show();
 }
 
@@ -374,19 +373,22 @@ function showOptions() {
 
 function processTMDBPosters(TMDBData) {
     document.getElementById('TMDBPosterResults').innerHTML = '';
-    TMDBData.forEach(imageData => {
+    for(let i = 0; i < TMDBData.length; i++) {
+        let imageData = TMDBData[i];
         let image = document.createElement('img');
         image.classList.add('img-fluid', 'm-1', 'TMDBPosterImage');
-        image.src = 'https://image.tmdb.org/t/p/w154' + imageData['file_path'];
         image.dataset.filepath = imageData['file_path'];
+        image.src = 'https://image.tmdb.org/t/p/w154' + imageData['file_path'];
         image.addEventListener('click', function() {
             if(document.getElementsByClassName('SelectedPoster').length > 0) {
                 document.querySelector('.SelectedPoster').className = 'img-fluid m-1 TMDBPosterImage';
             }
             this.className = 'img-fluid m-1 SelectedPoster';
+            document.getElementById('updatePosterButton').classList.remove('disabled');
+            document.getElementById('updatePosterButton').removeAttribute('disabled');
         });
         document.getElementById('TMDBPosterResults').append(image);
-    });
+    }
 }
 
 function updateSelectedPoster() {

@@ -40,6 +40,8 @@ class ServerSettings
 
     private const TMDB_API_KEY = 'TMDB_API_KEY';
 
+    private const TMDB_ENABLE_IMAGE_CACHING = 'TMDB_ENABLE_IMAGE_CACHING';
+
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
@@ -129,6 +131,11 @@ class ServerSettings
     public function isApplicationUrlSetInEnvironment() : bool
     {
         return $this->isSetInEnvironment(self::APPLICATION_URL);
+    }
+
+    public function isTmdbCachingEnabledInEnvironment() : ?bool
+    {
+        return (bool)$this->getByKey(self::TMDB_ENABLE_IMAGE_CACHING);
     }
 
     public function isSmtpEncryptionSetInEnvironment() : bool
