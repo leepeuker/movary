@@ -909,12 +909,13 @@ class MovieRepository
             JOIN person p ON mc.person_id = p.id
             JOIN watchlist wl ON m.id = wl.movie_id
             LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
-            WHERE p.id = ? AND m.id IN (wl.movies_id) AND wl.user_id = ?
+            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM watchlist) AND wl.user_id = ?
             ORDER BY LOWER(m.title)
             SQL,
             [$userId, $personId, $userId],
         );
     }
+
 
     public function fetchFromWatchlistWithDirector(int $personId, int $userId) : array
     {
@@ -926,7 +927,7 @@ class MovieRepository
             JOIN person p ON mc.person_id = p.id
             JOIN watchlist wl ON m.id = wl.movie_id and wl.user_id = ?
             LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
-            WHERE p.id = ? AND m.id IN (wl.movies_id)
+            WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM watchlist)
             ORDER BY LOWER(m.title)
             SQL,
             [$userId, $userId, $personId],
