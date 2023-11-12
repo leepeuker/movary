@@ -105,34 +105,40 @@ class MovieController
         );
     }
 
-    public function getPosters(Request $request) : Response
+    public function searchPosters(Request $request) : Response
     {
         $movieId = (int)$request->getRouteParameters()['id'];
+
         $movie = $this->movieApi->findById($movieId);
-        if($movie === null) {
+        if ($movie === null) {
             return Response::createNotFound();
         }
+
         $tmdbId = $movie->getTmdbId();
-        if($tmdbId === null) {
-            return Response::createBadRequest();
-        }
+
         $images = $this->tmdbApi->getImages($tmdbId)['posters'];
+
         return Response::createJson(Json::encode($images));
     }
 
     public function updatePoster(Request $request) : Response
     {
         $movieId = (int)$request->getRouteParameters()['id'];
+
         $movie = $this->movieApi->findById($movieId);
-        if($movie === null) {
+        if ($movie === null) {
             return Response::createNotFound();
         }
+
         $posterFilepath = $request->getBody();
         $oldPosterPath = $movie->getPosterPath();
-        if($posterFilepath === $movie->getTmdbPosterPath()) {
+
+        if ($posterFilepath === $movie->getTmdbPosterPath()) {
             return Response::createBadRequest();
         }
+
         $this->movieApi->updatePosterPath($movieId, $posterFilepath, $oldPosterPath);
+
         return Response::createOk();
     }
 }
