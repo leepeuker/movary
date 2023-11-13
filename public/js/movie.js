@@ -23,6 +23,21 @@ function deleteWatchDate() {
     })
 }
 
+function toggleWatchDateAdvancedMode() {
+    const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
+    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
+
+    if (advancedWatchDateDetails.classList.contains('d-none')) {
+        advancedWatchDateDetails.classList.remove('d-none')
+        advancedWatchDateModeButton.innerHTML = 'Simple mode'
+
+        return
+    }
+
+    advancedWatchDateModeButton.innerHTML = 'Advanced mode'
+    advancedWatchDateDetails.classList.add('d-none')
+}
+
 function getMovieId() {
     return document.getElementById('movieId').value
 }
