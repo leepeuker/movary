@@ -24,18 +24,29 @@ function deleteWatchDate() {
 }
 
 function toggleWatchDateAdvancedMode() {
-    const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
-    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
-
-    if (advancedWatchDateDetails.classList.contains('d-none')) {
-        advancedWatchDateDetails.classList.remove('d-none')
-        advancedWatchDateModeButton.innerHTML = 'Simple mode'
+    if (document.getElementById('advancedWatchDateDetails').classList.contains('d-none')) {
+        enableWatchDateAdvancedMode()
 
         return
     }
 
+    disableWatchDateAdvancedMode()
+}
+
+function disableWatchDateAdvancedMode() {
+    const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
+    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
+
     advancedWatchDateModeButton.innerHTML = 'Advanced mode'
     advancedWatchDateDetails.classList.add('d-none')
+}
+
+function enableWatchDateAdvancedMode() {
+    const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
+    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
+
+    advancedWatchDateDetails.classList.remove('d-none')
+    advancedWatchDateModeButton.innerHTML = 'Simple mode'
 }
 
 function getMovieId() {
@@ -96,6 +107,8 @@ function loadWatchDateModal(watchDateListElement) {
 
     document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
     document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
+
+    disableWatchDateAdvancedMode()
 
     new Datepicker(document.getElementById('editWatchDateModalInput'), {
         format: document.getElementById('dateFormatJavascript').value,
