@@ -330,7 +330,7 @@ class MovieRepository
     public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ?',
+            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ? ORDER BY watched_at',
             [$movieId, $userId],
         );
     }
@@ -378,7 +378,7 @@ class MovieRepository
             FROM movie_user_watch_dates muwd
             JOIN movie m on muwd.movie_id = m.id
             WHERE muwd.user_id = ?
-            ORDER BY watched_at DESC',
+            ORDER BY watched_at DESC, muwd.position DESC',
             [$userId],
         );
     }
@@ -402,7 +402,7 @@ class MovieRepository
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
             $whereQuery
-            ORDER BY watched_at $sortOrder
+            ORDER BY watched_at $sortOrder, mh.position $sortOrder
             LIMIT $offset, $limit
             SQL,
             $payload,
@@ -416,7 +416,7 @@ class MovieRepository
             FROM movie m
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
-            ORDER BY watched_at DESC
+            ORDER BY watched_at DESC, mh.position DESC
             LIMIT 6',
             [$userId, $userId],
         )->fetchAllAssociative();
