@@ -372,6 +372,10 @@ function showOptions() {
 }
 
 function processTMDBPosters(TMDBData) {
+    if(TMDBData.length < 1) {
+        let errorMessage = 'No images have been found; try selecting another country.';
+        document.getElementById('TMDBPosterResults').append(errorMessage);
+    }
     document.getElementById('TMDBPosterResults').innerHTML = '';
     for(let i = 0; i < TMDBData.length; i++) {
         let imageData = TMDBData[i];
@@ -428,9 +432,12 @@ function updateSelectedPoster() {
 
 async function searchTMDBForPoster() {
     let movieId = document.getElementById('movieId').value;
-    const posterRequest = fetch('/movies/' + movieId + '/search-posters', {
+    let country = document.getElementById('languageSelection').value;
+    // return;
+    const posterRequest = fetch('/movies/' + movieId + '/search-posters?country=' + country, {
         headers: {
-            'accept': 'application/json'
+            'accept': 'application/json',
+            'Content-Type': 'text/plain'
         }
     });
 

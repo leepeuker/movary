@@ -17,9 +17,7 @@
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
-
         <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
-
         <input type="hidden" id="movieId" value="{{ movie.id }}">
         <input type="hidden" id="username" value="{{ routeUsername }}">
 
@@ -166,7 +164,7 @@
             {{ include('component/modal-edit-rating.html.twig') }}
             {{ include('component/modal-edit-watch-date.html.twig') }}
             {{ include('component/modal-more-options.html.twig') }}
-            {{ include('component/modal-change-movie-poster.html.twig') }}
+            {{ include('component/modal-change-movie-poster.html.twig', {languages: languages}) }}
         {% endif %}
 
         {# --- Tagline --- #}

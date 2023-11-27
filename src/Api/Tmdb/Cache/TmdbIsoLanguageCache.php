@@ -42,6 +42,18 @@ class TmdbIsoLanguageCache
         throw new RuntimeException('Language code not handled: ' . $languageCode);
     }
 
+    public function fetchAll() : array
+    {
+        if ($this->languages === []) {
+            $this->loadFromDatabase();
+        }
+
+        if ($this->languages === []) {
+            $this->loadFromTmdb();
+        }
+        return $this->languages;
+    }
+
     public function loadFromTmdb() : bool
     {
         $languages = $this->client->get('/configuration/languages');

@@ -59,9 +59,13 @@ class TmdbApi
         );
     }
 
-    public function getImages(int $tmdbId) : array
+    public function getImages(int $tmdbId, string $country) : array
     {
-        return $this->client->get("/movie/$tmdbId/images");
+        $path = "/movie/$tmdbId/images";
+        if(empty($country)) {
+            return $this->client->get($path);
+        }
+        return $this->client->get($path, ['languages' => $country, 'include_image_language' => "$country,null"]);
     }
 
     public function searchMovie(string $searchTerm, ?Year $year = null, ?int $page = null) : array

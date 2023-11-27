@@ -12,6 +12,22 @@
                     <div class="PosterOptionsDiv d-none" onclick="toggleChangePosterSection(this)" id="uploadImageOption">Manually upload your own poster <br/> <i class="bi bi-upload"></i></div>
                 </div>
                 <div class="d-none" id="searchTMDBSection">
+                    <div class="mb-3">
+                        <label for="languageSelection" class="form-label">Select language</label>
+                        {% if languages is defined %}
+                            {{ languages }}
+                        {% else %}
+                            languages don't exist
+                        {% endif %}
+                        <select class="form-select" id="languageSelection" onchange="searchTMDBForPoster()" required>
+                            <option value="">Any language</option>
+                            {% for ISO6391, name in availableLanguages %}
+                                <option value="{{ ISO6391 }}" {% if ISO6391 == 'en' %}selected{% endif %}>{{ name }}</option>
+                            {% else %}
+                                <option>No languages found</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <div id="TMDBPosterResults" class="d-flex flex-wrap justify-content-around"></div>
                 </div>
                 <div class="d-none" id="pasteUrlSection">

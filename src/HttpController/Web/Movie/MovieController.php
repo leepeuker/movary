@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web\Movie;
 
 use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
+use Movary\Api\Tmdb\Cache\TmdbIsoLanguageCache;
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
@@ -25,6 +26,7 @@ class MovieController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
+        private readonly TmdbIsoLanguageCache $tmdbIsoLanguageCache,
         private readonly TmdbIsoCountryCache $tmdbIsoCountryCache,
         private readonly TmdbApi $tmdbApi,
         private readonly Authentication $authenticationService,
@@ -87,6 +89,7 @@ class MovieController
 
         $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
+        $languages = $this->tmdbIsoLanguageCache->fetchAll();
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/movie.html.twig', [
@@ -99,8 +102,10 @@ class MovieController
                 'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
                 'countries' => $this->tmdbIsoCountryCache->fetchAll(),
+                'userCountry' => $currentUser->getCountry(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
                 'canChangePoster' => $canChangePoster,
+                'availableLanguages' => $languages
             ]),
         );
     }
@@ -108,6 +113,7 @@ class MovieController
     public function searchPosters(Request $request) : Response
     {
         $movieId = (int)$request->getRouteParameters()['id'];
+        $country = (string)$request->getGetParameters()['country'];
 
         $movie = $this->movieApi->findById($movieId);
         if ($movie === null) {
@@ -116,7 +122,7 @@ class MovieController
 
         $tmdbId = $movie->getTmdbId();
 
-        $images = $this->tmdbApi->getImages($tmdbId)['posters'];
+        $images = $this->tmdbApi->getImages($tmdbId, $country)['posters'];
 
         return Response::createJson(Json::encode($images));
     }
