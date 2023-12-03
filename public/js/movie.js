@@ -343,40 +343,18 @@ function refreshWhereToWatchModal() {
 function toggleChangeMoviePosterModal() {
     const modal = new bootstrap.Modal(document.getElementById('changePosterModal'));
     modal.show();
-}
 
-function toggleChangePosterSection(el) {
-    document.getElementById('PosterOptionsContainer').classList.add('d-none');
-    document.getElementById('searchTMDBSection').classList.add('d-none');
-    document.getElementById('pasteUrlSection').classList.add('d-none');
-    document.getElementById('uploadImageSection').classList.add('d-none');
-    document.getElementById('updatePosterButton').classList.add('d-none');
-    document.getElementById('returnToOptionsBtn').classList.remove('d-none');
-    if(el.id == 'searchTMDBOption') {
-        document.getElementById('searchTMDBSection').classList.remove('d-none');
-        document.getElementById('updatePosterButton').classList.remove('d-none');
-        searchTMDBForPoster();
-    } else if(el.id == 'pasteUrlOption') {
-        document.getElementById('pasteUrlSection').classList.remove('d-none');
-    } else if(el.id == 'uploadImageOption') {
-        document.getElementById('uploadImageSection').classList.remove('d-none');
-    }
-}
-
-function showOptions() {
-    document.getElementById('PosterOptionsContainer').classList.remove('d-none');
-    document.getElementById('searchTMDBSection').classList.add('d-none');
-    document.getElementById('pasteUrlSection').classList.add('d-none');
-    document.getElementById('uploadImageSection').classList.add('d-none');
-    document.getElementById('returnToOptionsBtn').classList.add('d-none');
+    searchTMDBForPoster()
 }
 
 function processTMDBPosters(TMDBData) {
     if(TMDBData.length < 1) {
-        let errorMessage = 'No images have been found; try selecting another country.';
+        let errorMessage = 'No images have been found. Try selecting another country.';
         document.getElementById('TMDBPosterResults').append(errorMessage);
     }
+
     document.getElementById('TMDBPosterResults').innerHTML = '';
+
     for(let i = 0; i < TMDBData.length; i++) {
         let imageData = TMDBData[i];
         let image = document.createElement('img');
@@ -431,17 +409,13 @@ function updateSelectedPoster() {
 }
 
 async function searchTMDBForPoster() {
+    createSpinner(document.getElementById('TMDBPosterResults'));
+
     let movieId = document.getElementById('movieId').value;
     let country = document.getElementById('languageSelection').value;
-    // return;
-    const posterRequest = fetch('/movies/' + movieId + '/search-posters?country=' + country, {
-        headers: {
-            'accept': 'application/json',
-            'Content-Type': 'text/plain'
-        }
-    });
 
-    createSpinner(document.getElementById('TMDBPosterResults'));
+    const posterRequest = fetch('/movies/' + movieId + '/search-posters?country=' + country);
+
     let errorMessage = document.createElement('p');
     errorMessage.innerText = 'Something has gone wrong. Check the logs in Docker or your browser console and please try again.';
 
@@ -457,32 +431,6 @@ async function searchTMDBForPoster() {
         document.getElementById('TMDBPosterResults').append(errorMessage);
     });
 }
-
-async function processImageUrl() {
-
-}
-
-async function processUploadedPoster() {
-
-}
-
-function isTruncated(el) {
-    return el.scrollWidth > el.clientWidth
-}
-
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
-    if (isTruncated(tooltipTriggerEl) === false) {
-        return
-    }
-
-    let placement = 'bottom';
-    if (tooltipTriggerEl.classList.contains('card-header') === true) {
-        placement = 'top'
-    }
-
-    new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
-})
 
 function createSpinner(parent) {
     parent.innerHTML = '';
