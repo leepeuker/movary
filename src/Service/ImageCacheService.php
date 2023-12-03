@@ -20,7 +20,6 @@ class ImageCacheService
         private readonly LoggerInterface $logger,
         private readonly ClientInterface $httpClient,
         private readonly Connection $dbConnection,
-        private readonly ServerSettings $serverSettings,
         private readonly string $publicDirectory,
         private readonly string $imageBasePath,
     ) {
@@ -105,11 +104,6 @@ class ImageCacheService
         $imageFile = $this->publicDirectory . trim($posterPath, '/');
 
         return $this->fileUtil->fileExists($imageFile);
-    }
-
-    public function isImageCachingEnabled() : bool
-    {
-        return $this->serverSettings->isTmdbCachingEnabledInEnvironment() ?? false;
     }
 
     private function generateStorageDirectory(ResourceType $resourceType) : string

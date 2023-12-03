@@ -18,6 +18,7 @@ use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\Person\PersonApi;
 use Movary\Service\ImageCacheService;
+use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
@@ -47,6 +48,7 @@ class MovieApi
         private readonly ProductionCompanyApi $movieProductionCompanyApi,
         private readonly PersonApi $personApi,
         private readonly ImageCacheService $imageCacheService,
+        private readonly ServerSettings $serverSettings,
     ) {
     }
 
@@ -191,6 +193,11 @@ class MovieApi
         return $this->movieRepository->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit, $filterMovieIds, $onlyNeverSynced);
     }
 
+    public function fetchPlayedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    {
+        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
+    }
+
     public function fetchPlayedMoviesPaginated(
         int $userId,
         int $limit,
@@ -241,11 +248,6 @@ class MovieApi
     }
 
     public function fetchUniqueWatchedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
-    {
-        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
-    }
-
-    public function fetchPlayedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
     {
         return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
     }
@@ -543,7 +545,7 @@ class MovieApi
 
         $this->repository->updateTmdbPosterPath($movieId, $posterPath);
 
-        if ($this->imageCacheService->isImageCachingEnabled() === false) {
+        if ($this->serverSettings->isTmdbCachingEnabled() === false) {
             return;
         }
 

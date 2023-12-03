@@ -2,13 +2,15 @@
 
 namespace Movary\JobQueue;
 
+use Movary\Service\ServerSettings;
+
 class JobQueueScheduler
 {
     private const IMAGE_CACHE_BATCH_LIMIT = 250;
 
     public function __construct(
         private readonly JobQueueApi $jobQueueApi,
-        private readonly bool $enableImageCaching,
+        private readonly ServerSettings $serverSettings,
         private array $movieIdsForImageCacheJob = [],
         private array $personIdsForImageCacheJob = [],
     ) {
@@ -43,7 +45,7 @@ class JobQueueScheduler
 
     private function addTmdbImageCacheJob() : void
     {
-        if ($this->enableImageCaching === false) {
+        if ($this->serverSettings->isTmdbCachingEnabled() === false) {
             return;
         }
 

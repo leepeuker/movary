@@ -42,6 +42,8 @@ class ServerSettings
 
     private const TMDB_ENABLE_IMAGE_CACHING = 'TMDB_ENABLE_IMAGE_CACHING';
 
+    private const DEFAULT_VALUE_TMDB_ENABLE_IMAGE_CACHING = false;
+
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
@@ -61,6 +63,17 @@ class ServerSettings
     public function getFromAddress() : ?string
     {
         return $this->getByKey(self::SMTP_FROM_ADDRESS);
+    }
+
+    public function isTmdbCachingEnabled() : bool
+    {
+        $isCachingEnabled = $this->getByKey(self::TMDB_ENABLE_IMAGE_CACHING);
+
+        if ($isCachingEnabled !== null) {
+            return (bool)$isCachingEnabled;
+        }
+
+        return self::DEFAULT_VALUE_TMDB_ENABLE_IMAGE_CACHING;
     }
 
     public function getJellyfinAppName() : string
@@ -131,11 +144,6 @@ class ServerSettings
     public function isApplicationUrlSetInEnvironment() : bool
     {
         return $this->isSetInEnvironment(self::APPLICATION_URL);
-    }
-
-    public function isTmdbCachingEnabledInEnvironment() : ?bool
-    {
-        return (bool)$this->getByKey(self::TMDB_ENABLE_IMAGE_CACHING);
     }
 
     public function isSmtpEncryptionSetInEnvironment() : bool

@@ -9,7 +9,6 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Movary\Api\Tmdb;
-use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\TraktClient;
@@ -25,14 +24,12 @@ use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;
-use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
-use Movary\Service\UrlGenerator;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -56,8 +53,6 @@ class Factory
     private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
 
     private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
-
-    private const DEFAULT_TMDB_IMAGE_CACHING = false;
 
     private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
 
@@ -177,7 +172,6 @@ class Factory
             $container->get(LoggerInterface::class),
             $container->get(ClientInterface::class),
             $container->get(DBAL\Connection::class),
-            $container->get(ServerSettings::class),
             self::createDirectoryAppRoot() . 'public/',
             '/storage/images/',
         );
@@ -191,14 +185,6 @@ class Factory
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
             self::createDirectoryStorageApp()
-        );
-    }
-
-    public static function createJobQueueScheduler(ContainerInterface $container, Config $config) : JobQueueScheduler
-    {
-        return new JobQueueScheduler(
-            $container->get(JobQueueApi::class),
-            self::getTmdbEnabledImageCaching($config)
         );
     }
 
@@ -314,15 +300,6 @@ class Factory
         return new Twig\Loader\FilesystemLoader(self::createDirectoryAppRoot() . 'templates');
     }
 
-    public static function createUrlGenerator(ContainerInterface $container, Config $config) : UrlGenerator
-    {
-        return new UrlGenerator(
-            $container->get(TmdbUrlGenerator::class),
-            $container->get(ImageCacheService::class),
-            self::getTmdbEnabledImageCaching($config)
-        );
-    }
-
     public static function getDatabaseMode(Config $config) : string
     {
         return $config->getAsString('DATABASE_MODE');
@@ -385,11 +362,6 @@ class Factory
     private static function getLogLevel(Config $config) : string
     {
         return $config->getAsString('LOG_LEVEL', self::DEFAULT_LOG_LEVEL);
-    }
-
-    private static function getTmdbEnabledImageCaching(Config $config) : bool
-    {
-        return $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING', self::DEFAULT_TMDB_IMAGE_CACHING);
     }
 
     public function createProcessJobCommand(ContainerInterface $container, Config $config) : Command\ProcessJobs
