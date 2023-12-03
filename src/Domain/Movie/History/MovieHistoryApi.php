@@ -26,13 +26,22 @@ class MovieHistoryApi
 
     public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?int $position = null, ?string $comment = null) : void
     {
-        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, $position ?? 1);
+        if ($position === null) {
+            $position = $this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt);
+        }
+
+        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1);
 
         if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
             return;
         }
 
         $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
+    }
+
+    public function findHighestPositionForWatchDate(int $movieIdToIgnore, int $userId, ?Date $watchedAt) : ?int
+    {
+        return $this->repository->fetchHighestPositionForWatchDate($movieIdToIgnore, $userId, $watchedAt);
     }
 
     public function deleteByUserAndMovieId(int $userId, int $movieId) : void

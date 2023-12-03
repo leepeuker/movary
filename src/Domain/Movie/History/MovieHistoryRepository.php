@@ -65,6 +65,20 @@ class MovieHistoryRepository
         );
     }
 
+    public function fetchHighestPositionForWatchDate(int $movieIdToIgnore, int $userId, ?Date $watchedAt) : ?int
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT MAX(position)
+            FROM movie_user_watch_dates
+            WHERE movie_id != ? AND watched_at = ? AND user_id = ?',
+            [
+                $movieIdToIgnore,
+                $watchedAt === null ? null : (string)$watchedAt,
+                $userId
+            ],
+        )[0];
+    }
+
     public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, int $position, ?string $comment) : void
     {
         if ($watchedAt === null) {
