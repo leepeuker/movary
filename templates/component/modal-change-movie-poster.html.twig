@@ -6,44 +6,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="d-flex flex-sm-row flex-xs-column justify-content-around" id="PosterOptionsContainer">
-                    <div class="posterOptionsDiv" onclick="toggleChangePosterSection(this)" id="searchTMDBOption">Search TMDB for posters <br/> <i class="bi bi-search"></i></div>
-                    <div class="posterOptionsDiv d-none" onclick="toggleChangePosterSection(this)" id="pasteUrlOption">Manually paste an URL to a poster <br/> <span style="font-style: italic; ">https://</span></div>
-                    <div class="posterOptionsDiv d-none" onclick="toggleChangePosterSection(this)" id="uploadImageOption">Manually upload your own poster <br/> <i class="bi bi-upload"></i></div>
-                </div>
-                <div class="d-none" id="searchTMDBSection">
-                    <div class="mb-3">
-                        <label for="languageSelection" class="form-label">Select language</label>
-                        {% if languages is defined %}
-                            {{ languages }}
+                <div class="mb-3">
+                    <select class="form-select" id="languageSelection" onchange="searchTMDBForPoster()" required>
+                        <option value="">Any language</option>
+                        {% for ISO6391, name in availableLanguages %}
+                            <option value="{{ ISO6391 }}" {% if ISO6391 == 'en' %}selected{% endif %}>{{ name }}</option>
                         {% else %}
-                            languages don't exist
-                        {% endif %}
-                        <select class="form-select" id="languageSelection" onchange="searchTMDBForPoster()" required>
-                            <option value="">Any language</option>
-                            {% for ISO6391, name in availableLanguages %}
-                                <option value="{{ ISO6391 }}" {% if ISO6391 == 'en' %}selected{% endif %}>{{ name }}</option>
-                            {% else %}
-                                <option>No languages found</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div id="TMDBPosterResults" class="d-flex flex-wrap justify-content-around"></div>
+                            <option>No languages found</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="d-none" id="pasteUrlSection">
-                    <label for="imageInput" class="form-label">Paste the URL to your image below</label>
-                    <input type="text" class="form-control" id="urlInput" placeholder="https://..."/>
-                    <button class="btn btn-primary mt-3">Process URL</button>
-                </div>
-                <div class="d-none" id="uploadImageSection">
-                    <label for="imageInput" class="form-label">Upload your image file below</label>
-                    <input type="file" class="form-control" id="uploadInput" />
-                    <button class="btn btn-primary mt-3">Upload image</button>
-                </div>
+                <div id="TMDBPosterResults" class="d-flex flex-wrap justify-content-around"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary d-none" id="returnToOptionsBtn" onclick="showOptions()">Return</button>
-                <button type="button" class="btn btn-primary d-none disabled" id="updatePosterButton" onclick="updateSelectedPoster()" disabled>Update poster</button>
+                <button type="button" class="btn btn-secondary" id="returnToOptionsBtn" onclick="showOptions()">Return</button>
+                <button type="button" class="btn btn-primary disabled" id="updatePosterButton" onclick="updateSelectedPoster()" disabled>Update poster</button>
             </div>
         </div>
     </div>

@@ -74,7 +74,7 @@ class TmdbIsoLanguageCache
 
     private function loadFromDatabase() : bool
     {
-        $this->languages = $this->dbConnection->fetchAllKeyValue('SELECT iso_639_1, english_name FROM cache_tmdb_languages');
+        $this->languages = $this->dbConnection->fetchAllKeyValue('SELECT iso_639_1, english_name FROM cache_tmdb_languages ORDER BY english_name');
 
         return empty($this->languages);
     }

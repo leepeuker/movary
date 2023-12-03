@@ -21,11 +21,11 @@
                             onclick="showWhereToWatchModal({{ movie.tmdbId }})">
                         Where to watch
                     </button>
+                    {% if canChangePoster == true %}
+                        <button class="btn btn-primary" onclick="toggleChangeMoviePosterModal()" data-bs-dismiss="modal">Change poster</button>
+                    {% endif %}
                     <button type="button" class="btn btn-primary" id="refreshTmdbDataButton" onclick="refreshTmdbData()">Refresh TMDB data</button>
                     <button type="button" class="btn btn-primary" id="refreshImdbRatingButton" onclick="refreshImdbRating()">Refresh IMDb rating</button>
-                    {% if canChangePoster == true %}
-                        <button class="btn btn-primary" onclick="toggleChangeMoviePosterModal()" data-bs-dismiss="modal">Change movie poster</button>
-                    {% endif %}
                 </div>
             </div>
 
