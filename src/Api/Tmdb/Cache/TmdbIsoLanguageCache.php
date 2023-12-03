@@ -25,13 +25,7 @@ class TmdbIsoLanguageCache
 
     public function getLanguageByCode(string $languageCode) : string
     {
-        if ($this->languages === []) {
-            $this->loadFromDatabase();
-        }
-
-        if ($this->languages === []) {
-            $this->loadFromTmdb();
-        }
+        $this->fetchAll();
 
         foreach ($this->languages as $iso6931 => $englishName) {
             if ($iso6931 === $languageCode) {
@@ -51,6 +45,7 @@ class TmdbIsoLanguageCache
         if ($this->languages === []) {
             $this->loadFromTmdb();
         }
+
         return $this->languages;
     }
 

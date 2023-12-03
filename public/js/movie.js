@@ -380,14 +380,14 @@ function processTMDBPosters(TMDBData) {
     for(let i = 0; i < TMDBData.length; i++) {
         let imageData = TMDBData[i];
         let image = document.createElement('img');
-        image.classList.add('img-fluid', 'm-1', 'TMDBPosterImage');
+        image.classList.add('img-fluid', 'm-1', 'tmdbPosterImage');
         image.dataset.filepath = imageData['file_path'];
         image.src = 'https://image.tmdb.org/t/p/w154' + imageData['file_path'];
         image.addEventListener('click', function() {
-            if(document.getElementsByClassName('SelectedPoster').length > 0) {
-                document.querySelector('.SelectedPoster').className = 'img-fluid m-1 TMDBPosterImage';
+            if(document.getElementsByClassName('selectedPoster').length > 0) {
+                document.querySelector('.selectedPoster').className = 'img-fluid m-1 tmdbPosterImage';
             }
-            this.className = 'img-fluid m-1 SelectedPoster';
+            this.className = 'img-fluid m-1 selectedPoster';
             document.getElementById('updatePosterButton').classList.remove('disabled');
             document.getElementById('updatePosterButton').removeAttribute('disabled');
         });
@@ -397,7 +397,7 @@ function processTMDBPosters(TMDBData) {
 
 function updateSelectedPoster() {
     let movieId = document.getElementById('movieId').value;
-    let selectedPoster = document.querySelector('.SelectedPoster');
+    let selectedPoster = document.querySelector('.selectedPoster');
     let filePath = selectedPoster.dataset.filepath;
 
     const updatePosterRequest = fetch('/movies/' + movieId + '/update-poster', {

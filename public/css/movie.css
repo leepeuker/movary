@@ -14,7 +14,7 @@
     border-width: 0.1rem;
 }
 
-.PosterOptionsDiv {
+.posterOptionsDiv {
     border: var(--bs-tertiary-color) 2px solid;
     width: 20vh;
     height: 10vh;
@@ -25,14 +25,14 @@
     margin: 0 5px 0 5px;
 }
 
-.PosterOptionsDiv:hover {
+.posterOptionsDiv:hover {
     background-color: var(--bs-tertiary-color);
 }
 
-.TMDBPosterImage, .SelectedPoster {
+.tmdbPosterImage, .selectedPoster {
     cursor: pointer;
 }
 
-.TMDBPosterImage:hover, .SelectedPoster {
+.tmdbPosterImage:hover, .selectedPoster {
     filter: brightness(50%);
 }

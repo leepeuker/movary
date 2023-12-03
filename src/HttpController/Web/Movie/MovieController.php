@@ -77,7 +77,6 @@ class MovieController
         if ($this->authenticationService->isUserAuthenticated() === true) {
             $currentUser = $this->authenticationService->getCurrentUser();
         }
-        $canChangePoster = $currentUser->isAdmin();
 
         $movieId = (int)$request->getRouteParameters()['id'];
 
@@ -89,7 +88,6 @@ class MovieController
 
         $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
-        $languages = $this->tmdbIsoLanguageCache->fetchAll();
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/movie.html.twig', [
@@ -102,10 +100,10 @@ class MovieController
                 'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
                 'countries' => $this->tmdbIsoCountryCache->fetchAll(),
-                'userCountry' => $currentUser->getCountry(),
+                'userCountry' => $currentUser?->getCountry(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
-                'canChangePoster' => $canChangePoster,
-                'availableLanguages' => $languages
+                'canChangePoster' => $currentUser?->isAdmin(),
+                'availableLanguages' => $this->tmdbIsoLanguageCache->fetchAll()
             ]),
         );
     }
@@ -113,16 +111,16 @@ class MovieController
     public function searchPosters(Request $request) : Response
     {
         $movieId = (int)$request->getRouteParameters()['id'];
-        $country = (string)$request->getGetParameters()['country'];
+
+        $getParameters = $request->getGetParameters();
+        $country = empty($getParameters['country']) ? null : $getParameters['country'];
 
         $movie = $this->movieApi->findById($movieId);
         if ($movie === null) {
             return Response::createNotFound();
         }
 
-        $tmdbId = $movie->getTmdbId();
-
-        $images = $this->tmdbApi->getImages($tmdbId, $country)['posters'];
+        $images = $this->tmdbApi->getPosters($movie->getTmdbId(), $country);
 
         return Response::createJson(Json::encode($images));
     }
@@ -137,13 +135,16 @@ class MovieController
         }
 
         $posterFilepath = $request->getBody();
-        $oldPosterPath = $movie->getPosterPath();
 
         if ($posterFilepath === $movie->getTmdbPosterPath()) {
             return Response::createBadRequest();
         }
 
-        $this->movieApi->updatePosterPath($movieId, $posterFilepath, $oldPosterPath);
+        $this->movieApi->updatePosterPath(
+            $movieId,
+            $posterFilepath,
+            $movie->getPosterPath(),
+        );
 
         return Response::createOk();
     }

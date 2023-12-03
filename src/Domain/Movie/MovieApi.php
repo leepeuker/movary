@@ -537,16 +537,30 @@ class MovieApi
 
     public function updatePosterPath(int $movieId, string $posterPath, ?string $oldPosterPath) : void
     {
-        if($oldPosterPath !== null) {
+        if ($oldPosterPath !== null) {
             $this->imageCacheService->deleteImageByPosterPath($oldPosterPath);
         }
+
         $this->repository->updateTmdbPosterPath($movieId, $posterPath);
 
-        $tmdbPosterUrl = $this->tmdbUrlGenerator->generateImageUrl($posterPath);
-        if($this->imageCacheService->isImageCachingEnabled() === true) {
-            $newPosterPath = $this->imageCacheService->cacheImage($tmdbPosterUrl, $movieId, ResourceType::createMovie(), true);
-            $this->repository->updatePosterPath($movieId, $newPosterPath);
+        if ($this->imageCacheService->isImageCachingEnabled() === false) {
+            return;
         }
+
+        $tmdbPosterUrl = $this->tmdbUrlGenerator->generateImageUrl($posterPath);
+
+        $newPosterPath = $this->imageCacheService->cacheImage(
+            $tmdbPosterUrl,
+            $movieId,
+            ResourceType::createMovie(),
+            true,
+        );
+
+        if ($newPosterPath === null) {
+            throw new \RuntimeException('Could not cache new poster and update the poster path');
+        }
+
+        $this->repository->updatePosterPath($movieId, $newPosterPath);
     }
 
     public function updateProductionCompanies(int $movieId, CompanyEntityList $productionCompanies) : void
