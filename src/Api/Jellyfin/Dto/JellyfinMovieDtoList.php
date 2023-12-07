@@ -5,7 +5,8 @@ namespace Movary\Api\Jellyfin\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @extends AbstractList<JellyfinMovieDto>
+ * @method JellyfinMovieDto[] getIterator()
+ * @psalm-suppress ImplementedReturnTypeMismatch
  */
 class JellyfinMovieDtoList extends AbstractList
 {
