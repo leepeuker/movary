@@ -465,7 +465,7 @@ class MovieApi
                 $castMember->getPerson()->getPosterPath(),
             );
 
-            $this->castApi->create($movieId, $person->getId(), $castMember->getCharacter(), $position);
+            $this->castApi->create($movieId, $person->getId(), $castMember->getCharacter(), (int)$position);
         }
     }
 
