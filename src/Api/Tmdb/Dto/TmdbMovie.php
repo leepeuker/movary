@@ -12,7 +12,7 @@ class TmdbMovie
         private readonly string $originalLanguage,
         private readonly ?string $tagline,
         private readonly ?string $overview,
-        private readonly DateTime $releaseDate,
+        private readonly ?DateTime $releaseDate,
         private readonly ?int $runtime,
         private readonly float $voteAverage,
         private readonly int $voteCount,
@@ -33,7 +33,7 @@ class TmdbMovie
             $data['original_language'],
             empty($data['tagline']) === true ? null : $data['tagline'],
             empty($data['overview']) === true ? null : $data['overview'],
-            DateTime::createFromString($data['release_date']),
+            empty($data['release_date']) === false ? DateTime::createFromString($data['release_date']) : null,
             $data['runtime'],
             $data['vote_average'],
             $data['vote_count'],
@@ -91,7 +91,7 @@ class TmdbMovie
         return $this->productionCompanies;
     }
 
-    public function getReleaseDate() : DateTime
+    public function getReleaseDate() : ?DateTime
     {
         return $this->releaseDate;
     }
