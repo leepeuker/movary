@@ -477,7 +477,7 @@ class MovieRepository
                 <<<SQL
             SELECT strftime('%Y',release_date) as name, COUNT(*) as count
             FROM movie m
-            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?)
+            WHERE m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh WHERE user_id = ?) AND release_date IS NOT NULL
             GROUP BY strftime('%Y',release_date)
             ORDER BY COUNT(*) DESC, strftime('%Y',release_date) DESC
             SQL,

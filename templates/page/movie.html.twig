@@ -75,8 +75,11 @@
                 <h6 style="margin-bottom: 0.2rem">Release</h6>
                 <div style="margin-bottom: 0.4rem">
                     <span class="fw-light">
-                        {% if movie.releaseDate == '' %} - {% endif %}
-                        {{ movie.releaseDate|date(dateFormatPhp) }}
+                        {% if movie.releaseDate == '' %}
+                            -
+                        {% else %}
+                            {{ movie.releaseDate|date(dateFormatPhp) }}
+                        {% endif %}
                     </span>
                 </div>
             </div>
