@@ -363,7 +363,7 @@ class MovieRepository
             "SELECT watched_at, plays, comment, movie_id
             FROM movie_user_watch_dates
             WHERE user_id = ? and movie_id in ($placeholders)
-            ORDER BY watched_at DESC",
+            ORDER BY watched_at DESC, position DESC",
             [
                 $userId,
                 ...$movieIds
@@ -784,6 +784,11 @@ class MovieRepository
             default => 'LOWER(title)'
         };
 
+        $sortByWatchDatePosition = '';
+        if ($sortBySanitized === 'watched_at') {
+            $sortByWatchDatePosition = "mh.position $sortOrder, ";
+        }
+
         $whereQuery = 'WHERE m.title LIKE ? ';
 
         if (empty($releaseYear) === false) {
@@ -817,7 +822,7 @@ class MovieRepository
                 LEFT JOIN genre g on mg.genre_id = g.id
                 $whereQuery
                 GROUP BY m.id, title, release_date, watched_at, rating
-                ORDER BY $sortBySanitized $sortOrder, LOWER(title) asc
+                ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition LOWER(title) asc
             ) a
             WHERE rn = 1
             LIMIT $offset, $limit
