@@ -34,7 +34,7 @@ final class AddPositionToUserWatchDatesTable extends AbstractMigration
             CREATE TABLE `movie_user_watch_dates_tmp` (
                 `movie_id` INTEGER NOT NULL,
                 `user_id` INTEGER NOT NULL,
-                `watched_at` TEXT NOT NULL,
+                `watched_at` TEXT,
                 `plays` INTEGER DEFAULT 1,
                 `comment` TEXT DEFAULT NULL,
                 `position` INTEGER NOT NULL DEFAULT 1,
