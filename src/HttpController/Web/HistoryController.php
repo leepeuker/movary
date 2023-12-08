@@ -11,12 +11,10 @@ use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
-use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\PersonalRating;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Twig\Environment;
 
@@ -33,7 +31,6 @@ class HistoryController
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
-        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -53,16 +50,17 @@ class HistoryController
         $newWatchDate = empty($requestBody['newWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['newWatchDate'], $dateFormat) : null;
         $originalWatchDate = empty($requestBody['originalWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['originalWatchDate'], $dateFormat) : null;
 
-        $plays = (int)$requestBody['plays'];
+        $plays = empty($requestBody['plays']) === true ? 1 : (int)$requestBody['plays'];
         $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
+        $position = empty($requestBody['position']) === true ? 1 : (int)$requestBody['position'];
 
         if ($originalWatchDate == $newWatchDate) {
-            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $comment);
+            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position, $comment);
 
             return Response::create(StatusCode::createNoContent());
         }
 
-        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays);
+        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position);
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
 
         if ($comment !== null) {
@@ -92,7 +90,6 @@ class HistoryController
 
     public function logMovie(Request $request) : Response
     {
-        $this->logger->debug('CREATE_MOVIE_LOG start - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
         $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());
@@ -106,9 +103,7 @@ class HistoryController
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
         $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
 
-        $this->logger->debug('CREATE_MOVIE_LOG before local tmdb search - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
         $movie = $this->movieApi->findByTmdbId($tmdbId);
-        $this->logger->debug('CREATE_MOVIE_LOG after local tmdb search - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
 
         if ($movie === null) {
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
@@ -117,8 +112,6 @@ class HistoryController
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
-
-        $this->logger->debug('CREATE_MOVIE_LOG end - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
 
         return Response::create(StatusCode::createOk());
     }
