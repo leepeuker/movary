@@ -11,10 +11,12 @@ use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\PersonalRating;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Twig\Environment;
 
@@ -31,6 +33,7 @@ class HistoryController
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -89,6 +92,7 @@ class HistoryController
 
     public function logMovie(Request $request) : Response
     {
+        $this->logger->debug('CREATE_MOVIE_LOG start - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
         $userId = $this->authenticationService->getCurrentUserId();
 
         $requestData = Json::decode($request->getBody());
@@ -102,7 +106,9 @@ class HistoryController
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
         $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
 
+        $this->logger->debug('CREATE_MOVIE_LOG before local tmdb search - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
         $movie = $this->movieApi->findByTmdbId($tmdbId);
+        $this->logger->debug('CREATE_MOVIE_LOG after local tmdb search - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
 
         if ($movie === null) {
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
@@ -111,6 +117,8 @@ class HistoryController
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
         $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
+
+        $this->logger->debug('CREATE_MOVIE_LOG end - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
 
         return Response::create(StatusCode::createOk());
     }

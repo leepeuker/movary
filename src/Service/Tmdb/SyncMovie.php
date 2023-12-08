@@ -8,6 +8,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -28,6 +29,7 @@ class SyncMovie
 
     public function syncMovie(int $tmdbId) : MovieEntity
     {
+        $this->logger->debug('CREATE_MOVIE_LOG before tmdb remote fetch - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
         try {
             $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);
         } catch (Throwable) {
@@ -36,6 +38,8 @@ class SyncMovie
 
             $tmdbMovie = $this->tmdbApi->fetchMovieDetails($tmdbId);
         }
+
+        $this->logger->debug('CREATE_MOVIE_LOG after tmdb remote fetch - ' . DateTime::create()->format('Y-m-d H:i:s.u'));
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
