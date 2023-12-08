@@ -113,10 +113,10 @@ class SettingsController
     {
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $options = new ZipStream\Option\Archive();
-        $options->setSendHttpHeaders(true);
-
-        $zip = new ZipStream\ZipStream('export-for-letterboxd.zip', $options);
+        $zip = new ZipStream\ZipStream(
+            outputName: 'export-for-letterboxd.zip',
+            sendHttpHeaders: true,
+        );
 
         foreach ($this->letterboxdExporter->generateCsvFiles($userId) as $index => $csvFile) {
             $zip->addFileFromPath('export-' . $index . '.csv', $csvFile);

@@ -137,6 +137,27 @@
                         {% endfor %}
                     </div>
                 {% endif %}
+                {% if moviesFromWatchlistAsActor is not empty %}
+                    <h6>From your watch list</h6>
+                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                        {% for movieAsActor in moviesFromWatchlistAsActor %}
+                            <div class="col position-relative" style="padding-bottom: 1rem;">
+                                <div class="card h-100 position-relative" style="cursor: pointer"
+                                     onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
+                                    <div class="position-relative">
+                                        <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
+                                    </div>
+
+                                    {% if movieAsActor.userRating is not null %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                            {{ movieAsActor.userRating }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
             <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' or (moviesAsActor is empty and moviesAsDirector is not empty) %}active{% endif %}"
                  id="director" role="tabpanel" aria-labelledby="profile-tab"
@@ -159,6 +180,28 @@
                         </div>
                     {% endfor %}
                 </div>
+
+                {% if moviesFromWatchlistAsDirector is not empty %}
+                  <h6>From your watch list</h6>
+                  <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                      {% for movieAsDirector in moviesFromWatchlistAsDirector %}
+                          <div class="col position-relative" style="padding-bottom: 1rem">
+                              <div class="card h-100 position-relative" style="cursor: pointer"
+                                   onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                                  <div class="position-relative">
+                                      <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
+
+                                  </div>
+                                  {% if movieAsDirector.userRating is not null %}
+                                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                          {{ movieAsDirector.userRating }}
+                                      </span>
+                                  {% endif %}
+                              </div>
+                          </div>
+                      {% endfor %}
+                      </div>
+                  {% endif %}
             </div>
         </div>
         <br>
