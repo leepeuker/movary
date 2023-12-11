@@ -11,16 +11,17 @@ class MovieHistoryRepository
     {
     }
 
-    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment) : void
+    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment, int $position) : void
     {
         $this->dbConnection->executeStatement(
-            'INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`, `position`) VALUES (?, ?, ?, ?, ?, ?)',
             [
                 $movieId,
                 $userId,
                 $watchedAt !== null ? (string)$watchedAt : null,
                 (string)$plays,
                 $comment,
+                $position,
             ],
         );
     }
@@ -64,14 +65,29 @@ class MovieHistoryRepository
         );
     }
 
-    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment) : void
+    public function fetchHighestPositionForWatchDate(int $movieIdToIgnore, int $userId, ?Date $watchedAt) : ?int
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT MAX(position)
+            FROM movie_user_watch_dates
+            WHERE movie_id != ? AND watched_at = ? AND user_id = ?',
+            [
+                $movieIdToIgnore,
+                $watchedAt === null ? null : (string)$watchedAt,
+                $userId
+            ],
+        )[0];
+    }
+
+    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, int $position, ?string $comment) : void
     {
         if ($watchedAt === null) {
             $this->dbConnection->executeStatement(
-                'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',
+                'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ?, `position` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',
                 [
                     $comment,
                     $plays,
+                    $position,
                     $movieId,
                     $userId,
                 ],
@@ -81,10 +97,11 @@ class MovieHistoryRepository
         }
 
         $this->dbConnection->executeStatement(
-            'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
+            'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? , `position` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
             [
                 $comment,
                 $plays,
+                $position,
                 $movieId,
                 $userId,
                 (string)$watchedAt,

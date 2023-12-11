@@ -134,7 +134,8 @@
                             {% if currentUserName == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
                             data-watch-date="{{ watchDate.watched_at is null ? '' : watchDate.watched_at|date(dateFormatPhp) }}"
                             data-plays="{{ watchDate.plays }}"
-                            data-comment="{{ watchDate.comment }}">
+                            data-comment="{{ watchDate.comment }}"
+                            data-position="{{ watchDate.position }}">
                             {{ watchDate.watched_at is null ? 'Unkown date' : watchDate.watched_at|date(dateFormatPhp) }} {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
                             {% if watchDate.comment != '' %}<i class="bi bi-chat-square-text" style="position: absolute; right:.7rem; top:25%;">{% endif %}</i>
                         </li>
@@ -200,6 +201,7 @@
             {% for castMember in castMembers|slice(0, 40) %}
                 <div class="card" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;">
                     <div class="card-header text-truncate"
+                         id="castMemberName"
                          onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
                          data-bs-toggle="tooltip"
                          data-bs-title="{{ castMember.name }}"
@@ -216,6 +218,7 @@
                          style="cursor: pointer">
                     {% if displayCharacterNames == true %}
                         <div class="card-footer text-truncate"
+                             id="castCharacterName"
                              data-bs-toggle="tooltip"
                              data-bs-title="{{ castMember.characterName }}"
                              style="padding: 0.1rem;text-align: center">

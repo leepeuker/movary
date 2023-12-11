@@ -36,6 +36,7 @@ class HistoryController
                 $userId,
                 Date::createFromString($historyAddition['watchedAt']),
                 $historyAddition['plays'] ?? 1,
+                $historyAddition['position'] ?? 1,
                 $historyAddition['comment'] ?? null,
             );
         }
@@ -102,6 +103,7 @@ class HistoryController
                 $userId,
                 Date::createFromString($historyAddition['watchedAt']),
                 $historyAddition['plays'],
+                $historyAddition['position'],
                 $historyAddition['comment'],
             );
         }

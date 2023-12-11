@@ -151,6 +151,9 @@
                     },
                     "comment": {
                       "$ref": "#/components/schemas/commentOptional"
+                    },
+                    "position": {
+                      "$ref": "#/components/schemas/positionOptional"
                     }
                   }
                 }
@@ -211,6 +214,9 @@
                     },
                     "comment": {
                       "$ref": "#/components/schemas/comment"
+                    },
+                    "position": {
+                      "$ref": "#/components/schemas/position"
                     }
                   }
                 }
@@ -1197,6 +1203,18 @@
         "example": "This is a comment",
         "nullable": true,
         "default": null,
+        "required": false
+      },
+      "position": {
+        "type": "number",
+        "example": 1,
+        "nullable": false
+      },
+      "positionOptional": {
+        "type": "number",
+        "example": 1,
+        "nullable": true,
+        "default": 1,
         "required": false
       },
       "date": {
