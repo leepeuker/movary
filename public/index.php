@@ -1,74 +1,36 @@
 <?php declare(strict_types=1);
 
-session_start();
+echo 1;
 
-/** @var DI\Container $container */
+use Swoole\Coroutine;
+use Swoole\Http\Request;
+use Swoole\Http\Response;
+use Swoole\Http\Server;
 
-use Movary\HttpController\Web\ErrorController;
-use Movary\ValueObject\Http\Request;
-use Movary\ValueObject\Http\Response;
-use Psr\Log\LoggerInterface;
+$server = new Server('127.0.0.1', 9501);
 
-$container = require(__DIR__ . '/../bootstrap.php');
-$httpRequest = $container->get(Request::class);
+$server->on(
+    'request',
+    function (Request $request, Response $response) {
+        if (!empty($request->get['sleep'])) {
+            Coroutine::sleep((float) $request->get['sleep']); // Sleep for a while if HTTP query parameter "sleep" presents.
+        }
 
-try {
-    $dispatcher = FastRoute\simpleDispatcher(
-        require(__DIR__ . '/../settings/routes.php'),
-    );
+        // Next method call is to show how to change HTTP status code from the default one (200) to something else.
+        $response->status(200, 'Test');
 
-    $uri = $_SERVER['REQUEST_URI'];
+        $response->end(
+            <<<'EOT'
+                <pre>
+                In this example we start an HTTP/1 server.
 
-    // Strip query string (?foo=bar) and decode URI
-    if (false !== $pos = strpos($uri, '?')) {
-        $uri = substr($uri, 0, $pos);
+                NOTE: The autoreloading feature is enabled. If you update this PHP script and
+                then refresh URL http://127.0.0.1:9501, you should see the changes made.
+                </pre>
+
+            EOT
+        );
     }
-    $uri = rawurldecode($uri);
+);
 
-    $routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $uri);
-
-    switch ($routeInfo[0]) {
-        case FastRoute\Dispatcher::NOT_FOUND:
-            $response = Response::createNotFound();
-            break;
-        case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-            $response = Response::createMethodNotAllowed();
-            break;
-        case FastRoute\Dispatcher::FOUND:
-            $handler = $routeInfo[1]['handler'];
-            $httpRequest->addRouteParameters($routeInfo[2]);
-
-            foreach ($routeInfo[1]['middleware'] as $middleware) {
-                $middlewareResponse = $container->call($middleware, [$httpRequest]);
-
-                if ($middlewareResponse instanceof Response) {
-                    $response = $middlewareResponse;
-                    break 2;
-                }
-            }
-
-            $response = $container->call($handler, [$httpRequest]);
-            break;
-        default:
-            throw new LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
-    }
-
-    if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
-        $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
-    }
-} catch (Throwable $t) {
-    $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
-
-    if (str_starts_with($uri, '/api') === false) {
-        $response = $container->get(ErrorController::class)->renderInternalServerError();
-    }
-}
-
-header((string)$response->getStatusCode());
-foreach ($response->getHeaders() as $header) {
-    header((string)$header);
-}
-
-echo $response->getBody();
-
-exit(0);
+$server->start();

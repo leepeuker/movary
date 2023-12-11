@@ -1,0 +1,122 @@
+2023-12-11 14:20:08,190 INFO Set uid to user 0 succeeded
+2023-12-11 14:20:08,191 INFO supervisord started with pid 8
+2023-12-11 14:21:47,774 INFO Set uid to user 0 succeeded
+2023-12-11 14:21:47,775 INFO supervisord started with pid 8
+2023-12-11 14:21:48,777 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:21:48,794 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:21:49,800 INFO spawned: 'app-swoole' with pid 10
+2023-12-11 14:21:49,853 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:21:51,857 INFO spawned: 'app-swoole' with pid 11
+2023-12-11 14:21:51,878 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:21:54,886 INFO spawned: 'app-swoole' with pid 12
+2023-12-11 14:21:54,902 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:21:55,904 INFO gave up: app-swoole entered FATAL state, too many start retries too quickly
+2023-12-11 14:22:13,487 INFO Set uid to user 0 succeeded
+2023-12-11 14:22:13,488 INFO supervisord started with pid 8
+2023-12-11 14:22:14,494 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:22:14,511 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:22:15,516 INFO spawned: 'app-swoole' with pid 10
+2023-12-11 14:22:15,536 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:22:17,543 INFO spawned: 'app-swoole' with pid 11
+2023-12-11 14:22:17,560 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:22:20,568 INFO spawned: 'app-swoole' with pid 12
+2023-12-11 14:22:20,586 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:22:21,588 INFO gave up: app-swoole entered FATAL state, too many start retries too quickly
+2023-12-11 14:29:18,065 INFO Set uid to user 0 succeeded
+2023-12-11 14:29:18,067 INFO supervisord started with pid 8
+2023-12-11 14:29:19,069 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:29:19,087 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:29:20,092 INFO spawned: 'app-swoole' with pid 10
+2023-12-11 14:29:20,113 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:29:22,120 INFO spawned: 'app-swoole' with pid 11
+2023-12-11 14:29:22,139 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:29:25,145 INFO spawned: 'app-swoole' with pid 12
+2023-12-11 14:29:25,161 WARN exited: app-swoole (exit status 0; not expected)
+2023-12-11 14:29:26,163 INFO gave up: app-swoole entered FATAL state, too many start retries too quickly
+2023-12-11 14:36:11,101 INFO Set uid to user 0 succeeded
+2023-12-11 14:36:11,102 INFO supervisord started with pid 8
+2023-12-11 14:36:12,104 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:36:12,122 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:36:13,128 INFO spawned: 'app-swoole' with pid 10
+2023-12-11 14:36:13,146 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:36:15,149 INFO spawned: 'app-swoole' with pid 11
+2023-12-11 14:36:15,184 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:36:18,189 INFO spawned: 'app-swoole' with pid 12
+2023-12-11 14:36:18,220 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:36:19,222 INFO gave up: app-swoole entered FATAL state, too many start retries too quickly
+2023-12-11 14:40:31,211 INFO Set uid to user 0 succeeded
+2023-12-11 14:40:31,212 INFO supervisord started with pid 8
+2023-12-11 14:40:32,214 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:40:32,233 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:40:33,239 INFO spawned: 'app-swoole' with pid 10
+2023-12-11 14:40:33,299 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:40:35,305 INFO spawned: 'app-swoole' with pid 11
+2023-12-11 14:40:35,359 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:40:38,367 INFO spawned: 'app-swoole' with pid 12
+2023-12-11 14:40:38,386 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:40:39,388 INFO gave up: app-swoole entered FATAL state, too many start retries too quickly
+2023-12-11 14:41:08,529 INFO Set uid to user 0 succeeded
+2023-12-11 14:41:08,530 INFO supervisord started with pid 8
+2023-12-11 14:41:09,532 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:41:09,550 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:41:10,552 INFO spawned: 'app-swoole' with pid 10
+2023-12-11 14:41:10,568 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:41:12,575 INFO spawned: 'app-swoole' with pid 11
+2023-12-11 14:41:12,595 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:41:15,599 INFO spawned: 'app-swoole' with pid 12
+2023-12-11 14:41:15,617 WARN exited: app-swoole (exit status 255; not expected)
+2023-12-11 14:41:16,618 INFO gave up: app-swoole entered FATAL state, too many start retries too quickly
+2023-12-11 14:42:00,233 INFO Set uid to user 0 succeeded
+2023-12-11 14:42:00,235 INFO supervisord started with pid 8
+2023-12-11 14:42:01,237 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:42:02,253 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2023-12-11 14:42:50,217 INFO Set uid to user 0 succeeded
+2023-12-11 14:42:50,219 INFO supervisord started with pid 8
+2023-12-11 14:42:51,221 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:42:52,238 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2023-12-11 14:45:19,746 INFO Set uid to user 0 succeeded
+2023-12-11 14:45:19,747 INFO supervisord started with pid 8
+2023-12-11 14:45:20,749 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 14:45:21,766 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2023-12-11 14:48:18,081 INFO Set uid to user 0 succeeded
+2023-12-11 14:48:18,081 INFO supervisord started with pid 8
+2023-12-11 14:50:13,622 INFO Set uid to user 0 succeeded
+2023-12-11 14:50:13,622 INFO supervisord started with pid 8
+2023-12-11 14:51:08,431 INFO Set uid to user 0 succeeded
+2023-12-11 14:51:08,432 INFO supervisord started with pid 8
+2023-12-11 14:51:45,338 INFO Set uid to user 0 succeeded
+2023-12-11 14:51:45,339 INFO supervisord started with pid 8
+2023-12-11 15:06:54,172 INFO Set uid to user 0 succeeded
+2023-12-11 15:06:54,172 INFO supervisord started with pid 8
+2023-12-11 15:07:46,784 INFO Set uid to user 0 succeeded
+2023-12-11 15:07:46,784 INFO supervisord started with pid 8
+2023-12-11 15:09:49,854 INFO Set uid to user 0 succeeded
+2023-12-11 15:09:49,854 INFO supervisord started with pid 8
+2023-12-11 15:10:36,392 INFO Set uid to user 0 succeeded
+2023-12-11 15:10:36,392 INFO supervisord started with pid 8
+2023-12-11 15:10:51,321 INFO Set uid to user 0 succeeded
+2023-12-11 15:10:51,322 INFO supervisord started with pid 8
+2023-12-11 15:12:39,177 INFO Set uid to user 0 succeeded
+2023-12-11 15:12:39,177 INFO supervisord started with pid 8
+2023-12-11 15:13:17,727 INFO Set uid to user 0 succeeded
+2023-12-11 15:13:17,727 INFO supervisord started with pid 8
+2023-12-11 15:14:43,167 INFO Set uid to user 0 succeeded
+2023-12-11 15:14:43,169 INFO supervisord started with pid 8
+2023-12-11 15:14:44,171 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 15:14:45,187 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2023-12-11 15:17:12,870 INFO Set uid to user 0 succeeded
+2023-12-11 15:17:12,871 INFO supervisord started with pid 8
+2023-12-11 15:17:13,874 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 15:17:14,897 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2023-12-11 15:18:46,117 INFO Set uid to user 0 succeeded
+2023-12-11 15:18:46,119 INFO supervisord started with pid 8
+2023-12-11 15:18:47,120 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 15:18:48,136 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2023-12-11 15:24:37,795 INFO Set uid to user 0 succeeded
+2023-12-11 15:24:37,796 INFO supervisord started with pid 8
+2023-12-11 15:24:38,798 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 15:24:39,819 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2023-12-11 15:27:43,890 INFO Set uid to user 0 succeeded
+2023-12-11 15:27:43,891 INFO supervisord started with pid 8
+2023-12-11 15:27:44,893 INFO spawned: 'app-swoole' with pid 9
+2023-12-11 15:27:45,934 INFO success: app-swoole entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
