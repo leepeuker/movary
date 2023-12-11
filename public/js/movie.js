@@ -375,8 +375,8 @@ function isTruncated(el) {
     return el.scrollWidth > el.clientWidth
 }
 
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+const tooltipTriggerListCast = document.querySelectorAll('[data-bs-toggle="tooltip"]#castMemberName, [data-bs-toggle="tooltip"]#castCharacterName')
+const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
     if (isTruncated(tooltipTriggerEl) === false) {
         return
     }
@@ -388,3 +388,6 @@ const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
 
     new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
 })
+
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))

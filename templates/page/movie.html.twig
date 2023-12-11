@@ -201,6 +201,7 @@
             {% for castMember in castMembers|slice(0, 40) %}
                 <div class="card" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;">
                     <div class="card-header text-truncate"
+                         id="castMemberName"
                          onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
                          data-bs-toggle="tooltip"
                          data-bs-title="{{ castMember.name }}"
@@ -217,6 +218,7 @@
                          style="cursor: pointer">
                     {% if displayCharacterNames == true %}
                         <div class="card-footer text-truncate"
+                             id="castCharacterName"
                              data-bs-toggle="tooltip"
                              data-bs-title="{{ castMember.characterName }}"
                              style="padding: 0.1rem;text-align: center">
