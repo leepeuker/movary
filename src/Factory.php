@@ -150,6 +150,7 @@ class Factory
 
         if ($databaseMode === 'sqlite') {
             $connection->executeQuery('PRAGMA busy_timeout = 3000');
+            $connection->executeQuery('PRAGMA foreign_keys = ON');
         }
 
         return $connection;
