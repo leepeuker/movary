@@ -1,4 +1,6 @@
 #!/bin/sh
 
-/usr/bin/crontab /var/www/crontab
-/usr/bin/supervisord -n -c /etc/supervisord.conf
+php php bin/console.php storage:link
+php php bin/console.php database:migration:migrate
+
+php /app/public/index.php

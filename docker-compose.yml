@@ -5,10 +5,10 @@ services:
     build:
       context: ./
       dockerfile: ./build/Dockerfile
-      target: development
+      target: base
 #    user: "${USER_ID}:${USER_ID}"
     ports:
-      - "9501:9501"
+      - "80:80"
     volumes:
       - ./:/app
     environment:
