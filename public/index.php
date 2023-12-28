@@ -1,13 +1,11 @@
 <?php declare(strict_types=1);
 
-echo 1;
-
 use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
 
-$server = new Server('127.0.0.1', 9501);
+$server = new Server('0.0.0.0', 80);
 
 $server->on(
     'request',
@@ -25,7 +23,7 @@ $server->on(
                 In this example we start an HTTP/1 server.
 
                 NOTE: The autoreloading feature is enabled. If you update this PHP script and
-                then refresh URL http://127.0.0.1:9501, you should see the changes made.
+                then refresh URL http://127.0.0.1, you should see the changes made.
                 </pre>
 
             EOT

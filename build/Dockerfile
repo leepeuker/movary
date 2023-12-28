@@ -27,18 +27,18 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Supervisor
 COPY ./build/supervisord.conf /etc/supervisord.conf
-COPY ./build/supervisor.d /etc/supervisor.d
 
 # Setup working directory
 WORKDIR /app
 
 # Port Expose
-EXPOSE 9501
+EXPOSE 80
 
 # Entrypoint
 COPY ./build/entrypoint.sh /docker-entrypoint.sh
 
-ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/docker-entrypoint.sh"]
+
 
 FROM base as development
 COPY . /app
