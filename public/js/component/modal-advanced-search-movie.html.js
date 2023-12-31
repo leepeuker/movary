@@ -47,10 +47,8 @@ function search() {
     }
     if (searchUserRating != '') {
         getParameters += '&ur=' + searchUserRating
-        if (searchUserRating === '1' && searchMinUserRating != '') {
+        if (searchUserRating === '1') {
             getParameters += '&minur=' + searchMinUserRating
-        }
-        if (searchUserRating === '1' && searchMaxUserRating != '') {
             getParameters += '&maxur=' + searchMaxUserRating
         }
     }
@@ -73,7 +71,7 @@ function resetSearchOptions() {
 }
 
 
-function setUserRatingDivs(displayUserRating) {
+function toggleMinAndMaxUserRatingDivVisibility(displayUserRating) {
     if (displayUserRating === false) {
         document.getElementById('searchMinUserRatingDiv').classList.add('d-none')
         document.getElementById('searchMaxUserRatingDiv').classList.add('d-none')
@@ -86,11 +84,11 @@ function setUserRatingDivs(displayUserRating) {
 }
 
 document.getElementById('searchUserRatingSelect').addEventListener('change', (e) => {
-    setUserRatingDivs(e.target.value === '1')
+    toggleMinAndMaxUserRatingDivVisibility(e.target.value === '1')
 })
 
 document.getElementById('searchOptionsMovieModal').addEventListener('show.bs.modal', function () {
-    setUserRatingDivs(document.getElementById('searchUserRatingSelect').value === '1')
+    toggleMinAndMaxUserRatingDivVisibility(document.getElementById('searchUserRatingSelect').value === '1')
 })
 
 document.getElementById('searchMinUserRatingDiv').addEventListener('change', (e) => {
