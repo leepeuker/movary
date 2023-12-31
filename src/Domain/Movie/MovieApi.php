@@ -171,6 +171,20 @@ class MovieApi
         return $movie;
     }
 
+    public function fetchFromWatchlistWithActor(int $personId, int $userId) : array
+    {
+        $movies = $this->repository->fetchFromWatchlistWithActor($personId, $userId);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
+    }
+
+    public function fetchFromWatchlistWithDirector(int $personId, int $userId) : array
+    {
+        $movies = $this->repository->fetchFromWatchlistWithDirector($personId, $userId);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
+    }
+
     public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
         return $this->historyApi->fetchHistoryByMovieId($movieId, $userId);
@@ -190,6 +204,28 @@ class MovieApi
         return $this->movieRepository->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit, $filterMovieIds, $onlyNeverSynced);
     }
 
+    public function fetchPlayedMoviesCount(
+        int $userId,
+        ?string $searchTerm,
+        ?Year $releaseYear,
+        ?string $language,
+        ?string $genre,
+        ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
+    ) : int {
+        return $this->historyApi->fetchUniqueWatchedMoviesCount(
+            $userId,
+            $searchTerm,
+            $releaseYear,
+            $language,
+            $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
+        );
+    }
+
     public function fetchPlayedMoviesPaginated(
         int $userId,
         int $limit,
@@ -200,6 +236,9 @@ class MovieApi
         ?Year $releaseYear,
         ?string $language,
         ?string $genre,
+        ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
     ) : array {
         return $this->historyApi->fetchPlayedMoviesPaginated(
             $userId,
@@ -211,6 +250,9 @@ class MovieApi
             $releaseYear,
             $language,
             $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
     }
 
@@ -239,14 +281,26 @@ class MovieApi
         return $this->historyApi->fetchUniqueMovieReleaseYears($userId);
     }
 
-    public function fetchUniqueWatchedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
-    {
-        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
-    }
-
-    public function fetchPlayedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
-    {
-        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
+    public function fetchUniqueWatchedMoviesCount(
+        int $userId,
+        ?string $searchTerm,
+        ?Year $releaseYear,
+        ?string $language,
+        ?string $genre,
+        ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
+    ) : int {
+        return $this->historyApi->fetchUniqueWatchedMoviesCount(
+            $userId,
+            $searchTerm,
+            $releaseYear,
+            $language,
+            $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
+        );
     }
 
     public function fetchUniqueWatchedMoviesPaginated(
@@ -259,6 +313,9 @@ class MovieApi
         ?Year $releaseYear,
         ?string $language,
         ?string $genre,
+        ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
     ) : array {
         return $this->historyApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
@@ -270,6 +327,9 @@ class MovieApi
             $releaseYear,
             $language,
             $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
     }
 
@@ -299,22 +359,6 @@ class MovieApi
     public function fetchWithDirector(int $personId, int $userId) : array
     {
         $movies = $this->repository->fetchWithDirector($personId, $userId);
-
-        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
-    }
-
-
-    public function fetchFromWatchlistWithActor(int $personId, int $userId) : array
-    {
-        $movies = $this->repository->fetchFromWatchlistWithActor($personId, $userId);
-
-        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
-    }
-
-
-    public function fetchFromWatchlistWithDirector(int $personId, int $userId) : array
-    {
-        $movies = $this->repository->fetchFromWatchlistWithDirector($personId, $userId);
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
     }
