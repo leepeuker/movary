@@ -73,6 +73,9 @@ class MoviesController
                 'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
                 'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($userId),
                 'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($userId),
+                'hasUserRating' => $requestData->hasUserRating(),
+                'minUserRating' => $requestData->getUserRatingMin(),
+                'maxUserRating' => $requestData->getUserRatingMax(),
             ]),
         );
     }

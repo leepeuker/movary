@@ -56,6 +56,32 @@
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">User Rating</span>
+                        <select class="form-control" name="ur" id="searchUserRatingSelect">
+                            <option value="" {{ hasUserRating is null ? 'selected' }}></option>
+                            <option value="rated" {{ hasUserRating == '1' ? 'selected' }}>Rated</option>
+                            <option value="notRated" {{ hasUserRating == '0' ? 'selected' }}>Not Rated</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3 d-none" id="searchMinUserRatingDiv">
+                        <span class="input-group-text">Minimum Rating</span>
+                        <select class="form-control" name="minur" id="searchMinUserRatingSelect">
+                            <option value="1" {{ minUserRating == '1' or minUserRating is null ? 'selected' }}>1</option>
+                            {% for i in 2..10 %}
+                                <option value="{{ i }}" {{ minUserRating == i ? 'selected' }}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mb-3 d-none" id="searchMaxUserRatingDiv">
+                        <span class="input-group-text">Maximum Rating</span>
+                        <select class="form-control" name="maxur" id="searchMaxUserRatingSelect">
+                            {% for i in 1..9 %}
+                                <option value="{{ i }}" {{ maxUserRating == i ? 'selected' }}>{{ i }}</option>
+                            {% endfor %}
+                            <option value="10" {{ maxUserRating == '10' or maxUserRating is null ? 'selected' }}>10</option>
+                        </select>
+                    </div>
 
                     <h6 class="text-center">Pagination</h6>
 

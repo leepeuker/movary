@@ -17,6 +17,9 @@ class MoviesRequestDto
         private readonly ?Year $releaseYear,
         private readonly ?string $language,
         private readonly ?string $genre,
+        private readonly ?bool $hasUserRating,
+        private readonly ?int $userRatingMin,
+        private readonly ?int $userRatingMax,
     ) {
     }
 
@@ -30,6 +33,9 @@ class MoviesRequestDto
         ?Year $releaseYear = null,
         ?string $language = null,
         ?string $genre = null,
+        ?bool $hasUserRating = null,
+        ?int $userRatingMin = null,
+        ?int $userRatingMax = null,
     ) : self {
         return new self(
             $userId,
@@ -41,6 +47,9 @@ class MoviesRequestDto
             $releaseYear,
             $language,
             $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
     }
 
@@ -87,5 +96,20 @@ class MoviesRequestDto
     public function getUserId() : ?int
     {
         return $this->userId;
+    }
+
+    public function getUserRatingMax() : ?int
+    {
+        return $this->userRatingMax;
+    }
+
+    public function getUserRatingMin() : ?int
+    {
+        return $this->userRatingMin;
+    }
+
+    public function hasUserRating() : ?bool
+    {
+        return $this->hasUserRating;
     }
 }

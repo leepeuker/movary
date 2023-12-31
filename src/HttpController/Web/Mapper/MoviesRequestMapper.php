@@ -10,6 +10,12 @@ use Movary\ValueObject\Year;
 
 class MoviesRequestMapper
 {
+    private const DEFAULT_USER_RATING = null;
+
+    private const DEFAULT_USER_RATING_MIN = null;
+
+    private const DEFAULT_USER_RATING_MAX = null;
+
     private const DEFAULT_GENRE = null;
 
     private const DEFAULT_RELEASE_YEAR = null;
@@ -38,6 +44,9 @@ class MoviesRequestMapper
         $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
         $language = $getParameters['la'] ?? null;
         $genre = $getParameters['ge'] ?? self::DEFAULT_GENRE;
+        $userRating = $this->mapHasUserRating($getParameters);
+        $userRatingMin = isset($getParameters['minur']) === true ? (int)$getParameters['minur'] : self::DEFAULT_USER_RATING_MIN;
+        $userRatingMax = isset($getParameters['maxur']) === true ? (int)$getParameters['maxur'] : self::DEFAULT_USER_RATING_MAX;
 
         return MoviesRequestDto::createFromParameters(
             $userId,
@@ -49,7 +58,19 @@ class MoviesRequestMapper
             $releaseYear,
             $language,
             $genre,
+            $userRating,
+            $userRatingMin,
+            $userRatingMax,
         );
+    }
+
+    private function mapHasUserRating(array $getParameters) : ?bool
+    {
+        if (isset($getParameters['ur']) === false) {
+            return self::DEFAULT_USER_RATING;
+        }
+
+        return $getParameters['ur'] === 'rated';
     }
 
     private function mapSortOrder(array $getParameters) : SortOrder
