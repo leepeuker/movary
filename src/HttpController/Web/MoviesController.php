@@ -46,6 +46,7 @@ class MoviesController
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
             $requestData->getGenre(),
+            $requestData->hasUserRating(),
         );
 
         $watchedMoviesCount = $this->movieApi->fetchUniqueWatchedMoviesCount(
@@ -54,6 +55,7 @@ class MoviesController
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
             $requestData->getGenre(),
+            $requestData->hasUserRating(),
         );
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchedMoviesCount, $requestData->getLimit(), $requestData->getPage());
 

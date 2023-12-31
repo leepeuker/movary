@@ -74,7 +74,7 @@ function resetSearchOptions() {
 
 
 function setUserRatingDivs(displayUserRating) {
-    if (displayUserRating === true) {
+    if (displayUserRating === false) {
         document.getElementById('searchMinUserRatingDiv').classList.add('d-none')
         document.getElementById('searchMaxUserRatingDiv').classList.add('d-none')
 
@@ -86,11 +86,11 @@ function setUserRatingDivs(displayUserRating) {
 }
 
 document.getElementById('searchUserRatingSelect').addEventListener('change', (e) => {
-    setUserRatingDivs(e.target.value !== 'rated')
+    setUserRatingDivs(e.target.value === '1')
 })
 
 document.getElementById('searchOptionsMovieModal').addEventListener('show.bs.modal', function () {
-    setUserRatingDivs(document.getElementById('searchUserRatingSelect').value !== 'rated')
+    setUserRatingDivs(document.getElementById('searchUserRatingSelect').value === '1')
 })
 
 document.getElementById('searchMinUserRatingDiv').addEventListener('change', (e) => {

@@ -60,8 +60,8 @@
                         <span class="input-group-text">User Rating</span>
                         <select class="form-control" name="ur" id="searchUserRatingSelect">
                             <option value="" {{ hasUserRating is null ? 'selected' }}></option>
-                            <option value="rated" {{ hasUserRating == '1' ? 'selected' }}>Rated</option>
-                            <option value="notRated" {{ hasUserRating == '0' ? 'selected' }}>Not Rated</option>
+                            <option value="1" {{ hasUserRating == '1' ? 'selected' }}>Rated</option>
+                            <option value="0" {{ hasUserRating == '0' ? 'selected' }}>Not Rated</option>
                         </select>
                     </div>
                     <div class="input-group mb-3 d-none" id="searchMinUserRatingDiv">

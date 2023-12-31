@@ -51,7 +51,8 @@
             {% set releaseYearQuery = (releaseYear is null) ? '' : "ry=#{releaseYear}&" %}
             {% set genreQuery = (genre is null) ? '' : "ge=#{genre}&" %}
             {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
-            {% set baseUrl = '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery %}
+            {% set hasUserRatingQuery = (hasUserRating is null) ? '' : "ur=#{hasUserRating}&" %}
+            {% set baseUrl = '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ hasUserRatingQuery %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

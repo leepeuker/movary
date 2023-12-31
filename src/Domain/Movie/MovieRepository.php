@@ -140,7 +140,6 @@ class MovieRepository
 
         $payload[] = "%$searchTerm%";
 
-
         $whereQuery = 'WHERE p.name LIKE ? ';
         if (empty($gender) === false) {
             $whereQuery .= 'AND p.gender = ? ';
@@ -327,6 +326,40 @@ class MovieRepository
         return Date::createFromString($watchDate);
     }
 
+    public function fetchFromWatchlistWithActor(int $personId, int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT m.*, mur.rating as userRating
+            FROM movie m
+            JOIN movie_cast mc ON m.id = mc.movie_id
+            JOIN person p ON mc.person_id = p.id
+            JOIN watchlist wl ON m.id = wl.movie_id
+            LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
+            WHERE p.id = ? AND m.id IN (wl.movie_id) AND wl.user_id = ?
+            ORDER BY LOWER(m.title)
+            SQL,
+            [$userId, $personId, $userId],
+        );
+    }
+
+    public function fetchFromWatchlistWithDirector(int $personId, int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT m.*, mur.rating as userRating
+            FROM movie m
+            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
+            JOIN person p ON mc.person_id = p.id
+            JOIN watchlist wl ON m.id = wl.movie_id and wl.user_id = ?
+            LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
+            WHERE p.id = ? AND m.id IN (wl.movie_id)
+            ORDER BY LOWER(m.title)
+            SQL,
+            [$userId, $userId, $personId],
+        );
+    }
+
     public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
@@ -353,34 +386,6 @@ class MovieRepository
             'SELECT COUNT(*) FROM movie_user_watch_dates JOIN movie m on movie_id = m.id AND watched_at IS NOT NULL WHERE user_id = ?',
             [$userId],
         )[0];
-    }
-
-    public function fetchWatchDatesForMovieIds(int $userId, array $movieIds) : array
-    {
-        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
-
-        return $this->dbConnection->fetchAllAssociative(
-            "SELECT watched_at, plays, comment, movie_id
-            FROM movie_user_watch_dates
-            WHERE user_id = ? and movie_id in ($placeholders)
-            ORDER BY watched_at DESC, position DESC",
-            [
-                $userId,
-                ...$movieIds
-            ],
-        );
-    }
-
-    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.*, muwd.watched_at, muwd.plays, comment
-            FROM movie_user_watch_dates muwd
-            JOIN movie m on muwd.movie_id = m.id
-            WHERE muwd.user_id = ?
-            ORDER BY watched_at DESC, muwd.position DESC',
-            [$userId],
-        );
     }
 
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
@@ -761,6 +766,59 @@ class MovieRepository
         );
     }
 
+    public function fetchUniqueWatchedMoviesCount(
+        int $userId,
+        ?string $searchTerm,
+        ?Year $releaseYear,
+        ?string $language,
+        ?string $genre,
+        ?bool $hasUserRating,
+    ) : int {
+        $payload = [$userId, $userId, "%$searchTerm%"];
+
+        $whereQuery = 'WHERE m.title LIKE ? ';
+
+        if (empty($releaseYear) === false) {
+            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+                $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
+            } else {
+                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
+            }
+            $payload[] = (string)$releaseYear;
+        }
+
+        if (empty($language) === false) {
+            $whereQuery .= 'AND m.original_language = ? ';
+            $payload[] = $language;
+        }
+
+        if (empty($genre) === false) {
+            $whereQuery .= 'AND g.name = ? ';
+            $payload[] = $genre;
+        }
+
+        if ($hasUserRating === false) {
+            $whereQuery .= 'AND mur.rating IS NULL ';
+        }
+        if ($hasUserRating === true) {
+            $whereQuery .= 'AND mur.rating IS NOT NULL ';
+        }
+
+        return $this->dbConnection->fetchFirstColumn(
+            <<<SQL
+            SELECT COUNT(DISTINCT m.id)
+            FROM movie m
+            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
+            LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?
+            LEFT JOIN movie_genre mg on m.id = mg.movie_id
+            LEFT JOIN genre g on mg.genre_id = g.id
+            $whereQuery
+            SQL,
+            $payload,
+        )[0];
+    }
+
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function fetchUniqueWatchedMoviesPaginated(
         int $userId,
         int $limit,
@@ -771,6 +829,7 @@ class MovieRepository
         ?Year $releaseYear,
         ?string $language,
         ?string $genre,
+        ?bool $hasUserRating,
     ) : array {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -811,6 +870,13 @@ class MovieRepository
             $payload[] = $genre;
         }
 
+        if ($hasUserRating === false) {
+            $whereQuery .= 'AND mur.rating IS NULL ';
+        }
+        if ($hasUserRating === true) {
+            $whereQuery .= 'AND mur.rating IS NOT NULL ';
+        }
+
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT * FROM (
@@ -831,42 +897,32 @@ class MovieRepository
         );
     }
 
-    public function fetchUniqueWatchedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    public function fetchWatchDatesForMovieIds(int $userId, array $movieIds) : array
     {
-        $payload = [$userId, "%$searchTerm%"];
+        $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
 
-        $whereQuery = 'WHERE m.title LIKE ? ';
+        return $this->dbConnection->fetchAllAssociative(
+            "SELECT watched_at, plays, comment, movie_id
+            FROM movie_user_watch_dates
+            WHERE user_id = ? and movie_id in ($placeholders)
+            ORDER BY watched_at DESC, position DESC",
+            [
+                $userId,
+                ...$movieIds
+            ],
+        );
+    }
 
-        if (empty($releaseYear) === false) {
-            if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-                $whereQuery .= 'AND strftime(\'%Y\', m.release_date) = ? ';
-            } else {
-                $whereQuery .= 'AND YEAR(m.release_date) = ? ';
-            }
-            $payload[] = (string)$releaseYear;
-        }
-
-        if (empty($language) === false) {
-            $whereQuery .= 'AND m.original_language = ? ';
-            $payload[] = $language;
-        }
-
-        if (empty($genre) === false) {
-            $whereQuery .= 'AND g.name = ? ';
-            $payload[] = $genre;
-        }
-
-        return $this->dbConnection->fetchFirstColumn(
-            <<<SQL
-            SELECT COUNT(DISTINCT m.id)
-            FROM movie m
-            JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            LEFT JOIN movie_genre mg on m.id = mg.movie_id
-            LEFT JOIN genre g on mg.genre_id = g.id
-            $whereQuery
-            SQL,
-            $payload,
-        )[0];
+    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT m.*, muwd.watched_at, muwd.plays, comment
+            FROM movie_user_watch_dates muwd
+            JOIN movie m on muwd.movie_id = m.id
+            WHERE muwd.user_id = ?
+            ORDER BY watched_at DESC, muwd.position DESC',
+            [$userId],
+        );
     }
 
     public function fetchWithActor(int $personId, int $userId) : array
@@ -897,42 +953,6 @@ class MovieRepository
             JOIN movie_user_watch_dates muwd ON m.id = muwd.movie_id and muwd.user_id = ?
             LEFT JOIN movie_user_rating mur ON muwd.movie_id = mur.movie_id and mur.user_id = ?
             WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh)
-            ORDER BY LOWER(m.title)
-            SQL,
-            [$userId, $userId, $personId],
-        );
-    }
-
-
-    public function fetchFromWatchlistWithActor(int $personId, int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
-            FROM movie m
-            JOIN movie_cast mc ON m.id = mc.movie_id
-            JOIN person p ON mc.person_id = p.id
-            JOIN watchlist wl ON m.id = wl.movie_id
-            LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
-            WHERE p.id = ? AND m.id IN (wl.movie_id) AND wl.user_id = ?
-            ORDER BY LOWER(m.title)
-            SQL,
-            [$userId, $personId, $userId],
-        );
-    }
-
-
-    public function fetchFromWatchlistWithDirector(int $personId, int $userId) : array
-    {
-        return $this->dbConnection->fetchAllAssociative(
-            <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
-            FROM movie m
-            JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
-            JOIN person p ON mc.person_id = p.id
-            JOIN watchlist wl ON m.id = wl.movie_id and wl.user_id = ?
-            LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
-            WHERE p.id = ? AND m.id IN (wl.movie_id)
             ORDER BY LOWER(m.title)
             SQL,
             [$userId, $userId, $personId],

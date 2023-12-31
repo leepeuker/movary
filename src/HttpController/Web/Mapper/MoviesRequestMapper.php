@@ -70,7 +70,7 @@ class MoviesRequestMapper
             return self::DEFAULT_USER_RATING;
         }
 
-        return $getParameters['ur'] === 'rated';
+        return (bool)$getParameters['ur'];
     }
 
     private function mapSortOrder(array $getParameters) : SortOrder
