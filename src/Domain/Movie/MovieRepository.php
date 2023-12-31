@@ -773,6 +773,8 @@ class MovieRepository
         ?string $language,
         ?string $genre,
         ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
     ) : int {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -801,7 +803,9 @@ class MovieRepository
             $whereQuery .= 'AND mur.rating IS NULL ';
         }
         if ($hasUserRating === true) {
-            $whereQuery .= 'AND mur.rating IS NOT NULL ';
+            $whereQuery .= 'AND mur.rating BETWEEN ? AND ? ';
+            $payload[] = $userRatingMin;
+            $payload[] = $userRatingMax;
         }
 
         return $this->dbConnection->fetchFirstColumn(
@@ -830,6 +834,8 @@ class MovieRepository
         ?string $language,
         ?string $genre,
         ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
     ) : array {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -874,7 +880,9 @@ class MovieRepository
             $whereQuery .= 'AND mur.rating IS NULL ';
         }
         if ($hasUserRating === true) {
-            $whereQuery .= 'AND mur.rating IS NOT NULL ';
+            $whereQuery .= 'AND mur.rating BETWEEN ? AND ? ';
+            $payload[] = $userRatingMin;
+            $payload[] = $userRatingMax;
         }
 
         return $this->dbConnection->fetchAllAssociative(

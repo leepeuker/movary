@@ -47,12 +47,12 @@ function search() {
     }
     if (searchUserRating != '') {
         getParameters += '&ur=' + searchUserRating
-    }
-    if (searchMinUserRating != '') {
-        getParameters += '&minur=' + searchMinUserRating
-    }
-    if (searchMaxUserRating != '') {
-        getParameters += '&maxur=' + searchMaxUserRating
+        if (searchUserRating === '1' && searchMinUserRating != '') {
+            getParameters += '&minur=' + searchMinUserRating
+        }
+        if (searchUserRating === '1' && searchMaxUserRating != '') {
+            getParameters += '&maxur=' + searchMaxUserRating
+        }
     }
 
     const urlWithoutGetParameters = window.location.href.split('?')[0];

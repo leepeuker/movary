@@ -91,6 +91,8 @@ class PlayedController
             $requestData->getLanguage(),
             $requestData->getGenre(),
             null,
+            null,
+            null,
         );
 
         $watchDates = $this->movieApi->fetchWatchDatesForMovies($requestData->getRequestedUserId(), $playedEntries);
@@ -101,6 +103,8 @@ class PlayedController
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
             $requestData->getGenre(),
+            null,
+            null,
             null,
         );
 

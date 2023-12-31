@@ -204,9 +204,26 @@ class MovieApi
         return $this->movieRepository->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $limit, $filterMovieIds, $onlyNeverSynced);
     }
 
-    public function fetchPlayedMoviesCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre, ?bool $hasUserRating) : int
-    {
-        return $this->historyApi->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre, $hasUserRating);
+    public function fetchPlayedMoviesCount(
+        int $userId,
+        ?string $searchTerm,
+        ?Year $releaseYear,
+        ?string $language,
+        ?string $genre,
+        ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
+    ) : int {
+        return $this->historyApi->fetchUniqueWatchedMoviesCount(
+            $userId,
+            $searchTerm,
+            $releaseYear,
+            $language,
+            $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
+        );
     }
 
     public function fetchPlayedMoviesPaginated(
@@ -220,6 +237,8 @@ class MovieApi
         ?string $language,
         ?string $genre,
         ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
     ) : array {
         return $this->historyApi->fetchPlayedMoviesPaginated(
             $userId,
@@ -232,6 +251,8 @@ class MovieApi
             $language,
             $genre,
             $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
     }
 
@@ -267,6 +288,8 @@ class MovieApi
         ?string $language,
         ?string $genre,
         ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
     ) : int {
         return $this->historyApi->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -275,6 +298,8 @@ class MovieApi
             $language,
             $genre,
             $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
     }
 
@@ -289,6 +314,8 @@ class MovieApi
         ?string $language,
         ?string $genre,
         ?bool $hasUserRating,
+        ?int $userRatingMin,
+        ?int $userRatingMax,
     ) : array {
         return $this->historyApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
@@ -301,6 +328,8 @@ class MovieApi
             $language,
             $genre,
             $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
     }
 

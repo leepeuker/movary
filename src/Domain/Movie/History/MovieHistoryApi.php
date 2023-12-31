@@ -256,6 +256,8 @@ class MovieHistoryApi
         ?string $language = null,
         ?string $genre = null,
         ?bool $hasUserRating = null,
+        ?int $userRatingMin = null,
+        ?int $userRatingMax = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -272,6 +274,8 @@ class MovieHistoryApi
             $language,
             $genre,
             $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -394,6 +398,8 @@ class MovieHistoryApi
         ?string $language = null,
         ?string $genre = null,
         ?bool $hasUserRating = null,
+        ?int $userRatingMin = null,
+        ?int $userRatingMax = null,
     ) : int {
         return $this->movieRepository->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -402,6 +408,8 @@ class MovieHistoryApi
             $language,
             $genre,
             $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
     }
 
@@ -416,6 +424,8 @@ class MovieHistoryApi
         ?string $language = null,
         ?string $genre = null,
         ?bool $hasUserRating = null,
+        ?int $userRatingMin = null,
+        ?int $userRatingMax = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -432,6 +442,8 @@ class MovieHistoryApi
             $language,
             $genre,
             $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
