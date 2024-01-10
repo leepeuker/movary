@@ -50,16 +50,17 @@ class HistoryController
         $newWatchDate = empty($requestBody['newWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['newWatchDate'], $dateFormat) : null;
         $originalWatchDate = empty($requestBody['originalWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['originalWatchDate'], $dateFormat) : null;
 
-        $plays = (int)$requestBody['plays'];
+        $plays = empty($requestBody['plays']) === true ? 1 : (int)$requestBody['plays'];
         $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
+        $position = empty($requestBody['position']) === true ? 1 : (int)$requestBody['position'];
 
         if ($originalWatchDate == $newWatchDate) {
-            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $comment);
+            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position, $comment);
 
             return Response::create(StatusCode::createNoContent());
         }
 
-        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays);
+        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position);
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
 
         if ($comment !== null) {

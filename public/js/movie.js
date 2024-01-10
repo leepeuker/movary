@@ -23,6 +23,32 @@ function deleteWatchDate() {
     })
 }
 
+function toggleWatchDateAdvancedMode() {
+    if (document.getElementById('advancedWatchDateDetails').classList.contains('d-none')) {
+        enableWatchDateAdvancedMode()
+
+        return
+    }
+
+    disableWatchDateAdvancedMode()
+}
+
+function disableWatchDateAdvancedMode() {
+    const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
+    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
+
+    advancedWatchDateModeButton.innerHTML = 'Advanced mode'
+    advancedWatchDateDetails.classList.add('d-none')
+}
+
+function enableWatchDateAdvancedMode() {
+    const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
+    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
+
+    advancedWatchDateDetails.classList.remove('d-none')
+    advancedWatchDateModeButton.innerHTML = 'Simple mode'
+}
+
 function getMovieId() {
     return document.getElementById('movieId').value
 }
@@ -77,9 +103,12 @@ function loadWatchDateModal(watchDateListElement) {
     document.getElementById('editWatchDateModalInput').value = watchDateListElement.dataset.watchDate;
     document.getElementById('editWatchDateModalPlaysInput').value = watchDateListElement.dataset.plays;
     document.getElementById('editWatchDateModalCommentInput').value = watchDateListElement.dataset.comment;
+    document.getElementById('editWatchDateModalPositionInput').value = watchDateListElement.dataset.position;
 
     document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
     document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
+
+    disableWatchDateAdvancedMode()
 
     new Datepicker(document.getElementById('editWatchDateModalInput'), {
         format: document.getElementById('dateFormatJavascript').value,
@@ -94,6 +123,7 @@ function editWatchDate() {
 
     const newWatchDate = document.getElementById('editWatchDateModalInput').value;
     const newWatchDatePlays = document.getElementById('editWatchDateModalPlaysInput').value;
+    const newPositionPlays = document.getElementById('editWatchDateModalPositionInput').value;
     const comment = document.getElementById('editWatchDateModalCommentInput').value;
 
     const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
@@ -106,6 +136,7 @@ function editWatchDate() {
             'originalWatchDate': originalWatchDate,
             'plays': newWatchDatePlays,
             'comment': comment,
+            'position': newPositionPlays,
             'dateFormat': document.getElementById('dateFormatPhp').value
         }),
         success: function (data, textStatus, xhr) {
@@ -442,3 +473,23 @@ function createSpinner(parent) {
     div.append(span);
     parent.append(div);    
 }
+function isTruncated(el) {
+    return el.scrollWidth > el.clientWidth
+}
+
+const tooltipTriggerListCast = document.querySelectorAll('[data-bs-toggle="tooltip"]#castMemberName, [data-bs-toggle="tooltip"]#castCharacterName')
+const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
+    if (isTruncated(tooltipTriggerEl) === false) {
+        return
+    }
+
+    let placement = 'bottom';
+    if (tooltipTriggerEl.classList.contains('card-header') === true) {
+        placement = 'top'
+    }
+
+    new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
+})
+
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))

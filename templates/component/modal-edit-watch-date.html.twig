@@ -21,19 +21,34 @@
                         Watch date format is invalid!
                     </div>
                 </div>
-                <div class="input-group" style="margin-top: 1rem">
+                <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
                     <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
                     <textarea class="form-control" rows="1" aria-label="Comment" id="editWatchDateModalCommentInput" placeholder="Comment"></textarea>
                 </div>
-                <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
-                    <i class="input-group-text">Plays</i>
-                    <input type="number" class="datepicker_input form-control" placeholder="" aria-label="Plays" id="editWatchDateModalPlaysInput">
+                <div id="advancedWatchDateDetails" class="d-none">
+                    <div class="input-group" style="margin-top: 1rem">
+                        <i class="input-group-text">Plays</i>
+                        <input type="number" class="form-control" aria-label="Plays" id="editWatchDateModalPlaysInput" min="1" required>
+                        <button class="btn btn-outline-secondary" id="editWatchDateModalPlays" data-bs-toggle="tooltip" data-bs-title="The number of plays for the movie on this date">
+                            <i class="bi bi-question-lg"></i>
+                        </button>
+                    </div>
+                    <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
+                        <i class="input-group-text">Position</i>
+                        <input type="number" class="form-control" aria-label="Position" id="editWatchDateModalPositionInput" min="1" required>
+                        <button class="btn btn-outline-secondary" id="editWatchDateModalPlays" data-bs-toggle="tooltip" data-bs-title="The sort position of the movie plays on this date">
+                            <i class="bi bi-question-lg"></i>
+                        </button>
+                    </div>
                 </div>
                 <div id="alertMovieModalDiv"></div>
             </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-danger" onclick="deleteWatchDate()">Delete</button>
-                <button type="submit" class="btn btn-primary" onclick="editWatchDate()">Update</button>
+            <div class="modal-footer justify-content-between">
+                <button type="submit" class="btn btn-outline-primary float-start" onclick="toggleWatchDateAdvancedMode()" id="advancedWatchDateModeButton">Advanced mode</button>
+                <div class="float-end">
+                    <button type="submit" class="btn btn-danger" onclick="deleteWatchDate()">Delete</button>
+                    <button type="submit" class="btn btn-primary" onclick="editWatchDate()">Update</button>
+                </div>
             </div>
         </div>
     </div>

@@ -51,7 +51,7 @@ class SyncMovie
                     tagline: $tmdbMovie->getTagline(),
                     overview: $tmdbMovie->getOverview(),
                     originalLanguage: $tmdbMovie->getOriginalLanguage(),
-                    releaseDate: Date::createFromDateTime($tmdbMovie->getReleaseDate()),
+                    releaseDate: $tmdbMovie->getReleaseDate()?->asDate(),
                     runtime: $tmdbMovie->getRuntime(),
                     tmdbVoteAverage: $tmdbMovie->getVoteAverage(),
                     tmdbVoteCount: $tmdbMovie->getVoteCount(),

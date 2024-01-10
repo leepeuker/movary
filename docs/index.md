@@ -24,7 +24,7 @@
 <a href="https://demo.movary.org/" target="_blank" rel="noopener noreferrer">Demo</a>
 </p>
 
-Movary is free and open source web application to track, rate and explore your movie watch history.
+Movary is a free and open source web application to track, rate and explore your movie watch history.
 You can host it for yourself and others.
 It offers detailed statistics, 
 third-party integrations for importing and exporting your history from platforms like Trakt, Letterboxd, or Netflix,

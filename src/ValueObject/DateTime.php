@@ -40,6 +40,11 @@ class DateTime implements JsonSerializable
         return $this->format(self::DEFAULT_STRING_FORMAT);
     }
 
+    public function asDate() : Date
+    {
+        return Date::createFromDateTime($this);
+    }
+
     public function differenceInHours(DateTime $dateTime) : int
     {
         return (int)(((new \DateTime($this->dateTime))->getTimestamp() - (new \DateTime((string)$dateTime))->getTimestamp()) / 60 / 60);

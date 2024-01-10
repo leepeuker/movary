@@ -123,7 +123,9 @@ class PersonController
                     'isHiddenInTopLists' => $isHiddenInTopLists,
                 ],
                 'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
+                'moviesFromWatchlistAsActor' => $this->movieApi->fetchFromWatchlistWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
+                'moviesFromWatchlistAsDirector' => $this->movieApi->fetchFromWatchlistWithDirector($personId, $userId),
             ]),
         );
     }

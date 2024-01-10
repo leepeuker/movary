@@ -24,9 +24,13 @@ class MovieHistoryApi
     ) {
     }
 
-    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment = null) : void
+    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?int $position = null, ?string $comment = null) : void
     {
-        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment);
+        if ($position === null) {
+            $position = $this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt);
+        }
+
+        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1);
 
         if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
             return;
@@ -241,6 +245,42 @@ class MovieHistoryApi
         return $this->movieRepository->fetchMovieIdsWithWatchDatesByUserId($userId);
     }
 
+    public function fetchPlayedMoviesPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm = null,
+        string $sortBy = 'title',
+        ?SortOrder $sortOrder = null,
+        ?Year $releaseYear = null,
+        ?string $language = null,
+        ?string $genre = null,
+        ?bool $hasUserRating = null,
+        ?int $userRatingMin = null,
+        ?int $userRatingMax = null,
+    ) : array {
+        if ($sortOrder === null) {
+            $sortOrder = SortOrder::createAsc();
+        }
+
+        $movies = $this->movieRepository->fetchUniqueWatchedMoviesPaginated(
+            $userId,
+            $limit,
+            $page,
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $releaseYear,
+            $language,
+            $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
+        );
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
+    }
+
     public function fetchTmdbIdsToLastWatchDatesMap(int $userId, array $tmdbIds) : array
     {
         $map = [];
@@ -351,9 +391,26 @@ class MovieHistoryApi
         return $this->movieRepository->fetchUniqueMovieReleaseYears($userId);
     }
 
-    public function fetchUniqueWatchedMoviesCount(int $userId, ?string $searchTerm = null, ?Year $releaseYear = null, ?string $language = null, ?string $genre = null) : int
-    {
-        return $this->movieRepository->fetchUniqueWatchedMoviesCount($userId, $searchTerm, $releaseYear, $language, $genre);
+    public function fetchUniqueWatchedMoviesCount(
+        int $userId,
+        ?string $searchTerm = null,
+        ?Year $releaseYear = null,
+        ?string $language = null,
+        ?string $genre = null,
+        ?bool $hasUserRating = null,
+        ?int $userRatingMin = null,
+        ?int $userRatingMax = null,
+    ) : int {
+        return $this->movieRepository->fetchUniqueWatchedMoviesCount(
+            $userId,
+            $searchTerm,
+            $releaseYear,
+            $language,
+            $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
+        );
     }
 
     public function fetchUniqueWatchedMoviesPaginated(
@@ -366,6 +423,9 @@ class MovieHistoryApi
         ?Year $releaseYear = null,
         ?string $language = null,
         ?string $genre = null,
+        ?bool $hasUserRating = null,
+        ?int $userRatingMin = null,
+        ?int $userRatingMax = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -381,36 +441,9 @@ class MovieHistoryApi
             $releaseYear,
             $language,
             $genre,
-        );
-
-        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
-    }
-
-    public function fetchPlayedMoviesPaginated(
-        int $userId,
-        int $limit,
-        int $page,
-        ?string $searchTerm = null,
-        string $sortBy = 'title',
-        ?SortOrder $sortOrder = null,
-        ?Year $releaseYear = null,
-        ?string $language = null,
-        ?string $genre = null,
-    ) : array {
-        if ($sortOrder === null) {
-            $sortOrder = SortOrder::createAsc();
-        }
-
-        $movies = $this->movieRepository->fetchUniqueWatchedMoviesPaginated(
-            $userId,
-            $limit,
-            $page,
-            $searchTerm,
-            $sortBy,
-            $sortOrder,
-            $releaseYear,
-            $language,
-            $genre,
+            $hasUserRating,
+            $userRatingMin,
+            $userRatingMax,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -435,14 +468,19 @@ class MovieHistoryApi
         return $this->movieRepository->fetchWatchDatesOrderedByWatchedAtDesc($userId);
     }
 
+    public function findHighestPositionForWatchDate(int $movieIdToIgnore, int $userId, ?Date $watchedAt) : ?int
+    {
+        return $this->repository->fetchHighestPositionForWatchDate($movieIdToIgnore, $userId, $watchedAt);
+    }
+
     public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, ?Date $watchedAt) : ?MovieHistoryEntity
     {
         return $this->movieRepository->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
     }
 
-    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment = null) : void
+    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, int $position, ?string $comment = null) : void
     {
-        $this->repository->update($movieId, $userId, $watchedAt, $plays, $comment);
+        $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment);
     }
 
     public function updateHistoryComment(int $movieId, int $userId, ?Date $watchAt, ?string $comment) : void

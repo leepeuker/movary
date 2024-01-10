@@ -49,3 +49,8 @@ Make sure you persist the content of the `storage` directory to keep data e.g. w
 php bin/console.php tmdb:imageCache:refresh
 php bin/console.php tmdb:imageCache:delete
 ```
+
+## Import personal User Ratings
+
+There is no native integration to import the personal movie ratings of a tmdb user at the moment.
+However, you can use third party tools like [TMDBToMovary](https://github.com/SirMartin/TMDBToMovary) to work around this limitation. 
