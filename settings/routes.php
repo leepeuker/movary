@@ -194,12 +194,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class]);
-
-    #############################
-    # Serving static Vite assets#
-    #############################
-    $routes->add('GET', '/build/{entrypoint:[a-zA-Z0-9\-]+\.[a-z]{1,3}}', [Web\AssetController::class, 'processStaticRequest']);
-
+    
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }
 
