@@ -4,13 +4,9 @@
     Settings - Password
 {% endblock %}
 
-{% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
-{% endblock %}
-
 {% block scripts %}
-    <script src="/js/qrcode.min.js"></script>
-    <script src="/js/settings-account-security.js"></script>
+    {{ vite('js/qrcode.min.js') }}
+    {{ vite('js/settings-account-security.js') }}
 {% endblock %}
 
 {% block body %}

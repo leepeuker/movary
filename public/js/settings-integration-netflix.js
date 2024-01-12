@@ -1,3 +1,6 @@
+import { Modal } from 'bootstrap';
+import '/css/settings.css';
+import '/css/netflix.css';
 async function importNetflixHistory() {
     let importData = [];
     const rows = document.getElementsByClassName('netflixrow');
@@ -571,7 +574,7 @@ function saveTMDBItem() {
         targetrow.getElementsByClassName('bi-star-fill')[targetrow.getElementsByClassName('bi-star-fill').length - 1].click();
     }
 
-    bootstrap.Modal.getInstance(document.getElementById('tmdbSearchModal')).hide();
+    Modal.getInstance(document.getElementById('tmdbSearchModal')).hide();
 }
 
 function searchTable() {
@@ -627,13 +630,13 @@ function getNetflixRatingFromStars(row) {
 }
 
 function triggerRemoveNetflixModal() {
-    const removeNetflixModal = new bootstrap.Modal('#removeNetflixItemModal');
+    const removeNetflixModal = new Modal('#removeNetflixItemModal');
     document.getElementById('removeNetflixItemModal').setAttribute('data-NetflixRowId', this.closest('.netflixrow').id);
     removeNetflixModal.show();
 }
 
 function removeNetflixItem() {
-    const removeNetflixModal = bootstrap.Modal.getInstance(document.getElementById('removeNetflixItemModal'));
+    const removeNetflixModal = Modal.getInstance(document.getElementById('removeNetflixItemModal'));
     let NetflixRowId = document.getElementById('removeNetflixItemModal').dataset.netflixrowid;
     document.querySelector('tr#' + NetflixRowId).remove();
     removeNetflixModal.hide();

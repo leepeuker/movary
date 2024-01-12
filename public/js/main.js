@@ -1,3 +1,12 @@
+import 'vite/modulepreload-polyfill';
+import 'bootstrap';
+import 'bootstrap-icons/font/bootstrap-icons.scss';
+import 'bootstrap-datepicker';
+import '/css/bootstrap.scss';
+
+import.meta.glob(['../images/**', '../fonts/**', '../css/**'])
+import { Modal } from 'bootstrap';
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker
@@ -342,7 +351,7 @@ function logMovie(context) {
 }
 
 async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear) {
-    const myModal = new bootstrap.Modal(document.getElementById('logPlayModal'), {
+    const myModal = new Modal(document.getElementById('logPlayModal'), {
         keyboard: false
     });
 

@@ -1,3 +1,4 @@
+import '/css/settings.css';
 function regeneratePlexWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return

@@ -1,4 +1,7 @@
-const userModal = new bootstrap.Modal('#userModal', {keyboard: false})
+import { Modal } from 'bootstrap';
+import '/css/settings.css';
+
+const userModal = new Modal('#userModal', {keyboard: false})
 
 const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');

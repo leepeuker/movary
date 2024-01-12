@@ -1,3 +1,5 @@
+import { marked } from "marked";
+import { Modal } from 'bootstrap';
 generatedReleases()
 
 async function fetchLatestReleases() {
@@ -72,7 +74,7 @@ function addReleaseToList(latestRelease) {
 }
 
 function showReleaseModal(element) {
-    const modal = new bootstrap.Modal('#appReleaseModal');
+    const modal = new Modal('#appReleaseModal');
 
     document.getElementById('appReleaseModalTitle').innerHTML = element.dataset.name
     document.getElementById('appReleaseModalBody').innerHTML = element.dataset.body

@@ -1,3 +1,4 @@
+import '/css/settings.css';
 document.addEventListener("DOMContentLoaded", function () {
     let url = new URL(window.location.href)
     let params = new URLSearchParams(url.search);

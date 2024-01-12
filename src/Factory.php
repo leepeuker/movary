@@ -34,7 +34,9 @@ use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
 use Movary\Util\File;
+use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
+use Movary\Util\Vite;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\Http\Request;
@@ -296,7 +298,12 @@ class Factory
                 $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
             }
         }
+        $vite = self::createViteHelper($container);
+        $ViteFunction = new \Twig\TwigFunction('vite', function(string $entry, array $attributes = []) use ($vite) {
+            return new Twig\Markup($vite->getTags($entry, $attributes), 'UTF-8');
+        });
 
+        $twig->addFunction($ViteFunction);
         $twig->addGlobal('currentUserName', $user?->getName());
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
         $twig->addGlobal('currentUserCountry', $user?->getCountry());
@@ -320,6 +327,17 @@ class Factory
             $container->get(TmdbUrlGenerator::class),
             $container->get(ImageCacheService::class),
             self::getTmdbEnabledImageCaching($config)
+        );
+    }
+
+    public static function createViteHelper(ContainerInterface $container) : Vite
+    {
+        return new Vite(
+            $container->get(File::class),
+            $container->get(Json::class),
+            $container->get(Config::class),
+            $container->get(GuzzleHttp\Client::class),
+            $container->get(ServerSettings::class)
         );
     }
 

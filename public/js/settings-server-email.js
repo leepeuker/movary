@@ -1,3 +1,6 @@
+import { Modal } from 'bootstrap';
+import '/css/settings.css';
+
 const smtpHostInput = document.getElementById('smtpHostInput');
 const smtpPortInput = document.getElementById('smtpPortInput');
 const smtpEncryptionInput = document.getElementById('smtpEncryptionInput');
@@ -50,7 +53,7 @@ function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWi
     });
 }
 
-const testEmailModal = new bootstrap.Modal('#testEmailModal')
+const testEmailModal = new Modal('#testEmailModal')
 
 document.getElementById('emailSettingsTestButton').addEventListener('click', async () => {
     testEmailModal.show()

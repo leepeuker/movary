@@ -7,3 +7,7 @@ docker-compose.override.yml
 tmp/*
 .vscode
 http-client.private.env.json
+
+node_modules
+public/build/*
+!public/build/hot

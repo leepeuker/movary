@@ -5,8 +5,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/marked-5.0.2.min.js"></script>
-    <script src="/js/settings-app.js"></script>
+    {{ vite('js/settings-app.js') }}
 {% endblock %}
 
 {% block body %}

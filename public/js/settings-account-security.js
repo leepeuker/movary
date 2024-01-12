@@ -1,3 +1,6 @@
+import { Modal } from 'bootstrap';
+import '/css/settings.css';
+
 const errorMessageCurrentPasswordIncorrect = 'Current password wrong';
 const errorMessageNewPasswordInvalid = 'New password not meeting requirements';
 
@@ -97,7 +100,7 @@ async function showAddTwoFactorAuthenticationModal() {
         document.getElementById('TOTPInformation').classList.remove('d-none');
     });
 
-    const modal = new bootstrap.Modal(document.getElementById('addTwoFactorAuthenticationModal'));
+    const modal = new Modal(document.getElementById('addTwoFactorAuthenticationModal'));
     modal.show();
 
 }

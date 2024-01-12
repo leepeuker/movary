@@ -1,4 +1,5 @@
-const jobModal = new bootstrap.Modal('#jobModal')
+import { Modal } from 'bootstrap';
+const jobModal = new Modal('#jobModal')
 const jobModalTypeInput = document.getElementById('jobModalType');
 
 async function showJobModal(jobType) {

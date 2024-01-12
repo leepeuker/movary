@@ -25,14 +25,14 @@
 
 .activeItem {
     cursor: default;
-    border-left: none;!important;
-    border-right: none;!important;
+    border-left: none !important;
+    border-right: none !important;
     display: block;
 }
 
 .inactiveItem {
     cursor: default;
-    border-left: none;!important;
-    border-right: none;!important;
+    border-left: none !important;
+    border-right: none !important;
     display: none;
 }

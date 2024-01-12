@@ -24,6 +24,11 @@ class Response
         return new self(StatusCode::createBadRequest(), $body);
     }
 
+    public static function createCss(string $code) : self
+    {
+        return new self(StatusCode::createOk(), $code, [Header::createContentTypeCss()]);
+    }
+
     public static function createCsv(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);
@@ -38,6 +43,16 @@ class Response
     {
         $query = urlencode($redirectTarget);
         return new self(StatusCode::createForbidden(), null, [Header::createLocation('/login?redirect='.$query)]);
+    }
+
+    public static function createIco(string $icon) : self
+    {
+        return new self(StatusCode::createSeeOther(), $icon, [Header::createContentTypeIco()]);
+    }    
+
+    public static function createJs(string $code) : self
+    {
+        return new self(StatusCode::createOk(), $code, [Header::createContentTypeJs()]);
     }
 
     public static function createJson(string $body) : self
@@ -65,6 +80,11 @@ class Response
         return new self(StatusCode::createOk());
     }
 
+    public static function createPng(string $image) : self
+    {
+        return new self(StatusCode::createOk(), $image, [Header::createContentTypePng()]);
+    }
+
     public static function createSeeOther(string $targetUrl) : self
     {
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
@@ -78,6 +98,16 @@ class Response
     public static function createUnsupportedMediaType() : self
     {
         return new self(StatusCode::createUnsupportedMediaType());
+    }
+
+    public static function createWoff(string $font) : self
+    {
+        return new self(StatusCode::createOk(), $font, [Header::createContentTypeWoff()]);
+    }
+
+    public static function createWoff2(string $font) : self
+    {
+        return new self(StatusCode::createOk(), $font, [Header::createContentTypeWoff2()]);
     }
 
     public function getBody() : ?string

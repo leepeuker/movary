@@ -4,13 +4,9 @@
     Dashboard
 {% endblock %}
 
-{% block stylesheets %}
-    <link href="/css/dashboard.css" rel="stylesheet">
-{% endblock %}
-
 {% block scripts %}
-    <script src="/js/dashboard.js"></script>
-    <script src="/js/component/user-select.js"></script>
+    {{ vite('js/dashboard.js') }}
+    {{ vite('js/component/user-select.js') }}
 {% endblock %}
 
 {% block body %}

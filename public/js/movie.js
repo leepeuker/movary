@@ -1,3 +1,6 @@
+import { Modal } from 'bootstrap';
+import 'bootstrap-datepicker';
+import '/css/movie.css';
 let originalRating
 
 function deleteWatchDate() {
@@ -96,7 +99,7 @@ function toggleWatchDates() {
 }
 
 function loadWatchDateModal(watchDateListElement) {
-    const modal = new bootstrap.Modal('#editWatchDateModal', {
+    const modal = new Modal('#editWatchDateModal', {
         keyboard: false
     })
 
@@ -149,7 +152,7 @@ function editWatchDate() {
 }
 
 function loadRatingModal() {
-    const editRatingModal = new bootstrap.Modal(document.getElementById('editRatingModal'), {
+    const editRatingModal = new Modal(document.getElementById('editRatingModal'), {
         keyboard: false
     });
 

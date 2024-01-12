@@ -1,3 +1,6 @@
+import '/css/settings.css';
+import '/css/dashboard.css';
+
 function toggleButton (element) {
 	if (element.nextElementSibling.classList.contains("inactiveItem") == true) {
 		element.nextElementSibling.classList.remove("inactiveItem");

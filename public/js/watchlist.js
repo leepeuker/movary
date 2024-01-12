@@ -1,4 +1,5 @@
-const optionsModal = new bootstrap.Modal('#optionsModal');
+import { Modal } from 'bootstrap';
+const optionsModal = new Modal('#optionsModal');
 optionsModal.hide()
 
 async function removeFromWatchList() {

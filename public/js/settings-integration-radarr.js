@@ -1,3 +1,4 @@
+import '/css/settings.css';
 async function regenerateRadarrFeedId() {
     removeAlert('alertFeedUrlDiv')
 

@@ -5,12 +5,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-integration-jellyfin.js"></script>
-    <script src="/js/component/modal-job.js"></script>
-{% endblock %}
-
-{% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
+    {{ vite('js/settings-integration-jellyfin.js') }}
+    {{ vite('js/component/modal-job.js') }}
 {% endblock %}
 
 {% block body %}

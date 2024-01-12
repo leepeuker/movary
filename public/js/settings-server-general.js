@@ -1,3 +1,4 @@
+import '/css/settings.css';
 const tmdbApiKeyInput = document.getElementById('tmdbApiKeyInput');
 const applicationUrlInput = document.getElementById('applicationUrlInput');
 

@@ -4,12 +4,8 @@
     Settings - App
 {% endblock %}
 
-{% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
-{% endblock %}
-
 {% block scripts %}
-    <script src="/js/settings-server-jobs.js"></script>
+    {{ vite('js/settings-server-jobs.js') }}
 {% endblock %}
 
 {% block body %}

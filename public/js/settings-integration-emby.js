@@ -1,4 +1,6 @@
-function regenerateEmbyWebhook() {
+import '/css/settings.css';
+
+export function regenerateEmbyWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
         return
     }
@@ -14,7 +16,7 @@ function regenerateEmbyWebhook() {
     })
 }
 
-function deleteEmbyWebhook() {
+export function deleteEmbyWebhook() {
     if (confirm('Do you really want to delete the webhook url?') === false) {
         return
     }
@@ -30,7 +32,7 @@ function deleteEmbyWebhook() {
     })
 }
 
-async function regenerateEmbyWebhookRequest() {
+export async function regenerateEmbyWebhookRequest() {
     const response = await fetch('/settings/emby/webhook', {'method': 'put'})
 
     if (!response.ok) {
@@ -49,7 +51,7 @@ async function deleteEmbyWebhookRequest() {
     }
 }
 
-function setEmbyWebhookUrl(webhookUrl) {
+export function setEmbyWebhookUrl(webhookUrl) {
     if (webhookUrl) {
         document.getElementById('embyWebhookUrl').innerHTML = webhookUrl
         document.getElementById('deleteEmbyWebhookButton').classList.remove('disabled')
@@ -63,7 +65,7 @@ function setEmbyWebhookUrl(webhookUrl) {
     }
 }
 
-async function updateScrobbleOptions() {
+export async function updateScrobbleOptions() {
     removeAlert('alertWebhookOptionsDiv')
 
     await fetch('/settings/emby', {

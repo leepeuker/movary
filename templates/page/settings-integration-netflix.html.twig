@@ -5,13 +5,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-integration-netflix.js"></script>
-{% endblock %}
-
-{% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
-    <link href="/css/netflix.css" rel="stylesheet">
-    <link href="/css/bootstrap-icons-1.10.2.css" rel="stylesheet">
+    {{ vite('/js/settings-integration-netflix.js') }}
 {% endblock %}
 
 {% block body %}

@@ -1,5 +1,8 @@
-const exportHistoryModal = new bootstrap.Modal('#exportHistoryModal', {keyboard: false})
-const importHistoryModal = new bootstrap.Modal('#importHistoryModal', {keyboard: false})
+import { Modal } from 'bootstrap';
+import '/css/settings.css';
+
+const exportHistoryModal = new Modal('#exportHistoryModal', {keyboard: false})
+const importHistoryModal = new Modal('#importHistoryModal', {keyboard: false})
 
 function regenerateJellyfinWebhook() {
     if (confirm('Do you really want to regenerate the webhook url?') === false) {
