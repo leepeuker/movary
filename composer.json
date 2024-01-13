@@ -10,6 +10,7 @@
   "require": {
     "php": "^8.3",
     "ext-json": "*",
+    "ext-mbstring": "*",
     "ext-pdo": "*",
     "doctrine/dbal": "^3.7",
     "guzzlehttp/guzzle": "^7.8",
