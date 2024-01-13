@@ -23,15 +23,7 @@ class TmdbClient
 
     public function get(string $relativeUrl, array $getParameters = []) : array
     {
-        $getParametersRendered = '?';
-
-        foreach ($getParameters as $name => $getParameter) {
-            $getParametersRendered .= $name . '=' . $getParameter . '&';
-        }
-
-        $getParametersRendered .= 'api_key=' . $this->serverSettingsService->getTmdbApiKey();
-
-        $url = self::BASE_URL . $relativeUrl . $getParametersRendered;
+        $url = $this->buildUrl($relativeUrl, $getParameters);
 
         $request = new Request('GET', $url);
 
@@ -47,6 +39,19 @@ class TmdbClient
         };
 
         return Json::decode((string)$response->getBody());
+    }
+
+    private function buildUrl(string $relativeUrl, array $getParameters) : string
+    {
+        $getParametersRendered = '?';
+
+        foreach ($getParameters as $name => $getParameter) {
+            $getParametersRendered .= $name . '=' . $getParameter . '&';
+        }
+
+        $getParametersRendered .= 'api_key=' . $this->serverSettingsService->getTmdbApiKey();
+
+        return self::BASE_URL . $relativeUrl . $getParametersRendered;
     }
 
     private function handleNotFound(string $url, ResponseInterface $response) : never
