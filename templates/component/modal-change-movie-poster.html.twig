@@ -1,0 +1,26 @@
+<div class="modal fade" id="changePosterModal" tabindex="-1" aria-labelledby="changePosterModal" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="changePosterModalHeader">Change poster</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <select class="form-select" id="languageSelection" onchange="searchTMDBForPoster()" required>
+                        <option value="">Any language</option>
+                        {% for ISO6391, name in availableLanguages %}
+                            <option value="{{ ISO6391 }}" {% if ISO6391 == 'en' %}selected{% endif %}>{{ name }}</option>
+                        {% else %}
+                            <option>No languages found</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="TMDBPosterResults" class="d-flex flex-wrap justify-content-around"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary disabled" id="updatePosterButton" onclick="updateSelectedPoster()" disabled>Update poster</button>
+            </div>
+        </div>
+    </div>
+</div>

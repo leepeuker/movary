@@ -26,10 +26,13 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-calendar-date::before { content: "\f1e4"; }
 .bi-chat-square-text::before { content: "\f264"; }
 .bi-check-circle-fill::before { content: "\f26a"; }
+.bi-chevron-contract::before { content: "\f27d"; }
 .bi-chevron-down::before { content: "\f282"; }
+.bi-chevron-expand::before { content: "\f283"; }
 .bi-chevron-up::before { content: "\f286"; }
 .bi-eye::before { content: "\f341"; }
 .bi-eye-slash::before { content: "\f340"; }
+.bi-filter::before { content:"\f3ca"; }
 .bi-moon-fill::before { content: "\f494"; }
 .bi-pencil-square::before { content: "\f4ca"; }
 .bi-search::before { content: "\f52a"; }
@@ -39,9 +42,7 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-sun::before { content: "\f5a2"; }
 .bi-trash-fill::before { content: "\f5dd"; }
 .bi-three-dots-vertical::before { content: "\f5d3"; }
+.bi-upload::before { content:"\f603"; }
+.bi-question-lg::before { content: "\f64e"; }
 .bi-x-circle-fill::before { content: "\f622"; }
 .bi-x-lg::before { content: "\f659"; }
-.bi-chevron-expand::before { content: "\f283"; }
-.bi-chevron-contract::before { content: "\f27d"; }
-.bi-question-lg::before { content: "\f64e"; }
-.bi-filter::before{content:"\f3ca"}

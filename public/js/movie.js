@@ -371,6 +371,108 @@ function refreshWhereToWatchModal() {
 }
 //endregion whereToWatchModal
 
+function toggleChangeMoviePosterModal() {
+    const modal = new bootstrap.Modal(document.getElementById('changePosterModal'));
+    modal.show();
+
+    searchTMDBForPoster()
+}
+
+function processTMDBPosters(TMDBData) {
+    if(TMDBData.length < 1) {
+        let errorMessage = 'No images have been found. Try selecting another country.';
+        document.getElementById('TMDBPosterResults').append(errorMessage);
+    }
+
+    document.getElementById('TMDBPosterResults').innerHTML = '';
+
+    for(let i = 0; i < TMDBData.length; i++) {
+        let imageData = TMDBData[i];
+        let image = document.createElement('img');
+        image.classList.add('img-fluid', 'm-1', 'tmdbPosterImage');
+        image.dataset.filepath = imageData['file_path'];
+        image.src = 'https://image.tmdb.org/t/p/w154' + imageData['file_path'];
+        image.addEventListener('click', function() {
+            if(document.getElementsByClassName('selectedPoster').length > 0) {
+                document.querySelector('.selectedPoster').className = 'img-fluid m-1 tmdbPosterImage';
+            }
+            this.className = 'img-fluid m-1 selectedPoster';
+            document.getElementById('updatePosterButton').classList.remove('disabled');
+            document.getElementById('updatePosterButton').removeAttribute('disabled');
+        });
+        document.getElementById('TMDBPosterResults').append(image);
+    }
+}
+
+function updateSelectedPoster() {
+    let movieId = document.getElementById('movieId').value;
+    let selectedPoster = document.querySelector('.selectedPoster');
+    let filePath = selectedPoster.dataset.filepath;
+
+    const updatePosterRequest = fetch('/movies/' + movieId + '/update-poster', {
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        method: 'PUT',
+        body: filePath
+    });
+    
+    let errorMessage = document.createElement('p');
+    errorMessage.innerText = 'Something has gone wrong. Check the logs in Docker or your browser console and please try again.';
+    createSpinner(document.getElementById('TMDBPosterResults'));
+
+    updatePosterRequest.then(response => {
+        if(response.ok) {
+            window.location.reload();
+        } else {
+            if(response.status === 400) {
+                errorMessage.innerText = 'Choose a different poster; this one is already in use.'
+            } else {
+                console.error(response.body);
+            }
+            document.getElementById('TMDBPosterResults').innerHTML = '';
+            document.getElementById('TMDBPosterResults').append(errorMessage);
+        }
+    }).catch(error => {
+        console.error(error);
+        document.getElementById('TMDBPosterResults').append(errorMessage);
+    });
+}
+
+async function searchTMDBForPoster() {
+    createSpinner(document.getElementById('TMDBPosterResults'));
+
+    let movieId = document.getElementById('movieId').value;
+    let country = document.getElementById('languageSelection').value;
+
+    const posterRequest = fetch('/movies/' + movieId + '/search-posters?country=' + country);
+
+    let errorMessage = document.createElement('p');
+    errorMessage.innerText = 'Something has gone wrong. Check the logs in Docker or your browser console and please try again.';
+
+    posterRequest.then(response => {
+        if(response.ok) {
+            return response.json();
+        } else {
+            console.error(response.body);
+            document.getElementById('TMDBPosterResults').append(errorMessage);
+        }
+    }).then(data => processTMDBPosters(data)).catch(error => {
+        console.error(error);
+        document.getElementById('TMDBPosterResults').append(errorMessage);
+    });
+}
+
+function createSpinner(parent) {
+    parent.innerHTML = '';
+    let div = document.createElement('div');
+    let span = document.createElement('span');
+    div.className = 'spinner-border';
+    span.className = 'visually-hidden';
+    span.innerText = 'Loading...';
+    div.append(span);
+    parent.append(div);    
+}
 function isTruncated(el) {
     return el.scrollWidth > el.clientWidth
 }

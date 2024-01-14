@@ -4,6 +4,7 @@ namespace Tests\Unit\Movary\Service;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Service\ImageCacheService;
+use Movary\Service\ServerSettings;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Url;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 class UrlGeneratorTest extends TestCase
 {
     private ImageCacheService|MockObject $imageCacheServiceMock;
+
+    private ServerSettings|MockObject $serverSettingsMock;
 
     private UrlGenerator $subject;
 
@@ -64,17 +67,23 @@ class UrlGeneratorTest extends TestCase
     {
         $this->tmdbUrlGeneratorMock = $this->createMock(TmdbUrlGenerator::class);
         $this->imageCacheServiceMock = $this->createMock(ImageCacheService::class);
+        $this->serverSettingsMock = $this->createMock(ServerSettings::class);
 
         $this->subject = new UrlGenerator(
             $this->tmdbUrlGeneratorMock,
             $this->imageCacheServiceMock,
-            true
+            $this->serverSettingsMock,
         );
     }
 
     /** @dataProvider provideTestGenerateImageSrcUrlFromParametersData */
     public function testGenerateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath, string $expectedResult, bool $posterPathExists) : void
     {
+        $this->serverSettingsMock
+            ->expects(self::once())
+            ->method('isTmdbCachingEnabled')
+            ->willReturn(true);
+
         if ($posterPath !== null) {
             $this->imageCacheServiceMock
                 ->expects(self::once())
@@ -108,6 +117,11 @@ class UrlGeneratorTest extends TestCase
             'poster_path' => null,
             'tmdb_poster_path' => 'tmdb_poster_path',
         ];
+
+        $this->serverSettingsMock
+            ->expects(self::exactly(2))
+            ->method('isTmdbCachingEnabled')
+            ->willReturn(true);
 
         $this->imageCacheServiceMock
             ->expects(self::once())

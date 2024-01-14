@@ -13,3 +13,11 @@
     border: black solid;
     border-width: 0.1rem;
 }
+
+.tmdbPosterImage, .selectedPoster {
+    cursor: pointer;
+}
+
+.tmdbPosterImage:hover, .selectedPoster {
+    filter: brightness(50%);
+}

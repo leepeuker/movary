@@ -59,6 +59,17 @@ class TmdbApi
         );
     }
 
+    public function getPosters(int $tmdbId, ?string $country) : array
+    {
+        $path = "/movie/$tmdbId/images";
+
+        if (empty($country) === true) {
+            return $this->client->get($path)['posters'];
+        }
+
+        return $this->client->get($path, ['languages' => $country, 'include_image_language' => "$country,null"])['posters'];
+    }
+
     public function searchMovie(string $searchTerm, ?Year $year = null, ?int $page = null) : array
     {
         $getParameters = ['query' => urlencode($searchTerm)];

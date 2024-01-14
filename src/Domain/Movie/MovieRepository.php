@@ -1123,6 +1123,20 @@ class MovieRepository
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId, 'updated_at' => (string)DateTime::create()], ['id' => $id]);
     }
 
+    public function updatePosterPath(int $id, string $posterPath) : void
+    {
+        $this->dbConnection->update('movie', [
+            'poster_path' => $posterPath
+        ], ['id' => $id]);
+    }    
+
+    public function updateTmdbPosterPath(int $id, string $posterPath) : void
+    {
+        $this->dbConnection->update('movie', [
+            'tmdb_poster_path' => $posterPath
+        ], ['id' => $id]);
+    }
+
     public function updateTraktId(int $id, TraktId $traktId) : void
     {
         $this->dbConnection->update('movie', ['trakt_id' => $traktId->asInt(), 'updated_at' => (string)DateTime::create()], ['id' => $id]);

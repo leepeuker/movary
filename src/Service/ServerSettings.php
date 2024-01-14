@@ -14,13 +14,19 @@ class ServerSettings
 
     private const PLEX_APP_NAME = 'PLEX_APP_NAME';
 
+    private const PLEX_APP_NAME_DEFAULT_VALUE = 'Movary';
+
     private const JELLYFIN_APP_NAME = 'JELLYFIN_APP_NAME';
+
+    private const JELLYFIN_APP_NAME_DEFAULT_VALUE = 'Movary';
 
     private const PLEX_IDENTIFIER = 'PLEX_IDENTIFIER';
 
     private const APPLICATION_URL = 'APPLICATION_URL';
 
     private const APPLICATION_VERSION = 'APPLICATION_VERSION';
+
+    private const APPLICATION_VERSION_DEFAULT_VALUE = 'unknown';
 
     private const SMTP_HOST = 'SMTP_HOST';
 
@@ -40,6 +46,10 @@ class ServerSettings
 
     private const TMDB_API_KEY = 'TMDB_API_KEY';
 
+    private const TMDB_ENABLE_IMAGE_CACHING = 'TMDB_ENABLE_IMAGE_CACHING';
+
+    private const TMDB_ENABLE_IMAGE_CACHING_DEFAULT_VALUE = false;
+
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
@@ -53,7 +63,7 @@ class ServerSettings
 
     public function getApplicationVersion() : string
     {
-        return $this->getByKey(self::APPLICATION_VERSION) ?? 'unknown';
+        return $this->getByKey(self::APPLICATION_VERSION) ?? self::APPLICATION_VERSION_DEFAULT_VALUE;
     }
 
     public function getFromAddress() : ?string
@@ -63,7 +73,7 @@ class ServerSettings
 
     public function getJellyfinAppName() : string
     {
-        return $this->getByKey(self::JELLYFIN_APP_NAME) ?? 'Movary';
+        return $this->getByKey(self::JELLYFIN_APP_NAME) ?? self::JELLYFIN_APP_NAME_DEFAULT_VALUE;
     }
 
     public function getJellyfinDeviceId() : ?string
@@ -73,7 +83,7 @@ class ServerSettings
 
     public function getPlexAppName() : string
     {
-        return $this->getByKey(self::PLEX_APP_NAME) ?? 'Movary';
+        return $this->getByKey(self::PLEX_APP_NAME) ?? self::PLEX_APP_NAME_DEFAULT_VALUE;
     }
 
     public function getPlexIdentifier() : ?string
@@ -169,6 +179,17 @@ class ServerSettings
     public function isTmdbApiKeySetInEnvironment() : bool
     {
         return $this->isSetInEnvironment(self::TMDB_API_KEY);
+    }
+
+    public function isTmdbCachingEnabled() : bool
+    {
+        $isCachingEnabled = $this->getByKey(self::TMDB_ENABLE_IMAGE_CACHING);
+
+        if ($isCachingEnabled !== null) {
+            return (bool)$isCachingEnabled;
+        }
+
+        return self::TMDB_ENABLE_IMAGE_CACHING_DEFAULT_VALUE;
     }
 
     public function requireApplicationUrl() : string

@@ -25,13 +25,7 @@ class TmdbIsoLanguageCache
 
     public function getLanguageByCode(string $languageCode) : string
     {
-        if ($this->languages === []) {
-            $this->loadFromDatabase();
-        }
-
-        if ($this->languages === []) {
-            $this->loadFromTmdb();
-        }
+        $this->fetchAll();
 
         foreach ($this->languages as $iso6931 => $englishName) {
             if ($iso6931 === $languageCode) {
@@ -40,6 +34,19 @@ class TmdbIsoLanguageCache
         }
 
         throw new RuntimeException('Language code not handled: ' . $languageCode);
+    }
+
+    public function fetchAll() : array
+    {
+        if ($this->languages === []) {
+            $this->loadFromDatabase();
+        }
+
+        if ($this->languages === []) {
+            $this->loadFromTmdb();
+        }
+
+        return $this->languages;
     }
 
     public function loadFromTmdb() : bool
@@ -67,7 +74,7 @@ class TmdbIsoLanguageCache
 
     private function loadFromDatabase() : bool
     {
-        $this->languages = $this->dbConnection->fetchAllKeyValue('SELECT iso_639_1, english_name FROM cache_tmdb_languages');
+        $this->languages = $this->dbConnection->fetchAllKeyValue('SELECT iso_639_1, english_name FROM cache_tmdb_languages ORDER BY english_name');
 
         return empty($this->languages);
     }
