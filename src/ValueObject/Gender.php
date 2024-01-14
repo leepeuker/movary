@@ -80,4 +80,9 @@ class Gender
 
         return self::GENDER_TEXT[$this->asInt()];
     }
+
+    public function isEqual(Gender $gender) : bool
+    {
+        return $this->gender === $gender->gender;
+    }
 }
