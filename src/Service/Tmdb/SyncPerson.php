@@ -16,6 +16,7 @@ class SyncPerson
         private readonly PersonApi $personApi,
         private readonly JobQueueScheduler $jobScheduler,
         private readonly LoggerInterface $logger,
+        private readonly PersonChangesCalculator $changesCalculator,
     ) {
     }
 
@@ -30,7 +31,7 @@ class SyncPerson
                 $this->personApi->deleteById($person->getId());
             }
 
-            $this->logger->debug('TMDB: Could not update person, tmdb id not found', ['tmdbId' => $tmdbId]);
+            $this->logger->debug('TMDB: Could not sync person data, id does not exist', ['tmdbId' => $tmdbId]);
 
             return;
         }
@@ -49,10 +50,10 @@ class SyncPerson
                 $tmdbPerson->getDeathDate(),
                 $tmdbPerson->getPlaceOfBirth(),
                 updatedAtTmdb: DateTime::create(),
-                imdbId: $tmdbPerson->getImdbId()
+                imdbId: $tmdbPerson->getImdbId(),
             );
 
-            $this->logger->debug('TMDB: Created person meta data', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
+            $this->logger->debug('TMDB: Created person', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
 
             $this->jobScheduler->storePersonIdForTmdbImageCacheJob($person->getId());
 
@@ -60,6 +61,8 @@ class SyncPerson
         }
 
         $originalTmdbPosterPath = $person->getTmdbPosterPath();
+
+        $changes = $this->changesCalculator->calculatePersonChanges($person, $tmdbPerson);
 
         $person = $this->personApi->update(
             $person->getId(),
@@ -73,10 +76,16 @@ class SyncPerson
             $tmdbPerson->getDeathDate(),
             $tmdbPerson->getPlaceOfBirth(),
             DateTime::create(),
-            $tmdbPerson->getImdbId()
+            $tmdbPerson->getImdbId(),
         );
 
-        $this->logger->debug('TMDB: Updated person meta data', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
+        $this->logger->debug(
+            'TMDB: Synced person data',
+            array_merge(
+                ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()],
+                ['changes' => $changes],
+            ),
+        );
 
         if ($originalTmdbPosterPath !== $person->getTmdbPosterPath()) {
             $this->jobScheduler->storePersonIdForTmdbImageCacheJob($person->getId());
