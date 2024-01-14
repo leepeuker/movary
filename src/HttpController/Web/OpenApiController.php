@@ -17,17 +17,17 @@ class OpenApiController
 
     public function renderPage() : Response
     {
-        $openAiJsonUrl = '/api/openapi';
+        $openApiJsonurl = '/api/openapi';
 
         $applicationUrl = $this->serverSettings->getApplicationUrl();
         if ($applicationUrl !== null) {
-            $openAiJsonUrl = trim($applicationUrl, '/') . $openAiJsonUrl;
+            $openApiJsonurl = trim($applicationUrl, '/') . $openApiJsonurl;
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/api.html.twig', [
-                'openAiJsonUrl' => $openAiJsonUrl
+                'openApiJsonUrl' => $openApiJsonurl
             ]),
         );
     }

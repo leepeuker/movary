@@ -7,6 +7,9 @@
 </head>
 <body>
 <div id="swagger-ui"></div>
-{{ vite('js/swagger.js', ['url' => openApiJsonUrl, 'crossorigin' => '']) }}
+<script>
+var url = '{{ openApiJsonUrl }}';
+</script>
+{{ vite('js/swagger.js') }}
 </body>
 </html>

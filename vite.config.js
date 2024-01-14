@@ -10,15 +10,6 @@ const serverHost = process.env.VITE_SERVER_HOST ?? 'localhost';
 const serverPort = process.env.VITE_SERVER_PORT ?? 5173;
 const outputDir = __dirname + '/public/build';
 
-function renderChunks(deps) {
-    let chunks = {};
-    Object.keys(deps).forEach((key) => {
-      if (['react', 'react-router-dom', 'react-dom'].includes(key)) return;
-      chunks[key] = [key];
-    });
-    return chunks;
-  }
-
 export default defineConfig({
     plugins: [
         liveReload([

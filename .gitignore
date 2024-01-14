@@ -10,4 +10,4 @@ http-client.private.env.json
 
 node_modules
 public/build/*
-!public/build/hot
+!public/build/state

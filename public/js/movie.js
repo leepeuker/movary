@@ -394,3 +394,33 @@ const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
 
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1')
 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+export {
+    deleteWatchDate,
+    toggleWatchDateAdvancedMode,
+    disableWatchDateAdvancedMode,
+    enableWatchDateAdvancedMode,
+    getMovieId,
+    getRouteUsername,
+    saveRating,
+    toggleWatchDates,
+    loadWatchDateModal,
+    editWatchDate,
+    loadRatingModal,
+    toggleWatchlist,
+    refreshTmdbData,
+    addToWatchlistRequest,
+    removeFromWatchlistRequest,
+    refreshTmdbDataRequest,
+    refreshImdbRating,
+    refreshImdbRatingRequest,
+    showWhereToWatchModal,
+    loadWatchProviders,
+    fetchWatchProviders,
+    refreshWhereToWatchModal,
+    isTruncated,
+    tooltipTriggerListCast,
+    tooltipCastList,
+    tooltipTriggerList,
+    tooltipList,
+}

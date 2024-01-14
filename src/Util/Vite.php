@@ -60,13 +60,12 @@ class Vite
         }
     }
 
-    private function detectHRMFile() : bool
+    private function detectViteServer() : bool
     {
-        if($this->file->fileExists($this->rootDirectory . '/public/build/hot')) {
+        if($this->file->readFile($this->rootDirectory . '/public/build/state') === 'hot')  {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function getCompiledFilename(string $entry) : string
@@ -87,7 +86,7 @@ class Vite
 
     public function getJsTag(string $entry, array $attributes) : string
     {
-        $viteServerStatus = $this->detectHRMFile();
+        $viteServerStatus = $this->detectViteServer();
         $url = $viteServerStatus ? $this->baseUrl . '/' . $entry : $this->getAssetUrl($entry);
         if(empty($url)) {
             return '';
@@ -104,7 +103,7 @@ class Vite
 
     public function getPreloadTags($entry) : string
     {
-        if($this->detectHRMFile()) {
+        if($this->detectViteServer()) {
             return '';
         }
 
@@ -130,7 +129,7 @@ class Vite
 
     public function getCssTags(string $entry) : string
     {
-        if($this->detectHRMFile()) {
+        if($this->detectViteServer()) {
             return '';
         }
         $tags = '';
@@ -155,7 +154,7 @@ class Vite
 
     public function getImageTag(string $entry, array $attributes) : string
     {
-        $viteServerStatus = $this->detectHRMFile();
+        $viteServerStatus = $this->detectViteServer();
         $url = $viteServerStatus ? $this->baseUrl . '/' . $entry : $this->getAssetUrl($entry);
         if(empty($url)) {
             return '';
@@ -166,7 +165,7 @@ class Vite
 
     public function getStyleSheetTag(string $entry) : string
     {
-        $viteServerStatus = $this->detectHRMFile();
+        $viteServerStatus = $this->detectViteServer();
         $url = $viteServerStatus ? $this->baseUrl . '/' . $entry : $this->getAssetUrl($entry);
         if(empty($url)) {
             return '';
@@ -176,7 +175,7 @@ class Vite
 
     public function getIconTag(string $entry) : string
     {
-        $viteServerStatus = $this->detectHRMFile();
+        $viteServerStatus = $this->detectViteServer();
         $url = $viteServerStatus ? $this->baseUrl . '/' . $entry : $this->getAssetUrl($entry);
         if(empty($url)) {
             return '';

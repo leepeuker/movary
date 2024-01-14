@@ -5,16 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "predev": "echo hot > public/build/hot",
-    "postdev": "del /f public/build/hot & rm public/build/hot",
+    "predev": "echo hot > public/build/state",
+    "postdev": "echo cold > public/build/state",
     "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@vituum/vite-plugin-twig": "^1.1.0",
     "sass": "^1.69.7",
     "vite": "^5.0.8",
     "vite-bundle-visualizer": "^1.0.0",
-    "vite-plugin-node-polyfills": "^0.19.0"
+    "vite-plugin-node-polyfills": "^0.19.0",
+    "vituum": "^1.1.0"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
