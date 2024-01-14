@@ -7,7 +7,6 @@ use Movary\Domain\Person\PersonEntity;
 
 class PersonChangesCalculator
 {
-
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     public function calculatePersonChanges(PersonEntity $person, TmdbPerson $tmdbPerson) : array
     {
@@ -62,7 +61,7 @@ class PersonChangesCalculator
             ];
         }
 
-        if ($person->getGender()->asInt() !== $tmdbPerson->getGender()->asInt()) {
+        if ($person->getGender()->isEqual($tmdbPerson->getGender()) === false) {
             $changes['gender'] = [
                 'old' => $person->getGender()->getText(),
                 'new' => $tmdbPerson->getGender()->getText(),

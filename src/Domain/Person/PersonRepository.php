@@ -114,12 +114,12 @@ class PersonRepository
         Gender $gender,
         ?string $knownForDepartment,
         ?string $tmdbPosterPath,
-        ?string $biography = null,
-        ?Date $birthDate = null,
-        ?Date $deathDate = null,
-        ?string $placeOfBirth = null,
-        ?DateTime $updatedAtTmdb = null,
-        ?string $imdbId = null,
+        ?string $biography,
+        ?Date $birthDate,
+        ?Date $deathDate,
+        ?string $placeOfBirth,
+        ?DateTime $updatedAtTmdb,
+        ?string $imdbId,
     ) : PersonEntity {
         $payload = [
             'name' => $name,
@@ -163,6 +163,31 @@ class PersonRepository
                 'updated_at' => (string)DateTime::create()
             ],
         );
+    }
+
+    public function updateWithTmdbCreditsData(
+        int $id,
+        string $name,
+        Gender $gender,
+        ?string $knownForDepartment,
+        ?string $tmdbPosterPath,
+    ) : PersonEntity {
+        $updatedAt = (string)DateTime::create();
+
+        $payload = [
+            'name' => $name,
+            'gender' => $gender->asInt(),
+            'known_for_department' => $knownForDepartment,
+            'tmdb_poster_path' => $tmdbPosterPath,
+            'updated_at' => $updatedAt,
+            'updated_at_tmdb' => $updatedAt,
+        ];
+
+        $this->dbConnection->update(
+            'person', $payload, ['id' => $id],
+        );
+
+        return $this->fetchById($id);
     }
 
     private function fetchById(int $id) : PersonEntity
