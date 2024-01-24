@@ -38,14 +38,6 @@ document.getElementById('generalServerUpdateButton').addEventListener('click', a
         }
     }
 
-    if (applicationTimezoneSelect.value !== '') {
-        if (isValidTimeZone(applicationTimezoneSelect.value) === false) {
-            addAlert('alertGeneralServerDiv', 'Timezone not valid.', 'danger');
-            applicationTimezoneSelect.classList.add('invalid-input');
-            return;
-        }
-    }
-
     const response = await updateGeneral(tmdbApiKeyInputValue, applicationUrlInput.value, applicationNameInput.value, applicationTimezoneSelect.value);
 
     switch (response.status) {
@@ -101,13 +93,4 @@ function isValidName(nameString) {
     }
 
     return nameString.length <= 15;
-}
-
-function isValidTimeZone(timezone) {
-    try {
-        Intl.DateTimeFormat('en', { timeZone: timezone }).format();
-        return true;
-    } catch (error) {
-        return false;
-    }
 }

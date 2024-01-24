@@ -716,7 +716,6 @@ class SettingsController
         $applicationUrl = isset($requestData['applicationUrl']) === false ? null : $requestData['applicationUrl'];
         $applicationName = isset($requestData['applicationName']) === false ? null : $requestData['applicationName'];
         $applicationTimezone = isset($requestData['applicationTimezone']) === false ? null : $requestData['applicationTimezone'];
-        var_dump($applicationTimezone);
 
         if ($tmdbApiKey !== null) {
             $this->serverSettings->setTmdbApiKey($tmdbApiKey);
