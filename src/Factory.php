@@ -37,6 +37,7 @@ use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
@@ -298,6 +299,7 @@ class Factory
         }
 
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
+        $twig->addGlobal('applicationTimezone', $container->get(ServerSettings::class)->getApplicationTimezone() ?? DateTime::DEFAULT_TIME_ZONE);
         $twig->addGlobal('currentUserName', $user?->getName());
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
         $twig->addGlobal('currentUserCountry', $user?->getCountry());
