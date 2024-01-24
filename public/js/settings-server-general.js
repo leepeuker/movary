@@ -1,9 +1,11 @@
 const tmdbApiKeyInput = document.getElementById('tmdbApiKeyInput');
 const applicationUrlInput = document.getElementById('applicationUrlInput');
+const applicationNameInput = document.getElementById('applicationNameInput');
 
 document.getElementById('generalServerUpdateButton').addEventListener('click', async () => {
     tmdbApiKeyInput.classList.remove('invalid-input');
     applicationUrlInput.classList.remove('invalid-input');
+    applicationNameInput.classList.remove('invalid-input');
 
     let tmdbApiKeyInputValue = null;
 
@@ -26,11 +28,27 @@ document.getElementById('generalServerUpdateButton').addEventListener('click', a
         }
     }
 
-    const response = await updateGeneral(tmdbApiKeyInputValue, applicationUrlInput.value);
+    if (applicationNameInput.value !== '') {
+        console.log(applicationNameInput)
+        if (isValidName(applicationNameInput.value) === false) {
+            addAlert('alertGeneralServerDiv', 'Application name not valid. Must only contain letters, numbers, spaces or \'-\' and have max 15 characters', 'danger');
+            applicationNameInput.classList.add('invalid-input');
+            return;
+        }
+    }
+
+    const response = await updateGeneral(tmdbApiKeyInputValue, applicationUrlInput.value, applicationNameInput.value);
 
     switch (response.status) {
         case 200:
             addAlert('alertGeneralServerDiv', 'Update was successful', 'success');
+
+            if (applicationNameInput.value == '') {
+                document.getElementById('navbarBrand').innerText = 'Movary'
+                return
+            }
+
+            document.getElementById('navbarBrand').innerText = applicationNameInput.value ?? 'Movary'
 
             return;
         case 400:
@@ -45,13 +63,14 @@ document.getElementById('generalServerUpdateButton').addEventListener('click', a
     }
 });
 
-function updateGeneral(tmdbApiKey, applicationUrl) {
+function updateGeneral(tmdbApiKey, applicationUrl, applicationName) {
     return fetch('/settings/server/general', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({
             'tmdbApiKey': tmdbApiKey,
-            'applicationUrl': applicationUrl
+            'applicationUrl': applicationUrl,
+            'applicationName': applicationName
         })
     });
 }
@@ -64,4 +83,15 @@ function isValidUrl(urlString) {
         return false;
     }
 }
+function isValidName(nameString) {
+    const alphanumericRegex = /^[a-zA-Z0-9\s]+$/;
 
+    console.log(nameString)
+    console.log(alphanumericRegex.test(nameString))
+
+    if (alphanumericRegex.test(nameString) === false) {
+        return false;
+    }
+
+    return nameString.length <= 15;
+}

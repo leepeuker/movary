@@ -46,7 +46,7 @@
 
                 <div class="mb-3">
                     <label for="applicationUrlInput" class="form-label">
-                        <b>Application url</b>
+                        <b>Application Url</b>
                     </label>
                     <input type="text"
                            class="form-control"
@@ -57,6 +57,23 @@
                     >
                     <div id="applicationUrlInput" class="form-text">
                         The public base url used to serve Movary.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="applicationNameInput" class="form-label">
+                        <b>Application Name</b>
+                    </label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Movary"
+                           value="{{ applicationName }}"
+                           id="applicationNameInput"
+                           style="text-align: center"
+                            {{ applicationNameSetInEnv == true ? 'disabled' }}
+                    >
+                    <div id="applicationNameInput" class="form-text">
+                        Overwrite the default application name.
                     </div>
                 </div>
 

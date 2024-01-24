@@ -19,6 +19,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 |:--------------------------------------------|:---------------:|:------------------------------------------------------------------------|:------:|
 | `TMDB_API_KEY`                              |        -        | **Required** (get key [here](https://www.themoviedb.org/settings/api))  |  yes   |
 | `APPLICATION_URL`                           |        -        | Public base url of the application (e.g. `htttp://localhost`)           |  yes   |
+| `APPLICATION_NAME`                          |    `Movary`     | Application name, displayed e.g. as brand name in the navbar            |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |       `0`       | More info [here](features/tmdb-data.md#image-cache)                     |        |
 | `ENABLE_REGISTRATION`                       |       `0`       | Enables public user registration                                        |        |
 | `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |      `15`       | Minimum time between background jobs processing                         |        |

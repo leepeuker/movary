@@ -15,7 +15,7 @@
     <main role="main" class="form-signin w-100 m-auto text-center">
         {% if useTwoFactorAuthentication == false %}
             <form action="/login" method="post" enctype="multipart/form-data">
-                <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">Movary</h1>
+                <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">{{ applicationName ?? 'Movary' }}</h1>
                 <div class="form-floating">
                     <input type="email" name="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingInput"
                            placeholder="name@example.com" required>

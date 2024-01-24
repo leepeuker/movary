@@ -297,6 +297,7 @@ class Factory
             }
         }
 
+        $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
         $twig->addGlobal('currentUserName', $user?->getName());
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
         $twig->addGlobal('currentUserCountry', $user?->getCountry());
