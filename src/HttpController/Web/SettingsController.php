@@ -441,9 +441,11 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-general.html.twig', [
                 'applicationUrl' => $this->serverSettings->getApplicationUrl(),
+                'applicationName' => $this->serverSettings->getApplicationName(),
                 'tmdbApiKey' => $this->serverSettings->getTmdbApiKey(),
                 'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
                 'applicationUrlSetInEnv' => $this->serverSettings->isApplicationUrlSetInEnvironment(),
+                'applicationNameSetInEnv' => $this->serverSettings->isApplicationNameSetInEnvironment(),
             ]),
         );
     }
@@ -708,12 +710,16 @@ class SettingsController
 
         $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
         $applicationUrl = isset($requestData['applicationUrl']) === false ? null : $requestData['applicationUrl'];
+        $applicationName = isset($requestData['applicationName']) === false ? null : $requestData['applicationName'];
 
         if ($tmdbApiKey !== null) {
             $this->serverSettings->setTmdbApiKey($tmdbApiKey);
         }
         if ($applicationUrl !== null) {
             $this->serverSettings->setApplicationUrl($applicationUrl);
+        }
+        if ($applicationName !== null) {
+            $this->serverSettings->setApplicationName($applicationName);
         }
 
         return Response::createOk();

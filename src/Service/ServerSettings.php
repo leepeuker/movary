@@ -18,6 +18,8 @@ class ServerSettings
 
     private const PLEX_IDENTIFIER = 'PLEX_IDENTIFIER';
 
+    private const APPLICATION_NAME = 'APPLICATION_NAME';
+
     private const APPLICATION_URL = 'APPLICATION_URL';
 
     private const APPLICATION_VERSION = 'APPLICATION_VERSION';
@@ -49,6 +51,11 @@ class ServerSettings
     public function getApplicationUrl() : ?string
     {
         return $this->getByKey(self::APPLICATION_URL);
+    }
+
+    public function getApplicationName() : ?string
+    {
+        return $this->getByKey(self::APPLICATION_NAME);
     }
 
     public function getApplicationVersion() : string
@@ -126,6 +133,11 @@ class ServerSettings
         return $this->getByKey(self::TOTP_ISSUER) ?? 'Movary';
     }
 
+    public function isApplicationNameSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::APPLICATION_NAME);
+    }
+
     public function isApplicationUrlSetInEnvironment() : bool
     {
         return $this->isSetInEnvironment(self::APPLICATION_URL);
@@ -199,6 +211,11 @@ class ServerSettings
         }
 
         return $value;
+    }
+
+    public function setApplicationName(string $applicationName) : void
+    {
+        $this->updateValue(self::APPLICATION_NAME, $applicationName);
     }
 
     public function setApplicationUrl(string $applicationUrl) : void
