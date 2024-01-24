@@ -56,7 +56,7 @@
                             {{ applicationUrlSetInEnv == true ? 'disabled' }}
                     >
                     <div id="applicationUrlInput" class="form-text">
-                        The public base url used to serve Movary.
+                        The public base url used to reach Movary.
                     </div>
                 </div>
 
@@ -70,10 +70,24 @@
                            value="{{ applicationName }}"
                            id="applicationNameInput"
                            style="text-align: center"
-                            {{ applicationNameSetInEnv == true ? 'disabled' }}
+
                     >
                     <div id="applicationNameInput" class="form-text">
-                        Overwrite the default application name.
+                        The display name used by the application.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="applicationTimezoneSelect" class="form-label">
+                        <b>Timezone</b>
+                    </label>
+                    <select class="form-control text-center" name="ge" id="applicationTimezoneSelect" {{ applicationTimezoneSetInEnv == true ? 'disabled' }}>
+                        {% for applicationTimezoneAvailable in applicationTimezonesAvailable %}
+                            <option value="{{ applicationTimezoneAvailable }}" {{ applicationTimezoneAvailable == applicationTimezone ?? applicationTimezoneDefault ? 'selected' }}>{{ applicationTimezoneAvailable }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="applicationTimezoneInput" class="form-text">
+                        The default timezone used by the application.
                     </div>
                 </div>
 

@@ -8,6 +8,8 @@ use Movary\ValueObject\Exception\ConfigNotSetException;
 
 class ServerSettings
 {
+    private const APPLICATION_TIMEZONE = 'TIMEZONE';
+
     private const TOTP_ISSUER = 'TOTP_ISSUER';
 
     private const JELLYFIN_DEVICE_ID = 'JELLYFIN_DEVICE_ID';
@@ -56,6 +58,11 @@ class ServerSettings
     public function getApplicationName() : ?string
     {
         return $this->getByKey(self::APPLICATION_NAME);
+    }
+
+    public function getApplicationTimezone() : ?string
+    {
+        return $this->getByKey(self::APPLICATION_TIMEZONE);
     }
 
     public function getApplicationVersion() : string
@@ -138,6 +145,11 @@ class ServerSettings
         return $this->isSetInEnvironment(self::APPLICATION_NAME);
     }
 
+    public function isApplicationTimezoneSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::APPLICATION_TIMEZONE);
+    }
+
     public function isApplicationUrlSetInEnvironment() : bool
     {
         return $this->isSetInEnvironment(self::APPLICATION_URL);
@@ -216,6 +228,11 @@ class ServerSettings
     public function setApplicationName(string $applicationName) : void
     {
         $this->updateValue(self::APPLICATION_NAME, $applicationName);
+    }
+
+    public function setApplicationTimezone(string $applicationTimezone) : void
+    {
+        $this->updateValue(self::APPLICATION_TIMEZONE, $applicationTimezone);
     }
 
     public function setApplicationUrl(string $applicationUrl) : void
