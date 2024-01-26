@@ -1085,7 +1085,7 @@
           "description": "The credentials and optionally a two-factor Authentication code",
           "required": true,
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "required": ["email", "password"],
