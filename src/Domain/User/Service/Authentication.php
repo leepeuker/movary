@@ -153,7 +153,14 @@ class Authentication
         $token = $this->generateToken($userId, $deviceName, $userAgent, DateTime::createFromString((string)$authTokenExpirationDate));
 
         session_regenerate_id();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration, '/');
+        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
+            'expires' => $cookieExpiration,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'strict'
+        ]);
 
         $this->sessionWrapper->set('userId', $userId);
     }
