@@ -9,7 +9,6 @@ use Movary\Domain\User\Exception\NoVerificationCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
-use Movary\Service\ServerSettings;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -24,7 +23,6 @@ class Authentication
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
-        private readonly ServerSettings $serverSettings,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
     ) {
     }
@@ -156,7 +154,6 @@ class Authentication
 
         session_regenerate_id();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration, '/');
-        // setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration, '/', $this->serverSettings->getApplicationUrl(), true, true);
 
         $this->sessionWrapper->set('userId', $userId);
     }

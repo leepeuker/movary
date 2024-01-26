@@ -23,39 +23,6 @@ class AuthenticationController
     ) {
     }
 
-    public function login(Request $request) : Response
-    {
-        $postParameters = $request->getPostParameters();
-
-        try {
-            $this->authenticationService->login(
-                $postParameters['email'],
-                $postParameters['password'],
-                isset($postParameters['rememberMe']) === true,
-            );
-        } catch (NoVerificationCode) {
-            $this->sessionWrapper->set('useTwoFactorAuthentication', true);
-        } catch (InvalidCredentials) {
-            $this->sessionWrapper->set('failedLogin', true);
-        }
-        $redirect = $postParameters['redirect'];
-        $target = $redirect ?? $_SERVER['HTTP_REFERER'];
-
-        $urlParts = parse_url($target);
-        if (is_array($urlParts) === false) {
-            $urlParts = ['path' => '/'];
-        }
-
-        /* @phpstan-ignore-next-line */
-        $targetRelativeUrl = $urlParts['path'] . $urlParts['query'] ?? '';
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($targetRelativeUrl)],
-        );
-    }
-
     public function logout() : Response
     {
         $this->authenticationService->logout();
