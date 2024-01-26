@@ -1068,6 +1068,9 @@
     },
     "/authentication/request-token": {
       "post": {
+        "tags": [
+          "Authentication"
+        ],
         "description": "Get an authentication token by submitting an email, password and optionally a time-based 6-digit code. This token can be stored and used for future requests to protected endpoints.",
         "parameters": [{
           "in": "header",
