@@ -3,12 +3,8 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\Exception\InvalidCredentials;
-use Movary\Domain\User\Exception\InvalidTotpCode;
-use Movary\Domain\User\Exception\NoVerificationCode;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Util\Json;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -16,8 +12,6 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
-        private readonly SessionWrapper $sessionWrapper,
     ) {
     }
 
@@ -29,7 +23,7 @@ class AuthenticationController
             return Response::createBadRequest('Username or password has not been provided');
         }
         $totpCode = $postParameters['totpCode'] ?? 0;
-        $rememberMe = (bool)$postParameters['rememberMe'] ?? false;
+        $rememberMe = (bool)$postParameters['rememberMe'];
         $userAgent = $request->getUserAgent();
         
         if(isset($headers['X-Movary-Client']) === false) {

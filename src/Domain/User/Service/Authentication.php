@@ -217,9 +217,9 @@ class Authentication
     }
 
 
-    private function verifyTotp($userId, $userTotpInput) : bool
+    private function verifyTotp(int $userId, int $userTotpInput) : bool
     {
-        if ($this->twoFactorAuthenticationApi->verifyTotpUri($userId, (int)$userTotpInput) === false) {
+        if ($this->twoFactorAuthenticationApi->verifyTotpUri($userId, $userTotpInput) === false) {
             return false;
         }
         return true;

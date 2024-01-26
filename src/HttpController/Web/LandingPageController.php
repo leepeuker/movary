@@ -29,6 +29,8 @@ class LandingPageController
             $this->twig->render('page/login.html.twig', [
                 'deletedAccount' => $deletedAccount,
                 'registrationEnabled' => $this->registrationEnabled,
+                'defaultEmail' => $this->defaultEmail,
+                'defaultPassword' => $this->defaultPassword
             ]),
         );
     }
