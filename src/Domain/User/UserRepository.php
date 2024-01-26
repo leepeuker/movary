@@ -26,7 +26,7 @@ class UserRepository
         );
     }
 
-    public function createAuthToken(int $userId, string $token, DateTime $expirationDate) : void
+    public function createAuthToken(int $userId, string $token, string $deviceName, string $userAgent, DateTime $expirationDate) : void
     {
         $this->dbConnection->insert(
             'user_auth_token',
@@ -34,6 +34,8 @@ class UserRepository
                 'user_id' => $userId,
                 'token' => $token,
                 'expiration_date' => (string)$expirationDate,
+                'device_name' => $deviceName,
+                'user_agent_string' => $userAgent,
                 'created_at' => (string)DateTime::create(),
             ],
         );

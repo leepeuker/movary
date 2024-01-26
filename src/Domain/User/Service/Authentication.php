@@ -110,7 +110,7 @@ class Authentication
         return $targetUser->getId() === $userId;
     }
 
-    public function login(string $email, string $password, bool $rememberMe, ?int $userTotpInput = null) : void
+    public function login(string $email, string $password, bool $rememberMe, string $deviceName, string $userAgent, ?int $userTotpInput = null) : void
     {
         if ($this->isUserAuthenticated() === true) {
             return;
@@ -137,10 +137,10 @@ class Authentication
             }
         }
 
-        $this->createAuthenticationCookie($user->getId(), $rememberMe);
+        $this->createAuthenticationCookie($user->getId(), $rememberMe, $deviceName, $userAgent);
     }
 
-    public function createAuthenticationCookie(int $userId, bool $rememberMe) : void
+    public function createAuthenticationCookie(int $userId, bool $rememberMe, string $deviceName, string $userAgent) : void
     {
         $authTokenExpirationDate = $this->createExpirationDate();
         $cookieExpiration = 0;
@@ -150,7 +150,7 @@ class Authentication
             $cookieExpiration = (int)$authTokenExpirationDate->format('U');
         }
 
-        $token = $this->generateToken($userId, DateTime::createFromString((string)$authTokenExpirationDate));
+        $token = $this->generateToken($userId, $deviceName, $userAgent, DateTime::createFromString((string)$authTokenExpirationDate));
 
         session_regenerate_id();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration, '/');
@@ -183,7 +183,7 @@ class Authentication
         return DateTime::createFromString(date('Y-m-d H:i:s', $timestamp));
     }
 
-    private function generateToken(int $userId, ?DateTime $expirationDate = null) : string
+    private function generateToken(int $userId, string $deviceName, string $userAgent, ?DateTime $expirationDate = null) : string
     {
         if ($expirationDate === null) {
             $expirationDate = $this->createExpirationDate();
@@ -191,7 +191,7 @@ class Authentication
 
         $token = bin2hex(random_bytes(16));
 
-        $this->repository->createAuthToken($userId, $token, $expirationDate);
+        $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);
 
         return $token;
     }

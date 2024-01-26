@@ -29,6 +29,8 @@ class AuthenticationController
             return Response::createBadRequest('Username or password has not been provided');
         }
         $totpCode = $postParameters['totpCode'] ?? 0;
+        $rememberMe = (bool)$postParameters['rememberMe'] ?? false;
+        $userAgent = $request->getUserAgent();
         
         if(isset($headers['X-Movary-Client']) === false) {
             return Response::createBadRequest();
@@ -37,7 +39,7 @@ class AuthenticationController
         $client = $headers['X-Movary-Client'];
 
         try {
-            $this->authenticationService->login($postParameters['email'], $postParameters['password'], false, (int)$totpCode);
+            $this->authenticationService->login($postParameters['email'], $postParameters['password'], $rememberMe, $client, $userAgent, (int)$totpCode);
 
             if($client === 'Movary Web') {
                 $redirect = $postParameters['redirect'] ?? null;
