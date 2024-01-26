@@ -203,6 +203,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes = RouteList::create();
 
     $routes->add('GET', '/openapi', [Api\OpenApiController::class, 'getSchema']);
+    $routes->add('POST', '/authentication/request-token', [Api\AuthenticationController::class, 'requestToken']);
 
     $routeUserHistory = '/users/{username:[a-zA-Z0-9]+}/history/movies';
     $routes->add('GET', $routeUserHistory, [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);

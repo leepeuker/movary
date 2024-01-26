@@ -4,10 +4,12 @@ namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Exception\EmailNotFound;
 use Movary\Domain\User\Exception\InvalidPassword;
+use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\NoVerificationCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\Service\ServerSettings;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -22,6 +24,8 @@ class Authentication
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly ServerSettings $serverSettings,
+        private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
     ) {
     }
 
@@ -108,7 +112,7 @@ class Authentication
         return $targetUser->getId() === $userId;
     }
 
-    public function login(string $email, string $password, bool $rememberMe) : void
+    public function login(string $email, string $password, bool $rememberMe, ?int $userTotpInput = null) : void
     {
         if ($this->isUserAuthenticated() === true) {
             return;
@@ -127,9 +131,12 @@ class Authentication
         $totpUri = $this->userApi->findTotpUri($user->getId());
 
         if ($totpUri !== null) {
-            $this->sessionWrapper->set('totpUserId', $user->getId());
-            $this->sessionWrapper->set('rememberMe', $rememberMe);
-            throw NoVerificationCode::create();
+            if(empty($userTotpInput)) {
+                throw NoVerificationCode::create();
+            }
+            if($this->verifyTotp($user->getId(), $userTotpInput) === false) {
+                throw InvalidTotpCode::create();
+            }
         }
 
         $this->createAuthenticationCookie($user->getId(), $rememberMe);
@@ -148,7 +155,8 @@ class Authentication
         $token = $this->generateToken($userId, DateTime::createFromString((string)$authTokenExpirationDate));
 
         session_regenerate_id();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration);
+        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration, '/');
+        // setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, $cookieExpiration, '/', $this->serverSettings->getApplicationUrl(), true, true);
 
         $this->sessionWrapper->set('userId', $userId);
     }
@@ -191,7 +199,7 @@ class Authentication
         return $token;
     }
 
-    private function isValidToken(string $token) : bool
+    public function isValidToken(string $token) : bool
     {
         $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
 
@@ -203,6 +211,20 @@ class Authentication
             return false;
         }
 
+        return true;
+    }
+
+    public function getToken() : ?string
+    {
+        return $_COOKIE[self::AUTHENTICATION_COOKIE_NAME];
+    }
+
+
+    private function verifyTotp($userId, $userTotpInput) : bool
+    {
+        if ($this->twoFactorAuthenticationApi->verifyTotpUri($userId, (int)$userTotpInput) === false) {
+            return false;
+        }
         return true;
     }
 }

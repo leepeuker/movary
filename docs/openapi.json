@@ -1065,6 +1065,89 @@
           }
         }
       }
+    },
+    "/authentication/request-token": {
+      "post": {
+        "description": "Get an authentication token by submitting an email, password and optionally a time-based 6-digit code. This token can be stored and used for future requests to protected endpoints.",
+        "parameters": [{
+          "in": "header",
+          "name": "X-Movary-Client",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "example": "Client Name"
+        }],
+        "requestBody": {
+          "description": "The credentials and optionally a two-factor Authentication code",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "user@email.com",
+                    "description": "An email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "mysecurepassword123",
+                    "description": "A password"
+                  },
+                  "totpCode": {
+                    "type": "integer",
+                    "pattern": "/^[0-9]{6}$/gm",
+                    "example": "123456",
+                    "description": "A 6-digit two-factor authentication code",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "The authentication token to be used in future requests."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "An authentication error. Either missing credentials or the credentials were invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "The name of the error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "The message of the error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
