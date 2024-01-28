@@ -45,7 +45,7 @@ class AuthenticationController
                 (int)$totpCode,
             );
         } catch (InvalidCredentials) {
-            return Response::createBadRequest('Invalid login credentials');
+            return Response::createUnauthorized();
         }
 
         if ($requestClient !== CreateUserController::MOVARY_WEB_CLIENT) {

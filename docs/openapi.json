@@ -1071,7 +1071,7 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Create an authentication token by submitting an email, password and optionally a time-based 6-digit code. Add the token as X-Auth-Token header to further requests.",
+        "description": "Create an authentication token via email, password and optionally totp code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
         "parameters": [{
           "in": "header",
           "name": "X-Movary-Client",
@@ -1106,6 +1106,12 @@
                     "example": "123456",
                     "description": "A 6-digit two-factor authentication code",
                     "nullable": true
+                  },
+                  "rememberMe": {
+                    "type": "bool",
+                    "example": true,
+                    "description": "Extend auth token lifetime",
+                    "nullable": true
                   }
                 }
               }
@@ -1129,22 +1135,24 @@
               }
             }
           },
-          "401": {
-            "description": "An authentication error. Either missing credentials or the credentials were invalid.",
+          "400": {
+            "description": "An request payload error. Either missing credentials or the credentials were invalid.",
             "content": {
-              "application/json": {
+              "text/plain": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "The name of the error"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "The message of the error"
-                    }
-                  }
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error. Credentials or totp code are not valid.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error message"
                 }
               }
             }
