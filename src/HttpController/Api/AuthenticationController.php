@@ -4,6 +4,7 @@ namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Service\Authentication;
+use Movary\HttpController\Web\CreateUserController;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -35,7 +36,7 @@ class AuthenticationController
         try {
             $this->authenticationService->login($postParameters['email'], $postParameters['password'], (bool)$rememberMe, $client, $userAgent, (int)$totpCode);
 
-            if($client === 'Movary Web') {
+            if($client === CreateUserController::MOVARY_WEB_CLIENT) {
                 $redirect = $postParameters['redirect'] ?? null;
                 $target = $redirect ?? $_SERVER['HTTP_REFERER'];
         
