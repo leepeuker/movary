@@ -1,10 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddDeviceNameToAuthTokenTable extends AbstractMigration
+final class AddDeviceNameAndUserAgentToAuthTokenTable extends AbstractMigration
 {
     public function down() : void
     {
@@ -35,7 +33,7 @@ final class AddDeviceNameToAuthTokenTable extends AbstractMigration
                 `user_id` INT(10) NOT NULL,
                 `token` CHAR(36) NOT NULL,
                 `device_name` VARCHAR(256) NOT NULL,
-                `user_agent_string` VARCHAR(256) NOT NULL,
+                `user_agent` VARCHAR(256) NOT NULL,
                 `expiration_date` TEXT NOT NULL,
                 `created_at` TEXT NOT NULL,
                 PRIMARY KEY (`id`),

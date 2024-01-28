@@ -35,7 +35,7 @@ class UserRepository
                 'token' => $token,
                 'expiration_date' => (string)$expirationDate,
                 'device_name' => $deviceName,
-                'user_agent_string' => $userAgent,
+                'user_agent' => $userAgent,
                 'created_at' => (string)DateTime::create(),
             ],
         );
