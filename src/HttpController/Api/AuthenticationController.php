@@ -18,6 +18,7 @@ class AuthenticationController
     ) {
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function createToken(Request $request) : Response
     {
         $tokenRequestBody = Json::decode($request->getBody());
@@ -53,7 +54,7 @@ class AuthenticationController
 
             return Response::createJson(
                 Json::encode([
-                    'userId' => $user->getId(),
+                    'userId' => $user?->getId(),
                     'authToken' => $authToken
                 ]),
             );

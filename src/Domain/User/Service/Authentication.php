@@ -191,7 +191,7 @@ class Authentication
 
         $token = $this->setAuthenticationToken($user->getId(), $deviceName, $userAgent, $authTokenExpirationDate);
 
-        if ($deviceName == !CreateUserController::MOVARY_WEB_CLIENT) {
+        if ($deviceName !== CreateUserController::MOVARY_WEB_CLIENT) {
             return $token;
         }
 
@@ -214,7 +214,7 @@ class Authentication
         $this->sessionWrapper->start();
     }
 
-    public function setAuthenticationCookieAndNewSession(int $userId, string $token, ?DateTime $expirationDate = null) : void
+    public function setAuthenticationCookieAndNewSession(int $userId, string $token, DateTime $expirationDate) : void
     {
         session_regenerate_id();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
