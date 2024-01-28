@@ -5,7 +5,7 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\SessionService;
 use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
-use Movary\Domain\User\Exception\NoVerificationCode;
+use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;

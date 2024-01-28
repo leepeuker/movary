@@ -5,7 +5,7 @@ namespace Movary\Domain\User\Service;
 use Movary\Domain\User\Exception\EmailNotFound;
 use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Exception\InvalidTotpCode;
-use Movary\Domain\User\Exception\NoVerificationCode;
+use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
@@ -17,6 +17,7 @@ use RuntimeException;
 class Authentication
 {
     private const AUTHENTICATION_COOKIE_NAME = 'id';
+
     private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
     public function __construct(
@@ -25,6 +26,42 @@ class Authentication
         private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
     ) {
+    }
+
+    public function createAuthenticationCookie(int $userId, bool $rememberMe, string $deviceName, string $userAgent) : void
+    {
+        $authTokenExpirationDate = $this->createExpirationDate();
+        $cookieExpiration = 0;
+
+        if ($rememberMe === true) {
+            $authTokenExpirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
+            $cookieExpiration = (int)$authTokenExpirationDate->format('U');
+        }
+
+        $token = $this->generateToken($userId, $deviceName, $userAgent, DateTime::createFromString((string)$authTokenExpirationDate));
+
+        session_regenerate_id();
+        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
+            'expires' => $cookieExpiration,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'strict'
+        ]);
+
+        $this->sessionWrapper->set('userId', $userId);
+    }
+
+    public function createExpirationDate(int $days = 1) : DateTime
+    {
+        $timestamp = strtotime('+' . $days . ' day');
+
+        if ($timestamp === false) {
+            throw new RuntimeException('Could not generate timestamp for auth token expiration date.');
+        }
+
+        return DateTime::createFromString(date('Y-m-d H:i:s', $timestamp));
     }
 
     public function deleteToken(string $token) : void
@@ -54,6 +91,11 @@ class Authentication
         return $userId;
     }
 
+    public function getToken() : ?string
+    {
+        return $_COOKIE[self::AUTHENTICATION_COOKIE_NAME];
+    }
+
     public function getUserIdByApiToken(Request $request) : ?int
     {
         $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
@@ -80,19 +122,6 @@ class Authentication
         return false;
     }
 
-    public function isUserPageVisibleForCurrentUser(int $privacyLevel, int $userId) : bool
-    {
-        if ($privacyLevel === 2) {
-            return true;
-        }
-
-        if ($privacyLevel === 1 && $this->isUserAuthenticated() === true) {
-            return true;
-        }
-
-        return $this->isUserAuthenticated() === true && $this->getCurrentUserId() === $userId;
-    }
-
     public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
     {
         $userId = $this->getUserIdByApiToken($request);
@@ -110,97 +139,17 @@ class Authentication
         return $targetUser->getId() === $userId;
     }
 
-    public function login(string $email, string $password, bool $rememberMe, string $deviceName, string $userAgent, ?int $userTotpInput = null) : void
+    public function isUserPageVisibleForCurrentUser(int $privacyLevel, int $userId) : bool
     {
-        if ($this->isUserAuthenticated() === true) {
-            return;
+        if ($privacyLevel === 2) {
+            return true;
         }
 
-        $user = $this->repository->findUserByEmail($email);
-
-        if ($user === null) {
-            throw EmailNotFound::create();
+        if ($privacyLevel === 1 && $this->isUserAuthenticated() === true) {
+            return true;
         }
 
-        if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
-            throw InvalidPassword::create();
-        }
-
-        $totpUri = $this->userApi->findTotpUri($user->getId());
-
-        if ($totpUri !== null) {
-            if(empty($userTotpInput)) {
-                throw NoVerificationCode::create();
-            }
-            if($this->verifyTotp($user->getId(), $userTotpInput) === false) {
-                throw InvalidTotpCode::create();
-            }
-        }
-
-        $this->createAuthenticationCookie($user->getId(), $rememberMe, $deviceName, $userAgent);
-    }
-
-    public function createAuthenticationCookie(int $userId, bool $rememberMe, string $deviceName, string $userAgent) : void
-    {
-        $authTokenExpirationDate = $this->createExpirationDate();
-        $cookieExpiration = 0;
-
-        if ($rememberMe === true) {
-            $authTokenExpirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
-            $cookieExpiration = (int)$authTokenExpirationDate->format('U');
-        }
-
-        $token = $this->generateToken($userId, $deviceName, $userAgent, DateTime::createFromString((string)$authTokenExpirationDate));
-
-        session_regenerate_id();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
-            'expires' => $cookieExpiration,
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'strict'
-        ]);
-
-        $this->sessionWrapper->set('userId', $userId);
-    }
-
-    public function logout() : void
-    {
-        $token = filter_input(INPUT_COOKIE, 'id');
-
-        if ($token !== null) {
-            $this->deleteToken((string)$token);
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
-        }
-
-        $this->sessionWrapper->destroy();
-        $this->sessionWrapper->start();
-    }
-
-    public function createExpirationDate(int $days = 1) : DateTime
-    {
-        $timestamp = strtotime('+' . $days . ' day');
-
-        if ($timestamp === false) {
-            throw new RuntimeException('Could not generate timestamp for auth token expiration date.');
-        }
-
-        return DateTime::createFromString(date('Y-m-d H:i:s', $timestamp));
-    }
-
-    private function generateToken(int $userId, string $deviceName, string $userAgent, ?DateTime $expirationDate = null) : string
-    {
-        if ($expirationDate === null) {
-            $expirationDate = $this->createExpirationDate();
-        }
-
-        $token = bin2hex(random_bytes(16));
-
-        $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);
-
-        return $token;
+        return $this->isUserAuthenticated() === true && $this->getCurrentUserId() === $userId;
     }
 
     public function isValidToken(string $token) : bool
@@ -218,17 +167,67 @@ class Authentication
         return true;
     }
 
-    public function getToken() : ?string
-    {
-        return $_COOKIE[self::AUTHENTICATION_COOKIE_NAME];
+    public function login(
+        string $email,
+        string $password,
+        bool $rememberMe,
+        string $deviceName,
+        string $userAgent,
+        ?int $userTotpInput = null,
+    ) : void {
+        if ($this->isUserAuthenticated() === true) {
+            return;
+        }
+
+        $user = $this->repository->findUserByEmail($email);
+
+        if ($user === null) {
+            throw EmailNotFound::create();
+        }
+
+        if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
+            throw InvalidPassword::create();
+        }
+
+        $totpUri = $this->userApi->findTotpUri($user->getId());
+
+        if ($totpUri !== null) {
+            if (empty($userTotpInput) === true) {
+                throw MissingTotpCode::create();
+            }
+
+            if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpInput) === false) {
+                throw InvalidTotpCode::create();
+            }
+        }
+
+        $this->createAuthenticationCookie($user->getId(), $rememberMe, $deviceName, $userAgent);
     }
 
-
-    private function verifyTotp(int $userId, int $userTotpInput) : bool
+    public function logout() : void
     {
-        if ($this->twoFactorAuthenticationApi->verifyTotpUri($userId, $userTotpInput) === false) {
-            return false;
+        $token = filter_input(INPUT_COOKIE, 'id');
+
+        if ($token !== null) {
+            $this->deleteToken((string)$token);
+            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
         }
-        return true;
+
+        $this->sessionWrapper->destroy();
+        $this->sessionWrapper->start();
+    }
+
+    private function generateToken(int $userId, string $deviceName, string $userAgent, ?DateTime $expirationDate = null) : string
+    {
+        if ($expirationDate === null) {
+            $expirationDate = $this->createExpirationDate();
+        }
+
+        $token = bin2hex(random_bytes(16));
+
+        $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);
+
+        return $token;
     }
 }
