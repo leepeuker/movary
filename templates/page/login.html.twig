@@ -21,12 +21,12 @@
                 <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">{{ applicationName ?? 'Movary' }}</h1>
                 <div class="form-floating">
                     <input type="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="email"
-                        placeholder="name@example.com" required>
+                        placeholder="name@example.com" onkeypress="submitCredentialsOnEnter(event)" required>
                     <label for="email">Email address</label>
                 </div>
                 <div class="form-floating">
                     <input type="password" value="{{ defaultPassword }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="password"
-                        placeholder="Password" required>
+                        placeholder="Password" onkeypress="submitCredentialsOnEnter(event)" required>
                     <label for="password">Password</label>
                 </div>
 

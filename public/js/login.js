@@ -34,3 +34,9 @@ async function submitCredentials() {
         });
     }
 }
+
+function submitCredentialsOnEnter(event) {
+    if (event.keyCode == 13) {
+        submitCredentials()
+    }
+}
