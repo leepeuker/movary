@@ -1,7 +1,7 @@
 const MOVARY_CLIENT_IDENTIFIER = 'Movary Web';
 
 async function submitCredentials() {
-    const request = await fetch('/api/authentication/request-token', {
+    const request = await fetch('/api/authentication/create-token', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',

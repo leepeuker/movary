@@ -1066,12 +1066,12 @@
         }
       }
     },
-    "/authentication/request-token": {
+    "/authentication/create-token": {
       "post": {
         "tags": [
           "Authentication"
         ],
-        "description": "Get an authentication token by submitting an email, password and optionally a time-based 6-digit code. This token can be stored and used for future requests to protected endpoints.",
+        "description": "Create an authentication token by submitting an email, password and optionally a time-based 6-digit code. Add the token as X-Auth-Token header to further requests.",
         "parameters": [{
           "in": "header",
           "name": "X-Movary-Client",
@@ -1082,7 +1082,7 @@
           "example": "Client Name"
         }],
         "requestBody": {
-          "description": "The credentials and optionally a two-factor Authentication code",
+          "description": "The credentials and optionally a two-factor authentication code",
           "required": true,
           "content": {
             "application/json": {

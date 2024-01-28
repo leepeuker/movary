@@ -1,0 +1,9 @@
+POST http://127.0.0.1/api/authentication/create-token
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{"email" : "{{email}}", "password" : "{{password}}", "rememberMe" : 1, "totpCode" : 123456}
+
+###

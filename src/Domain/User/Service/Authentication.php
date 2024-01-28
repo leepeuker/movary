@@ -9,6 +9,7 @@ use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\HttpController\Web\CreateUserController;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -28,31 +29,6 @@ class Authentication
     ) {
     }
 
-    public function createAuthenticationCookie(int $userId, bool $rememberMe, string $deviceName, string $userAgent) : void
-    {
-        $authTokenExpirationDate = $this->createExpirationDate();
-        $cookieExpiration = 0;
-
-        if ($rememberMe === true) {
-            $authTokenExpirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
-            $cookieExpiration = (int)$authTokenExpirationDate->format('U');
-        }
-
-        $token = $this->generateToken($userId, $deviceName, $userAgent, DateTime::createFromString((string)$authTokenExpirationDate));
-
-        session_regenerate_id();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
-            'expires' => $cookieExpiration,
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'strict'
-        ]);
-
-        $this->sessionWrapper->set('userId', $userId);
-    }
-
     public function createExpirationDate(int $days = 1) : DateTime
     {
         $timestamp = strtotime('+' . $days . ' day');
@@ -67,6 +43,37 @@ class Authentication
     public function deleteToken(string $token) : void
     {
         $this->repository->deleteAuthToken($token);
+    }
+
+    public function findUserAndVerifyAuthentication(
+        string $email,
+        string $password,
+        ?int $userTotpCode = null,
+    ) : UserEntity {
+        $user = $this->repository->findUserByEmail($email);
+
+        if ($user === null) {
+            throw EmailNotFound::create();
+        }
+
+        if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
+            throw InvalidPassword::create();
+        }
+
+        $totpUri = $this->userApi->findTotpUri($user->getId());
+        if ($totpUri === null) {
+            return $user;
+        }
+
+        if (empty($userTotpCode) === true) {
+            throw MissingTotpCode::create();
+        }
+
+        if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
+            throw InvalidTotpCode::create();
+        }
+
+        return $user;
     }
 
     public function getCurrentUser() : UserEntity
@@ -103,7 +110,7 @@ class Authentication
             return null;
         }
 
-        return $this->userApi->findByApiToken($apiToken)?->getId();
+        return $this->userApi->findByToken($apiToken)?->getId();
     }
 
     public function isUserAuthenticated() : bool
@@ -174,34 +181,23 @@ class Authentication
         string $deviceName,
         string $userAgent,
         ?int $userTotpInput = null,
-    ) : void {
-        if ($this->isUserAuthenticated() === true) {
-            return;
+    ) : string {
+        $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput);
+
+        $authTokenExpirationDate = $this->createExpirationDate();
+        if ($rememberMe === true) {
+            $authTokenExpirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
         }
 
-        $user = $this->repository->findUserByEmail($email);
+        $token = $this->setAuthenticationToken($user->getId(), $deviceName, $userAgent, $authTokenExpirationDate);
 
-        if ($user === null) {
-            throw EmailNotFound::create();
+        if ($deviceName == !CreateUserController::MOVARY_WEB_CLIENT) {
+            return $token;
         }
 
-        if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
-            throw InvalidPassword::create();
-        }
+        $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
 
-        $totpUri = $this->userApi->findTotpUri($user->getId());
-
-        if ($totpUri !== null) {
-            if (empty($userTotpInput) === true) {
-                throw MissingTotpCode::create();
-            }
-
-            if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpInput) === false) {
-                throw InvalidTotpCode::create();
-            }
-        }
-
-        $this->createAuthenticationCookie($user->getId(), $rememberMe, $deviceName, $userAgent);
+        return $token;
     }
 
     public function logout() : void
@@ -218,12 +214,23 @@ class Authentication
         $this->sessionWrapper->start();
     }
 
-    private function generateToken(int $userId, string $deviceName, string $userAgent, ?DateTime $expirationDate = null) : string
+    public function setAuthenticationCookieAndNewSession(int $userId, string $token, ?DateTime $expirationDate = null) : void
     {
-        if ($expirationDate === null) {
-            $expirationDate = $this->createExpirationDate();
-        }
+        session_regenerate_id();
+        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
+            'expires' => (int)$expirationDate->format('U'),
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'strict'
+        ]);
 
+        $this->sessionWrapper->set('userId', $userId);
+    }
+
+    private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string
+    {
         $token = bin2hex(random_bytes(16));
 
         $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);

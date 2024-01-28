@@ -317,14 +317,15 @@ class UserRepository
         return $plexWebhookId;
     }
 
-    public function findUserByApiToken(string $apiToken) : ?UserEntity
+    public function findUserByToken(string $apiToken) : ?UserEntity
     {
         $data = $this->dbConnection->fetchAssociative(
             'SELECT user.*
             FROM user
-            JOIN user_api_token ON user.id = user_api_token.user_id
-            WHERE user_api_token.token = ?',
-            [$apiToken],
+            LEFT JOIN user_api_token ON user.id = user_api_token.user_id
+            LEFT JOIN user_auth_token ON user.id = user_auth_token.user_id
+            WHERE user_api_token.token = ? OR user_auth_token.token = ?',
+            [$apiToken, $apiToken],
         );
 
         if (empty($data) === true) {

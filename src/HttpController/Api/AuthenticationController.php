@@ -4,6 +4,7 @@ namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -13,15 +14,16 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi,
     ) {
     }
 
-    public function requestToken(Request $request) : Response
+    public function createToken(Request $request) : Response
     {
         $tokenRequestBody = Json::decode($request->getBody());
 
         if ($tokenRequestBody['email'] === null || $tokenRequestBody['password'] === null) {
-            return Response::createBadRequest('Username or password has not been provided');
+            return Response::createBadRequest('Email or password is missing');
         }
 
         $headers = $request->getHeaders();
@@ -34,7 +36,7 @@ class AuthenticationController
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
 
         try {
-            $this->authenticationService->login(
+            $authToken = $this->authenticationService->login(
                 $tokenRequestBody['email'],
                 $tokenRequestBody['password'],
                 (bool)$rememberMe,
@@ -47,7 +49,14 @@ class AuthenticationController
         }
 
         if ($requestClient !== CreateUserController::MOVARY_WEB_CLIENT) {
-            return Response::createJson(Json::encode(['token' => $this->authenticationService->getToken()]));
+            $user = $this->userApi->findByToken($authToken);
+
+            return Response::createJson(
+                Json::encode([
+                    'userId' => $user->getId(),
+                    'authToken' => $authToken
+                ]),
+            );
         }
 
         $redirect = $tokenRequestBody['redirect'] ?? null;
