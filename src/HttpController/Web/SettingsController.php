@@ -23,6 +23,7 @@ use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -153,7 +154,6 @@ class SettingsController
             $this->twig->render('page/settings-app.html.twig', [
                 'currentApplicationVersion' => $this->serverSettings->getApplicationVersion(),
                 'latestRelease' => $this->githubApi->fetchLatestMovaryRelease(),
-                'timeZone' => date_default_timezone_get(),
             ]),
         );
     }
@@ -442,10 +442,14 @@ class SettingsController
             $this->twig->render('page/settings-server-general.html.twig', [
                 'applicationUrl' => $this->serverSettings->getApplicationUrl(),
                 'applicationName' => $this->serverSettings->getApplicationName(),
+                'applicationTimezone' => $this->serverSettings->getApplicationTimezone(),
+                'applicationTimezoneDefault' => DateTime::DEFAULT_TIME_ZONE,
+                'applicationTimezonesAvailable' => timezone_identifiers_list(),
                 'tmdbApiKey' => $this->serverSettings->getTmdbApiKey(),
                 'tmdbApiKeySetInEnv' => $this->serverSettings->isTmdbApiKeySetInEnvironment(),
                 'applicationUrlSetInEnv' => $this->serverSettings->isApplicationUrlSetInEnvironment(),
                 'applicationNameSetInEnv' => $this->serverSettings->isApplicationNameSetInEnvironment(),
+                'applicationTimezoneSetInEnv' => $this->serverSettings->isApplicationTimezoneSetInEnvironment(),
             ]),
         );
     }
@@ -711,6 +715,7 @@ class SettingsController
         $tmdbApiKey = isset($requestData['tmdbApiKey']) === false ? null : $requestData['tmdbApiKey'];
         $applicationUrl = isset($requestData['applicationUrl']) === false ? null : $requestData['applicationUrl'];
         $applicationName = isset($requestData['applicationName']) === false ? null : $requestData['applicationName'];
+        $applicationTimezone = isset($requestData['applicationTimezone']) === false ? null : $requestData['applicationTimezone'];
 
         if ($tmdbApiKey !== null) {
             $this->serverSettings->setTmdbApiKey($tmdbApiKey);
@@ -720,6 +725,9 @@ class SettingsController
         }
         if ($applicationName !== null) {
             $this->serverSettings->setApplicationName($applicationName);
+        }
+        if ($applicationTimezone !== null) {
+            $this->serverSettings->setApplicationTimezone($applicationTimezone);
         }
 
         return Response::createOk();
