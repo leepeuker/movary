@@ -1,7 +1,8 @@
 const MOVARY_CLIENT_IDENTIFIER = 'Movary Web';
 
 async function submitCredentials() {
-    const request = await fetch('/api/authentication/create-token', {
+        const urlParams = new URLSearchParams(window.location.search);
+        const request = await fetch('/api/authentication/create-token', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',
@@ -11,7 +12,8 @@ async function submitCredentials() {
             'email': document.getElementById('email').value,
             'password': document.getElementById('password').value,
             'rememberMe': document.getElementById('rememberMe').checked,
-            'totpCode': document.getElementById('totpCode').value
+            'totpCode': document.getElementById('totpCode').value,
+            'redirect': urlParams.get('redirect') ?? ''
         })
     }).then((response) => {
         return response;
