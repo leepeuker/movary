@@ -60,7 +60,7 @@ class AuthenticationController
             );
         }
 
-        $redirect = $tokenRequestBody['redirect'] ?? null;
+        $redirect = empty($tokenRequestBody['redirect']) === true ? null : $tokenRequestBody['redirect'];
         $target = $redirect ?? $_SERVER['HTTP_REFERER'];
 
         $urlParts = parse_url($target);
