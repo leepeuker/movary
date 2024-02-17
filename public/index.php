@@ -5,6 +5,7 @@ session_start();
 /** @var DI\Container $container */
 
 use Movary\HttpController\Web\ErrorController;
+use Movary\HttpController\Api\PreflightRequestController;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Psr\Log\LoggerInterface;
@@ -55,6 +56,10 @@ try {
 
     if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
+    }
+
+    if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        $response = $container->get(PreflightRequestController::class)->handleRequest($httpRequest, $dispatcher);
     }
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);

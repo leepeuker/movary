@@ -24,6 +24,11 @@ class Response
         return new self(StatusCode::createBadRequest(), $body);
     }
 
+    public static function createCors(array $methods, string $origin) : self
+    {
+        return new self(StatusCode::createOk(), null, Header::createCorsHeaders($methods, $origin));
+    }
+
     public static function createCsv(string $body) : self
     {
         return new self(StatusCode::createOk(), $body, [Header::createContentTypeCsv()]);

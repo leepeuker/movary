@@ -25,6 +25,17 @@ class Header
         return new self('Location', $value);
     }
 
+    public static function createCorsHeaders(array $methods, string $origin = '*') : array
+    {
+        return [
+            new self('Access-Control-Allow-Origin', $origin),
+            new self('Access-Control-Allow-Credentials', 'true'),
+            new self('Access-Control-Max-Age', '60'),
+            new self('Access-Control-Allow-Headers', 'X-Movary-Client, Content-Type, Content-Type-Body, accept'),
+            new self('Access-Control-Allow-Methods', implode(', ', $methods))
+        ];
+    }
+
     public function __toString() : string
     {
         return $this->name . ': ' . $this->value;
