@@ -45,8 +45,11 @@ class AuthenticationController
                 $request->getUserAgent(),
                 (int)$totpCode,
             );
-        } catch (InvalidCredentials) {
-            return Response::createUnauthorized();
+        } catch (InvalidCredentials $e) {
+            return Response::createBadRequest(Json::encode([
+                'error' => basename(str_replace('\\', '/', get_class($e))),
+                'message' => $e->getMessage()
+            ]));
         }
 
         if ($requestClient !== CreateUserController::MOVARY_WEB_CLIENT) {
