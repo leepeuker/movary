@@ -29,15 +29,19 @@ class DashboardController
 
     public function getDashboardData(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
-            return Response::createForbiddenRedirect($request->getPath());
-        }
-
         $currentUserId = null;
         if ($this->authenticationService->isUserAuthenticated() === true) {
             $currentUserId = $this->authenticationService->getCurrentUserId();
         }
+        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if ($requestedUser === null) {
+            return Response::createNotFound();
+        }
+
+        if ($this->userPageAuthorizationChecker->findUserIfCurrentVisitorIsAllowedToSeeUser($requestedUser->getName()) === false) {
+            return Response::createForbidden();
+        }
+        $userId = $requestedUser->getId();
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
 
