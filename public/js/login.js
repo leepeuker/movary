@@ -23,7 +23,7 @@ async function submitCredentials() {
         window.location.replace(request.url);
     } else {
         await request.json().then(error => {
-            if(error['error'] === 'NoVerificationCode') {
+            if(error['error'] === 'MissingTotpCode') {
                document.getElementById('LoginForm').classList.add('d-none');
                document.getElementById('TotpForm').classList.remove('d-none');
             } else if(error['error'] === 'InvalidTotpCode') {
