@@ -105,7 +105,7 @@ class Authentication
 
     public function getUserIdByApiToken(Request $request) : ?int
     {
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME) ?? null;
         if ($apiToken === null) {
             return null;
         }
