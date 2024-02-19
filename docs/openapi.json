@@ -1108,7 +1108,7 @@
                     "nullable": true
                   },
                   "rememberMe": {
-                    "type": "bool",
+                    "type": "boolean",
                     "example": true,
                     "description": "Extend auth token lifetime",
                     "nullable": true
@@ -1133,6 +1133,14 @@
                   }
                 }
               }
+            },
+            "headers": {
+                "Set-Cookie": {
+                    "schema": {
+                        "type": "string",
+                        "example": ""
+                    }
+                }
             }
           },
           "400": {
@@ -1337,6 +1345,11 @@
         "type": "apiKey",
         "name": "X-Auth-Token",
         "in": "header"
+      },
+      "cookieauth": {
+        "type": "apiKey",
+        "name": "id",
+        "in": "cookie"
       }
     }
   }
