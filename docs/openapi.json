@@ -6,6 +6,258 @@
   },
   "servers": [],
   "paths": {
+    "\/users\/{username}\/dashboard": {
+        "get": {
+            "tags": [
+                "Dashboard"
+            ],
+            "summary": "Get all the data that's shown in the dashboard",
+            "description": "Get all the statistics and the order of the rows in the dashboard. When a row is collapsed / hidden by default, the data for the hidden row isn't sent.",
+            "parameters": [
+                {
+                    "name": "username",
+                    "in": "path",
+                    "description": "Name of user",
+                    "required": true,
+                    "schema": {
+                      "type": "string"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "User is allowed to see the statistics of the requested user.",
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "users": {
+                                        "type": "object",
+                                        "example": [
+                                            {
+                                                "name": "user1"
+                                            },
+                                            {
+                                                "name": "user2"
+                                            }
+                                        ]
+                                    },
+                                    "totalPlayCount": {
+                                        "$ref": "#/components/schemas/plays"
+                                    },
+                                    "uniqueMoviesCount" : {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "totalHoursWatched": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "averagePersonalRating": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "averagePlaysPerDay": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "averageRuntime": {
+                                        "type": "number",
+                                        "example": 1
+                                    },
+                                    "dashboardRows": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the dashboard rows. The order of the objects is the order of the rows.",
+                                        "example": [
+                                            {
+                                                "row": "Last Plays",
+                                                "id": 0,
+                                                "isExtended": true,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Latest in Watchlist",
+                                                "id": 9,
+                                                "isExtended": true,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Most watched Actors",
+                                                "id": 1,
+                                                "isExtended": false,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Most watched Actresses",
+                                                "id": 2,
+                                                "isExtended": false,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Most watched Directors",
+                                                "id": 3,
+                                                "isExtended": false,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Most watched Genres",
+                                                "id": 4,
+                                                "isExtended": false,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Most watched Languages",
+                                                "id": 8,
+                                                "isExtended": false,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Most watched Production Companies",
+                                                "id": 6,
+                                                "isExtended": false,
+                                                "isVisible": true
+                                            },
+                                            {
+                                                "row": "Most watched Release Years",
+                                                "id": 7,
+                                                "isExtended": false,
+                                                "isVisible": true
+                                            }
+                                        ]
+                                    },
+                                    "lastPlays": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the last played movies based on date.",
+                                        "example": [
+                                            {
+                                                "$ref": "#/components/schemas/movie"
+                                            }
+                                        ]
+                                    },
+                                    "mostWatchedActors": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the most watched male actors.",
+                                        "example": [
+                                            {
+                                                "id": 1,
+                                                "name": "Actor name",
+                                                "uniqueCount": 4,
+                                                "totalCount": 4,
+                                                "gender": "m",
+                                                "tmdb_poster_path": "/path_to_poster_on_tmdb.jpg",
+                                                "poster_path": "/storage/images/person/path_to_poster_on_local_storage.jpg"
+                                            }
+                                        ]
+                                    },
+                                    "mostWatchedActresses": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the most watched actresses.",
+                                        "example": [
+                                            {
+                                                "id": 1,
+                                                "name": "Actress name",
+                                                "uniqueCount": 2,
+                                                "totalCount": 2,
+                                                "gender": "f",
+                                                "tmdb_poster_path": "/path_to_poster_on_tmdb.jpg",
+                                                "poster_path": "/storage/images/person/path_to_poster_on_local_storage.jpg"
+                                            }
+                                        ]
+                                    },
+                                    "mostWatchedDirectors": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the most watched directors.",
+                                        "example": [
+                                            {
+                                                "id": 1,
+                                                "name": "Director name",
+                                                "uniqueCount": 2,
+                                                "totalCount": 2,
+                                                "gender": "m",
+                                                "tmdb_poster_path": "/path_to_poster_on_tmdb.jpg",
+                                                "poster_path": "/storage/images/person/path_to_poster_on_local_storage.jpg"
+                                            }
+                                        ]
+                                    },
+                                    "mostWatchedLanguages": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the most watched languages.",
+                                        "example": [
+                                            {
+                                                "language": "en",
+                                                "count": 7,
+                                                "name": "English",
+                                                "code": "en"
+                                            }
+                                        ]
+                                    },
+                                    "mostWatchedGenres": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the most watched genres.",
+                                        "example": [
+                                            {
+                                                "name": "Adventure",
+                                                "count": 7
+                                            },
+                                            {
+                                                "name": "Action",
+                                                "count": 6
+                                            },
+                                            {
+                                                "name": "Science Fiction",
+                                                "count": 3
+                                            },
+                                            {
+                                                "name": "Fantasy",
+                                                "count": 1
+                                            }
+                                        ]
+                                    },
+                                    "mostWatchedProductionCompanies": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the most watched production companies and the watched movies they produced.",
+                                        "example": [
+                                            {
+                                                "name": "Lucasfilm Ltd.",
+                                                "count": 4,
+                                                "origin_country": "US",
+                                                "movies": [
+                                                    "Indiana Jones and the Temple of Doom",
+                                                    "Raiders of the Lost Ark",
+                                                    "Indiana Jones and the Kingdom of the Crystal Skull",
+                                                    "Indiana Jones and the Last Crusade"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "mostWatchedReleaseYears": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the most watched release years.",
+                                        "example": [
+                                            {
+                                                "name": 2023,
+                                                "count": 1
+                                            }
+                                        ]
+                                    },
+                                    "watchlistItems": {
+                                        "type": "array",
+                                        "description": "An array containing JSON objects of the items in the watchlist.",
+                                        "example": [
+                                            {
+                                                "$ref": "#/components/schemas/movie"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
     "\/users\/{username}\/history\/movies": {
       "get": {
         "tags": [
