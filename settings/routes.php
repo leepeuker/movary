@@ -204,6 +204,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/openapi', [Api\OpenApiController::class, 'getSchema']);
 
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard', [Api\DashboardController::class, 'getDashboardData']);
+
     $routeUserHistory = '/users/{username:[a-zA-Z0-9]+}/history/movies';
     $routes->add('GET', $routeUserHistory, [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('POST', $routeUserHistory, [Api\HistoryController::class, 'addToHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
