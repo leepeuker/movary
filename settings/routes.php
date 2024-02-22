@@ -223,6 +223,9 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
 
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [Api\MovieRatingController::class, 'updateRating'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Api\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Api\Middleware\IsAuthenticated::class]);
+
     $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
     $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
     $routes->add('POST', '/webhook/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
