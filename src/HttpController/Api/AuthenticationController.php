@@ -77,4 +77,15 @@ class AuthenticationController
 
         return Response::createSeeOther($targetRelativeUrl);
     }
+
+    public function destroyToken(Request $request) : Response
+    {
+        if($this->authenticationService->isUserAuthenticated() === true) {
+            $this->authenticationService->logout();
+        } 
+        else {
+            $this->userApi->deleteApiToken($this->authenticationService->getUserIdByApiToken($request));
+        }
+        return Response::createOk();
+    }
 }
