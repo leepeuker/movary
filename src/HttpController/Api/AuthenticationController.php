@@ -84,7 +84,11 @@ class AuthenticationController
             $this->authenticationService->logout();
         } 
         else {
-            $this->userApi->deleteApiToken($this->authenticationService->getUserIdByApiToken($request));
+            $apiToken = $this->authenticationService->getUserIdByApiToken($request);
+            if($apiToken === null) {
+                return Response::createForbidden();
+            }
+            $this->userApi->deleteApiToken($apiToken);
         }
         return Response::createOk();
     }
