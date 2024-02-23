@@ -1,11 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Movary\HttpController\Web;
+namespace Movary\HttpController\Api;
 
-use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
-use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
