@@ -28,6 +28,9 @@ class MovieRatingController
         $userRating = null;
         $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
 
+        if($userId === null) {
+            return Response::createForbidden();
+        }
         if ($movie !== null) {
             $userRating = $this->movieApi->findUserRating($movie->getId(), $userId);
         }
@@ -40,6 +43,9 @@ class MovieRatingController
     public function updateRating(Request $request) : Response
     {
         $userId = $this->authenticationService->getUserIdByApiToken($request);
+        if($userId === null) {
+            return Response::createForbidden();
+        }
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
