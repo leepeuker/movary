@@ -23,23 +23,14 @@ class DashboardController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly DashboardFactory $dashboardFactory,
         private readonly UserApi $userApi,
-        private readonly Authentication $authenticationService,
     ) {
     }
 
     public function getDashboardData(Request $request) : Response
     {
-        $currentUserId = null;
-        if ($this->authenticationService->isUserAuthenticated() === true) {
-            $currentUserId = $this->authenticationService->getCurrentUserId();
-        }
         $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
         if ($requestedUser === null) {
             return Response::createNotFound();
-        }
-
-        if ($this->userPageAuthorizationChecker->findUserIfCurrentVisitorIsAllowedToSeeUser($requestedUser->getName()) === false) {
-            return Response::createForbidden();
         }
         $userId = $requestedUser->getId();
 
@@ -69,21 +60,21 @@ class DashboardController
             if($row->isExtended()) {
                 if($row->isLastPlays()) {
                     $response['lastPlays'] = $this->movieHistoryApi->fetchLastPlays($userId);
-                } else if($row->isMostWatchedActors()) {
-                    $response['mostWatchedActors'] = $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale(), personFilterUserId: $currentUserId);
-                } else if($row->isMostWatchedActresses()) {
-                    $response['mostWatchedActresses'] = $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $currentUserId);
-                } else if($row->isMostWatchedDirectors()) {
-                    $response['mostWatchedDirectors'] = $this->movieHistoryApi->fetchDirectors($userId, 6, 1, personFilterUserId: $currentUserId);
-                } else if($row->isMostWatchedLanguages()) {
+                } elseif($row->isMostWatchedActors()) {
+                    $response['mostWatchedActors'] = $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale(), personFilterUserId: $userId);
+                } elseif($row->isMostWatchedActresses()) {
+                    $response['mostWatchedActresses'] = $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $userId);
+                } elseif($row->isMostWatchedDirectors()) {
+                    $response['mostWatchedDirectors'] = $this->movieHistoryApi->fetchDirectors($userId, 6, 1, personFilterUserId: $userId);
+                } elseif($row->isMostWatchedLanguages()) {
                     $response['mostWatchedLanguages'] = $this->movieHistoryApi->fetchMostWatchedLanguages($userId);
-                } else if($row->isMostWatchedGenres()) {
+                } elseif($row->isMostWatchedGenres()) {
                     $response['mostWatchedGenres'] = $this->movieHistoryApi->fetchMostWatchedGenres($userId);
-                } else if($row->isMostWatchedProductionCompanies()) {
+                } elseif($row->isMostWatchedProductionCompanies()) {
                     $response['mostWatchedProductionCompanies'] = $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12);
-                } else if($row->isMostWatchedReleaseYears()) {
+                } elseif($row->isMostWatchedReleaseYears()) {
                     $response['mostWatchedReleaseYears'] = $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId);
-                } else if($row->isWatchlist()) {
+                } elseif($row->isWatchlist()) {
                     $response['watchlistItems'] = $this->movieWatchlistApi->fetchWatchlistPaginated($userId, 6, 1);
                 }
             }
