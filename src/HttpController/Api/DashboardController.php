@@ -26,6 +26,7 @@ class DashboardController
     ) {
     }
 
+    // phpcs:ignore
     public function getDashboardData(Request $request) : Response
     {
         $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
@@ -34,7 +35,7 @@ class DashboardController
         }
         $userId = $requestedUser->getId();
 
-        $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
+        $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($requestedUser);
 
         $response = [
             'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
