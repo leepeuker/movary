@@ -6,6 +6,7 @@ use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -15,6 +16,7 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi
     ) {
     }
 
@@ -102,6 +104,6 @@ class AuthenticationController
             }
             $this->userApi->deleteApiToken($apiToken);
         }
-        return Response::createOk();
+        return Response::CreateNoContent();
     }
 }
