@@ -28,24 +28,36 @@ Use the following cli commands to manage your local environment:
 We recommend to use PhpStorm and to import the Movary code style scheme (found at `settings/phpstorm.xml`).
 For import instructions see the [official docs](https://www.jetbrains.com/help/phpstorm/configuring-code-style.html#import-export-schemes).
 
-To apply the code style rules use the following features:
+To apply the code style rules use at least the following features:
+
 - `Reformat code` (more info [here](https://www.jetbrains.com/help/phpstorm/rearrange-code.html))
 - `Rearrange code` (more info [here](https://www.jetbrains.com/help/phpstorm/rearrange-code.html))
 - `Optimize imports`
 
 Notes:
+
 - Please apply the code style rules for every file you changed
-- You can search for these features in the Settings under Keymap to find their default shortcuts and customize them
-- If you use the PhpStorm UI for git you can execute the features listed above automatically before every commit (Settings -> Version Control -> Commit -> Commit Checks)
+- To find the default shortcuts for the features and/or customize search for them in Settings -> Keymap
+- If you use the PhpStorm UI for git you can execute the features automatically before every commit (Settings -> Version Control -> Commit -> Commit Checks)
 
+### Documentation
 
-### Api docs
+#### General
 
-Checkout the API docs via the url path `{your-movie-url}/doecho $UIDcs/api`.
+We use [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) for the documentation.
 
-This uses the schema defined in the file `/docs/openapi.json`
+This is part of the default development docker compose setup and can be reached via `http://127.0.0.1:8000`.
+
+To adjust the documentation files look into the `docs` directory and the configuration of MkDocs is in `mkdocs.yml`. 
+
+#### Api
+
+Checkout the API docs via the url `http://127.0.0.1/docs/api`.
+
+This uses the schema defined in the file `/docs/openapi.json`. Please adjust openapi schema if you change the API.
 
 ### Useful links
 
 - [Trakt API docs](https://trakt.docs.apiary.io/)
 - [TMDB API docs](https://developers.themoviedb.org/3)
+- [OpenAPI API docs](https://swagger.io/docs/specification/about/)
