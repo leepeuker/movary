@@ -111,7 +111,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -174,7 +174,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -237,7 +237,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -291,7 +291,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -427,7 +427,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -477,7 +477,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -527,7 +527,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -677,7 +677,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -745,7 +745,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -813,7 +813,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -871,7 +871,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -980,7 +980,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
