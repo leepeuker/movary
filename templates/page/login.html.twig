@@ -17,16 +17,16 @@
         if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
     </script>
         <main role="main" class="form-signin w-100 m-auto text-center">
-            <form id="LoginForm">
+            <div id="loginForm">
                 <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">{{ applicationName ?? 'Movary' }}</h1>
                 <div class="form-floating">
                     <input type="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="email"
-                        placeholder="name@example.com" onkeypress="submitCredentialsOnEnter(event)" required>
+                        placeholder="name@example.com" onkeydown="submitCredentialsOnEnter(event)" required>
                     <label for="email">Email address</label>
                 </div>
                 <div class="form-floating">
                     <input type="password" value="{{ defaultPassword }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="password"
-                        placeholder="Password" onkeypress="submitCredentialsOnEnter(event)" required>
+                        placeholder="Password" onkeydown="submitCredentialsOnEnter(event)" required>
                     <label for="password">Password</label>
                 </div>
 
@@ -53,8 +53,8 @@
                 {% if registrationEnabled == true %}
                     <a href="/create-user">Create new user</a>
                 {% endif %}
-            </form>
-            <form id="TotpForm" class="d-none">
+            </div>
+            <div id="totpForm" class="d-none">
                 <p style="margin-bottom: 0">Enter the 6 digit verification code from your authenticator app.</p>
                 <input type="text"
                     class="form-control form-control-lg text-{{ theme == 'dark' ? 'light' : 'dark' }}"
@@ -63,10 +63,11 @@
                     autocomplete="off"
                     style="margin-bottom: .7rem;margin-top: .7rem"
                     id="totpCode"
+                    onkeydown="submitCredentialsOnEnter(event)"
                     required>
                 <div id="totpErrors"></div>
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" style="margin-bottom: .7rem!important;" onclick="submitCredentials()">Continue</button>
                 <a href="/">Back</a>
-            </form>
+            </div>
         </main>
 {% endblock %}

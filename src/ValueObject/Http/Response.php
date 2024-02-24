@@ -19,9 +19,9 @@ class Response
         return new self($statusCode, $body, $headers);
     }
 
-    public static function createBadRequest(?string $body = null) : self
+    public static function createBadRequest(?string $body = null, array $headers = []) : self
     {
-        return new self(StatusCode::createBadRequest(), $body);
+        return new self(StatusCode::createBadRequest(), $body, $headers);
     }
 
     public static function createCsv(string $body) : self
@@ -40,9 +40,9 @@ class Response
         return new self(StatusCode::createForbidden(), null, [Header::createLocation('/login?redirect='.$query)]);
     }
 
-    public static function createJson(string $body) : self
+    public static function createJson(string $body, StatusCode $statusCode = null) : self
     {
-        return new self(StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
+        return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
 
     public static function createMethodNotAllowed() : self
@@ -70,9 +70,9 @@ class Response
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
     }
 
-    public static function createUnauthorized() : self
+    public static function createUnauthorized(string $message = null, array $headers = []) : self
     {
-        return new self(StatusCode::createUnauthorized());
+        return new self(StatusCode::createUnauthorized(), $message, $headers);
     }
 
     public static function createUnsupportedMediaType() : self

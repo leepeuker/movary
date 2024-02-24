@@ -18,8 +18,9 @@ final class AddDeviceNameAndUserAgentToAuthTokenTable extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            ALTER TABLE `user_auth_token` ADD COLUMN device_name VARCHAR(256);
-            ALTER TABLE `user_auth_token` ADD COLUMN user_agent TEXT;
+            DELETE FROM `user_auth_token`;
+            ALTER TABLE `user_auth_token` ADD COLUMN device_name VARCHAR(256) NOT NULL;
+            ALTER TABLE `user_auth_token` ADD COLUMN user_agent TEXT NOT NULL;
             SQL,
         );
     }
