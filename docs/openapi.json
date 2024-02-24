@@ -1071,16 +1071,18 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Create an authentication token via email, password and optionally totp code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
-        "parameters": [{
-          "in": "header",
-          "name": "X-Movary-Client",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "example": "Client Name"
-        }],
+        "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Movary-Client",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Client Name"
+          }
+        ],
         "requestBody": {
           "description": "The credentials and optionally a two-factor authentication code",
           "required": true,
@@ -1088,7 +1090,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -1104,7 +1109,7 @@
                     "type": "integer",
                     "pattern": "/^[0-9]{6}$/gm",
                     "example": "123456",
-                    "description": "A 6-digit two-factor authentication code",
+                    "description": "A 6-digit two-factor TOTP code",
                     "nullable": true
                   },
                   "rememberMe": {
@@ -1120,12 +1125,16 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Returned if authentication was successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "userId": {
+                      "type": "integer",
+                      "description": "The id of the authenticated user."
+                    },
                     "token": {
                       "type": "string",
                       "description": "The authentication token to be used in future requests."
@@ -1133,37 +1142,13 @@
                   }
                 }
               }
-            },
-            "headers": {
-                "Set-Cookie": {
-                    "schema": {
-                        "type": "string",
-                        "example": ""
-                    }
-                }
             }
           },
           "400": {
-            "description": "An request payload error. Either missing credentials or the credentials were invalid.",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "description": "Error message"
-                }
-              }
-            }
+            "$ref": "#/components/responses/400"
           },
           "401": {
-            "description": "Authentication error. Credentials or totp code are not valid.",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "description": "Error message"
-                }
-              }
-            }
+            "$ref": "#/components/responses/401"
           }
         }
       }
@@ -1332,6 +1317,50 @@
     "responses": {
       "204": {
         "description": "Successful operation, response has no content"
+      },
+      "400": {
+        "description": "The request payload or header are not correct",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "The error type",
+                  "example": "ErrorType"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The error message",
+                  "example": "This is the error message"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "The provided credentials or TOTP code are not valid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "The error type",
+                  "example": "ErrorType"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The error message",
+                  "example": "This is the error message"
+                }
+              }
+            }
+          }
+        }
       },
       "403": {
         "description": "Not authorized to access resource"

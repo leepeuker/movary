@@ -65,7 +65,7 @@ class Authentication
             return $user;
         }
 
-        if (empty($userTotpCode) === true) {
+        if ($userTotpCode === null) {
             throw MissingTotpCode::create();
         }
 
@@ -174,6 +174,9 @@ class Authentication
         return true;
     }
 
+    /**
+     * @return array{user: UserEntity, token: string}
+     */
     public function login(
         string $email,
         string $password,
@@ -181,7 +184,7 @@ class Authentication
         string $deviceName,
         string $userAgent,
         ?int $userTotpInput = null,
-    ) : string {
+    ) : array {
         $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput);
 
         $authTokenExpirationDate = $this->createExpirationDate();
@@ -191,13 +194,15 @@ class Authentication
 
         $token = $this->setAuthenticationToken($user->getId(), $deviceName, $userAgent, $authTokenExpirationDate);
 
+        $userAndToken = ['user' => $user, 'token' => $token];
+
         if ($deviceName !== CreateUserController::MOVARY_WEB_CLIENT) {
-            return $token;
+            return $userAndToken;
         }
 
         $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
 
-        return $token;
+        return $userAndToken;
     }
 
     public function logout() : void
