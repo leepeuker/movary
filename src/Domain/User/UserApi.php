@@ -131,9 +131,9 @@ class UserApi
         return $this->repository->findApiToken($userId);
     }
 
-    public function findByApiToken(string $apiToken) : ?UserEntity
+    public function findByToken(string $token) : ?UserEntity
     {
-        return $this->repository->findUserByApiToken($apiToken);
+        return $this->repository->findUserByToken($token);
     }
 
     public function findJellyfinAuthentication(int $userId) : ?JellyfinAuthenticationData

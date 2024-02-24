@@ -8,74 +8,66 @@
     <link rel="stylesheet" href="/css/login.css">
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/login.js"></script>
+{% endblock %}
+
 {% block body %}
     <script>
         if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
     </script>
-    <main role="main" class="form-signin w-100 m-auto text-center">
-        {% if useTwoFactorAuthentication == false %}
-            <form action="/login" method="post" enctype="multipart/form-data">
+        <main role="main" class="form-signin w-100 m-auto text-center">
+            <div id="loginForm">
                 <h1 id="header" class="text-{{ theme == 'dark' ? 'light' : 'dark' }}" style="margin-bottom: 1rem">{{ applicationName ?? 'Movary' }}</h1>
                 <div class="form-floating">
-                    <input type="email" name="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingInput"
-                           placeholder="name@example.com" required>
-                    <label for="floatingInput">Email address</label>
+                    <input type="email" value="{{ defaultEmail }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="email"
+                        placeholder="name@example.com" onkeydown="submitCredentialsOnEnter(event)" required>
+                    <label for="email">Email address</label>
                 </div>
                 <div class="form-floating">
-                    <input type="password" name="password" value="{{ defaultPassword }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingPassword"
-                           placeholder="Password" required>
-                    <label for="floatingPassword">Password</label>
+                    <input type="password" value="{{ defaultPassword }}" class="form-control text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="password"
+                        placeholder="Password" onkeydown="submitCredentialsOnEnter(event)" required>
+                    <label for="password">Password</label>
                 </div>
 
                 <div class="checkbox mb-3" style="margin-bottom: 0.7rem!important;">
                     <label class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">
-                        <input type="checkbox" name="rememberMe" value="true"> Remember me
+                        <input type="checkbox" id="rememberMe" value="true" {{ defaultRememberMe == 'true' ? 'checked' : '' }}> Remember me
                     </label>
                 </div>
+
+                <div id="loginErrors"></div>
 
                 {% if deletedAccount == true %}
                     <div class="alert alert-success" role="alert" style="margin-bottom: 0.7rem!important;">
                         Account deleted successfully.
                     </div>
                 {% endif %}
-                {% if failedLogin == true %}
-                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
-                        Invalid credentials
-                    </div>
-                {% else %}
                 {% if redirect != false %}
                     <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
                         Sign in to access page
                     </div>
                     <input type="hidden" value="{{ redirect }}" name="redirect" />
                 {% endif %}
-                {% endif %}
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="submit">Sign in</button>
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">Sign in</button>
                 {% if registrationEnabled == true %}
                     <a href="/create-user">Create new user</a>
                 {% endif %}
-            </form>
-        {% elseif useTwoFactorAuthentication == true %}
-            <form action="/verify-totp" method="post">
+            </div>
+            <div id="totpForm" class="d-none">
                 <p style="margin-bottom: 0">Enter the 6 digit verification code from your authenticator app.</p>
                 <input type="text"
-                       name="totpCode"
-                       class="form-control form-control-lg text-{{ theme == 'dark' ? 'light' : 'dark' }}" id="floatingVerificationCode"
-                       placeholder="Verification code"
-                       maxlength="6"
-                       autocomplete="off"
-                       style="margin-bottom: .7rem;margin-top: .7rem"
-                       required>
-                {% if invalidTotpCode == true %}
-                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-bottom: 0.7rem!important;margin-top: .7rem">
-                        Invalid verification code
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endif %}
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="submit" style="margin-bottom: .7rem!important;">Continue</button>
-            </form>
-            <a href="/">Back</a>
-        {% endif %}
-
-    </main>
+                    class="form-control form-control-lg text-{{ theme == 'dark' ? 'light' : 'dark' }}"
+                    placeholder="Verification code"
+                    maxlength="6"
+                    autocomplete="off"
+                    style="margin-bottom: .7rem;margin-top: .7rem"
+                    id="totpCode"
+                    onkeydown="submitCredentialsOnEnter(event)"
+                    required>
+                <div id="totpErrors"></div>
+                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" style="margin-bottom: .7rem!important;" onclick="submitCredentials()">Continue</button>
+                <a href="/">Back</a>
+            </div>
+        </main>
 {% endblock %}

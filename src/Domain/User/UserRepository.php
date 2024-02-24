@@ -26,7 +26,7 @@ class UserRepository
         );
     }
 
-    public function createAuthToken(int $userId, string $token, DateTime $expirationDate) : void
+    public function createAuthToken(int $userId, string $token, string $deviceName, string $userAgent, DateTime $expirationDate) : void
     {
         $this->dbConnection->insert(
             'user_auth_token',
@@ -34,6 +34,8 @@ class UserRepository
                 'user_id' => $userId,
                 'token' => $token,
                 'expiration_date' => (string)$expirationDate,
+                'device_name' => $deviceName,
+                'user_agent' => $userAgent,
                 'created_at' => (string)DateTime::create(),
             ],
         );
@@ -315,14 +317,15 @@ class UserRepository
         return $plexWebhookId;
     }
 
-    public function findUserByApiToken(string $apiToken) : ?UserEntity
+    public function findUserByToken(string $apiToken) : ?UserEntity
     {
         $data = $this->dbConnection->fetchAssociative(
             'SELECT user.*
             FROM user
-            JOIN user_api_token ON user.id = user_api_token.user_id
-            WHERE user_api_token.token = ?',
-            [$apiToken],
+            LEFT JOIN user_api_token ON user.id = user_api_token.user_id
+            LEFT JOIN user_auth_token ON user.id = user_auth_token.user_id
+            WHERE user_api_token.token = ? OR user_auth_token.token = ?',
+            [$apiToken, $apiToken],
         );
 
         if (empty($data) === true) {

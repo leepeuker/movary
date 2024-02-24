@@ -18,6 +18,8 @@ use Twig\Environment;
 
 class CreateUserController
 {
+    public const MOVARY_WEB_CLIENT = 'Movary Web';
+    
     public function __construct(
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
@@ -32,6 +34,7 @@ class CreateUserController
         $hasUsers = $this->userApi->hasUsers();
         $postParameters = $request->getPostParameters();
 
+        $userAgent = $request->getUserAgent();
         $email = empty($postParameters['email']) === true ? null : (string)$postParameters['email'];
         $name = empty($postParameters['name']) === true ? null : (string)$postParameters['name'];
         $password = empty($postParameters['password']) === true ? null : (string)$postParameters['password'];
@@ -60,7 +63,7 @@ class CreateUserController
         try {
             $this->userApi->createUser($email, $password, $name, $hasUsers === false);
 
-            $this->authenticationService->login($email, $password, false);
+            $this->authenticationService->login($email, $password, false, self::MOVARY_WEB_CLIENT, $userAgent);
         } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
         } catch (UsernameInvalidFormat) {

@@ -17,30 +17,9 @@ class TwoFactorAuthenticationApi
         $this->userApi->deleteTotpUri($userId);
     }
 
-    public function fetchTotpUriSecretByTotpUri(string $totpUri) : string
-    {
-        return $this->twoFactorAuthenticationFactory->createOtpFromProvisioningUri($totpUri)->getSecret();
-    }
-
-    public function fetchTotpUriSecretByUserId(int $userId) : string
-    {
-        $totpUri = $this->findTotpUri($userId);
-
-        if (empty($totpUri) === true) {
-            throw new \RuntimeException('Could not find totp uri for user with id: ' . $userId);
-        }
-
-        return $this->twoFactorAuthenticationFactory->createOtpFromProvisioningUri($totpUri)->getSecret();
-    }
-
     public function findTotpUri(int $userId) : ?string
     {
         return $this->userApi->findTotpUri($userId);
-    }
-
-    public function isValidTOTPCookie(string $totpUri, string $TOTPCookieValue) : bool
-    {
-        return $this->fetchTotpUriSecretByTotpUri($totpUri) === $TOTPCookieValue;
     }
 
     public function updateTotpUri(int $userId, string $uri) : void

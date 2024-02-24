@@ -111,7 +111,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -174,7 +174,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -237,7 +237,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -291,7 +291,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -427,7 +427,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -477,7 +477,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -527,7 +527,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -677,7 +677,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -745,7 +745,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -813,7 +813,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -871,7 +871,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -980,7 +980,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -1062,6 +1062,93 @@
           },
           "404": {
             "$ref": "#/components/responses/404"
+          }
+        }
+      }
+    },
+    "/authentication/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Movary-Client",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Client Name"
+          }
+        ],
+        "requestBody": {
+          "description": "The credentials and optionally a two-factor authentication code",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "user@email.com",
+                    "description": "An email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "mysecurepassword123",
+                    "description": "A password"
+                  },
+                  "totpCode": {
+                    "type": "integer",
+                    "pattern": "/^[0-9]{6}$/gm",
+                    "example": "123456",
+                    "description": "A 6-digit two-factor TOTP code",
+                    "nullable": true
+                  },
+                  "rememberMe": {
+                    "type": "boolean",
+                    "example": true,
+                    "description": "Extend auth token lifetime",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if authentication was successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "integer",
+                      "description": "The id of the authenticated user."
+                    },
+                    "token": {
+                      "type": "string",
+                      "description": "The authentication token to be used in future requests."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
           }
         }
       }
@@ -1231,6 +1318,50 @@
       "204": {
         "description": "Successful operation, response has no content"
       },
+      "400": {
+        "description": "The request payload or header are not correct",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "The error type",
+                  "example": "ErrorType"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The error message",
+                  "example": "This is the error message"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "The provided credentials or TOTP code are not valid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "The error type",
+                  "example": "ErrorType"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The error message",
+                  "example": "This is the error message"
+                }
+              }
+            }
+          }
+        }
+      },
       "403": {
         "description": "Not authorized to access resource"
       },
@@ -1239,10 +1370,15 @@
       }
     },
     "securitySchemes": {
-      "authToken": {
+      "token": {
         "type": "apiKey",
         "name": "X-Auth-Token",
         "in": "header"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "name": "id",
+        "in": "cookie"
       }
     }
   }
