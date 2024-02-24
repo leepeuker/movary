@@ -111,7 +111,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -174,7 +174,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -237,7 +237,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -291,7 +291,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -427,7 +427,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -477,7 +477,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -527,7 +527,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -677,7 +677,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -745,7 +745,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -813,7 +813,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       },
@@ -871,118 +871,9 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
-      }
-    },
-    "/users/{username}/movies/{id}/rating": {
-      "post": {
-        "tags": [
-          "Rating"
-        ],
-        "summary": "Update the rating of an user for a movie",
-        "description": "Update the rating of an user for a movie",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Movary ID of the movie",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application\/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "rating": {
-                      "type": "integer",
-                      "description": "Rating of the movie. It has to be an integer in the range of 0 - 10. If the rating is 0, then the rating will be deleted.",
-                      "example": 10,
-                      "minimum": 0,
-                      "maximum": 10
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          }
-        },
-        "security": [
-          {
-            "authToken": [],
-            "cookieauth": []
-          }
-        ]
-      },
-    },
-    "\/fetchMovieRatingByTmdbdId": {
-      "get": {
-        "tags": [
-          "Rating"
-        ],
-        "summary": "Get movie rating",
-        "description": "Get the movie rating from the current user. The movie is found by using the TMDB ID",
-        "parameters": [
-          {
-            "name": "tmdbId",
-            "description": "The ID of the movie from TMDB",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The TMDB ID was valid and the ratings have been returned.",
-            "content": {
-              "application\/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "personalRating": {
-                      "type": "integer",
-                      "description": "The rating of the movie by the user. It will be null if there is no rating.",
-                      "minimum": 1,
-                      "maximum": 10
-                    }
-                  },
-                }
-              }
-            }
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          }
-        }
       }
     },
     "\/movies\/search": {
@@ -1089,7 +980,7 @@
         },
         "security": [
           {
-            "authToken": []
+            "token": []
           }
         ]
       }
@@ -1175,12 +1066,12 @@
         }
       }
     },
-    "/authentication/create-token": {
+    "/authentication/token": {
       "post": {
         "tags": [
           "Authentication"
         ],
-        "description": "Create an authentication token via email, password and optionally totp code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
+        "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
         "parameters": [
           {
             "in": "header",
@@ -1218,7 +1109,7 @@
                     "type": "integer",
                     "pattern": "/^[0-9]{6}$/gm",
                     "example": "123456",
-                    "description": "A 6-digit two-factor authentication code",
+                    "description": "A 6-digit two-factor TOTP code",
                     "nullable": true
                   },
                   "rememberMe": {
@@ -1234,12 +1125,16 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Returned if authentication was successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "userId": {
+                      "type": "integer",
+                      "description": "The id of the authenticated user."
+                    },
                     "token": {
                       "type": "string",
                       "description": "The authentication token to be used in future requests."
@@ -1247,37 +1142,13 @@
                   }
                 }
               }
-            },
-            "headers": {
-              "Set-Cookie": {
-                "schema": {
-                  "type": "string",
-                  "example": ""
-                }
-              }
             }
           },
           "400": {
-            "description": "An request payload error. Either missing credentials or the credentials were invalid.",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "description": "Error message"
-                }
-              }
-            }
+            "$ref": "#/components/responses/400"
           },
           "401": {
-            "description": "Authentication error. Credentials or totp code are not valid.",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string",
-                  "description": "Error message"
-                }
-              }
-            }
+            "$ref": "#/components/responses/401"
           }
         }
       }
@@ -1447,6 +1318,50 @@
       "204": {
         "description": "Successful operation, response has no content"
       },
+      "400": {
+        "description": "The request payload or header are not correct",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "The error type",
+                  "example": "ErrorType"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The error message",
+                  "example": "This is the error message"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "The provided credentials or TOTP code are not valid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "The error type",
+                  "example": "ErrorType"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The error message",
+                  "example": "This is the error message"
+                }
+              }
+            }
+          }
+        }
+      },
       "403": {
         "description": "Not authorized to access resource"
       },
@@ -1455,12 +1370,12 @@
       }
     },
     "securitySchemes": {
-      "authToken": {
+      "token": {
         "type": "apiKey",
         "name": "X-Auth-Token",
         "in": "header"
       },
-      "cookieauth": {
+      "cookie": {
         "type": "apiKey",
         "name": "id",
         "in": "cookie"

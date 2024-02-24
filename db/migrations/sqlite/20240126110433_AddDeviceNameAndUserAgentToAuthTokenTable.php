@@ -41,7 +41,6 @@ final class AddDeviceNameAndUserAgentToAuthTokenTable extends AbstractMigration
             )
             SQL,
         );
-        $this->execute('INSERT INTO `user_auth_token_tmp` (`id`, `user_id`, `token`, `expiration_date`, `created_at`) SELECT * FROM `user_auth_token`');
         $this->execute('DROP TABLE `user_auth_token`');
         $this->execute('ALTER TABLE `user_auth_token_tmp` RENAME TO `user_auth_token`');
     }
