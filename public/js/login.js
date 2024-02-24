@@ -42,7 +42,7 @@ async function submitCredentials() {
 }
 
 function loginRequest() {
-    return fetch('/api/authentication/create-token', {
+    return fetch('/api/authentication/token', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',

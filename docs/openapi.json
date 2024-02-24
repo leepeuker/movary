@@ -1066,7 +1066,7 @@
         }
       }
     },
-    "/authentication/create-token": {
+    "/authentication/token": {
       "post": {
         "tags": [
           "Authentication"
