@@ -1370,12 +1370,12 @@
       }
     },
     "securitySchemes": {
-      "authToken": {
+      "token": {
         "type": "apiKey",
         "name": "X-Auth-Token",
         "in": "header"
       },
-      "cookieauth": {
+      "cookie": {
         "type": "apiKey",
         "name": "id",
         "in": "cookie"
