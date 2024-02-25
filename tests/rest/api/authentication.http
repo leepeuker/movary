@@ -1,4 +1,4 @@
-POST http://127.0.0.1/api/authentication/token
+POST http://127.0.0.1/api/authentication/create-token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -7,3 +7,9 @@ X-Movary-Client: RestAPI Test
 {"email" : "{{email}}", "password" : "{{password}}", "rememberMe" : 1, "totpCode" : 123456}
 
 ###
+
+GET http://127.0.0.1/api/authentication/authenticated
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test

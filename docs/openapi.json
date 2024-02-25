@@ -1066,6 +1066,45 @@
         }
       }
     },
+    "/authentication/authenticated": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Checks the authentication status of the user.",
+        "description": "Checks if the user is authenticated based on cookie.. The response is a JSON object with the authentication status and an optional username + userId of the authenticated user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {
+                      "type": "boolean",
+                      "description": "True if authenticated, false if unauthenticated."
+                    },
+                    "username": {
+                      "type": "string",
+                      "description": "The username of the authenticated user. It's empty if the user is unauthenticated."
+                    },
+                    "userId": {
+                      "type": "integer",
+                      "description": "The ID of the authenticated user. It's empty if the user is unauthenticated."
+                    },
+                    "isAdmin": {
+                      "type": "boolean",
+                      "description": "True if the user is an admin, False if the user isn't."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/authentication/token": {
       "post": {
         "tags": [

@@ -89,4 +89,19 @@ class AuthenticationController
             ]),
         );
     }
+
+    public function isAuthenticated() : Response
+    {
+        if($this->authenticationService->isUserAuthenticated()) {
+            return Response::createJson(Json::encode([
+                'authenticated' => true,
+                'userId' => $this->authenticationService->getCurrentUser()->getId(),
+                'username' => $this->authenticationService->getCurrentUser()->getName(),
+                'isAdmin' => $this->authenticationService->getCurrentUser()->isAdmin(),
+            ]));
+        }
+        return Response::createJson(Json::encode([
+            'authenticated' => false,
+        ]));
+    }
 }
