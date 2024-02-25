@@ -16,7 +16,6 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly UserApi $userApi
     ) {
     }
 
@@ -94,16 +93,25 @@ class AuthenticationController
 
     public function destroyToken(Request $request) : Response
     {
-        if($this->authenticationService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
             $this->authenticationService->logout();
-        } 
-        else {
-            $apiToken = $this->authenticationService->getUserIdByApiToken($request);
-            if($apiToken === null) {
-                return Response::createForbidden();
-            }
-            $this->userApi->deleteApiToken($apiToken);
+
+            return Response::CreateNoContent();
         }
+
+        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        if ($apiToken === null) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingAuthToken',
+                    'message' => 'Authentication token to delete in headers missing'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $this->authenticationService->deleteToken($apiToken);
+
         return Response::CreateNoContent();
     }
 }

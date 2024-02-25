@@ -279,7 +279,7 @@ class Factory
         $currentRequest = $container->get(Request::class);
         $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;
 
-        $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticated();
+        $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticatedWithCookie();
 
         $twig->addGlobal('loggedIn', $userAuthenticated);
 

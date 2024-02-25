@@ -3,12 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\SessionService;
-use Movary\Domain\User\Exception\InvalidCredentials;
-use Movary\Domain\User\Exception\InvalidTotpCode;
-use Movary\Domain\User\Exception\MissingTotpCode;
-use Movary\Domain\User\Service;
 use Movary\Util\SessionWrapper;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -18,20 +13,8 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Service\Authentication $authenticationService,
         private readonly SessionWrapper $sessionWrapper,
     ) {
-    }
-
-    public function logout() : Response
-    {
-        $this->authenticationService->logout();
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation('/')],
-        );
     }
 
     public function renderLoginPage(Request $request) : Response

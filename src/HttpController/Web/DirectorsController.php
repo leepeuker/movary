@@ -34,7 +34,7 @@ class DirectorsController
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
         $currentUserId = null;
-        if ($this->authenticationService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
             $currentUserId = $this->authenticationService->getCurrentUserId();
         }
 

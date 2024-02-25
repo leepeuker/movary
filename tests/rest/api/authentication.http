@@ -4,11 +4,11 @@ Cache-Control: no-cache
 Content-Type: application/json
 X-Movary-Client: RestAPI Test
 
-{"email" : "{{username}}", "password" : "{{password}}", "rememberMe" : 1, "totpCode" : 123456}
+{"email" : "{{email}}", "password" : "{{password}}", "rememberMe" : 1, "totpCode" : 123456}
 
 ###
 
-GET http://127.0.0.1/api/authentication/destroy-token
+DELETE http://127.0.0.1/api/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

@@ -113,7 +113,7 @@ class Authentication
         return $this->userApi->findByToken($apiToken)?->getId();
     }
 
-    public function isUserAuthenticated() : bool
+    public function isUserAuthenticatedWithCookie() : bool
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
@@ -152,11 +152,11 @@ class Authentication
             return true;
         }
 
-        if ($privacyLevel === 1 && $this->isUserAuthenticated() === true) {
+        if ($privacyLevel === 1 && $this->isUserAuthenticatedWithCookie() === true) {
             return true;
         }
 
-        return $this->isUserAuthenticated() === true && $this->getCurrentUserId() === $userId;
+        return $this->isUserAuthenticatedWithCookie() === true && $this->getCurrentUserId() === $userId;
     }
 
     public function isValidToken(string $token) : bool

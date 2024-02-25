@@ -98,7 +98,7 @@ class PersonController
         }
 
         $isHiddenInTopLists = false;
-        if ($this->authenticationService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
             $userId = $this->authenticationService->getCurrentUserId();
             $isHiddenInTopLists = $this->userApi->hasHiddenPerson($userId, $personId);
         }
