@@ -1066,6 +1066,80 @@
         }
       }
     },
+    "/images/person/{id}": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Get person image.",
+        "description": "Get image of an actor, actress or directory based on their Movary ID.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "ID of the person in Movary",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Person was found and has an image in Movary.",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Either no person exists with the given ID or the person exists, but doesn't have an image in Movary."
+          }
+        }
+      }
+    },
+    "/images/movie/{id}": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Get movie cover image.",
+        "description": "Get cover image of a movie based on their Movary ID.",
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "description": "ID of the movie in Movary",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movie was found and has a cover in Movary.",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Either no movie exists with the given ID or the movie exists, but doesn't have a cover image in Movary."
+          }
+        }
+      }
+    },
     "/authentication/token": {
       "post": {
         "tags": [
