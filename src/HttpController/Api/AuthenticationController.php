@@ -23,7 +23,7 @@ class AuthenticationController
     {
         $tokenRequestBody = Json::decode($request->getBody());
 
-        if ($tokenRequestBody['email'] === null || $tokenRequestBody['password'] === null) {
+        if (isset($tokenRequestBody['email']) === false || isset($tokenRequestBody['password']) === false) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingCredentials',
