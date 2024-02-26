@@ -248,7 +248,7 @@ class Factory
         return $logger;
     }
 
-    public static function createUserMiddleware(Config $config, ContainerInterface $container) : HttpController\Api\Middleware\createUserMiddleware
+    public static function createCreateUserMiddleware(Config $config, ContainerInterface $container) : HttpController\Api\Middleware\CreateUserMiddleware
     {
         return new HttpController\Api\Middleware\CreateUserMiddleware(
             $container->get(UserApi::class),

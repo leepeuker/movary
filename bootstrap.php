@@ -19,7 +19,7 @@ $builder->addDefinitions(
         \Movary\HttpController\Web\CreateUserController::class => DI\factory([Factory::class, 'createCreateUserController']),
         \Movary\HttpController\Web\JobController::class => DI\factory([Factory::class, 'createJobController']),
         \Movary\HttpController\Web\LandingPageController::class => DI\factory([Factory::class, 'createLandingPageController']),
-        \Movary\HttpController\Api\Middleware\CreateUserMiddleware::class => DI\factory([Factory::class, 'createUserMiddleware']),
+        \Movary\HttpController\Api\Middleware\CreateUserMiddleware::class => DI\factory([Factory::class, 'createCreateUserMiddleware']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),
         \Movary\Command\CreatePublicStorageLink::class => DI\factory([Factory::class, 'createCreatePublicStorageLink']),
         \Movary\Command\DatabaseMigrationStatus::class => DI\factory([Factory::class, 'createDatabaseMigrationStatusCommand']),
