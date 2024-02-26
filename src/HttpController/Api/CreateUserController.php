@@ -12,7 +12,7 @@ use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Throwable;
+use Exception;
 
 class CreateUserController
 {
@@ -102,7 +102,7 @@ class CreateUserController
                 ]),
                 [Header::createContentTypeJson()],
             );
-        } catch (Throwable) {
+        } catch (Exception) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'GenericError',
