@@ -56,7 +56,7 @@ class TwoFactorAuthenticationFactory
     public function createOtpFromProvisioningUri(string $totpUri) : OTPInterface
     {
         if ($totpUri === '') {
-            throw new \RuntimeException('Totp uri not valid because it is empty');
+            throw new \RuntimeException('TOTP uri not valid because it is empty');
         }
 
         return Factory::loadFromProvisioningUri($totpUri);

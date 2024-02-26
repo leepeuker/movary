@@ -15,6 +15,7 @@ class Request
         private readonly string $body,
         private readonly array $filesParameters,
         private readonly array $headers,
+        private readonly string $userAgent
     ) {
     }
 
@@ -27,10 +28,11 @@ class Request
         $postParameters = self::extractPostParameter();
         $filesParameters = self::extractFilesParameter();
         $headers = self::extractHeaders();
+        $userAgent = self::extractUserAgent();
 
         $body = (string)file_get_contents('php://input');
 
-        return new self($path, $getParameters, $postParameters, $body, $filesParameters, $headers);
+        return new self($path, $getParameters, $postParameters, $body, $filesParameters, $headers, $userAgent);
     }
 
     private static function extractFilesParameter() : array
@@ -87,6 +89,11 @@ class Request
         return self::getServerSetting('REQUEST_URI') ?? '';
     }
 
+    private static function extractUserAgent() : string
+    {
+        return self::getServerSetting('HTTP_USER_AGENT') ?? '';
+    }
+
     private static function getServerSetting(string $key) : ?string
     {
         return empty($_SERVER[$key]) === false ? (string)$_SERVER[$key] : null;
@@ -130,5 +137,10 @@ class Request
     public function getRouteParameters() : array
     {
         return $this->routeParameters;
+    }
+
+    public function getUserAgent() : string
+    {
+        return $this->userAgent;
     }
 }

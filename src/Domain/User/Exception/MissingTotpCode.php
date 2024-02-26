@@ -2,10 +2,10 @@
 
 namespace Movary\Domain\User\Exception;
 
-class NoVerificationCode extends InvalidCredentials
+class MissingTotpCode extends InvalidCredentials
 {
     public static function create() : self
     {
-        return new self('Verification code is not present.');
+        return new self('Two-factor authentication code missing.');
     }
 }
