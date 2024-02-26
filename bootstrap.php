@@ -7,6 +7,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(
     [
+        \Movary\HttpController\Web\AuthenticationController::class => DI\Factory([Factory::class, 'createAuthenticationController']),
         \Movary\ValueObject\Config::class => DI\factory([Factory::class, 'createConfig']),
         \Movary\Api\Trakt\TraktApi::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
@@ -18,7 +19,7 @@ $builder->addDefinitions(
         \Movary\HttpController\Web\CreateUserController::class => DI\factory([Factory::class, 'createCreateUserController']),
         \Movary\HttpController\Web\JobController::class => DI\factory([Factory::class, 'createJobController']),
         \Movary\HttpController\Web\LandingPageController::class => DI\factory([Factory::class, 'createLandingPageController']),
-        \Movary\HttpController\Web\Middleware\ServerHasRegistrationEnabled::class => DI\factory([Factory::class, 'createMiddlewareServerHasRegistrationEnabled']),
+        \Movary\HttpController\Api\Middleware\CreateUserMiddleware::class => DI\factory([Factory::class, 'createUserMiddleware']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),
         \Movary\Command\CreatePublicStorageLink::class => DI\factory([Factory::class, 'createCreatePublicStorageLink']),
         \Movary\Command\DatabaseMigrationStatus::class => DI\factory([Factory::class, 'createDatabaseMigrationStatusCommand']),

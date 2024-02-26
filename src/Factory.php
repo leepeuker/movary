@@ -13,7 +13,6 @@ use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\TraktClient;
-use Movary\Command;
 use Movary\Command\CreatePublicStorageLink;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
@@ -21,6 +20,7 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
+use Movary\HttpController\Web\AuthenticationController;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
@@ -64,6 +64,16 @@ class Factory
 
     private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
+    public static function createAuthenticationController(Config $config, ContainerInterface $container) : AuthenticationController
+    {
+        return new AuthenticationController(
+            $container->get(Twig\Environment::class),
+            $container->get(Authentication::class),
+            $container->get(SessionWrapper::class),
+            $config->getAsBool('ENABLE_REGISTRATION')
+        );
+    }
+
     public static function createConfig(ContainerInterface $container) : Config
     {
         $dotenv = Dotenv::createMutable(self::createDirectoryAppRoot());
@@ -91,9 +101,7 @@ class Factory
     {
         return new CreateUserController(
             $container->get(Twig\Environment::class),
-            $container->get(Authentication::class),
             $container->get(UserApi::class),
-            $container->get(SessionWrapper::class),
         );
     }
 
@@ -240,9 +248,10 @@ class Factory
         return $logger;
     }
 
-    public static function createMiddlewareServerHasRegistrationEnabled(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
+    public static function createUserMiddleware(Config $config, ContainerInterface $container) : HttpController\Api\Middleware\createUserMiddleware
     {
-        return new HttpController\Web\Middleware\ServerHasRegistrationEnabled(
+        return new HttpController\Api\Middleware\CreateUserMiddleware(
+            $container->get(UserApi::class),
             $config->getAsBool('ENABLE_REGISTRATION', false)
         );
     }

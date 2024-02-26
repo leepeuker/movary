@@ -6,6 +6,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\Url;
 use Ramsey\Uuid\Uuid;
@@ -19,6 +20,9 @@ class UserApi
     ) {
     }
 
+    /**
+     * @throws PasswordTooShort
+     */
     public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
     {
         $this->userValidator->ensureEmailIsUnique($email);

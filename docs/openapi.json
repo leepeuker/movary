@@ -1074,13 +1074,7 @@
         "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
         "parameters": [
           {
-            "in": "header",
-            "name": "X-Movary-Client",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "Client Name"
+            "$ref": "#/components/parameters/deviceName"
           }
         ],
         "requestBody": {
@@ -1149,6 +1143,81 @@
           },
           "401": {
             "$ref": "#/components/responses/401"
+          }
+        }
+      }
+    },
+    "/create-user": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Create a new user",
+        "description": "Creates new user if one of the conditions are true: Public registration is enabled or the server has no users.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/deviceName"
+          }
+        ],
+        "requestBody": {
+          "description": "The request data in JSON format.",
+          "content": {
+            "application/json": {
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "myname@domain.com",
+                    "description": "E-Mail address of the new user"
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "A very cool username",
+                    "description": "The username of the new user"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "My secure password",
+                    "description": "The password of the new user"
+                  },
+                  "repeatPassword": {
+                    "type": "string",
+                    "example": "My secure password",
+                    "description": "The password of the new user but repeated for security."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned if the user was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "integer",
+                      "description": "The id of the newly created user."
+                    },
+                    "token": {
+                      "type": "string",
+                      "description": "The authentication token to be used in future requests."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
           }
         }
       }
@@ -1367,6 +1436,17 @@
       },
       "404": {
         "description": "The resource was not found"
+      }
+    },
+    "parameters": {
+      "deviceName": {
+        "in": "header",
+        "name": "X-Movary-Client",
+        "schema": {
+          "type": "string"
+        },
+        "required": true,
+        "example": "Client Name"
       }
     },
     "securitySchemes": {

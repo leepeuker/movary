@@ -21,15 +21,9 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('POST', '/login', [Web\AuthenticationController::class, 'login']);
     $routes->add('GET', '/logout', [Web\AuthenticationController::class, 'logout']);
-    $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
-        Web\Middleware\UserIsUnauthenticated::class,
-        Web\Middleware\ServerHasUsers::class,
-        Web\Middleware\ServerHasRegistrationEnabled::class
-    ]);
     $routes->add('GET', '/create-user', [Web\CreateUserController::class, 'renderPage'], [
         Web\Middleware\UserIsUnauthenticated::class,
-        Web\Middleware\ServerHasUsers::class,
-        Web\Middleware\ServerHasRegistrationEnabled::class
+        Api\Middleware\CreateUserMiddleware::class,
     ]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
 
@@ -203,6 +197,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/openapi', [Api\OpenApiController::class, 'getSchema']);
     $routes->add('POST', '/authentication/token', [Api\AuthenticationController::class, 'createToken']);
+    $routes->add('POST', '/create-user', [Api\CreateUserController::class, 'createUser'], [Api\Middleware\IsUnauthenticated::class, Api\Middleware\CreateUserMiddleware::class]);
 
     $routeUserHistory = '/users/{username:[a-zA-Z0-9]+}/history/movies';
     $routes->add('GET', $routeUserHistory, [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);

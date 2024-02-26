@@ -20,6 +20,7 @@ class AuthenticationController
         private readonly Environment $twig,
         private readonly Service\Authentication $authenticationService,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly bool $registrationEnabled
     ) {
     }
 
@@ -44,7 +45,8 @@ class AuthenticationController
             'page/login.html.twig',
             [
                 'failedLogin' => $failedLogin,
-                'redirect' => $redirect
+                'redirect' => $redirect,
+                'registrationEnabled' => $this->registrationEnabled
             ],
         );
 

@@ -8,61 +8,37 @@
     <link rel="stylesheet" href="/css/createUser.css">
 {% endblock %}
 
+{% block scripts %}
+    <script src="/js/createnewuser.js"></script>
+{% endblock %}
+
 {% block body %}
     <script>
         if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
     </script>
     <main role="main" class="form-signin w-100 m-auto text-center">
-        <form action="/create-user" method="post" enctype="multipart/form-data">
+        <form>
             <h1 class="">Movary</h1>
             <p>{{ subtitle }}</p>
             <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="email" name="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required>
-                <label for="floatingEmail">Email address <span class="text-danger">*</span></label>
+                <input type="email" name="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
+                <label for="emailInput">Email address <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="text" name="name" class="form-control" id="floatingName" placeholder="name" required>
-                <label for="floatingName">Username <span class="text-danger">*</span></label>
+                <input type="text" name="name" class="form-control" id="usernameInput" placeholder="name" required>
+                <label for="usernameInput">Username <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="8" required>
-                <label for="floatingPassword">Password <span class="text-danger">*</span></label>
+                <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Password" minlength="8" required>
+                <label for="passwordInput">Password <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 1rem">
-                <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Repeat password" minlength="8" required>
-                <label for="floatingRepeatPassword">Repeat password <span class="text-danger">*</span></label>
+                <input type="password" name="repeatPassword" class="form-control" id="repeatPasswordInput" placeholder="Repeat password" minlength="8" required>
+                <label for="repeatPasswordInput">Repeat password <span class="text-danger">*</span></label>
             </div>
-            {% if errorPasswordNotEqual == true %}
-                <div class="alert alert-danger" role="alert">
-                    Passwords not equal
-                </div>
-            {% endif %}
-            {% if errorPasswordTooShort == true %}
-                <div class="alert alert-danger" role="alert">
-                    Password must be at least 8 characters
-                </div>
-            {% endif %}
-            {% if errorUsernameInvalidFormat == true %}
-                <div class="alert alert-danger" role="alert">
-                    Username must consist of only letters and numbers
-                </div>
-            {% endif %}
-            {% if errorUsernameUnique == true %}
-                <div class="alert alert-danger" role="alert">
-                    Username is already used
-                </div>
-            {% endif %}
-            {% if errorEmailUnique == true %}
-                <div class="alert alert-danger" role="alert">
-                    Email is already used
-                </div>
-            {% endif %}
-            {% if missingFormData == true %}
-                <div class="alert alert-danger" role="alert">
-                    Please fill out all fields
-                </div>
-            {% endif %}
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Create</button>
+            <div class="alert alert-danger d-none" role="alert" id="createUserResponse"></div>
+            <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitNewUser()">Create</button>
+            <a href="/login">Return to login</a>
         </form>
     </main>
 {% endblock %}
