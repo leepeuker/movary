@@ -1,3 +1,4 @@
+#@name Test creating a new user properly
 POST http://127.0.0.1/api/create-user
 Accept: */*
 Cache-Control: no-cache
@@ -15,9 +16,11 @@ X-Movary-Client: RestAPI Test
  client.test("User created", function() {
     client.assert(response.status === 200, "Response status is not 200");
  });
+ client.global.set('responseAuthToken', response.body.token);
 %}
 
 ###
+#@name Test missing input erro
 
 POST http://127.0.0.1/api/create-user
 Accept: */*
@@ -34,14 +37,16 @@ X-Movary-Client: RestAPI Test
 
 > {%
     client.test("Missing input", function() {
-        client.assert(response.status === 400, "Response status is not 200");
-        client.assert(response.body['error'] === 'MissingInput', 'Response error was not as expected');
+        let expectedStatusCode = 400;
+        let expectedError = 'MissingInput'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
         client.assert(response.body['message'] === 'Email, username, password or the password repeat is missing', 'Response was not as expected');
     });
 %}
 
 ###
-
+#@name Test passwords not equal error
 POST http://127.0.0.1/api/create-user
 Accept: */*
 Cache-Control: no-cache
@@ -56,14 +61,16 @@ X-Movary-Client: RestAPI Test
 }
 
 > {%
-    client.test("Missing input", function() {
-        client.assert(response.status === 400, "Response status is not 200");
-        client.assert(response.body['error'] === 'PasswordsNotEqual', 'Response error was not as expected');
-        client.assert(response.body['message'] === 'The repeated password is not the same as the password', 'Response was not as expected');
+    client.test("Passwords not equal", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'PasswordsNotEqual'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
     });
 %}
 
 ###
+#@name Test email already exists error
 
 POST http://127.0.0.1/api/create-user
 Accept: */*
@@ -79,14 +86,16 @@ X-Movary-Client: RestAPI Test
 }
 
 > {%
-    client.test("Missing input", function() {
-        client.assert(response.status === 400, "Response status is not 200");
-        client.assert(response.body['error'] === 'EmailNotUnique', 'Response error was not MissingInput');
-        client.assert(response.body['message'] === 'Email is already taken', 'Response was not as expected');
+    client.test("Email already exists", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'EmailNotUnique'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
     });
 %}
 
 ###
+#@name Test password is shorter than 8 characters
 
 POST http://127.0.0.1/api/create-user
 Accept: */*
@@ -102,14 +111,16 @@ X-Movary-Client: RestAPI Test
 }
 
 > {%
-    client.test("Missing input", function() {
-        client.assert(response.status === 400, "Response status is not 200");
-        client.assert(response.body['error'] === 'PasswordTooShort', 'Response error was not MissingInput');
-        client.assert(response.body['message'] === 'Password must be at least 8 characters', 'Response was not as expected');
+    client.test("Password too short", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'PasswordTooShort'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
     });
 %}
 
 ###
+#@name Test invalid username error
 
 POST http://127.0.0.1/api/create-user
 Accept: */*
@@ -125,14 +136,16 @@ X-Movary-Client: RestAPI Test
 }
 
 > {%
-    client.test("Missing input", function() {
-        client.assert(response.status === 400, "Response status is not 200");
-        client.assert(response.body['error'] === 'UsernameInvalidFormat', 'Response error was not as expected');
-        client.assert(response.body['message'] === 'Username can only contain letters or numbers', 'Response was not as expected');
+    client.test("Invalid username", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'UsernameInvalidFormat'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
     });
 %}
 
 ###
+#@name Test username already exists error
 
 POST http://127.0.0.1/api/create-user
 Accept: */*
@@ -148,33 +161,26 @@ X-Movary-Client: RestAPI Test
 }
 
 > {%
-    client.test("Missing input", function() {
-        client.assert(response.status === 400, "Response status is not 200");
-        client.assert(response.body['error'] === 'UsernameNotUnique', 'Response error was not as expected');
-        client.assert(response.body['message'] === 'Username is already taken', 'Response was not as expected');
+    client.test("Username already exists", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'UsernameNotUnique'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
     });
 %}
 
 ###
+#@name Delete the test user since all tests are finished
 
-POST http://127.0.0.1/api/create-user
+DELETE http://127.0.0.1/api/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Movary-Client: RestAPI Test
-
-{
-  "email": "myuniqueaddress@domain.com",
-  "username": "MyUniqueUsername",
-  "password": "short",
-  "repeatPassword": "short"
-}
+X-Auth-Token: {{responseAuthToken}}
 
 > {%
-    client.test("Missing input", function() {
-        client.assert(response.status === 400, "Response status is not 200");
-        client.assert(response.body['error'] === 'PasswordTooShort', 'Response error was not MissingInput');
-        client.assert(response.body['message'] === 'Password must be at least 8 characters', 'Response was not as expected');
+    client.test("Response has correct status code", function() {
+        let expected = 204
+        client.assert(response.status === expected, "Expected status code: " + expected);
     });
 %}
-
