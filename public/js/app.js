@@ -498,3 +498,11 @@ function addAlert(parentDivId, message, color, withCloseButton = true, marginBot
 function removeAlert(parentDivId) {
     document.getElementById(parentDivId).innerHTML = ''
 }
+
+async function logout() {
+    await fetch('/api/authentication/token', {
+        method: 'DELETE',
+    });
+
+    window.location.href = '/'
+}
