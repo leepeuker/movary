@@ -6,6 +6,7 @@ use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -15,6 +16,7 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -84,8 +86,12 @@ class AuthenticationController
 
         return Response::createJson(
             Json::encode([
-                'userId' => $userAndAuthToken['user']->getId(),
-                'authToken' => $userAndAuthToken['token']
+                'authToken' => $userAndAuthToken['token'],
+                'user' => [
+                    'id' => $userAndAuthToken['user']->getId(),
+                    'username' => $userAndAuthToken['user']->getName(),
+                    'isAdmin' => $userAndAuthToken['user']->isAdmin(),
+                ]
             ]),
         );
     }
@@ -98,12 +104,12 @@ class AuthenticationController
             return Response::CreateNoContent();
         }
 
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        $apiToken = $this->authenticationService->getToken($request);
         if ($apiToken === null) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingAuthToken',
-                    'message' => 'Authentication token to delete in headers missing'
+                    'message' => 'Authentication token header is missing'
                 ]),
                 [Header::createContentTypeJson()],
             );
@@ -114,22 +120,35 @@ class AuthenticationController
         return Response::CreateNoContent();
     }
 
-    public function isAuthenticated() : Response
+    public function getTokenData(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie()) {
-            return Response::createJson(
+        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        if ($apiToken === null) {
+            return Response::createBadRequest(
                 Json::encode([
-                    'authenticated' => true,
-                    'userId' => $this->authenticationService->getCurrentUser()->getId(),
-                    'username' => $this->authenticationService->getCurrentUser()->getName(),
-                    'isAdmin' => $this->authenticationService->getCurrentUser()->isAdmin(),
+                    'error' => 'MissingAuthToken',
+                    'message' => 'Authentication token header is missing'
                 ]),
+                [Header::createContentTypeJson()],
             );
+        }
+
+        if ($this->authenticationService->isValidToken($apiToken) === false) {
+            return Response::createForbidden();
+        }
+
+        $user = $this->userApi->findByToken($apiToken);
+        if ($user === null) {
+            return Response::createForbidden();
         }
 
         return Response::createJson(
             Json::encode([
-                'authenticated' => false,
+                'user' => [
+                    'id' => $user->getId(),
+                    'username' => $user->getName(),
+                    'isAdmin' => $user->isAdmin(),
+                ]
             ]),
         );
     }

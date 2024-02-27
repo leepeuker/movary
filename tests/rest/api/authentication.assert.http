@@ -89,7 +89,7 @@ Content-Type: application/json
         client.assert(response.status === expected, "Expected status code: " + expected);
     });
     client.test("Response has correct body", function() {
-        let expected = '{"error":"MissingAuthToken","message":"Authentication token to delete in headers missing"}';
+        let expected = '{"error":"MissingAuthToken","message":"Authentication token header is missing"}';
         client.assert(JSON.stringify(response.body) === expected, "Expected response body: " + expected);
     });
 %}

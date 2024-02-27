@@ -98,14 +98,19 @@ class Authentication
         return $userId;
     }
 
-    public function getToken() : ?string
+    public function getToken(Request $request) : ?string
     {
-        return $_COOKIE[self::AUTHENTICATION_COOKIE_NAME];
+        $tokenInCookie = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        if ($tokenInCookie !== false && $tokenInCookie !== null) {
+            return $tokenInCookie;
+        }
+
+        return $request->getHeaders()['X-Auth-Token'] ?? null;
     }
 
     public function getUserIdByApiToken(Request $request) : ?int
     {
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME) ?? null;
+        $apiToken = $this->getToken($request);
         if ($apiToken === null) {
             return null;
         }
