@@ -1,0 +1,20 @@
+## PlayedApi
+
+### Delete movie plays from user
+# @name usersUsernamePlayedMoviesDelete
+DELETE http://localhost/users/{{username}}/played/movies
+Content-Type: application/json
+
+### Get played movies of user
+# @name usersUsernamePlayedMoviesGet
+GET http://localhost/users/{{username}}/played/movies
+
+### Add movie plays to user
+# @name usersUsernamePlayedMoviesPost
+POST http://localhost/users/{{username}}/played/movies
+Content-Type: application/json
+
+### Replace movie plays for user
+# @name usersUsernamePlayedMoviesPut
+PUT http://localhost/users/{{username}}/played/movies
+Content-Type: application/json

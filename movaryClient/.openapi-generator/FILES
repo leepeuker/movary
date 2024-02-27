@@ -1,0 +1,8 @@
+.openapi-generator-ignore
+Apis/AuthenticationApi.http
+Apis/HistoryApi.http
+Apis/MoviesApi.http
+Apis/PlayedApi.http
+Apis/WatchlistApi.http
+Apis/WebhooksApi.http
+README.md

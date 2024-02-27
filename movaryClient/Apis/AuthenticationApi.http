@@ -1,0 +1,10 @@
+## AuthenticationApi
+
+### 
+# @name authenticationTokenDelete
+DELETE http://localhost/authentication/token
+
+### 
+# @name authenticationTokenPost
+POST http://localhost/authentication/token
+Content-Type: application/json
