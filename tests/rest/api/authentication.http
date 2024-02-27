@@ -67,7 +67,7 @@ GET http://127.0.0.1/api/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xAuthToken}}
 
 ###
 
@@ -97,7 +97,7 @@ Content-Type: application/json
         client.assert(response.status === expected, "Expected status code: " + expected);
     });
     client.test("Response has correct body", function() {
-        let expected = '{"error":"MissingAuthToken","message":"Authentication token to delete in headers missing"}';
+        let expected = '{"error":"MissingAuthToken","message":"Authentication token header is missing"}';
         client.assert(JSON.stringify(response.body) === expected, "Expected response body: " + expected);
     });
 %}
