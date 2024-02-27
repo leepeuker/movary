@@ -192,7 +192,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class]);
 
-    $routerService->addRoutesToRouteCollector($routeCollector, $routes);
+    $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }
 
 function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void

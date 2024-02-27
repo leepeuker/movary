@@ -6,7 +6,29 @@ class SessionWrapper
 {
     public function destroy() : void
     {
+        $_SESSION = array();
+
+        if (ini_get('session.use_cookies')) {
+            $sessionName = session_name();
+            if ($sessionName === false) {
+                throw new \RuntimeException('Could not get session name');
+            }
+
+            $params = session_get_cookie_params();
+
+            setcookie(
+                $sessionName,
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly'],
+            );
+        }
+
         session_destroy();
+        session_regenerate_id();
     }
 
     public function find(string $key) : mixed
