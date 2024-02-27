@@ -1072,7 +1072,7 @@
           "Authentication"
         ],
         "summary": "Retrieves the authhentication data",
-        "description": "Gets the user ID, the username and whether the user is admin or not, based on a token in either a header or a cookie.",
+        "description": "Gets the user ID, the username and whether the user is admin or not, based on a token in the header.",
         "responses": {
           "200": {
             "description": "OK",
@@ -1104,7 +1104,7 @@
             }
           },
           "400": {
-            "description": "Authentication token is missing in both the header and the cookie"
+            "description": "Authentication token is missing in the header."
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -1113,9 +1113,6 @@
         "security": [
           {
             "token": []
-          },
-          {
-            "cookie": []
           }
         ]
       },
@@ -1466,11 +1463,6 @@
         "type": "apiKey",
         "name": "X-Auth-Token",
         "in": "header"
-      },
-      "cookie": {
-        "type": "apiKey",
-        "name": "id",
-        "in": "cookie"
       }
     }
   }
