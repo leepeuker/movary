@@ -19,8 +19,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
-    $routes->add('POST', '/login', [Web\AuthenticationController::class, 'login']);
-    $routes->add('GET', '/logout', [Web\AuthenticationController::class, 'logout']);
     $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
         Web\Middleware\UserIsUnauthenticated::class,
         Web\Middleware\ServerHasUsers::class,
@@ -189,7 +187,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
 
-    $routerService->addRoutesToRouteCollector($routeCollector, $routes);
+    $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }
 
 function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
@@ -198,6 +196,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/openapi', [Api\OpenApiController::class, 'getSchema']);
     $routes->add('POST', '/authentication/token', [Api\AuthenticationController::class, 'createToken']);
+    $routes->add('DELETE', '/authentication/token', [Api\AuthenticationController::class, 'destroyToken']);
+    $routes->add('GET', '/authentication/token', [Api\AuthenticationController::class, 'getTokenData']);
 
     $routeUserHistory = '/users/{username:[a-zA-Z0-9]+}/history/movies';
     $routes->add('GET', $routeUserHistory, [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);

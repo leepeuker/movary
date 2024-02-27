@@ -44,7 +44,7 @@
                     </div>
                 {% endif %}
                 {% if redirect != false %}
-                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0.7rem!important;">
+                    <div class="alert alert-danger" role="alert" id="forbiddenPageAlert">
                         Sign in to access page
                     </div>
                     <input type="hidden" value="{{ redirect }}" name="redirect" />
