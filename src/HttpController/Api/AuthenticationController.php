@@ -99,7 +99,7 @@ class AuthenticationController
             return Response::CreateNoContent();
         }
 
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        $apiToken = $request->getHeaders()['X-Movary-Token'] ?? null;
         if ($apiToken === null) {
             return Response::createBadRequest(
                 Json::encode([

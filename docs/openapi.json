@@ -1071,7 +1071,7 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
+        "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Movary-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
         "parameters": [
           {
             "in": "header",
@@ -1156,11 +1156,11 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Delete the authentication token provided in the X-Auth-Token header value.",
+        "description": "Delete the authentication token provided in the X-Movary-Token header value.",
         "parameters": [
           {
             "in": "header",
-            "name": "X-Auth-Token",
+            "name": "X-Movary-Token",
             "schema": {
               "type": "string"
             },
@@ -1397,7 +1397,7 @@
     "securitySchemes": {
       "token": {
         "type": "apiKey",
-        "name": "X-Auth-Token",
+        "name": "X-Movary-Token",
         "in": "header"
       },
       "cookie": {
