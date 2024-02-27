@@ -22,7 +22,7 @@ class AuthenticationController
     {
         $tokenRequestBody = Json::decode($request->getBody());
 
-        if ($tokenRequestBody['email'] === null || $tokenRequestBody['password'] === null) {
+        if (isset($tokenRequestBody['email']) === false || isset($tokenRequestBody['password']) === false) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingCredentials',
@@ -90,18 +90,47 @@ class AuthenticationController
         );
     }
 
+    public function destroyToken(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
+            $this->authenticationService->logout();
+
+            return Response::CreateNoContent();
+        }
+
+        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        if ($apiToken === null) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingAuthToken',
+                    'message' => 'Authentication token to delete in headers missing'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $this->authenticationService->deleteToken($apiToken);
+
+        return Response::CreateNoContent();
+    }
+
     public function isAuthenticated() : Response
     {
-        if($this->authenticationService->isUserAuthenticated()) {
-            return Response::createJson(Json::encode([
-                'authenticated' => true,
-                'userId' => $this->authenticationService->getCurrentUser()->getId(),
-                'username' => $this->authenticationService->getCurrentUser()->getName(),
-                'isAdmin' => $this->authenticationService->getCurrentUser()->isAdmin(),
-            ]));
+        if ($this->authenticationService->isUserAuthenticatedWithCookie()) {
+            return Response::createJson(
+                Json::encode([
+                    'authenticated' => true,
+                    'userId' => $this->authenticationService->getCurrentUser()->getId(),
+                    'username' => $this->authenticationService->getCurrentUser()->getName(),
+                    'isAdmin' => $this->authenticationService->getCurrentUser()->isAdmin(),
+                ]),
+            );
         }
-        return Response::createJson(Json::encode([
-            'authenticated' => false,
-        ]));
+
+        return Response::createJson(
+            Json::encode([
+                'authenticated' => false,
+            ]),
+        );
     }
 }

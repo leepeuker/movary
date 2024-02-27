@@ -11,6 +11,11 @@ async function submitCredentials() {
         return;
     }
 
+    const forbiddenPageAlert = document.getElementById('forbiddenPageAlert');
+    if (forbiddenPageAlert) {
+        forbiddenPageAlert.classList.add('d-none');
+    }
+
     if (response.status === 400) {
         const error = await response.json();
 
