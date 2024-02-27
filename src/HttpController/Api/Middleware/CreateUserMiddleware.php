@@ -6,11 +6,11 @@ use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Middleware\MiddlewareInterface;
 use Movary\ValueObject\Http\Response;
 
-readonly class CreateUserMiddleware implements MiddlewareInterface
+class CreateUserMiddleware implements MiddlewareInterface
 {
     public function __construct(
-        private UserApi $userApi,
-        private bool $registrationEnabled
+        readonly private UserApi $userApi,
+        readonly private bool $registrationEnabled
     ) {
     }
 
