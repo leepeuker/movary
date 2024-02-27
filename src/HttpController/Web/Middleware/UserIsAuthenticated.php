@@ -14,7 +14,7 @@ class UserIsAuthenticated implements MiddlewareInterface
 
     public function __invoke() : ?Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
             return null;
         }
 

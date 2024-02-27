@@ -14,7 +14,7 @@ class UserIsUnauthenticated implements MiddlewareInterface
 
     public function __invoke() : ?Response
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
             return null;
         }
 

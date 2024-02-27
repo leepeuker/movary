@@ -1141,10 +1141,70 @@
       }
     },
     "/authentication/token": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Get authentication data",
+        "description": "Get information about the authenticated user.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Auth-Token",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The name of the user"
+                        },
+                        "userId": {
+                          "type": "integer",
+                          "description": "The id of the user"
+                        },
+                        "isAdmin": {
+                          "type": "boolean",
+                          "description": "True if user is an admin, false if not."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "Authentication"
         ],
+        "summary": "Create authentication token",
         "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
         "parameters": [
           {
@@ -1205,13 +1265,26 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "userId": {
-                      "type": "integer",
-                      "description": "The id of the authenticated user."
-                    },
-                    "token": {
+                    "authToken": {
                       "type": "string",
                       "description": "The authentication token to be used in future requests."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The username of the user"
+                        },
+                        "userId": {
+                          "type": "integer",
+                          "description": "The ID of the authenticated user"
+                        },
+                        "isAdmin": {
+                          "type": "boolean",
+                          "description": "True if the user is an admin, False if the user isn't."
+                        }
+                      }
                     }
                   }
                 }
@@ -1223,6 +1296,32 @@
           },
           "401": {
             "$ref": "#/components/responses/401"
+          }
+        }
+      },
+      "delete" : {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Delete authentication token",
+        "description": "Delete the authentication token provided in the X-Auth-Token header value.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Auth-Token",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {},
+        "responses": {
+          "204": {
+            "description": "Returned if authentication token does no longer exist"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           }
         }
       }
@@ -1448,11 +1547,6 @@
         "type": "apiKey",
         "name": "X-Auth-Token",
         "in": "header"
-      },
-      "cookie": {
-        "type": "apiKey",
-        "name": "id",
-        "in": "cookie"
       }
     }
   }
