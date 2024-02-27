@@ -1071,8 +1071,18 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "Retrieves the authhentication data",
-        "description": "Gets the user ID, the username and whether the user is admin or not, based on a token in the header.",
+        "summary": "Get authentication data",
+        "description": "Get information about the authenticated user.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Auth-Token",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1086,15 +1096,15 @@
                       "properties": {
                         "name": {
                           "type": "string",
-                          "description": "The username of the user"
+                          "description": "The name of the user"
                         },
                         "userId": {
                           "type": "integer",
-                          "description": "The ID of the authenticated user"
+                          "description": "The id of the user"
                         },
                         "isAdmin": {
                           "type": "boolean",
-                          "description": "True if the user is an admin, False if the user isn't."
+                          "description": "True if user is an admin, false if not."
                         }
                       }
                     }
@@ -1104,7 +1114,7 @@
             }
           },
           "400": {
-            "description": "Authentication token is missing in the header."
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -1120,7 +1130,7 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "Create an authentication token",
+        "summary": "Create authentication token",
         "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
         "parameters": [
           {

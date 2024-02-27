@@ -127,7 +127,7 @@ class AuthenticationController
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingAuthToken',
-                    'message' => 'Authentication token is missing in both the header and the cookie'
+                    'message' => 'Authentication token header is missing'
                 ]),
                 [Header::createContentTypeJson()],
             );

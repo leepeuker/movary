@@ -126,7 +126,7 @@ Content-Type: application/json
         let expectedError = "MissingAuthToken";
         client.assert(response.status === expectedStatusCode, "Expected status code: " + expectedStatusCode);
         client.assert(response.body.error === expectedError, "Expected error: " + expectedError);
-        client.assert(response.body.message === 'Authentication token is missing in both the header and the cookie');
+        client.assert(response.body.message === 'Authentication token header is missing');
     });
 %}
 
