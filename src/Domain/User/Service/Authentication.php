@@ -221,7 +221,8 @@ class Authentication
 
     public function setAuthenticationCookieAndNewSession(int $userId, string $token, DateTime $expirationDate) : void
     {
-        session_regenerate_id();
+        $this->sessionWrapper->destroy();
+        $this->sessionWrapper->start();
         setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
             'expires' => (int)$expirationDate->format('U'),
             'path' => '/',
