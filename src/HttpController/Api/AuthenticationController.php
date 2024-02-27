@@ -6,6 +6,7 @@ use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
@@ -22,7 +23,7 @@ class AuthenticationController
     {
         $tokenRequestBody = Json::decode($request->getBody());
 
-        if ($tokenRequestBody['email'] === null || $tokenRequestBody['password'] === null) {
+        if (isset($tokenRequestBody['email']) === false || isset($tokenRequestBody['password']) === false) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingCredentials',
@@ -88,5 +89,29 @@ class AuthenticationController
                 'authToken' => $userAndAuthToken['token']
             ]),
         );
+    }
+
+    public function destroyToken(Request $request) : Response
+    {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
+            $this->authenticationService->logout();
+
+            return Response::CreateNoContent();
+        }
+
+        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        if ($apiToken === null) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingAuthToken',
+                    'message' => 'Authentication token to delete in headers missing'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $this->authenticationService->deleteToken($apiToken);
+
+        return Response::CreateNoContent();
     }
 }

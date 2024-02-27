@@ -1151,6 +1151,31 @@
             "$ref": "#/components/responses/401"
           }
         }
+      },
+      "delete" : {
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Delete the authentication token provided in the X-Auth-Token header value.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Auth-Token",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {},
+        "responses": {
+          "204": {
+            "description": "Returned if authentication token does no longer exist"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          }
+        }
       }
     }
   },

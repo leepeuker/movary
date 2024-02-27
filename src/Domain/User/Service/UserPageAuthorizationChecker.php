@@ -15,7 +15,7 @@ class UserPageAuthorizationChecker
 
     public function fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor(int $movieId) : array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
             return $this->userApi->fetchAllHavingWatchedMoviePublicVisibleUsernames($movieId);
         }
 
@@ -24,7 +24,7 @@ class UserPageAuthorizationChecker
 
     public function fetchAllHavingWatchedMovieWithPersonVisibleUsernamesForCurrentVisitor(int $personId) : array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
             return $this->userApi->fetchAllHavingWatchedMovieWithPersonPublicVisibleUsernames($personId);
         }
 
@@ -33,7 +33,7 @@ class UserPageAuthorizationChecker
 
     public function fetchAllVisibleUsernamesForCurrentVisitor() : array
     {
-        if ($this->authenticationService->isUserAuthenticated() === false) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
             return $this->userApi->fetchAllPublicVisibleUsernames();
         }
 

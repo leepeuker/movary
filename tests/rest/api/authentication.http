@@ -7,3 +7,10 @@ X-Movary-Client: RestAPI Test
 {"email" : "{{email}}", "password" : "{{password}}", "rememberMe" : 1, "totpCode" : 123456}
 
 ###
+
+DELETE http://127.0.0.1/api/authentication/token
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+X-Auth-Token: {{xAuthToken}}
