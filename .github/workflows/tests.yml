@@ -3,8 +3,8 @@ name: Run tests
 on: [ pull_request ]
 
 jobs:
-  run_tests:
-    name: Run tests
+  run_php_tests:
+    name: Run PHP tests
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -18,3 +18,17 @@ jobs:
 
       - name: Run all test tools/suites
         run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer test
+  run_http_tests:
+    name: Run HTTP tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Downloads and runs the Jetbrains HTTP Client CLI
+        run: |
+          curl -f -L -o ijhttp.zip "https://jb.gg/ijhttp/latest"
+          unzip ijhttp.zip
+          ./ijhttp/ijhttp tests/rest/api --env-file tests/rest/api/http-client.env.json --env testUser
