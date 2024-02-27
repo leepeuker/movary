@@ -69,7 +69,7 @@ class MovieController
         }
 
         $currentUser = null;
-        if ($this->authenticationService->isUserAuthenticated() === true) {
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
             $currentUser = $this->authenticationService->getCurrentUser();
         }
 

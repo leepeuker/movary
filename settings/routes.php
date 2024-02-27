@@ -19,11 +19,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
-    $routes->add('POST', '/login', [Web\AuthenticationController::class, 'login']);
-    $routes->add('GET', '/logout', [Web\AuthenticationController::class, 'logout']);
     $routes->add('GET', '/create-user', [Web\CreateUserController::class, 'renderPage'], [
         Web\Middleware\UserIsUnauthenticated::class,
-        Api\Middleware\CreateUserMiddleware::class,
+        Web\Middleware\ServerHasUsers::class,
+        Web\Middleware\ServerHasRegistrationEnabled::class
     ]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
 
@@ -188,7 +187,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class]);
 
-    $routerService->addRoutesToRouteCollector($routeCollector, $routes);
+    $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }
 
 function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
@@ -197,6 +196,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/openapi', [Api\OpenApiController::class, 'getSchema']);
     $routes->add('POST', '/authentication/token', [Api\AuthenticationController::class, 'createToken']);
+    $routes->add('DELETE', '/authentication/token', [Api\AuthenticationController::class, 'destroyToken']);
+    $routes->add('GET', '/authentication/token', [Api\AuthenticationController::class, 'getTokenData']);
     $routes->add('POST', '/create-user', [Api\CreateUserController::class, 'createUser'], [Api\Middleware\IsUnauthenticated::class, Api\Middleware\CreateUserMiddleware::class]);
 
     $routeUserHistory = '/users/{username:[a-zA-Z0-9]+}/history/movies';
