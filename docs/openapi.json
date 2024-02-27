@@ -1066,13 +1066,13 @@
         }
       }
     },
-    "/authentication/authenticated": {
+    "/authentication/token": {
       "get": {
         "tags": [
           "Authentication"
         ],
-        "summary": "Checks the authentication status of the user.",
-        "description": "Checks if the user is authenticated based on cookie.. The response is a JSON object with the authentication status and an optional username + userId of the authenticated user",
+        "summary": "Retrieves the authhentication data",
+        "description": "Gets the user ID, the username and whether the user is admin or not, based on a token in either a header or a cookie.",
         "responses": {
           "200": {
             "description": "OK",
@@ -1081,35 +1081,49 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "authenticated": {
-                      "type": "boolean",
-                      "description": "True if authenticated, false if unauthenticated."
-                    },
-                    "username": {
-                      "type": "string",
-                      "description": "The username of the authenticated user. It's empty if the user is unauthenticated."
-                    },
-                    "userId": {
-                      "type": "integer",
-                      "description": "The ID of the authenticated user. It's empty if the user is unauthenticated."
-                    },
-                    "isAdmin": {
-                      "type": "boolean",
-                      "description": "True if the user is an admin, False if the user isn't."
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The username of the user"
+                        },
+                        "userId": {
+                          "type": "integer",
+                          "description": "The ID of the authenticated user"
+                        },
+                        "isAdmin": {
+                          "type": "boolean",
+                          "description": "True if the user is an admin, False if the user isn't."
+                        }
+                      }
                     }
                   }
                 }
               }
             }
+          },
+          "400": {
+            "description": "Authentication token is missing in both the header and the cookie"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
           }
-        }
-      }
-    },
-    "/authentication/token": {
+        },
+        "security": [
+          {
+            "token": []
+          },
+          {
+            "cookie": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "Authentication"
         ],
+        "summary": "Create an authentication token",
         "description": "Create an authentication token via email, password and optionally TOTP code. Add the token as X-Auth-Token header to further requests. Token lifetime 1d default, 30d with rememberMe.",
         "parameters": [
           {
@@ -1170,13 +1184,26 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "userId": {
-                      "type": "integer",
-                      "description": "The id of the authenticated user."
-                    },
-                    "token": {
+                    "authToken": {
                       "type": "string",
                       "description": "The authentication token to be used in future requests."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "The username of the user"
+                        },
+                        "userId": {
+                          "type": "integer",
+                          "description": "The ID of the authenticated user"
+                        },
+                        "isAdmin": {
+                          "type": "boolean",
+                          "description": "True if the user is an admin, False if the user isn't."
+                        }
+                      }
                     }
                   }
                 }
@@ -1195,6 +1222,7 @@
         "tags": [
           "Authentication"
         ],
+        "summary": "Delete authentication token",
         "description": "Delete the authentication token provided in the X-Auth-Token header value.",
         "parameters": [
           {

@@ -122,24 +122,24 @@ class AuthenticationController
 
     public function getTokenData(Request $request) : Response
     {
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
-        if ($apiToken === null) {
+        $token = $this->authenticationService->getToken($request);
+        if ($token === null) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingAuthToken',
-                    'message' => 'Authentication token header is missing'
+                    'message' => 'Authentication token is missing in both the header and the cookie'
                 ]),
                 [Header::createContentTypeJson()],
             );
         }
 
-        if ($this->authenticationService->isValidToken($apiToken) === false) {
-            return Response::createForbidden();
+        $user = $this->userApi->findByToken($token);
+        if ($user === null) {
+            return Response::createUnauthorized();
         }
 
-        $user = $this->userApi->findByToken($apiToken);
-        if ($user === null) {
-            return Response::createForbidden();
+        if($this->authenticationService->isUserAuthenticatedWithCookie() && $this->authenticationService->isValidAuthToken($token) === false) {
+            return Response::createUnauthorized();
         }
 
         return Response::createJson(

@@ -108,8 +108,25 @@ X-Auth-Token: {{responseAuthToken}}
 
 > {%
     client.test("Response has correct status code", function() {
-        let expected = 403
+        let expected = 401
         client.assert(response.status === expected, "Expected status code: " + expected);
+    });
+%}
+
+###
+
+GET http://127.0.0.1/api/authentication/token
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+    client.test("Response has correct status code", function() {
+        let expectedStatusCode = 400
+        let expectedError = "MissingAuthToken";
+        client.assert(response.status === expectedStatusCode, "Expected status code: " + expectedStatusCode);
+        client.assert(response.body.error === expectedError, "Expected error: " + expectedError);
+        client.assert(response.body.message === 'Authentication token is missing in both the header and the cookie');
     });
 %}
 
