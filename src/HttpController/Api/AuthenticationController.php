@@ -89,7 +89,7 @@ class AuthenticationController
                 'authToken' => $userAndAuthToken['token'],
                 'user' => [
                     'id' => $userAndAuthToken['user']->getId(),
-                    'username' => $userAndAuthToken['user']->getName(),
+                    'name' => $userAndAuthToken['user']->getName(),
                     'isAdmin' => $userAndAuthToken['user']->isAdmin(),
                 ]
             ]),
@@ -146,7 +146,7 @@ class AuthenticationController
             Json::encode([
                 'user' => [
                     'id' => $user->getId(),
-                    'username' => $user->getName(),
+                    'name' => $user->getName(),
                     'isAdmin' => $user->isAdmin(),
                 ]
             ]),

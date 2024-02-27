@@ -8,11 +8,11 @@ X-Movary-Client: RestAPI Test
 
 ###
 
-GET http://127.0.0.1/api/authentication/authenticated
+GET http://127.0.0.1/api/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Movary-Client: RestAPI Test
+X-Auth-Token: {{xAuthToken}}
 
 ###
 
