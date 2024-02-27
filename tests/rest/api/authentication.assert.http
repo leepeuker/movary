@@ -54,11 +54,33 @@ X-Movary-Client: RestAPI Test
         client.assert(response.status === expected, "Expected status code: " + expected);
     });
     client.test("Response has correct body", function() {
-        client.assert(response.body.hasOwnProperty("'userId'") === false, "Response body missing property: userId");
-        client.assert(response.body.hasOwnProperty("'authToken'") === false, "Response body missing property: authToken");
+        client.assert(response.body.hasOwnProperty("authToken") === true, "Response body missing property: authToken");
+        client.assert(response.body.user.hasOwnProperty("id") === true, "Response body missing property: user.id");
+        client.assert(response.body.user.hasOwnProperty("name") === true, "Response body missing property: user.name");
+        client.assert(response.body.user.hasOwnProperty("isAdmin") === true, "Response body missing property: user.isAdmin");
     });
 
     client.global.set("responseAuthToken", response.body.authToken);
+%}
+
+###
+
+GET http://127.0.0.1/api/authentication/token
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{responseAuthToken}}
+
+> {%
+    client.test("Response has correct status code", function() {
+        let expected = 200
+        client.assert(response.status === expected, "Expected status code: " + expected);
+    });
+    client.test("Response has correct body", function() {
+        client.assert(response.body.user.hasOwnProperty("id") === true, "Response body missing property: user.id");
+        client.assert(response.body.user.hasOwnProperty("name") === true, "Response body missing property: user.name");
+        client.assert(response.body.user.hasOwnProperty("isAdmin") === true, "Response body missing property: user.isAdmin");
+    });
 %}
 
 ###
@@ -78,6 +100,38 @@ X-Auth-Token: {{responseAuthToken}}
 
 ###
 
+GET http://127.0.0.1/api/authentication/token
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{responseAuthToken}}
+
+> {%
+    client.test("Response has correct status code", function() {
+        let expected = 401
+        client.assert(response.status === expected, "Expected status code: " + expected);
+    });
+%}
+
+###
+
+GET http://127.0.0.1/api/authentication/token
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+    client.test("Response has correct status code", function() {
+        let expectedStatusCode = 400
+        let expectedError = "MissingAuthToken";
+        client.assert(response.status === expectedStatusCode, "Expected status code: " + expectedStatusCode);
+        client.assert(response.body.error === expectedError, "Expected error: " + expectedError);
+        client.assert(response.body.message === 'Authentication token header is missing');
+    });
+%}
+
+###
+
 DELETE http://127.0.0.1/api/authentication/token
 Accept: */*
 Cache-Control: no-cache
@@ -89,7 +143,7 @@ Content-Type: application/json
         client.assert(response.status === expected, "Expected status code: " + expected);
     });
     client.test("Response has correct body", function() {
-        let expected = '{"error":"MissingAuthToken","message":"Authentication token to delete in headers missing"}';
+        let expected = '{"error":"MissingAuthToken","message":"Authentication token header is missing"}';
         client.assert(JSON.stringify(response.body) === expected, "Expected response body: " + expected);
     });
 %}
