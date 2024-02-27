@@ -64,13 +64,12 @@ class Factory
 
     private const DEFAULT_ENABLE_FILE_LOGGING = true;
 
-    public static function createAuthenticationController(Config $config, ContainerInterface $container) : AuthenticationController
+    public static function createAuthenticationController(ContainerInterface $container) : AuthenticationController
     {
         return new AuthenticationController(
             $container->get(Twig\Environment::class),
             $container->get(Authentication::class),
-            $container->get(SessionWrapper::class),
-            $config->getAsBool('ENABLE_REGISTRATION')
+            $container->get(SessionWrapper::class)
         );
     }
 
