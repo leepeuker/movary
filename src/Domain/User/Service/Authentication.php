@@ -105,7 +105,7 @@ class Authentication
             return $tokenInCookie;
         }
 
-        return $request->getHeaders()['X-Auth-Token'] ?? null;
+        return $request->getHeaders()['X-Movary-Token'] ?? null;
     }
 
     public function getUserIdByApiToken(Request $request) : ?int
