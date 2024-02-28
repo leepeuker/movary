@@ -1,7 +1,0 @@
-GET http://127.0.0.1/api/movies/search?search=Matrix&page=1&releaseYear=2012
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
-X-Movary-Token: {{xMovaryToken}}
-
-####
