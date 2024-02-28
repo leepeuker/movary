@@ -82,21 +82,11 @@
 
                 <div style="margin-top: 0.9rem">
                     <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_history')" style="margin-right: .3rem">Show imports</button>
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       href="/jobs/schedule/trakt-history-sync">Import history</a>
-
+                    <button type="button" onclick="triggerTraktImportHistory()" class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}">Import history</button>
                     <br>
-
-                    {% if traktScheduleRatingsSyncSuccessful == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Ratings import scheduled
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
-
+                    <div id="traktScheduleRatingsResponse"></div>
                     <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_ratings')" style="margin-right: .3rem;margin-top: 1rem">Show imports</button>
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       href="/jobs/schedule/trakt-ratings-sync" style="margin-top: 1rem">Import ratings</a>
+                    <button type="button" onclick="triggerTraktImportRatings()" class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}" style="margin-top: 1rem">Import ratings</button>
                 </div>
             </div>
         </div>

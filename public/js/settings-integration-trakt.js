@@ -44,3 +44,23 @@ function toggleTableVisibility() {
     document.getElementById('importTable').classList.remove('d-none')
     document.getElementById('showImportTableButton').disabled = true
 }
+
+async function triggerTraktImportRatings(){
+    await fetch('/api/job-queue/schedule/trakt-ratings-sync', {
+        method: 'POST',
+    }).then(response => {
+        if(response.ok) {
+            addAlert('#traktScheduleRatingsResponse', 'Ratings import scheduled', 'success', true, 0);
+        }
+    })
+}
+
+async function triggerTraktImportHistory(){
+    await fetch('/api/job-queue/schedule/trakt-history-sync', {
+        method: 'POST',
+    }).then(response => {
+        if(response.ok) {
+            addAlert('#traktScheduleRatingsResponse', 'Ratings import scheduled', 'success', true, 0);
+        }
+    })
+}

@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Movary\HttpController\Web\Middleware;
+namespace Movary\HttpController\Api\Middleware;
 
 use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\Web\Middleware\MiddlewareInterface;
 use Movary\ValueObject\Http\Response;
 
 class UserHasJellyfinToken implements MiddlewareInterface

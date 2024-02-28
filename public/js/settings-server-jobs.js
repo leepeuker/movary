@@ -17,3 +17,21 @@ function refreshPage() {
 
     window.location.href = '/settings/server/jobs?jpp=' + jobsPerPage
 }
+
+async function deleteJobs(target = 'all') {
+    let confirmation;
+    if(target === 'all') {
+        confirmation = confirm('Are you sure you want to remove all processed jobs (done + failed)?');
+    } else if(target === 'processed') {
+        confirmation = confirm('Are you sure you want to remove all jobs? This will not stop active job processes');
+    }
+    if(confirmation === true) {
+        await fetch('/api/job-queue?target=' + target, {
+            method: 'DELETE',
+        }).then(response => {
+            if(response.ok) {
+                window.location.reload();
+            }
+        })
+    }
+}

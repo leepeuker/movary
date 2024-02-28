@@ -38,23 +38,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook']);
     $routes->add('POST', '/emby/{id:.+}', [Web\EmbyController::class, 'handleEmbyWebhook']);
 
-    #############
-    # Job Queue #
-    #############
-    $routes->add('GET', '/jobs', [Web\JobController::class, 'getJobs'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/job-queue/purge-processed', [Web\JobController::class, 'purgeProcessedJobs'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/job-queue/purge-all', [Web\JobController::class, 'purgeAllJobs'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/jellyfin-export-history', [Web\JobController::class, 'scheduleJellyfinExportHistory'], [
-        Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserHasJellyfinToken::class
-    ]);
-
     ############
     # Settings #
     ############
@@ -228,6 +211,20 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/webhook/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
 
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
+
+    #############
+    # Job Queue #
+    #############
+    $routes->add('GET', '/job-queue', [Api\JobController::class, 'getJobs'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('DELETE', '/job-queue', [Api\JobController::class, 'purgeJobs'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/job-queue/schedule/trakt-history-sync', [Api\JobController::class, 'scheduleTraktHistorySync'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/job-queue/schedule/trakt-ratings-sync', [Api\JobController::class, 'scheduleTraktRatingsSync'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/job-queue/schedule/letterboxd-diary-sync', [Api\JobController::class, 'scheduleLetterboxdDiaryImport'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/job-queue/schedule/letterboxd-ratings-sync', [Api\JobController::class, 'scheduleLetterboxdRatingsImport'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/job-queue/schedule/plex-watchlist-sync', [Api\JobController::class, 'schedulePlexWatchlistImport'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/job-queue/schedule/jellyfin-import-history', [Api\JobController::class, 'scheduleJellyfinImportHistory'], [Api\Middleware\IsAuthenticated::class]);
+
+    $routes->add('POST', '/jobs/schedule/jellyfin-export-history', [Api\JobController::class, 'scheduleJellyfinExportHistory'], [Api\Middleware\IsAuthenticated::class, Api\Middleware\UserHasJellyfinToken::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

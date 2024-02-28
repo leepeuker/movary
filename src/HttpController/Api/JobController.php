@@ -1,11 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Movary\HttpController\Web;
+namespace Movary\HttpController\Api;
 
-use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
-use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
@@ -33,98 +30,104 @@ class JobController
         $parameters = $request->getGetParameters();
 
         $jobType = JobType::createFromString($parameters['type']);
+        $token = $this->authenticationService->getUserIdByApiToken($request);
+        if(empty($token)) {
+            return Response::createUnauthorized();
+        }
 
-        $jobs = $this->jobQueueApi->find($this->authenticationService->getCurrentUserId(), $jobType);
+        $jobs = $this->jobQueueApi->find($token, $jobType);
 
         return Response::createJson(Json::encode($jobs));
     }
 
-    public function purgeAllJobs() : Response
+    public function purgeJobs(Request $request) : Response
     {
-        $this->jobQueueApi->purgeAllJobs();
-
-        return Response::createSeeOther('/settings/server/jobs');
-    }
-
-    public function purgeProcessedJobs() : Response
-    {
-        $this->jobQueueApi->purgeProcessedJobs();
-
-        return Response::createSeeOther('/settings/server/jobs');
+        $queryParameters = $request->getGetParameters();
+        $target = $queryParameters['target'] ?? null;
+        switch($target) {
+            case 'all':
+            case null:
+                $this->jobQueueApi->purgeAllJobs();
+                return Response::createNoContent();
+            case 'processed':
+                $this->jobQueueApi->purgeProcessedJobs();
+                return Response::createNoContent();
+            default:
+                return Response::createBadRequest(
+                    Json::encode([
+                        "error" => "InvalidTarget",
+                        "message" => "An invalid target has been requested to delete."
+                    ])
+                );
+        }
     }
 
     public function scheduleLetterboxdDiaryImport(Request $request) : Response
     {
         $fileParameters = $request->getFileParameters();
 
-        if (empty($fileParameters['diaryCsv']['tmp_name']) === true) {
-            throw new RuntimeException('Missing ratings csv file');
+        if (empty($fileParameters['letterboxdDiaryCsv']['tmp_name']) === true) {
+            return Response::createBadRequest(
+                Json::encode([
+                    "error" => "missingRatingsCsvFile",
+                    "message" => "No CSV file has been uploaded"
+                ])
+            );
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
 
         $targetFile = $this->appStorageDirectory . 'letterboxd-diary-' . $userId . '-' . time() . '.csv';
-        move_uploaded_file($fileParameters['diaryCsv']['tmp_name'], $targetFile);
+        move_uploaded_file($fileParameters['letterboxdDiaryCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidDiaryCsv($targetFile) === false) {
-            $this->sessionWrapper->set('letterboxdDiaryImportFileInvalid', true);
-
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            return Response::createBadRequest(
+                Json::encode([
+                    "error" => "letterboxdDiaryImportFileInvalid",
+                    "message" => 'Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Watched date".'
+                ])
             );
         }
 
         $this->jobQueueApi->addLetterboxdImportHistoryJob($userId, $targetFile);
 
-        $this->sessionWrapper->set('letterboxdDiarySyncSuccessful', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createNoContent();
     }
 
     public function scheduleLetterboxdRatingsImport(Request $request) : Response
     {
         $fileParameters = $request->getFileParameters();
 
-        if (empty($fileParameters['ratingsCsv']['tmp_name']) === true) {
+        if (empty($fileParameters['letterboxdRatingsCsv']['tmp_name']) === true) {
             $this->sessionWrapper->set('letterboxdRatingsImportFileMissing', true);
 
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            return Response::createBadRequest(
+                Json::encode([
+                    "error" => "letterboxdRatingsImportFileMissing",
+                    "message" => "No file has been uploaded"
+                ])
             );
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
 
         $targetFile = $this->appStorageDirectory . 'letterboxd-ratings-' . $userId . '-' . time() . '.csv';
-        move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
+        move_uploaded_file($fileParameters['letterboxdRatingsCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidRatingsCsv($targetFile) === false) {
             $this->sessionWrapper->set('letterboxdRatingsImportFileInvalid', true);
 
-            return Response::create(
-                StatusCode::createSeeOther(),
-                null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            return Response::createBadRequest(
+                Json::encode([
+                    "error" => "letterboxdRatingsImportFileInvalid",
+                    "message" => 'Csv file invalid: Must contain the columns "Rating", "Letterboxd URI" and "Name".'
+                ])
             );
         }
 
         $this->jobQueueApi->addLetterboxdImportRatingsJob($userId, $targetFile);
 
-        $this->sessionWrapper->set('letterboxdRatingsSyncSuccessful', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createNoContent();
     }
 
     public function schedulePlexWatchlistImport() : Response
@@ -133,11 +136,7 @@ class JobController
 
         $this->jobQueueApi->addPlexImportWatchlistJob($currentUser->getId());
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createNoContent();
     }
 
     public function scheduleJellyfinImportHistory() : Response
@@ -146,11 +145,7 @@ class JobController
 
         $this->jobQueueApi->addJellyfinImportMoviesJob($currentUserId);
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createNoContent();
     }
 
     public function scheduleJellyfinExportHistory() : Response
@@ -159,11 +154,7 @@ class JobController
 
         $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId);
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createNoContent();
     }
 
     public function scheduleTraktHistorySync() : Response
@@ -172,11 +163,7 @@ class JobController
 
         $this->sessionWrapper->set('scheduledTraktHistoryImport', true);
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createNoContent();
     }
 
     public function scheduleTraktRatingsSync() : Response
@@ -185,10 +172,6 @@ class JobController
 
         $this->sessionWrapper->set('scheduledTraktRatingsImport', true);
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::createNoContent();
     }
 }

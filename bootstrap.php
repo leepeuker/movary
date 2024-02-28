@@ -16,7 +16,7 @@ $builder->addDefinitions(
         \Movary\Service\Export\ExportService::class => DI\factory([Factory::class, 'createExportService']),
         \Movary\HttpController\Api\OpenApiController::class => DI\factory([Factory::class, 'createOpenApiController']),
         \Movary\HttpController\Web\CreateUserController::class => DI\factory([Factory::class, 'createCreateUserController']),
-        \Movary\HttpController\Web\JobController::class => DI\factory([Factory::class, 'createJobController']),
+        \Movary\HttpController\Api\JobController::class => DI\factory([Factory::class, 'createJobController']),
         \Movary\HttpController\Web\LandingPageController::class => DI\factory([Factory::class, 'createLandingPageController']),
         \Movary\HttpController\Web\Middleware\ServerHasRegistrationEnabled::class => DI\factory([Factory::class, 'createMiddlewareServerHasRegistrationEnabled']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),

@@ -1066,6 +1066,273 @@
         }
       }
     },
+    "/job-queue": {
+      "get": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Get all jobs of a specific type",
+        "description": "Get all jobs in the queue with a specific type, triggered by a specific user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The type of job that's requested"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "The response is an array containing all the jobs with a specific type.",
+                  "example": [
+                    {
+                      "type": "job_type",
+                      "status": "in progress",
+                      "userId": 1,
+                      "createdAt": "2023-08-05 16:44:35",
+                      "updatedAt": null
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Delete all jobs",
+        "description": "Delete all jobs, regardless of their status",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "target",
+            "description": "Which jobs to delete. It can be either 'all' (meaning that all jobs would be deleted) or 'processed' (meaning only the jobs that have finished running will be deleted). It defaults to 'all'.",
+            "examples": {
+              "all": {
+                "target": "all"
+              },
+              "processed": {
+                "target": "processed"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/job-queue/schedule/trakt-history-sync": {
+      "post": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Schedule a movie history import from Trakt.tv",
+        "description": "Schedule a job to import all watched movies from Trakt.tv, if the user has set Trakt.tv credentials in the settings.",
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-jobs"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/job-queue/schedule/trakt-ratings-sync": {
+      "post": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Schedule a ratings import from Trakt.tv",
+        "description": "Schedule a job to import all ratings of movies from Trakt.tv, if the user has set Trakt.tv credentials in the settings.",
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-jobs"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/job-queue/schedule/letterboxd-diary-sync": {
+      "post": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Schedule a diary import from Letterboxd",
+        "description": "Schedule a job to upload and import all diary data from Letterboxd",
+        "requestBody": {
+          "content": {
+            "text/csv": {
+              "schema": {
+                "type": "string",
+                "name": "letterboxdDiaryCsv",
+                "description": "The file of the letterboxd diary. It has to be in sent in a form parameter named 'letterboxdDiaryCsv', otherwise the request will fail."
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-jobs"
+          },
+          "400": {
+            "description": "An invalid Letterboxd diary has been uploaded or no file was uploaded"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/job-queue/schedule/letterboxd-ratings-sync": {
+      "post": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Schedule a rating import from Letterboxd",
+        "description": "Schedule a job to upload and import all rating data from Letterboxd",
+        "requestBody": {
+          "content": {
+            "text/csv": {
+              "schema": {
+                "type": "string",
+                "name": "letterboxdRatingsCsv",
+                "description": "The file of the letterboxd ratings. It has to be in sent in a form parameter named 'letterboxdRatingsCsv', otherwise the request will fail."
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-jobs"
+          },
+          "400": {
+            "description": "An invalid Letterboxd ratings file been uploaded or no file was uploaded"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/job-queue/schedule/plex-watchlist-sync": {
+      "post": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Schedule a job to import the watchlist from Plex.",
+        "description": "Schedule a job to import all movies from Plex's watchlist into Movary's watchlist",
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-jobs"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/job-queue/schedule/jellyfin-import-history": {
+      "post": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Schedule a job to import the watch history from Jellyfin.",
+        "description": "Schedule a job to import all watched movies from Jellyfin",
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-jobs"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/job-queue/schedule/jellyfin-export-history": {
+      "post": {
+        "tags": [
+          "Job management"
+        ],
+        "summary": "Schedule a job to export the watch history to Jellyfin.",
+        "description": "Schedule a job to export all watched movies from Movary into Jellyfin",
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204-jobs"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
     "/authentication/token": {
       "get": {
         "tags": [
@@ -1416,6 +1683,9 @@
     "responses": {
       "204": {
         "description": "Successful operation, response has no content"
+      },
+      "204-jobs": {
+        "description": "No response content. The job has been scheduled, but it hasn't necessarily already started running."
       },
       "400": {
         "description": "The request payload or header are not correct",
