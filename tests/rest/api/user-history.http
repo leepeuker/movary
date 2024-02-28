@@ -2,7 +2,7 @@ GET http://127.0.0.1/api/users/{{username}}/history/movies?search=Matrix&limit=1
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 ####
 
@@ -10,7 +10,7 @@ PUT http://127.0.0.1/api/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 [{"movaryId" : 1, "watchedAt" : "2011-05-06", "plays" :  1, "comment" :  "comment"}]
 
@@ -20,7 +20,7 @@ POST http://127.0.0.1/api/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 [{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
 
@@ -30,7 +30,7 @@ DELETE http://127.0.0.1/api/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 [{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
 
