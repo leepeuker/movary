@@ -34,35 +34,23 @@
                     </ul>
                 </div>
 
-                <form action="/api/jobs/schedule/letterboxd-diary-sync" method="post" enctype="multipart/form-data">
+                <form>
                     <h5 style="margin-bottom: 0.5rem">Import History</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the diary.csv file</p>
                     <div class="input-group mb-3">
-                        <input type="file" class="form-control" accept=".csv" name="letterboxdDiaryCsv" id="diaryCsv" required
+                        <input type="file" class="form-control" accept=".csv" name="letterboxdDiaryCsv" id="letterboxdDiaryCsv" required
                                {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
                     </div>
 
                     <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_history')" style="margin-right: .3rem">Show imports</button>
-                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history</button>
+                    <button type="button" onclick="triggerLetterboxdDiaryImport()" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import history</button>
 
-                    {% if letterboxdDiarySyncSuccessful == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            History import scheduled
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-
-                    {% endif %}
-                    {% if letterboxdDiaryImportFileInvalid == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Watched date".
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
+                    <div id="letterboxdImportDiaryResponse"></div>
                 </form>
 
                 <br>
 
-                <form action="/api/jobs/schedule/letterboxd-ratings-sync" method="post" enctype="multipart/form-data">
+                <form>
                     <h5 style="margin-bottom: 0.5rem">Import Ratings</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
                     <div class="input-group mb-3">
@@ -71,20 +59,9 @@
                     </div>
 
                     <button type="button" class="btn btn-outline-primary" onclick="showJobModal('letterboxd_import_ratings')" style="margin-right: .3rem">Show imports</button>
-                    <button type="submit" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import ratings</button>
+                    <button type="button" onclick="triggerLetterboxdRatingsImport()" class="btn btn-warning" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import ratings</button>
 
-                    {% if letterboxdRatingsSyncSuccessful == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Ratings import scheduled
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
-                    {% if letterboxdRatingsImportFileInvalid == true %}
-                        <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Csv file invalid: Must contain the columns "Rating", "Letterboxd URI" and "Name".
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
+                    <div id="letterboxdImportRatingsResponse"></div>
                 </form>
 
                 <hr>

@@ -266,7 +266,7 @@ async function updateSyncOptions() {
 
 async function exportJellyfin() {
     const response = await fetch(
-        '/api/jobs/schedule/jellyfin-export-history',
+        '/api/job-queue/schedule/jellyfin-export-history',
         {'method': 'get'}
     ).catch(function (error) {
         addAlert('alertJellyfinExportHistoryDiv', 'History export could not be scheduled', 'danger')
@@ -296,7 +296,7 @@ async function exportJellyfin() {
 
 async function importJellyfin() {
     const response = await fetch(
-        '/api/jobs/schedule/jellyfin-import-history',
+        '/api/job-queue/schedule/jellyfin-import-history',
         {'method': 'get'}
     ).catch(function (error) {
         addAlert('alertJellyfinImportHistoryDiv', 'History import could not be scheduled', 'danger')

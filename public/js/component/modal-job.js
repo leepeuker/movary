@@ -67,7 +67,7 @@ function setJobModalTitle(jobType) {
 
 async function fetchJobs(jobType) {
 
-    const response = await fetch('/api/jobs?type=' + jobType)
+    const response = await fetch('/api/job-queue?type=' + jobType)
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

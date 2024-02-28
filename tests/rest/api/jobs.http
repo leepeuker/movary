@@ -2,4 +2,4 @@ GET http://127.0.0.1/api/jobs?type=jellyfin_import_history
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xAuthToken}}

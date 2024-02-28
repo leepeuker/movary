@@ -40,18 +40,26 @@ class JobController
         return Response::createJson(Json::encode($jobs));
     }
 
-    public function purgeAllJobs() : Response
+    public function purgeJobs(Request $request) : Response
     {
-        $this->jobQueueApi->purgeAllJobs();
-
-        return Response::createNoContent();
-    }
-
-    public function purgeProcessedJobs() : Response
-    {
-        $this->jobQueueApi->purgeProcessedJobs();
-
-        return Response::createNoContent();
+        $queryParameters = $request->getGetParameters();
+        $target = $queryParameters['target'] ?? null;
+        switch($target) {
+            case 'all':
+            case null:
+                $this->jobQueueApi->purgeAllJobs();
+                return Response::createNoContent();
+            case 'processed':
+                $this->jobQueueApi->purgeProcessedJobs();
+                return Response::createNoContent();
+            default:
+                return Response::createBadRequest(
+                    Json::encode([
+                        "error" => "InvalidTarget",
+                        "message" => "An invalid target has been requested to delete."
+                    ])
+                );
+        }
     }
 
     public function scheduleLetterboxdDiaryImport(Request $request) : Response
@@ -76,7 +84,7 @@ class JobController
             return Response::createBadRequest(
                 Json::encode([
                     "error" => "letterboxdDiaryImportFileInvalid",
-                    "message" => "Invalid Letterboxd diary has been uploaded"
+                    "message" => 'Csv file invalid: Must contain the columns "Date", "Letterboxd URI" and "Watched date".'
                 ])
             );
         }
@@ -112,7 +120,7 @@ class JobController
             return Response::createBadRequest(
                 Json::encode([
                     "error" => "letterboxdRatingsImportFileInvalid",
-                    "message" => "Invalid Letterboxd ratings has been uploaded"
+                    "message" => 'Csv file invalid: Must contain the columns "Rating", "Letterboxd URI" and "Name".'
                 ])
             );
         }

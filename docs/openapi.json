@@ -1066,7 +1066,7 @@
         }
       }
     },
-    "/jobs": {
+    "/job-queue": {
       "get": {
         "tags": [
           "Job management"
@@ -1114,40 +1114,31 @@
             "token": []
           }
         ]
-      }
-    },
-    "/job-queue/purge-processed": {
-      "delete": {
-        "tags": [
-          "Job management"
-        ],
-        "summary": "Delete processed jobs",
-        "description": "Delete processed jobs",
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204-jobs"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          }
-        },
-        "security": [
-          {
-            "token": []
-          }
-        ]
-      }
-    },
-    "/job-queue/purge-all": {
+      },
       "delete": {
         "tags": [
           "Job management"
         ],
         "summary": "Delete all jobs",
         "description": "Delete all jobs, regardless of their status",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "target",
+            "description": "Which jobs to delete. It can be either 'all' (meaning that all jobs would be deleted) or 'processed' (meaning only the jobs that have finished running will be deleted). It defaults to 'all'.",
+            "examples": {
+              "all": {
+                "target": "all"
+              },
+              "processed": {
+                "target": "processed"
+              }
+            }
+          }
+        ],
         "responses": {
           "204": {
-            "$ref": "#/components/responses/204-jobs"
+            "$ref": "#/components/responses/204"
           },
           "403": {
             "$ref": "#/components/responses/403"
@@ -1160,7 +1151,7 @@
         ]
       }
     },
-    "/jobs/schedule/trakt-history-sync": {
+    "/job-queue/schedule/trakt-history-sync": {
       "post": {
         "tags": [
           "Job management"
@@ -1182,7 +1173,7 @@
         ]
       }
     },
-    "/jobs/schedule/trakt-ratings-sync": {
+    "/job-queue/schedule/trakt-ratings-sync": {
       "post": {
         "tags": [
           "Job management"
@@ -1204,7 +1195,7 @@
         ]
       }
     },
-    "/jobs/schedule/letterboxd-diary-sync": {
+    "/job-queue/schedule/letterboxd-diary-sync": {
       "post": {
         "tags": [
           "Job management"
@@ -1240,7 +1231,7 @@
         ]
       }
     },
-    "/jobs/schedule/letterboxd-ratings-sync": {
+    "/job-queue/schedule/letterboxd-ratings-sync": {
       "post": {
         "tags": [
           "Job management"
@@ -1276,7 +1267,7 @@
         ]
       }
     },
-    "/jobs/schedule/plex-watchlist-sync": {
+    "/job-queue/schedule/plex-watchlist-sync": {
       "post": {
         "tags": [
           "Job management"
@@ -1298,7 +1289,7 @@
         ]
       }
     },
-    "/jobs/schedule/jellyfin-import-history": {
+    "/job-queue/schedule/jellyfin-import-history": {
       "post": {
         "tags": [
           "Job management"
@@ -1320,7 +1311,7 @@
         ]
       }
     },
-    "/jobs/schedule/jellyfin-export-history": {
+    "/job-queue/schedule/jellyfin-export-history": {
       "post": {
         "tags": [
           "Job management"
