@@ -6,12 +6,12 @@ jobs:
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
-    services:
-      database:
-        image: mariadb
-        env:
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
-          MARIADB_DATABASE: movary
+#    services:
+#      database:
+#        image: mariadb
+#        env:
+#          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
+#          MARIADB_DATABASE: movary
 
     steps:
       - uses: actions/checkout@v3
@@ -63,7 +63,7 @@ jobs:
         run: docker build --target development --tag movary:ci ./build/php/
 
       - name: Run development image
-        run: docker run --name movary --rm -d -v /home/runner/work/movary/movary:/app --add-host host.docker.internal:host-gateway --env-file=test.env -p 80:80 movary:ci
+        run: docker run --name movary --rm -d -v /home/runner/work/movary/movary:/app -e DATABASE_MODE="sqlite" -p 80:80 movary:ci
 
       - name: Prepare for the tests
         run: |
