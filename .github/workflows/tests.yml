@@ -20,7 +20,7 @@ jobs:
       - name: Set environment variables
         run: |
           echo "DATABASE_MODE=mysql" > "test.env"
-          echo "DATABASE_MYSQL_HOST=localhost" >> "test.env"
+          echo "DATABASE_MYSQL_HOST=127.0.0.1" >> "test.env"
           echo "DATABASE_MYSQL_PORT=3306" >> "test.env"
           echo "DATABASE_MYSQL_USER=root" >> "test.env"
           echo "DATABASE_MYSQL_NAME=movary" >> "test.env"
@@ -41,7 +41,7 @@ jobs:
         with:
           php-version: '8.3'
           extensions: json, mbstring, pdo
-          tools: composer, phpcs, phpstan, phpunit:9.6.17, psalm:4.30, cs2pr
+          tools: composer, phpcs, phpstan, phpunit:9.6.17, psalm:4.30, cs2pr, phinx:0.15.5
 
       - name: Install composer package
         uses: "ramsey/composer-install@v3"
