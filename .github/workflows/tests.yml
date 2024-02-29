@@ -60,10 +60,10 @@ jobs:
         run: phpunit -c ./settings/phpunit.xml --testsuite unit
 
       - name: Build docker development image
-        run: docker build --target development --tag movary ./build/php/
+        run: docker build --target development --tag movary:ci ./build/php/
 
       - name: Run development image
-        run: docker run --rm -d -v /home/runner/work/movary/movary:/app movary --add-host host.docker.internal:host-gateway --env-file=test.env --name movary -p 80:80
+        run: docker run --name movary --rm -d -v /home/runner/work/movary/movary:/app --add-host host.docker.internal:host-gateway --env-file=test.env -p 80:80 movary:ci
 
       - name: Prepare for the tests
         run: |
