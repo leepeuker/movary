@@ -98,14 +98,19 @@ class Authentication
         return $userId;
     }
 
-    public function getToken() : ?string
+    public function getToken(Request $request) : ?string
     {
-        return $_COOKIE[self::AUTHENTICATION_COOKIE_NAME];
+        $tokenInCookie = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        if ($tokenInCookie !== false && $tokenInCookie !== null) {
+            return $tokenInCookie;
+        }
+
+        return $request->getHeaders()['X-Movary-Token'] ?? null;
     }
 
     public function getUserIdByApiToken(Request $request) : ?int
     {
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME) ?? null;
+        $apiToken = $this->getToken($request);
         if ($apiToken === null) {
             return null;
         }
@@ -117,7 +122,7 @@ class Authentication
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
-        if (empty($token) === false && $this->isValidToken((string)$token) === true) {
+        if (empty($token) === false && $this->isValidAuthToken((string)$token) === true) {
             return true;
         }
 
@@ -159,7 +164,7 @@ class Authentication
         return $this->isUserAuthenticatedWithCookie() === true && $this->getCurrentUserId() === $userId;
     }
 
-    public function isValidToken(string $token) : bool
+    public function isValidAuthToken(string $token) : bool
     {
         $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
 

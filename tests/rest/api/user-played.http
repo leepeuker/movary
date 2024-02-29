@@ -2,7 +2,7 @@ GET http://127.0.0.1/api/users/{{username}}/played/movies?limit=10&sortOrder=des
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 ####
 
@@ -10,7 +10,7 @@ PUT http://127.0.0.1/api/users/{{username}}/played/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 [
   {
@@ -36,7 +36,7 @@ POST http://127.0.0.1/api/users/{{username}}/played/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 [
   {
@@ -60,7 +60,7 @@ DELETE http://127.0.0.1/api/users/{{username}}/played/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{xAuthToken}}
+X-Movary-Token: {{xMovaryToken}}
 
 [
   {

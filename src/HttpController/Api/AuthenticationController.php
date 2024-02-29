@@ -16,6 +16,7 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -85,8 +86,12 @@ class AuthenticationController
 
         return Response::createJson(
             Json::encode([
-                'userId' => $userAndAuthToken['user']->getId(),
-                'authToken' => $userAndAuthToken['token']
+                'authToken' => $userAndAuthToken['token'],
+                'user' => [
+                    'id' => $userAndAuthToken['user']->getId(),
+                    'name' => $userAndAuthToken['user']->getName(),
+                    'isAdmin' => $userAndAuthToken['user']->isAdmin(),
+                ]
             ]),
         );
     }
@@ -99,12 +104,12 @@ class AuthenticationController
             return Response::CreateNoContent();
         }
 
-        $apiToken = $request->getHeaders()['X-Auth-Token'] ?? null;
+        $apiToken = $this->authenticationService->getToken($request);
         if ($apiToken === null) {
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'MissingAuthToken',
-                    'message' => 'Authentication token to delete in headers missing'
+                    'message' => 'Authentication token header is missing'
                 ]),
                 [Header::createContentTypeJson()],
             );
@@ -113,5 +118,38 @@ class AuthenticationController
         $this->authenticationService->deleteToken($apiToken);
 
         return Response::CreateNoContent();
+    }
+
+    public function getTokenData(Request $request) : Response
+    {
+        $token = $this->authenticationService->getToken($request);
+        if ($token === null) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingAuthToken',
+                    'message' => 'Authentication token header is missing'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $user = $this->userApi->findByToken($token);
+        if ($user === null) {
+            return Response::createUnauthorized();
+        }
+
+        if($this->authenticationService->isUserAuthenticatedWithCookie() && $this->authenticationService->isValidAuthToken($token) === false) {
+            return Response::createUnauthorized();
+        }
+
+        return Response::createJson(
+            Json::encode([
+                'user' => [
+                    'id' => $user->getId(),
+                    'name' => $user->getName(),
+                    'isAdmin' => $user->isAdmin(),
+                ]
+            ]),
+        );
     }
 }
