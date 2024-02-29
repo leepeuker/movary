@@ -17,12 +17,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set environment variables
         run: |
-          echo "{DATABASE_MODE}={mysql}" >> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_HOST}={localhost}" >> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_PORT}={3306}" >> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_USER}={root}" >> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_NAME}={movary}" >> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_PASSWORD}={}" >> "$GITHUB_ENV"
+          echo "DATABASE_MODE=mysql" > "test.env"
+          echo "DATABASE_MYSQL_HOST=localhost" >> "test.env"
+          echo "DATABASE_MYSQL_PORT=3306" >> "test.env"
+          echo "DATABASE_MYSQL_USER=root" >> "test.env"
+          echo "DATABASE_MYSQL_NAME=movary" >> "test.env"
+          echo "DATABASE_MYSQL_PASSWORD=" >> "test.env"
 
       - uses: actions/setup-java@v3
         with:
@@ -59,9 +59,20 @@ jobs:
       - name: Run PHPUnit
         run: phpunit -c ./settings/phpunit.xml --testsuite unit
 
-      - name: Start built-in PHP webserver and run the tests
+      - name: Build docker development image
+        run: docker build --target development --tag movary ./build/php/
+
+      - name: Run development image
+        run: docker run --rm -d -v /home/runner/work/movary/movary:/app movary --add-host host.docker.internal:host-gateway --env-file=test.env --name movary -p 80:80
+
+      - name: Prepare for the tests
         run: |
-          php bin/console.php database:migration:migrate &&
-          php bin/console.php user:create testUser@domain.com password1234 testUser true &&
-          php -S 127.0.0.1:80 -t public &
+          docker exec movary php bin/console.php database:migration:migrate &&
+          docker exec movary php bin/console.php user:create testUser@domain.com password1234 testUser true
+
+      - name: Run the HTTP tests
+        run: |
           ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
+          
+      - name: Remove development image
+        run: docker rm -f movary
