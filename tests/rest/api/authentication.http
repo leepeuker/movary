@@ -54,8 +54,11 @@ X-Movary-Client: RestAPI Test
         client.assert(response.status === expected, "Expected status code: " + expected);
     });
     client.test("Response has correct body", function() {
-        client.assert(response.body.hasOwnProperty("'userId'") === false, "Response body missing property: userId");
-        client.assert(response.body.hasOwnProperty("'authToken'") === false, "Response body missing property: authToken");
+        client.assert(response.body.hasOwnProperty("user") === true, "Response body missing property: user");
+        client.assert(response.body.hasOwnProperty("authToken") === true, "Response body missing property: authToken");
+        client.assert(response.body.user.hasOwnProperty("id") === true, "Response body missing property: id");
+        client.assert(response.body.user.hasOwnProperty("name") === true, "Response body missing property: name");
+        client.assert(response.body.user.hasOwnProperty("isAdmin") === true, "Response body missing property: isAdmin");
     });
 
     client.global.set("responseAuthToken", response.body.authToken);
@@ -75,10 +78,10 @@ X-Movary-Token: {{responseAuthToken}}
         client.assert(response.status === expected, "Expected status code: " + expected);
     });
     client.test("Response has correct body", function() {
-        client.assert(response.body.hasOwnProperty("user") === false, "Response body missing property: user");
-        client.assert(response.body.user.hasOwnProperty("id") === false, "Response body missing property: id");
-        client.assert(response.body.user.hasOwnProperty("name") === false, "Response body missing property: name");
-        client.assert(response.body.user.hasOwnProperty("isAdmin") === false, "Response body missing property: isAdmin");
+        client.assert(response.body.hasOwnProperty("user") === true, "Response body missing property: user");
+        client.assert(response.body.user.hasOwnProperty("id") === true, "Response body missing property: id");
+        client.assert(response.body.user.hasOwnProperty("name") === true, "Response body missing property: name");
+        client.assert(response.body.user.hasOwnProperty("isAdmin") === true, "Response body missing property: isAdmin");
     });
 %}
 
