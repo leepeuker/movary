@@ -17,12 +17,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set environment variables
         run: |
-          echo "DATABASE_MODE=mysql" >> $DATABASE_MODE
-          echo "DATABASE_MYSQL_HOST=localhost" >>> $DATABASE_MYSQL_HOST
-          echo "DATABASE_MYSQL_PORT=3306" >>> $DATABASE_MYSQL_PORT
-          echo "DATABASE_MYSQL_USER=root" >>> $DATABASE_MYSQL_USER
-          echo "DATABASE_MYSQL_NAME=movary" >>> $DATABASE_MYSQL_NAME
-          echo "DATABASE_MYSQL_PASSWORD=" >>> $DATABASE_MYSQL_PASSWORD
+          echo "{DATABASE_MODE}={mysql}" >>> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_HOST}={localhost}" >>> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_PORT}={3306}" >>> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_USER}={root}" >>> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_NAME}={movary}" >>> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_PASSWORD}={}" >>> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v3
         with:
@@ -43,7 +43,7 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT
 
       - name: Cache dependencies
         uses: actions/cache@v4
