@@ -3,26 +3,27 @@ name: Run tests
 on: [ pull_request ]
 
 jobs:
-  run_php_tests:
-    name: Run PHP tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
-
-      - name: Build docker development image
-        run: docker build --target development --tag movary ./build/php/
-
-      - name: Install dependencies
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
-
-      - name: Run all test tools/suites
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer test
-  run_http_tests:
+  run_tests:
     name: Run HTTP tests
     runs-on: ubuntu-latest
+    services:
+      database:
+        image: mariadb
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD : password
+          MARIADB_DATABASE: movary
+
     steps:
       - uses: actions/checkout@v3
+      - name: Set environment variables
+        run: |
+          echo "DATABASE_MODE=mysql" >> $DATABASE_MODE
+          echo "DATABASE_MYSQL_HOST=localhost" >>> $DATABASE_MYSQL_HOST
+          echo "DATABASE_MYSQL_PORT=3306" >>> $DATABASE_MYSQL_PORT
+          echo "DATABASE_MYSQL_USER=root" >>> $DATABASE_MYSQL_USER
+          echo "DATABASE_MYSQL_NAME=movary" >>> $DATABASE_MYSQL_NAME
+          echo "DATABASE_MYSQL_PASSWORD=" >>> $DATABASE_MYSQL_PASSWORD
+
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -31,4 +32,47 @@ jobs:
         run: |
           curl -f -L -o ijhttp.zip "https://jb.gg/ijhttp/latest"
           unzip ijhttp.zip
-          ./ijhttp/ijhttp tests/rest/api --env-file tests/rest/api/http-client.env.json --env testUser
+          alias ijhttp="./ijhttp/ijhttp"
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: json, mbstring, pdo
+          tools: composer, phpcs, phpstan, phpunit, psalm, cs2pr
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Run PHPCs
+        run: phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests | cs2pr
+
+      - name: Run PHPStan
+        run: phpstan analyse -c ./settings/phpstan.neon
+
+      - name: Run Psalm
+        run: psalm -c ./settings/psalm.xml --show-info=false --output-format=github
+
+      - name: Run PHPUnit
+        run: phpunit -c ./settings/phpunit.xml --testsuite unit
+
+      - name: Start built-in PHP webserver and run the tests
+        run: |
+          php -S 127.0.0.1:80 -t public &
+          php bin/console.php database:migration:migrate &&
+          php bin/console.php user:create testUser@domain.com password1234 testUser true &&
+          ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
