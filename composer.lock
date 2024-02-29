@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ffb57947ee609fef4613bf091563c4f",
+    "content-hash": "39b079101e2b8798fea0049596857122",
     "packages": [
         {
             "name": "brick/math",
@@ -5497,12 +5497,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "de4aeda76503091f0d7b6f8a493f87994d6736a9"
+                "reference": "cca68bc8c5e35d0bc657c6c47bd40d28184abd87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/de4aeda76503091f0d7b6f8a493f87994d6736a9",
-                "reference": "de4aeda76503091f0d7b6f8a493f87994d6736a9",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/cca68bc8c5e35d0bc657c6c47bd40d28184abd87",
+                "reference": "cca68bc8c5e35d0bc657c6c47bd40d28184abd87",
                 "shasum": ""
             },
             "conflict": {
@@ -5861,7 +5861,7 @@
                 "open-web-analytics/open-web-analytics": "<1.7.4",
                 "opencart/opencart": "<=3.0.3.7|>=4,<4.0.2.3-dev",
                 "openid/php-openid": "<2.3",
-                "openmage/magento-lts": "<20.2",
+                "openmage/magento-lts": "<20.5",
                 "opensource-workshop/connect-cms": "<1.7.2|>=2,<2.3.2",
                 "orchid/platform": ">=9,<9.4.4|>=14.0.0.0-alpha4,<14.5",
                 "oro/calendar-bundle": ">=4.2,<=4.2.6|>=5,<=5.0.6|>=5.1,<5.1.1",
@@ -6229,7 +6229,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-26T23:04:41+00:00"
+            "time": "2024-02-27T22:04:41+00:00"
         },
         {
             "name": "sebastian/cli-parser",
