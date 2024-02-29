@@ -67,7 +67,20 @@ GET http://127.0.0.1/api/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Movary-Token: {{xMovaryToken}}
+X-Movary-Token: {{responseAuthToken}}
+
+> {%
+    client.test("Response has correct status code", function() {
+        let expected = 200
+        client.assert(response.status === expected, "Expected status code: " + expected);
+    });
+    client.test("Response has correct body", function() {
+        client.assert(response.body.hasOwnProperty("user") === false, "Response body missing property: user");
+        client.assert(response.body.user.hasOwnProperty("id") === false, "Response body missing property: id");
+        client.assert(response.body.user.hasOwnProperty("name") === false, "Response body missing property: name");
+        client.assert(response.body.user.hasOwnProperty("isAdmin") === false, "Response body missing property: isAdmin");
+    });
+%}
 
 ###
 
