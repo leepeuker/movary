@@ -74,7 +74,7 @@ jobs:
       - name: Run the HTTP tests
         run: |
           alias ijhttp="./ijhttp/ijhttp"
-          ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
+          ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
           
       - name: Remove development image
         run: docker rm -f movary
