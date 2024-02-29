@@ -17,12 +17,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set environment variables
         run: |
-          echo "{DATABASE_MODE}={mysql}" >>> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_HOST}={localhost}" >>> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_PORT}={3306}" >>> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_USER}={root}" >>> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_NAME}={movary}" >>> "$GITHUB_ENV"
-          echo "{DATABASE_MYSQL_PASSWORD}={}" >>> "$GITHUB_ENV"
+          echo "{DATABASE_MODE}={mysql}" >> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_HOST}={localhost}" >> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_PORT}={3306}" >> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_USER}={root}" >> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_NAME}={movary}" >> "$GITHUB_ENV"
+          echo "{DATABASE_MYSQL_PASSWORD}={}" >> "$GITHUB_ENV"
 
       - uses: actions/setup-java@v3
         with:
