@@ -49,12 +49,10 @@ class UserPageAuthorizationChecker
             return null;
         }
 
-        $requestedUserId = $requestedUser->getId();
-
-        if ($this->authenticationService->isUserPageVisibleForCurrentUser($requestedUser->getPrivacyLevel(), $requestedUserId) === false) {
+        if ($this->authenticationService->isUserPageVisibleForWebRequest($requestedUser) === false) {
             return null;
         }
 
-        return $requestedUserId;
+        return $requestedUser->getId();
     }
 }
