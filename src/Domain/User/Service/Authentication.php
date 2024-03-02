@@ -199,7 +199,7 @@ class Authentication
         $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
 
         if ($tokenExpirationDate === null) {
-            if($this->repository->findUserByToken($token) === null) {
+            if($this->repository->findUserByApiToken($token) === null) {
                 return false;
             }
         } else {
