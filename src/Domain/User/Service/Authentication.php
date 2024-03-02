@@ -48,13 +48,13 @@ class Authentication
 
     public function createAuthenticationObjectDynamically(Request $request) : ?AuthenticationObject
     {
-        $token =  $request->getHeaders()['X-Movary-Token'] ?? filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
-        $authenticationMethod = AuthenticationObject::COOKIE_AUTHENTICATION;
+        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME) ?? $request->getHeaders()['X-Movary-Token'] ?? null;
         if (empty($token) === true || $this->isValidToken($token) === false) {
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
-            $authenticationMethod = AuthenticationObject::HEADER_AUTHENTICATION;
+            return null;
         }
+        $authenticationMethod = empty($request->getHeaders()['X-Movary-Token']) === true ?  AuthenticationObject::COOKIE_AUTHENTICATION : AuthenticationObject::HEADER_AUTHENTICATION;
         $user = $this->userApi->findByToken($token);
         if(empty($user) === true) {
             return null;
