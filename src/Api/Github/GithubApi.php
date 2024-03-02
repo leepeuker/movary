@@ -4,7 +4,6 @@ namespace Movary\Api\Github;
 
 use Exception;
 use GuzzleHttp\Client;
-use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
 
 class GithubApi

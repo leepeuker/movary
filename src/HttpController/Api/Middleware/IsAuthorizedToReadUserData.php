@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController\Api\Middleware;
 
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Request;
-use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
 class IsAuthorizedToReadUserData implements MiddlewareInterface

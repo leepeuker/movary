@@ -7,6 +7,7 @@ use Movary\HttpController\Web\Dto\PersonsRequestDto;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
+use RuntimeException;
 
 class PersonsRequestMapper
 {
@@ -53,7 +54,7 @@ class PersonsRequestMapper
             'asc' => SortOrder::createAsc(),
             'desc' => SortOrder::createDesc(),
 
-            default => throw new \RuntimeException('Not supported sort order: ' . $getParameters['so'])
+            default => throw new RuntimeException('Not supported sort order: ' . $getParameters['so'])
         };
     }
 }

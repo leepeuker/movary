@@ -4,6 +4,7 @@ namespace Movary\Service\Export;
 
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
+use RuntimeException;
 
 class ExportService
 {
@@ -90,7 +91,7 @@ class ExportService
         $exportFileHandle = fopen($fileName, 'wb');
 
         if ($exportFileHandle === false) {
-            throw new \RuntimeException('Could not create or open export file: ' . $fileName);
+            throw new RuntimeException('Could not create or open export file: ' . $fileName);
         }
 
         return $exportFileHandle;

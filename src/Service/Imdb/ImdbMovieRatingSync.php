@@ -6,7 +6,6 @@ use Exception;
 use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
-use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
@@ -72,7 +71,7 @@ class ImdbMovieRatingSync
         ?int $movieCountSyncThreshold = null,
         array $movieIds = null,
         int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
-        bool $onlyNeverSynced = false
+        bool $onlyNeverSynced = false,
     ) : void {
         $movieIds = $this->movieApi->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold, $movieIds, $onlyNeverSynced);
 

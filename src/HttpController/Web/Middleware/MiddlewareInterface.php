@@ -2,7 +2,6 @@
 
 namespace Movary\HttpController\Web\Middleware;
 
-use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
 interface MiddlewareInterface

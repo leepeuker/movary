@@ -3,6 +3,7 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\UserApi;
+use RuntimeException;
 
 class TwoFactorAuthenticationApi
 {
@@ -34,7 +35,7 @@ class TwoFactorAuthenticationApi
         }
 
         if ($uri === null) {
-            throw new \RuntimeException('Could not find totp uri for user with id: ' . $userId);
+            throw new RuntimeException('Could not find totp uri for user with id: ' . $userId);
         }
 
         $totp = $this->twoFactorAuthenticationFactory->createOtpFromProvisioningUri($uri);

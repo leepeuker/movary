@@ -26,7 +26,7 @@ class WatchlistController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
         private readonly SyncMovie $tmdbMovieSyncService,
-        private readonly WatchlistRequestMapper $watchlistRequestMapper
+        private readonly WatchlistRequestMapper $watchlistRequestMapper,
     ) {
     }
 

@@ -14,6 +14,7 @@ use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 use RuntimeException;
+use Traversable;
 
 class MovieRepository
 {
@@ -176,7 +177,7 @@ class MovieRepository
         return MovieEntityList::createFromArray($data);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : \Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : Traversable
     {
         $whereQuery = '';
         if ($ids !== null && count($ids) > 0) {

@@ -7,6 +7,7 @@ use Movary\HttpController\Web\Dto\MoviesRequestDto;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
+use RuntimeException;
 
 class MoviesRequestMapper
 {
@@ -75,7 +76,7 @@ class MoviesRequestMapper
             'asc' => SortOrder::createAsc(),
             'desc' => SortOrder::createDesc(),
 
-            default => throw new \RuntimeException('Not supported sort order: ' . $getParameters['so'])
+            default => throw new RuntimeException('Not supported sort order: ' . $getParameters['so'])
         };
     }
 }

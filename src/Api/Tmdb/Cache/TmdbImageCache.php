@@ -3,6 +3,7 @@
 namespace Movary\Api\Tmdb\Cache;
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\ImageCacheService;
@@ -110,7 +111,7 @@ class TmdbImageCache
                 $resourceType,
                 $data['poster_path'] === null ? true : $forceRefresh,
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->warning('Could not cache ' . $resourceType . 'image: ' . $data['tmdb_poster_path'], ['exception' => $e]);
         }
 
