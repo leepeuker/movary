@@ -31,7 +31,7 @@ class DashboardController
 
     public function render(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
         if ($userId === null) {
             return Response::createForbiddenRedirect($request->getPath());
         }

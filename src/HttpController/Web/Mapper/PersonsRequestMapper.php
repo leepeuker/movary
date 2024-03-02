@@ -21,7 +21,7 @@ class PersonsRequestMapper
 
     public function mapRenderPageRequest(Request $request) : PersonsRequestDto
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
 
         $getParameters = $request->getGetParameters();
 

@@ -27,7 +27,7 @@ class WatchlistRequestMapper
 
     public function mapRenderPageRequest(Request $request) : MoviesRequestDto
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
 
         $getParameters = $request->getGetParameters();
 

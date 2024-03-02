@@ -63,7 +63,7 @@ class MovieController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
         if ($userId === null) {
             return Response::createNotFound();
         }
