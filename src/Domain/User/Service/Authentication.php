@@ -9,6 +9,7 @@ use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\HttpController\Api\ValueObject\AuthenticationObject;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
@@ -27,6 +28,52 @@ class Authentication
         private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
     ) {
+    }
+
+    public function createAuthenticationObjectFromCookie() : ?AuthenticationObject
+    {
+        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        $authenticationMethod = AuthenticationObject::COOKIE_AUTHENTICATION;
+        if (empty($token) === true || $this->isValidToken((string)$token) === true) {
+            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
+            return null;
+        }
+        $user = $this->userApi->findByToken($token);
+        if(empty($user) === true) {
+            return null;
+        }
+        return AuthenticationObject::createAuthenticationObject($token, $authenticationMethod, $user);
+    }
+
+    public function createAuthenticationObjectDynamically(Request $request) : ?AuthenticationObject
+    {
+        $token =  $request->getHeaders()['X-Movary-Token'] ?? filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        $authenticationMethod = AuthenticationObject::COOKIE_AUTHENTICATION;
+        if (empty($token) === true || $this->isValidToken($token) === false) {
+            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
+            $authenticationMethod = AuthenticationObject::HEADER_AUTHENTICATION;
+        }
+        $user = $this->userApi->findByToken($token);
+        if(empty($user) === true) {
+            return null;
+        }
+        return AuthenticationObject::createAuthenticationObject($token, $authenticationMethod, $user);
+    }
+
+    public function createAuthenticationObjectFromHeader(Request $request) : ?AuthenticationObject
+    {
+        $token = $request->getHeaders()['X-Movary-Token'] ?? null;
+        $authenticationMethod = AuthenticationObject::HEADER_AUTHENTICATION;
+        if (empty($token) === true || $this->isValidToken((string)$token) === false) {
+            return null;
+        }
+        $user = $this->userApi->findByToken($token);
+        if(empty($user) === true) {
+            return null;
+        }
+        return AuthenticationObject::createAuthenticationObject($token, $authenticationMethod, $user);
     }
 
     public function createExpirationDate(int $days = 1) : DateTime
@@ -84,28 +131,27 @@ class Authentication
     public function getCurrentUserId() : int
     {
         $userId = $this->sessionWrapper->find('userId');
-        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
-        if ($userId === null && $token !== null) {
-            $userId = $this->repository->findUserIdByAuthToken((string)$token);
-            $this->sessionWrapper->set('userId', $userId);
+        if ($userId === null) {
+
+            $authenticationObject = $this->createAuthenticationObjectFromCookie();
+            if($authenticationObject === null) {
+                throw new RuntimeException('Could not find a current user');
+            }
+            $this->sessionWrapper->set('userId', $authenticationObject->getUser()->getId());
         }
 
         if ($userId === null) {
             throw new RuntimeException('Could not find a current user');
         }
-
         return $userId;
     }
 
     public function getToken(Request $request) : ?string
     {
-        $tokenInCookie = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
-        if ($tokenInCookie !== false && $tokenInCookie !== null) {
-            return $tokenInCookie;
-        }
+        $authenticationObject = $this->createAuthenticationObjectDynamically($request);
 
-        return $request->getHeaders()['X-Movary-Token'] ?? null;
+        return $authenticationObject?->getToken();
     }
 
     public function getUserIdByApiToken(Request $request) : ?int
@@ -115,7 +161,7 @@ class Authentication
             return null;
         }
 
-        if ($this->isValidAuthToken($apiToken) === false) {
+        if ($this->isValidToken($apiToken) === false) {
             return null;
         }
 
@@ -124,18 +170,11 @@ class Authentication
 
     public function isUserAuthenticatedWithCookie() : bool
     {
-        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
-
-        if (empty($token) === false && $this->isValidAuthToken((string)$token) === true) {
-            return true;
+        $authenticationObject = $this->createAuthenticationObjectFromCookie();
+        if($authenticationObject === null) {
+            return false;
         }
-
-        if (empty($token) === false) {
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
-        }
-
-        return false;
+        return true;
     }
 
     public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
@@ -155,16 +194,19 @@ class Authentication
         return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
-    public function isValidAuthToken(string $token) : bool
+    public function isValidToken(string $token) : bool
     {
         $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
 
-        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
-            if ($tokenExpirationDate !== null) {
-                $this->repository->deleteAuthToken($token);
+        if ($tokenExpirationDate === null) {
+            if($this->repository->findUserByToken($token) === null) {
+                return false;
             }
-
-            return false;
+        } else {
+            if($tokenExpirationDate->isAfter(DateTime::create()) === false) {
+                $this->repository->deleteAuthToken($token);
+                return false;
+            }
         }
 
         return true;
