@@ -11,12 +11,12 @@ class AuthenticationObject
     public function __construct(
         public readonly string $token,
         public readonly int $authenticationMethod,
-        public readonly UserEntity $userId,
+        public readonly UserEntity $user,
     ) { }
 
-    public static function createAuthenticationObject(string $token, int $authenticationMethod, UserEntity $userId) : self
+    public static function createAuthenticationObject(string $token, int $authenticationMethod, UserEntity $user) : self
     {
-        return new self($token, $authenticationMethod, $userId);
+        return new self($token, $authenticationMethod, $user);
     }
 
     public function getToken() : string
@@ -31,7 +31,7 @@ class AuthenticationObject
 
     public function getUser() : UserEntity
     {
-        return $this->userId;
+        return $this->user;
     }
 
     public function hasCookieAuthentication() : bool
