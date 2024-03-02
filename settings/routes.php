@@ -19,6 +19,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
+    $routes->add('POST', '/login', [Web\AuthenticationController::class, 'login'], [Web\Middleware\UserIsUnauthenticated::class]);
+    $routes->add('GET', '/logout', [Web\AuthenticationController::class, 'logout'], [Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
         Web\Middleware\UserIsUnauthenticated::class,
         Web\Middleware\ServerHasUsers::class,

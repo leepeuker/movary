@@ -6,6 +6,7 @@ use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\AuthenticationRestApi;
 use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
@@ -16,6 +17,7 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
+        private readonly AuthenticationRestApi $authenticationServiceRestApi,
         private readonly UserApi $userApi,
     ) {
     }
@@ -50,7 +52,7 @@ class AuthenticationController
         $rememberMe = $tokenRequestBody['rememberMe'] ?? false;
 
         try {
-            $userAndAuthToken = $this->authenticationService->login(
+            $userAndAuthToken = $this->authenticationServiceRestApi->login(
                 $tokenRequestBody['email'],
                 $tokenRequestBody['password'],
                 (bool)$rememberMe,
@@ -86,7 +88,7 @@ class AuthenticationController
 
         return Response::createJson(
             Json::encode([
-                'authToken' => $userAndAuthToken['token'],
+                'authToken' => $userAndAuthToken['token']['token'],
                 'user' => [
                     'id' => $userAndAuthToken['user']->getId(),
                     'name' => $userAndAuthToken['user']->getName(),
@@ -98,12 +100,6 @@ class AuthenticationController
 
     public function destroyToken(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $this->authenticationService->logout();
-
-            return Response::CreateNoContent();
-        }
-
         $apiToken = $this->authenticationService->getToken($request);
         if ($apiToken === null) {
             return Response::createBadRequest(
@@ -115,7 +111,7 @@ class AuthenticationController
             );
         }
 
-        $this->authenticationService->deleteToken($apiToken);
+        $this->authenticationServiceRestApi->deleteToken($apiToken);
 
         return Response::CreateNoContent();
     }

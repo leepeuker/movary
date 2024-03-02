@@ -6,6 +6,6 @@ class MissingTotpCode extends InvalidCredentials
 {
     public static function create() : self
     {
-        return new self('Two-factor authentication code missing.');
+        return new self('Two-factor authentication code missing');
     }
 }

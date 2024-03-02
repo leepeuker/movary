@@ -7,6 +7,8 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\AuthenticationRestApi;
+use Movary\Domain\User\Service\AuthenticationWeb;
 use Movary\Domain\User\UserApi;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
@@ -22,7 +24,7 @@ class CreateUserController
     
     public function __construct(
         private readonly Environment $twig,
-        private readonly Authentication $authenticationService,
+        private readonly AuthenticationWeb $authenticationService,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
     ) {
@@ -63,7 +65,7 @@ class CreateUserController
         try {
             $this->userApi->createUser($email, $password, $name, $hasUsers === false);
 
-            $this->authenticationService->login($email, $password, false, self::MOVARY_WEB_CLIENT, $userAgent);
+            $this->authenticationService->login($email, $password, false, $userAgent);
         } catch (PasswordTooShort) {
             $this->sessionWrapper->set('errorPasswordTooShort', true);
         } catch (UsernameInvalidFormat) {

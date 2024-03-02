@@ -9,7 +9,7 @@ use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
-use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\AuthenticationWeb;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
@@ -36,7 +36,7 @@ class SettingsController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly Authentication $authenticationService,
+        private readonly AuthenticationWeb $authenticationService,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationService,
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,

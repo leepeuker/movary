@@ -3,49 +3,44 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\UserApi;
-use Movary\Domain\User\UserEntity;
+use Movary\ValueObject\Http\Request;
 
 class UserPageAuthorizationChecker
 {
     public function __construct(
         private readonly UserApi $userApi,
-        private readonly Authentication $authenticationService,
+        private readonly AuthenticationInterface $authenticationService,
     ) {
     }
 
-    public function fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor(int $movieId) : array
+    public function fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor(Request $request, int $movieId) : array
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
+        if ($this->authenticationService->isUserAuthenticated($request) === false) {
             return $this->userApi->fetchAllHavingWatchedMoviePublicVisibleUsernames($movieId);
         }
 
         return $this->userApi->fetchAllHavingWatchedMovieInternVisibleUsernames($movieId);
     }
 
-    public function fetchAllHavingWatchedMovieWithPersonVisibleUsernamesForCurrentVisitor(int $personId) : array
+    public function fetchAllHavingWatchedMovieWithPersonVisibleUsernamesForCurrentVisitor(Request $request, int $personId) : array
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
+        if ($this->authenticationService->isUserAuthenticated($request) === false) {
             return $this->userApi->fetchAllHavingWatchedMovieWithPersonPublicVisibleUsernames($personId);
         }
 
         return $this->userApi->fetchAllHavingWatchedMovieWithPersonInternVisibleUsernames($personId);
     }
 
-    public function fetchAllVisibleUsernamesForCurrentVisitor() : array
+    public function fetchAllVisibleUsernamesForCurrentVisitor(Request $request) : array
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
+        if ($this->authenticationService->isUserAuthenticated($request) === false) {
             return $this->userApi->fetchAllPublicVisibleUsernames();
         }
 
         return $this->userApi->fetchAllInternVisibleUsernames();
     }
 
-    public function findUserIdIfCurrentVisitorIsAllowedToSeeUser(string $username) : ?int
-    {
-        return $this->findUserIfCurrentVisitorIsAllowedToSeeUser($username)?->getId();
-    }
-
-    public function findUserIfCurrentVisitorIsAllowedToSeeUser(string $username) : ?UserEntity
+    public function findUserIdIfCurrentVisitorIsAllowedToSeeUser(Request $request, string $username) : ?int
     {
         $user = $this->userApi->findUserByName($username);
         if ($user === null) {
@@ -54,10 +49,25 @@ class UserPageAuthorizationChecker
 
         $userId = $user->getId();
 
-        if ($this->authenticationService->isUserPageVisibleForCurrentUser($user->getPrivacyLevel(), $userId) === false) {
+        if ($this->isUserPageVisibleForCurrentUser($request, $user->getPrivacyLevel(), $userId) === false) {
             return null;
         }
 
-        return $user;
+        return $user->getId();
+    }
+
+    private function isUserPageVisibleForCurrentUser(Request $request, int $privacyLevel, int $userId) : bool
+    {
+        if ($privacyLevel === 2) {
+            return true;
+        }
+
+        $isUserAuthenticated = $this->authenticationService->isUserAuthenticated($request);
+
+        if ($privacyLevel === 1 && $isUserAuthenticated === true) {
+            return true;
+        }
+
+        return $isUserAuthenticated === true && $this->authenticationService->getCurrentUser($request)->getId() === $userId;
     }
 }
