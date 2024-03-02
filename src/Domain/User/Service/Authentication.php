@@ -115,6 +115,10 @@ class Authentication
             return null;
         }
 
+        if ($this->isValidAuthToken($apiToken) === false) {
+            return null;
+        }
+
         return $this->userApi->findByToken($apiToken)?->getId();
     }
 
