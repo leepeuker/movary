@@ -1,0 +1,45 @@
+#@name Search movie
+GET http://127.0.0.1/api/movies/search?search=Matrix&page=1&releaseYear=2012
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Token: {{xAuthToken}}
+
+####
+#@name Get movie data
+GET http://127.0.0.1/api/movies/1
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+client.test('Has correct status code', () => {
+    let expectedStatusCode = 200;
+    client.assert(response.status === expectedStatusCode, 'Response did not have status code ' + expectedStatusCode);
+});
+client.test('Has the right properties', () => {
+   client.assert(response.body.hasOwnProperty('movie') === true, 'Response did not have the \'movie\' property.');
+    client.assert(response.body.hasOwnProperty('movieGenres') === true, 'Response did not have the \'movieGenres\' property.');
+    client.assert(response.body.hasOwnProperty('castMembers') === true, 'Response did not have the \'castMembers\' property.');
+    client.assert(response.body.hasOwnProperty('directors') === true, 'Response did not have the \'directors\' property.');
+    client.assert(response.body.hasOwnProperty('totalPlays') === true, 'Response did not have the \'totalPlays\' property.');
+    client.assert(response.body.hasOwnProperty('watchDates') === true, 'Response did not have the \'watchDates\' property.');
+    client.assert(response.body.hasOwnProperty('isOnWatchlist') === true, 'Response did not have the \'isOnWatchlist\' property.');
+    client.assert(response.body.hasOwnProperty('countries') === true, 'Response did not have the \'countries\' property.');
+    client.assert(response.body.hasOwnProperty('displayCharacterNames') === true, 'Response did not have the \'displayCharacterNames\' property.');
+});
+%}
+
+####
+#@name Trigger Not Found
+GET http://127.0.0.1/api/movies/-1
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+> {%
+    client.test('Has correct status code', () => {
+        let expectedStatusCode = 404;
+        client.assert(response.status === expectedStatusCode, 'Response did not have status code ' + expectedStatusCode);
+    });
+%}
