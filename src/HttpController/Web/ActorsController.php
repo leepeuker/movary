@@ -22,14 +22,11 @@ class ActorsController
         private readonly PersonsRequestMapper $requestMapper,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
-        private readonly UserApi $userApi,
     ) {
     }
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
-
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
         $currentUserId = null;
@@ -40,7 +37,7 @@ class ActorsController
         $personFilterUserId = $requestData->getSortBy() !== 'name' ? $currentUserId : null;
 
         $actors = $this->movieHistoryApi->fetchActors(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
@@ -51,7 +48,7 @@ class ActorsController
         );
 
         $actorsCount = $this->movieHistoryApi->fetchMostWatchedActorsCount(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getSearchTerm(),
             $requestData->getGender(),
             $personFilterUserId,
@@ -69,7 +66,7 @@ class ActorsController
                 'sortBy' => $requestData->getSortBy(),
                 'sortOrder' => (string)$requestData->getSortOrder(),
                 'filterGender' => (string)$requestData->getGender(),
-                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueActorGenders($userId)
+                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueActorGenders($requestData->getUserId())
             ]),
         );
     }
