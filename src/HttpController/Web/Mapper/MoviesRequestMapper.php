@@ -2,7 +2,7 @@
 
 namespace Movary\HttpController\Web\Mapper;
 
-use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Dto\MoviesRequestDto;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
@@ -26,14 +26,14 @@ class MoviesRequestMapper
     private const DEFAULT_SORT_BY = 'title';
 
     public function __construct(
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly UserApi $userApi,
     ) {
     }
 
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function mapRenderPageRequest(Request $request) : MoviesRequestDto
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
+        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
         $getParameters = $request->getGetParameters();
 

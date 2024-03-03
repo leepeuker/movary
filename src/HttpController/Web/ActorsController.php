@@ -5,6 +5,7 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Mapper\PersonsRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\ValueObject\Http\Request;
@@ -21,15 +22,13 @@ class ActorsController
         private readonly PersonsRequestMapper $requestMapper,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi,
     ) {
     }
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
+        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 

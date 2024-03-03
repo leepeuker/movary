@@ -8,7 +8,7 @@ use Movary\ValueObject\Year;
 class MoviesRequestDto
 {
     private function __construct(
-        private readonly ?int $userId,
+        private readonly int $userId,
         private readonly ?string $searchTerm,
         private readonly int $page,
         private readonly int $limit,
@@ -24,7 +24,7 @@ class MoviesRequestDto
     }
 
     public static function createFromParameters(
-        ?int $userId,
+        int $userId,
         ?string $searchTerm,
         int $page,
         int $limit,
@@ -93,7 +93,7 @@ class MoviesRequestDto
         return $this->sortOrder;
     }
 
-    public function getUserId() : ?int
+    public function getUserId() : int
     {
         return $this->userId;
     }

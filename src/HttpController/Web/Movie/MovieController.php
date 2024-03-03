@@ -7,6 +7,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\ValueObject\Http\Request;
@@ -25,6 +26,7 @@ class MovieController
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
         private readonly TmdbIsoCountryCache $tmdbIsoCountryCache,
         private readonly Authentication $authenticationService,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -63,10 +65,7 @@ class MovieController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
+        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
         $currentUser = null;
         if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
