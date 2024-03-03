@@ -3,7 +3,6 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\UserApi;
-use Movary\ValueObject\Http\Request;
 
 class UserPageAuthorizationChecker
 {
@@ -38,21 +37,5 @@ class UserPageAuthorizationChecker
         }
 
         return $this->userApi->fetchAllInternVisibleUsernames();
-    }
-
-    public function findUserIdIfCurrentVisitorIsAllowedToSeeUser(Request $request) : ?int
-    {
-        $requestUsername = (string)$request->getRouteParameters()['username'];
-
-        $requestedUser = $this->userApi->findUserByName($requestUsername);
-        if ($requestedUser === null) {
-            return null;
-        }
-
-        if ($this->authenticationService->isUserPageVisibleForWebRequest($requestedUser) === false) {
-            return null;
-        }
-
-        return $requestedUser->getId();
     }
 }
