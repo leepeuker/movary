@@ -10,6 +10,7 @@ $builder->addDefinitions(
         \Movary\ValueObject\Config::class => DI\factory([Factory::class, 'createConfig']),
         \Movary\Api\Trakt\TraktApi::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
+        \Movary\HttpController\Api\ImagesController::class => DI\factory([Factory::class, 'createImagesController']),
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
