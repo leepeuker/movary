@@ -66,7 +66,6 @@ class JellyfinController
         return Response::createOk();
     }
 
-
     /**
      * @deprecated
      * @see \Movary\HttpController\Api\JellyfinController::handleJellyfinWebhook()

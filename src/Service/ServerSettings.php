@@ -50,11 +50,6 @@ class ServerSettings
     ) {
     }
 
-    public function getApplicationUrl() : ?string
-    {
-        return $this->getByKey(self::APPLICATION_URL);
-    }
-
     public function getApplicationName() : ?string
     {
         return $this->getByKey(self::APPLICATION_NAME);
@@ -63,6 +58,11 @@ class ServerSettings
     public function getApplicationTimezone() : ?string
     {
         return $this->getByKey(self::APPLICATION_TIMEZONE);
+    }
+
+    public function getApplicationUrl() : ?string
+    {
+        return $this->getByKey(self::APPLICATION_URL);
     }
 
     public function getApplicationVersion() : string

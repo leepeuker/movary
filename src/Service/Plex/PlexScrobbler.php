@@ -2,6 +2,7 @@
 
 namespace Movary\Service\Plex;
 
+use DateTime;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\User\UserApi;
@@ -85,7 +86,7 @@ class PlexScrobbler
             return;
         }
 
-        $dateTime = \DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
+        $dateTime = DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
         if ($dateTime === false) {
             throw new RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);
         }

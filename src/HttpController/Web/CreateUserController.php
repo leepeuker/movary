@@ -19,7 +19,7 @@ use Twig\Environment;
 class CreateUserController
 {
     public const MOVARY_WEB_CLIENT = 'Movary Web';
-    
+
     public function __construct(
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,

@@ -2,9 +2,10 @@
 
 namespace Movary\Api\Tmdb\Dto;
 
+use JsonSerializable;
 use Movary\ValueObject\RelativeUrl;
 
-class TmdbWatchProviderDto implements \JsonSerializable
+class TmdbWatchProviderDto implements JsonSerializable
 {
     private function __construct(
         private readonly int $id,

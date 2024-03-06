@@ -4,7 +4,6 @@ namespace Movary\Service\Emby;
 
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\UserApi;
-use Movary\Service\Emby\EmbyWebhookDtoMapper;
 use Movary\Service\Tmdb\SyncMovie;
 use Psr\Log\LoggerInterface;
 

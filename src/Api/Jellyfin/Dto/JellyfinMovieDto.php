@@ -46,14 +46,14 @@ class JellyfinMovieDto
         return $this->lastWatchDate;
     }
 
-    public function getWatched() : bool
-    {
-        return $this->watched;
-    }
-
     public function getTmdbId() : int
     {
         return $this->tmdbId;
+    }
+
+    public function getWatched() : bool
+    {
+        return $this->watched;
     }
 
     public function isEqual(self $jellyfinMovieDto) : bool

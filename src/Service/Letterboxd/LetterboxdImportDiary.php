@@ -2,6 +2,8 @@
 
 namespace Movary\Service\Letterboxd;
 
+use Exception;
+use Iterator;
 use League\Csv\Reader;
 use Movary\Domain\Movie\MovieApi;
 use Movary\JobQueue\JobEntity;
@@ -52,7 +54,7 @@ class LetterboxdImportDiary
         $this->execute($userId, $job->getParameters()['importFile']);
     }
 
-    private function aggregateWatchDatesAndImportMissingMovies(\Iterator $watchDateRecords) : array
+    private function aggregateWatchDatesAndImportMissingMovies(Iterator $watchDateRecords) : array
     {
         /** @var array<int, WatchDateToPlaysMap> $watchDatesToImport */
         $watchDatesToImport = [];
@@ -62,7 +64,7 @@ class LetterboxdImportDiary
 
             try {
                 $movieId = $this->letterboxdMovieImporter->importMovieByDiaryUri($csvLineHistory->getLetterboxdDiaryEntryUri())->getId();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logger->warning('Letterboxd import: Could not import movie: ' . $csvLineHistory->getName(), ['exception' => $e]);
 
                 continue;

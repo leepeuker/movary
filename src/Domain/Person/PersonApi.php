@@ -5,6 +5,7 @@ namespace Movary\Domain\Person;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Traversable;
 
 class PersonApi
 {
@@ -87,7 +88,7 @@ class PersonApi
         $this->repository->deleteById($id);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : \Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : Traversable
     {
         return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit, $ids);
     }

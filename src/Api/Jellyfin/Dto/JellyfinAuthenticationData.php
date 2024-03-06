@@ -18,6 +18,11 @@ class JellyfinAuthenticationData
         return new self($jellyfinAccessToken, $jellyfinUserId, $jellyfinServerUrl);
     }
 
+    public function getAccessToken() : JellyfinAccessToken
+    {
+        return $this->jellyfinAccessToken;
+    }
+
     public function getServerUrl() : Url
     {
         return $this->jellyfinServerUrl;
@@ -26,10 +31,5 @@ class JellyfinAuthenticationData
     public function getUserId() : JellyfinUserId
     {
         return $this->jellyfinUserId;
-    }
-
-    public function getAccessToken() : JellyfinAccessToken
-    {
-        return $this->jellyfinAccessToken;
     }
 }

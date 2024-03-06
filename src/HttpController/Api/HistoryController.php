@@ -69,7 +69,7 @@ class HistoryController
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
-            $requestData->getSortOrder()
+            $requestData->getSortOrder(),
         );
 
         $historyCount = $this->movieHistoryApi->fetchHistoryCount(

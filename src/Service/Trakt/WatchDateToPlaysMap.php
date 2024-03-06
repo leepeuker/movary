@@ -20,7 +20,7 @@ class WatchDateToPlaysMap extends AbstractList
     public function add(Date $watchDate, int $plays) : void
     {
         if ($this->containsDate($watchDate) === true) {
-            throw new \RuntimeException('Cannot add date date, date already exists.');
+            throw new RuntimeException('Cannot add date date, date already exists.');
         }
 
         $this->data[(string)$watchDate] = $plays;

@@ -7,6 +7,7 @@ use OTPHP\Factory;
 use OTPHP\OTPInterface;
 use OTPHP\TOTP;
 use ParagonIE\ConstantTime\Base32;
+use RuntimeException;
 
 class TwoFactorAuthenticationFactory
 {
@@ -23,19 +24,28 @@ class TwoFactorAuthenticationFactory
     ) {
     }
 
+    public function createOtpFromProvisioningUri(string $totpUri) : OTPInterface
+    {
+        if ($totpUri === '') {
+            throw new RuntimeException('TOTP uri not valid because it is empty');
+        }
+
+        return Factory::loadFromProvisioningUri($totpUri);
+    }
+
     public function createTotp(string $userName) : TOTP
     {
         $secret = $this->generateSecret();
         $issuer = $this->serverSettings->getTotpIssuer();
 
         if ($secret === '') {
-            throw new \RuntimeException('Secret must not be empty string');
+            throw new RuntimeException('Secret must not be empty string');
         }
         if ($userName === '') {
-            throw new \RuntimeException('Username must not be empty string');
+            throw new RuntimeException('Username must not be empty string');
         }
         if ($issuer === '') {
-            throw new \RuntimeException('Issuer must not be empty string');
+            throw new RuntimeException('Issuer must not be empty string');
         }
 
         $totp = TOTP::createFromSecret($secret);
@@ -51,14 +61,5 @@ class TwoFactorAuthenticationFactory
     private function generateSecret() : string
     {
         return Base32::encodeUpper(random_bytes(self::SECRET_LENGTH));
-    }
-
-    public function createOtpFromProvisioningUri(string $totpUri) : OTPInterface
-    {
-        if ($totpUri === '') {
-            throw new \RuntimeException('TOTP uri not valid because it is empty');
-        }
-
-        return Factory::loadFromProvisioningUri($totpUri);
     }
 }

@@ -5,6 +5,7 @@ namespace Movary\Service\Dashboard;
 use Movary\Domain\User\UserEntity;
 use Movary\Service\Dashboard\Dto\DashboardRow;
 use Movary\Service\Dashboard\Dto\DashboardRowList;
+use RuntimeException;
 
 class DashboardFactory
 {
@@ -52,7 +53,7 @@ class DashboardFactory
             DashboardRow::createMostWatchedLanguages(),
             DashboardRow::createMostWatchedProductionCompanies(),
             DashboardRow::createMostWatchedReleaseYears(),
-            DashboardRow::createWatchlist()
+            DashboardRow::createWatchlist(),
         );
     }
 
@@ -69,7 +70,7 @@ class DashboardFactory
             DashboardRow::createMostWatchedReleaseYears()->getId() === $rowId => DashboardRow::createMostWatchedReleaseYears($isVisible, $isExtended),
             DashboardRow::createWatchlist()->getId() === $rowId => DashboardRow::createWatchlist($isVisible, $isExtended),
 
-            default => throw new \RuntimeException('Not supported dashboard row id: ' . $rowId)
+            default => throw new RuntimeException('Not supported dashboard row id: ' . $rowId)
         };
     }
 }

@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\UserApi;
+use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
 class ServerHasNoUsers implements MiddlewareInterface
@@ -12,7 +13,8 @@ class ServerHasNoUsers implements MiddlewareInterface
     ) {
     }
 
-    public function __invoke() : ?Response
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+    public function __invoke(Request $request) : ?Response
     {
         if ($this->userApi->hasUsers() === true) {
             return null;

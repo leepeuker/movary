@@ -47,16 +47,6 @@ class JellyfinCacheRepository
         );
     }
 
-    public function fetchJellyfinPlayedMovies(int $userId) : JellyfinMovieDtoList
-    {
-        $result = $this->dbConnection->fetchAllAssociative(
-            'SELECT * FROM user_jellyfin_cache JOIN user u on id = movary_user_id WHERE movary_user_id = ? AND watched = 1 AND last_watch_date IS NOT NULL',
-            [$userId],
-        );
-
-        return JellyfinMovieDtoList::createFromArray($result);
-    }
-
     public function fetchJellyfinMoviesByTmdbIds(int $userId, array $tmdbIds) : JellyfinMovieDtoList
     {
         if (count($tmdbIds) === 0) {
@@ -80,6 +70,16 @@ class JellyfinCacheRepository
     {
         $result = $this->dbConnection->fetchAllAssociative(
             'SELECT * FROM user_jellyfin_cache JOIN user u on id = movary_user_id WHERE movary_user_id = ?',
+            [$userId],
+        );
+
+        return JellyfinMovieDtoList::createFromArray($result);
+    }
+
+    public function fetchJellyfinPlayedMovies(int $userId) : JellyfinMovieDtoList
+    {
+        $result = $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM user_jellyfin_cache JOIN user u on id = movary_user_id WHERE movary_user_id = ? AND watched = 1 AND last_watch_date IS NOT NULL',
             [$userId],
         );
 

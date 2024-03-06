@@ -2,11 +2,12 @@
 
 namespace Movary\HttpController\Api\Dto;
 
+use JsonSerializable;
 use Movary\Api\Trakt\ValueObject\TraktId;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 
-class MovieDto implements \JsonSerializable
+class MovieDto implements JsonSerializable
 {
     public function __construct(
         private readonly int $id,

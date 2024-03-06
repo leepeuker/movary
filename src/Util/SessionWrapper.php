@@ -2,6 +2,8 @@
 
 namespace Movary\Util;
 
+use RuntimeException;
+
 class SessionWrapper
 {
     public function destroy() : void
@@ -11,7 +13,7 @@ class SessionWrapper
         if (ini_get('session.use_cookies')) {
             $sessionName = session_name();
             if ($sessionName === false) {
-                throw new \RuntimeException('Could not get session name');
+                throw new RuntimeException('Could not get session name');
             }
 
             $params = session_get_cookie_params();

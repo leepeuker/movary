@@ -2,11 +2,12 @@
 
 namespace Movary\HttpController\Web\Mapper;
 
-use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Dto\MoviesRequestDto;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
+use RuntimeException;
 
 class WatchlistRequestMapper
 {
@@ -21,13 +22,13 @@ class WatchlistRequestMapper
     private const DEFAULT_SORT_BY = 'addedAt';
 
     public function __construct(
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly UserApi $userApi,
     ) {
     }
 
     public function mapRenderPageRequest(Request $request) : MoviesRequestDto
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
+        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
         $getParameters = $request->getGetParameters();
 
@@ -64,7 +65,7 @@ class WatchlistRequestMapper
             'asc' => SortOrder::createAsc(),
             'desc' => SortOrder::createDesc(),
 
-            default => throw new \RuntimeException('Not supported sort order: ' . $getParameters['so'])
+            default => throw new RuntimeException('Not supported sort order: ' . $getParameters['so'])
         };
     }
 }

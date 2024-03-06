@@ -2,10 +2,7 @@
 
 namespace Movary\HttpController\Web;
 
-use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
-use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
@@ -51,6 +48,32 @@ class JobController
         $this->jobQueueApi->purgeProcessedJobs();
 
         return Response::createSeeOther('/settings/server/jobs');
+    }
+
+    public function scheduleJellyfinExportHistory() : Response
+    {
+        $currentUserId = $this->authenticationService->getCurrentUserId();
+
+        $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    public function scheduleJellyfinImportHistory() : Response
+    {
+        $currentUserId = $this->authenticationService->getCurrentUserId();
+
+        $this->jobQueueApi->addJellyfinImportMoviesJob($currentUserId);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
     }
 
     public function scheduleLetterboxdDiaryImport(Request $request) : Response
@@ -132,32 +155,6 @@ class JobController
         $currentUser = $this->authenticationService->getCurrentUser();
 
         $this->jobQueueApi->addPlexImportWatchlistJob($currentUser->getId());
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
-    }
-
-    public function scheduleJellyfinImportHistory() : Response
-    {
-        $currentUserId = $this->authenticationService->getCurrentUserId();
-
-        $this->jobQueueApi->addJellyfinImportMoviesJob($currentUserId);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
-    }
-
-    public function scheduleJellyfinExportHistory() : Response
-    {
-        $currentUserId = $this->authenticationService->getCurrentUserId();
-
-        $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId);
 
         return Response::create(
             StatusCode::createSeeOther(),
