@@ -34,4 +34,18 @@ class DashboardRowList extends AbstractList
 
         ksort($this->data);
     }
+
+    public function asArray() : array
+    {
+        $serialized = [];
+        foreach($this->data as $row) {
+            $serialized[] = [
+                'row' => $row->getName(),
+                'id' => $row->getId(),
+                'isExtended' => $row->isExtended(),
+                'isVisible' => $row->isVisible()
+            ];
+        }
+        return $serialized;
+    }
 }
