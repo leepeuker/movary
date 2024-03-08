@@ -6,10 +6,10 @@
   },
   "servers": [],
   "paths": {
-    "\/users\/{username}\/dashboard": {
+    "\/users\/{username}\/statistics\/dashboard": {
         "get": {
             "tags": [
-                "Dashboard"
+                "Statistics"
             ],
             "summary": "Get all the data that's shown in the dashboard",
             "description": "Get all the statistics and the order of the rows in the dashboard. When a row is collapsed / hidden by default, the data for the hidden row isn't sent.",
@@ -129,126 +129,65 @@
                                     "lastPlays": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the last played movies based on date.",
-                                        "example": [
-                                            {
-                                                "$ref": "#/components/schemas/movie"
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/movie"
+                                        }
                                     },
                                     "mostWatchedActors": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the most watched male actors.",
-                                        "example": [
-                                            {
-                                                "id": 1,
-                                                "name": "Actor name",
-                                                "uniqueCount": 4,
-                                                "totalCount": 4,
-                                                "gender": "m",
-                                                "tmdb_poster_path": "/path_to_poster_on_tmdb.jpg",
-                                                "poster_path": "/storage/images/person/path_to_poster_on_local_storage.jpg"
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/male"
+                                        }
                                     },
                                     "mostWatchedActresses": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the most watched actresses.",
-                                        "example": [
-                                            {
-                                                "id": 1,
-                                                "name": "Actress name",
-                                                "uniqueCount": 2,
-                                                "totalCount": 2,
-                                                "gender": "f",
-                                                "tmdb_poster_path": "/path_to_poster_on_tmdb.jpg",
-                                                "poster_path": "/storage/images/person/path_to_poster_on_local_storage.jpg"
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/female"
+                                        }
                                     },
                                     "mostWatchedDirectors": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the most watched directors.",
-                                        "example": [
-                                            {
-                                                "id": 1,
-                                                "name": "Director name",
-                                                "uniqueCount": 2,
-                                                "totalCount": 2,
-                                                "gender": "m",
-                                                "tmdb_poster_path": "/path_to_poster_on_tmdb.jpg",
-                                                "poster_path": "/storage/images/person/path_to_poster_on_local_storage.jpg"
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/male"
+                                        }
                                     },
                                     "mostWatchedLanguages": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the most watched languages.",
-                                        "example": [
-                                            {
-                                                "language": "en",
-                                                "count": 7,
-                                                "name": "English",
-                                                "code": "en"
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/language"
+                                        }
                                     },
                                     "mostWatchedGenres": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the most watched genres.",
-                                        "example": [
-                                            {
-                                                "name": "Adventure",
-                                                "count": 7
-                                            },
-                                            {
-                                                "name": "Action",
-                                                "count": 6
-                                            },
-                                            {
-                                                "name": "Science Fiction",
-                                                "count": 3
-                                            },
-                                            {
-                                                "name": "Fantasy",
-                                                "count": 1
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/genre"
+                                        }
                                     },
                                     "mostWatchedProductionCompanies": {
                                         "type": "array",
-                                        "description": "An array containing JSON objects of the most watched production companies and the watched movies they produced.",
-                                        "example": [
-                                            {
-                                                "name": "Lucasfilm Ltd.",
-                                                "count": 4,
-                                                "origin_country": "US",
-                                                "movies": [
-                                                    "Indiana Jones and the Temple of Doom",
-                                                    "Raiders of the Lost Ark",
-                                                    "Indiana Jones and the Kingdom of the Crystal Skull",
-                                                    "Indiana Jones and the Last Crusade"
-                                                ]
-                                            }
-                                        ]
+                                        "description": "An array containing JSON objects of the most watched production companies, the watched movies they produced and their country of origin.",
+                                        "items": {
+                                          "$ref": "#/components/schemas/productioncompany"
+                                        }
                                     },
                                     "mostWatchedReleaseYears": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the most watched release years.",
-                                        "example": [
-                                            {
-                                                "name": 2023,
-                                                "count": 1
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/releaseYears"
+                                        }
                                     },
                                     "watchlistItems": {
                                         "type": "array",
                                         "description": "An array containing JSON objects of the items in the watchlist.",
-                                        "example": [
-                                            {
-                                                "$ref": "#/components/schemas/movie"
-                                            }
-                                        ]
+                                        "items": {
+                                          "$ref": "#/components/schemas/movie"
+                                        }
                                     }
                                 }
                             }
@@ -263,6 +202,365 @@
                 }
             }
         }
+    },
+    "/users/{username}\/statistics/lastplays": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get last plays",
+        "description": "Gets the last plays for use in lazy-loading the data shown in the user's dashboard",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/movie"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}\/statistics/mostwatchedactors": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get most watched actors",
+        "description": "Gets the most watched actors for use in lazy-loading the data shown in the user's dashboard",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/female"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}\/statistics/mostwatchedactresses": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get most watched actresses",
+        "description": "Gets the most watched actresses for use in lazy-loading the data shown in the user's dashboard",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/male"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}\/statistics/mostwatcheddirectors": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get most watched directors",
+        "description": "Gets the most watched directors for use in lazy-loading the data shown in the user's dashboard",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/male"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}/statistics/mostwatchedlanguages": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get most watched languages",
+        "description": "Get list of the languages that have been watched the most, together with the amount of times they have been watched.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/language"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}/statistics/mostwatchedgenres": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get most watched genres",
+        "description": "Get list of the genres that have been watched the most, together with the amount of times they have been watched.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/genre"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}/statistics/mostwatchedproductioncompanies": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get most watched production companies",
+        "description": "Get list of the production companies that have been watched the most, together with the amount of times they have been watched, the watched movies they've produced and their country of origin.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/productioncompany"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}/statistics/mostwatchedreleaseyears": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get most watched release years",
+        "description": "Get list of the release years that have been watched the most, together with the amount of times they have been watched.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/releaseYears"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
+    },
+    "/users/{username}/statistics/watchlist": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get movies in the watchlist",
+        "description": "Get all the movies in the watchlist of the user.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/movie"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "description": "The requested user does not exist."
+          }
+        }
+      }
     },
     "\/users\/{username}\/history\/movies": {
       "get": {
@@ -1513,6 +1811,165 @@
   },
   "components": {
     "schemas": {
+      "male": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The ID Movary has assigned this person",
+            "example": 32
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the person",
+            "example": "Peron name"
+          },
+          "uniqueCount": {
+            "type": "integer",
+            "example": 1
+          },
+          "totalCount": {
+            "type": "integer",
+            "example": 1
+          },
+          "gender": {
+            "type": "string",
+            "example": "m",
+            "description": "Can be either f (for female) or m (for male)"
+          },
+          "tmdb_poster_path": {
+            "type": "string",
+            "description": "The filepath of the poster from the TMDB API",
+            "example": "/tmdb_poster.jpg"
+          },
+          "poster_path": {
+            "type": "string",
+            "description": "The filepath of the poster on the local Kovary installation from the root directory of Movary",
+            "example": "\/storage\/images\/person\/32.jpg"
+          }
+        }
+      },
+      "female": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The ID Movary has assigned this person",
+            "example": 32
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the person",
+            "example": "Peron name"
+          },
+          "uniqueCount": {
+            "type": "integer",
+            "example": 1
+          },
+          "totalCount": {
+            "type": "integer",
+            "example": 1
+          },
+          "gender": {
+            "type": "string",
+            "example": "f",
+            "description": "Can be either f (for female) or m (for male)"
+          },
+          "tmdb_poster_path": {
+            "type": "string",
+            "description": "The filepath of the poster from the TMDB API",
+            "example": "/tmdb_poster.jpg"
+          },
+          "poster_path": {
+            "type": "string",
+            "description": "The filepath of the poster on the local Kovary installation from the root directory of Movary",
+            "example": "\/storage\/images\/person\/32.jpg"
+          }
+        }
+      },
+      "productioncompany": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the production company",
+            "example": "Disney"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The amount of watched movies this production company has released",
+            "example": 2
+          },
+          "origin_country": {
+            "type": "string",
+            "description": "The country where this production company was founded",
+            "example": "US"
+          },
+          "movies": {
+            "type": "array",
+            "description": "The list of watched movies this production company has released",
+            "example": [
+              "Movie 1",
+              "Movie 2"
+            ]
+          }
+        }
+      },
+      "language": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "description": "Two-letter code of the language",
+            "example": "en"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The amount of times watched movies have occured in this language",
+            "example": 8
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the language in speaking format",
+            "example": "English"
+          },
+          "code": {
+            "type": "string",
+            "description": "Two-letter code of the language",
+            "example": "en"
+          }
+        }
+      },
+      "genre": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the genre",
+            "example": "Action"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The amount of times watched movies contain this genre",
+            "example": 8
+          }
+        }
+      },
+      "releaseYears": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The year in four digits",
+            "example": "2024"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The amount of times watched movies have been released in this year",
+            "example": 8
+          }
+        }
+      },
       "movie": {
         "type": "object",
         "properties": {

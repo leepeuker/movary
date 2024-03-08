@@ -14,15 +14,15 @@ use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
-class DashboardController
+readonly class StatisticsController
 {
     public function __construct(
-        private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly MovieApi $movieApi,
-        private readonly MovieWatchlistApi $movieWatchlistApi,
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly DashboardFactory $dashboardFactory,
-        private readonly UserApi $userApi,
+        private MovieHistoryApi $movieHistoryApi,
+        private MovieApi $movieApi,
+        private MovieWatchlistApi $movieWatchlistApi,
+        private UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private DashboardFactory $dashboardFactory,
+        private UserApi $userApi,
     ) {
     }
 
@@ -79,6 +79,51 @@ class DashboardController
                     $response['watchlistItems'] = $this->movieWatchlistApi->fetchWatchlistPaginated($userId, 6, 1);
                 }
             }
+        }
+        return Response::createJson(Json::encode($response));
+    }
+
+    // phpcs:ignore
+    public function getStatistic(Request $request) : Response
+    {
+        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if ($requestedUser === null) {
+            return Response::createNotFound();
+        }
+        $userId = $requestedUser->getId();
+        $requestedStatistic = strtolower($request->getRouteParameters()['statistic'] ?? '');
+        $response = null;
+        switch($requestedStatistic) {
+            case 'lastplays':
+                $response = $this->movieHistoryApi->fetchLastPlays($userId);
+                break;
+            case 'mostwatchedactors':
+                $response = $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale(), personFilterUserId: $userId);
+                break;
+            case 'mostwatchedactresses':
+                $response = $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $userId);
+                break;
+            case 'mostwatcheddirectors':
+                $response = $this->movieHistoryApi->fetchDirectors($userId, 6, 1, personFilterUserId: $userId);
+                break;
+            case 'mostwatchedlanguages':
+                $response = $this->movieHistoryApi->fetchMostWatchedLanguages($userId);
+                break;
+            case 'mostwatchedgenres':
+                $response = $this->movieHistoryApi->fetchMostWatchedGenres($userId);
+                break;
+            case 'mostwatchedproductioncompanies':
+                $response = $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12);
+                break;
+            case 'mostwatchedreleaseyears':
+                $response = $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId);
+                break;
+            case 'watchlist':
+                $response = $this->movieWatchlistApi->fetchWatchlistPaginated($userId, 6, 1);
+                break;
+        }
+        if($response === null) {
+            return Response::createNotFound();
         }
         return Response::createJson(Json::encode($response));
     }

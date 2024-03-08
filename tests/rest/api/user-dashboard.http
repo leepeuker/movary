@@ -1,5 +1,0 @@
-GET http://127.0.0.1/api/users/{{username}}/dashboard
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
-X-Movary-Client: REST Unit Test
