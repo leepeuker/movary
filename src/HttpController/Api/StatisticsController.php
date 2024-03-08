@@ -58,7 +58,7 @@ readonly class StatisticsController
         ];
 
         foreach($dashboardRows as $row) {
-            if($row->isExtended()) {
+            if($row->isExtended() && $row->isVisible()) {
                 if($row->isLastPlays()) {
                     $response['lastPlays'] = $this->movieHistoryApi->fetchLastPlays($userId);
                 } elseif($row->isMostWatchedActors()) {
