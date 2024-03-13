@@ -3,11 +3,11 @@
 namespace Movary\Service\Tmdb;
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobQueueScheduler;
-use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -92,7 +92,7 @@ class SyncMovie
             $this->movieApi->updateCrew($movie->getId(), $tmdbMovie->getCredits()->getCrew());
 
             $this->dbConnection->commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dbConnection->rollBack();
 
             throw $e;

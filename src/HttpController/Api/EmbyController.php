@@ -34,5 +34,5 @@ class EmbyController
         $this->embyScrobbler->processEmbyWebhook($userId, Json::decode($requestPayload));
 
         return Response::createOk();
-    }    
+    }
 }

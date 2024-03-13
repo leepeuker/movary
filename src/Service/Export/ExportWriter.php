@@ -7,6 +7,7 @@ use Movary\Domain\Movie\MovieEntity;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Year;
+use RuntimeException;
 
 class ExportWriter
 {
@@ -32,7 +33,7 @@ class ExportWriter
         ]);
 
         if ($lengthOfWrittenString === false) {
-            throw new \RuntimeException('Could not write watch date to export csv');
+            throw new RuntimeException('Could not write watch date to export csv');
         }
     }
 
@@ -53,7 +54,7 @@ class ExportWriter
             ]);
 
             if ($lengthOfWrittenString === false) {
-                throw new \RuntimeException('Could not write watch date to export csv');
+                throw new RuntimeException('Could not write watch date to export csv');
             }
         }
     }
@@ -69,7 +70,7 @@ class ExportWriter
             $watchlistItem['added_at'],
         ]);
         if ($lengthOfWrittenString === false) {
-            throw new \RuntimeException('Could not write watch date to export csv');
+            throw new RuntimeException('Could not write watch date to export csv');
         }
     }
 

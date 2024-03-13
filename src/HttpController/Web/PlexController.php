@@ -17,6 +17,7 @@ use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class PlexController
 {
@@ -84,12 +85,12 @@ class PlexController
         $plexClientId = $this->userApi->findPlexClientId($this->authenticationService->getCurrentUserId());
         $plexClientCode = $this->userApi->findTemporaryPlexCode($this->authenticationService->getCurrentUserId());
         if ($plexClientId === null || $plexClientCode === null) {
-            throw new \RuntimeException('Missing plex client id or code');
+            throw new RuntimeException('Missing plex client id or code');
         }
 
         $plexAccessToken = $this->plexApi->findPlexAccessToken($plexClientId, $plexClientCode);
         if ($plexAccessToken === null) {
-            throw new \RuntimeException('Missing plex client id or code');
+            throw new RuntimeException('Missing plex client id or code');
         }
 
         $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), (string)$plexAccessToken);

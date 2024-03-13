@@ -31,7 +31,7 @@ class NetflixActivityItemsConverter
     {
         $tmdbSearchResults = [];
         foreach ($activityItems as $activityItem) {
-            if(trim($activityItem->getTitle()) == '') {
+            if (trim($activityItem->getTitle()) == '') {
                 $this->logger->debug('Netflix: Ignoring item because it has no valid title', ['netflixTitle' => $activityItem->getTitle()]);
                 continue;
             }

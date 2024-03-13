@@ -26,7 +26,7 @@ class WatchlistController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
         private readonly SyncMovie $tmdbMovieSyncService,
-        private readonly WatchlistRequestMapper $watchlistRequestMapper
+        private readonly WatchlistRequestMapper $watchlistRequestMapper,
     ) {
     }
 
@@ -55,15 +55,10 @@ class WatchlistController
 
     public function renderWatchlist(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
         $requestData = $this->watchlistRequestMapper->mapRenderPageRequest($request);
 
         $watchlistPaginated = $this->movieWatchlistApi->fetchWatchlistPaginated(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
@@ -74,7 +69,7 @@ class WatchlistController
             $requestData->getGenre(),
         );
         $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getSearchTerm(),
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
@@ -96,9 +91,9 @@ class WatchlistController
                 'releaseYear' => (string)$requestData->getReleaseYear(),
                 'language' => (string)$requestData->getLanguage(),
                 'genre' => (string)$requestData->getGenre(),
-                'uniqueReleaseYears' => $this->movieWatchlistApi->fetchUniqueMovieReleaseYears($userId),
-                'uniqueLanguages' => $this->movieWatchlistApi->fetchUniqueMovieLanguages($userId),
-                'uniqueGenres' => $this->movieWatchlistApi->fetchUniqueMovieGenres($userId),
+                'uniqueReleaseYears' => $this->movieWatchlistApi->fetchUniqueMovieReleaseYears($requestData->getUserId()),
+                'uniqueLanguages' => $this->movieWatchlistApi->fetchUniqueMovieLanguages($requestData->getUserId()),
+                'uniqueGenres' => $this->movieWatchlistApi->fetchUniqueMovieGenres($requestData->getUserId()),
             ]),
         );
     }

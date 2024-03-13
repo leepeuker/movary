@@ -75,7 +75,7 @@ class Gender
     public function getText() : string
     {
         if (isset(self::GENDER_TEXT[$this->asInt()]) === false) {
-            throw new \RuntimeException('Could not get text for gender with id: ' . $this->asInt());
+            throw new RuntimeException('Could not get text for gender with id: ' . $this->asInt());
         }
 
         return self::GENDER_TEXT[$this->asInt()];

@@ -2,6 +2,7 @@
 
 namespace Movary\Api\Jellyfin;
 
+use Exception;
 use Movary\Api\Jellyfin\Cache\JellyfinCache;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
@@ -16,6 +17,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class JellyfinApi
 {
@@ -44,7 +46,7 @@ class JellyfinApi
         ];
         $response = $this->jellyfinClient->post($url, data: $data);
         if ($response === null) {
-            throw new \RuntimeException('Missing authentication response body');
+            throw new RuntimeException('Missing authentication response body');
         }
 
         $this->logger->info('Jellyfin account has been authenticated for user: ' . $userId);
@@ -89,7 +91,7 @@ class JellyfinApi
 
         try {
             $userInformation = $this->jellyfinClient->get($url, jellyfinAccessToken: $jellyfinAuthentication->getAccessToken(), timeout: 2);
-        } catch (\Exception) {
+        } catch (Exception) {
             return null;
         }
 

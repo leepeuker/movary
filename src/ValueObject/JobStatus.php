@@ -2,9 +2,10 @@
 
 namespace Movary\ValueObject;
 
+use JsonSerializable;
 use RuntimeException;
 
-class JobStatus implements \JsonSerializable
+class JobStatus implements JsonSerializable
 {
     private const STATUS_DONE = 'done';
 

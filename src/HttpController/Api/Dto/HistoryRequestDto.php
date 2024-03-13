@@ -44,6 +44,11 @@ class HistoryRequestDto
         return $this->page;
     }
 
+    public function getRequestedUserId() : int
+    {
+        return $this->requestedUserId;
+    }
+
     public function getSearchTerm() : ?string
     {
         return $this->searchTerm;
@@ -57,10 +62,5 @@ class HistoryRequestDto
     public function getSortOrder() : SortOrder
     {
         return $this->sortOrder;
-    }
-
-    public function getRequestedUserId() : int
-    {
-        return $this->requestedUserId;
     }
 }

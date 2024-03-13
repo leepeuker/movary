@@ -17,6 +17,7 @@ class JellyfinController
         private readonly LoggerInterface $logger,
     ) {
     }
+
     public function handleJellyfinWebhook(Request $request) : Response
     {
         $webhookId = $request->getRouteParameters()['id'];

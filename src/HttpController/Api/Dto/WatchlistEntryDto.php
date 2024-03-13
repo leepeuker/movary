@@ -2,9 +2,10 @@
 
 namespace Movary\HttpController\Api\Dto;
 
+use JsonSerializable;
 use Movary\ValueObject\DateTime;
 
-class WatchlistEntryDto implements \JsonSerializable
+class WatchlistEntryDto implements JsonSerializable
 {
     public function __construct(
         private readonly MovieDto $movieDto,
