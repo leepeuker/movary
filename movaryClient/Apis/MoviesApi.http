@@ -1,5 +1,0 @@
-## MoviesApi
-
-### Search for movies remotely
-# @name moviesSearchGet
-GET http://localhost/movies/search

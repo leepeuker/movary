@@ -70,6 +70,3 @@ jobs:
           sudo php -S 127.0.0.1:80 -t public &
           ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
           kill $!
-          
-      - name: Remove development image
-        run: docker rm -f movary
