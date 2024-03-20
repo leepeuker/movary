@@ -36,7 +36,8 @@
     "roave/security-advisories": "dev-latest",
     "squizlabs/php_codesniffer": "^3.9",
     "vimeo/psalm": "^4.30",
-    "webmozarts/strict-phpunit": "^7.11.4"
+    "webmozarts/strict-phpunit": "^7.11.4",
+    "staabm/annotate-pull-request-from-checkstyle": "^1.8.5"
   },
   "scripts": {
     "test": [
