@@ -35,30 +35,23 @@ jobs:
           curl -f -L -o ijhttp.zip "https://jb.gg/ijhttp/latest"
           unzip ijhttp.zip
 
-      - name: Setup PHP with PECL extension
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          extensions: json, mbstring, pdo
-          tools: composer, phpcs, phpstan, phpunit:9.6.17, psalm:4.30, cs2pr, phinx:0.15.5
+      - name: Build docker development image
+        run: docker build --target development --tag movary ./build/php/
 
-      - name: Install composer package
-        uses: "ramsey/composer-install@v3"
-
-      - name: Setup problem matchers for PHPUnit
-        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+      - name: Install dependencies
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
 
       - name: Run PHPCs
-        run: phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests | cs2pr
+        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests | cs2pr
 
       - name: Run PHPStan
-        run: phpstan analyse -c ./settings/phpstan.neon
+        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon
 
       - name: Run Psalm
-        run: psalm -c ./settings/psalm.xml --show-info=false --output-format=github
+        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/psalm -c ./settings/psalm.xml --show-info=false --output-format=github
 
       - name: Run PHPUnit
-        run: phpunit -c ./settings/phpunit.xml --testsuite unit
+        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpunit -c ./settings/phpunit.xml --testsuite unit
 
       - name: Prepare for the tests
         run: |
@@ -67,6 +60,4 @@ jobs:
 
       - name: Run the HTTP tests
         run: |
-          sudo php -S 127.0.0.1:80 -t public &
           ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
-          kill $!
