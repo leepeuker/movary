@@ -60,6 +60,6 @@ jobs:
 
       - name: Run the HTTP tests
         run: |
-          docker run --rm -d --network host -v /home/runner/work/movary/movary:/app movary &&
+          docker run --rm -d -p 80:80 -v /home/runner/work/movary/movary:/app movary &&
           ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI &&
           docker stop movary && docker rm movary
