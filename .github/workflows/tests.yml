@@ -45,7 +45,7 @@ jobs:
         run:  docker run --rm --network host -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests | vendor/bin/cs2pr
 
       - name: Run PHPStan
-        run:  docker run --rm --network host -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon | vendor/bin/cs2pr
+        run:  docker run --rm --network host -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon
 
       - name: Run Psalm
         run:  docker run --rm --network host -v /home/runner/work/movary/movary:/app movary vendor/bin/psalm -c ./settings/psalm.xml --show-info=false --output-format=github
