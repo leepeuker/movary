@@ -42,7 +42,7 @@ jobs:
         run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
 
       - name: Run PHPCs
-        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests | cs2pr
+        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests
 
       - name: Run PHPStan
         run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon
