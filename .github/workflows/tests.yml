@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set environment variables
         run: |
-          echo "DATABASE_MODE=mysql" > ".env"
+          echo "DATABASE_MODE=127.0.0.1" > ".env"
           echo "DATABASE_MYSQL_HOST=database" >> ".env"
           echo "DATABASE_MYSQL_PORT=3306" >> ".env"
           echo "DATABASE_MYSQL_USER=root" >> ".env"
@@ -39,13 +39,13 @@ jobs:
         run: docker build --target development --tag movary ./build/php/
 
       - name: Install dependencies
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
+        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --net=host --no-interaction install
 
       - name: Run PHPCs
-        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests
+        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests | vendor/bin/cs2pr
 
       - name: Run PHPStan
-        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon | cs2pr
+        run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon | vendor/bin/cs2pr
 
       - name: Run Psalm
         run:  docker run --rm -v /home/runner/work/movary/movary:/app movary vendor/bin/psalm -c ./settings/psalm.xml --show-info=false --output-format=github
