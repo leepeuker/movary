@@ -19,8 +19,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set environment variables
         run: |
-          echo "DATABASE_MODE=127.0.0.1" > ".env"
-          echo "DATABASE_MYSQL_HOST=database" >> ".env"
+          echo "DATABASE_MODE=mysql" > ".env"
+          echo "DATABASE_MYSQL_HOST=127.0.0.1" >> ".env"
           echo "DATABASE_MYSQL_PORT=3306" >> ".env"
           echo "DATABASE_MYSQL_USER=root" >> ".env"
           echo "DATABASE_MYSQL_NAME=movary" >> ".env"
