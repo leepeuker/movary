@@ -55,8 +55,8 @@ jobs:
 
       - name: Prepare for the tests
         run: |
-          php bin/console.php database:migration:migrate
-          php bin/console.php user:create testUser@domain.com password1234 testUser true
+          docker run --rm -v /home/runner/work/movary/movary:/app movary php bin/console.php database:migration:migrate
+          docker run --rm -v /home/runner/work/movary/movary:/app movary php bin/console.php user:create testUser@domain.com password1234 testUser true
 
       - name: Run the HTTP tests
         run: |
