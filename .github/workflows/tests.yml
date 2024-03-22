@@ -80,7 +80,5 @@ jobs:
         run: |
           docker run --rm -d --network container:database --name movary -v /home/runner/work/movary/movary:/app movary
           ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
-          docker stop movary
-          docker rm movary
         env: 
           NETWORK: ${{ steps.get_network.outputs.NETWORK }}
