@@ -77,8 +77,9 @@ jobs:
 
       - name: Run the HTTP tests
         run: |
-          docker run --rm -d -p 80:80 --network $NETWORK -v /home/runner/work/movary/movary:/app movary &&
-          ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI &&
-          docker stop movary && docker rm movary
+          docker run --rm -d -p 80:80 --network $NETWORK -v /home/runner/work/movary/movary:/app movary
+          ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
+          docker stop movary
+          docker rm movary
         env: 
           NETWORK: ${{ steps.get_network.outputs.NETWORK }}
