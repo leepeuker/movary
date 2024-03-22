@@ -38,7 +38,7 @@ jobs:
       
       - name: Get Docker network name of GitHub services
         id: get_network
-        run: echo "NETWORK=$(docker ps --format '{{ json .Networks }}' --filter 'name=database')" >> "$GITHUB_OUTPUT"
+        run: echo "NETWORK=$(docker ps --format '{{ json .Networks }}' --filter 'name=database' | cut -d "\"" -f 2)" >> "$GITHUB_OUTPUT"
 
       - name: Build docker development image
         run: docker build --target development --tag movary ./build/php/
