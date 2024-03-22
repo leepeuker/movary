@@ -14,7 +14,7 @@ jobs:
           MARIADB_DATABASE: movary
         ports:
           - 3306:3306
-        options: --name database --add-host=127.0.0.1=host-gateway
+        options: --name database
 
     steps:
       - uses: actions/checkout@v3
