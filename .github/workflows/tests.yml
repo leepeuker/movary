@@ -33,16 +33,6 @@ jobs:
       options: -u application -w /app --name movary
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set environment variables
-        run: |
-          echo "DATABASE_MODE=mysql" > ".env"
-          echo "DATABASE_MYSQL_HOST=database" >> ".env"
-          echo "DATABASE_MYSQL_PORT=3306" >> ".env"
-          echo "DATABASE_MYSQL_USER=root" >> ".env"
-          echo "DATABASE_MYSQL_NAME=movary" >> ".env"
-          echo "DATABASE_MYSQL_PASSWORD=" >> ".env"
-
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
