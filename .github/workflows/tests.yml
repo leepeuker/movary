@@ -30,7 +30,7 @@ jobs:
         - 80
       volumes:
         - /home/runner/work/movary/movary:/app
-      options: -u application -w /app --name movary apk add --no-cache make nano
+      options: -u application -w /app --name movary
 
     steps:
       - uses: actions/checkout@v3
