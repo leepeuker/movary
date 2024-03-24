@@ -131,7 +131,7 @@ class HistoryController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/history.html.twig', [
-                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
+                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor($request),
                 'historyEntries' => $historyPaginated,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $searchTerm,

@@ -56,7 +56,7 @@ class MoviesController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/movies.html.twig', [
-                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
+                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor($request),
                 'movies' => $uniqueMovies,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $requestData->getSearchTerm(),
