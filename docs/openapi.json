@@ -6,6 +6,52 @@
   },
   "servers": [],
   "paths": {
+    "/users": {
+      "get": {
+        "tags": [
+          "User management"
+        ],
+        "summary": "Get all visible users",
+        "description": "Get all the usernames of the visible users to the current request based on the authentication. If the request doesn't contain a valid token, only public users will be returned.",
+        "responses": {
+          "200": {
+            "description": "All visible usernames",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array of objects containing the username of the visible users",
+                  "items": {
+                    "description": "Username",
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Username 1"
+                      }
+                    }
+                  },
+                  "example": [
+                    {
+                      "name": "Username 1"
+                    },
+                    {
+                      "name": "Username 2"
+                    },
+                    {
+                      "name": "Username 3"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "There are no visible users"
+          }
+        }
+      }
+    },
     "\/users\/{username}\/history\/movies": {
       "get": {
         "tags": [
