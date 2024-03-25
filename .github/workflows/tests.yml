@@ -74,4 +74,4 @@ jobs:
       - name: Install ibm-openapi-validator
         run: npm install -g ibm-openapi-validator
       - name: Validate OpenAPI
-        run: npx lint-openapi /home/runner/work/movary/movary/docs/openapi.json
+        run: npx lint-openapi -s /home/runner/work/movary/movary/docs/openapi.json
