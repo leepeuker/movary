@@ -64,3 +64,16 @@ jobs:
         run: |
           docker run --rm -d --network container:database --name movary -v /home/runner/work/movary/movary:/app movary
           ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
+
+  test_openapi:
+    name: Validate OpenAPI spec
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+            cache: 'npm'
+      - name: Install ibm-openapi-validator
+        run: npm install -g ibm-openapi-validator
+      - name: Validate OpenAPI
+        run: npx lint-openapi /home/runner/work/movary/movary/docs/openapi.json
