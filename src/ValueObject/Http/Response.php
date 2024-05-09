@@ -41,6 +41,11 @@ class Response
         return new self(StatusCode::createForbidden(), null, [Header::createLocation('/login?redirect=' . $query)]);
     }
 
+    public static function createJpeg(string $image) : self
+    {
+        return new self(StatusCode::createOk(), $image, Header::createContentTypeJpeg(strlen($image)));
+    }
+
     public static function createJson(string $body, StatusCode $statusCode = null) : self
     {
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
