@@ -3,12 +3,13 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\UserApi;
+use Movary\ValueObject\Http\Request;
 
-class UserPageAuthorizationChecker
+readonly class UserPageAuthorizationChecker
 {
     public function __construct(
-        private readonly UserApi $userApi,
-        private readonly Authentication $authenticationService,
+        private UserApi $userApi,
+        private Authentication $authenticationService,
     ) {
     }
 
@@ -30,9 +31,9 @@ class UserPageAuthorizationChecker
         return $this->userApi->fetchAllHavingWatchedMovieWithPersonInternVisibleUsernames($personId);
     }
 
-    public function fetchAllVisibleUsernamesForCurrentVisitor() : array
+    public function fetchAllVisibleUsernamesForCurrentVisitor(Request $request) : array
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false) {
+        if ($this->authenticationService->createAuthenticationObjectDynamically($request) === null) {
             return $this->userApi->fetchAllPublicVisibleUsernames();
         }
 

@@ -204,6 +204,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', '/authentication/token', [Api\AuthenticationController::class, 'destroyToken']);
     $routes->add('GET', '/authentication/token', [Api\AuthenticationController::class, 'getTokenData']);
 
+    $routes->add('GET', '/users', [Api\UsersController::class, 'getVisibleUsers']);
+
     $routeUserHistory = '/users/{username:[a-zA-Z0-9]+}/history/movies';
     $routes->add('GET', $routeUserHistory, [Api\HistoryController::class, 'getHistory'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('POST', $routeUserHistory, [Api\HistoryController::class, 'addToHistory'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);

@@ -81,7 +81,7 @@ class WatchlistController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/watchlist.html.twig', [
-                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
+                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor($request),
                 'watchlistEntries' => $watchlistPaginated,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $requestData->getSearchTerm(),

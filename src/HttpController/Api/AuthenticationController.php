@@ -138,7 +138,7 @@ class AuthenticationController
             return Response::createUnauthorized();
         }
 
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() && $this->authenticationService->isValidAuthToken($token) === false) {
+        if($this->authenticationService->isUserAuthenticatedWithCookie() && $this->authenticationService->isValidToken($token) === false) {
             return Response::createUnauthorized();
         }
 
