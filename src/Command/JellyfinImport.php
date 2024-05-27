@@ -2,7 +2,6 @@
 
 namespace Movary\Command;
 
-use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
 use Movary\ValueObject\JobStatus;

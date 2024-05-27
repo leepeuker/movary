@@ -44,6 +44,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use RuntimeException;
 use Twig;
 
 class Factory
@@ -151,7 +152,7 @@ class Factory
                 'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
                 'charset' => self::getDatabaseMysqlCharset($config),
             ],
-            default => throw new \RuntimeException('Not supported database mode: ' . $databaseMode)
+            default => throw new RuntimeException('Not supported database mode: ' . $databaseMode)
         };
 
         $connection = DBAL\DriverManager::getConnection($config);

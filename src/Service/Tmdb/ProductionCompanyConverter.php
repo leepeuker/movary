@@ -2,8 +2,6 @@
 
 namespace Movary\Service\Tmdb;
 
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbProductionCompany;
 use Movary\Domain\Company\CompanyApi;

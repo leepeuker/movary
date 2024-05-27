@@ -7,5 +7,5 @@ use Movary\ValueObject\Http\Response;
 
 interface MiddlewareInterface
 {
-    public function __invoke() : ?Response;
+    public function __invoke(Request $request) : ?Response;
 }

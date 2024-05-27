@@ -47,7 +47,7 @@ class EmbyWebhookDtoMapper
     {
         $timestampWithoutMicroseconds = preg_replace('/\.\d+Z/', '', (string)$timestamp);
 
-        $dateTime = \DateTime::createFromFormat('Y-m-d\TH:i:s', (string)$timestampWithoutMicroseconds, new DateTimeZone('UTC'));
+        $dateTime = DateTime::createFromFormat('Y-m-d\TH:i:s', (string)$timestampWithoutMicroseconds, new DateTimeZone('UTC'));
         if ($dateTime === false) {
             throw new RuntimeException('Could not build date time from: ' . $timestamp);
         }

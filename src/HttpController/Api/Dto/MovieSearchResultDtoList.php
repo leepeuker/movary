@@ -15,11 +15,6 @@ class MovieSearchResultDtoList extends AbstractList
         return new self();
     }
 
-    public function set(MovieSearchResultDto $dto) : void
-    {
-        $this->data[$dto->getTmdbId()] = $dto;
-    }
-
     public function get(int $tmdbId) : MovieSearchResultDto
     {
         return $this->data[$tmdbId];
@@ -28,5 +23,10 @@ class MovieSearchResultDtoList extends AbstractList
     public function jsonSerialize() : array
     {
         return array_values($this->data);
+    }
+
+    public function set(MovieSearchResultDto $dto) : void
+    {
+        $this->data[$dto->getTmdbId()] = $dto;
     }
 }

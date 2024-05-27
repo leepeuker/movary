@@ -2,9 +2,10 @@
 
 namespace Movary\ValueObject;
 
+use JsonSerializable;
 use RuntimeException;
 
-class JobType implements \JsonSerializable
+class JobType implements JsonSerializable
 {
     private const TYPE_TMDB_PERSON_SYNC = 'tmdb_person_sync';
 

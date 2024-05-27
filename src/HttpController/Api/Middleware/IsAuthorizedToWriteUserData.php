@@ -17,7 +17,9 @@ class IsAuthorizedToWriteUserData implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
-        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        $requestedUsername = (string)$request->getRouteParameters()['username'];
+
+        $requestedUser = $this->userApi->findUserByName($requestedUsername);
         if ($requestedUser === null) {
             return Response::createNotFound();
         }

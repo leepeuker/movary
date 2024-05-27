@@ -2,6 +2,8 @@
 
 namespace Movary\Service\Email;
 
-class CannotSendEmailException extends \RuntimeException
+use RuntimeException;
+
+class CannotSendEmailException extends RuntimeException
 {
 }

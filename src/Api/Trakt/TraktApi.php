@@ -68,7 +68,7 @@ class TraktApi
             return true;
         }
 
-        if ($response->getStatusCode() === 403 || $response->getStatusCode() === 404|| $response->getStatusCode() === 405) {
+        if ($response->getStatusCode() === 403 || $response->getStatusCode() === 404 || $response->getStatusCode() === 405) {
             return false;
         }
 

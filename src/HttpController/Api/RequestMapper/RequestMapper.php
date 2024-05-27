@@ -7,6 +7,7 @@ use Movary\Domain\User\UserEntity;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
+use RuntimeException;
 
 class RequestMapper
 {
@@ -21,22 +22,13 @@ class RequestMapper
     ) {
     }
 
-    public function mapUsernameFromRoute(Request $request) : UserEntity
-    {
-        $username = $request->getRouteParameters()['username'] ?? null;
-
-        if ($username === null) {
-            throw new \RuntimeException('Username parameter missing in route');
-        }
-
-        return $this->userApi->fetchUserByName($username);
-    }
-
-    public function mapSearchTerm(Request $request) : ?string
+    public function mapLimit(Request $request) : int
     {
         $getParameters = $request->getGetParameters();
 
-        return $getParameters['search'] ?? null;
+        $limit = $getParameters['limit'] ?? self::DEFAULT_LIMIT;
+
+        return (int)$limit;
     }
 
     public function mapPage(Request $request) : int
@@ -59,13 +51,11 @@ class RequestMapper
         return Year::createFromString($getParameters['releaseYear']);
     }
 
-    public function mapLimit(Request $request) : int
+    public function mapSearchTerm(Request $request) : ?string
     {
         $getParameters = $request->getGetParameters();
 
-        $limit = $getParameters['limit'] ?? self::DEFAULT_LIMIT;
-
-        return (int)$limit;
+        return $getParameters['search'] ?? null;
     }
 
     public function mapSortOrder(Request $request, ?string $defaultSortOrder = null) : SortOrder
@@ -78,7 +68,18 @@ class RequestMapper
             'asc' => SortOrder::createAsc(),
             'desc' => SortOrder::createDesc(),
 
-            default => throw new \RuntimeException('Not supported sort order: ' . $getParameters['sortOrder'])
+            default => throw new RuntimeException('Not supported sort order: ' . $getParameters['sortOrder'])
         };
+    }
+
+    public function mapUsernameFromRoute(Request $request) : UserEntity
+    {
+        $username = $request->getRouteParameters()['username'] ?? null;
+
+        if ($username === null) {
+            throw new RuntimeException('Username parameter missing in route');
+        }
+
+        return $this->userApi->fetchUserByName($username);
     }
 }

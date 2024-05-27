@@ -27,13 +27,13 @@ class Route
         return $this->httpMethod;
     }
 
-    public function getRoute() : string
-    {
-        return $this->route;
-    }
-
     public function getMiddleware() : ?array
     {
         return $this->middleware;
+    }
+
+    public function getRoute() : string
+    {
+        return $this->route;
     }
 }

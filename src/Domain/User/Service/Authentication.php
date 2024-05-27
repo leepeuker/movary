@@ -115,6 +115,10 @@ class Authentication
             return null;
         }
 
+        if ($this->isValidAuthToken($apiToken) === false) {
+            return null;
+        }
+
         return $this->userApi->findByToken($apiToken)?->getId();
     }
 
@@ -136,32 +140,19 @@ class Authentication
 
     public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
     {
-        $userId = $this->getUserIdByApiToken($request);
+        $requestUserId = $this->getUserIdByApiToken($request);
 
-        $privacyLevel = $targetUser->getPrivacyLevel();
-
-        if ($privacyLevel === 2) {
-            return true;
-        }
-
-        if ($privacyLevel === 1 && $userId !== null) {
-            return true;
-        }
-
-        return $targetUser->getId() === $userId;
+        return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
-    public function isUserPageVisibleForCurrentUser(int $privacyLevel, int $userId) : bool
+    public function isUserPageVisibleForWebRequest(UserEntity $targetUser) : bool
     {
-        if ($privacyLevel === 2) {
-            return true;
+        $requestUserId = null;
+        if ($this->isUserAuthenticatedWithCookie() === true) {
+            $requestUserId = $this->getCurrentUserId();
         }
 
-        if ($privacyLevel === 1 && $this->isUserAuthenticatedWithCookie() === true) {
-            return true;
-        }
-
-        return $this->isUserAuthenticatedWithCookie() === true && $this->getCurrentUserId() === $userId;
+        return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
     public function isValidAuthToken(string $token) : bool
@@ -238,6 +229,21 @@ class Authentication
         ]);
 
         $this->sessionWrapper->set('userId', $userId);
+    }
+
+    private function isUserPageVisibleForUser(UserEntity $targetUser, ?int $requestUserId) : bool
+    {
+        $privacyLevel = $targetUser->getPrivacyLevel();
+
+        if ($privacyLevel === 2) {
+            return true;
+        }
+
+        if ($privacyLevel === 1 && $requestUserId !== null) {
+            return true;
+        }
+
+        return $targetUser->getId() === $requestUserId;
     }
 
     private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\HttpController\Api\Middleware;
+namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -24,8 +24,8 @@ class IsAuthorizedToReadUserData implements MiddlewareInterface
             return Response::createNotFound();
         }
 
-        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
-            return Response::createForbidden();
+        if ($this->authenticationService->isUserPageVisibleForWebRequest($requestedUser) === false) {
+            return Response::createForbiddenRedirect($request->getPath());
         }
 
         return null;

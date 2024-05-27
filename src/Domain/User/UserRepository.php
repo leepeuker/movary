@@ -317,24 +317,6 @@ class UserRepository
         return $plexWebhookId;
     }
 
-    public function findUserByToken(string $apiToken) : ?UserEntity
-    {
-        $data = $this->dbConnection->fetchAssociative(
-            'SELECT user.*
-            FROM user
-            LEFT JOIN user_api_token ON user.id = user_api_token.user_id
-            LEFT JOIN user_auth_token ON user.id = user_auth_token.user_id
-            WHERE user_api_token.token = ? OR user_auth_token.token = ?',
-            [$apiToken, $apiToken],
-        );
-
-        if (empty($data) === true) {
-            return null;
-        }
-
-        return UserEntity::createFromArray($data);
-    }
-
     public function findUserByEmail(string $email) : ?UserEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `email` = ?', [$email]);
@@ -360,6 +342,24 @@ class UserRepository
     public function findUserByName(string $name) : ?UserEntity
     {
         $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `name` = ?', [$name]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return UserEntity::createFromArray($data);
+    }
+
+    public function findUserByToken(string $apiToken) : ?UserEntity
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT user.*
+            FROM user
+            LEFT JOIN user_api_token ON user.id = user_api_token.user_id
+            LEFT JOIN user_auth_token ON user.id = user_auth_token.user_id
+            WHERE user_api_token.token = ? OR user_auth_token.token = ?',
+            [$apiToken, $apiToken],
+        );
 
         if (empty($data) === true) {
             return null;
@@ -539,6 +539,19 @@ class UserRepository
         );
     }
 
+    public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_character_names' => (int)$displayCharacterNames,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateEmail(int $userId, string $email) : void
     {
         $this->dbConnection->update(
@@ -558,19 +571,6 @@ class UserRepository
             'user',
             [
                 'emby_scrobble_views' => (int)$scrobbleWatches,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'display_character_names' => (int)$displayCharacterNames,
             ],
             [
                 'id' => $userId,
