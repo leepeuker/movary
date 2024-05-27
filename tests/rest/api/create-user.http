@@ -1,0 +1,186 @@
+#@name Test creating a new user properly
+POST http://127.0.0.1/api/create-user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{
+  "email": "myname@domain.com",
+  "username": "Averycoolusername",
+  "password": "Mysecurepassword",
+  "repeatPassword": "Mysecurepassword"
+}
+
+> {%
+ client.test("User created", function() {
+    client.assert(response.status === 200, "Response status is not 200");
+ });
+ client.global.set('responseAuthToken', response.body.token);
+%}
+
+###
+#@name Test missing input erro
+
+POST http://127.0.0.1/api/create-user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{
+  "email": "",
+  "username": "",
+  "password": "",
+  "repeatPassword": ""
+}
+
+> {%
+    client.test("Missing input", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'MissingInput'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
+        client.assert(response.body['message'] === 'Email, username, password or the password repeat is missing', 'Response was not as expected');
+    });
+%}
+
+###
+#@name Test passwords not equal error
+POST http://127.0.0.1/api/create-user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{
+  "email": "myname@domain.com",
+  "username": "Averycoolusername",
+  "password": "Mysecurepassword",
+  "repeatPassword": "Adifferentpassword"
+}
+
+> {%
+    client.test("Passwords not equal", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'PasswordsNotEqual'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
+    });
+%}
+
+###
+#@name Test email already exists error
+
+POST http://127.0.0.1/api/create-user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{
+  "email": "myname@domain.com",
+  "username": "MyUniqueUsername",
+  "password": "Mysecurepassword",
+  "repeatPassword": "Mysecurepassword"
+}
+
+> {%
+    client.test("Email already exists", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'EmailNotUnique'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
+    });
+%}
+
+###
+#@name Test password is shorter than 8 characters
+
+POST http://127.0.0.1/api/create-user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{
+  "email": "myuniqueaddress@domain.com",
+  "username": "MyUniqueUsername",
+  "password": "short",
+  "repeatPassword": "short"
+}
+
+> {%
+    client.test("Password too short", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'PasswordTooShort'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
+    });
+%}
+
+###
+#@name Test invalid username error
+
+POST http://127.0.0.1/api/create-user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{
+  "email": "myuniqueaddress@domain.com",
+  "username": "An invalid username!!!!",
+  "password": "Mysecurepassword",
+  "repeatPassword": "Mysecurepassword"
+}
+
+> {%
+    client.test("Invalid username", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'UsernameInvalidFormat'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
+    });
+%}
+
+###
+#@name Test username already exists error
+
+POST http://127.0.0.1/api/create-user
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: RestAPI Test
+
+{
+  "email": "myuniqueaddress@domain.com",
+  "username": "Averycoolusername",
+  "password": "Mysecurepassword",
+  "repeatPassword": "Mysecurepassword"
+}
+
+> {%
+    client.test("Username already exists", function() {
+        let expectedStatusCode = 400;
+        let expectedError = 'UsernameNotUnique'
+        client.assert(response.status === expectedStatusCode, "Response status is not: " + expectedStatusCode);
+        client.assert(response.body['error'] === expectedError, 'Response error was not: ' + expectedError);
+    });
+%}
+
+###
+#@name Delete the test user since all tests are finished
+
+DELETE http://127.0.0.1/api/authentication/token
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Auth-Token: {{responseAuthToken}}
+
+> {%
+    client.test("Response has correct status code", function() {
+        let expected = 204
+        client.assert(response.status === expected, "Expected status code: " + expected);
+    });
+%}
