@@ -430,7 +430,7 @@ function getCurrentDate() {
  * Rating star logic starting here
  */
 async function fetchRating(tmdbId) {
-    const response = await fetch('/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
+    const response = await fetch('/api/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
