@@ -48,6 +48,9 @@ class Validator
         }
     }
 
+    /**
+     * @throws PasswordTooShort
+     */
     public function ensurePasswordIsValid(string $password) : void
     {
         if (strlen($password) < self::PASSWORD_MIN_LENGTH) {
