@@ -17,9 +17,11 @@ use Movary\Command;
 use Movary\Command\CreatePublicStorageLink;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
+use Movary\Domain\Person\PersonApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\ImagesController;
 use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
@@ -182,6 +184,15 @@ class Factory
             $container->get(DBAL\Connection::class),
             self::createDirectoryAppRoot() . 'public/',
             '/storage/images/',
+        );
+    }
+
+    public static function createImagesController(ContainerInterface $container) : ImagesController
+    {
+        return new ImagesController(
+            $container->get(PersonApi::class),
+            $container->get(MovieApi::class),
+            self::createDirectoryAppRoot() . 'public'
         );
     }
 
