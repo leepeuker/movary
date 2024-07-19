@@ -29,8 +29,10 @@ class SessionWrapper
             );
         }
 
-        session_destroy();
-        session_regenerate_id();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+            session_regenerate_id();
+        }
     }
 
     public function find(string $key) : mixed
