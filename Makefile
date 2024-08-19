@@ -25,8 +25,8 @@ logs:
 build:
 	docker compose build --no-cache
 	make up
-	make db_mysql_create_database
 	make composer_install
+	make db_mysql_create_database
 	make app_database_migrate
 	make exec_app_cmd CMD="php bin/console.php storage:link"
 
