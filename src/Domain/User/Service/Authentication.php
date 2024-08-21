@@ -220,10 +220,10 @@ class Authentication
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
         setcookie(
-            name: self::AUTHENTICATION_COOKIE_NAME,
-            value: $token,
-            expires_or_options: (int)$expirationDate->format('U'),
-            path: '/',
+            self::AUTHENTICATION_COOKIE_NAME,
+            $token,
+            (int)$expirationDate->format('U'),
+            '/',
             httponly: true
         );
 
