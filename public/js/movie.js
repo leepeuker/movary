@@ -104,6 +104,7 @@ function loadWatchDateModal(watchDateListElement) {
     document.getElementById('editWatchDateModalPlaysInput').value = watchDateListElement.dataset.plays;
     document.getElementById('editWatchDateModalCommentInput').value = watchDateListElement.dataset.comment;
     document.getElementById('editWatchDateModalPositionInput').value = watchDateListElement.dataset.position;
+    document.getElementById('editWatchDateModalLocationInput').value = watchDateListElement.dataset.location;
 
     document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
     document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
@@ -125,6 +126,7 @@ function editWatchDate() {
     const newWatchDatePlays = document.getElementById('editWatchDateModalPlaysInput').value;
     const newPositionPlays = document.getElementById('editWatchDateModalPositionInput').value;
     const comment = document.getElementById('editWatchDateModalCommentInput').value;
+    const location = document.getElementById('editWatchDateModalLocationInput').value;
 
     const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
 
@@ -137,7 +139,8 @@ function editWatchDate() {
             'plays': newWatchDatePlays,
             'comment': comment,
             'position': newPositionPlays,
-            'dateFormat': document.getElementById('dateFormatPhp').value
+            'dateFormat': document.getElementById('dateFormatPhp').value,
+            'location': location
         }),
         success: function (data, textStatus, xhr) {
             window.location.reload()

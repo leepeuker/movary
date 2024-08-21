@@ -45,3 +45,4 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-chevron-contract::before { content: "\f27d"; }
 .bi-question-lg::before { content: "\f64e"; }
 .bi-filter::before{content:"\f3ca"}
+.bi-pin-map-fill::before{content:"\f64b"}

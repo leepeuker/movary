@@ -63,6 +63,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', '/settings/account/general/api-token', [Web\SettingsController::class, 'deleteApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('PUT', '/settings/account/general/api-token', [Web\SettingsController::class, 'regenerateApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/dashboard', [Web\SettingsController::class, 'renderDashboardAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/locations', [Web\SettingsController::class, 'renderLocationsAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/security', [Web\SettingsController::class, 'renderSecurityAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/data', [Web\SettingsController::class, 'renderDataAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/server/general', [Web\SettingsController::class, 'renderServerGeneralPage'], [Web\Middleware\UserIsAuthenticated::class]);

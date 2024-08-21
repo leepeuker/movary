@@ -8,6 +8,7 @@ use Movary\Api\Plex\PlexApi;
 use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Movie;
+use Movary\Domain\Movie\History\Location\MovieHistoryLocationApi;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
@@ -52,6 +53,7 @@ class SettingsController
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
         private readonly TmdbIsoCountryCache $countryCache,
+        private readonly MovieHistoryLocationApi $historyLocationApi,
     ) {
     }
 
@@ -172,6 +174,20 @@ class SettingsController
             $this->twig->render('page/settings-account-dashboard.html.twig', [
                 'dashboardRows' => $dashboardRows,
                 'dashboardRowsSuccessfullyReset' => $dashboardRowsSuccessfullyReset,
+            ]),
+        );
+    }
+
+    public function renderLocationsAccountPage() : Response
+    {
+        $user = $this->authenticationService->getCurrentUser();
+
+        $locations = $this->historyLocationApi->findLocationsByUserId($user->getId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-locations.html.twig', [
+                'locations' => $locations,
             ]),
         );
     }
