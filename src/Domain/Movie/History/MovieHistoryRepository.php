@@ -11,10 +11,10 @@ class MovieHistoryRepository
     {
     }
 
-    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment, int $position) : void
+    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment, int $position, ?int $locationId) : void
     {
         $this->dbConnection->executeStatement(
-            'INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`, `position`) VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`, `position`, `location_id`) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [
                 $movieId,
                 $userId,
@@ -22,6 +22,7 @@ class MovieHistoryRepository
                 (string)$plays,
                 $comment,
                 $position,
+                $locationId,
             ],
         );
     }
@@ -79,15 +80,24 @@ class MovieHistoryRepository
         )[0];
     }
 
-    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, int $position, ?string $comment) : void
+    public function update(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        int $plays,
+        int $position,
+        ?string $comment,
+        ?int $locationId,
+    ) : void
     {
         if ($watchedAt === null) {
             $this->dbConnection->executeStatement(
-                'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ?, `position` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',
+                'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ?, `position` = ?, `location_id` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',
                 [
                     $comment,
                     $plays,
                     $position,
+                    $locationId,
                     $movieId,
                     $userId,
                 ],
@@ -97,11 +107,12 @@ class MovieHistoryRepository
         }
 
         $this->dbConnection->executeStatement(
-            'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? , `position` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
+            'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ? , `position` = ?, `location_id` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
             [
                 $comment,
                 $plays,
                 $position,
+                $locationId,
                 $movieId,
                 $userId,
                 (string)$watchedAt,
