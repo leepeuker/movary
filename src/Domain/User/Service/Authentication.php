@@ -219,14 +219,13 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
-            'expires' => (int)$expirationDate->format('U'),
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'strict'
-        ]);
+        setcookie(
+            self::AUTHENTICATION_COOKIE_NAME,
+            $token,
+            (int)$expirationDate->format('U'),
+            '/',
+            httponly: true
+        );
 
         $this->sessionWrapper->set('userId', $userId);
     }
