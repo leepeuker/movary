@@ -51,6 +51,7 @@ class ExportWriter
                 $movieWatchDate['imdb_id'],
                 $watchDate,
                 $movieWatchDate['comment'],
+                $movieWatchDate['location_name'],
             ]);
 
             if ($lengthOfWrittenString === false) {

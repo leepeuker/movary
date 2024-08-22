@@ -8,7 +8,7 @@ use RuntimeException;
 
 class ExportService
 {
-    private const CSV_HEADER_HISTORY = 'title,year,tmdbId,imdbId,watchedAt,comment' . PHP_EOL;
+    private const CSV_HEADER_HISTORY = 'title,year,tmdbId,imdbId,watchedAt,comment,location' . PHP_EOL;
 
     private const CSV_HEADER_RATINGS = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
 
