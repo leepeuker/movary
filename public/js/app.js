@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
             currentModalVersion++
         })
 
+        loadLogPlayModalLocationOptions()
+
         document.getElementById('logPlayModal').addEventListener('hidden.bs.modal', function () {
             setLogPlayModalSearchSpinner(false)
             logPlayModalSearchInput.value = ''
@@ -310,7 +312,9 @@ function logMovie(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
     const watchDate = document.getElementById(context + 'WatchDateInput').value
     const comment = document.getElementById(context + 'CommentInput').value
+    const locationId = document.getElementById(context + 'LocationInput').value
     const dateFormatPhp = document.getElementById('dateFormatPhp').value
+
     removeAlert('logPlayModalAlert')
 
     if (validateWatchDate(context, watchDate) === false) {
@@ -326,6 +330,7 @@ function logMovie(context) {
             'comment': comment,
             'dateFormat': dateFormatPhp,
             'personalRating': rating,
+            'locationId': locationId
         })
     }).then(function (response) {
         if (response.status === 200) {
@@ -505,4 +510,49 @@ async function logout() {
     });
 
     window.location.href = '/'
+}
+
+async function fetchLocations() {
+    const response = await fetch(
+        '/settings/locations',
+        {signal: AbortSignal.timeout(4000)}
+    )
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return await response.json();
+}
+
+async function loadLogPlayModalLocationOptions() {
+    let locations;
+    try {
+        locations = await fetchLocations();
+    } catch (error) {
+        addAlert('logPlayModalAlert', 'Could not load locations', 'danger', false);
+
+        return;
+    }
+
+    const selectElement = document.getElementById('logPlayModalLocationInput');
+
+    selectElement.innerHTML = '';
+
+    const fragment = document.createDocumentFragment();
+
+    const optionElement = document.createElement('option');
+    optionElement.value = null;
+    optionElement.selected = true;
+    fragment.appendChild(optionElement);
+
+    locations.forEach(location => {
+        const optionElement = document.createElement('option');
+        optionElement.value = location.id;
+        optionElement.textContent = location.name;
+
+        fragment.appendChild(optionElement);
+    });
+
+    selectElement.appendChild(fragment)
 }

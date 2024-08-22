@@ -26,8 +26,8 @@ async function reloadTable() {
 
     locations.forEach((location) => {
         let row = document.createElement('tr');
-        row.innerHTML = '<td>' + location.id + '</td>';
-        row.innerHTML += '<td>' + location.name + '</td>';
+        row.dataset.id = location.id
+        row.innerHTML += '<td >' + location.name + '</td>';
         row.style.cursor = 'pointer'
 
         table.getElementsByTagName('tbody')[0].appendChild(row);
@@ -37,11 +37,11 @@ async function reloadTable() {
 }
 
 function setLocationsAlert(message, type = 'success') {
-    const locationManagementAlerts = document.getElementById('locationAlerts');
-    locationManagementAlerts.classList.remove('d-none')
-    locationManagementAlerts.innerHTML = ''
-    locationManagementAlerts.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
-    locationManagementAlerts.style.textAlign = 'center'
+    const locationAlerts = document.getElementById('locationAlerts');
+    locationAlerts.classList.remove('d-none')
+    locationAlerts.innerHTML = ''
+    locationAlerts.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    locationAlerts.style.textAlign = 'center'
 }
 
 function registerTableRowClickEvent() {
@@ -50,8 +50,8 @@ function registerTableRowClickEvent() {
 
         rows[i].onclick = function () {
             prepareEditLocationsModal(
-                this.cells[0].innerHTML,
-                this.cells[1].innerHTML
+                this.dataset.id,
+                this.cells[0].innerHTML
             )
 
             locationModal.show()

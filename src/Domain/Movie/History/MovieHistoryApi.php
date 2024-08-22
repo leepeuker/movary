@@ -507,4 +507,14 @@ class MovieHistoryApi
     {
         $this->repository->updateHistoryComment($movieId, $userId, $watchAt, $comment);
     }
+
+    public function updateHistoryLocation(
+        int $movieId,
+        int $userId,
+        ?Date $watchAt,
+        ?int $locationId,
+    ) : void
+    {
+        $this->repository->updateHistoryLocation($movieId, $userId, $watchAt, $locationId);
+    }
 }

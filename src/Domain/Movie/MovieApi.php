@@ -70,6 +70,7 @@ class MovieApi
                 $playsToAdd,
                 $position,
                 $comment,
+                $locationId,
             );
 
             return;
@@ -598,6 +599,16 @@ class MovieApi
             $userId,
             $watchDate,
             $comment,
+        );
+    }
+
+    public function updateHistoryLocation(int $movieId, int $userId, ?Date $watchDate, ?int $locationId) : void
+    {
+        $this->historyApi->updateHistoryLocation(
+            $movieId,
+            $userId,
+            $watchDate,
+            $locationId,
         );
     }
 

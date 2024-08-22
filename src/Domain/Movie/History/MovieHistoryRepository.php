@@ -145,4 +145,30 @@ class MovieHistoryRepository
             ],
         );
     }
+
+    public function updateHistoryLocation(int $movieId, int $userId, ?Date $watchedAt, ?int $locationId) : void
+    {
+        if ($watchedAt === null) {
+            $this->dbConnection->executeStatement(
+                'UPDATE movie_user_watch_dates SET `location_id` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL ',
+                [
+                    $locationId,
+                    $movieId,
+                    $userId,
+                ],
+            );
+
+            return;
+        }
+
+        $this->dbConnection->executeStatement(
+            'UPDATE movie_user_watch_dates SET `location_id` = ? WHERE movie_id = ? AND user_id = ? AND watched_at = ?',
+            [
+                $locationId,
+                $movieId,
+                $userId,
+                (string)$watchedAt,
+            ],
+        );
+    }
 }

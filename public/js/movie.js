@@ -95,7 +95,7 @@ function toggleWatchDates() {
     }
 }
 
-function loadWatchDateModal(watchDateListElement) {
+async function loadWatchDateModal(watchDateListElement) {
     const modal = new bootstrap.Modal('#editWatchDateModal', {
         keyboard: false
     })
@@ -104,7 +104,6 @@ function loadWatchDateModal(watchDateListElement) {
     document.getElementById('editWatchDateModalPlaysInput').value = watchDateListElement.dataset.plays;
     document.getElementById('editWatchDateModalCommentInput').value = watchDateListElement.dataset.comment;
     document.getElementById('editWatchDateModalPositionInput').value = watchDateListElement.dataset.position;
-    document.getElementById('editWatchDateModalLocationInput').value = watchDateListElement.dataset.location;
 
     document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
     document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
@@ -116,7 +115,41 @@ function loadWatchDateModal(watchDateListElement) {
         title: 'Watch date',
     })
 
+    await loadLocationOptions()
+    document.getElementById('editWatchDateModalLocationInput').value = watchDateListElement.dataset.location;
+
     modal.show()
+}
+
+async function loadLocationOptions() {
+    let locations;
+    try {
+        locations = await fetchLocations();
+    } catch (error) {
+        addAlert('alertMovieModalDiv', 'Could not load locations', 'danger', false);
+
+        return;
+    }
+
+    const selectElement = document.getElementById('editWatchDateModalLocationInput');
+
+    selectElement.innerHTML = '';
+
+    const fragment = document.createDocumentFragment();
+
+    const optionElement = document.createElement('option');
+    optionElement.selected = true;
+    fragment.appendChild(optionElement);
+
+    locations.forEach(location => {
+        const optionElement = document.createElement('option');
+        optionElement.value = location.id;
+        optionElement.textContent = location.name;
+
+        fragment.appendChild(optionElement);
+    });
+
+    selectElement.appendChild(fragment)
 }
 
 function editWatchDate() {
@@ -126,7 +159,7 @@ function editWatchDate() {
     const newWatchDatePlays = document.getElementById('editWatchDateModalPlaysInput').value;
     const newPositionPlays = document.getElementById('editWatchDateModalPositionInput').value;
     const comment = document.getElementById('editWatchDateModalCommentInput').value;
-    const location = document.getElementById('editWatchDateModalLocationInput').value;
+    const locationId = document.getElementById('editWatchDateModalLocationInput').value;
 
     const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
 
@@ -140,7 +173,7 @@ function editWatchDate() {
             'comment': comment,
             'position': newPositionPlays,
             'dateFormat': document.getElementById('dateFormatPhp').value,
-            'location': location
+            'locationId': locationId
         }),
         success: function (data, textStatus, xhr) {
             window.location.reload()
