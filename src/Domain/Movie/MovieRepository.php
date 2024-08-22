@@ -710,6 +710,21 @@ class MovieRepository
         );
     }
 
+    public function fetchUniqueLocations(int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT l.name, l.id
+            FROM movie_user_watch_dates mh
+            JOIN movie m on mh.movie_id = m.id
+            JOIN location l on l.id = mh.location_id
+            WHERE mh.user_id = ?
+            ORDER BY l.name
+            SQL,
+            [$userId],
+        );
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->dbConnection->fetchFirstColumn(
@@ -776,6 +791,7 @@ class MovieRepository
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : int {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -809,6 +825,11 @@ class MovieRepository
             $payload[] = $userRatingMax;
         }
 
+        if ($locationId !== null) {
+            $whereQuery .= 'AND mh.location_id = ? ';
+            $payload[] = $locationId;
+        }
+
         return $this->dbConnection->fetchFirstColumn(
             <<<SQL
             SELECT COUNT(DISTINCT m.id)
@@ -837,6 +858,7 @@ class MovieRepository
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : array {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -884,6 +906,11 @@ class MovieRepository
             $whereQuery .= 'AND mur.rating BETWEEN ? AND ? ';
             $payload[] = $userRatingMin;
             $payload[] = $userRatingMax;
+        }
+
+        if ($locationId !== null) {
+            $whereQuery .= 'AND mh.location_id = ? ';
+            $payload[] = $locationId;
         }
 
         return $this->dbConnection->fetchAllAssociative(

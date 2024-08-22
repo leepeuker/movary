@@ -20,6 +20,7 @@ class MoviesRequestDto
         private readonly ?bool $hasUserRating,
         private readonly ?int $userRatingMin,
         private readonly ?int $userRatingMax,
+        private readonly ?int $locationId,
     ) {
     }
 
@@ -36,6 +37,7 @@ class MoviesRequestDto
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
+        ?int $locationId = null,
     ) : self {
         return new self(
             $userId,
@@ -50,6 +52,7 @@ class MoviesRequestDto
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 
@@ -66,6 +69,11 @@ class MoviesRequestDto
     public function getLimit() : int
     {
         return $this->limit;
+    }
+
+    public function getLocationId() : ?int
+    {
+        return $this->locationId;
     }
 
     public function getPage() : int

@@ -49,6 +49,7 @@ class MoviesRequestMapper
         $userRating = isset($getParameters['ur']) === true ? (bool)$getParameters['ur'] : self::DEFAULT_HAS_USER_RATING;
         $userRatingMin = isset($getParameters['minur']) === true ? (int)$getParameters['minur'] : self::DEFAULT_USER_RATING_MIN;
         $userRatingMax = isset($getParameters['maxur']) === true ? (int)$getParameters['maxur'] : self::DEFAULT_USER_RATING_MAX;
+        $locationId = isset($getParameters['loc']) === true ? (int)$getParameters['loc'] : null;
 
         return MoviesRequestDto::createFromParameters(
             $userId,
@@ -63,6 +64,7 @@ class MoviesRequestMapper
             $userRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 
