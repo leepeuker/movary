@@ -542,7 +542,7 @@ async function loadLogPlayModalLocationOptions() {
     const fragment = document.createDocumentFragment();
 
     const optionElement = document.createElement('option');
-    optionElement.value = null;
+    optionElement.value = '';
     optionElement.selected = true;
     fragment.appendChild(optionElement);
 

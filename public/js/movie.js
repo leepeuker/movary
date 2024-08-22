@@ -138,6 +138,7 @@ async function loadLocationOptions() {
     const fragment = document.createDocumentFragment();
 
     const optionElement = document.createElement('option');
+    optionElement.value = '';
     optionElement.selected = true;
     fragment.appendChild(optionElement);
 

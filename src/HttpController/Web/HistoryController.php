@@ -102,7 +102,7 @@ class HistoryController
         $tmdbId = (int)$requestData['tmdbId'];
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
         $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
-        $locationId = empty($requestData['locationId']) === true || $requestData['locationId'] === 'null' ? null : (int)$requestData['locationId'];
+        $locationId = empty($requestData['locationId']) === true ? null : (int)$requestData['locationId'];
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
