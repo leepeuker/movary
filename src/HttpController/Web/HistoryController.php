@@ -59,14 +59,13 @@ class HistoryController
         $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
 
         if ($originalWatchDate == $newWatchDate) {
-            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position, $comment);
+            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position);
 
             return Response::create(StatusCode::createNoContent());
         }
 
         $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position);
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
-
 
         return Response::create(StatusCode::createNoContent());
     }
