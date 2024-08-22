@@ -277,6 +277,11 @@ class MovieApi
         return $this->historyApi->fetchTotalPlayCountUnique($userId);
     }
 
+    public function fetchUniqueLocations(int $userId) : array
+    {
+        return $this->historyApi->fetchUniqueLocations($userId);
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->historyApi->fetchUniqueMovieGenres($userId);
@@ -301,6 +306,7 @@ class MovieApi
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : int {
         return $this->historyApi->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -311,6 +317,7 @@ class MovieApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 
@@ -327,6 +334,7 @@ class MovieApi
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : array {
         return $this->historyApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
@@ -341,6 +349,7 @@ class MovieApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 

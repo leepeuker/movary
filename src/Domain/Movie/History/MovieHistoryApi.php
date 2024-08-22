@@ -265,6 +265,7 @@ class MovieHistoryApi
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
+        ?int $locationId = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -283,6 +284,7 @@ class MovieHistoryApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -369,6 +371,11 @@ class MovieHistoryApi
         return $uniqueDirectorsGendersEnriched;
     }
 
+    public function fetchUniqueLocations(int $userId) : array
+    {
+        return $this->movieRepository->fetchUniqueLocations($userId);
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->movieRepository->fetchUniqueMovieGenres($userId);
@@ -407,6 +414,7 @@ class MovieHistoryApi
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
+        ?int $locationId = null,
     ) : int {
         return $this->movieRepository->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -417,6 +425,7 @@ class MovieHistoryApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 
@@ -433,6 +442,7 @@ class MovieHistoryApi
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
+        ?int $locationId = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -451,6 +461,7 @@ class MovieHistoryApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);

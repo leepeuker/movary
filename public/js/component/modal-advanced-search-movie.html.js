@@ -14,6 +14,7 @@ const searchPerPageSelect = document.getElementById('searchPerPageSelect');
 const searchUserRatingSelect = document.getElementById('searchUserRatingSelect');
 const searchMinUserRatingSelect = document.getElementById('searchMinUserRatingSelect');
 const searchMaxUserRatingSelect = document.getElementById('searchMaxUserRatingSelect');
+const searchLocationSelect = document.getElementById('searchLocationSelect');
 
 function search() {
     let sortBy = searchSortBySelect.value
@@ -26,6 +27,7 @@ function search() {
     let searchMinUserRating = searchMinUserRatingSelect.value
     let searchMaxUserRating = searchMaxUserRatingSelect.value
     let searchTerm = document.getElementById('searchTermInput').value
+    let searchLocation = searchLocationSelect.value
 
     let getParameters = '?'
 
@@ -44,6 +46,9 @@ function search() {
     }
     if (searchTerm != '') {
         getParameters += '&s=' + searchTerm
+    }
+    if (searchLocation != '') {
+        getParameters += '&loc=' + searchLocation
     }
     if (searchUserRating != '') {
         getParameters += '&ur=' + searchUserRating
@@ -68,6 +73,7 @@ function resetSearchOptions() {
     searchMinUserRatingSelect.value = ''
     searchMaxUserRatingSelect.value = ''
     searchPerPageSelect.value = '24'
+    searchLocationSelect.value = ''
 }
 
 
