@@ -24,13 +24,20 @@ class MovieHistoryApi
     ) {
     }
 
-    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?int $position = null, ?string $comment = null) : void
-    {
+    public function create(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        int $plays,
+        ?int $position = null,
+        ?string $comment = null,
+        ?int $locationId = null,
+    ) : void {
         if ($position === null) {
             $position = $this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt);
         }
 
-        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1);
+        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1, $locationId);
 
         if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
             return;
@@ -478,13 +485,36 @@ class MovieHistoryApi
         return $this->movieRepository->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
     }
 
-    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, int $position, ?string $comment = null) : void
+    public function update(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        int $plays,
+        int $position,
+        ?string $comment = null,
+        ?int $locationId = null,
+    ) : void
     {
-        $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment);
+        $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId);
     }
 
-    public function updateHistoryComment(int $movieId, int $userId, ?Date $watchAt, ?string $comment) : void
+    public function updateHistoryComment(
+        int $movieId,
+        int $userId,
+        ?Date $watchAt,
+        ?string $comment,
+    ) : void
     {
         $this->repository->updateHistoryComment($movieId, $userId, $watchAt, $comment);
+    }
+
+    public function updateHistoryLocation(
+        int $movieId,
+        int $userId,
+        ?Date $watchAt,
+        ?int $locationId,
+    ) : void
+    {
+        $this->repository->updateHistoryLocation($movieId, $userId, $watchAt, $locationId);
     }
 }

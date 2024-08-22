@@ -176,6 +176,14 @@ class SettingsController
         );
     }
 
+    public function renderLocationsAccountPage() : Response
+    {
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-locations.html.twig'),
+        );
+    }
+
     public function renderDataAccountPage() : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();

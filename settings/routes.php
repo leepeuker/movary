@@ -63,6 +63,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', '/settings/account/general/api-token', [Web\SettingsController::class, 'deleteApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('PUT', '/settings/account/general/api-token', [Web\SettingsController::class, 'regenerateApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/dashboard', [Web\SettingsController::class, 'renderDashboardAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/locations', [Web\SettingsController::class, 'renderLocationsAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/security', [Web\SettingsController::class, 'renderSecurityAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/data', [Web\SettingsController::class, 'renderDataAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/server/general', [Web\SettingsController::class, 'renderServerGeneralPage'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -143,6 +144,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/settings/users', [Web\UserController::class, 'createUser']);
     $routes->add('PUT', '/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/users/{userId:\d+}', [Web\UserController::class, 'deleteUser'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/locations', [Web\LocationController::class, 'fetchLocations'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/locations', [Web\LocationController::class, 'createLocation'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'updateLocation'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'deleteLocation'], [Web\Middleware\UserIsAuthenticated::class]);
 
     $routes->add('GET', '/settings/integrations/radarr', [Web\SettingsController::class, 'renderRadarrPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('PUT', '/settings/radarr/feed', [RadarrController::class, 'regenerateRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class]);
