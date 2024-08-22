@@ -19,8 +19,8 @@ class MovieHistoryLocationEntityList extends AbstractList
     {
         $list = new self();
 
-        foreach ($data as $historyEntry) {
-            $list->add(MovieHistoryLocationEntity::createFromArray($historyEntry));
+        foreach ($data as $location) {
+            $list->add(MovieHistoryLocationEntity::createFromArray($location));
         }
 
         return $list;

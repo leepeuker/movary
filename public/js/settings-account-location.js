@@ -23,6 +23,7 @@ async function reloadTable() {
 
     document.getElementById('locationsTableLoadingSpinner').classList.add('d-none')
 
+
     locations.forEach((location) => {
         let row = document.createElement('tr');
         row.innerHTML = '<td>' + location.id + '</td>';
@@ -50,9 +51,7 @@ function registerTableRowClickEvent() {
         rows[i].onclick = function () {
             prepareEditLocationsModal(
                 this.cells[0].innerHTML,
-                this.cells[1].innerHTML,
-                this.cells[2].innerHTML,
-                this.cells[3].innerHTML === '1'
+                this.cells[1].innerHTML
             )
 
             locationModal.show()
@@ -61,11 +60,12 @@ function registerTableRowClickEvent() {
 }
 
 function prepareEditLocationsModal(id, name) {
-    document.getElementById('locationModalHeaderTitle').innerHTML = 'Edit User'
+    document.getElementById('locationModalHeaderTitle').innerHTML = 'Edit Location'
 
     document.getElementById('locationModalFooterCreateButton').classList.add('d-none')
     document.getElementById('locationModalFooterButtons').classList.remove('d-none')
 
+    document.getElementById('locationModalIdInput').value = id
     document.getElementById('locationModalNameInput').value = name
 
     document.getElementById('locationModalAlerts').innerHTML = ''
@@ -143,3 +143,50 @@ function validateCreateLocationInput() {
 
     return error
 }
+
+document.getElementById('deleteLocationButton').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to delete the location?') === false) {
+        return
+    }
+
+    const response = await fetch('/settings/locations/' + document.getElementById('locationModalIdInput').value, {
+        method: 'DELETE'
+    });
+
+    if (response.status !== 200) {
+        setLocationModalAlertServerError()
+        return
+    }
+
+    setLocationsAlert('Location was deleted: ' + document.getElementById('locationModalNameInput').value)
+
+    reloadTable()
+    locationModal.hide()
+})
+
+document.getElementById('updateLocationButton').addEventListener('click', async () => {
+    if (validateCreateLocationInput() === true) {
+        return;
+    }
+
+    const response = await fetch('/settings/locations/' + document.getElementById('locationModalIdInput').value, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'name': document.getElementById('locationModalNameInput').value
+        })
+    })
+
+    if (response.status !== 200) {
+        setLocationModalAlertServerError(await response.text())
+
+        return
+    }
+
+    setLocationsAlert('Location was updated: ' + document.getElementById('locationModalNameInput').value)
+
+    reloadTable()
+    locationModal.hide()
+})
