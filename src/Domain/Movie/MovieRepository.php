@@ -633,6 +633,18 @@ class MovieRepository
         );
     }
 
+    public function fetchTopLocations(int $userId) : array
+    {
+        return $this->dbConnection->executeQuery(
+            'SELECT location_id as id, name, COUNT(muwd.movie_id) AS count_plays
+            FROM location
+            JOIN movie_user_watch_dates muwd on location.id = muwd.location_id
+            WHERE location.user_id = ?
+            GROUP BY location_id',
+            [$userId],
+        )->fetchAllAssociative();
+    }
+
     public function fetchTotalMinutesWatched(int $userId) : int
     {
         return (int)$this->dbConnection->executeQuery(

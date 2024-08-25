@@ -54,6 +54,7 @@ class DashboardFactory
             DashboardRow::createMostWatchedProductionCompanies(),
             DashboardRow::createMostWatchedReleaseYears(),
             DashboardRow::createWatchlist(),
+            DashboardRow::createTopLocations(),
         );
     }
 
@@ -69,6 +70,7 @@ class DashboardFactory
             DashboardRow::createMostWatchedProductionCompanies()->getId() === $rowId => DashboardRow::createMostWatchedProductionCompanies($isVisible, $isExtended),
             DashboardRow::createMostWatchedReleaseYears()->getId() === $rowId => DashboardRow::createMostWatchedReleaseYears($isVisible, $isExtended),
             DashboardRow::createWatchlist()->getId() === $rowId => DashboardRow::createWatchlist($isVisible, $isExtended),
+            DashboardRow::createTopLocations()->getId() === $rowId => DashboardRow::createTopLocations($isVisible, $isExtended),
 
             default => throw new RuntimeException('Not supported dashboard row id: ' . $rowId)
         };

@@ -1,0 +1,24 @@
+{% macro create(dashboardRow, topLocations, routeUsername) %}
+
+    {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {{ rowItemToggle.create(dashboardRow) }}
+
+    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
+        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+            {% for topLocation in topLocations %}
+                <div class="col" style="padding-bottom: 1rem;">
+                    <div class="card h-100 position-relative"
+                         style="cursor: pointer"
+                         onclick="window.location='/users/{{ routeUsername }}/movies?loc={{ topLocation.id }}'">
+                        <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
+                            <small class="text-muted" style="font-size: 0.9rem;font-weight: bold;">{{ topLocation.name }}</small>
+                        </div>
+                        <div class="card-footer" style="padding: 0.1rem">
+                            <small class="text-muted" style="font-size: 0.9rem;">{{ topLocation.count_plays }}x</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </li>
+{% endmacro %}

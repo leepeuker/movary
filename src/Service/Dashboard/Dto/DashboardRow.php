@@ -57,6 +57,11 @@ class DashboardRow
         return self::create(9, 'Latest in Watchlist', $isVisible, $isExtended);
     }
 
+    public static function createTopLocations(bool $isVisible = true, bool $isExtended = false) : self
+    {
+        return self::create(10, 'Top Locations', $isVisible, $isExtended);
+    }
+
     private static function create(int $id, string $name, bool $isVisible, bool $isExtended) : self
     {
         return new self($id, $name, $isVisible, $isExtended);
@@ -125,5 +130,10 @@ class DashboardRow
     public function isWatchlist() : bool
     {
         return $this->getId() === self::createWatchlist()->getId();
+    }
+
+    public function isTopLocations() : bool
+    {
+        return $this->getId() === self::createTopLocations()->getId();
     }
 }
