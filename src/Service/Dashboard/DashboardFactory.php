@@ -58,6 +58,7 @@ class DashboardFactory
         );
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     private function createDashboardRowById(int $rowId, bool $isVisible, bool $isExtended) : DashboardRow
     {
         return match (true) {
