@@ -636,9 +636,10 @@ class MovieRepository
     public function fetchTopLocations(int $userId) : array
     {
         return $this->dbConnection->executeQuery(
-            'SELECT location_id, name, COUNT(muwd.movie_id) AS count_plays
+            'SELECT location_id as id, name, COUNT(muwd.movie_id) AS count_plays
             FROM location
-            JOIN main.movie_user_watch_dates muwd on location.id = muwd.location_id
+            JOIN movie_user_watch_dates muwd on location.id = muwd.location_id
+            WHERE location.user_id = ?
             GROUP BY location_id
             ORDER BY count_plays DESC',
             [$userId],
