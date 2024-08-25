@@ -75,6 +75,9 @@
                     {% elseif dashboardRow.isWatchlist and dashboardRow.isVisible %}
                         {% import "component/dashboard/row-watchlist.html.twig" as dashboardWatchlist %}
                         {{ dashboardWatchlist.create(dashboardRow, watchlistItems, routeUsername) }}
+                    {% elseif dashboardRow.isTopLocations and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-top-locations.html.twig" as dashboardTopLocations %}
+                        {{ dashboardTopLocations.create(dashboardRow, topLocations, routeUsername) }}
                     {% endif %}
                 {% endfor %}
             </div>

@@ -311,6 +311,11 @@ class MovieHistoryApi
         return $this->movieRepository->fetchTmdbIdsWithoutWatchDateByUserId($userId, $movieIds);
     }
 
+    public function fetchTopLocations(int $userId) : array
+    {
+        return $this->movieRepository->fetchTopLocations($userId);
+    }
+
     public function fetchTotalHoursWatched(int $userId) : int
     {
         $minutes = $this->movieRepository->fetchTotalMinutesWatched($userId);

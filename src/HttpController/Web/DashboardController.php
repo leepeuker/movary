@@ -60,6 +60,7 @@ class DashboardController
                 'mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12),
                 'mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId),
                 'watchlistItems' => $this->movieWatchlistApi->fetchWatchlistPaginated($userId, 6, 1),
+                'topLocations' => $this->movieHistoryApi->fetchTopLocations($userId),
                 'dashboardRows' => $dashboardRows,
             ]),
         );
