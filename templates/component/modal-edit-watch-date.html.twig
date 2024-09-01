@@ -25,7 +25,7 @@
                     <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
                     <textarea class="form-control" rows="1" aria-label="Comment" id="editWatchDateModalCommentInput"></textarea>
                 </div>
-                <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
+                <div class="input-group {% if currentUserLocationsEnabled == false %}d-none{% endif %}" style="margin-top: 1rem;margin-bottom: 1rem">
                     <i class="input-group-text"><i class="bi bi-pin-map-fill"></i></i>
                     <select class="form-select"  id="editWatchDateModalLocationInput" aria-describedby="location"></select>
                 </div>

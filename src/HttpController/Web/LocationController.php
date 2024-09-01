@@ -4,6 +4,7 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\Movie\History\Location\MovieHistoryLocationApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -13,6 +14,7 @@ class LocationController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly MovieHistoryLocationApi $locationApi,
+        private readonly UserApi $userApi,
     ) {
     }
 
@@ -58,6 +60,19 @@ class LocationController
         return Response::createJson(Json::encode($locations));
     }
 
+    public function fetchToggleFeature() : Response
+    {
+        $currentUser = $this->authenticationService->getCurrentUser();
+
+        $isLocationsEnabled = $this->userApi->isLocationsEnabled($currentUser->getId());
+
+        return Response::createJson(
+            Json::encode(
+                ['locationsEnabled' => $isLocationsEnabled],
+            ),
+        );
+    }
+
     public function updateLocation(Request $request) : Response
     {
         $currentUser = $this->authenticationService->getCurrentUser();
@@ -80,5 +95,18 @@ class LocationController
         );
 
         return Response::createOk();
+    }
+
+    public function updateToggleFeature(Request $request) : Response
+    {
+        $currentUser = $this->authenticationService->getCurrentUser();
+        $requestData = Json::decode($request->getBody());
+
+        $this->userApi->updateLocationsEnabled(
+            $currentUser->getId(),
+            $requestData['locationsEnabled'],
+        );
+
+        return Response::createNoContent();
     }
 }

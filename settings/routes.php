@@ -148,6 +148,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/settings/locations', [Web\LocationController::class, 'createLocation'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('PUT', '/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'updateLocation'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/locations/{locationId:\d+}', [Web\LocationController::class, 'deleteLocation'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/locations/toggle-feature', [Web\LocationController::class, 'fetchToggleFeature'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/locations/toggle-feature', [Web\LocationController::class, 'updateToggleFeature'], [Web\Middleware\UserIsAuthenticated::class]);
 
     $routes->add('GET', '/settings/integrations/radarr', [Web\SettingsController::class, 'renderRadarrPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('PUT', '/settings/radarr/feed', [RadarrController::class, 'regenerateRadarrFeedUrl'], [Web\Middleware\UserIsAuthenticated::class]);

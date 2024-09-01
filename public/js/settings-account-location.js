@@ -5,8 +5,13 @@ const rows = table.getElementsByTagName('tr');
 
 reloadTable()
 
-async function reloadTable() {
+async function reloadTable(featureIsEnabled = true) {
     table.getElementsByTagName('tbody')[0].innerHTML = ''
+
+    if (document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations') {
+        return
+    }
+
     document.getElementById('locationsTableLoadingSpinner').classList.remove('d-none')
 
     const response = await fetch('/settings/locations');
@@ -190,3 +195,66 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
     reloadTable()
     locationModal.hide()
 })
+
+async function toggleLocationFeature() {
+    let enableLocationsFeature = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations'
+    await sendRequestToggleLocationsFeature(enableLocationsFeature)
+    setLocationFeatureBtnState(!enableLocationsFeature)
+    setLocationTableState(enableLocationsFeature)
+    reloadTable(enableLocationsFeature)
+
+    setLocationsAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
+}
+
+function setLocationFeatureBtnState(featureIsEnabled) {
+    if (featureIsEnabled === true) {
+        document.getElementById('toggleLocationsFeatureBtn').classList.add('btn-primary')
+        document.getElementById('toggleLocationsFeatureBtn').classList.remove('btn-outline-danger')
+        document.getElementById('toggleLocationsFeatureBtn').textContent = 'Enable locations'
+
+        return
+    }
+
+    document.getElementById('toggleLocationsFeatureBtn').classList.add('btn-outline-danger')
+    document.getElementById('toggleLocationsFeatureBtn').classList.remove('btn-primary')
+    document.getElementById('toggleLocationsFeatureBtn').textContent = 'Disable locations'
+
+}
+
+function setLocationTableState(featureIsEnabled) {
+    if (featureIsEnabled === true) {
+        document.getElementById('createLocationBtn').disabled = false
+
+        return
+    }
+
+    document.getElementById('createLocationBtn').disabled = true
+}
+
+async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
+    const response = await fetch('/settings/locations/toggle-feature', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'locationsEnabled': isLocationsEnabled,
+        })
+    })
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+}
+
+
+async function sendRequestFetchIsLocationsFeatureEnabled() {
+    const response = await fetch('/settings/locations/toggle-feature', {method: 'GET'})
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data = await response.json()
+
+    return data.locationsEnabled
+}

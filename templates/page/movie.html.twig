@@ -143,7 +143,7 @@
                                 {% if watchDate.comment != '' %}
                                     <i class="bi bi-chat-square-text"></i>
                                 {% endif %}
-                                {% if watchDate.location_id != '' %}
+                                {% if watchDate.location_id != '' and currentUserLocationsEnabled %}
                                     <i class="bi bi-pin-map-fill"></i>
                                 {% endif %}
                             </span>
