@@ -41,7 +41,7 @@ final class AddLocationToUserWatchDatesTable extends AbstractMigration
             ALTER TABLE `movie_user_watch_dates` 
                 ADD COLUMN `location_id` INT(10) UNSIGNED DEFAULT NULL AFTER `position`,
                 ADD CONSTRAINT `fk_movie_user_watch_dates_location_id` FOREIGN KEY (`location_id`) REFERENCES `location` (`id`) ON DELETE CASCADE;
-        SQL
+            SQL
         );
     }
 }
