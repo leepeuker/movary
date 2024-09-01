@@ -273,6 +273,7 @@ class Factory
         );
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     public static function createTwigEnvironment(ContainerInterface $container) : Twig\Environment
     {
         $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
@@ -304,6 +305,7 @@ class Factory
         $twig->addGlobal('currentUserName', $user?->getName());
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
         $twig->addGlobal('currentUserCountry', $user?->getCountry());
+        $twig->addGlobal('currentUserLocationsEnabled', $user?->hasLocationsEnabled());
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);

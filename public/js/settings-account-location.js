@@ -8,7 +8,7 @@ reloadTable()
 async function reloadTable(featureIsEnabled = true) {
     table.getElementsByTagName('tbody')[0].innerHTML = ''
 
-    if (featureIsEnabled === false) {
+    if (document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations') {
         return
     }
 
@@ -196,13 +196,14 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
     locationModal.hide()
 })
 
-function disableLocationFeature() {
-    let featureIsDisabled = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations'
-    setLocationFeatureBtnState(!featureIsDisabled)
-    setLocationTableState(featureIsDisabled)
-    reloadTable(featureIsDisabled)
+async function toggleLocationFeature() {
+    let enableLocationsFeature = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations'
+    await sendRequestToggleLocationsFeature(enableLocationsFeature)
+    setLocationFeatureBtnState(!enableLocationsFeature)
+    setLocationTableState(enableLocationsFeature)
+    reloadTable(enableLocationsFeature)
 
-    setLocationsAlert('Locations ' + (featureIsDisabled === true ? 'enabled' : 'disabled'))
+    setLocationsAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
 }
 
 function setLocationFeatureBtnState(featureIsEnabled) {
@@ -228,4 +229,32 @@ function setLocationTableState(featureIsEnabled) {
     }
 
     document.getElementById('createLocationBtn').disabled = true
+}
+
+async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
+    const response = await fetch('/settings/locations/toggle-feature', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'locationsEnabled': isLocationsEnabled,
+        })
+    })
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+}
+
+
+async function sendRequestFetchIsLocationsFeatureEnabled() {
+    const response = await fetch('/settings/locations/toggle-feature', {method: 'GET'})
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data = await response.json()
+
+    return data.locationsEnabled
 }

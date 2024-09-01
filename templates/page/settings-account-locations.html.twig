@@ -23,7 +23,13 @@
                 <h5 class="text-center">Locations</h5>
 
                 <div style="padding-bottom: .8rem">
-                    <button type="button" class="btn btn-outline-danger" onclick="disableLocationFeature()" id="toggleLocationsFeatureBtn">Disable locations</button>
+                    <p>You can set the location where you have watched a movie.</p>
+
+                    {% if locationsEnabled %}
+                        <button type="button" class="btn btn-outline-danger" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">Disable locations</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">Enable locations</button>
+                    {% endif %}
                 </div>
 
                 <div id="locationAlerts"></div>
@@ -38,11 +44,11 @@
                         <tbody></tbody>
                     </table>
                 </div>
-                <div class="spinner-border d-none" role="status" id="locationsTableLoadingSpinner">
+                <div class="spinner-border d-none" role="status" id="locationsTableLoadingSpinner" style="margin-bottom: .5rem">
                     <span class="visually-hidden">Loading...</span>
                 </div>
 
-                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn">Add Location</button>
+                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn" {% if locationsEnabled == false %}disabled{% endif %}>Add Location</button>
                 <br>
             </div>
         </div>

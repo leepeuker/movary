@@ -178,9 +178,13 @@ class SettingsController
 
     public function renderLocationsAccountPage() : Response
     {
+        $user = $this->authenticationService->getCurrentUser();
+
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-account-locations.html.twig'),
+            $this->twig->render('page/settings-account-locations.html.twig', [
+                'locationsEnabled' => $user->hasLocationsEnabled(),
+            ]),
         );
     }
 
