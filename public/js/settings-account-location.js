@@ -5,8 +5,13 @@ const rows = table.getElementsByTagName('tr');
 
 reloadTable()
 
-async function reloadTable() {
+async function reloadTable(featureIsEnabled = true) {
     table.getElementsByTagName('tbody')[0].innerHTML = ''
+
+    if (featureIsEnabled === false) {
+        return
+    }
+
     document.getElementById('locationsTableLoadingSpinner').classList.remove('d-none')
 
     const response = await fetch('/settings/locations');
@@ -190,3 +195,37 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
     reloadTable()
     locationModal.hide()
 })
+
+function disableLocationFeature() {
+    let featureIsDisabled = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations'
+    setLocationFeatureBtnState(!featureIsDisabled)
+    setLocationTableState(featureIsDisabled)
+    reloadTable(featureIsDisabled)
+
+    setLocationsAlert('Locations ' + (featureIsDisabled === true ? 'enabled' : 'disabled'))
+}
+
+function setLocationFeatureBtnState(featureIsEnabled) {
+    if (featureIsEnabled === true) {
+        document.getElementById('toggleLocationsFeatureBtn').classList.add('btn-primary')
+        document.getElementById('toggleLocationsFeatureBtn').classList.remove('btn-outline-danger')
+        document.getElementById('toggleLocationsFeatureBtn').textContent = 'Enable locations'
+
+        return
+    }
+
+    document.getElementById('toggleLocationsFeatureBtn').classList.add('btn-outline-danger')
+    document.getElementById('toggleLocationsFeatureBtn').classList.remove('btn-primary')
+    document.getElementById('toggleLocationsFeatureBtn').textContent = 'Disable locations'
+
+}
+
+function setLocationTableState(featureIsEnabled) {
+    if (featureIsEnabled === true) {
+        document.getElementById('createLocationBtn').disabled = false
+
+        return
+    }
+
+    document.getElementById('createLocationBtn').disabled = true
+}

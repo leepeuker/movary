@@ -23,7 +23,7 @@
                 <h5 class="text-center">Locations</h5>
 
                 <div style="padding-bottom: .8rem">
-                    <p>Customize your available location options.</p>
+                    <button type="button" class="btn btn-outline-danger" onclick="disableLocationFeature()" id="toggleLocationsFeatureBtn">Disable locations</button>
                 </div>
 
                 <div id="locationAlerts"></div>
@@ -32,7 +32,7 @@
                     <table class="table table-hover" id="locationsTable">
                         <thead>
                         <tr>
-                            <th scope="col">Name</th>
+                            <th scope="col">Manage your locations</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -41,10 +41,11 @@
                 <div class="spinner-border d-none" role="status" id="locationsTableLoadingSpinner">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn">Add Location</button>
+                <br>
             </div>
         </div>
-
-        <button type="button" class="btn btn-primary float-end" style="width: 100%" onclick="showCreateLocationModal()">Create Location</button>
 
         {{ include('component/modal-location.html.twig') }}
     </main>
