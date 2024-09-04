@@ -428,6 +428,20 @@ class MovieRepository
         )->fetchAllAssociative();
     }
 
+    public function fetchLastPlaysCinema(int $userId) : array
+    {
+        return $this->dbConnection->executeQuery(
+            'SELECT m.*, mh.watched_at, mur.rating AS user_rating
+            FROM movie m
+            JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
+            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
+            WHERE location_id IS NOT NULL
+            ORDER BY watched_at DESC, mh.position DESC
+            LIMIT 6',
+            [$userId, $userId],
+        )->fetchAllAssociative();
+    }
+
     public function fetchMostWatchedGenres(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
