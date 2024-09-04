@@ -26,6 +26,7 @@ class LocationController
         $this->locationApi->createLocation(
             $currentUser->getId(),
             $requestData['name'],
+            $requestData['isCinema'],
         );
 
         return Response::createOk();
@@ -92,6 +93,7 @@ class LocationController
         $this->locationApi->updateLocation(
             $locationId,
             $requestData['name'],
+            (bool)$requestData['isCinema'],
         );
 
         return Response::createOk();

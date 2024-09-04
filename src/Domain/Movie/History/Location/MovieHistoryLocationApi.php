@@ -8,9 +8,9 @@ class MovieHistoryLocationApi
     {
     }
 
-    public function createLocation(int $userId, string $name) : void
+    public function createLocation(int $userId, string $name, bool $isCinema) : void
     {
-        $this->locationRepository->createLocation($userId, $name);
+        $this->locationRepository->createLocation($userId, $name, $isCinema);
     }
 
     public function deleteLocation(int $locationId) : void
@@ -28,8 +28,8 @@ class MovieHistoryLocationApi
         return $this->locationRepository->findLocationsByUserId($userId);
     }
 
-    public function updateLocation(int $locationId, string $name) : void
+    public function updateLocation(int $locationId, string $name, bool $isCinema) : void
     {
-        $this->locationRepository->updateLocation($locationId, $name);
+        $this->locationRepository->updateLocation($locationId, $name, $isCinema);
     }
 }
