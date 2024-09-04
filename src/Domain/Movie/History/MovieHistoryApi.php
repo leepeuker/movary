@@ -204,6 +204,13 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
     }
 
+    public function fetchLastPlaysCinema(int $userId) : array
+    {
+        $lastPlays = $this->movieRepository->fetchLastPlaysCinema($userId);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
+    }
+
     public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null, ?int $personFilterUserId = null) : int
     {
         return $this->movieRepository->fetchActorsCount($userId, $searchTerm, $gender, $personFilterUserId);

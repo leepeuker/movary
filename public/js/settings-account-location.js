@@ -56,7 +56,8 @@ async function reloadTable(featureIsEnabled = true) {
     locations.forEach((location) => {
         let row = document.createElement('tr');
         row.dataset.id = location.id
-        row.innerHTML += '<td >' + location.name + '</td>';
+        row.innerHTML += '<td>' + location.name + '</td>';
+        row.innerHTML += '<td class="d-none">' + location.isCinema + '</td>';
         row.style.cursor = 'pointer'
 
         table.getElementsByTagName('tbody')[0].appendChild(row);
@@ -78,9 +79,11 @@ function registerTableRowClickEvent() {
         if (i === 0) continue
 
         rows[i].onclick = function () {
+
             prepareEditLocationsModal(
                 this.dataset.id,
-                this.cells[0].innerHTML
+                this.cells[0].innerHTML,
+                this.cells[1].innerHTML === 'true'
             )
 
             locationModal.show()
@@ -88,7 +91,7 @@ function registerTableRowClickEvent() {
     }
 }
 
-function prepareEditLocationsModal(id, name) {
+function prepareEditLocationsModal(id, name, isCinema) {
     document.getElementById('locationModalHeaderTitle').innerHTML = 'Edit Location'
 
     document.getElementById('locationModalFooterCreateButton').classList.add('d-none')
@@ -96,6 +99,7 @@ function prepareEditLocationsModal(id, name) {
 
     document.getElementById('locationModalIdInput').value = id
     document.getElementById('locationModalNameInput').value = name
+    document.getElementById('locationModalCinemaInput').checked = isCinema
 
     document.getElementById('locationModalAlerts').innerHTML = ''
 
@@ -116,6 +120,7 @@ function prepareCreateLocationModal(name) {
 
     document.getElementById('locationModalIdInput').value = ''
     document.getElementById('locationModalNameInput').value = ''
+    document.getElementById('locationModalCinemaInput').value = ''
 
     document.getElementById('locationModalAlerts').innerHTML = ''
 
@@ -129,6 +134,7 @@ document.getElementById('createLocationButton').addEventListener('click', async 
     }
 
     let categoryName = document.getElementById('locationModalNameInput').value;
+    let isCinema = document.getElementById('locationModalCinemaInput').value;
     const response = await fetch('/settings/locations', {
         method: 'POST',
         headers: {
@@ -136,6 +142,7 @@ document.getElementById('createLocationButton').addEventListener('click', async 
         },
         body: JSON.stringify({
             'name': categoryName,
+            'isCinema': isCinema
         })
     })
 
@@ -206,14 +213,16 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
         return;
     }
 
-    let categoryName = document.getElementById('locationModalNameInput').value;
+    let locationName = document.getElementById('locationModalNameInput').value;
+    let isCinema = document.getElementById('locationModalCinemaInput').checked;
     const response = await fetch('/settings/locations/' + document.getElementById('locationModalIdInput').value, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'name': categoryName
+            'name': locationName,
+            'isCinema': isCinema
         })
     })
 
@@ -225,9 +234,9 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
 
     let url = window.location.href;
     if (url.indexOf('?') > -1){
-        url += '&categoryUpdated=' + categoryName
+        url += '&categoryUpdated=' + locationName
     } else {
-        url += '?categoryUpdated=' + categoryName
+        url += '?categoryUpdated=' + locationName
     }
     window.location.href = url;
 })

@@ -13,7 +13,7 @@ class MovieHistoryLocationRepository
     {
     }
 
-    public function createLocation(int $userId, string $name) : void
+    public function createLocation(int $userId, string $name, bool $isCinema) : void
     {
         $timestamp = DateTime::create();
 
@@ -22,6 +22,7 @@ class MovieHistoryLocationRepository
             [
                 'user_id' => $userId,
                 'name' => $name,
+                'is_cinema' => (int)$isCinema,
                 'created_at' => (string)$timestamp,
                 'updated_at' => (string)$timestamp,
             ],
@@ -57,12 +58,13 @@ class MovieHistoryLocationRepository
         return MovieHistoryLocationEntity::createFromArray($data);
     }
 
-    public function updateLocation(int $locationId, string $name) : void
+    public function updateLocation(int $locationId, string $name, bool $isCinema) : void
     {
         $this->dbConnection->update(
             'location',
             [
                 'name' => $name,
+                'is_cinema' => (int)$isCinema,
                 'updated_at' => (string)DateTime::create(),
             ],
             [

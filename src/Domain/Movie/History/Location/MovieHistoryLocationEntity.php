@@ -10,6 +10,7 @@ class MovieHistoryLocationEntity implements \JsonSerializable
         private readonly int $id,
         private readonly int $userId,
         private readonly string $name,
+        private readonly bool $isCinema,
     ) {
     }
 
@@ -19,6 +20,7 @@ class MovieHistoryLocationEntity implements \JsonSerializable
             (int)$data['id'],
             (int)$data['user_id'],
             (string)$data['name'],
+            (bool)$data['is_cinema'],
         );
     }
 
@@ -32,6 +34,7 @@ class MovieHistoryLocationEntity implements \JsonSerializable
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'isCinema' => $this->isCinema,
         ];
     }
 }

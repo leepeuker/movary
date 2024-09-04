@@ -62,6 +62,11 @@ class DashboardRow
         return self::create(10, 'Top Locations', $isVisible, $isExtended);
     }
 
+    public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = true) : self
+    {
+        return self::create(11, 'Last Plays Cinema', $isVisible, $isExtended);
+    }
+
     private static function create(int $id, string $name, bool $isVisible, bool $isExtended) : self
     {
         return new self($id, $name, $isVisible, $isExtended);
@@ -135,5 +140,10 @@ class DashboardRow
     public function isTopLocations() : bool
     {
         return $this->getId() === self::createTopLocations()->getId();
+    }
+
+    public function isLastPlaysCinema() : bool
+    {
+        return $this->getId() === self::createLastPlaysCinema()->getId();
     }
 }
