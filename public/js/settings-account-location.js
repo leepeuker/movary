@@ -3,7 +3,31 @@ const locationModal = new bootstrap.Modal('#locationModal', {keyboard: false})
 const table = document.getElementById('locationsTable');
 const rows = table.getElementsByTagName('tr');
 
-reloadTable()
+document.addEventListener('DOMContentLoaded', function () {
+    reloadTable()
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('toggle')) {
+        let enableLocationsFeature = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Disable locations'
+        setLocationsAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
+        window.history.replaceState(null, '', window.location.pathname);
+    }
+    let categoryCreatedName = urlParams.get('categoryCreated');
+    if (categoryCreatedName) {
+        setLocationsAlert('Location was created: ' + categoryCreatedName)
+        window.history.replaceState(null, '', window.location.pathname);
+    }
+    let categoryDeletedName = urlParams.get('categoryDeleted');
+    if (categoryDeletedName) {
+        setLocationsAlert('Location was deleted: ' + categoryDeletedName)
+        window.history.replaceState(null, '', window.location.pathname);
+    }
+    let categoryUpdatedName = urlParams.get('categoryUpdated');
+    if (categoryUpdatedName) {
+        setLocationsAlert('Location was updated: ' + categoryUpdatedName)
+        window.history.replaceState(null, '', window.location.pathname);
+    }
+});
 
 async function reloadTable(featureIsEnabled = true) {
     table.getElementsByTagName('tbody')[0].innerHTML = ''
@@ -104,13 +128,14 @@ document.getElementById('createLocationButton').addEventListener('click', async 
         return;
     }
 
+    let categoryName = document.getElementById('locationModalNameInput').value;
     const response = await fetch('/settings/locations', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'name': document.getElementById('locationModalNameInput').value,
+            'name': categoryName,
         })
     })
 
@@ -119,10 +144,13 @@ document.getElementById('createLocationButton').addEventListener('click', async 
         return
     }
 
-    setLocationsAlert('Location was created: ' + document.getElementById('locationModalNameInput').value)
-
-    reloadTable()
-    locationModal.hide()
+    let url = window.location.href;
+    if (url.indexOf('?') > -1){
+        url += '&categoryCreated=' + categoryName
+    } else {
+        url += '?categoryCreated=' + categoryName
+    }
+    window.location.href = url;
 })
 
 function setLocationModalAlertServerError(message = "Server error, please try again.") {
@@ -163,10 +191,14 @@ document.getElementById('deleteLocationButton').addEventListener('click', async 
         return
     }
 
-    setLocationsAlert('Location was deleted: ' + document.getElementById('locationModalNameInput').value)
-
-    reloadTable()
-    locationModal.hide()
+    let categoryName = document.getElementById('locationModalNameInput').value;
+    let url = window.location.href;
+    if (url.indexOf('?') > -1){
+        url += '&categoryDeleted=' + categoryName
+    } else {
+        url += '?categoryDeleted=' + categoryName
+    }
+    window.location.href = url;
 })
 
 document.getElementById('updateLocationButton').addEventListener('click', async () => {
@@ -174,13 +206,14 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
         return;
     }
 
+    let categoryName = document.getElementById('locationModalNameInput').value;
     const response = await fetch('/settings/locations/' + document.getElementById('locationModalIdInput').value, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'name': document.getElementById('locationModalNameInput').value
+            'name': categoryName
         })
     })
 
@@ -190,20 +223,26 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
         return
     }
 
-    setLocationsAlert('Location was updated: ' + document.getElementById('locationModalNameInput').value)
-
-    reloadTable()
-    locationModal.hide()
+    let url = window.location.href;
+    if (url.indexOf('?') > -1){
+        url += '&categoryUpdated=' + categoryName
+    } else {
+        url += '?categoryUpdated=' + categoryName
+    }
+    window.location.href = url;
 })
 
 async function toggleLocationFeature() {
     let enableLocationsFeature = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations'
     await sendRequestToggleLocationsFeature(enableLocationsFeature)
-    setLocationFeatureBtnState(!enableLocationsFeature)
-    setLocationTableState(enableLocationsFeature)
-    reloadTable(enableLocationsFeature)
 
-    setLocationsAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
+    let url = window.location.href;
+    if (url.indexOf('?') > -1){
+        url += '&toggle=1'
+    } else {
+        url += '?toggle=1'
+    }
+    window.location.href = url;
 }
 
 function setLocationFeatureBtnState(featureIsEnabled) {
