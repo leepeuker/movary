@@ -2,7 +2,7 @@
 
 Locations (e.g. a cinema) can be set for a play.
 
-Each user maintains his own collection of locations, available only to him. The locations can be managed in the user settings at `/settings/account/locations`.
+Each user maintains a personal collection of available locations. The locations can be managed in the user settings at `/settings/account/locations`.
 
 When a users visibility is not set to private, others can see if a location is set for a play but not which exact location.
 
