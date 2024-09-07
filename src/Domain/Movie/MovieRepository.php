@@ -435,7 +435,8 @@ class MovieRepository
             FROM movie m
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
-            WHERE location_id IS NOT NULL
+            JOIN location l on l.id = mh.location_id
+            WHERE l.is_cinema = 1
             ORDER BY watched_at DESC, mh.position DESC
             LIMIT 6',
             [$userId, $userId],
