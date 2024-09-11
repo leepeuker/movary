@@ -39,7 +39,7 @@ class TraktClient
                 'Content-Type' => 'application/json',
                 'trakt-api-version' => self::TRAKT_API_VERSION,
                 'trakt-api-key' => $clientId,
-            ]
+            ],
         );
 
         return $this->httpClient->sendRequest($request);

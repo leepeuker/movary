@@ -74,7 +74,7 @@ class ImdbWebScrapper
 
     private function extractRatingAverage(string $imdbRatingPage, string $imdbId) : ?float
     {
-        preg_match('/'. self::VOTING_AVERAGE_CLASS_NAME .'">(\d([.,])\d)/', $imdbRatingPage, $averageRatingMatches);
+        preg_match('/' . self::VOTING_AVERAGE_CLASS_NAME . '">(\d([.,])\d)/', $imdbRatingPage, $averageRatingMatches);
         if (empty($averageRatingMatches[1]) === true) {
             $this->logger->warning('IMDb: Could not extract rating average.', ['url' => $this->urlGenerator->buildMovieUrl($imdbId)]);
 
@@ -87,32 +87,32 @@ class ImdbWebScrapper
     private function extractRatingVoteCount(string $imdbRatingPage, string $imdbId) : ?int
     {
         // Handle numbers without suffix
-        preg_match('/'. self::VOTING_COUNT_CLASS_NAME .'">([0-9]+)</', $imdbRatingPage, $voteCountMatches);
+        preg_match('/' . self::VOTING_COUNT_CLASS_NAME . '">([0-9]+)</', $imdbRatingPage, $voteCountMatches);
         if (empty($voteCountMatches[1]) === false) {
             return (int)$voteCountMatches[1];
         }
-        preg_match('/'. self::VOTING_COUNT_CLASS_NAME .'">([0-9]{1,3}([.,]?[0-9]{3})+)/', $imdbRatingPage, $voteCountMatches);
+        preg_match('/' . self::VOTING_COUNT_CLASS_NAME . '">([0-9]{1,3}([.,]?[0-9]{3})+)/', $imdbRatingPage, $voteCountMatches);
         if (empty($voteCountMatches[1]) === false) {
             return (int)str_replace([',', '.'], '', $voteCountMatches[1]);
         }
 
         // Handle numbers with K suffix
-        preg_match('/'. self::VOTING_COUNT_CLASS_NAME .'">([0-9]+)K</', $imdbRatingPage, $voteCountMatches);
+        preg_match('/' . self::VOTING_COUNT_CLASS_NAME . '">([0-9]+)K</', $imdbRatingPage, $voteCountMatches);
         if (empty($voteCountMatches[1]) === false) {
             return (int)$voteCountMatches[1] * 1000;
         }
-        preg_match('/'. self::VOTING_COUNT_CLASS_NAME .'">([0-9]{1,3}[.,][0-9]{1,3})K</', $imdbRatingPage, $voteCountMatches);
+        preg_match('/' . self::VOTING_COUNT_CLASS_NAME . '">([0-9]{1,3}[.,][0-9]{1,3})K</', $imdbRatingPage, $voteCountMatches);
         if (empty($voteCountMatches[1]) === false) {
             return (int)((float)$voteCountMatches[1] * 1000);
         }
 
         // Handle simple numbers with M suffix
-        preg_match('/'. self::VOTING_COUNT_CLASS_NAME .'">([0-9]+)M</', $imdbRatingPage, $voteCountMatches);
+        preg_match('/' . self::VOTING_COUNT_CLASS_NAME . '">([0-9]+)M</', $imdbRatingPage, $voteCountMatches);
         if (empty($voteCountMatches[1]) === false) {
             return (int)$voteCountMatches[1] * 1000000;
         }
         // Handle simple numbers with K suffix
-        preg_match('/'. self::VOTING_COUNT_CLASS_NAME .'">([0-9]{1,3}[.,][0-9]{1,3})M</', $imdbRatingPage, $voteCountMatches);
+        preg_match('/' . self::VOTING_COUNT_CLASS_NAME . '">([0-9]{1,3}[.,][0-9]{1,3})M</', $imdbRatingPage, $voteCountMatches);
         if (empty($voteCountMatches[1]) === false) {
             return (int)((float)$voteCountMatches[1] * 1000000);
         }

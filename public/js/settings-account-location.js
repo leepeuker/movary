@@ -120,7 +120,7 @@ function prepareCreateLocationModal(name) {
 
     document.getElementById('locationModalIdInput').value = ''
     document.getElementById('locationModalNameInput').value = ''
-    document.getElementById('locationModalCinemaInput').value = ''
+    document.getElementById('locationModalCinemaInput').checked = false
 
     document.getElementById('locationModalAlerts').innerHTML = ''
 
@@ -134,7 +134,7 @@ document.getElementById('createLocationButton').addEventListener('click', async 
     }
 
     let categoryName = document.getElementById('locationModalNameInput').value;
-    let isCinema = document.getElementById('locationModalCinemaInput').value;
+    let isCinema = document.getElementById('locationModalCinemaInput').checked;
     const response = await fetch('/settings/locations', {
         method: 'POST',
         headers: {

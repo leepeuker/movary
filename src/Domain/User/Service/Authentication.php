@@ -224,7 +224,7 @@ class Authentication
             $token,
             (int)$expirationDate->format('U'),
             '/',
-            httponly: true
+            httponly: true,
         );
 
         $this->sessionWrapper->set('userId', $userId);

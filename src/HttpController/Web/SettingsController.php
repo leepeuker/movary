@@ -176,18 +176,6 @@ class SettingsController
         );
     }
 
-    public function renderLocationsAccountPage() : Response
-    {
-        $user = $this->authenticationService->getCurrentUser();
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/settings-account-locations.html.twig', [
-                'locationsEnabled' => $user->hasLocationsEnabled(),
-            ]),
-        );
-    }
-
     public function renderDataAccountPage() : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
@@ -325,6 +313,18 @@ class SettingsController
                 'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
                 'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
                 'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+            ]),
+        );
+    }
+
+    public function renderLocationsAccountPage() : Response
+    {
+        $user = $this->authenticationService->getCurrentUser();
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-locations.html.twig', [
+                'locationsEnabled' => $user->hasLocationsEnabled(),
             ]),
         );
     }

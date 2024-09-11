@@ -88,8 +88,7 @@ class MovieHistoryRepository
         int $position,
         ?string $comment,
         ?int $locationId,
-    ) : void
-    {
+    ) : void {
         if ($watchedAt === null) {
             $this->dbConnection->executeStatement(
                 'UPDATE movie_user_watch_dates SET `comment` = ?, `plays` = ?, `position` = ?, `location_id` = ? WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',

@@ -17,6 +17,11 @@ class DashboardRow
         return self::create(0, 'Last Plays', $isVisible, $isExtended);
     }
 
+    public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = true) : self
+    {
+        return self::create(11, 'Last Plays Cinema', $isVisible, $isExtended);
+    }
+
     public static function createMostWatchedActors(bool $isVisible = true, bool $isExtended = false) : self
     {
         return self::create(1, 'Most watched Actors', $isVisible, $isExtended);
@@ -52,19 +57,14 @@ class DashboardRow
         return self::create(7, 'Most watched Release Years', $isVisible, $isExtended);
     }
 
-    public static function createWatchlist(bool $isVisible = true, bool $isExtended = false) : self
-    {
-        return self::create(9, 'Latest in Watchlist', $isVisible, $isExtended);
-    }
-
     public static function createTopLocations(bool $isVisible = true, bool $isExtended = false) : self
     {
         return self::create(10, 'Top Locations', $isVisible, $isExtended);
     }
 
-    public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = true) : self
+    public static function createWatchlist(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(11, 'Last Plays Cinema', $isVisible, $isExtended);
+        return self::create(9, 'Latest in Watchlist', $isVisible, $isExtended);
     }
 
     private static function create(int $id, string $name, bool $isVisible, bool $isExtended) : self
@@ -90,6 +90,11 @@ class DashboardRow
     public function isLastPlays() : bool
     {
         return $this->getId() === self::createLastPlays()->getId();
+    }
+
+    public function isLastPlaysCinema() : bool
+    {
+        return $this->getId() === self::createLastPlaysCinema()->getId();
     }
 
     public function isMostWatchedActors() : bool
@@ -127,6 +132,11 @@ class DashboardRow
         return $this->getId() === self::createMostWatchedReleaseYears()->getId();
     }
 
+    public function isTopLocations() : bool
+    {
+        return $this->getId() === self::createTopLocations()->getId();
+    }
+
     public function isVisible() : bool
     {
         return $this->isVisible;
@@ -135,15 +145,5 @@ class DashboardRow
     public function isWatchlist() : bool
     {
         return $this->getId() === self::createWatchlist()->getId();
-    }
-
-    public function isTopLocations() : bool
-    {
-        return $this->getId() === self::createTopLocations()->getId();
-    }
-
-    public function isLastPlaysCinema() : bool
-    {
-        return $this->getId() === self::createLastPlaysCinema()->getId();
     }
 }
