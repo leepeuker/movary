@@ -3,8 +3,6 @@
 namespace Movary\Domain\Movie\History\Location;
 
 use Doctrine\DBAL\Connection;
-use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
-use Movary\Domain\User\UserEntity;
 use Movary\ValueObject\DateTime;
 
 class MovieHistoryLocationRepository
@@ -34,6 +32,29 @@ class MovieHistoryLocationRepository
         $this->dbConnection->delete('location', ['id' => $locationId]);
     }
 
+    public function findLocationById(int $locationId) : ?MovieHistoryLocationEntity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `location` WHERE `id` = ?', [$locationId]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return MovieHistoryLocationEntity::createFromArray($data);
+    }
+
+    public function findLocationByName(int $userId, string $locationName) : ?MovieHistoryLocationEntity
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT *
+            FROM `location` 
+            WHERE user_id = ? AND name = ?',
+            [$userId, $locationName],
+        );
+
+        return $data === false ? null : MovieHistoryLocationEntity::createFromArray($data);
+    }
+
     public function findLocationsByUserId(int $userId) : MovieHistoryLocationEntityList
     {
         $data = $this->dbConnection->fetchAllAssociative(
@@ -45,17 +66,6 @@ class MovieHistoryLocationRepository
         );
 
         return MovieHistoryLocationEntityList::createFromArray($data);
-    }
-
-    public function findLocationById(int $locationId) : ?MovieHistoryLocationEntity
-    {
-        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `location` WHERE `id` = ?', [$locationId]);
-
-        if (empty($data) === true) {
-            return null;
-        }
-
-        return MovieHistoryLocationEntity::createFromArray($data);
     }
 
     public function updateLocation(int $locationId, string $name, bool $isCinema) : void

@@ -26,7 +26,7 @@ class LocationController
         $this->locationApi->createLocation(
             $currentUser->getId(),
             $requestData['name'],
-            $requestData['isCinema'],
+            empty($requestData['isCinema']) === false,
         );
 
         return Response::createOk();

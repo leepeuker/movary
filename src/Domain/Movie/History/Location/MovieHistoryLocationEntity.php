@@ -2,9 +2,9 @@
 
 namespace Movary\Domain\Movie\History\Location;
 
-use Movary\ValueObject\DateTime;
+use JsonSerializable;
 
-class MovieHistoryLocationEntity implements \JsonSerializable
+class MovieHistoryLocationEntity implements JsonSerializable
 {
     private function __construct(
         private readonly int $id,
@@ -22,6 +22,11 @@ class MovieHistoryLocationEntity implements \JsonSerializable
             (string)$data['name'],
             (bool)$data['is_cinema'],
         );
+    }
+
+    public function getId() : int
+    {
+        return $this->id;
     }
 
     public function getUserId() : int

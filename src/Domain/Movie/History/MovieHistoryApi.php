@@ -516,8 +516,7 @@ class MovieHistoryApi
         int $position,
         ?string $comment = null,
         ?int $locationId = null,
-    ) : void
-    {
+    ) : void {
         $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId);
     }
 
@@ -526,8 +525,7 @@ class MovieHistoryApi
         int $userId,
         ?Date $watchAt,
         ?string $comment,
-    ) : void
-    {
+    ) : void {
         $this->repository->updateHistoryComment($movieId, $userId, $watchAt, $comment);
     }
 
@@ -536,8 +534,7 @@ class MovieHistoryApi
         int $userId,
         ?Date $watchAt,
         ?int $locationId,
-    ) : void
-    {
+    ) : void {
         $this->repository->updateHistoryLocation($movieId, $userId, $watchAt, $locationId);
     }
 }
