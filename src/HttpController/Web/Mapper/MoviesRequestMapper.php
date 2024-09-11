@@ -11,19 +11,19 @@ use RuntimeException;
 
 class MoviesRequestMapper
 {
-    private const DEFAULT_HAS_USER_RATING = null;
+    private const null DEFAULT_HAS_USER_RATING = null;
 
-    private const DEFAULT_USER_RATING_MIN = null;
+    private const null DEFAULT_USER_RATING_MIN = null;
 
-    private const DEFAULT_USER_RATING_MAX = null;
+    private const null DEFAULT_USER_RATING_MAX = null;
 
-    private const DEFAULT_GENRE = null;
+    private const null DEFAULT_GENRE = null;
 
-    private const DEFAULT_RELEASE_YEAR = null;
+    private const null DEFAULT_RELEASE_YEAR = null;
 
-    private const DEFAULT_LIMIT = 24;
+    private const int DEFAULT_LIMIT = 24;
 
-    private const DEFAULT_SORT_BY = 'title';
+    private const string DEFAULT_SORT_BY = 'title';
 
     public function __construct(
         private readonly UserApi $userApi,

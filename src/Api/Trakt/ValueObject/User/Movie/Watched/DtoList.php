@@ -7,8 +7,7 @@ use Movary\ValueObject\AbstractList;
 use Movary\ValueObject\DateTime;
 
 /**
- * @method Dto[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<Dto>
  */
 class DtoList extends AbstractList
 {

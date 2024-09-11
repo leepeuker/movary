@@ -5,8 +5,7 @@ namespace Movary\Domain\Movie;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method MovieEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<MovieEntity>
  */
 class MovieEntityList extends AbstractList
 {

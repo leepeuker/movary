@@ -11,13 +11,13 @@ use PHPUnit\Framework\TestCase;
 /** @covers \Movary\Domain\Company\CompanyApi */
 class CompanyApiTest extends TestCase
 {
-    private const ID = 12;
+    private const int ID = 12;
 
-    private const NAME = 'Company Name';
+    private const string NAME = 'Company Name';
 
-    private const ORIGIN_COUNTRY = 'US';
+    private const string ORIGIN_COUNTRY = 'US';
 
-    private const TMDB_ID = 100;
+    private const int TMDB_ID = 100;
 
     private MockObject|CompanyRepository $repositoryMock;
 

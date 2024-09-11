@@ -5,8 +5,7 @@ namespace Movary\Domain\Movie\History\Location;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method MovieHistoryLocationEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<MovieHistoryLocationEntity>
  */
 class MovieHistoryLocationEntityList extends AbstractList
 {

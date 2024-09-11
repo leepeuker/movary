@@ -27,9 +27,9 @@ class DateFormat
         ],
     ];
 
-    private const KEY_JAVASCRIPT = 'javascript';
+    private const string KEY_JAVASCRIPT = 'javascript';
 
-    private const KEY_PHP = 'php';
+    private const string KEY_PHP = 'php';
 
     public static function getFormats() : array
     {

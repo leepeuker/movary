@@ -560,7 +560,7 @@ class MovieApi
                 $crewMember->getPerson()->getPosterPath(),
             );
 
-            $this->crewApi->create($movieId, $person->getId(), $crewMember->getJob(), $crewMember->getDepartment(), $position);
+            $this->crewApi->create($movieId, $person->getId(), $crewMember->getJob(), $crewMember->getDepartment(), (int)$position);
         }
     }
 

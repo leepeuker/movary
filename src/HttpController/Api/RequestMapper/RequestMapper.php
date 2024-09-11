@@ -11,11 +11,11 @@ use RuntimeException;
 
 class RequestMapper
 {
-    private const DEFAULT_PAGE = 1;
+    private const int DEFAULT_PAGE = 1;
 
-    private const DEFAULT_LIMIT = 24;
+    private const int DEFAULT_LIMIT = 24;
 
-    private const DEFAULT_SORT_ORDER = 'desc';
+    private const string DEFAULT_SORT_ORDER = 'desc';
 
     public function __construct(
         private readonly UserApi $userApi,
