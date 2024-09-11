@@ -3,9 +3,11 @@ parameters:
 	paths:
 		- ../src
 		- ../tests
-	checkMissingIterableValueType: false
-	checkGenericClassInNonGenericObjectType: false
 	ignoreErrors:
+		-
+			identifier: missingType.iterableValue
+		-
+			identifier: missingType.generics
 		-
 		    message: '#Parameter \#2 \$level of class Monolog\\Handler\\StreamHandler#'
 		    path: ../src/Factory.php

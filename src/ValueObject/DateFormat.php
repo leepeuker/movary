@@ -6,9 +6,9 @@ use RuntimeException;
 
 class DateFormat
 {
-    private const DEFAULT_ID = 0;
+    private const int DEFAULT_ID = 0;
 
-    private const FORMATS = [
+    private const array FORMATS = [
         self::DEFAULT_ID => [
             self::KEY_PHP => 'y-m-d',
             self::KEY_JAVASCRIPT => 'yy-mm-dd',

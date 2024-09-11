@@ -4,16 +4,21 @@ namespace Movary\Command;
 
 use Movary\Api\Jellyfin\Cache;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'jellyfin:cache:refresh',
+    description: 'Refresh the local cache of Jellyfin movies.',
+    aliases: ['jellyfin:cache:refresh'],
+    hidden: false,
+)]
 class JellyfinCacheRefresh extends Command
 {
-    private const OPTION_NAME_USER_ID = 'userId';
-
-    protected static $defaultName = 'jellyfin:cache:refresh';
+    private const string OPTION_NAME_USER_ID = 'userId';
 
     public function __construct(
         private readonly Cache\JellyfinCache $jellyfinCache,
@@ -24,8 +29,7 @@ class JellyfinCacheRefresh extends Command
 
     protected function configure() : void
     {
-        $this->setDescription('Refresh the local cache of Jellyfin movies.')
-            ->addArgument(self::OPTION_NAME_USER_ID, InputArgument::REQUIRED, 'Id of user.');
+        $this->addArgument(self::OPTION_NAME_USER_ID, InputArgument::REQUIRED, 'Id of user.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int

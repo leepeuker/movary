@@ -17,9 +17,9 @@ use RuntimeException;
 
 class Authentication
 {
-    private const AUTHENTICATION_COOKIE_NAME = 'id';
+    private const string AUTHENTICATION_COOKIE_NAME = 'id';
 
-    private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
+    private const int MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
     public function __construct(
         private readonly UserRepository $repository,

@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 
 class GithubApi
 {
-    private const GITHUB_LATEST_RELEASE_URL = 'https://api.github.com/repos/leepeuker/movary/releases/latest';
+    private const string GITHUB_LATEST_RELEASE_URL = 'https://api.github.com/repos/leepeuker/movary/releases/latest';
 
     public function __construct(
         private readonly Client $httpClient,

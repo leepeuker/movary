@@ -14,7 +14,7 @@ use RuntimeException;
 
 class ImageCacheService
 {
-    private const CACHE_DIR_PERMISSIONS = 0755;
+    private const int CACHE_DIR_PERMISSIONS = 0755;
 
     public function __construct(
         private readonly File $fileUtil,
