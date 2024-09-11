@@ -4,15 +4,20 @@ namespace Movary\Command;
 
 use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'user:delete',
+    description: 'Delete a user.',
+    aliases: ['user:delete'],
+    hidden: false,
+)]
 class UserDelete extends Command
 {
-    protected static $defaultName = 'user:delete';
-
     public function __construct(
         private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
@@ -22,9 +27,7 @@ class UserDelete extends Command
 
     protected function configure() : void
     {
-        $this
-            ->setDescription('Delete a user.')
-            ->addArgument('userId', InputArgument::REQUIRED, 'Id of user to delete.');
+        $this->addArgument('userId', InputArgument::REQUIRED, 'Id of user to delete.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter

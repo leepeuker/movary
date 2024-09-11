@@ -48,21 +48,21 @@ use Twig;
 
 class Factory
 {
-    private const SRC_DIRECTORY_NAME = 'src';
+    private const string SRC_DIRECTORY_NAME = 'src';
 
-    private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
+    private const int DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
 
-    private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
+    private const string DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
 
-    private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
+    private const int DEFAULT_DATABASE_MYSQL_PORT = 3306;
 
-    private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
+    private const string DEFAULT_LOG_LEVEL = LogLevel::WARNING;
 
-    private const DEFAULT_TMDB_IMAGE_CACHING = false;
+    private const bool DEFAULT_TMDB_IMAGE_CACHING = false;
 
-    private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
+    private const bool DEFAULT_LOG_ENABLE_STACKTRACE = false;
 
-    private const DEFAULT_ENABLE_FILE_LOGGING = true;
+    private const bool DEFAULT_ENABLE_FILE_LOGGING = true;
 
     public static function createConfig(ContainerInterface $container) : Config
     {

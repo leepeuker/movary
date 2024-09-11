@@ -11,13 +11,13 @@ use RuntimeException;
 
 class TwoFactorAuthenticationFactory
 {
-    private const SECRET_LENGTH = 32;
+    private const int SECRET_LENGTH = 32;
 
-    private const REGENERATION_TIME = 30;
+    private const int REGENERATION_TIME = 30;
 
-    private const DIGEST_ALGORITHM = 'sha1';
+    private const string DIGEST_ALGORITHM = 'sha1';
 
-    private const DIGITS = 6;
+    private const int DIGITS = 6;
 
     public function __construct(
         private readonly ServerSettings $serverSettings,

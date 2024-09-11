@@ -20,7 +20,7 @@ use Twig\Environment;
 
 class HistoryController
 {
-    private const DEFAULT_LIMIT = 24;
+    private const int DEFAULT_LIMIT = 24;
 
     public function __construct(
         private readonly Environment $twig,

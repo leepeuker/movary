@@ -10,9 +10,9 @@ use RuntimeException;
 
 class EmbyWebhookDtoMapper
 {
-    private const SUPPORTED_NOTIFICATION_TYPE = 'playback.stop';
+    private const string SUPPORTED_NOTIFICATION_TYPE = 'playback.stop';
 
-    private const SUPPORTED_ITEM_TYPE = 'Movie';
+    private const string SUPPORTED_ITEM_TYPE = 'Movie';
 
     public function __construct(private readonly LoggerInterface $logger)
     {

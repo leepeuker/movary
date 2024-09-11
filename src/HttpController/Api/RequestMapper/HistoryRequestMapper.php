@@ -7,9 +7,9 @@ use Movary\ValueObject\Http\Request;
 
 class HistoryRequestMapper
 {
-    private const DEFAULT_SORT_BY = 'watchedAt';
+    private const string DEFAULT_SORT_BY = 'watchedAt';
 
-    private const DEFAULT_SORT_ORDER = 'desc';
+    private const string DEFAULT_SORT_ORDER = 'desc';
 
     public function __construct(private readonly RequestMapper $requestMapper)
     {

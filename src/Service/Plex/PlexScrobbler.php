@@ -16,9 +16,9 @@ use RuntimeException;
 
 class PlexScrobbler
 {
-    private const MEDIA_RATE = 'media.rate';
+    private const string MEDIA_RATE = 'media.rate';
 
-    private const MEDIA_SCROBBLE = 'media.scrobble';
+    private const string MEDIA_SCROBBLE = 'media.scrobble';
 
     public function __construct(
         private readonly LoggerInterface $logger,

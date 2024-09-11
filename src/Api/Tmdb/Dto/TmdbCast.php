@@ -5,8 +5,7 @@ namespace Movary\Api\Tmdb\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method TmdbCastMember[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<TmdbCastMember>
  */
 class TmdbCast extends AbstractList
 {

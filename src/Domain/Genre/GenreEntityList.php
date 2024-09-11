@@ -5,8 +5,7 @@ namespace Movary\Domain\Genre;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method GenreEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<GenreEntity>
  */
 class GenreEntityList extends AbstractList
 {

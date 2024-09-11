@@ -7,20 +7,25 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'tmdb:movie:sync',
+    description: 'Sync themoviedb.org meta data for local movies.',
+    aliases: ['tmdb:movie:sync'],
+    hidden: false,
+)]
 class TmdbMovieSync extends Command
 {
-    private const OPTION_NAME_FORCE_HOURS = 'hours';
+    private const string OPTION_NAME_FORCE_HOURS = 'hours';
 
-    private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
+    private const string OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
-    private const OPTION_NAME_MOVIE_IDS = 'movieIds';
-
-    protected static $defaultName = 'tmdb:movie:sync';
+    private const string OPTION_NAME_MOVIE_IDS = 'movieIds';
 
     public function __construct(
         private readonly SyncMovies $syncMovieDetails,
@@ -34,7 +39,6 @@ class TmdbMovieSync extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Sync themoviedb.org meta data for local movies.')
             ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Max number of movies to sync.')
             ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.')
             ->addOption(self::OPTION_NAME_MOVIE_IDS, 'movieIds', InputOption::VALUE_REQUIRED, 'Comma seperated ids of movies to sync.');

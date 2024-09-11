@@ -5,7 +5,7 @@ namespace Movary\Api\Trakt\ValueObject\User\Movie\Rating;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<Dto>
  */
 class DtoList extends AbstractList
 {
