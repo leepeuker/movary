@@ -2,32 +2,28 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          backupGlobals="true"
          cacheResult="false"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          failOnRisky="true"
          failOnWarning="true"
-         forceCoversAnnotation="true"
+         requireCoverageMetadata="true"
          beStrictAboutChangesToGlobalState="true"
          beStrictAboutTestsThatDoNotTestAnything="true"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
-         beStrictAboutCoversAnnotation="false"
+         beStrictAboutCoverageMetadata="false"
          stopOnError="false"
          stopOnFailure="false"
          stopOnIncomplete="false"
          stopOnSkipped="false"
          stopOnRisky="false"
          colors="true"
-         verbose="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
          bootstrap="../vendor/autoload.php"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd">
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
     <testsuites>
         <testsuite name="unit">
             <directory suffix="Test.php">../tests/unit/</directory>
         </testsuite>
     </testsuites>
-    <extensions>
-        <extension class="Webmozarts\StrictPHPUnit\StrictPHPUnitExtension"/>
-    </extensions>
 </phpunit>
