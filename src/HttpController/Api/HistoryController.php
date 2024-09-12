@@ -38,6 +38,7 @@ class HistoryController
                 $historyAddition['plays'] ?? 1,
                 $historyAddition['position'] ?? 1,
                 $historyAddition['comment'] ?? null,
+                $historyAddition['locationId'] ?? null,
             );
         }
 
@@ -107,6 +108,7 @@ class HistoryController
                 $historyAddition['plays'],
                 $historyAddition['position'],
                 $historyAddition['comment'],
+                $historyAddition['locationId'],
             );
         }
 

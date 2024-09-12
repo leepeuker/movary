@@ -142,6 +142,7 @@ class PlayedController
                     $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
                     $watchDate['plays'],
                     $watchDate['comment'],
+                    $watchDate['locationId'],
                 );
             }
         }
