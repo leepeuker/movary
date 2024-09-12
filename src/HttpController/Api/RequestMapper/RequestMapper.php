@@ -11,6 +11,12 @@ use RuntimeException;
 
 class RequestMapper
 {
+    private const null DEFAULT_LANGUAGE = null;
+
+    private const null DEFAULT_GENRE = null;
+
+    private const null DEFAULT_LOCATION_ID = null;
+
     private const int DEFAULT_PAGE = 1;
 
     private const int DEFAULT_LIMIT = 24;
@@ -22,6 +28,24 @@ class RequestMapper
     ) {
     }
 
+    public function mapLanguage(Request $request) : ?string
+    {
+        $getParameters = $request->getGetParameters();
+
+        $language = $getParameters['language'] ?? self::DEFAULT_LANGUAGE;
+
+        return $language !== null ? (string)$language : null;
+    }
+
+    public function mapGenre(Request $request) : ?string
+    {
+        $getParameters = $request->getGetParameters();
+
+        $genre = $getParameters['genre'] ?? self::DEFAULT_GENRE;
+
+        return $genre !== null ? (string)$genre : null;
+    }
+
     public function mapLimit(Request $request) : int
     {
         $getParameters = $request->getGetParameters();
@@ -29,6 +53,15 @@ class RequestMapper
         $limit = $getParameters['limit'] ?? self::DEFAULT_LIMIT;
 
         return (int)$limit;
+    }
+
+    public function mapLocationId(Request $request) : ?int
+    {
+        $getParameters = $request->getGetParameters();
+
+        $locationId = $getParameters['locationId'] ?? self::DEFAULT_LOCATION_ID;
+
+        return $locationId !== null ? (int)$locationId : null;
     }
 
     public function mapPage(Request $request) : int
