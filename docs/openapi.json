@@ -163,6 +163,9 @@
                     },
                     "position": {
                       "$ref": "#/components/schemas/positionOptional"
+                    },
+                    "locationId": {
+                      "$ref": "#/components/schemas/idNullable"
                     }
                   }
                 }
@@ -226,6 +229,9 @@
                     },
                     "position": {
                       "$ref": "#/components/schemas/position"
+                    },
+                    "locationId": {
+                      "$ref": "#/components/schemas/idNullable"
                     }
                   }
                 }
@@ -761,6 +767,9 @@
                           },
                           "comment": {
                             "$ref": "#/components/schemas/commentOptional"
+                          },
+                          "locationId": {
+                            "$ref": "#/components/schemas/idNullable"
                           }
                         }
                       }
@@ -829,6 +838,9 @@
                           },
                           "comment": {
                             "$ref": "#/components/schemas/comment"
+                          },
+                          "locationId": {
+                            "$ref": "#/components/schemas/idNullable"
                           }
                         }
                       }
