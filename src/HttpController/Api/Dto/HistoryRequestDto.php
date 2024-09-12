@@ -13,6 +13,7 @@ class HistoryRequestDto
         private readonly int $limit,
         private readonly string $sortBy,
         private readonly SortOrder $sortOrder,
+        private readonly ?int $locationId,
     ) {
     }
 
@@ -23,6 +24,7 @@ class HistoryRequestDto
         int $limit,
         string $sortBy,
         SortOrder $sortOrder,
+        ?int $locationId,
     ) : self {
         return new self(
             $requestedUserId,
@@ -31,12 +33,18 @@ class HistoryRequestDto
             $limit,
             $sortBy,
             $sortOrder,
+            $locationId,
         );
     }
 
     public function getLimit() : int
     {
         return $this->limit;
+    }
+
+    public function getLocationId() : ?int
+    {
+        return $this->locationId;
     }
 
     public function getPage() : int

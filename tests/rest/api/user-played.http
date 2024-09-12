@@ -1,4 +1,4 @@
-GET http://127.0.0.1/api/users/{{username}}/played/movies?limit=10&sortOrder=desc
+GET http://127.0.0.1/api/users/{{username}}/played/movies?limit=10&sortOrder=desc&locationId=7
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

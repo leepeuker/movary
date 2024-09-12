@@ -70,11 +70,13 @@ class HistoryController
             $requestData->getPage(),
             $requestData->getSearchTerm(),
             $requestData->getSortOrder(),
+            $requestData->getLocationId(),
         );
 
         $historyCount = $this->movieHistoryApi->fetchHistoryCount(
             $requestData->getRequestedUserId(),
             $requestData->getSearchTerm(),
+            $requestData->getLocationId(),
         );
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(

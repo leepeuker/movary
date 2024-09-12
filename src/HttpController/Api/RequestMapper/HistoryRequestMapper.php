@@ -24,6 +24,7 @@ class HistoryRequestMapper
             $this->requestMapper->mapLimit($request),
             self::DEFAULT_SORT_BY,
             $this->requestMapper->mapSortOrder($request, self::DEFAULT_SORT_ORDER),
+            $this->requestMapper->mapLocationId($request),
         );
     }
 }

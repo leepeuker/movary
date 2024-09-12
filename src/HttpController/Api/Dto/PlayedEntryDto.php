@@ -21,7 +21,7 @@ class PlayedEntryDto implements JsonSerializable
     {
         return [
             'movie' => $this->movieDto,
-            'watchDates' => $this->watchDates
+            'watchDates' => $this->watchDates,
         ];
     }
 }

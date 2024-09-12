@@ -65,6 +65,15 @@
                 "desc"
               ]
             }
+          },
+          {
+            "name": "locationId",
+            "in": "query",
+            "description": "Id of location",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -617,6 +626,33 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language code (ISO 639-1)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "genre",
+            "in": "query",
+            "description": "Name of the genre",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locationId",
+            "in": "query",
+            "description": "Id of location",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -648,6 +684,9 @@
                                 },
                                 "comment": {
                                   "$ref": "#/components/schemas/comment"
+                                },
+                                "locationId": {
+                                  "$ref": "#/components/schemas/idNullable"
                                 }
                               }
                             }
