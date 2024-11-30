@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 
 class JellyfinCache
 {
-    private const DEFAULT_HTTP_HEADERS = [
+    private const array DEFAULT_HTTP_HEADERS = [
         'Recursive' => 'true',
         'IncludeItemTypes' => 'Movie',
         'hasTmdbId' => 'true',

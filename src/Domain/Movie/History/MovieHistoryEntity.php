@@ -12,6 +12,7 @@ class MovieHistoryEntity
         private readonly int $plays,
         private readonly int $position,
         private readonly ?string $comment,
+        private readonly ?int $locationId,
     ) {
     }
 
@@ -23,12 +24,18 @@ class MovieHistoryEntity
             $data['plays'],
             $data['position'],
             $data['comment'],
+            $data['location_id'],
         );
     }
 
     public function getComment() : ?string
     {
         return $this->comment;
+    }
+
+    public function getLocationId() : ?int
+    {
+        return $this->locationId;
     }
 
     public function getMovieId() : int

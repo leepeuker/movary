@@ -4,24 +4,24 @@ namespace Movary\Command;
 
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'tmdb:imageCache:cleanup',
+    description: 'Delete outdated cached images which are not referenced anymore.',
+    aliases: ['tmdb:imageCache:cleanup'],
+    hidden: false,
+)]
 class TmdbImageCacheCleanup extends Command
 {
-    protected static $defaultName = 'tmdb:imageCache:cleanup';
-
     public function __construct(
         private readonly TmdbImageCache $imageCacheService,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
-    }
-
-    protected function configure() : void
-    {
-        $this->setDescription('Delete outdated cached images which are not referenced anymore.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter

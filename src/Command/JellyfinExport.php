@@ -7,16 +7,21 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'jellyfin:export',
+    description: 'Export Movary watch dates as plays to Jellyfin.',
+    aliases: ['jellyfin:export'],
+    hidden: false,
+)]
 class JellyfinExport extends Command
 {
-    private const OPTION_NAME_USER_ID = 'userId';
-
-    protected static $defaultName = 'jellyfin:export';
+    private const string OPTION_NAME_USER_ID = 'userId';
 
     public function __construct(
         private readonly JellyfinMoviesExporter $jellyfinMoviesExporter,
@@ -29,8 +34,7 @@ class JellyfinExport extends Command
 
     protected function configure() : void
     {
-        $this->setDescription('Export Movary watch dates as plays to Jellyfin.')
-            ->addArgument(self::OPTION_NAME_USER_ID, InputArgument::REQUIRED, 'Id of user.');
+        $this->addArgument(self::OPTION_NAME_USER_ID, InputArgument::REQUIRED, 'Id of user.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int

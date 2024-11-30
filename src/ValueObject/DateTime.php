@@ -8,11 +8,11 @@ use JsonSerializable;
 
 class DateTime implements JsonSerializable
 {
-    public const DEFAULT_TIME_ZONE = 'UTC';
+    public const string DEFAULT_TIME_ZONE = 'UTC';
 
-    private const DEFAULT_STRING_FORMAT = 'Y-m-d H:i:s';
+    private const string DEFAULT_STRING_FORMAT = 'Y-m-d H:i:s';
 
-    private const STATE_FORMAT = 'Y-m-d H:i:s.u';
+    private const string STATE_FORMAT = 'Y-m-d H:i:s.u';
 
     private string $dateTime;
 

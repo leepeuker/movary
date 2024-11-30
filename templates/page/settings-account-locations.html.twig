@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - General Account
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-account-location.js"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-top: 1rem">
+                <h5 class="text-center">Locations</h5>
+
+                <div style="padding-bottom: .8rem">
+                    <p>You can set the location where you have watched a movie.</p>
+
+                    {% if locationsEnabled %}
+                        <button type="button" class="btn btn-outline-danger" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">Disable locations</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">Enable locations</button>
+                    {% endif %}
+                </div>
+
+                <div id="locationAlerts"></div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="locationsTable">
+                        <thead>
+                        <tr>
+                            <th scope="col">Manage your locations</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="spinner-border d-none" role="status" id="locationsTableLoadingSpinner" style="margin-bottom: .5rem">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn" {% if locationsEnabled == false %}disabled{% endif %}>Add Location</button>
+                <br>
+            </div>
+        </div>
+
+        {{ include('component/modal-location.html.twig') }}
+    </main>
+{% endblock %}

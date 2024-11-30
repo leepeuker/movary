@@ -403,7 +403,7 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.*, mh.watched_at, mur.rating as userRating
+            SELECT m.*, mh.watched_at, mur.rating as userRating, mh.location_id as locationId
             FROM movie m
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
@@ -422,6 +422,21 @@ class MovieRepository
             FROM movie m
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
+            ORDER BY watched_at DESC, mh.position DESC
+            LIMIT 6',
+            [$userId, $userId],
+        )->fetchAllAssociative();
+    }
+
+    public function fetchLastPlaysCinema(int $userId) : array
+    {
+        return $this->dbConnection->executeQuery(
+            'SELECT m.*, mh.watched_at, mur.rating AS user_rating
+            FROM movie m
+            JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
+            LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
+            JOIN location l on l.id = mh.location_id
+            WHERE l.is_cinema = 1
             ORDER BY watched_at DESC, mh.position DESC
             LIMIT 6',
             [$userId, $userId],
@@ -633,6 +648,19 @@ class MovieRepository
         );
     }
 
+    public function fetchTopLocations(int $userId) : array
+    {
+        return $this->dbConnection->executeQuery(
+            'SELECT location_id as id, name, COUNT(muwd.movie_id) AS count_plays
+            FROM location
+            JOIN movie_user_watch_dates muwd on location.id = muwd.location_id
+            WHERE location.user_id = ?
+            GROUP BY location_id
+            ORDER BY count_plays DESC',
+            [$userId],
+        )->fetchAllAssociative();
+    }
+
     public function fetchTotalMinutesWatched(int $userId) : int
     {
         return (int)$this->dbConnection->executeQuery(
@@ -710,6 +738,21 @@ class MovieRepository
         );
     }
 
+    public function fetchUniqueLocations(int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT l.name, l.id
+            FROM movie_user_watch_dates mh
+            JOIN movie m on mh.movie_id = m.id
+            JOIN location l on l.id = mh.location_id
+            WHERE mh.user_id = ?
+            ORDER BY l.name
+            SQL,
+            [$userId],
+        );
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->dbConnection->fetchFirstColumn(
@@ -776,6 +819,7 @@ class MovieRepository
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : int {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -809,6 +853,11 @@ class MovieRepository
             $payload[] = $userRatingMax;
         }
 
+        if ($locationId !== null) {
+            $whereQuery .= 'AND mh.location_id = ? ';
+            $payload[] = $locationId;
+        }
+
         return $this->dbConnection->fetchFirstColumn(
             <<<SQL
             SELECT COUNT(DISTINCT m.id)
@@ -837,6 +886,7 @@ class MovieRepository
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : array {
         $payload = [$userId, $userId, "%$searchTerm%"];
 
@@ -886,6 +936,11 @@ class MovieRepository
             $payload[] = $userRatingMax;
         }
 
+        if ($locationId !== null) {
+            $whereQuery .= 'AND mh.location_id = ? ';
+            $payload[] = $locationId;
+        }
+
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT * FROM (
@@ -925,9 +980,10 @@ class MovieRepository
     public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.*, muwd.watched_at, muwd.plays, comment
+            'SELECT m.*, muwd.watched_at, muwd.plays, comment, l.name as location_name
             FROM movie_user_watch_dates muwd
             JOIN movie m on muwd.movie_id = m.id
+            LEFT JOIN location l on muwd.location_id = l.id
             WHERE muwd.user_id = ?
             ORDER BY watched_at DESC, muwd.position DESC',
             [$userId],

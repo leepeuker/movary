@@ -6,16 +6,21 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'plex:watchlist:import',
+    description: 'Import missing movies from Plex watchlist to the Movary watchlist.',
+    aliases: ['plex:watchlist:import'],
+    hidden: false,
+)]
 class PlexWatchlistImport extends Command
 {
-    private const OPTION_NAME_USER_ID = 'userId';
-
-    protected static $defaultName = 'plex:watchlist:import';
+    private const string OPTION_NAME_USER_ID = 'userId';
 
     public function __construct(
         private readonly PlexWatchlistImporter $plexWatchlistImporter,
@@ -27,8 +32,7 @@ class PlexWatchlistImport extends Command
 
     protected function configure() : void
     {
-        $this->setDescription('Import missing movies from Plex watchlist to the Movary watchlist.')
-            ->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user to import for.');
+        $this->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user to import for.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int

@@ -13,7 +13,6 @@ use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\TraktClient;
-use Movary\Command;
 use Movary\Command\CreatePublicStorageLink;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
@@ -49,21 +48,21 @@ use Twig;
 
 class Factory
 {
-    private const SRC_DIRECTORY_NAME = 'src';
+    private const string SRC_DIRECTORY_NAME = 'src';
 
-    private const DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
+    private const int DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
 
-    private const DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
+    private const string DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
 
-    private const DEFAULT_DATABASE_MYSQL_PORT = 3306;
+    private const int DEFAULT_DATABASE_MYSQL_PORT = 3306;
 
-    private const DEFAULT_LOG_LEVEL = LogLevel::WARNING;
+    private const string DEFAULT_LOG_LEVEL = LogLevel::WARNING;
 
-    private const DEFAULT_TMDB_IMAGE_CACHING = false;
+    private const bool DEFAULT_TMDB_IMAGE_CACHING = false;
 
-    private const DEFAULT_LOG_ENABLE_STACKTRACE = false;
+    private const bool DEFAULT_LOG_ENABLE_STACKTRACE = false;
 
-    private const DEFAULT_ENABLE_FILE_LOGGING = true;
+    private const bool DEFAULT_ENABLE_FILE_LOGGING = true;
 
     public static function createConfig(ContainerInterface $container) : Config
     {
@@ -75,7 +74,7 @@ class Factory
 
         return new Config(
             $container->get(File::class),
-            array_merge($fpmEnvironment, $systemEnvironment)
+            array_merge($fpmEnvironment, $systemEnvironment),
         );
     }
 
@@ -107,7 +106,7 @@ class Factory
     {
         return new Command\DatabaseMigrationMigrate(
             $container->get(PhinxApplication::class),
-            self::createDirectoryAppRoot() . 'settings/phinx.php'
+            self::createDirectoryAppRoot() . 'settings/phinx.php',
         );
     }
 
@@ -115,7 +114,7 @@ class Factory
     {
         return new Command\DatabaseMigrationRollback(
             $container->get(PhinxApplication::class),
-            self::createDirectoryAppRoot() . 'settings/phinx.php'
+            self::createDirectoryAppRoot() . 'settings/phinx.php',
         );
     }
 
@@ -123,7 +122,7 @@ class Factory
     {
         return new Command\DatabaseMigrationStatus(
             $container->get(PhinxApplication::class),
-            self::createDirectoryAppRoot() . 'settings/phinx.php'
+            self::createDirectoryAppRoot() . 'settings/phinx.php',
         );
     }
 
@@ -192,7 +191,7 @@ class Factory
             $container->get(JobQueueApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
-            self::createDirectoryStorageApp()
+            self::createDirectoryStorageApp(),
         );
     }
 
@@ -200,7 +199,7 @@ class Factory
     {
         return new JobQueueScheduler(
             $container->get(JobQueueApi::class),
-            self::getTmdbEnabledImageCaching($config)
+            self::getTmdbEnabledImageCaching($config),
         );
     }
 
@@ -244,7 +243,7 @@ class Factory
     public static function createMiddlewareServerHasRegistrationEnabled(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
     {
         return new HttpController\Web\Middleware\ServerHasRegistrationEnabled(
-            $config->getAsBool('ENABLE_REGISTRATION', false)
+            $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
 
@@ -261,7 +260,7 @@ class Factory
     {
         return new Tmdb\TmdbClient(
             $container->get(ClientInterface::class),
-            $container->get(ServerSettings::class)
+            $container->get(ServerSettings::class),
         );
     }
 
@@ -273,6 +272,7 @@ class Factory
         );
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     public static function createTwigEnvironment(ContainerInterface $container) : Twig\Environment
     {
         $twig = new Twig\Environment($container->get(Twig\Loader\LoaderInterface::class));
@@ -304,6 +304,7 @@ class Factory
         $twig->addGlobal('currentUserName', $user?->getName());
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
         $twig->addGlobal('currentUserCountry', $user?->getCountry());
+        $twig->addGlobal('currentUserLocationsEnabled', $user?->hasLocationsEnabled());
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
@@ -323,7 +324,7 @@ class Factory
         return new UrlGenerator(
             $container->get(TmdbUrlGenerator::class),
             $container->get(ImageCacheService::class),
-            self::getTmdbEnabledImageCaching($config)
+            self::getTmdbEnabledImageCaching($config),
         );
     }
 
@@ -371,7 +372,7 @@ class Factory
     {
         $streamHandler = new StreamHandler(
             self::createDirectoryStorageLogs() . 'app.log',
-            self::getLogLevel($config)
+            self::getLogLevel($config),
         );
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 

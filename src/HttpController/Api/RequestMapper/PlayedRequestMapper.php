@@ -7,9 +7,9 @@ use Movary\ValueObject\Http\Request;
 
 class PlayedRequestMapper
 {
-    private const DEFAULT_SORT_ORDER = 'asc';
+    private const string DEFAULT_SORT_ORDER = 'asc';
 
-    private const DEFAULT_SORT_BY = 'title';
+    private const string DEFAULT_SORT_BY = 'title';
 
     public function __construct(private readonly RequestMapper $requestMapper)
     {

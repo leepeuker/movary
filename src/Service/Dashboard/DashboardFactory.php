@@ -54,9 +54,12 @@ class DashboardFactory
             DashboardRow::createMostWatchedProductionCompanies(),
             DashboardRow::createMostWatchedReleaseYears(),
             DashboardRow::createWatchlist(),
+            DashboardRow::createTopLocations(),
+            DashboardRow::createLastPlaysCinema(),
         );
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     private function createDashboardRowById(int $rowId, bool $isVisible, bool $isExtended) : DashboardRow
     {
         return match (true) {
@@ -69,6 +72,8 @@ class DashboardFactory
             DashboardRow::createMostWatchedProductionCompanies()->getId() === $rowId => DashboardRow::createMostWatchedProductionCompanies($isVisible, $isExtended),
             DashboardRow::createMostWatchedReleaseYears()->getId() === $rowId => DashboardRow::createMostWatchedReleaseYears($isVisible, $isExtended),
             DashboardRow::createWatchlist()->getId() === $rowId => DashboardRow::createWatchlist($isVisible, $isExtended),
+            DashboardRow::createTopLocations()->getId() === $rowId => DashboardRow::createTopLocations($isVisible, $isExtended),
+            DashboardRow::createLastPlaysCinema()->getId() === $rowId => DashboardRow::createLastPlaysCinema($isVisible, $isExtended),
 
             default => throw new RuntimeException('Not supported dashboard row id: ' . $rowId)
         };

@@ -7,20 +7,25 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Tmdb\SyncPersons;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'tmdb:person:sync',
+    description: 'Sync themoviedb.org meta data for local persons.',
+    aliases: ['tmdb:person:sync'],
+    hidden: false,
+)]
 class TmdbPersonSync extends Command
 {
-    private const OPTION_NAME_FORCE_HOURS = 'hours';
+    private const string OPTION_NAME_FORCE_HOURS = 'hours';
 
-    private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
+    private const string OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
-    private const OPTION_NAME_PERSON_IDS = 'personIds';
-
-    protected static $defaultName = 'tmdb:person:sync';
+    private const string OPTION_NAME_PERSON_IDS = 'personIds';
 
     public function __construct(
         private readonly SyncPersons $syncPersons,
@@ -34,7 +39,6 @@ class TmdbPersonSync extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Sync themoviedb.org meta data for local persons.')
             ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Max number of persons to sync.')
             ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.')
             ->addOption(self::OPTION_NAME_PERSON_IDS, 'personIds', InputOption::VALUE_REQUIRED, 'Comma seperated ids of persons to sync.');

@@ -104,7 +104,7 @@ class ImportWatchedMovies
         foreach ($localMovieWatchDates as $localMovieWatchDate) {
             $localWatchDate = Date::createFromString($localMovieWatchDate['watched_at']);
 
-            if ($traktMovieWatchDates->containsDate($localWatchDate) === false) {
+            if ($traktMovieWatchDates->get($localWatchDate) === null) {
                 if ($overwriteExistingData === false) {
                     $this->logger->debug('Trakt history import: Skipped deleting "' . $movie->getTitle() . '" watch date "' . $localWatchDate . '" not exising in trakt, overwrite not set');
 
@@ -122,7 +122,7 @@ class ImportWatchedMovies
             if ($localWatchDatePlays === $traktWatchDatePlays) {
                 $this->logger->debug('Trakt history import: Skipped "' . $movie->getTitle() . '" watch date "' . $localWatchDate . '" plays update, already up to date');
 
-                $skipTraktWatchDates->add($localWatchDate, $localWatchDatePlays);
+                $skipTraktWatchDates->set($localWatchDate, $localWatchDatePlays);
 
                 continue;
             }
@@ -130,7 +130,7 @@ class ImportWatchedMovies
             if ($overwriteExistingData === false) {
                 $this->logger->debug('Trakt history import: Skipped "' . $movie->getTitle() . '" watch date "' . $localWatchDate . '" plays update, overwrite not set');
 
-                $skipTraktWatchDates->add($localWatchDate, $localWatchDatePlays);
+                $skipTraktWatchDates->set($localWatchDate, $localWatchDatePlays);
             }
         }
 
@@ -140,7 +140,7 @@ class ImportWatchedMovies
             $this->replaceMovieWatchDate(
                 $movie,
                 $userId,
-                Date::createFromString($watchedAt),
+                Date::createFromString((string)$watchedAt),
                 $plays,
             );
         }

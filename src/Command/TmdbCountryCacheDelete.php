@@ -4,24 +4,24 @@ namespace Movary\Command;
 
 use Movary\Api\Tmdb\Cache\TmdbIsoLanguageCache;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'tmdb:countryCodeCache:delete',
+    description: 'Delete cached tmdb country codes',
+    aliases: ['tmdb:countryCodeCache:delete'],
+    hidden: false,
+)]
 class TmdbCountryCacheDelete extends Command
 {
-    protected static $defaultName = 'tmdb:countryCodeCache:delete';
-
     public function __construct(
         private readonly TmdbIsoLanguageCache $tmdbIso6931Cache,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
-    }
-
-    protected function configure() : void
-    {
-        $this->setDescription('Delete cached tmdb country codes');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter

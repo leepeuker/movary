@@ -7,9 +7,9 @@ use Movary\ValueObject\Http\Request;
 
 class WatchlistRequestMapper
 {
-    private const DEFAULT_SORT_BY = 'addedAt';
+    private const string DEFAULT_SORT_BY = 'addedAt';
 
-    private const DEFAULT_SORT_ORDER = 'desc';
+    private const string DEFAULT_SORT_ORDER = 'desc';
 
     public function __construct(private readonly RequestMapper $requestMapper)
     {

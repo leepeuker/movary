@@ -8,15 +8,20 @@ use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'user:create',
+    description: 'Create a new user.',
+    aliases: ['user:create'],
+    hidden: false,
+)]
 class UserCreate extends Command
 {
-    protected static $defaultName = 'user:create';
-
     public function __construct(
         private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
@@ -27,7 +32,6 @@ class UserCreate extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Create a new user.')
             ->addArgument('email', InputArgument::REQUIRED, 'Email address for user')
             ->addArgument('password', InputArgument::REQUIRED, 'Password for user')
             ->addArgument('name', InputArgument::REQUIRED, 'Name for user')

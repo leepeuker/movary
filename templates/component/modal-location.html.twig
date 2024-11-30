@@ -1,0 +1,36 @@
+<div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModal" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="locationModalHeaderTitle"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding-bottom: 0!important;">
+                <form>
+                    <input type="hidden" id="locationModalIdInput">
+
+                    <div class="mb-3">
+                        <label for="locationModalNameInput" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="locationModalNameInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="locationModalCinemaInput">
+                            <label class="form-check-label" for="locationModalCinemaInput">Cinema</label>
+                        </div>
+                    </div>
+                </form>
+                <div id="locationModalAlerts"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-none" id="locationModalFooterCreateButton">
+                    <button type="submit" form="locationCreateModal" class="btn btn-primary" id="createLocationButton">Create</button>
+                </div>
+                <div class="d-none" id="locationModalFooterButtons">
+                    <button type="button" class="btn btn-danger" id="deleteLocationButton">Delete</button>
+                    <button type="button" class="btn btn-primary" id="updateLocationButton">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
