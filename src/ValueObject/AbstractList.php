@@ -14,11 +14,9 @@ use function count;
  */
 abstract class AbstractList implements Countable, IteratorAggregate, JsonSerializable
 {
-    protected array $data;
-
-    protected function __construct()
+    /** @param array<int|string, TValue> $data */
+    final protected function __construct(protected array $data = [])
     {
-        $this->data = [];
     }
 
     public function asArray() : array
@@ -36,6 +34,9 @@ abstract class AbstractList implements Countable, IteratorAggregate, JsonSeriali
         return count($this->data);
     }
 
+    /**
+     * @return ArrayIterator<int|string, TValue>
+     */
     public function getIterator() : ArrayIterator
     {
         return new ArrayIterator($this->data);

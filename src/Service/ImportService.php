@@ -50,8 +50,13 @@ class ImportService
             $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
 
             $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+
             if (empty($record['comment']) === false) {
                 $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $record['comment']);
+            }
+
+            if (empty($record['location']) === false) {
+                $this->movieApi->updateHistoryLocationByName($movie->getId(), $userId, $watchDate, $record['location']);
             }
         }
     }

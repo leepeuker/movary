@@ -10,7 +10,7 @@ use Traversable;
 
 class LetterboxdExporter
 {
-    private const LIMIT_CSV_FILE_RECORDS = 1000;
+    private const int LIMIT_CSV_FILE_RECORDS = 1000;
 
     public function __construct(
         private readonly Connection $dbConnection,

@@ -78,7 +78,13 @@
                         </div>
                         <div class="input-group" style="margin-top: 0.5rem;">
                             <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
-                            <textarea class="form-control" rows="1" aria-label="Comment" id="logPlayModalCommentInput" placeholder="Comment"></textarea>
+                            <textarea class="form-control" rows="1" aria-label="Comment" id="logPlayModalCommentInput"></textarea>
+                        </div>
+                        <div class="input-group {% if currentUserLocationsEnabled == false %}d-none{% endif %}" style="margin-top: 0.5rem;">
+                            <i class="input-group-text"><i class="bi bi-pin-map-fill"></i></i>
+                            <select class="form-select" style="" id="logPlayModalLocationInput" aria-describedby="location" required>
+                            </select>
+                            <a class="btn btn-outline-secondary rounded-end" href="/settings/account/locations"><i class="bi bi-gear"></i></a>
                         </div>
                     </div>
 

@@ -34,6 +34,7 @@ class UserEntity
         private readonly ?string $country,
         private readonly bool $jellyfinSyncEnabled,
         private readonly bool $displayCharacterNames,
+        private readonly bool $hasLocationsEnabled,
     ) {
     }
 
@@ -66,6 +67,7 @@ class UserEntity
             $data['country'],
             (bool)$data['jellyfin_sync_enabled'],
             (bool)$data['display_character_names'],
+            (bool)$data['locations_enabled'],
         );
     }
 
@@ -177,6 +179,11 @@ class UserEntity
     public function hasJellyfinSyncEnabled() : bool
     {
         return $this->jellyfinSyncEnabled;
+    }
+
+    public function hasLocationsEnabled() : bool
+    {
+        return $this->hasLocationsEnabled;
     }
 
     public function hasPlexScrobbleRatingsEnabled() : bool

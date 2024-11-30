@@ -9,16 +9,21 @@ use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'user:update',
+    description: 'Update user data.',
+    aliases: ['user:update'],
+    hidden: false,
+)]
 class UserUpdate extends Command
 {
-    protected static $defaultName = 'user:update';
-
     public function __construct(
         private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
@@ -29,7 +34,6 @@ class UserUpdate extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Update user data.')
             ->addArgument('userId', InputArgument::REQUIRED, 'ID of user')
             ->addOption('email', [], InputOption::VALUE_OPTIONAL, 'New email')
             ->addOption('name', [], InputOption::VALUE_OPTIONAL, 'New name')

@@ -1,0 +1,32 @@
+{% macro create(dashboardRow, lastPlaysCinema, routeUsername) %}
+
+    {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {{ rowItemToggle.create(dashboardRow) }}
+
+    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
+        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+            {% for lastPlay in lastPlaysCinema %}
+                <div class="col" style="padding-bottom: 1rem;">
+                    <div class="card h-100" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ lastPlay.id }}'">
+                        <div style="height: 100%">
+                            <img src="{{ lastPlay.poster_path }}"
+                                 class="card-img-top"
+                                 alt="{{ lastPlay.title }} Poster">
+
+                        </div>
+                        <div class="card-footer" style="padding: 0.1rem">
+                            <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>
+                        </div>
+
+                        {% if lastPlay.user_rating is not null %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                            {{ lastPlay.user_rating }}
+                                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+    </li>
+{% endmacro %}

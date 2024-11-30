@@ -5,7 +5,6 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
-use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Mapper\PersonsRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\ValueObject\Http\Request;

@@ -25,8 +25,8 @@ logs:
 build:
 	docker compose build --no-cache
 	make up
-	make db_mysql_create_database
 	make composer_install
+	make db_mysql_create_database
 	make app_database_migrate
 	make exec_app_cmd CMD="php bin/console.php storage:link"
 
@@ -64,12 +64,12 @@ db_mysql_create_database:
 	make app_database_migrate
 
 db_mysql_import:
-	docker cp storage/dump.sql movary_mysql_1:/tmp/dump.sql
-	docker compose exec mysql bash -c 'mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} < /tmp/dump.sql'
+	docker cp storage/dump.sql movary-mysql-1:/tmp/dump.sql
+	docker compose exec mysql bash -c 'mysql -uroot -p${DATABASE_MYSQL_ROOT_PASSWORD} movary < /tmp/dump.sql'
 
 db_mysql_export:
 	docker compose exec mysql bash -c 'mysqldump --databases --add-drop-database -uroot -p$(DATABASE_MYSQL_ROOT_PASSWORD) $(DATABASE_MYSQL_NAME) > /tmp/dump.sql'
-	docker cp movary_mysql_1:/tmp/dump.sql storage/dump.sql
+	docker cp movary-mysql-1:/tmp/dump.sql storage/dump.sql
 	chown $(USER_ID):$(USER_ID) storage/dump.sql
 
 db_migration_create:
