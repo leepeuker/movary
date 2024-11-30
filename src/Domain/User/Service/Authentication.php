@@ -34,7 +34,7 @@ class Authentication
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
         $authenticationMethod = AuthenticationObject::COOKIE_AUTHENTICATION;
-        if (empty($token) === true || $this->isValidToken((string)$token) === true) {
+        if (empty($token) === true || $this->isValidToken((string)$token) === false) {
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
             return null;
@@ -145,9 +145,10 @@ class Authentication
                 throw new RuntimeException('Could not find a current user');
             }
             $this->sessionWrapper->set('userId', $authenticationObject->getUser()->getId());
+            $userId = $authenticationObject->getUser()->getId();
         }
 
-        if ($userId === null) {
+        if ($userId == null) {
             throw new RuntimeException('Could not find a current user');
         }
         return $userId;
@@ -200,12 +201,16 @@ class Authentication
         return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
-    public function isValidAuthToken(string $token) : bool
+    public function isValidToken(string $token) : bool
     {
         $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
 
-        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
-            if ($tokenExpirationDate !== null) {
+        if ($tokenExpirationDate === null) {
+            if($this->repository->findUserByApiToken($token) === null) {
+                return false;
+            }
+        } else {
+            if($tokenExpirationDate->isAfter(DateTime::create()) === false) {
                 $this->repository->deleteAuthToken($token);
                 return false;
             }
