@@ -13,7 +13,7 @@ use RuntimeException;
 
 class TmdbClient
 {
-    private const BASE_URL = 'https://api.themoviedb.org/3';
+    private const string BASE_URL = 'https://api.themoviedb.org/3';
 
     public function __construct(
         private readonly ClientInterface $httpClient,

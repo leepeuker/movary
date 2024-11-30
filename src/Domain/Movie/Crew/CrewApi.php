@@ -7,7 +7,7 @@ use Movary\Service\UrlGenerator;
 
 class CrewApi
 {
-    private const RELEVANT_JOBS = [
+    private const array RELEVANT_JOBS = [
         'Screenplay',
         'Director',
         'Producer',

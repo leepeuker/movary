@@ -2,7 +2,7 @@
 
 namespace Movary\HttpController\Web\Mapper;
 
-use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Dto\MoviesRequestDto;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
@@ -11,24 +11,24 @@ use RuntimeException;
 
 class WatchlistRequestMapper
 {
-    private const DEFAULT_GENRE = null;
+    private const null DEFAULT_GENRE = null;
 
-    private const DEFAULT_RELEASE_YEAR = null;
+    private const null DEFAULT_RELEASE_YEAR = null;
 
-    private const DEFAULT_LIMIT = 24;
+    private const int DEFAULT_LIMIT = 24;
 
-    private const DEFAULT_PAGE = 1;
+    private const int DEFAULT_PAGE = 1;
 
-    private const DEFAULT_SORT_BY = 'addedAt';
+    private const string DEFAULT_SORT_BY = 'addedAt';
 
     public function __construct(
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly UserApi $userApi,
     ) {
     }
 
     public function mapRenderPageRequest(Request $request) : MoviesRequestDto
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
+        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
         $getParameters = $request->getGetParameters();
 

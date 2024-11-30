@@ -5,8 +5,7 @@ namespace Movary\Service\Router\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method Route[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<Route>
  */
 class RouteList extends AbstractList
 {

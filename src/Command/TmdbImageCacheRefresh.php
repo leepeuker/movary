@@ -6,18 +6,23 @@ use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\JobQueue\JobQueueApi;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'tmdb:imageCache:refresh',
+    description: 'Cache themoviedb.org images used for local movies to disk.',
+    aliases: ['tmdb:imageCache:refresh'],
+    hidden: false,
+)]
 class TmdbImageCacheRefresh extends Command
 {
-    private const OPTION_NAME_FORCE = 'force';
+    private const string OPTION_NAME_FORCE = 'force';
 
-    private const  OPTION_NAME_TYPE = 'type';
-
-    protected static $defaultName = 'tmdb:imageCache:refresh';
+    private const string OPTION_NAME_TYPE = 'type';
 
     public function __construct(
         private readonly TmdbImageCache $imageCacheService,
@@ -30,7 +35,6 @@ class TmdbImageCacheRefresh extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Cache themoviedb.org images used for local movies to disk.')
             ->addOption(
                 self::OPTION_NAME_TYPE,
                 'type',

@@ -65,11 +65,7 @@ class PersonController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
+        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
         $personId = (int)$request->getRouteParameters()['id'];
 
         $person = $this->personApi->findById($personId);

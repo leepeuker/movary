@@ -466,6 +466,16 @@ class UserRepository
         return (bool)$userPersonSettings[0]['is_hidden_in_top_lists'];
     }
 
+    public function isLocationsEnabled(int $userId) : bool
+    {
+        $userPersonSettings = $this->dbConnection->fetchAllAssociative(
+            'SELECT locations_enabled FROM user WHERE id = ?',
+            [$userId],
+        );
+
+        return (bool)$userPersonSettings[0]['locations_enabled'];
+    }
+
     public function setEmbyWebhookId(int $userId, ?string $embyWebhookId) : void
     {
         $this->dbConnection->update(
@@ -668,6 +678,19 @@ class UserRepository
             'user',
             [
                 'jellyfin_sync_enabled' => (int)$enabledSync,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateLocationsEnabled(int $userId, bool $locationsEnabled) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'locations_enabled' => (int)$locationsEnabled,
             ],
             [
                 'id' => $userId,

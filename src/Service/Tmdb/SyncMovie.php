@@ -13,7 +13,7 @@ use Throwable;
 
 class SyncMovie
 {
-    private const SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 1000000;
+    private const int SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 1000000;
 
     public function __construct(
         private readonly TmdbApi $tmdbApi,

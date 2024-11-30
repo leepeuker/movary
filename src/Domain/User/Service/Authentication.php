@@ -200,16 +200,12 @@ class Authentication
         return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
-    public function isValidToken(string $token) : bool
+    public function isValidAuthToken(string $token) : bool
     {
         $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
 
-        if ($tokenExpirationDate === null) {
-            if($this->repository->findUserByApiToken($token) === null) {
-                return false;
-            }
-        } else {
-            if($tokenExpirationDate->isAfter(DateTime::create()) === false) {
+        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
+            if ($tokenExpirationDate !== null) {
                 $this->repository->deleteAuthToken($token);
                 return false;
             }
@@ -267,14 +263,13 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
-            'expires' => (int)$expirationDate->format('U'),
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'strict'
-        ]);
+        setcookie(
+            self::AUTHENTICATION_COOKIE_NAME,
+            $token,
+            (int)$expirationDate->format('U'),
+            '/',
+            httponly: true,
+        );
 
         $this->sessionWrapper->set('userId', $userId);
     }

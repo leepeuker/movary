@@ -2,7 +2,7 @@
 
 namespace Movary\HttpController\Web\Mapper;
 
-use Movary\Domain\User\Service\UserPageAuthorizationChecker;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Dto\PersonsRequestDto;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
@@ -11,18 +11,18 @@ use RuntimeException;
 
 class PersonsRequestMapper
 {
-    private const DEFAULT_LIMIT = 24;
+    private const int DEFAULT_LIMIT = 24;
 
-    private const DEFAULT_SORT_BY = 'uniqueAppearances';
+    private const string DEFAULT_SORT_BY = 'uniqueAppearances';
 
     public function __construct(
-        private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
+        private readonly UserApi $userApi,
     ) {
     }
 
     public function mapRenderPageRequest(Request $request) : PersonsRequestDto
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser($request);
+        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
         $getParameters = $request->getGetParameters();
 

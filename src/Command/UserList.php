@@ -3,22 +3,22 @@
 namespace Movary\Command;
 
 use Movary\Domain\User\UserApi;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'user:list',
+    description: 'List all existing users.',
+    aliases: ['user:list'],
+    hidden: false,
+)]
 class UserList extends Command
 {
-    protected static $defaultName = 'user:list';
-
     public function __construct(
         private readonly UserApi $userApi,
     ) {
         parent::__construct();
-    }
-
-    protected function configure() : void
-    {
-        $this->setDescription('List all existing users.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter

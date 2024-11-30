@@ -40,6 +40,7 @@ nav:
   - Features:
       - TMDB Data: features/tmdb-data.md
       - IMDb Rating: features/imdb-rating.md
+      - Locations: features/locations.md
       - Plex: features/plex.md
       - Jellyfin: features/jellyfin.md
       - Emby: features/emby.md

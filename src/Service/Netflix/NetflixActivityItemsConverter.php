@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 
 class NetflixActivityItemsConverter
 {
-    private const SHOW_PATTERNS = [
+    private const array SHOW_PATTERNS = [
         // Check for TvShow: Season 1: EpisodeTitle
         "(.+): .+ (\d{1,2}): (.*)",
         // Check for TvShow: Season 1 - Part A: EpisodeTitle

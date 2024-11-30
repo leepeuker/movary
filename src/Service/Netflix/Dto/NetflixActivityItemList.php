@@ -5,8 +5,7 @@ namespace Movary\Service\Netflix\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method NetflixActivityItem[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<NetflixActivityItem>
  */
 class NetflixActivityItemList extends AbstractList
 {

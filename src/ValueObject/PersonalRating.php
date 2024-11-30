@@ -6,7 +6,7 @@ use RuntimeException;
 
 class PersonalRating
 {
-    private const ALLOWED_RATINGS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    private const array ALLOWED_RATINGS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     private function __construct(private readonly int $rating)
     {

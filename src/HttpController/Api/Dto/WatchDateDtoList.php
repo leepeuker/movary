@@ -6,8 +6,7 @@ use Movary\ValueObject\AbstractList;
 use RuntimeException;
 
 /**
- * @method WatchDateDto[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<WatchDateDto>
  */
 class WatchDateDtoList extends AbstractList
 {

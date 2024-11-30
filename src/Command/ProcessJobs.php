@@ -8,15 +8,20 @@ use Movary\Service\JobProcessor;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'jobs:process',
+    description: 'Process job from the queue.',
+    aliases: ['jobs:process'],
+    hidden: false,
+)]
 class ProcessJobs extends Command
 {
-    private const OPTION_NAME_MIN_RUNTIME = 'minRuntime';
-
-    protected static $defaultName = 'jobs:process';
+    private const string OPTION_NAME_MIN_RUNTIME = 'minRuntime';
 
     public function __construct(
         private readonly JobQueue\JobQueueApi $jobApi,
@@ -29,9 +34,7 @@ class ProcessJobs extends Command
 
     protected function configure() : void
     {
-        $this
-            ->setDescription('Process job from the queue.')
-            ->addOption(self::OPTION_NAME_MIN_RUNTIME, 'minRuntime', InputOption::VALUE_REQUIRED, 'Minimum runtime of command.');
+        $this->addOption(self::OPTION_NAME_MIN_RUNTIME, 'minRuntime', InputOption::VALUE_REQUIRED, 'Minimum runtime of command.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
