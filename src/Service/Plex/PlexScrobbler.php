@@ -2,6 +2,7 @@
 
 namespace Movary\Service\Plex;
 
+use DateTime;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\User\UserApi;
@@ -15,9 +16,9 @@ use RuntimeException;
 
 class PlexScrobbler
 {
-    private const MEDIA_RATE = 'media.rate';
+    private const string MEDIA_RATE = 'media.rate';
 
-    private const MEDIA_SCROBBLE = 'media.scrobble';
+    private const string MEDIA_SCROBBLE = 'media.scrobble';
 
     public function __construct(
         private readonly LoggerInterface $logger,
@@ -85,7 +86,7 @@ class PlexScrobbler
             return;
         }
 
-        $dateTime = \DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
+        $dateTime = DateTime::createFromFormat('U', (string)$webHook['Metadata']['lastViewedAt']);
         if ($dateTime === false) {
             throw new RuntimeException('Could not build date time from: ' . $webHook['Metadata']['lastViewedAt']);
         }

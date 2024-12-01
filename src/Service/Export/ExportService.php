@@ -4,14 +4,15 @@ namespace Movary\Service\Export;
 
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
+use RuntimeException;
 
 class ExportService
 {
-    private const CSV_HEADER_HISTORY = 'title,year,tmdbId,imdbId,watchedAt,comment' . PHP_EOL;
+    private const string CSV_HEADER_HISTORY = 'title,year,tmdbId,imdbId,watchedAt,comment,location' . PHP_EOL;
 
-    private const CSV_HEADER_RATINGS = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
+    private const string CSV_HEADER_RATINGS = 'title,year,tmdbId,imdbId,userRating' . PHP_EOL;
 
-    private const CSV_HEADER_WATCHLIST = 'title,year,tmdbId,imdbId,addedAt' . PHP_EOL;
+    private const string CSV_HEADER_WATCHLIST = 'title,year,tmdbId,imdbId,addedAt' . PHP_EOL;
 
     public function __construct(
         private readonly MovieApi $movieApi,
@@ -90,7 +91,7 @@ class ExportService
         $exportFileHandle = fopen($fileName, 'wb');
 
         if ($exportFileHandle === false) {
-            throw new \RuntimeException('Could not create or open export file: ' . $fileName);
+            throw new RuntimeException('Could not create or open export file: ' . $fileName);
         }
 
         return $exportFileHandle;

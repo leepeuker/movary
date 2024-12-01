@@ -2,6 +2,7 @@
 
 namespace Movary\Service\Letterboxd\Service;
 
+use Exception;
 use Movary\Api\Letterboxd\LetterboxdWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
@@ -23,7 +24,7 @@ class LetterboxdMovieFinder
 
         try {
             $tmdbId = $this->webScrapper->scrapeTmdbIdByLetterboxdId($letterboxdId);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
 

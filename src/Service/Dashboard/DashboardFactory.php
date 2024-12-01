@@ -5,6 +5,7 @@ namespace Movary\Service\Dashboard;
 use Movary\Domain\User\UserEntity;
 use Movary\Service\Dashboard\Dto\DashboardRow;
 use Movary\Service\Dashboard\Dto\DashboardRowList;
+use RuntimeException;
 
 class DashboardFactory
 {
@@ -52,10 +53,13 @@ class DashboardFactory
             DashboardRow::createMostWatchedLanguages(),
             DashboardRow::createMostWatchedProductionCompanies(),
             DashboardRow::createMostWatchedReleaseYears(),
-            DashboardRow::createWatchlist()
+            DashboardRow::createWatchlist(),
+            DashboardRow::createTopLocations(),
+            DashboardRow::createLastPlaysCinema(),
         );
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     private function createDashboardRowById(int $rowId, bool $isVisible, bool $isExtended) : DashboardRow
     {
         return match (true) {
@@ -68,8 +72,10 @@ class DashboardFactory
             DashboardRow::createMostWatchedProductionCompanies()->getId() === $rowId => DashboardRow::createMostWatchedProductionCompanies($isVisible, $isExtended),
             DashboardRow::createMostWatchedReleaseYears()->getId() === $rowId => DashboardRow::createMostWatchedReleaseYears($isVisible, $isExtended),
             DashboardRow::createWatchlist()->getId() === $rowId => DashboardRow::createWatchlist($isVisible, $isExtended),
+            DashboardRow::createTopLocations()->getId() === $rowId => DashboardRow::createTopLocations($isVisible, $isExtended),
+            DashboardRow::createLastPlaysCinema()->getId() === $rowId => DashboardRow::createLastPlaysCinema($isVisible, $isExtended),
 
-            default => throw new \RuntimeException('Not supported dashboard row id: ' . $rowId)
+            default => throw new RuntimeException('Not supported dashboard row id: ' . $rowId)
         };
     }
 }

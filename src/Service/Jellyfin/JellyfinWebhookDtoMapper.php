@@ -10,9 +10,9 @@ use RuntimeException;
 
 class JellyfinWebhookDtoMapper
 {
-    private const SUPPORTED_NOTIFICATION_TYPE = 'PlaybackStop';
+    private const string SUPPORTED_NOTIFICATION_TYPE = 'PlaybackStop';
 
-    private const SUPPORTED_ITEM_TYPE = 'Movie';
+    private const string SUPPORTED_ITEM_TYPE = 'Movie';
 
     public function __construct(private readonly LoggerInterface $logger)
     {
@@ -47,7 +47,7 @@ class JellyfinWebhookDtoMapper
     {
         $timestampWithoutMicroseconds = preg_replace('/\.\d+Z/', '', (string)$timestamp);
 
-        $dateTime = \DateTime::createFromFormat('Y-m-d\TH:i:s', (string)$timestampWithoutMicroseconds, new DateTimeZone('UTC'));
+        $dateTime = DateTime::createFromFormat('Y-m-d\TH:i:s', (string)$timestampWithoutMicroseconds, new DateTimeZone('UTC'));
         if ($dateTime === false) {
             throw new RuntimeException('Could not build date time from: ' . $timestamp);
         }

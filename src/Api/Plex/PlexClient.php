@@ -2,6 +2,7 @@
 
 namespace Movary\Api\Plex;
 
+use Exception;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use Movary\Api\Plex\Exception\PlexAuthenticationInvalid;
@@ -12,7 +13,7 @@ use Movary\ValueObject\Url;
 
 abstract class PlexClient
 {
-    protected const DEFAULT_HEADERS = [
+    protected const array DEFAULT_HEADERS = [
         'accept' => 'application/json'
     ];
 
@@ -22,7 +23,7 @@ abstract class PlexClient
     ) {
     }
 
-    protected function convertException(\Exception $e, Url $requestUrl) : \Exception
+    protected function convertException(Exception $e, Url $requestUrl) : Exception
     {
         return match (true) {
             $e->getCode() === 401 => PlexAuthenticationInvalid::create(),

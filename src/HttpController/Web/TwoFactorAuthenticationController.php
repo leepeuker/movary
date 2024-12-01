@@ -7,10 +7,8 @@ use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Movary\ValueObject\Http\StatusCode;
 
 class TwoFactorAuthenticationController
 {

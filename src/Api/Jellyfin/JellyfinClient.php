@@ -2,6 +2,8 @@
 
 namespace Movary\Api\Jellyfin;
 
+use Exception;
+use Generator;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
@@ -16,9 +18,9 @@ use RuntimeException;
 
 class JellyfinClient
 {
-    private const DEFAULT_PAGINATION_LIMIT = 500;
+    private const int DEFAULT_PAGINATION_LIMIT = 500;
 
-    private const DEFAULT_TIMEOUT = 4;
+    private const int DEFAULT_TIMEOUT = 4;
 
     public function __construct(
         private readonly HttpClient $httpClient,
@@ -57,7 +59,7 @@ class JellyfinClient
         return Json::decode((string)$response->getBody());
     }
 
-    public function getPaginated(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null, ?int $timeout = null) : \Generator
+    public function getPaginated(Url $jellyfinServerUrl, ?array $query = [], ?JellyfinAccessToken $jellyfinAccessToken = null, ?int $timeout = null) : Generator
     {
         yield $response = $this->get($jellyfinServerUrl, $query, $jellyfinAccessToken, $timeout);
 
@@ -65,7 +67,7 @@ class JellyfinClient
         $totalMoviesCount = $response['TotalRecordCount'] ?? null;
 
         if ($totalMoviesCount === null) {
-            throw new \RuntimeException('Could not extract total record count from response');
+            throw new RuntimeException('Could not extract total record count from response');
         }
 
         $pages = ceil($totalMoviesCount / $limit);
@@ -97,7 +99,7 @@ class JellyfinClient
         return Json::decode((string)$response->getBody());
     }
 
-    private function convertException(\Exception $e, Url $url) : \Exception
+    private function convertException(Exception $e, Url $url) : Exception
     {
         return match (true) {
             $e->getCode() === 401 || $e->getCode() === 400 => JellyfinInvalidAuthentication::create(),

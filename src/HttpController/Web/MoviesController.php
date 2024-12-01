@@ -24,20 +24,10 @@ class MoviesController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
         $requestData = $this->moviesRequestMapper->mapRenderPageRequest($request);
 
-        $userId = $requestData->getUserId();
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
         $uniqueMovies = $this->movieApi->fetchUniqueWatchedMoviesPaginated(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
@@ -49,10 +39,11 @@ class MoviesController
             $requestData->hasUserRating(),
             $requestData->getUserRatingMin(),
             $requestData->getUserRatingMax(),
+            $requestData->getLocationId(),
         );
 
         $watchedMoviesCount = $this->movieApi->fetchUniqueWatchedMoviesCount(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getSearchTerm(),
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
@@ -60,6 +51,7 @@ class MoviesController
             $requestData->hasUserRating(),
             $requestData->getUserRatingMin(),
             $requestData->getUserRatingMax(),
+            $requestData->getLocationId(),
         );
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchedMoviesCount, $requestData->getLimit(), $requestData->getPage());
 
@@ -76,9 +68,11 @@ class MoviesController
                 'releaseYear' => (string)$requestData->getReleaseYear(),
                 'language' => (string)$requestData->getLanguage(),
                 'genre' => (string)$requestData->getGenre(),
-                'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($userId),
-                'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($userId),
-                'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($userId),
+                'locationId' => $requestData->getLocationId(),
+                'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($requestData->getUserId()),
+                'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($requestData->getUserId()),
+                'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($requestData->getUserId()),
+                'uniqueLocations' => $this->movieApi->fetchUniqueLocations($requestData->getUserId()),
                 'hasUserRating' => $requestData->hasUserRating(),
                 'minUserRating' => $requestData->getUserRatingMin(),
                 'maxUserRating' => $requestData->getUserRatingMax(),

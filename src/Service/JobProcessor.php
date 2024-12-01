@@ -6,10 +6,8 @@ use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
-use Movary\Service\Letterboxd;
 use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\Tmdb\SyncMovies;
-use Movary\Service\Trakt;
 use Movary\Service\Trakt\ImportWatchedMovies;
 use RuntimeException;
 

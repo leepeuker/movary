@@ -2,17 +2,18 @@
 
 namespace Movary\ValueObject;
 
+use JsonSerializable;
 use RuntimeException;
 
-class JobStatus implements \JsonSerializable
+class JobStatus implements JsonSerializable
 {
-    private const STATUS_DONE = 'done';
+    private const string STATUS_DONE = 'done';
 
-    private const STATUS_FAILED = 'failed';
+    private const string STATUS_FAILED = 'failed';
 
-    private const STATUS_IN_PROGRESS = 'in progress';
+    private const string STATUS_IN_PROGRESS = 'in progress';
 
-    private const STATUS_WAITING = 'waiting';
+    private const string STATUS_WAITING = 'waiting';
 
     private function __construct(private readonly string $status)
     {

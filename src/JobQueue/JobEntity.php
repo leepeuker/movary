@@ -2,12 +2,13 @@
 
 namespace Movary\JobQueue;
 
+use JsonSerializable;
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 
-class JobEntity implements \JsonSerializable
+class JobEntity implements JsonSerializable
 {
     private function __construct(
         private readonly int $id,

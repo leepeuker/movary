@@ -2,7 +2,9 @@
 
 namespace Movary\ValueObject\Exception;
 
-class ConfigNotSetException extends \RuntimeException
+use RuntimeException;
+
+class ConfigNotSetException extends RuntimeException
 {
     public static function create(string $key) : self
     {

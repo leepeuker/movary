@@ -7,7 +7,7 @@ use UnexpectedValueException;
 class Request
 {
     private array $routeParameters = [];
-    
+
     private function __construct(
         private readonly string $path,
         private readonly array $getParameters,
@@ -15,7 +15,7 @@ class Request
         private readonly string $body,
         private readonly array $filesParameters,
         private readonly array $headers,
-        private readonly string $userAgent
+        private readonly string $userAgent,
     ) {
     }
 

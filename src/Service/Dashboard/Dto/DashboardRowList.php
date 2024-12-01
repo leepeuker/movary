@@ -5,8 +5,7 @@ namespace Movary\Service\Dashboard\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method DashboardRow[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<DashboardRow>
  */
 class DashboardRowList extends AbstractList
 {

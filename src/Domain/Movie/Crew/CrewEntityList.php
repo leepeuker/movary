@@ -5,8 +5,7 @@ namespace Movary\Domain\Movie\Crew;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method CrewEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<CrewEntity>
  */
 class CrewEntityList extends AbstractList
 {

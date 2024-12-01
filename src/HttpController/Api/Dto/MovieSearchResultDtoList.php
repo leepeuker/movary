@@ -5,19 +5,13 @@ namespace Movary\HttpController\Api\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method MovieSearchResultDto[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<MovieSearchResultDto>
  */
 class MovieSearchResultDtoList extends AbstractList
 {
     public static function create() : self
     {
         return new self();
-    }
-
-    public function set(MovieSearchResultDto $dto) : void
-    {
-        $this->data[$dto->getTmdbId()] = $dto;
     }
 
     public function get(int $tmdbId) : MovieSearchResultDto
@@ -28,5 +22,10 @@ class MovieSearchResultDtoList extends AbstractList
     public function jsonSerialize() : array
     {
         return array_values($this->data);
+    }
+
+    public function set(MovieSearchResultDto $dto) : void
+    {
+        $this->data[$dto->getTmdbId()] = $dto;
     }
 }

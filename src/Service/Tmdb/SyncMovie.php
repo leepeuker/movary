@@ -3,17 +3,17 @@
 namespace Movary\Service\Tmdb;
 
 use Doctrine\DBAL\Connection;
+use Exception;
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\JobQueue\JobQueueScheduler;
-use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class SyncMovie
 {
-    private const SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 1000000;
+    private const int SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 1000000;
 
     public function __construct(
         private readonly TmdbApi $tmdbApi,
@@ -92,7 +92,7 @@ class SyncMovie
             $this->movieApi->updateCrew($movie->getId(), $tmdbMovie->getCredits()->getCrew());
 
             $this->dbConnection->commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->dbConnection->rollBack();
 
             throw $e;

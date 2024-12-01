@@ -2,7 +2,9 @@
 
 namespace Movary\ValueObject\Exception;
 
-class InvalidUrl extends \RuntimeException
+use RuntimeException;
+
+class InvalidUrl extends RuntimeException
 {
     public static function create(string $url) : self
     {

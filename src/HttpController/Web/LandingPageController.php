@@ -2,8 +2,6 @@
 
 namespace Movary\HttpController\Web;
 
-use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;

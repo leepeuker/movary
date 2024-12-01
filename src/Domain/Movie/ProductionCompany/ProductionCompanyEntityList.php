@@ -5,8 +5,7 @@ namespace Movary\Domain\Movie\ProductionCompany;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method ProductionCompanyEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<ProductionCompanyEntity>
  */
 class ProductionCompanyEntityList extends AbstractList
 {

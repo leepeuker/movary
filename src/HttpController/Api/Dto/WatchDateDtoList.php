@@ -3,10 +3,10 @@
 namespace Movary\HttpController\Api\Dto;
 
 use Movary\ValueObject\AbstractList;
+use RuntimeException;
 
 /**
- * @method WatchDateDto[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<WatchDateDto>
  */
 class WatchDateDtoList extends AbstractList
 {
@@ -19,7 +19,7 @@ class WatchDateDtoList extends AbstractList
     {
         foreach ($this as $watchDate) {
             if ($watchDate->getWatchDate() == $dto->getWatchDate()) {
-                throw new \RuntimeException('Watch date must be unique');
+                throw new RuntimeException('Watch date must be unique');
             }
         }
 

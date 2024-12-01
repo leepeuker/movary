@@ -31,7 +31,7 @@ use Psr\Log\LoggerInterface;
  */
 class PlexApi
 {
-    private const BASE_URL = 'https://app.plex.tv/auth#?';
+    private const string BASE_URL = 'https://app.plex.tv/auth#?';
 
     public function __construct(
         private readonly Authentication $authenticationService,

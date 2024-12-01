@@ -17,6 +17,27 @@ class JobQueueApi
         return $this->repository->addJob(JobType::createImdbSync(), $jobStatus);
     }
 
+    public function addJellyfinExportMoviesJob(int $userId, array $movieIds = [], ?JobStatus $jobStatus = null) : int
+    {
+        return $this->repository->addJob(
+            JobType::createJellyfinExportMovies(),
+            $jobStatus ?? JobStatus::createWaiting(),
+            $userId,
+            parameters: [
+                'movieIds' => $movieIds,
+            ],
+        );
+    }
+
+    public function addJellyfinImportMoviesJob(int $userId, ?JobStatus $jobStatus = null) : int
+    {
+        return $this->repository->addJob(
+            JobType::createJellyfinImportMovies(),
+            $jobStatus ?? JobStatus::createWaiting(),
+            $userId,
+        );
+    }
+
     public function addLetterboxdImportHistoryJob(int $userId, string $importFile) : void
     {
         $this->repository->addJob(JobType::createLetterboxdImportHistory(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
@@ -47,27 +68,6 @@ class JobQueueApi
     public function addTmdbMovieSyncJob(JobStatus $jobStatus) : int
     {
         return $this->repository->addJob(JobType::createTmdbMovieSync(), $jobStatus);
-    }
-
-    public function addJellyfinExportMoviesJob(int $userId, array $movieIds = [], ?JobStatus $jobStatus = null) : int
-    {
-        return $this->repository->addJob(
-            JobType::createJellyfinExportMovies(),
-            $jobStatus ?? JobStatus::createWaiting(),
-            $userId,
-            parameters: [
-                'movieIds' => $movieIds,
-            ],
-        );
-    }
-
-    public function addJellyfinImportMoviesJob(int $userId, ?JobStatus $jobStatus = null) : int
-    {
-        return $this->repository->addJob(
-            JobType::createJellyfinImportMovies(),
-            $jobStatus ?? JobStatus::createWaiting(),
-            $userId,
-        );
     }
 
     public function addTmdbPersonSyncJob(JobStatus $createDone) : int

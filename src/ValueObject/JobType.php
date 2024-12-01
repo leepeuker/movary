@@ -2,31 +2,32 @@
 
 namespace Movary\ValueObject;
 
+use JsonSerializable;
 use RuntimeException;
 
-class JobType implements \JsonSerializable
+class JobType implements JsonSerializable
 {
-    private const TYPE_TMDB_PERSON_SYNC = 'tmdb_person_sync';
+    private const string TYPE_TMDB_PERSON_SYNC = 'tmdb_person_sync';
 
-    private const TYPE_IMDB_SYNC = 'imdb_sync';
+    private const string TYPE_IMDB_SYNC = 'imdb_sync';
 
-    private const TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
+    private const string TYPE_LETTERBOXD_IMPORT_HISTORY = 'letterboxd_import_history';
 
-    private const TYPE_JELLYFIN_EXPORT_HISTORY = 'jellyfin_export_history';
+    private const string TYPE_JELLYFIN_EXPORT_HISTORY = 'jellyfin_export_history';
 
-    private const TYPE_JELLYFIN_IMPORT_HISTORY = 'jellyfin_import_history';
+    private const string TYPE_JELLYFIN_IMPORT_HISTORY = 'jellyfin_import_history';
 
-    private const TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
+    private const string TYPE_LETTERBOXD_IMPORT_RATINGS = 'letterboxd_import_ratings';
 
-    private const TYPE_TMDB_IMAGE_CACHE = 'tmdb_image_cache';
+    private const string TYPE_TMDB_IMAGE_CACHE = 'tmdb_image_cache';
 
-    private const TYPE_TMDB_MOVIE_SYNC = 'tmdb_movie_sync';
+    private const string TYPE_TMDB_MOVIE_SYNC = 'tmdb_movie_sync';
 
-    private const TYPE_TRAKT_IMPORT_HISTORY = 'trakt_import_history';
+    private const string TYPE_TRAKT_IMPORT_HISTORY = 'trakt_import_history';
 
-    private const TYPE_TRAKT_IMPORT_RATINGS = 'trakt_import_ratings';
+    private const string TYPE_TRAKT_IMPORT_RATINGS = 'trakt_import_ratings';
 
-    private const TYPE_PLEX_IMPORT_WATCHLIST = 'plex_import_watchlist';
+    private const string TYPE_PLEX_IMPORT_WATCHLIST = 'plex_import_watchlist';
 
     private function __construct(private readonly string $type)
     {

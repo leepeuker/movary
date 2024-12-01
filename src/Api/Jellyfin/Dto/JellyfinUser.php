@@ -6,7 +6,7 @@ class JellyfinUser
 {
     private function __construct(
         private readonly JellyfinUserId $jellyfinUserId,
-        private readonly string $jellyfinUsername
+        private readonly string $jellyfinUsername,
     ) {
     }
 

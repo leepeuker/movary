@@ -2,7 +2,9 @@
 
 namespace Movary\HttpController\Api\Dto;
 
-class PlayedEntryDto implements \JsonSerializable
+use JsonSerializable;
+
+class PlayedEntryDto implements JsonSerializable
 {
     public function __construct(
         private readonly MovieDto $movieDto,

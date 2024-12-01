@@ -7,6 +7,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use RuntimeException;
 use Twig\Environment;
 
 class MovieWatchProviderController
@@ -35,7 +36,7 @@ class MovieWatchProviderController
             $streamType === 'abo' => $watchProviders->getFlatrateProviders(),
             $streamType === 'buy' => $watchProviders->getBuyProviders(),
             $streamType === 'all' => $watchProviders->getAll(),
-            default => throw new \RuntimeException('Not supported stream type: ' . $streamType)
+            default => throw new RuntimeException('Not supported stream type: ' . $streamType)
         };
 
         return Response::create(

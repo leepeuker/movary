@@ -6,10 +6,11 @@ use Doctrine\DBAL\Connection;
 use League\Csv\Writer;
 use Movary\Util\File;
 use Movary\ValueObject\DateTime;
+use Traversable;
 
 class LetterboxdExporter
 {
-    private const LIMIT_CSV_FILE_RECORDS = 1000;
+    private const int LIMIT_CSV_FILE_RECORDS = 1000;
 
     public function __construct(
         private readonly Connection $dbConnection,
@@ -17,7 +18,7 @@ class LetterboxdExporter
     ) {
     }
 
-    public function generateCsvFiles(int $userId) : \Traversable
+    public function generateCsvFiles(int $userId) : Traversable
     {
         $stmt = $this->dbConnection->executeQuery(
             'SELECT m.title, m.release_date, m.tmdb_id, mw.watched_at, mur.rating

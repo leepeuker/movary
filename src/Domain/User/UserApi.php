@@ -109,7 +109,7 @@ class UserApi
         $jellyfinUserId = $this->repository->findJellyfinUserId($userId);
 
         if ($jellyfinUserId === null) {
-            throw new \RuntimeException('Missing jellyfin user id.');
+            throw new RuntimeException('Missing jellyfin user id.');
         }
 
         return JellyfinUserId::create($jellyfinUserId);
@@ -121,6 +121,17 @@ class UserApi
 
         if ($user === null) {
             throw new RuntimeException('User does not exist with id : ' . $userId);
+        }
+
+        return $user;
+    }
+
+    public function fetchUserByName(string $name) : UserEntity
+    {
+        $user = $this->findUserByName($name);
+
+        if ($user === null) {
+            throw new RuntimeException('There is no user with name: ' . $name);
         }
 
         return $user;
@@ -211,17 +222,6 @@ class UserApi
         return $this->repository->findUserByName($name);
     }
 
-    public function fetchUserByName(string $name) : UserEntity
-    {
-        $user = $this->findUserByName($name);
-
-        if ($user === null) {
-            throw new RuntimeException('There is no user with name: ' . $name);
-        }
-
-        return $user;
-    }
-
     public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByEmbyWebhookId($webhookId);
@@ -257,6 +257,11 @@ class UserApi
     public function hasUsers() : bool
     {
         return $this->repository->getCountOfUsers() > 0;
+    }
+
+    public function isLocationsEnabled(int $userId) : bool
+    {
+        return $this->repository->isLocationsEnabled($userId);
     }
 
     public function isValidPassword(int $userId, string $password) : bool
@@ -321,6 +326,11 @@ class UserApi
         $this->repository->updateDateFormatId($userId, $dateFormat);
     }
 
+    public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
+    {
+        $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
+    }
+
     public function updateEmail(int $userId, string $email) : void
     {
         $this->userValidator->ensureEmailIsUnique($email, $userId);
@@ -331,11 +341,6 @@ class UserApi
     public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->repository->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
-    }
-
-    public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
-    {
-        $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
     }
 
     public function updateExtendedDashboardRows(int $userId, ?string $extendedRows) : void
@@ -370,6 +375,11 @@ class UserApi
     public function updateJellyfinSyncEnabled(int $userId, bool $enabledSync) : void
     {
         $this->repository->updateJellyfinSyncEnabled($userId, $enabledSync);
+    }
+
+    public function updateLocationsEnabled(int $userId, bool $locationsEnabled) : void
+    {
+        $this->repository->updateLocationsEnabled($userId, $locationsEnabled);
     }
 
     public function updateName(int $userId, string $name) : void

@@ -8,7 +8,7 @@ use RuntimeException;
 
 class CompanyRepository
 {
-    private const TABLE_NAME = 'company';
+    private const string TABLE_NAME = 'company';
 
     public function __construct(private readonly Connection $dbConnection)
     {
