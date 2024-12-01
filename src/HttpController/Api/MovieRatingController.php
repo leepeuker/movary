@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Movary\HttpController\Web\Movie;
+namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
@@ -22,12 +22,15 @@ class MovieRatingController
 
     public function fetchMovieRatingByTmdbdId(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->getUserIdByApiToken($request);
         $tmdbId = $request->getGetParameters()['tmdbId'] ?? null;
 
         $userRating = null;
         $movie = $this->movieApi->findByTmdbId((int)$tmdbId);
 
+        if($userId === null) {
+            return Response::createForbidden();
+        }
         if ($movie !== null) {
             $userRating = $this->movieApi->findUserRating($movie->getId(), $userId);
         }
@@ -39,7 +42,10 @@ class MovieRatingController
 
     public function updateRating(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->getUserIdByApiToken($request);
+        if($userId === null) {
+            return Response::createForbidden();
+        }
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
@@ -47,14 +53,14 @@ class MovieRatingController
 
         $movieId = (int)$request->getRouteParameters()['id'];
 
-        $postParameters = $request->getPostParameters();
+        $postParameters = Json::decode($request->getBody());
 
         $personalRating = null;
         if (empty($postParameters['rating']) === false && $postParameters['rating'] !== 0) {
             $personalRating = PersonalRating::create((int)$postParameters['rating']);
         }
 
-        $this->movieApi->updateUserRating($movieId, $this->authenticationService->getCurrentUserId(), $personalRating);
+        $this->movieApi->updateUserRating($movieId, $userId, $personalRating);
 
         return Response::create(StatusCode::createNoContent());
     }
