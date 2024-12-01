@@ -21,8 +21,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('GET', '/create-user', [Web\CreateUserController::class, 'renderPage'], [
         Web\Middleware\UserIsUnauthenticated::class,
-        Web\Middleware\ServerHasUsers::class,
-        Web\Middleware\ServerHasRegistrationEnabled::class
+        Api\Middleware\CreateUserMiddleware::class
     ]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
 
