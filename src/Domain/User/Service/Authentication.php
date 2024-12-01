@@ -34,6 +34,9 @@ class Authentication
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
         $authenticationMethod = AuthenticationObject::COOKIE_AUTHENTICATION;
+        /**
+         * @psalm-suppress RedundantCast
+         */
         if (empty($token) === true || $this->isValidToken((string)$token) === false) {
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
@@ -255,6 +258,9 @@ class Authentication
         $token = filter_input(INPUT_COOKIE, 'id');
 
         if ($token !== null) {
+            /**
+             * @psalm-suppress RedundantCast
+             */
             $this->deleteToken((string)$token);
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
