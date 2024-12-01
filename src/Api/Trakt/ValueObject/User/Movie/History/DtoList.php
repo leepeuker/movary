@@ -5,8 +5,7 @@ namespace Movary\Api\Trakt\ValueObject\User\Movie\History;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method Dto[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<Dto>
  */
 class DtoList extends AbstractList
 {

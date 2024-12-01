@@ -33,7 +33,7 @@ class File
         $tempFileName = tempnam(sys_get_temp_dir(), 'movary');
 
         if ($tempFileName === false) {
-            throw new \RuntimeException('Could not create tmp file.');
+            throw new RuntimeException('Could not create tmp file.');
         }
 
         return $tempFileName;
@@ -94,7 +94,7 @@ class File
         $fileContent = file_get_contents($fileName);
 
         if ($fileContent === false) {
-            throw new \RuntimeException('Could not read file: ' . $fileName);
+            throw new RuntimeException('Could not read file: ' . $fileName);
         }
 
         return $fileContent;

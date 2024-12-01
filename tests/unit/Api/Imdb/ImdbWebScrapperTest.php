@@ -27,63 +27,63 @@ class ImdbWebScrapperTest extends TestCase
     {
         return [
             [
-                'cMEQkK">7.9</span>
-                gPVQxL">229.240</div>',
+                'imUuxf">7.9</span>
+                dwhNqC">229.240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             'returns no rating if current production status is found' => [
                 'hjAonB">Post-production
-                cMEQkK">7.9</span>
-                gPVQxL">229.240</div>',
+                imUuxf">7.9</span>
+                dwhNqC">229.240</div>',
                 null,
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">229,240</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">229,240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">229240</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">229240</div>',
                 ImdbRating::create(7.9, 229240)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">1.229,240</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">1.229,240</div>',
                 ImdbRating::create(7.9, 1229240)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">40</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">40</div>',
                 ImdbRating::create(7.9, 40)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">40K</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">40K</div>',
                 ImdbRating::create(7.9, 40000)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">4.1K</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">4.1K</div>',
                 ImdbRating::create(7.9, 4100)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">14.12K</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">14.12K</div>',
                 ImdbRating::create(7.9, 14120)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">10M</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">10M</div>',
                 ImdbRating::create(7.9, 10000000)
             ],
             [
-                'cMEQkK">7,9</span>
-                gPVQxL">10.1M</div>',
+                'imUuxf">7,9</span>
+                dwhNqC">10.1M</div>',
                 ImdbRating::create(7.9, 10100000)
             ],
             [
-                'cMEQkK">7,9</span>',
+                'imUuxf">7,9</span>',
                 null
             ],
             [

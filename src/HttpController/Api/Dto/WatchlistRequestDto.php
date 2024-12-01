@@ -69,6 +69,11 @@ class WatchlistRequestDto
         return $this->releaseYear;
     }
 
+    public function getRequestedUserId() : int
+    {
+        return $this->requestedUserId;
+    }
+
     public function getSearchTerm() : ?string
     {
         return $this->searchTerm;
@@ -82,10 +87,5 @@ class WatchlistRequestDto
     public function getSortOrder() : SortOrder
     {
         return $this->sortOrder;
-    }
-
-    public function getRequestedUserId() : int
-    {
-        return $this->requestedUserId;
     }
 }

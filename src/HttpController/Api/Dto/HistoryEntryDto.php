@@ -2,9 +2,10 @@
 
 namespace Movary\HttpController\Api\Dto;
 
+use JsonSerializable;
 use Movary\ValueObject\Date;
 
-class HistoryEntryDto implements \JsonSerializable
+class HistoryEntryDto implements JsonSerializable
 {
     public function __construct(
         private readonly MovieDto $movieDto,

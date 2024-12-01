@@ -8,7 +8,7 @@ use Movary\ValueObject\SortOrder;
 class PersonsRequestDto
 {
     private function __construct(
-        private readonly ?int $userId,
+        private readonly int $userId,
         private readonly ?string $searchTerm,
         private readonly int $page,
         private readonly int $limit,
@@ -19,7 +19,7 @@ class PersonsRequestDto
     }
 
     public static function createFromParameters(
-        ?int $userId,
+        int $userId,
         ?string $searchTerm,
         int $page,
         int $limit,
@@ -34,7 +34,7 @@ class PersonsRequestDto
             $limit,
             $sortBy,
             $sortOrder,
-            $gender
+            $gender,
         );
     }
 
@@ -68,7 +68,7 @@ class PersonsRequestDto
         return $this->sortOrder;
     }
 
-    public function getUserId() : ?int
+    public function getUserId() : int
     {
         return $this->userId;
     }

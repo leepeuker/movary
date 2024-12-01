@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 
 class JellyfinCache
 {
-    private const DEFAULT_HTTP_HEADERS = [
+    private const array DEFAULT_HTTP_HEADERS = [
         'Recursive' => 'true',
         'IncludeItemTypes' => 'Movie',
         'hasTmdbId' => 'true',
@@ -36,18 +36,18 @@ class JellyfinCache
         $this->repository->delete($userId);
     }
 
-    public function fetchJellyfinPlayedMovies(int $userId) : JellyfinMovieDtoList
-    {
-        $this->loadFromJellyfin($userId);
-
-        return $this->repository->fetchJellyfinPlayedMovies($userId);
-    }
-
     public function fetchJellyfinMoviesByTmdbIds(int $userId, array $tmdbIds) : JellyfinMovieDtoList
     {
         $this->loadFromJellyfin($userId);
 
         return $this->repository->fetchJellyfinMoviesByTmdbIds($userId, $tmdbIds);
+    }
+
+    public function fetchJellyfinPlayedMovies(int $userId) : JellyfinMovieDtoList
+    {
+        $this->loadFromJellyfin($userId);
+
+        return $this->repository->fetchJellyfinPlayedMovies($userId);
     }
 
     public function loadFromJellyfin(int $userId) : void

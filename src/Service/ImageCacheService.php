@@ -2,6 +2,7 @@
 
 namespace Movary\Service;
 
+use DirectoryIterator;
 use Doctrine\DBAL\Connection;
 use GuzzleHttp\Psr7\Request;
 use Movary\Util\File;
@@ -13,7 +14,7 @@ use RuntimeException;
 
 class ImageCacheService
 {
-    private const CACHE_DIR_PERMISSIONS = 0755;
+    private const int CACHE_DIR_PERMISSIONS = 0755;
 
     public function __construct(
         private readonly File $fileUtil,
@@ -75,7 +76,7 @@ class ImageCacheService
 
     public function deleteOutdatedImagesByResourceType(ResourceType $resourceType) : int
     {
-        $iterator = new \DirectoryIterator($this->generateStorageDirectory($resourceType));
+        $iterator = new DirectoryIterator($this->generateStorageDirectory($resourceType));
 
         $deletionCounter = 0;
 
@@ -112,7 +113,7 @@ class ImageCacheService
             $resourceType->isMovie() => 'movie',
             $resourceType->isPerson() => 'person',
 
-            default => throw new \RuntimeException('Not handled resource type: ' . $resourceType)
+            default => throw new RuntimeException('Not handled resource type: ' . $resourceType)
         };
 
         return $this->publicDirectory . trim($this->imageBasePath, '/') . '/' . $pathId . '/';
@@ -123,7 +124,7 @@ class ImageCacheService
         $imageUrlPath = $imageUrl->getPath();
 
         if ($imageUrlPath == null) {
-            throw new \RuntimeException('Could not get url path from image url: ' . $imageUrl);
+            throw new RuntimeException('Could not get url path from image url: ' . $imageUrl);
         }
 
         $imageFileExtension = pathinfo($imageUrlPath, PATHINFO_EXTENSION);

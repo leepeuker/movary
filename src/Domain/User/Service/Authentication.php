@@ -17,9 +17,9 @@ use RuntimeException;
 
 class Authentication
 {
-    private const AUTHENTICATION_COOKIE_NAME = 'id';
+    private const string AUTHENTICATION_COOKIE_NAME = 'id';
 
-    private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
+    private const int MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
     public function __construct(
         private readonly UserRepository $repository,
@@ -84,10 +84,10 @@ class Authentication
     public function getCurrentUserId() : int
     {
         $userId = $this->sessionWrapper->find('userId');
-        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        $token = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
-        if ($userId === null && $token !== null) {
-            $userId = $this->repository->findUserIdByAuthToken((string)$token);
+        if ($userId === null && $token !== '') {
+            $userId = $this->repository->findUserIdByAuthToken($token);
             $this->sessionWrapper->set('userId', $userId);
         }
 
@@ -100,12 +100,12 @@ class Authentication
 
     public function getToken(Request $request) : ?string
     {
-        $tokenInCookie = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
-        if ($tokenInCookie !== false && $tokenInCookie !== null) {
+        $tokenInCookie = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        if ($tokenInCookie !== '') {
             return $tokenInCookie;
         }
 
-        return $request->getHeaders()['X-Auth-Token'] ?? null;
+        return $request->getHeaders()['X-Movary-Token'] ?? null;
     }
 
     public function getUserIdByApiToken(Request $request) : ?int
@@ -115,14 +115,18 @@ class Authentication
             return null;
         }
 
+        if ($this->isValidAuthToken($apiToken) === false) {
+            return null;
+        }
+
         return $this->userApi->findByToken($apiToken)?->getId();
     }
 
     public function isUserAuthenticatedWithCookie() : bool
     {
-        $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        $token = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
 
-        if (empty($token) === false && $this->isValidAuthToken((string)$token) === true) {
+        if ($token !== '' && $this->isValidAuthToken($token) === true) {
             return true;
         }
 
@@ -136,32 +140,19 @@ class Authentication
 
     public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
     {
-        $userId = $this->getUserIdByApiToken($request);
+        $requestUserId = $this->getUserIdByApiToken($request);
 
-        $privacyLevel = $targetUser->getPrivacyLevel();
-
-        if ($privacyLevel === 2) {
-            return true;
-        }
-
-        if ($privacyLevel === 1 && $userId !== null) {
-            return true;
-        }
-
-        return $targetUser->getId() === $userId;
+        return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
-    public function isUserPageVisibleForCurrentUser(int $privacyLevel, int $userId) : bool
+    public function isUserPageVisibleForWebRequest(UserEntity $targetUser) : bool
     {
-        if ($privacyLevel === 2) {
-            return true;
+        $requestUserId = null;
+        if ($this->isUserAuthenticatedWithCookie() === true) {
+            $requestUserId = $this->getCurrentUserId();
         }
 
-        if ($privacyLevel === 1 && $this->isUserAuthenticatedWithCookie() === true) {
-            return true;
-        }
-
-        return $this->isUserAuthenticatedWithCookie() === true && $this->getCurrentUserId() === $userId;
+        return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
     public function isValidAuthToken(string $token) : bool
@@ -212,10 +203,10 @@ class Authentication
 
     public function logout() : void
     {
-        $token = filter_input(INPUT_COOKIE, 'id');
+        $token = (string)filter_input(INPUT_COOKIE, 'id');
 
-        if ($token !== null) {
-            $this->deleteToken((string)$token);
+        if ($token !== '') {
+            $this->deleteToken($token);
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
         }
@@ -228,16 +219,30 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
-            'expires' => (int)$expirationDate->format('U'),
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'strict'
-        ]);
+        setcookie(
+            self::AUTHENTICATION_COOKIE_NAME,
+            $token,
+            (int)$expirationDate->format('U'),
+            '/',
+            httponly: true,
+        );
 
         $this->sessionWrapper->set('userId', $userId);
+    }
+
+    private function isUserPageVisibleForUser(UserEntity $targetUser, ?int $requestUserId) : bool
+    {
+        $privacyLevel = $targetUser->getPrivacyLevel();
+
+        if ($privacyLevel === 2) {
+            return true;
+        }
+
+        if ($privacyLevel === 1 && $requestUserId !== null) {
+            return true;
+        }
+
+        return $targetUser->getId() === $requestUserId;
     }
 
     private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string

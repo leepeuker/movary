@@ -5,14 +5,19 @@ namespace Movary\Command;
 use Exception;
 use Movary\Service\Export\ExportService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'user:export:history',
+    description: 'Export the history of a user as a csv file.',
+    aliases: ['user:export:history'],
+    hidden: false,
+)]
 class UserHistoryExport extends Command
 {
-    protected static $defaultName = 'user:export:history';
-
     public function __construct(
         private readonly ExportService $exportService,
         private readonly LoggerInterface $logger,
@@ -23,7 +28,6 @@ class UserHistoryExport extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Export the history of a user as a csv file.')
             ->addArgument('userId', InputArgument::REQUIRED, 'Id of user to export the history from.')
             ->addArgument('exportFilename', InputArgument::OPTIONAL, 'A full qualified file name for the export csv.', null);
     }

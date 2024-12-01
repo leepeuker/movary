@@ -6,15 +6,14 @@ use Exception;
 use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
-use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
 class ImdbMovieRatingSync
 {
-    private const DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS = 1000000;
+    private const int DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS = 1000000;
 
-    private const SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 2000000;
+    private const int SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 2000000;
 
     public function __construct(
         private readonly ImdbWebScrapper $imdbWebScrapper,
@@ -72,7 +71,7 @@ class ImdbMovieRatingSync
         ?int $movieCountSyncThreshold = null,
         array $movieIds = null,
         int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
-        bool $onlyNeverSynced = false
+        bool $onlyNeverSynced = false,
     ) : void {
         $movieIds = $this->movieApi->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold, $movieIds, $onlyNeverSynced);
 

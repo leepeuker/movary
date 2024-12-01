@@ -2,9 +2,9 @@
 
 namespace Movary\HttpController\Api\Middleware;
 
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Request;
-use Movary\Domain\User\Service\Authentication;
 use Movary\ValueObject\Http\Response;
 
 class IsAuthorizedToReadUserData implements MiddlewareInterface
@@ -17,7 +17,9 @@ class IsAuthorizedToReadUserData implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
-        $requestedUser = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        $requestedUsername = (string)$request->getRouteParameters()['username'];
+
+        $requestedUser = $this->userApi->findUserByName($requestedUsername);
         if ($requestedUser === null) {
             return Response::createNotFound();
         }

@@ -6,29 +6,29 @@ use RuntimeException;
 
 class Gender
 {
-    private const GENDER_ABBREVIATION = [
+    private const array GENDER_ABBREVIATION = [
         self::GENDER_FEMALE => 'f',
         self::GENDER_MALE => 'm',
         self::GENDER_NON_BINARY => 'nb',
         self::GENDER_UNKNOWN => null,
     ];
 
-    private const GENDER_TEXT = [
+    private const array GENDER_TEXT = [
         self::GENDER_FEMALE => 'Female',
         self::GENDER_MALE => 'Male',
         self::GENDER_NON_BINARY => 'Non Binary',
         self::GENDER_UNKNOWN => 'Unknown',
     ];
 
-    private const GENDER_FEMALE = 1;
+    private const int GENDER_FEMALE = 1;
 
-    private const GENDER_MALE = 2;
+    private const int GENDER_MALE = 2;
 
-    private const GENDER_NON_BINARY = 3;
+    private const int GENDER_NON_BINARY = 3;
 
-    private const GENDER_UNKNOWN = 0;
+    private const int GENDER_UNKNOWN = 0;
 
-    private const VALID_GENDERS = [self::GENDER_FEMALE, self::GENDER_MALE, self::GENDER_NON_BINARY, self::GENDER_UNKNOWN];
+    private const array VALID_GENDERS = [self::GENDER_FEMALE, self::GENDER_MALE, self::GENDER_NON_BINARY, self::GENDER_UNKNOWN];
 
     private function __construct(private readonly int $gender)
     {
@@ -75,7 +75,7 @@ class Gender
     public function getText() : string
     {
         if (isset(self::GENDER_TEXT[$this->asInt()]) === false) {
-            throw new \RuntimeException('Could not get text for gender with id: ' . $this->asInt());
+            throw new RuntimeException('Could not get text for gender with id: ' . $this->asInt());
         }
 
         return self::GENDER_TEXT[$this->asInt()];

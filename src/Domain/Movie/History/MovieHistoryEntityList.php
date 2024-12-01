@@ -5,8 +5,7 @@ namespace Movary\Domain\Movie\History;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method MovieHistoryEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<MovieHistoryEntity>
  */
 class MovieHistoryEntityList extends AbstractList
 {

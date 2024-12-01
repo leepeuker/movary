@@ -2,6 +2,7 @@
 
 namespace Movary\Service\Plex;
 
+use Exception;
 use Movary\Api\Plex\Exception\PlexAuthenticationMissing;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\Movie\MovieApi;
@@ -51,7 +52,7 @@ class PlexWatchlistImporter
                 $this->importPlexWatchlistMovie($userId, (int)$tmdbId, $timestamp);
 
                 $timestamp = $timestamp->subSeconds(1); // To prevent movies having the same timestamp which causes sorting issues
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logger->warning(
                     'Could not import plex watchlist movie: ' . $e->getMessage(),
                     [

@@ -26,11 +26,6 @@ class DirectorsController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userPageAuthorizationChecker->findUserIdIfCurrentVisitorIsAllowedToSeeUser((string)$request->getRouteParameters()['username']);
-        if ($userId === null) {
-            return Response::createNotFound();
-        }
-
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
         $currentUserId = null;
@@ -41,7 +36,7 @@ class DirectorsController
         $personFilterUserId = $requestData->getSortBy() !== 'name' ? $currentUserId : null;
 
         $directors = $this->movieHistoryApi->fetchDirectors(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
             $requestData->getSearchTerm(),
@@ -52,7 +47,7 @@ class DirectorsController
         );
 
         $directorsCount = $this->movieHistoryApi->fetchDirectorsCount(
-            $userId,
+            $requestData->getUserId(),
             $requestData->getSearchTerm(),
             $requestData->getGender(),
             personFilterUserId: $personFilterUserId,
@@ -70,7 +65,7 @@ class DirectorsController
                 'sortBy' => $requestData->getSortBy(),
                 'sortOrder' => (string)$requestData->getSortOrder(),
                 'filterGender' => (string)$requestData->getGender(),
-                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueDirectorsGenders($userId)
+                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueDirectorsGenders($requestData->getUserId())
             ]),
         );
     }

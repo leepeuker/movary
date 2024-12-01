@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Util\SessionWrapper;
+use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
 class StartSession implements MiddlewareInterface
@@ -12,7 +13,8 @@ class StartSession implements MiddlewareInterface
     ) {
     }
 
-    public function __invoke() : ?Response
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+    public function __invoke(Request $request) : ?Response
     {
         $this->sessionWrapper->start();
 

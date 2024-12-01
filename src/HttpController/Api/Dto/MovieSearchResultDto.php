@@ -2,9 +2,10 @@
 
 namespace Movary\HttpController\Api\Dto;
 
+use JsonSerializable;
 use Movary\ValueObject\Date;
 
-class MovieSearchResultDto implements \JsonSerializable
+class MovieSearchResultDto implements JsonSerializable
 {
     public function __construct(
         private readonly int $tmdbId,

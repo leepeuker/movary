@@ -5,8 +5,7 @@ namespace Movary\JobQueue;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method JobEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<JobEntity>
  */
 class JobEntityList extends AbstractList
 {
