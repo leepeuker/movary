@@ -5,6 +5,7 @@ namespace Movary\HttpController\Api\Middleware;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Middleware\MiddlewareInterface;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\Request;
 
 class CreateUserMiddleware implements MiddlewareInterface
 {
@@ -14,7 +15,7 @@ class CreateUserMiddleware implements MiddlewareInterface
     ) {
     }
 
-    public function __invoke() : ?Response
+    public function __invoke(Request $request) : ?Response
     {
         if ($this->registrationEnabled === false && $this->userApi->hasUsers() === true) {
             return Response::createForbidden();
