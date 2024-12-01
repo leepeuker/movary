@@ -57,7 +57,7 @@ class DirectorsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/directors.html.twig', [
-                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
+                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor($request),
                 'mostWatchedDirectors' => $directors,
                 'paginationElements' => $paginationElements,
                 'searchTerm' => $requestData->getSearchTerm(),

@@ -43,7 +43,7 @@ class DashboardController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/dashboard.html.twig', [
-                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
+                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor($request),
                 'totalPlayCount' => $this->movieApi->fetchTotalPlayCount($userId),
                 'uniqueMoviesCount' => $this->movieApi->fetchTotalPlayCountUnique($userId),
                 'totalHoursWatched' => $this->movieHistoryApi->fetchTotalHoursWatched($userId),
