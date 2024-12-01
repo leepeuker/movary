@@ -4,24 +4,24 @@ namespace Movary\Command;
 
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'tmdb:imageCache:delete',
+    description: 'Delete cached images from themoviedb.org',
+    aliases: ['tmdb:imageCache:delete'],
+    hidden: false,
+)]
 class TmdbImageCacheDelete extends Command
 {
-    protected static $defaultName = 'tmdb:imageCache:delete';
-
     public function __construct(
         private readonly TmdbImageCache $imageCacheService,
         private readonly LoggerInterface $logger,
     ) {
         parent::__construct();
-    }
-
-    protected function configure() : void
-    {
-        $this->setDescription('Delete cached images from themoviedb.org');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter

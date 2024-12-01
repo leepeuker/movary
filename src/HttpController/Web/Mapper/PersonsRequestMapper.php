@@ -11,9 +11,9 @@ use RuntimeException;
 
 class PersonsRequestMapper
 {
-    private const DEFAULT_LIMIT = 24;
+    private const int DEFAULT_LIMIT = 24;
 
-    private const DEFAULT_SORT_BY = 'uniqueAppearances';
+    private const string DEFAULT_SORT_BY = 'uniqueAppearances';
 
     public function __construct(
         private readonly UserApi $userApi,

@@ -5,8 +5,7 @@ namespace Movary\Domain\Company;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method CompanyEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<CompanyEntity>
  */
 class CompanyEntityList extends AbstractList
 {

@@ -10,7 +10,7 @@ use Movary\Domain\User\UserRepository;
 
 class Validator
 {
-    private const PASSWORD_MIN_LENGTH = 8;
+    private const int PASSWORD_MIN_LENGTH = 8;
 
     public function __construct(private readonly UserRepository $repository)
     {

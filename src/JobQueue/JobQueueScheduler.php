@@ -4,7 +4,7 @@ namespace Movary\JobQueue;
 
 class JobQueueScheduler
 {
-    private const IMAGE_CACHE_BATCH_LIMIT = 250;
+    private const int IMAGE_CACHE_BATCH_LIMIT = 250;
 
     public function __construct(
         private readonly JobQueueApi $jobQueueApi,

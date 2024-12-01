@@ -24,13 +24,20 @@ class MovieHistoryApi
     ) {
     }
 
-    public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?int $position = null, ?string $comment = null) : void
-    {
+    public function create(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        int $plays,
+        ?int $position = null,
+        ?string $comment = null,
+        ?int $locationId = null,
+    ) : void {
         if ($position === null) {
             $position = $this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt);
         }
 
-        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1);
+        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1, $locationId);
 
         if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
             return;
@@ -197,6 +204,13 @@ class MovieHistoryApi
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
     }
 
+    public function fetchLastPlaysCinema(int $userId) : array
+    {
+        $lastPlays = $this->movieRepository->fetchLastPlaysCinema($userId);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($lastPlays);
+    }
+
     public function fetchMostWatchedActorsCount(int $userId, ?string $searchTerm = null, ?Gender $gender = null, ?int $personFilterUserId = null) : int
     {
         return $this->movieRepository->fetchActorsCount($userId, $searchTerm, $gender, $personFilterUserId);
@@ -258,6 +272,7 @@ class MovieHistoryApi
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
+        ?int $locationId = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -276,6 +291,7 @@ class MovieHistoryApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -300,6 +316,11 @@ class MovieHistoryApi
     public function fetchTmdbIdsWithoutWatchDateByUserId(int $userId, array $movieIds) : array
     {
         return $this->movieRepository->fetchTmdbIdsWithoutWatchDateByUserId($userId, $movieIds);
+    }
+
+    public function fetchTopLocations(int $userId) : array
+    {
+        return $this->movieRepository->fetchTopLocations($userId);
     }
 
     public function fetchTotalHoursWatched(int $userId) : int
@@ -362,6 +383,11 @@ class MovieHistoryApi
         return $uniqueDirectorsGendersEnriched;
     }
 
+    public function fetchUniqueLocations(int $userId) : array
+    {
+        return $this->movieRepository->fetchUniqueLocations($userId);
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->movieRepository->fetchUniqueMovieGenres($userId);
@@ -400,6 +426,7 @@ class MovieHistoryApi
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
+        ?int $locationId = null,
     ) : int {
         return $this->movieRepository->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -410,6 +437,7 @@ class MovieHistoryApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 
@@ -426,6 +454,7 @@ class MovieHistoryApi
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
+        ?int $locationId = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -444,6 +473,7 @@ class MovieHistoryApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -478,13 +508,33 @@ class MovieHistoryApi
         return $this->movieRepository->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
     }
 
-    public function update(int $movieId, int $userId, ?Date $watchedAt, int $plays, int $position, ?string $comment = null) : void
-    {
-        $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment);
+    public function update(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        int $plays,
+        int $position,
+        ?string $comment = null,
+        ?int $locationId = null,
+    ) : void {
+        $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId);
     }
 
-    public function updateHistoryComment(int $movieId, int $userId, ?Date $watchAt, ?string $comment) : void
-    {
+    public function updateHistoryComment(
+        int $movieId,
+        int $userId,
+        ?Date $watchAt,
+        ?string $comment,
+    ) : void {
         $this->repository->updateHistoryComment($movieId, $userId, $watchAt, $comment);
+    }
+
+    public function updateHistoryLocation(
+        int $movieId,
+        int $userId,
+        ?Date $watchAt,
+        ?int $locationId,
+    ) : void {
+        $this->repository->updateHistoryLocation($movieId, $userId, $watchAt, $locationId);
     }
 }

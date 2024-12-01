@@ -5,8 +5,7 @@ namespace Movary\Domain\Person;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method PersonEntity[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<PersonEntity>
  */
 class PersonEntityList extends AbstractList
 {

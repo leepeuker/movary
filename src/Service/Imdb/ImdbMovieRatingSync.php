@@ -11,9 +11,9 @@ use Psr\Log\LoggerInterface;
 
 class ImdbMovieRatingSync
 {
-    private const DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS = 1000000;
+    private const int DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS = 1000000;
 
-    private const SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 2000000;
+    private const int SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 2000000;
 
     public function __construct(
         private readonly ImdbWebScrapper $imdbWebScrapper,

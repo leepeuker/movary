@@ -7,22 +7,27 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'imdb:sync',
+    description: 'Sync imdb ratings for local movies, sorted by how outdated they are (oldest first).',
+    aliases: ['imdb:sync'],
+    hidden: false,
+)]
 class ImdbSync extends Command
 {
-    private const OPTION_NAME_NEVER_SYNC = 'never-synced';
+    private const string OPTION_NAME_NEVER_SYNC = 'never-synced';
 
-    private const OPTION_NAME_HOURS = 'hours';
+    private const string OPTION_NAME_HOURS = 'hours';
 
-    private const OPTION_NAME_FORCE_THRESHOLD = 'threshold';
+    private const string OPTION_NAME_FORCE_THRESHOLD = 'threshold';
 
-    private const OPTION_NAME_MOVIE_IDS = 'movieIds';
-
-    protected static $defaultName = 'imdb:sync';
+    private const string OPTION_NAME_MOVIE_IDS = 'movieIds';
 
     public function __construct(
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
@@ -36,7 +41,6 @@ class ImdbSync extends Command
     protected function configure() : void
     {
         $this
-            ->setDescription('Sync imdb ratings for local movies, sorted by how outdated they are (oldest first).')
             ->addOption(self::OPTION_NAME_MOVIE_IDS, 'movieIds', InputOption::VALUE_REQUIRED, 'Comma separated string of movie ids to force sync.')
             ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Maximum number of movies to sync.')
             ->addOption(self::OPTION_NAME_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Number of hours required to have elapsed since last sync.')

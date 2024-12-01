@@ -7,7 +7,7 @@ use RuntimeException;
 
 class Date implements JsonSerializable
 {
-    private const FORMAT = 'Y-m-d';
+    private const string FORMAT = 'Y-m-d';
 
     private function __construct(private readonly string $date)
     {

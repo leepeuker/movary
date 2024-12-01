@@ -82,6 +82,15 @@
                             <option value="10" {{ maxUserRating == '10' or maxUserRating is null ? 'selected' }}>10</option>
                         </select>
                     </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Location</span>
+                        <select class="form-control" name="loc" id="searchLocationSelect">
+                            <option value="" {{ locationId is null ? 'selected' }}></option>
+                            {% for uniqueLocation in uniqueLocations %}
+                                <option value="{{ uniqueLocation.id }}" {{ uniqueLocation.id == locationId ? 'selected' }}>{{ uniqueLocation.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                     <h6 class="text-center">Pagination</h6>
 
