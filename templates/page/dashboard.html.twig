@@ -75,6 +75,12 @@
                     {% elseif dashboardRow.isWatchlist and dashboardRow.isVisible %}
                         {% import "component/dashboard/row-watchlist.html.twig" as dashboardWatchlist %}
                         {{ dashboardWatchlist.create(dashboardRow, watchlistItems, routeUsername) }}
+                    {% elseif dashboardRow.isTopLocations and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-top-locations.html.twig" as dashboardTopLocations %}
+                        {{ dashboardTopLocations.create(dashboardRow, topLocations, routeUsername) }}
+                    {% elseif dashboardRow.isLastPlaysCinema and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-last-plays-cinema.html.twig" as dashboardTopLocations %}
+                        {{ dashboardTopLocations.create(dashboardRow, lastPlaysCinema, routeUsername) }}
                     {% endif %}
                 {% endfor %}
             </div>

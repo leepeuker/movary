@@ -7,7 +7,7 @@ use RuntimeException;
 
 class LetterboxdWebScrapper
 {
-    private const BASE_URL = 'https://boxd.it/';
+    private const string BASE_URL = 'https://boxd.it/';
 
     private array $letterboxdIdToTmdbIdCache = [];
 

@@ -34,7 +34,7 @@ class PersonsRequestDto
             $limit,
             $sortBy,
             $sortOrder,
-            $gender
+            $gender,
         );
     }
 

@@ -18,9 +18,9 @@ use RuntimeException;
 
 class Authentication
 {
-    private const AUTHENTICATION_COOKIE_NAME = 'id';
+    private const string AUTHENTICATION_COOKIE_NAME = 'id';
 
-    private const MAX_EXPIRATION_AGE_IN_DAYS = 30;
+    private const int MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
     public function __construct(
         private readonly UserRepository $repository,
@@ -34,7 +34,7 @@ class Authentication
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
         $authenticationMethod = AuthenticationObject::COOKIE_AUTHENTICATION;
-        if (empty($token) === true || $this->isValidToken((string)$token) === true) {
+        if (empty($token) === true || $this->isValidToken((string)$token) === false) {
             unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
             setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
             return null;
@@ -46,6 +46,13 @@ class Authentication
         return AuthenticationObject::createAuthenticationObject($token, $authenticationMethod, $user);
     }
 
+    /**
+     * This method will 'dynamically' create an authentication object.
+     * It will first check if cookie authentication is possible and if not, it'll check if header authentication is possible.
+     * If neither are possible and/or the authentication token is invalid, then the cookie is deleted and null is returned.
+     * @param Request $request
+     * @return AuthenticationObject|null
+     */
     public function createAuthenticationObjectDynamically(Request $request) : ?AuthenticationObject
     {
         $token = filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME) ?? $request->getHeaders()['X-Movary-Token'] ?? null;
@@ -75,7 +82,6 @@ class Authentication
         }
         return AuthenticationObject::createAuthenticationObject($token, $authenticationMethod, $user);
     }
-
     public function createExpirationDate(int $days = 1) : DateTime
     {
         $timestamp = strtotime('+' . $days . ' day');
@@ -139,9 +145,10 @@ class Authentication
                 throw new RuntimeException('Could not find a current user');
             }
             $this->sessionWrapper->set('userId', $authenticationObject->getUser()->getId());
+            $userId = $authenticationObject->getUser()->getId();
         }
 
-        if ($userId === null) {
+        if ($userId == null) {
             throw new RuntimeException('Could not find a current user');
         }
         return $userId;
@@ -261,14 +268,13 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
-        setcookie(self::AUTHENTICATION_COOKIE_NAME, $token, [
-            'expires' => (int)$expirationDate->format('U'),
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-            'httponly' => true,
-            'samesite' => 'strict'
-        ]);
+        setcookie(
+            self::AUTHENTICATION_COOKIE_NAME,
+            $token,
+            (int)$expirationDate->format('U'),
+            '/',
+            httponly: true,
+        );
 
         $this->sessionWrapper->set('userId', $userId);
     }

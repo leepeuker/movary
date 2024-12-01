@@ -10,9 +10,9 @@ use RuntimeException;
 
 class TraktClient
 {
-    private const BASE_URL = 'https://api.trakt.tv';
+    private const string BASE_URL = 'https://api.trakt.tv';
 
-    private const TRAKT_API_VERSION = '2';
+    private const string TRAKT_API_VERSION = '2';
 
     public function __construct(
         private readonly ClientInterface $httpClient,
@@ -39,7 +39,7 @@ class TraktClient
                 'Content-Type' => 'application/json',
                 'trakt-api-version' => self::TRAKT_API_VERSION,
                 'trakt-api-key' => $clientId,
-            ]
+            ],
         );
 
         return $this->httpClient->sendRequest($request);

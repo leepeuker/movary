@@ -3,24 +3,24 @@
 namespace Movary\Command;
 
 use Phinx\Console\PhinxApplication;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    name: 'database:migration:status',
+    description: 'Status of database migrations.',
+    aliases: ['database:migration:status'],
+    hidden: false,
+)]
 class DatabaseMigrationStatus extends Command
 {
-    protected static $defaultName = 'database:migration:status';
-
     public function __construct(
         private readonly PhinxApplication $phinxApplication,
         private readonly string $phinxConfigurationFile,
     ) {
         parent::__construct();
-    }
-
-    protected function configure() : void
-    {
-        $this->setDescription('Status of database migrations.');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
