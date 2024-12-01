@@ -259,6 +259,11 @@ class UserApi
         return $this->repository->getCountOfUsers() > 0;
     }
 
+    public function isLocationsEnabled(int $userId) : bool
+    {
+        return $this->repository->isLocationsEnabled($userId);
+    }
+
     public function isValidPassword(int $userId, string $password) : bool
     {
         $passwordHash = $this->repository->findUserById($userId)?->getPasswordHash();
@@ -370,6 +375,11 @@ class UserApi
     public function updateJellyfinSyncEnabled(int $userId, bool $enabledSync) : void
     {
         $this->repository->updateJellyfinSyncEnabled($userId, $enabledSync);
+    }
+
+    public function updateLocationsEnabled(int $userId, bool $locationsEnabled) : void
+    {
+        $this->repository->updateLocationsEnabled($userId, $locationsEnabled);
     }
 
     public function updateName(int $userId, string $name) : void

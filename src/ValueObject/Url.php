@@ -28,7 +28,7 @@ class Url
     {
         if (parse_url($this->url, PHP_URL_QUERY) !== null) {
             throw new RuntimeException(
-                sprintf('Cannot append relative url "%s" to url "%s", because the url has query parameters', $relativeUrl, $this->url)
+                sprintf('Cannot append relative url "%s" to url "%s", because the url has query parameters', $relativeUrl, $this->url),
             );
         }
 

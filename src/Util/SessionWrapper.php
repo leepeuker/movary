@@ -22,15 +22,17 @@ class SessionWrapper
                 $sessionName,
                 '',
                 time() - 42000,
-                $params['path'],
-                $params['domain'],
-                $params['secure'],
-                $params['httponly'],
+                (string)$params['path'],
+                (string)$params['domain'],
+                (bool)$params['secure'],
+                (bool)$params['httponly'],
             );
         }
 
-        session_destroy();
-        session_regenerate_id();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+            session_regenerate_id();
+        }
     }
 
     public function find(string $key) : mixed

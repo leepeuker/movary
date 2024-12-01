@@ -5,8 +5,7 @@ namespace Movary\Api\Tmdb\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method TmdbWatchProviderDto[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<TmdbWatchProviderDto>
  */
 class TmdbWatchProviderList extends AbstractList
 {

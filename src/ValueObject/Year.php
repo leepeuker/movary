@@ -7,9 +7,9 @@ use RuntimeException;
 
 class Year implements JsonSerializable
 {
-    private const MAX_YEAR_ALLOWED = 2155;
+    private const int MAX_YEAR_ALLOWED = 2155;
 
-    private const MIN_YEAR_ALLOWED = 1901;
+    private const int MIN_YEAR_ALLOWED = 1901;
 
     private function __construct(private readonly int $year)
     {

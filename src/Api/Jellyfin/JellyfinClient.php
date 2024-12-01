@@ -18,9 +18,9 @@ use RuntimeException;
 
 class JellyfinClient
 {
-    private const DEFAULT_PAGINATION_LIMIT = 500;
+    private const int DEFAULT_PAGINATION_LIMIT = 500;
 
-    private const DEFAULT_TIMEOUT = 4;
+    private const int DEFAULT_TIMEOUT = 4;
 
     public function __construct(
         private readonly HttpClient $httpClient,

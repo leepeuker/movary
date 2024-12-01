@@ -5,8 +5,7 @@ namespace Movary\HttpController\Api\Dto;
 use Movary\ValueObject\AbstractList;
 
 /**
- * @method MovieSearchResultDto[] getIterator()
- * @psalm-suppress ImplementedReturnTypeMismatch
+ * @extends AbstractList<MovieSearchResultDto>
  */
 class MovieSearchResultDtoList extends AbstractList
 {

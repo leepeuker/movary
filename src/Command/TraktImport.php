@@ -9,24 +9,29 @@ use Movary\Service\Trakt\ImportRatings;
 use Movary\Service\Trakt\ImportWatchedMovies;
 use Movary\ValueObject\JobStatus;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
+#[AsCommand(
+    name: 'trakt:import',
+    description: 'Import trakt.tv movie history and rating with local database.',
+    aliases: ['trakt:import'],
+    hidden: false,
+)]
 class TraktImport extends Command
 {
-    private const OPTION_NAME_HISTORY = 'history';
+    private const string OPTION_NAME_HISTORY = 'history';
 
-    private const OPTION_NAME_IGNORE_CACHE = 'ignore-cache';
+    private const string OPTION_NAME_IGNORE_CACHE = 'ignore-cache';
 
-    private const OPTION_NAME_OVERWRITE = 'overwrite';
+    private const string OPTION_NAME_OVERWRITE = 'overwrite';
 
-    private const OPTION_NAME_RATINGS = 'ratings';
+    private const string OPTION_NAME_RATINGS = 'ratings';
 
-    private const OPTION_NAME_USER_ID = 'userId';
-
-    protected static $defaultName = 'trakt:import';
+    private const string OPTION_NAME_USER_ID = 'userId';
 
     public function __construct(
         private readonly ImportRatings $importRatings,
@@ -39,7 +44,7 @@ class TraktImport extends Command
 
     protected function configure() : void
     {
-        $this->setDescription('Import trakt.tv movie history and rating with local database.')
+        $this
             ->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user to import to.')
             ->addOption(self::OPTION_NAME_HISTORY, [], InputOption::VALUE_NONE, 'Import movie history.')
             ->addOption(self::OPTION_NAME_RATINGS, [], InputOption::VALUE_NONE, 'Import movie ratings.')
