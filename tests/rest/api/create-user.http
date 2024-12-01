@@ -20,7 +20,7 @@ X-Movary-Client: RestAPI Test
 %}
 
 ###
-#@name Test missing input erro
+#@name Test missing input error
 
 POST http://127.0.0.1/api/create-user
 Accept: */*
@@ -176,7 +176,8 @@ DELETE http://127.0.0.1/api/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
-X-Auth-Token: {{responseAuthToken}}
+X-Movary-Client: RestAPI Test
+X-Movary-Token: {{responseAuthToken}}
 
 > {%
     client.test("Response has correct status code", function() {

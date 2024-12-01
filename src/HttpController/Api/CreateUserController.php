@@ -67,7 +67,7 @@ class CreateUserController
             return Response::createJson(
                 Json::encode([
                     'userId' => $userAndAuthToken['user']->getId(),
-                    'authToken' => $userAndAuthToken['token']
+                    'token' => $userAndAuthToken['token']
                 ]),
             );
         } catch (UsernameInvalidFormat) {
