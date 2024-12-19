@@ -9,7 +9,7 @@ services:
       - "${HTTP_PORT}:80"
     volumes:
       - ./:/app
-      - ./settings/supervisor:/opt/docker/etc/supervisor.d
+      # - ./settings/supervisor:/opt/docker/etc/supervisor.d
     environment:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
 
