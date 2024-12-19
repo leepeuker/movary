@@ -13,6 +13,10 @@ their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/do
 
     Missing database migrations can cause criticatal errors!
 
+!!! info
+    
+    The docker images automatically try to run the missing database migrations on start up.
+
 ## Image tags
 
 - `latest` Default image. Latest stable version and **recommended** for the average user
