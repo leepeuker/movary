@@ -9,6 +9,8 @@ services:
       - "${HTTP_PORT}:80"
     volumes:
       - ./:/app
+      # - ./settings/supervisor/database-migrate.conf:/opt/docker/etc/supervisor.d/database-migrate.conf
+      # - ./settings/supervisor/job-processing.conf:/opt/docker/etc/supervisor.d/job-processing.conf
     environment:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
 
