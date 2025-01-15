@@ -82,7 +82,7 @@ class DashboardController
     }
 
     // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-    private function fetchRowData(DashboardRow $row, int $requestedUserId, ?int $currentUserId) : array
+    private function fetchDashboardRowData(DashboardRow $row, int $requestedUserId, ?int $currentUserId) : array
     {
         return match (true) {
             $row->isLastPlays() => ['lastPlays' => $this->movieHistoryApi->fetchLastPlays($requestedUserId)],
