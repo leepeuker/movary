@@ -74,7 +74,7 @@ class DashboardController
 
             $renderData = array_merge(
                 $renderData,
-                $this->fetchRowData($row, $requestedUserId, $currentUserId),
+                $this->fetchDashboardRowData($row, $requestedUserId, $currentUserId),
             );
         }
 
