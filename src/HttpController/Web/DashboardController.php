@@ -9,6 +9,8 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Dashboard\DashboardFactory;
+use Movary\Service\Dashboard\Dto\DashboardRow;
+use Movary\Service\Dashboard\Dto\DashboardRowList;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -40,9 +42,8 @@ class DashboardController
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($userId));
 
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render('page/dashboard.html.twig', [
+        $renderData = array_merge(
+            [
                 'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
                 'totalPlayCount' => $this->movieApi->fetchTotalPlayCount($userId),
                 'uniqueMoviesCount' => $this->movieApi->fetchTotalPlayCountUnique($userId),
@@ -51,19 +52,51 @@ class DashboardController
                 'averagePlaysPerDay' => $this->movieHistoryApi->fetchAveragePlaysPerDay($userId),
                 'averageRuntime' => $this->movieHistoryApi->fetchAverageRuntime($userId),
                 'firstDiaryEntry' => $this->movieHistoryApi->fetchFirstHistoryWatchDate($userId),
-                'lastPlays' => $this->movieHistoryApi->fetchLastPlays($userId),
-                'mostWatchedActors' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale(), personFilterUserId: $currentUserId),
-                'mostWatchedActresses' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $currentUserId),
-                'mostWatchedDirectors' => $this->movieHistoryApi->fetchDirectors($userId, 6, 1, personFilterUserId: $currentUserId),
-                'mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($userId),
-                'mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId),
-                'mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12),
-                'mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId),
-                'watchlistItems' => $this->movieWatchlistApi->fetchWatchlistPaginated($userId, 6, 1),
-                'topLocations' => $this->movieHistoryApi->fetchTopLocations($userId),
-                'lastPlaysCinema' => $this->movieHistoryApi->fetchLastPlaysCinema($userId),
                 'dashboardRows' => $dashboardRows,
-            ]),
+            ],
+            $this->getDashboardRowData($dashboardRows, $userId, $currentUserId),
         );
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/dashboard.html.twig', $renderData),
+        );
+    }
+
+    private function getDashboardRowData(DashboardRowList $dashboardRows, int $userId, ?int $currentUserId) : array
+    {
+        $renderData = [];
+
+        foreach ($dashboardRows as $row) {
+            if ($row->isVisible() === false) {
+                continue;
+            }
+
+            $renderData = array_merge(
+                $renderData,
+                $this->getRowData($row, $userId, $currentUserId),
+            );
+        }
+
+        return $renderData;
+    }
+
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+    private function getRowData(DashboardRow $row, int $userId, ?int $currentUserId) : array
+    {
+        return match (true) {
+            $row->isLastPlays() => ['lastPlays' => $this->movieHistoryApi->fetchLastPlays($userId)],
+            $row->isLastPlaysCinema() => ['lastPlaysCinema' => $this->movieHistoryApi->fetchLastPlaysCinema($userId)],
+            $row->isMostWatchedActors() => ['mostWatchedActors' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createMale(), personFilterUserId: $currentUserId)],
+            $row->isMostWatchedActresses() => ['mostWatchedActresses' => $this->movieHistoryApi->fetchActors($userId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $currentUserId)],
+            $row->isMostWatchedDirectors() => ['mostWatchedDirectors' => $this->movieHistoryApi->fetchDirectors($userId, 6, 1, personFilterUserId: $currentUserId)],
+            $row->isMostWatchedLanguages() => ['mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($userId)],
+            $row->isMostWatchedGenres() => ['mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($userId)],
+            $row->isMostWatchedProductionCompanies() => ['mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($userId, 12)],
+            $row->isMostWatchedReleaseYears() => ['mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($userId)],
+            $row->isWatchlist() => ['watchlistItems' => $this->movieWatchlistApi->fetchWatchlistPaginated($userId, 6, 1)],
+            $row->isTopLocations() => ['topLocations' => $this->movieHistoryApi->fetchTopLocations($userId)],
+            default => [],
+        };
     }
 }
