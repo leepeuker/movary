@@ -54,7 +54,7 @@ class DashboardController
                 'firstDiaryEntry' => $this->movieHistoryApi->fetchFirstHistoryWatchDate($userId),
                 'dashboardRows' => $dashboardRows,
             ],
-            $this->getDashboardRowData($dashboardRows, $userId, $currentUserId),
+            $this->fetchVisibleDashboardRowData($dashboardRows, $userId, $currentUserId),
         );
 
         return Response::create(
@@ -63,7 +63,7 @@ class DashboardController
         );
     }
 
-    private function getDashboardRowData(DashboardRowList $dashboardRows, int $userId, ?int $currentUserId) : array
+    private function fetchVisibleDashboardRowData(DashboardRowList $dashboardRows, int $userId, ?int $currentUserId) : array
     {
         $renderData = [];
 
