@@ -1,0 +1,26 @@
+GET http://127.0.0.1/api/images/person/1
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+###
+
+GET http://127.0.0.1/api/images/movies/1
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+###
+
+GET http://127.0.0.1/api/images/invalidresourcetype/1
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+###
+
+GET http://127.0.0.1/api/images/person/invalidresourceid
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+

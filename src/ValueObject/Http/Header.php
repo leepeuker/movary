@@ -20,6 +20,14 @@ class Header
         return new self('Content-Type', 'application/json');
     }
 
+    public static function createContentTypeJpeg(int $contentLength) : array
+    {
+        return [
+            new self('Content-Type', 'image/jpeg'),
+            new self('Content-Length', (string)$contentLength)
+        ];
+    }
+
     public static function createLocation(string $value) : self
     {
         return new self('Location', $value);
