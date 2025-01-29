@@ -6,15 +6,61 @@ jobs:
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
+    services:
+      database:
+        image: mariadb
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
+          MARIADB_DATABASE: movary
+        ports:
+          - 3306:3306
+          - 80:80
+        options: --name database
+
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - name: Set environment variables
+        run: |
+          echo "DATABASE_MODE=mysql" > ".env"
+          echo "DATABASE_MYSQL_HOST=127.0.0.1" >> ".env"
+          echo "DATABASE_MYSQL_PORT=3306" >> ".env"
+          echo "DATABASE_MYSQL_USER=root" >> ".env"
+          echo "DATABASE_MYSQL_NAME=movary" >> ".env"
+          echo "DATABASE_MYSQL_PASSWORD=" >> ".env"
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Downloads and runs the Jetbrains HTTP Client CLI
+        run: |
+          curl -f -L -o ijhttp.zip "https://jb.gg/ijhttp/latest"
+          unzip ijhttp.zip
 
       - name: Build docker development image
         run: docker build --target development --tag movary ./build/php/
 
       - name: Install dependencies
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
+        run: docker run --rm --network container:database -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
 
-      - name: Run all test tools/suites
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer test
+      - name: Run PHPCs
+        run:  docker run --rm --network container:database -v /home/runner/work/movary/movary:/app movary vendor/bin/phpcs --standard=./settings/phpcs.xml --report=checkstyle -q ./src ./tests | vendor/bin/cs2pr
+
+      - name: Run PHPStan
+        run:  docker run --rm --network container:database -v /home/runner/work/movary/movary:/app movary vendor/bin/phpstan analyse -c ./settings/phpstan.neon
+
+      - name: Run Psalm
+        run:  docker run --rm --network container:database -v /home/runner/work/movary/movary:/app movary vendor/bin/psalm -c ./settings/psalm.xml --show-info=false --output-format=github
+
+      - name: Run PHPUnit
+        run:  docker run --rm --network container:database -v /home/runner/work/movary/movary:/app movary vendor/bin/phpunit -c ./settings/phpunit.xml --testsuite unit
+
+      - name: Prepare for the tests
+        run: |
+          docker run --rm --network container:database -v /home/runner/work/movary/movary:/app movary php bin/console.php database:migration:migrate
+          docker run --rm --network container:database -v /home/runner/work/movary/movary:/app movary php bin/console.php user:create testUser@domain.com password1234 testUser true
+
+      - name: Run the HTTP tests
+        run: |
+          docker run --rm -d --network container:database --name movary -v /home/runner/work/movary/movary:/app movary
+          ./ijhttp/ijhttp tests/rest/api/authentication.http --env-file tests/rest/api/http-client.env.json --env CI
