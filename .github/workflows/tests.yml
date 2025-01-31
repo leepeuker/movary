@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build docker development image
-        run: docker build --target development --tag movary ./build/
+        run: docker build --target development --tag movary -f ./build/ .
 
       - name: Run all test tools/suites
         run: docker run --rm -v /home/runner/work/movary/movary:/var/www/html movary composer test
