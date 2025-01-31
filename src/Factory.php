@@ -293,10 +293,8 @@ class Factory
             /** @var User\UserEntity $user */
             $user = $container->get(User\UserApi::class)->findUserById($currentUserId);
 
-            if ($user !== null) {
-                $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
-                $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
-            }
+            $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
+            $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
