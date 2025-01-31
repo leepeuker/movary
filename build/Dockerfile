@@ -39,6 +39,8 @@ RUN chown -R www-data:www-data /var/www/html /run /var/lib/nginx /var/log/nginx
 
 USER www-data
 
+COPY .env.development.example .env
+
 RUN composer install
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
