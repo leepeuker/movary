@@ -24,7 +24,13 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN composer install --no-dev
 
+COPY .env.production.example .env
+
+USER nobody
+
 RUN /usr/bin/php /var/www/html/bin/console.php storage:link
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 FROM base AS development
 
@@ -49,9 +55,3 @@ FROM base AS production
 
 ARG APPLICATION_VERSION
 ENV APPLICATION_VERSION=${APPLICATION_VERSION}
-
-COPY .env.production.example .env
-
-USER nobody
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
