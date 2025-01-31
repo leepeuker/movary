@@ -19,11 +19,15 @@ COPY ./build/config/conf.d /etc/nginx/conf.d
 COPY ./build/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY --chown=nobody ./ /var/www/html
 
+COPY .env.production.example .env
+
 USER nobody
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN composer install --no-dev
+
+RUN /usr/bin/php /var/www/html/bin/console.php storage:link
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
@@ -38,16 +42,6 @@ RUN chown -R www-data:www-data /var/www/html /run /var/lib/nginx /var/log/nginx
 
 USER www-data
 
-RUN composer update
+RUN composer install
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
-
-#FROM development AS production
-#ARG APPLICATION_VERSION
-#ENV APPLICATION_VERSION=${APPLICATION_VERSION}
-#COPY --chown=nobody ./ ./
-#COPY .env.production.example .env
-#COPY settings/supervisor/movary.conf /opt/docker/etc/supervisor.d/movary.conf
-#RUN composer install --no-dev
-#RUN php bin/console.php storage:link
