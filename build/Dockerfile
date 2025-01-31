@@ -32,26 +32,24 @@ RUN /usr/bin/php /var/www/html/bin/console.php storage:link
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
+FROM base AS production
+
+ARG APPLICATION_VERSION
+ENV APPLICATION_VERSION=${APPLICATION_VERSION}
+
 FROM base AS development
 
 ARG USER_ID=1000
 
 USER root
 
-RUN apk add --no-cache make nano php84-pecl-imagick
+RUN addgroup -g $USER_ID -S dev && adduser -u $USER_ID -S dev -G dev
+RUN chown -R dev:dev /var/www/html /run /var/lib/nginx /var/log/nginx
 
-RUN adduser -D -u $USER_ID --ingroup www-data www-data
-RUN chown -R www-data:www-data /var/www/html /run /var/lib/nginx /var/log/nginx
-
-USER www-data
+USER dev
 
 COPY .env.development.example .env
 
 RUN composer install
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
-FROM base AS production
-
-ARG APPLICATION_VERSION
-ENV APPLICATION_VERSION=${APPLICATION_VERSION}
