@@ -14,4 +14,4 @@ jobs:
         run: docker build --target development --tag movary -f ./build/Dockerfile .
 
       - name: Run all test tools/suites
-        run: docker run --rm -v /home/runner/work/movary/movary:/var/www/html movary composer test
+        run: docker run --rm movary composer test
