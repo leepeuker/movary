@@ -63,17 +63,13 @@ class ImdbMovieRatingSync
         ]);
     }
 
-    /**
-     * @param positive-int $minDelayBetweenRequests
-     */
     public function syncMultipleMovieRatings(
         ?int $maxAgeInHours = null,
         ?int $movieCountSyncThreshold = null,
-        array $movieIds = null,
-        int $minDelayBetweenRequests = self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS,
-        bool $onlyNeverSynced = false,
+        ?array $movieIds = null,
+        ?bool $onlyNeverSynced = false,
     ) : void {
-        $movieIds = $this->movieApi->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold, $movieIds, $onlyNeverSynced);
+        $movieIds = $this->movieApi->fetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt($maxAgeInHours, $movieCountSyncThreshold, $movieIds, (bool)$onlyNeverSynced);
 
         foreach ($movieIds as $index => $movieId) {
             $this->syncMovieRating($movieId);
@@ -83,7 +79,7 @@ class ImdbMovieRatingSync
             }
 
             // Hacky way to prevent imdb rate limits
-            usleep($minDelayBetweenRequests);
+            usleep(self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS);
         }
     }
 
