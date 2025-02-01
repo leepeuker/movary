@@ -11,6 +11,3 @@ services:
     environment:
       TMDB_API_KEY: "${TMDB_API_KEY:-XXXXX}"
       TMDB_ENABLE_IMAGE_CACHING: "${TMDB_ENABLE_IMAGE_CACHING:-0}"
-
-volumes:
-  movary-storage:
