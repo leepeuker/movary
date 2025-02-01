@@ -8,25 +8,31 @@ up:
 	docker compose up -d
 
 up_mysql:
-	mkdir -p tmp/db
-	docker compose up -d mysql
+	docker compose -f docker-compose.yml -f docker-compose.mysql.yml up -d
 
-up_app: 
-	docker compose up -d app
+up_docs:
+	docker compose -f docker-compose.docs.yml up -d
+
+up_development:
+	docker compose -f docker-compose.yml -f docker-compose.development.yml up -d
+
+up_development_mysql:
+	docker compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.mysql.yml up -d
 
 down:
-	docker compose down
-
-reup: down up
+	docker compose \
+	 -f docker-compose.yml \
+	 -f docker-compose.mysql.yml \
+	 -f docker-compose.docs.yml \
+	 down
 
 logs: 
 	docker compose logs -f
 
-build:
-	docker compose build --no-cache
-	make up
+build_development:
+	docker compose -f docker-compose.yml -f docker-compose.development.yml build --no-cache
+	make up_development
 	make composer_install
-	#make db_mysql_create_database
 	make app_database_migrate
 	make exec_app_cmd CMD="php bin/console.php storage:link"
 
