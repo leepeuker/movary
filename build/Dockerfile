@@ -2,6 +2,9 @@ FROM composer:latest AS composer
 
 FROM trafex/php-nginx AS base
 
+LABEL Description="Movary is a self hosted web app to track and rate your watched movies"
+LABEL Maintainer="Lee Peuker"
+
 ARG USER_ID=3000
 ARG GROUP_ID=3000
 
