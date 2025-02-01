@@ -13,9 +13,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: copy files
-        uses: appleboy/scp-action@v0.1.4
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DOCS_SSH_HOST }}
           username: ${{ secrets.DOCS_SSH_USER }}
@@ -23,7 +23,7 @@ jobs:
           source: "mkdocs.yml,docs/*"
           target: ${{ secrets.DOCS_DEPLOYMENT_DIRECTORY }}
           rm: true
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: restart docker containers
         uses: appleboy/ssh-action@v0.1.10
         with:

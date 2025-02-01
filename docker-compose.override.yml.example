@@ -10,7 +10,6 @@ services:
     ports:
       - "8080:80"
     environment:
-      PHP_DATE_TIMEZONE: "${TIMEZONE}"
       TMDB_API_KEY: "${TMDB_API_KEY}"
       TMDB_ENABLE_IMAGE_CACHING: 1
       DATABASE_MODE: "mysql"

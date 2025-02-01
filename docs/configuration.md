@@ -34,7 +34,7 @@ Required to run the application
 
 | NAME                              |      DEFAULT VALUE      | INFO                                                   |
 |:----------------------------------|:-----------------------:|:-------------------------------------------------------|
-| `DATABASE_MODE`                   |            -            | **Required** `sqlite` or `mysql`                       |
+| `DATABASE_MODE`                   |        `sqlite`         | `sqlite` or `mysql`                                    |
 | `DATABASE_SQLITE`                 | `storage/movary.sqlite` |                                                        |
 | `DATABASE_MYSQL_HOST`             |            -            | Required when mode is `mysql`                          |
 | `DATABASE_MYSQL_PORT`             |         `3306`          |                                                        |

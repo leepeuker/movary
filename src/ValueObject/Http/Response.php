@@ -10,16 +10,16 @@ class Response
     private function __construct(
         private readonly StatusCode $statusCode,
         private readonly ?string $body = null,
-        private readonly array $headers = [],
+        private readonly ?array $headers = [],
     ) {
     }
 
-    public static function create(StatusCode $statusCode, ?string $body = null, array $headers = []) : self
+    public static function create(StatusCode $statusCode, ?string $body = null, ?array $headers = []) : self
     {
         return new self($statusCode, $body, $headers);
     }
 
-    public static function createBadRequest(?string $body = null, array $headers = []) : self
+    public static function createBadRequest(?string $body = null, ?array $headers = []) : self
     {
         return new self(StatusCode::createBadRequest(), $body, $headers);
     }
@@ -41,7 +41,7 @@ class Response
         return new self(StatusCode::createForbidden(), null, [Header::createLocation('/login?redirect=' . $query)]);
     }
 
-    public static function createJson(string $body, StatusCode $statusCode = null) : self
+    public static function createJson(string $body, ?StatusCode $statusCode = null) : self
     {
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
@@ -71,7 +71,7 @@ class Response
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
     }
 
-    public static function createUnauthorized(string $message = null, array $headers = []) : self
+    public static function createUnauthorized(?string $message = null, ?array $headers = []) : self
     {
         return new self(StatusCode::createUnauthorized(), $message, $headers);
     }
@@ -88,7 +88,7 @@ class Response
 
     public function getHeaders() : array
     {
-        return $this->headers;
+        return (array)$this->headers;
     }
 
     public function getStatusCode() : StatusCode

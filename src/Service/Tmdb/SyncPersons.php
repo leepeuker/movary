@@ -46,7 +46,7 @@ class SyncPersons
         }
     }
 
-    private function syncExpired(DateTime $updatedAtTmdb, int $maxAgeInDays = null) : bool
+    private function syncExpired(DateTime $updatedAtTmdb, ?int $maxAgeInDays = null) : bool
     {
         return DateTime::create()->differenceInHours($updatedAtTmdb) > $maxAgeInDays;
     }
