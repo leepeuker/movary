@@ -7,7 +7,7 @@ $config = $container->get(Movary\ValueObject\Config::class);
 
 $databaseMode = \Movary\Factory::getDatabaseMode($config);
 if ($databaseMode === 'sqlite') {
-    $sqliteFile = pathinfo($config->getAsString('DATABASE_SQLITE'));
+    $sqliteFile = pathinfo($config->getAsString('DATABASE_SQLITE', \Movary\Factory::getDatabaseSqlite($config)));
     $databaseConfig = [
         'adapter' => 'sqlite',
         'name' => $sqliteFile['dirname'] . '/' . $sqliteFile['filename'],

@@ -9,7 +9,7 @@ services:
     ports:
       - "${HTTP_PORT}:8080"
     volumes:
-      - ./:/var/www/html
+      - ./:/app
     environment:
       PHP_DATE_TIMEZONE: "${TIMEZONE}"
 

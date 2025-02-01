@@ -1,11 +1,13 @@
 FROM composer:latest AS composer
+
 FROM trafex/php-nginx AS base
+
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 USER root
 
 RUN apk add --no-cache \
-    make \
-    nano \
     php84-pdo \
     php84-pdo_mysql \
     php84-pdo_sqlite \
@@ -14,21 +16,39 @@ RUN apk add --no-cache \
     php84-simplexml \
     php84-pecl-imagick
 
+# Create standard binary for php
 RUN cp /usr/bin/php84 /usr/bin/php
 
+# Create entrypoint script (for automatic database migrations)
+COPY ./build/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Create stop_supervisor_on_process_failure script (stop supervisor to kill container if a processes fails)
+COPY ./build/scripts/stop_supervisor_on_process_failure.sh /usr/local/bin/stop_supervisor_on_process_failure.sh
+RUN chmod +x /usr/local/bin/stop_supervisor_on_process_failure.sh
+
+# Create configuration and appllication files
 COPY ./build/config/conf.d /etc/nginx/conf.d
 COPY ./build/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY --chown=nobody ./ /var/www/html
+COPY ./ /app
 
+# Create non root user
+RUN addgroup -g $USER_ID -S movary && adduser -u $USER_ID -S movary -G movary
+RUN chown -R movary:movary /app /run /var/lib/nginx /var/log/nginx
+
+# Add composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
-RUN composer install --no-dev
+# Switch to non root (improve security)
+USER movary
 
-COPY .env.production.example .env
+# Set app directory as working directory
+WORKDIR /app
 
-USER nobody
 
-RUN /usr/bin/php /var/www/html/bin/console.php storage:link
+RUN /usr/bin/php /app/bin/console.php storage:link
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
@@ -37,19 +57,10 @@ FROM base AS production
 ARG APPLICATION_VERSION
 ENV APPLICATION_VERSION=${APPLICATION_VERSION}
 
+RUN composer install --no-dev
+
 FROM base AS development
-
-ARG USER_ID=1000
-
-USER root
-
-RUN addgroup -g $USER_ID -S dev && adduser -u $USER_ID -S dev -G dev
-RUN chown -R dev:dev /var/www/html /run /var/lib/nginx /var/log/nginx
-
-USER dev
 
 COPY .env.development.example .env
 
 RUN composer install
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
