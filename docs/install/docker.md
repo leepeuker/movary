@@ -16,7 +16,7 @@ their [docs](https://github.com/TrafeX/docker-php-nginx) for more configuration 
 !!! info
     
     The docker images automatically runs the missing database migrations on start up. 
-    To stop this behavior set the environment variable `DATABASE_DISABLE_AUTO_MIGRATION=0`
+    To stop this behavior set the environment variable `DATABASE_DISABLE_AUTO_MIGRATION=1`
 
 ## Image tags
 
