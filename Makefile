@@ -8,14 +8,20 @@ up:
 	docker compose up -d
 
 up_mysql:
-	mkdir -p tmp/db
-	docker compose up -d mysql
+	docker compose -f docker-compose.yml -f docker-compose.mysql.yml up -d
 
-up_app: 
-	docker compose up -d app
+up_docs:
+	docker compose -f docker-compose.docs.yml up -d
+
+up_development:
+	docker compose -f docker-compose.yml -f docker-compose.development.yml up -d
 
 down:
-	docker compose down
+	docker compose \
+	 -f docker-compose.yml \
+	 -f docker-compose.mysql.yml \
+	 -f docker-compose.docs.yml \
+	 down
 
 reup: down up
 
