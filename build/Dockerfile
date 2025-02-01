@@ -2,8 +2,8 @@ FROM composer:latest AS composer
 
 FROM trafex/php-nginx AS base
 
-ARG USER_ID=1000
-ARG GROUP_ID=1000
+ARG USER_ID=3000
+ARG GROUP_ID=3000
 
 USER root
 
