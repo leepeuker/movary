@@ -26,4 +26,7 @@ else
   echo "INFO: Automatic database migration is disabled";
 fi
 
+echo "INFO: Generating symbolic link for storage"
+/usr/bin/php /app/bin/console.php storage:link
+
 exec "$@"

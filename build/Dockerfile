@@ -46,8 +46,6 @@ USER application
 # Set app directory as working directory
 WORKDIR /app
 
-RUN /usr/bin/php /app/bin/console.php storage:link
-
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
@@ -60,7 +58,5 @@ ENV APPLICATION_VERSION=${APPLICATION_VERSION}
 RUN composer install --no-dev
 
 FROM base AS development
-
-COPY .env.development.example .env
 
 RUN composer install
