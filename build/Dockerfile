@@ -34,14 +34,14 @@ COPY ./build/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY ./ /app
 
 # Create non root user
-RUN addgroup -g $USER_ID -S movary && adduser -u $USER_ID -S movary -G movary
-RUN chown -R movary:movary /app /run /var/lib/nginx /var/log/nginx
+RUN addgroup -g $USER_ID -S application && adduser -u $USER_ID -S application -G application
+RUN chown -R application:application /app /run /var/lib/nginx /var/log/nginx
 
 # Add composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 # Switch to non root (improve security)
-USER movary
+USER application
 
 # Set app directory as working directory
 WORKDIR /app
