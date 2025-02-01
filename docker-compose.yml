@@ -11,6 +11,14 @@ services:
     volumes:
       - ./:/app
 
+#  app_prod:
+#    build:
+#      context: ./
+#      dockerfile: build/Dockerfile
+#      target: production
+#    ports:
+#      - "8080:8080"
+
   mysql:
     image: mysql:8.0
     environment:

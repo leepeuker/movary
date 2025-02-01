@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Infinite loop to listen for events
 while true; do

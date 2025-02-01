@@ -8,6 +8,7 @@ ARG GROUP_ID=3000
 USER root
 
 RUN apk add --no-cache \
+    bash \
     php84-pdo \
     php84-pdo_mysql \
     php84-pdo_sqlite \
@@ -44,7 +45,6 @@ USER movary
 
 # Set app directory as working directory
 WORKDIR /app
-
 
 RUN /usr/bin/php /app/bin/console.php storage:link
 

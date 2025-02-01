@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$DATABASE_DISABLE_AUTO_MIGRATION" != "true" ] && [ "$DATABASE_DISABLE_AUTO_MIGRATION" != "0" ]; then
   RETRY_COUNT=0
