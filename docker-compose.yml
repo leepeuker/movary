@@ -7,7 +7,7 @@ services:
       args:
         - USER_ID=$USER_ID
     ports:
-      - "${HTTP_PORT}:8080"
+      - "${HTTP_PORT}:80"
     volumes:
       - ./:/app
 
@@ -17,7 +17,7 @@ services:
 #      dockerfile: build/Dockerfile
 #      target: production
 #    ports:
-#      - "8080:8080"
+#      - "8080:80"
 
   mysql:
     image: mysql:8.0
