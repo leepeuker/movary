@@ -225,6 +225,7 @@ class MovieApi
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : int {
         return $this->historyApi->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -235,6 +236,7 @@ class MovieApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 
@@ -251,6 +253,7 @@ class MovieApi
         ?bool $hasUserRating,
         ?int $userRatingMin,
         ?int $userRatingMax,
+        ?int $locationId,
     ) : array {
         return $this->historyApi->fetchPlayedMoviesPaginated(
             $userId,
@@ -265,6 +268,7 @@ class MovieApi
             $hasUserRating,
             $userRatingMin,
             $userRatingMax,
+            $locationId,
         );
     }
 

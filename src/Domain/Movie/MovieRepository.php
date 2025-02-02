@@ -369,36 +369,47 @@ class MovieRepository
         );
     }
 
-    public function fetchHistoryCount(int $userId, ?string $searchTerm = null) : int
+    public function fetchHistoryCount(int $userId, ?string $searchTerm = null, ?int $locationId = null) : int
     {
+        $payload = [$userId];
+        $whereQuery = 'WHERE user_id = ?';
+
         if ($searchTerm !== null) {
-            return $this->dbConnection->fetchFirstColumn(
-                <<<SQL
-                SELECT COUNT(*)
-                FROM movie_user_watch_dates mh
-                JOIN movie m on mh.movie_id = m.id AND watched_at IS NOT NULL
-                WHERE m.title LIKE ? AND user_id = ?
-                SQL,
-                ["%$searchTerm%", $userId],
-            )[0];
+            $payload[] = "%$searchTerm%";
+            $whereQuery .= ' AND m.title LIKE ?';
+        }
+
+        if ($locationId !== null) {
+            $payload[] = $locationId;
+            $whereQuery .= ' AND mh.location_id = ?';
         }
 
         return $this->dbConnection->fetchFirstColumn(
-            'SELECT COUNT(*) FROM movie_user_watch_dates JOIN movie m on movie_id = m.id AND watched_at IS NOT NULL WHERE user_id = ?',
-            [$userId],
+            <<<SQL
+            SELECT COUNT(*)
+            FROM movie_user_watch_dates mh
+            JOIN movie m on mh.movie_id = m.id AND watched_at IS NOT NULL
+            {$whereQuery}
+            SQL,
+            $payload,
         )[0];
     }
 
-    public function fetchHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
+    public function fetchHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm, ?int $locationId) : array
     {
-        $payload = [$userId, $userId];
+        $payload = [$userId, $userId, $userId];
 
         $offset = ($limit * $page) - $limit;
 
-        $whereQuery = '';
+        $payload[] = $userId;
+        $whereQuery = 'WHERE mh.user_id = ?';
         if ($searchTerm !== null) {
             $payload[] = "%$searchTerm%";
-            $whereQuery .= 'WHERE  m.title LIKE ?';
+            $whereQuery .= ' AND m.title LIKE ?';
+        }
+        if ($locationId !== null) {
+            $payload[] = $locationId;
+            $whereQuery .= ' AND mh.location_id = ?';
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -407,6 +418,7 @@ class MovieRepository
             FROM movie m
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
+            LEFT JOIN location l ON mh.location_id = l.id AND l.user_id = ?
             $whereQuery
             ORDER BY watched_at $sortOrder, mh.position $sortOrder
             LIMIT $offset, $limit
@@ -944,14 +956,14 @@ class MovieRepository
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT * FROM (
-                SELECT m.*, mur.rating as userRating, ROW_NUMBER() OVER(PARTITION BY m.id) rn
+                SELECT m.*, mur.rating as userRating, ROW_NUMBER() OVER(PARTITION BY m.id) rn, mh.location_id AS locationId 
                 FROM movie m
                 JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
                 LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?
                 LEFT JOIN movie_genre mg on m.id = mg.movie_id
                 LEFT JOIN genre g on mg.genre_id = g.id
                 $whereQuery
-                GROUP BY m.id, title, release_date, watched_at, rating
+                GROUP BY m.id, title, release_date, watched_at, rating, locationId
                 ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition LOWER(title) asc
             ) a
             WHERE rn = 1
@@ -966,7 +978,7 @@ class MovieRepository
         $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
 
         return $this->dbConnection->fetchAllAssociative(
-            "SELECT watched_at, plays, comment, movie_id
+            "SELECT watched_at, plays, comment, movie_id, location_id
             FROM movie_user_watch_dates
             WHERE user_id = ? and movie_id in ($placeholders)
             ORDER BY watched_at DESC, position DESC",

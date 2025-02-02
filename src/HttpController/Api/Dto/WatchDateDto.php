@@ -11,12 +11,13 @@ class WatchDateDto implements JsonSerializable
         private readonly ?Date $watchDate,
         private readonly int $plays,
         private readonly ?string $comment,
+        private readonly ?int $locationId,
     ) {
     }
 
-    public static function create(?Date $watchDate, int $plays, ?string $comment) : self
+    public static function create(?Date $watchDate, int $plays, ?string $comment, ?int $locationId) : self
     {
-        return new self($watchDate, $plays, $comment);
+        return new self($watchDate, $plays, $comment, $locationId);
     }
 
     public function getWatchDate() : ?Date
@@ -30,6 +31,7 @@ class WatchDateDto implements JsonSerializable
             'date' => $this->watchDate,
             'plays' => $this->plays,
             'comment' => $this->comment,
+            'locationId' => $this->locationId,
         ];
     }
 }
