@@ -2,16 +2,21 @@
 
 It is recommended to host Movary with the [official Docker image](https://hub.docker.com/r/leepeuker/movary).
 
-The official docker image extends the `webdevops/php-nginx` image, checkout
-their [docs](https://dockerfile.readthedocs.io/en/latest/content/DockerImages/dockerfiles/php-nginx.html) for more configuration information.
+The official docker image extends the `TrafeX/docker-php-nginx` image, checkout
+their [docs](https://github.com/TrafeX/docker-php-nginx) for more configuration information.
 
-!!! danger
+!!! warning
 
-    After the **initial installation** and after **each image update** execute the database migrations, example:
+    After the **initial installation** and every update containing database changes the database migrations must be executed:
 
-    `docker exec movary php bin/console.php database:migration:migrate`
+    `php bin/console.php database:migration:migrate`
 
     Missing database migrations can cause criticatal errors!
+
+!!! info
+    
+    The docker images automatically runs the missing database migrations on start up. 
+    To stop this behavior set the environment variable `DATABASE_DISABLE_AUTO_MIGRATION=1`
 
 ## Image tags
 
@@ -29,7 +34,7 @@ The easiest way to do this are managed docker volumes (used in the examples belo
 !!! info
 
     If you bind a local mount, make sure the directory exists before you start the container
-    and that it has the necessary permissions/ownership.
+    and that it has the necessary permissions/ownership (3000:3000 on default).
 
 ## Docker secrets
 

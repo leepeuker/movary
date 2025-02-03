@@ -23,8 +23,8 @@ class PlexTvClient extends PlexClient
         PlexAccessToken $plexAccessToken,
         RelativeUrl $relativeUrl,
         array $query = [],
-        int $limit = null,
-        int $offset = null,
+        ?int $limit = null,
+        ?int $offset = null,
     ) : array {
         $requestUrl = Url::createFromString('https://metadata.provider.plex.tv/')->appendRelativeUrl($relativeUrl);
         $requestOptions = [

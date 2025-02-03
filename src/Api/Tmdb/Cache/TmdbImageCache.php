@@ -112,7 +112,7 @@ class TmdbImageCache
                 $data['poster_path'] === null ? true : $forceRefresh,
             );
         } catch (Exception $e) {
-            $this->logger->warning('Could not cache ' . $resourceType . 'image: ' . $data['tmdb_poster_path'], ['exception' => $e]);
+            $this->logger->warning('Could not cache ' . $resourceType . ' image: ' . $data['tmdb_poster_path'], ['exception' => $e]);
         }
 
         if ($cachedImagePublicPath === null) {

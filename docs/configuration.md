@@ -32,16 +32,17 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 
 Required to run the application
 
-| NAME                      |      DEFAULT VALUE      | INFO                             |
-|:--------------------------|:-----------------------:|:---------------------------------|
-| `DATABASE_MODE`           |            -            | **Required** `sqlite` or `mysql` |
-| `DATABASE_SQLITE`         | `storage/movary.sqlite` |                                  |
-| `DATABASE_MYSQL_HOST`     |            -            | Required when mode is `mysql`    |
-| `DATABASE_MYSQL_PORT`     |         `3306`          |                                  |
-| `DATABASE_MYSQL_NAME`     |            -            | Required when mode is `mysql`    |
-| `DATABASE_MYSQL_USER`     |            -            | Required when mode is `mysql`    |
-| `DATABASE_MYSQL_PASSWORD` |            -            | Required when mode is `mysql`    |
-| `DATABASE_MYSQL_CHARSET`  |        `utf8mb4`        |                                  |
+| NAME                              |      DEFAULT VALUE      | INFO                                                   |
+|:----------------------------------|:-----------------------:|:-------------------------------------------------------|
+| `DATABASE_MODE`                   |        `sqlite`         | `sqlite` or `mysql`                                    |
+| `DATABASE_SQLITE`                 | `storage/movary.sqlite` |                                                        |
+| `DATABASE_MYSQL_HOST`             |            -            | Required when mode is `mysql`                          |
+| `DATABASE_MYSQL_PORT`             |         `3306`          |                                                        |
+| `DATABASE_MYSQL_NAME`             |            -            | Required when mode is `mysql`                          |
+| `DATABASE_MYSQL_USER`             |            -            | Required when mode is `mysql`                          |
+| `DATABASE_MYSQL_PASSWORD`         |            -            | Required when mode is `mysql`                          |
+| `DATABASE_MYSQL_CHARSET`          |        `utf8mb4`        |                                                        |
+| `DATABASE_DISABLE_AUTO_MIGRATION` |           `0`           | On default docker runs migrations on container startup |
 
 ### Third party integrations
 

@@ -1,10 +1,17 @@
 ## System requirements
 
-- PHP 8.2
+- PHP 8.4 (FPM) + extensions:
+    - php84-pdo
+    - php84-pdo_mysql
+    - php84-pdo_sqlite
+    - php84-mbstring
+    - php84-sqlite3
+    - php84-simplexml
+    - php84-pecl-imagick
 - git
-- composer
-- web server
-- supervisor (optional but recommended)
+- [composer](https://getcomposer.org)
+- web server (e.g. nginx)
+- supervisor or cron for job processing
 
 ## Setup
 
@@ -15,14 +22,14 @@
 git clone https://github.com/leepeuker/movary.git .
 ```
 
-2. Install composer dependencies (execute after every update)
+2. Install composer dependencies (recommended to install after every update)
 ```
 composer install --no-dev
 ```
 
 3. Create (and edit) your environment configuration
 ```
-cp .env.production.example .env
+cp .env.example .env
 ```
 
 4. Create necessary symlink between the storage and public/storage
@@ -30,16 +37,27 @@ cp .env.production.example .env
 php bin/console.php storage:link
 ```
 
+5. Run the database migrations
+```
+php bin/console.php database:migration:migrate
+```
+
 !!! Info
 
-    Make sure that the permissions on the `storage` directory are correct and set to writable for the application user
+    Make sure that the permissions on the `storage` directory are correct and set to writable for the php (fpm) user
 
 ### Web server
 
 Use the `public` directory as the document root
 
-### Supervisor
-Use supervisor to continuously process jobs/events created by the application.
+### Job processing
+
+The `jobs:process` cli command has to be executed to keep the Movary data up to date and process all background jobs.
+
+Here are two recommanded ways.
+
+#### Supervisor
+Supervisor manages a process to execute the cli command contentiously.  
 
 Example config:
 
@@ -56,4 +74,13 @@ stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
+```
+
+#### Cron
+Use a cronjob to process jobs in at least 1 minute intervals.
+
+Example config:
+
+```
+* * * * * usr/local/bin/php /app/bin/console.php jobs:process
 ```

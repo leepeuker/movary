@@ -1,4 +1,10 @@
-build/
-tests/
+.git/
+.env
 public/images/cached/*
-tmp/*
+storage/*
+!storage/app
+storage/app/*
+!storage/app/public
+storage/app/public/*
+!storage/logs
+storage/logs/*

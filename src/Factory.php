@@ -48,6 +48,10 @@ use Twig;
 
 class Factory
 {
+    private const string DEFAULT_DATABASE_SQLITE = 'storage/movary.sqlite';
+
+    private const string DEFAULT_DATABASE_MODE = 'sqlite';
+
     private const string SRC_DIRECTORY_NAME = 'src';
 
     private const int DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
@@ -133,7 +137,7 @@ class Factory
         $config = match ($databaseMode) {
             'sqlite' => [
                 'driver' => 'sqlite3',
-                'path' => self::createDirectoryAppRoot() . $config->getAsString('DATABASE_SQLITE'),
+                'path' => self::createDirectoryAppRoot() . $config->getAsString('DATABASE_SQLITE', self::DEFAULT_DATABASE_SQLITE),
             ],
             'mysql' => [
                 'driver' => 'pdo_mysql',
@@ -293,10 +297,8 @@ class Factory
             /** @var User\UserEntity $user */
             $user = $container->get(User\UserApi::class)->findUserById($currentUserId);
 
-            if ($user !== null) {
-                $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
-                $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
-            }
+            $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
+            $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
@@ -328,9 +330,14 @@ class Factory
         );
     }
 
+    public static function getDatabaseSqlite(Config $config) : string
+    {
+        return $config->getAsString('DATABASE_SQLITE', self::DEFAULT_DATABASE_SQLITE);
+    }
+
     public static function getDatabaseMode(Config $config) : string
     {
-        return $config->getAsString('DATABASE_MODE');
+        return $config->getAsString('DATABASE_MODE', self::DEFAULT_DATABASE_MODE);
     }
 
     public static function getDatabaseMysqlCharset(mixed $config) : string
