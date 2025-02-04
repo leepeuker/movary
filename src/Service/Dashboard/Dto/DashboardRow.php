@@ -17,7 +17,7 @@ class DashboardRow
         return self::create(0, 'Last Plays', $isVisible, $isExtended);
     }
 
-    public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = true) : self
+    public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = false) : self
     {
         return self::create(11, 'Last Plays Cinema', $isVisible, $isExtended);
     }
