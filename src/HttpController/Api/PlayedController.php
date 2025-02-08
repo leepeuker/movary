@@ -39,6 +39,7 @@ class PlayedController
                     $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
                     $watchDate['plays'] ?? 1,
                     $watchDate['comment'] ?? null,
+                    $watchDate['locationId'] ?? null,
                 );
             }
         }
@@ -93,6 +94,7 @@ class PlayedController
             null,
             null,
             null,
+            $requestData->getLocationId(),
         );
 
         $watchDates = $this->movieApi->fetchWatchDatesForMovies($requestData->getRequestedUserId(), $playedEntries);
@@ -106,6 +108,7 @@ class PlayedController
             null,
             null,
             null,
+            $requestData->getLocationId(),
         );
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
@@ -139,6 +142,7 @@ class PlayedController
                     $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
                     $watchDate['plays'],
                     $watchDate['comment'],
+                    $watchDate['locationId'],
                 );
             }
         }
