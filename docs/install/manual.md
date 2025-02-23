@@ -48,7 +48,9 @@ php bin/console.php database:migration:migrate
 
 ### Web server
 
-Use the `public` directory as the document root
+See `build/config/conf.d/default.conf` as an example nginx server configuration.
+
+Use the `public` directory as the document root of the web server.
 
 ### Job processing
 
