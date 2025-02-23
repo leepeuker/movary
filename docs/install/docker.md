@@ -58,7 +58,7 @@ This is the easiest setup and especially recommend for beginners
 $ docker volume create movary-storage
 $ docker run --rm -d \
   --name movary \
-  -p 80:80 \
+  -p 80:8080 \
   -e TMDB_API_KEY="<tmdb_key>" \
   -e DATABASE_MODE="sqlite" \
   -v movary-storage:/app/storage \
@@ -71,7 +71,7 @@ $ docker run --rm -d \
 $ docker volume create movary-storage
 $ docker run --rm -d \
   --name movary \
-  -p 80:80 \
+  -p 80:8080 \
   -e TMDB_API_KEY="<tmdb_key>" \
   -e DATABASE_MODE="mysql" \
   -e DATABASE_MYSQL_HOST="<host>" \
@@ -92,7 +92,7 @@ services:
     image: leepeuker/movary:latest
     container_name: movary
     ports:
-      - "80:80"
+      - "80:8080"
     environment:
       TMDB_API_KEY: "<tmdb_key>"
       DATABASE_MODE: "mysql"
@@ -128,7 +128,7 @@ services:
     image: leepeuker/movary:latest
     container_name: movary
     ports:
-      - "80:80"
+      - "80:8080"
     environment:
       TMDB_API_KEY_FILE: /run/secrets/tmdb_key
       DATABASE_MODE: "mysql"
