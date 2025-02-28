@@ -3,6 +3,7 @@
 namespace Movary\Service\Trakt;
 
 use Movary\Api;
+use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
 use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\ValueObject\TraktCredentials;
 use Movary\Api\Trakt\ValueObject\TraktId;
@@ -41,7 +42,16 @@ class ImportWatchedMovies
 
         $traktWatchedMovies = $this->traktApi->fetchUserMoviesWatched($traktCredentials);
         foreach ($traktWatchedMovies as $traktWatchedMovie) {
-            $movie = $this->movieImporter->importMovie($traktWatchedMovie->getMovie());
+            try {
+                $movie = $this->movieImporter->importMovie($traktWatchedMovie->getMovie());
+            } catch (TmdbResourceNotFound) {
+                $this->logger->warning('Trakt history import: Skipped movie because no result can be found for tmdbId', [
+                    'traktid' => $traktWatchedMovie->getMovie()->getTraktId(),
+                    'tmdbId' => $traktWatchedMovie->getMovie()->getTmdbId(),
+                ]);
+
+                continue;
+            }
 
             if ($ignoreCache === false && $this->isTraktCacheUpToDate($userId, $traktWatchedMovie) === true) {
                 $this->logger->debug('Trakt history import: Skipped "' . $movie->getTitle() . '" because trakt cache is up to date');
