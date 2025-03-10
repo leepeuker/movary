@@ -185,14 +185,27 @@ class MovieHistoryApi
         return $this->movieRepository->fetchHistoryByMovieId($movieId, $userId);
     }
 
-    public function fetchHistoryCount(int $userId, ?string $searchTerm = null) : int
+    public function fetchHistoryCount(int $userId, ?string $searchTerm = null, ?int $locationId = null) : int
     {
-        return $this->movieRepository->fetchHistoryCount($userId, $searchTerm);
+        return $this->movieRepository->fetchHistoryCount($userId, $searchTerm, $locationId);
     }
 
-    public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null, ?SortOrder $sortOrder = null) : array
-    {
-        $historyEntries = $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $sortOrder ?? SortOrder::createDesc(), $searchTerm);
+    public function fetchHistoryPaginated(
+        int $userId,
+        int $limit,
+        int $page,
+        ?string $searchTerm = null,
+        ?SortOrder $sortOrder = null,
+        ?int $locationId = null,
+    ) : array {
+        $historyEntries = $this->movieRepository->fetchHistoryPaginated(
+            $userId,
+            $limit,
+            $page,
+            $sortOrder ?? SortOrder::createDesc(),
+            $searchTerm,
+            $locationId,
+        );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($historyEntries);
     }
@@ -483,10 +496,15 @@ class MovieHistoryApi
     {
         $watchDates = [];
 
+        if (count($movieIds) === 0) {
+            return $watchDates;
+        }
+
         foreach ($this->movieRepository->fetchWatchDatesForMovieIds($userId, $movieIds) as $watchDateData) {
             $watchDates[$watchDateData['movie_id']][$watchDateData['watched_at']] = [
                 'plays' => $watchDateData['plays'],
                 'comment' => $watchDateData['comment'],
+                'locationId' => $watchDateData['location_id'],
             ];
         }
 
