@@ -387,7 +387,7 @@ class SettingsController
         $applicationUrl = $this->serverSettings->getApplicationUrl();
 
         if ($applicationUrl !== null && $radarrFeedId !== null) {
-            $radarrFeedUrl = $this->webhookUrlBuilder->buildRadarrFeedUrl($radarrFeedId);
+            $radarrFeedUrl = $applicationUrl . '/api/feed/radarr/' . $radarrFeedId;
         }
 
         return Response::create(

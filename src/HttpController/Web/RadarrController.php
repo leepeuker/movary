@@ -4,7 +4,7 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
-use Movary\Service\WebhookUrlBuilder;
+use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Response;
 
@@ -13,7 +13,7 @@ class RadarrController
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly WebhookUrlBuilder $webhookUrlBuilder,
+        private readonly ServerSettings $serverSettings,
     ) {
     }
 
@@ -27,7 +27,8 @@ class RadarrController
     public function regenerateRadarrFeedUrl() : Response
     {
         $feedId = $this->userApi->regenerateRadarrFeedId($this->authenticationService->getCurrentUserId());
+        $feedUrl = $this->serverSettings->getApplicationUrl() . '/api/feed/radarr/' . $feedId;
 
-        return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildRadarrFeedUrl($feedId)]));
+        return Response::createJson(Json::encode(['url' => $feedUrl]));
     }
 }
