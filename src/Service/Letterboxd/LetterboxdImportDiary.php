@@ -86,7 +86,6 @@ class LetterboxdImportDiary
             $movie = $this->movieApi->fetchById($movieId);
 
             foreach ($watchDateToPlaysMap as $watchDate => $plays) {
-                $watchDate = Date::createFromString($watchDate);
 
                 if ($this->movieApi->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchDate) !== null) {
                     $this->logger->info('Letterboxd import: Ignoring movie watch date because it was already set for movie: ' . $movie->getTitle());
