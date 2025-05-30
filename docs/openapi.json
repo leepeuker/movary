@@ -985,6 +985,222 @@
         ]
       }
     },
+    "/movies/{id}": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "Get movie data",
+        "description": "Get the data of a specific movie based on their Movary ID",
+        "parameters": [
+          {
+            "$ref": "#/components/schemas/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movie ID is valid and the movie was found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "movie": {
+                      "description": "Movie object",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "$ref": "#/components/schemas/id"
+                        },
+                        "tmdbId": {
+                          "$ref": "#/components/schemas/idNullable"
+                        },
+                        "imdbId": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": "tt12345678"
+                        },
+                        "title": {
+                          "$ref": "#/components/schemas/title"
+                        },
+                        "releaseDate": {
+                          "$ref":"#/components/schemas/releaseDateNullable"
+                        },
+                        "posterPath": {
+                          "$ref": "#/components/schemas/posterPath"
+                        },
+                        "tagline": {
+                          "$ref": "#/components/schemas/movie/properties/tagline"
+                        },
+                        "overview": {
+                          "$ref": "#/components/schemas/overview"
+                        },
+                        "runtime": {
+                          "$ref": "#/components/schemas/movie/properties/runtime"
+                        },
+                        "imdbUrl": {
+                          "type": "string",
+                          "description": "URL of the movie in IMDb",
+                          "nullable": true
+                        },
+                        "imdbRatingAverage": {
+                          "type": "string",
+                          "description": "Average rating of movie on IMDb",
+                          "nullable": true
+                        },
+                        "imdbRatingVoteCount": {
+                          "type": "string",
+                          "description": "Amount of ratings of movie in IMDb",
+                          "nullable": true
+                        },
+                        "tmdbUrl": {
+                          "type": "string",
+                          "description": "The URL of the movie on TMDB",
+                          "nullable": true
+                        },
+                        "tmdbRatingAverage": {
+                          "type": "number",
+                          "description": "Average rating of movie on TMDB",
+                          "nullable": true
+                        },
+                        "tmdbRatingVotecount": {
+                          "type": "string",
+                          "description": "Amount of ratings of movie in TMDB",
+                          "nullable": true
+                        },
+                        "originalLanguage": {
+                          "type": "string",
+                          "description": "Original language of movie",
+                          "nullable": true,
+                          "example": "English"
+                        }
+                      }
+                    },
+                    "movieGenres": {
+                      "type": "array",
+                      "properties": {
+                        "genre": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Name of the genre"
+                            }
+                          }
+                        }
+                      },
+                      "example": [
+                        {
+                          "name": "Genre 1"
+                        },
+                        {
+                          "name": "Genre 2"
+                        }
+                      ]
+                    },
+                    "castMembers": {
+                      "type": "array",
+                      "properties": {
+                        "castMember": {
+                          "type": "object",
+                          "id": {
+                            "$ref": "#/components/schemas/id"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Name of the cast member"
+                          },
+                          "posterPath": {
+                            "$ref": "#/components/schemas/posterPath"
+                          },
+                          "characterName": {
+                            "type": "string",
+                            "description": "Name of the character this cast member played in the movie"
+                          }
+                        }
+                      },
+                      "example": [
+                        {
+                          "id": 1,
+                          "name": "Name 1",
+                          "posterPath": "/path/to/poster1.jpg",
+                          "characterName": "Character name 1"
+                        },
+                        {
+                          "id": 2,
+                          "name": "Name 2",
+                          "posterPath": "/path/to/poster2.jpg",
+                          "characterName": "Character name 2"
+                        }
+                      ]
+                    },
+                    "directors": {
+                      "type": "array",
+                      "properties": {
+                        "director": {
+                          "type": "object",
+                          "description": "The director",
+                          "properties": {
+                            "id": {
+                              "$ref": "#/components/schemas/id"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "Name of the director"
+                            },
+                            "posterPath": {
+                              "$ref": "#/components/schemas/posterPath"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "totalPlays": {
+                      "$ref": "#/components/schemas/playsOptional"
+                    },
+                    "watchDates": {
+                      "type": "array",
+                      "properties": {
+                        "date": {
+                          "$ref": "#/components/schemas/dateNullable"
+                        }
+                      }
+                    },
+                    "isOnWatchList": {
+                      "type": "boolean",
+                      "description": "True if on watchlist, false if not, and null if no token has been sent in the request header..",
+                      "nullable": true
+                    },
+                    "countries": {
+                      "type": "object",
+                      "properties": {
+                        "ISOCode": {
+                          "type": "object",
+                          "description": "2-Letter ISO code of country, with as value their full name",
+                          "example": {
+                            "US": "United States"
+                          }
+                        }
+                      },
+                      "example": {
+                        "AF": "Afghanistan",
+                        "AL": "Albania"
+                      }
+                    },
+                    "displayCharacterNames": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movie was not found"
+          }
+        }
+      }
+    },
     "/webhook/plex/{uuid}": {
       "post": {
         "tags": [
@@ -1395,6 +1611,12 @@
         "type": "number",
         "example": 1,
         "nullable": false
+      },
+      "posterPath": {
+        "type": "string",
+        "description": "The path to the poster",
+        "nullable": true,
+        "example": "/storage/images/itemtype/1.jpg"
       },
       "positionOptional": {
         "type": "number",
