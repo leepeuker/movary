@@ -44,6 +44,7 @@ class PlayedResponseMapper
                 empty($watchDate) === false ? Date::createFromString($watchDate) : null,
                 $watchDateData['plays'],
                 $watchDateData['comment'],
+                $watchDateData['locationId'],
             );
 
             $watchDates->add($watchDate);

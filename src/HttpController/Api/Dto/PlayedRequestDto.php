@@ -3,8 +3,9 @@
 namespace Movary\HttpController\Api\Dto;
 
 use Movary\ValueObject\SortOrder;
+use Movary\ValueObject\Year;
 
-class HistoryRequestDto
+class PlayedRequestDto
 {
     private function __construct(
         private readonly int $requestedUserId,
@@ -13,6 +14,9 @@ class HistoryRequestDto
         private readonly int $limit,
         private readonly string $sortBy,
         private readonly SortOrder $sortOrder,
+        private readonly ?Year $releaseYear,
+        private readonly ?string $language,
+        private readonly ?string $genre,
         private readonly ?int $locationId,
     ) {
     }
@@ -24,7 +28,10 @@ class HistoryRequestDto
         int $limit,
         string $sortBy,
         SortOrder $sortOrder,
-        ?int $locationId,
+        ?Year $releaseYear = null,
+        ?string $language = null,
+        ?string $genre = null,
+        ?int $locationId = null,
     ) : self {
         return new self(
             $requestedUserId,
@@ -33,8 +40,21 @@ class HistoryRequestDto
             $limit,
             $sortBy,
             $sortOrder,
+            $releaseYear,
+            $language,
+            $genre,
             $locationId,
         );
+    }
+
+    public function getGenre() : ?string
+    {
+        return $this->genre;
+    }
+
+    public function getLanguage() : ?string
+    {
+        return $this->language;
     }
 
     public function getLimit() : int
@@ -50,6 +70,11 @@ class HistoryRequestDto
     public function getPage() : int
     {
         return $this->page;
+    }
+
+    public function getReleaseYear() : ?Year
+    {
+        return $this->releaseYear;
     }
 
     public function getRequestedUserId() : int

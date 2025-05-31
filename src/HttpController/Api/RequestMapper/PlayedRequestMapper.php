@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController\Api\RequestMapper;
 
+use Movary\HttpController\Api\Dto\PlayedRequestDto;
 use Movary\HttpController\Api\Dto\WatchlistRequestDto;
 use Movary\ValueObject\Http\Request;
 
@@ -15,13 +16,13 @@ class PlayedRequestMapper
     {
     }
 
-    public function mapRequest(Request $request) : WatchlistRequestDto
+    public function mapRequest(Request $request) : PlayedRequestDto
     {
         $getParameters = $request->getGetParameters();
 
         $sortBy = $getParameters['sortBy'] ?? self::DEFAULT_SORT_BY;
 
-        return WatchlistRequestDto::create(
+        return PlayedRequestDto::create(
             $this->requestMapper->mapUsernameFromRoute($request)->getId(),
             $this->requestMapper->mapSearchTerm($request),
             $this->requestMapper->mapPage($request),
@@ -29,6 +30,9 @@ class PlayedRequestMapper
             $sortBy,
             $this->requestMapper->mapSortOrder($request, self::DEFAULT_SORT_ORDER),
             $this->requestMapper->mapReleaseYear($request),
+            $this->requestMapper->mapLanguage($request),
+            $this->requestMapper->mapGenre($request),
+            locationId: $this->requestMapper->mapLocationId($request),
         );
     }
 }

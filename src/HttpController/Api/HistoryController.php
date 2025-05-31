@@ -38,6 +38,7 @@ class HistoryController
                 $historyAddition['plays'] ?? 1,
                 $historyAddition['position'] ?? 1,
                 $historyAddition['comment'] ?? null,
+                $historyAddition['locationId'] ?? null,
             );
         }
 
@@ -70,11 +71,13 @@ class HistoryController
             $requestData->getPage(),
             $requestData->getSearchTerm(),
             $requestData->getSortOrder(),
+            $requestData->getLocationId(),
         );
 
         $historyCount = $this->movieHistoryApi->fetchHistoryCount(
             $requestData->getRequestedUserId(),
             $requestData->getSearchTerm(),
+            $requestData->getLocationId(),
         );
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
@@ -105,6 +108,7 @@ class HistoryController
                 $historyAddition['plays'],
                 $historyAddition['position'],
                 $historyAddition['comment'],
+                $historyAddition['locationId'],
             );
         }
 
