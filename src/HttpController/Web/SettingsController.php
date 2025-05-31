@@ -18,6 +18,7 @@ use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Service\Radarr\RadarrFeedUrlGenerator;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
@@ -52,6 +53,7 @@ class SettingsController
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
         private readonly TmdbIsoCountryCache $countryCache,
+        private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
     ) {
     }
 
@@ -387,7 +389,7 @@ class SettingsController
         $applicationUrl = $this->serverSettings->getApplicationUrl();
 
         if ($applicationUrl !== null && $radarrFeedId !== null) {
-            $radarrFeedUrl = $applicationUrl . '/api/feed/radarr/' . $radarrFeedId;
+            $radarrFeedUrl = $this->radarrFeedUrlGenerator->generateUrl($radarrFeedId);
         }
 
         return Response::create(
