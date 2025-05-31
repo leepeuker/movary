@@ -6,13 +6,15 @@ use GuzzleHttp\Client;
 use Movary\Api\Imdb\ImdbUrlGenerator;
 use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\ValueObject\ImdbRating;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 
-/** @covers \Movary\Api\Imdb\ImdbWebScrapper */
+#[CoversClass(\Movary\Api\Imdb\ImdbWebScrapper::class)]
 class ImdbWebScrapperTest extends TestCase
 {
     private Client|MockObject $httpClientMock;
@@ -23,7 +25,7 @@ class ImdbWebScrapperTest extends TestCase
 
     private MockObject|ImdbUrlGenerator $urlGeneratorMock;
 
-    public function provideFindRatingData() : array
+    public static function provideFindRatingData() : array
     {
         return [
             [
@@ -102,9 +104,7 @@ class ImdbWebScrapperTest extends TestCase
         $this->subject = new ImdbWebScrapper($this->httpClientMock, $this->urlGeneratorMock, $this->loggerMock);
     }
 
-    /**
-     * @dataProvider provideFindRatingData
-     */
+    #[DataProvider('provideFindRatingData')]
     public function testFindRating(string $responseContent, ?ImdbRating $expectedResult) : void
     {
         $imdbId = 'imdb-id';

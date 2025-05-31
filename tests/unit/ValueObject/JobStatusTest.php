@@ -3,10 +3,11 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\JobStatus;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-/** @covers \Movary\ValueObject\JobStatus */
+#[CoversClass(\Movary\ValueObject\JobStatus::class)]
 class JobStatusTest extends TestCase
 {
     public function testCreateDone() : void

@@ -3,14 +3,16 @@
 namespace Tests\Unit\Movary\Service;
 
 use Movary\Service\VoteCountFormatter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Service\VoteCountFormatter */
+#[CoversClass(\Movary\Service\VoteCountFormatter::class)]
 class VoteCountFormatterTest extends TestCase
 {
     private VoteCountFormatter $subject;
 
-    public function provideTestData() : array
+    public static function provideTestData() : array
     {
         return [
             [null, '-'],
@@ -39,9 +41,7 @@ class VoteCountFormatterTest extends TestCase
         $this->subject = new VoteCountFormatter();
     }
 
-    /**
-     * @dataProvider provideTestData
-     */
+    #[DataProvider('provideTestData')]
     public function testFormat(?int $voteCount, string $expectedResult) : void
     {
         self::assertSame($expectedResult, $this->subject->formatVoteCount($voteCount));

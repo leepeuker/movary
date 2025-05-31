@@ -3,10 +3,11 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\DateFormat;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-/** @covers \Movary\ValueObject\DateFormat */
+#[CoversClass(\Movary\ValueObject\DateFormat::class)]
 class DateFormatTest extends TestCase
 {
     public function testGetFormats() : void

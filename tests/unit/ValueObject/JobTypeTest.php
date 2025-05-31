@@ -3,10 +3,11 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\JobType;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-/** @covers \Movary\ValueObject\JobType */
+#[CoversClass(\Movary\ValueObject\JobType::class)]
 class JobTypeTest extends TestCase
 {
     public function testCreateImdbSync() : void

@@ -4,9 +4,10 @@ namespace Tests\Unit\Movary\Domain\Company;
 
 use Movary\Domain\Company\CompanyEntity;
 use Movary\Domain\Company\CompanyEntityList;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Domain\Company\CompanyEntity */
+#[CoversClass(\Movary\Domain\Company\CompanyEntityList::class)]
 class CompanyEntityListTest extends TestCase
 {
     public function testAdd() : void

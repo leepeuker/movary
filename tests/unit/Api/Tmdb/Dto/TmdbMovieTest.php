@@ -6,9 +6,10 @@ use Movary\Api\Tmdb\Dto\TmdbGenreList;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbProductionCompanyList;
 use Movary\ValueObject\DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Api\Tmdb\Dto\TmdbMovie */
+#[CoversClass(\Movary\Api\Tmdb\Dto\TmdbMovie::class)]
 class TmdbMovieTest extends TestCase
 {
     public function testWithAllPossibleValuesEmptyOrNull() : void
