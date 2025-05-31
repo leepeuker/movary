@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\ValueObject\Http;
 
 use Movary\ValueObject\Http\StatusCode;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\Http\StatusCode */
+#[CoversClass(\Movary\ValueObject\Http\StatusCode::class)]
 class StatusCodeTest extends TestCase
 {
     public function testCreateBadRequest() : void

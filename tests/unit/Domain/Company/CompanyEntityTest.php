@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\Domain\Company;
 
 use Movary\Domain\Company\CompanyEntity;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Domain\Company\CompanyEntity */
+#[CoversClass(\Movary\Domain\Company\CompanyEntity::class)]
 class CompanyEntityTest extends TestCase
 {
     public static function testCreateFromArrayWithAllPossibleValuesSetToNull() : void

@@ -6,10 +6,12 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\Domain\Movie\MovieRepository;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Domain\Movie\MovieRepository */
+#[CoversClass(\Movary\Domain\Movie\MovieRepository::class)]
 class MovieRepositoryTest extends TestCase
 {
     private MockObject|Connection $dbConnectionMock;
@@ -95,9 +97,7 @@ class MovieRepositoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providedTestFetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAtData
-     */
+    #[DataProvider('providedTestFetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAtData')]
     public function testFetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAt(string $expectedQuery, bool $isSqlite, ?int $maxAgeInHours, ?int $limit) : void
     {
         $this->dbConnectionMock

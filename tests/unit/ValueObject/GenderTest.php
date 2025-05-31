@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\Gender;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\Gender */
+#[CoversClass(\Movary\ValueObject\Gender::class)]
 class GenderTest extends TestCase
 {
     public function testCreateFemale() : void

@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\ResourceType;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\ResourceType */
+#[CoversClass(\Movary\ValueObject\ResourceType::class)]
 class ResourceTypeTest extends TestCase
 {
     public function testCreateMovie() : void

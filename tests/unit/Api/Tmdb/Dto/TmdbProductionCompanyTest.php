@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\Api\Tmdb\Dto;
 
 use Movary\Api\Tmdb\Dto\TmdbProductionCompany;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Api\Tmdb\Dto\TmdbProductionCompany */
+#[CoversClass(\Movary\Api\Tmdb\Dto\TmdbProductionCompany::class)]
 class TmdbProductionCompanyTest extends TestCase
 {
     public function testCreateFromArray() : void

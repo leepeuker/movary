@@ -4,9 +4,10 @@ namespace Tests\Unit\Movary\Api\Tmdb;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\ValueObject\Url;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Api\Tmdb\TmdbUrlGenerator */
+#[CoversClass(\Movary\Api\Tmdb\TmdbUrlGenerator::class)]
 class TmdbUrlGeneratorTest extends TestCase
 {
     private TmdbUrlGenerator $subject;

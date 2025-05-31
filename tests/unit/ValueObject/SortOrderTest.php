@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\SortOrder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\SortOrder */
+#[CoversClass(\Movary\ValueObject\SortOrder::class)]
 class SortOrderTest extends TestCase
 {
     public function testCreateAsc() : void

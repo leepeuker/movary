@@ -4,9 +4,10 @@ namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\DateTime */
+#[CoversClass(\Movary\ValueObject\DateTime::class)]
 class DateTimeTest extends TestCase
 {
     public function testDiffInHours() : void

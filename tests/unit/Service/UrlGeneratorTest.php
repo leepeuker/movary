@@ -6,10 +6,12 @@ use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Service\ImageCacheService;
 use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Url;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Service\UrlGenerator */
+#[CoversClass(\Movary\Service\UrlGenerator::class)]
 class UrlGeneratorTest extends TestCase
 {
     private ImageCacheService|MockObject $imageCacheServiceMock;
@@ -18,7 +20,7 @@ class UrlGeneratorTest extends TestCase
 
     private MockObject|TmdbUrlGenerator $tmdbUrlGeneratorMock;
 
-    public function provideTestGenerateImageSrcUrlFromParametersData() : array
+    public static function provideTestGenerateImageSrcUrlFromParametersData() : array
     {
         return [
             [
@@ -68,11 +70,11 @@ class UrlGeneratorTest extends TestCase
         $this->subject = new UrlGenerator(
             $this->tmdbUrlGeneratorMock,
             $this->imageCacheServiceMock,
-            true
+            true,
         );
     }
 
-    /** @dataProvider provideTestGenerateImageSrcUrlFromParametersData */
+    #[DataProvider('provideTestGenerateImageSrcUrlFromParametersData')]
     public function testGenerateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath, string $expectedResult, bool $posterPathExists) : void
     {
         if ($posterPath !== null) {

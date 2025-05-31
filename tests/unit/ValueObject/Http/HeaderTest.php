@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\ValueObject\Http;
 
 use Movary\ValueObject\Http\Header;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\Http\Header */
+#[CoversClass(\Movary\ValueObject\Http\Header::class)]
 class HeaderTest extends TestCase
 {
     public function testCreateContentTypeCsv() : void

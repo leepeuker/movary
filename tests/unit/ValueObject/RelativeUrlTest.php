@@ -5,9 +5,10 @@ namespace Tests\Unit\Movary\ValueObject;
 use Movary\Util\Json;
 use Movary\ValueObject\Exception\InvalidRelativeUrl;
 use Movary\ValueObject\RelativeUrl;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\RelativeUrl */
+#[CoversClass(\Movary\ValueObject\RelativeUrl::class)]
 class RelativeUrlTest extends TestCase
 {
     public function testCreateThrowsExceptionIfUrlIsNotValid() : void

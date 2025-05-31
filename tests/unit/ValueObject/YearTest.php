@@ -4,10 +4,11 @@ namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\Util\Json;
 use Movary\ValueObject\Year;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-/** @covers \Movary\ValueObject\Year */
+#[CoversClass(\Movary\ValueObject\Year::class)]
 class YearTest extends TestCase
 {
     public function testAsInt() : void

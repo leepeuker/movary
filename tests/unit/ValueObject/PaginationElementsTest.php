@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\PaginationElements;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\PaginationElements */
+#[CoversClass(\Movary\ValueObject\PaginationElements::class)]
 class PaginationElementsTest extends TestCase
 {
     private PaginationElements $subject;
