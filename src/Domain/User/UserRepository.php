@@ -182,7 +182,7 @@ class UserRepository
         );
     }
 
-    public function findApiToken(int $userId) : ?string
+    public function findApiTokenByUserId(int $userId) : ?string
     {
         return $this->dbConnection->fetchFirstColumn(
             'SELECT token
@@ -366,6 +366,22 @@ class UserRepository
         }
 
         return UserEntity::createFromArray($data);
+    }
+
+    public function findUserIdByApiToken(string $apiToken) : ?int
+    {
+        $result = $this->dbConnection->fetchFirstColumn(
+            'SELECT user_id
+            FROM `user_api_token` 
+            WHERE token = ?',
+            [$apiToken],
+        );
+
+        if (count($result) !== 1) {
+            return null;
+        }
+
+        return (int)$result[0];
     }
 
     public function findUserIdByAuthToken(string $token) : ?int

@@ -139,7 +139,7 @@ class UserApi
 
     public function findApiTokenByUserId(int $userId) : ?string
     {
-        return $this->repository->findApiToken($userId);
+        return $this->repository->findApiTokenByUserId($userId);
     }
 
     public function findByToken(string $token) : ?UserEntity
@@ -220,6 +220,11 @@ class UserApi
     public function findUserByName(string $name) : ?UserEntity
     {
         return $this->repository->findUserByName($name);
+    }
+
+    public function findUserIdByApiToken(string $apiToken) : ?int
+    {
+        return $this->repository->findUserIdByApiToken($apiToken);
     }
 
     public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
