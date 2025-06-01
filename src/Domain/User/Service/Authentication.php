@@ -108,18 +108,18 @@ class Authentication
         return $request->getHeaders()['X-Movary-Token'] ?? null;
     }
 
-    public function getUserIdByApiToken(Request $request) : ?int
+    public function getUserIdByToken(Request $request) : ?int
     {
-        $apiToken = $this->getToken($request);
-        if ($apiToken === null) {
+        $token = $this->getToken($request);
+        if ($token === null) {
             return null;
         }
 
-        if ($this->isValidAuthToken($apiToken) === false) {
+        if ($this->isValidToken($token) === false) {
             return null;
         }
 
-        return $this->userApi->findByToken($apiToken)?->getId();
+        return $this->userApi->findByToken($token)?->getId();
     }
 
     public function isUserAuthenticatedWithCookie() : bool
@@ -140,7 +140,7 @@ class Authentication
 
     public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
     {
-        $requestUserId = $this->getUserIdByApiToken($request);
+        $requestUserId = $this->getUserIdByToken($request);
 
         return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
@@ -155,19 +155,13 @@ class Authentication
         return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
-    public function isValidAuthToken(string $token) : bool
+    public function isValidToken(string $token) : bool
     {
-        $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
-
-        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
-            if ($tokenExpirationDate !== null) {
-                $this->repository->deleteAuthToken($token);
-            }
-
-            return false;
-        }
-
-        return true;
+        return match (true) {
+            $this->isValidApiToken($token) => true,
+            $this->isValidAuthToken($token) => true,
+            default => false,
+        };
     }
 
     /**
@@ -243,6 +237,26 @@ class Authentication
         }
 
         return $targetUser->getId() === $requestUserId;
+    }
+
+    private function isValidApiToken(string $token) : bool
+    {
+        return $this->userApi->findUserIdByApiToken($token) !== null;
+    }
+
+    private function isValidAuthToken(string $token) : bool
+    {
+        $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
+
+        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
+            if ($tokenExpirationDate !== null) {
+                $this->repository->deleteAuthToken($token);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string
