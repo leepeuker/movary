@@ -876,6 +876,57 @@
         ]
       }
     },
+    "\/movies\/add": {
+      "post": {
+        "tags": [
+          "Movies"
+        ],
+        "summary": "Add movie via external provider id",
+        "description": "Adds a new movie via external data provider",
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tmdbId": {
+                    "$ref": "#/components/schemas/id"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "movaryId": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        },
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
     "\/movies\/search": {
       "get": {
         "tags": [
