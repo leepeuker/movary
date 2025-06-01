@@ -36,7 +36,7 @@ class MovieAddController
             return Response::createBadRequest(
                 Json::encode([
                     'error' => 'ProviderIdNotFound',
-                    'message' => 'External provider found no movie with submitted provider id',
+                    'message' => 'External provider found no movie for submitted id',
                 ]),
                 [Header::createContentTypeJson()],
             );
