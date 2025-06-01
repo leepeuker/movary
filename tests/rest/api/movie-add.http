@@ -1,0 +1,11 @@
+POST http://127.0.0.1/api/movies/add
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Token: {{xMovaryToken}}
+
+{
+  "tmdbId": 1233413
+}
+
+####
