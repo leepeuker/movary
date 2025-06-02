@@ -58,14 +58,16 @@ function getRouteUsername() {
 }
 
 function saveRating() {
-    let newRating = getRatingFromStars('editRatingModal')
+    let newRating = getRatingFromStars('editRatingModal');
 
-    fetch('/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
+    fetch('/api/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
         method: 'post',
         headers: {
-            'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            'Content-type': 'application/json'
         },
-        body: 'rating=' + newRating
+        body: JSON.stringify({
+            'rating': newRating
+        })
     }).then(function (response) {
         if (response.ok === false) {
             addAlert('editRatingModalDiv', 'Could not update rating.', 'danger')

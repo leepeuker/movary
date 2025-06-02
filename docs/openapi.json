@@ -1117,6 +1117,115 @@
         }
       }
     },
+    "/users/{username}/movies/{id}/rating": {
+      "post": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Update the rating of an user for a movie",
+        "description": "Update the rating of an user for a movie",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Name of user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Movary ID of the movie",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rating": {
+                      "type": "integer",
+                      "description": "Rating of the movie. It has to be an integer in the range of 0 - 10. If the rating is 0, then the rating will be deleted.",
+                      "example": 10,
+                      "minimum": 0,
+                      "maximum": 10
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": [
+          {
+            "authToken": [],
+            "cookieauth": []
+          }
+        ]
+      }
+    },
+    "\/fetchMovieRatingByTmdbdId": {
+      "get": {
+        "tags": [
+          "Rating"
+        ],
+        "summary": "Get movie rating",
+        "description": "Get the movie rating from the current user. The movie is found by using the TMDB ID",
+        "parameters": [
+          {
+            "name": "tmdbId",
+            "description": "The ID of the movie from TMDB",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The TMDB ID was valid and the ratings have been returned.",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "personalRating": {
+                      "type": "integer",
+                      "description": "The rating of the movie by the user. It will be null if there is no rating.",
+                      "minimum": 1,
+                      "maximum": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          }
+        }
+      }
+    },
     "/authentication/token": {
       "get": {
         "tags": [

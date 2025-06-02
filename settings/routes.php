@@ -191,13 +191,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\HistoryController::class,
         'createHistoryEntry'
     ], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [
-        Web\Movie\MovieRatingController::class,
-        'updateRating'
-    ], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }
@@ -230,6 +225,9 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
+
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/rating', [Api\MovieRatingController::class, 'updateRating'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Api\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Api\Middleware\IsAuthenticated::class]);
 
     $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
     $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
