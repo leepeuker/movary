@@ -57,6 +57,15 @@
                         </select>
                     </div>
                     <div class="input-group mb-3">
+                        <span class="input-group-text">Production country</span>
+                        <select class="form-control" name="pc" id="searchProductionCountrySelect">
+                            <option value="" {{ productionCountryCode is null ? 'selected' }}></option>
+                            {% for uniqueProductionCountry in uniqueProductionCountries %}
+                                <option value="{{ uniqueProductionCountry.iso_3166_1 }}" {{ uniqueProductionCountry.iso_3166_1 == productionCountryCode ? 'selected' }}>{{ uniqueProductionCountry.english_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
                         <span class="input-group-text">User Rating</span>
                         <select class="form-control" name="ur" id="searchUserRatingSelect">
                             <option value="" {{ hasUserRating is null ? 'selected' }}></option>

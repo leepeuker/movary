@@ -67,6 +67,7 @@ class WatchlistController
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
             $requestData->getGenre(),
+            $requestData->getProductionCountryCode(),
         );
         $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
             $requestData->getUserId(),
@@ -74,6 +75,7 @@ class WatchlistController
             $requestData->getReleaseYear(),
             $requestData->getLanguage(),
             $requestData->getGenre(),
+            $requestData->getProductionCountryCode(),
         );
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchlistCount, $requestData->getLimit(), $requestData->getPage());
@@ -91,7 +93,9 @@ class WatchlistController
                 'releaseYear' => (string)$requestData->getReleaseYear(),
                 'language' => (string)$requestData->getLanguage(),
                 'genre' => (string)$requestData->getGenre(),
+                'productionCountryCode' => $requestData->getProductionCountryCode(),
                 'uniqueReleaseYears' => $this->movieWatchlistApi->fetchUniqueMovieReleaseYears($requestData->getUserId()),
+                'uniqueProductionCountries' => $this->movieWatchlistApi->fetchUniqueMovieProductionCountries($requestData->getUserId()),
                 'uniqueLanguages' => $this->movieWatchlistApi->fetchUniqueMovieLanguages($requestData->getUserId()),
                 'uniqueGenres' => $this->movieWatchlistApi->fetchUniqueMovieGenres($requestData->getUserId()),
             ]),

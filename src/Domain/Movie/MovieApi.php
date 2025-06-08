@@ -298,6 +298,11 @@ class MovieApi
         return $this->historyApi->fetchUniqueMovieReleaseYears($userId);
     }
 
+    public function fetchUniqueProductionCountries(int $userId) : array
+    {
+        return $this->historyApi->fetchUniqueProductionCountries($userId);
+    }
+
     public function fetchUniqueWatchedMoviesCount(
         int $userId,
         ?string $searchTerm,
@@ -308,6 +313,7 @@ class MovieApi
         ?int $userRatingMin,
         ?int $userRatingMax,
         ?int $locationId,
+        ?string $productionCountryCode,
     ) : int {
         return $this->historyApi->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -319,6 +325,7 @@ class MovieApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
     }
 
@@ -336,6 +343,7 @@ class MovieApi
         ?int $userRatingMin,
         ?int $userRatingMax,
         ?int $locationId,
+        ?string $productionCountryCode,
     ) : array {
         return $this->historyApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
@@ -351,6 +359,7 @@ class MovieApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
     }
 

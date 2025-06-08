@@ -21,6 +21,7 @@ class MoviesRequestDto
         private readonly ?int $userRatingMin,
         private readonly ?int $userRatingMax,
         private readonly ?int $locationId,
+        private readonly ?string $productionCountryCode,
     ) {
     }
 
@@ -34,6 +35,7 @@ class MoviesRequestDto
         ?Year $releaseYear = null,
         ?string $language = null,
         ?string $genre = null,
+        ?string $productionCountryCode = null,
         ?bool $hasUserRating = null,
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
@@ -53,6 +55,7 @@ class MoviesRequestDto
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
     }
 
@@ -79,6 +82,11 @@ class MoviesRequestDto
     public function getPage() : int
     {
         return $this->page;
+    }
+
+    public function getProductionCountryCode() : ?string
+    {
+        return $this->productionCountryCode;
     }
 
     public function getReleaseYear() : ?Year

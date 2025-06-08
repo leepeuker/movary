@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\Api\Tmdb\Dto;
 
+use Movary\Api\Tmdb\Dto\TmdbCountryList;
 use Movary\Api\Tmdb\Dto\TmdbGenreList;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbProductionCompanyList;
@@ -30,6 +31,7 @@ class TmdbMovieTest extends TestCase
             'backdrop_path' => null,
             'imdb_id' => null,
             'credits' => null,
+            'production_countries' => [],
         ];
 
         $subject = TmdbMovie::createFromArray($testData);
@@ -38,6 +40,7 @@ class TmdbMovieTest extends TestCase
 
         self::assertEquals(TmdbGenreList::createFromArray([]), $subject->getGenres());
         self::assertEquals(TmdbProductionCompanyList::createFromArray([]), $subject->getProductionCompanies());
+        self::assertEquals(TmdbCountryList::createFromArray([]), $subject->getProductionCountries());
 
         self::assertNull($subject->getOverview());
         self::assertNull($subject->getRuntime());
@@ -75,6 +78,11 @@ class TmdbMovieTest extends TestCase
             'poster_path' => 'posterPath',
             'backdrop_path' => 'backdropPath',
             'imdb_id' => 'tt1234567',
+            'production_countries' => [
+                [
+                    'iso_3166_1' => 'UK'
+                ]
+            ],
         ];
 
         $subject = TmdbMovie::createFromArray($testData);
@@ -83,6 +91,7 @@ class TmdbMovieTest extends TestCase
 
         self::assertEquals(TmdbGenreList::createFromArray([['id' => 2, 'name' => 'Horror']]), $subject->getGenres());
         self::assertEquals(TmdbProductionCompanyList::createFromArray([['id' => 120, 'name' => 'company', 'origin_country' => 'US']]), $subject->getProductionCompanies());
+        self::assertEquals(TmdbCountryList::createFromArray([['iso_3166_1' => 'UK']]), $subject->getProductionCountries());
 
         self::assertSame('overview...', $subject->getOverview());
         self::assertSame(90, $subject->getRuntime());
