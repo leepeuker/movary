@@ -2,7 +2,7 @@
 
 namespace Movary\HttpController\Web\Movie;
 
-use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
+use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
@@ -24,7 +24,7 @@ class MovieController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
-        private readonly TmdbIsoCountryCache $tmdbIsoCountryCache,
+        private readonly CountryApi $countryApi,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
     ) {
@@ -93,7 +93,7 @@ class MovieController
                 'totalPlays' => $this->movieApi->fetchHistoryMovieTotalPlays($movieId, $userId),
                 'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
-                'countries' => $this->tmdbIsoCountryCache->fetchAll(),
+                'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
             ]),
         );

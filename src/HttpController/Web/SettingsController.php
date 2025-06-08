@@ -5,8 +5,8 @@ namespace Movary\HttpController\Web;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Plex\PlexApi;
-use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Api\Trakt\TraktApi;
+use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
@@ -52,7 +52,7 @@ class SettingsController
         private readonly JobQueueApi $jobQueueApi,
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
-        private readonly TmdbIsoCountryCache $countryCache,
+        private readonly CountryApi $countryApi,
         private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
     ) {
     }
@@ -248,7 +248,7 @@ class SettingsController
                 'privacyLevel' => $user->getPrivacyLevel(),
                 'username' => $user->getName(),
                 'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
-                'countries' => $this->countryCache->fetchAll(),
+                'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'userCountry' => $user->getCountry(),
                 'apiToken' => $this->userApi->findApiTokenByUserId($user->getId()),
                 'displayCharacterNamesInput' => $user->getDisplayCharacterNames(),
