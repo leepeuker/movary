@@ -91,6 +91,7 @@ class SyncMovie
 
             $this->movieApi->updateCast($movie->getId(), $tmdbMovie->getCredits()->getCast());
             $this->movieApi->updateCrew($movie->getId(), $tmdbMovie->getCredits()->getCrew());
+            $this->movieApi->updateProductionCountries($movie->getId(), $tmdbMovie->getProductionCountries()->asArray());
 
             $this->dbConnection->commit();
         } catch (Exception $e) {

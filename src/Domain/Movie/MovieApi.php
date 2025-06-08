@@ -657,6 +657,12 @@ class MovieApi
         }
     }
 
+    public function updateProductionCountries(int $movieId, array $countriesIso31661) : void
+    {
+        $this->repository->deleteProductionCountries($movieId);
+        $this->repository->updateProductionCountries($movieId, $countriesIso31661);
+    }
+
     public function updateTraktId(int $movieId, TraktId $traktId) : void
     {
         $this->repository->updateTraktId($movieId, $traktId);

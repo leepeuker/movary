@@ -65,6 +65,11 @@ class MovieRepository
         $this->dbConnection->delete('movie_user_rating', ['user_id' => $userId]);
     }
 
+    public function deleteProductionCountries(int $movieId) : void
+    {
+        $this->dbConnection->delete('movie_production_countries', ['movie_id' => $movieId]);
+    }
+
     public function deleteUserRating(int $movieId, int $userId) : void
     {
         $this->dbConnection->executeQuery(
@@ -1178,6 +1183,20 @@ class MovieRepository
     public function updateLetterboxdId(int $id, string $letterboxdId) : void
     {
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId, 'updated_at' => (string)DateTime::create()], ['id' => $id]);
+    }
+
+    public function updateProductionCountries(int $movieId, array $countriesIso31661) : void
+    {
+        $timestamp = (string)DateTime::create();
+
+        foreach ($countriesIso31661 as $index => $countryIso31661) {
+            $this->dbConnection->insert('movie_production_countries', [
+                'movie_id' => $movieId,
+                'iso_3166_1' => $countryIso31661,
+                'position' => $index,
+                'created_at' => $timestamp
+            ]);
+        }
     }
 
     public function updateTraktId(int $id, TraktId $traktId) : void
