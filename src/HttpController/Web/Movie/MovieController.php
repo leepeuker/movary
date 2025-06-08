@@ -87,6 +87,7 @@ class MovieController
             $this->twig->render('page/movie.html.twig', [
                 'users' => $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor($movieId),
                 'movie' => $movie,
+                'movieProductionCountries' => $this->movieApi->findProductionCountriesByMovieId($movieId),
                 'movieGenres' => $this->movieApi->findGenresByMovieId($movieId),
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),
                 'directors' => $this->movieApi->findDirectorsByMovieId($movieId),

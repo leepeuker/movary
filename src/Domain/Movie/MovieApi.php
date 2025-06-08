@@ -492,6 +492,11 @@ class MovieApi
         return $this->historyApi->findHistoryEntryForMovieByUserOnDate($id, $userId, $watchedAt);
     }
 
+    public function findProductionCountriesByMovieId(int $movieId) : ?array
+    {
+        return $this->movieRepository->findProductionCountriesByMovieId($movieId);
+    }
+
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         return $this->repository->findUserRating($movieId, $userId);

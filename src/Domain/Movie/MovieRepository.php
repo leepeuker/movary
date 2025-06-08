@@ -1144,6 +1144,14 @@ class MovieRepository
         return $data === false ? null : PersonalRating::create($data);
     }
 
+    public function findProductionCountriesByMovieId(int $movieId) : array
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT c.english_name FROM `movie_production_countries` mpc JOIN movary.country c on c.iso_3166_1 = mpc.iso_3166_1 WHERE movie_id = ?',
+            [$movieId],
+        );
+    }
+
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         $userRating = $this->dbConnection->fetchFirstColumn(
