@@ -46,7 +46,6 @@ function search() {
     if (searchReleaseYear != '') {
         getParameters += '&ry=' + searchReleaseYear
     }
-    console.log(searchProductionCountry)
     if (searchProductionCountry != '') {
         getParameters += '&pc=' + searchProductionCountry
     }
