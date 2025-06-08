@@ -273,6 +273,7 @@ class MovieHistoryApi
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
         ?int $locationId = null,
+        ?string $productionCountryCode = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -292,6 +293,7 @@ class MovieHistoryApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -417,6 +419,11 @@ class MovieHistoryApi
         return $this->movieRepository->fetchUniqueMovieReleaseYears($userId);
     }
 
+    public function fetchUniqueProductionCountries(int $userId) : array
+    {
+        return $this->movieRepository->fetchUniqueProductionCountries($userId);
+    }
+
     public function fetchUniqueWatchedMoviesCount(
         int $userId,
         ?string $searchTerm = null,
@@ -427,6 +434,7 @@ class MovieHistoryApi
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
         ?int $locationId = null,
+        ?string $productionCountryCode = null,
     ) : int {
         return $this->movieRepository->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -438,6 +446,7 @@ class MovieHistoryApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
     }
 
@@ -455,6 +464,7 @@ class MovieHistoryApi
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
         ?int $locationId = null,
+        ?string $productionCountryCode = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -474,6 +484,7 @@ class MovieHistoryApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);

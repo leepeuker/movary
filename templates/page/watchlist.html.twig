@@ -48,7 +48,8 @@
             {% set releaseYearQuery = (releaseYear is null) ? '' : "ry=#{releaseYear}&" %}
             {% set genreQuery = (genre is null) ? '' : "ge=#{genre}&" %}
             {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
-            {% set baseUrl = '/users/' ~ routeUsername ~ '/watchlist?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery %}
+            {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
+            {% set baseUrl = '/users/' ~ routeUsername ~ '/watchlist?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ productionCountryCode %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

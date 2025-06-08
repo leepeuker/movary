@@ -40,6 +40,7 @@ class MoviesController
             $requestData->getUserRatingMin(),
             $requestData->getUserRatingMax(),
             $requestData->getLocationId(),
+            $requestData->getProductionCountryCode(),
         );
 
         $watchedMoviesCount = $this->movieApi->fetchUniqueWatchedMoviesCount(
@@ -52,6 +53,7 @@ class MoviesController
             $requestData->getUserRatingMin(),
             $requestData->getUserRatingMax(),
             $requestData->getLocationId(),
+            $requestData->getProductionCountryCode(),
         );
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements($watchedMoviesCount, $requestData->getLimit(), $requestData->getPage());
 
@@ -69,7 +71,9 @@ class MoviesController
                 'language' => (string)$requestData->getLanguage(),
                 'genre' => (string)$requestData->getGenre(),
                 'locationId' => $requestData->getLocationId(),
+                'productionCountryCode' => $requestData->getProductionCountryCode(),
                 'uniqueReleaseYears' => $this->movieApi->fetchUniqueMovieReleaseYears($requestData->getUserId()),
+                'uniqueProductionCountries' => $this->movieApi->fetchUniqueProductionCountries($requestData->getUserId()),
                 'uniqueLanguages' => $this->movieApi->fetchUniqueMovieLanguages($requestData->getUserId()),
                 'uniqueGenres' => $this->movieApi->fetchUniqueMovieGenres($requestData->getUserId()),
                 'uniqueLocations' => $this->movieApi->fetchUniqueLocations($requestData->getUserId()),

@@ -11,6 +11,8 @@ use RuntimeException;
 
 class MoviesRequestMapper
 {
+    private const null DEFAULT_PRODUCTION_COUNTRY_CODE = null;
+
     private const null DEFAULT_HAS_USER_RATING = null;
 
     private const null DEFAULT_USER_RATING_MIN = null;
@@ -46,6 +48,7 @@ class MoviesRequestMapper
         $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
         $language = $getParameters['la'] ?? null;
         $genre = $getParameters['ge'] ?? self::DEFAULT_GENRE;
+        $productionCountryCode = $getParameters['pc'] ?? self::DEFAULT_PRODUCTION_COUNTRY_CODE;
         $userRating = isset($getParameters['ur']) === true ? (bool)$getParameters['ur'] : self::DEFAULT_HAS_USER_RATING;
         $userRatingMin = isset($getParameters['minur']) === true ? (int)$getParameters['minur'] : self::DEFAULT_USER_RATING_MIN;
         $userRatingMax = isset($getParameters['maxur']) === true ? (int)$getParameters['maxur'] : self::DEFAULT_USER_RATING_MAX;
@@ -61,6 +64,7 @@ class MoviesRequestMapper
             $releaseYear,
             $language,
             $genre,
+            $productionCountryCode,
             $userRating,
             $userRatingMin,
             $userRatingMax,

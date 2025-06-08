@@ -65,6 +65,11 @@ class MovieRepository
         $this->dbConnection->delete('movie_user_rating', ['user_id' => $userId]);
     }
 
+    public function deleteProductionCountries(int $movieId) : void
+    {
+        $this->dbConnection->delete('movie_production_countries', ['movie_id' => $movieId]);
+    }
+
     public function deleteUserRating(int $movieId, int $userId) : void
     {
         $this->dbConnection->executeQuery(
@@ -810,6 +815,22 @@ class MovieRepository
         );
     }
 
+    public function fetchUniqueProductionCountries(int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT mpc.iso_3166_1, c.english_name
+            FROM movie_user_watch_dates muwd
+            JOIN movie m on muwd.movie_id = m.id
+            JOIN movie_production_countries mpc on mpc.movie_id = m.id
+            JOIN country c on c.iso_3166_1 = mpc.iso_3166_1
+            WHERE user_id = ?
+            ORDER BY c.english_name
+            SQL,
+            [$userId],
+        );
+    }
+
     public function fetchUniqueWatchedMoviesCount(
         int $userId,
         ?string $searchTerm,
@@ -820,10 +841,18 @@ class MovieRepository
         ?int $userRatingMin,
         ?int $userRatingMax,
         ?int $locationId,
+        ?string $productionCountryCode,
     ) : int {
-        $payload = [$userId, $userId, "%$searchTerm%"];
+        $payload = [$userId, $userId];
+
+        $joinProductionCountry = '';
+        if (empty($productionCountryCode) === false) {
+            $joinProductionCountry = 'JOIN movie_production_countries pc on pc.movie_id = m.id AND pc.iso_3166_1 = ? ';
+            $payload[] = $productionCountryCode;
+        }
 
         $whereQuery = 'WHERE m.title LIKE ? ';
+        $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
             if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
@@ -866,6 +895,7 @@ class MovieRepository
             LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?
             LEFT JOIN movie_genre mg on m.id = mg.movie_id
             LEFT JOIN genre g on mg.genre_id = g.id
+            $joinProductionCountry
             $whereQuery
             SQL,
             $payload,
@@ -887,8 +917,9 @@ class MovieRepository
         ?int $userRatingMin,
         ?int $userRatingMax,
         ?int $locationId,
+        ?string $productionCountryCode,
     ) : array {
-        $payload = [$userId, $userId, "%$searchTerm%"];
+        $payload = [$userId, $userId];
 
         $offset = ($limit * $page) - $limit;
 
@@ -900,12 +931,19 @@ class MovieRepository
             default => 'LOWER(title)'
         };
 
+        $joinProductionCountry = '';
+        if (empty($productionCountryCode) === false) {
+            $joinProductionCountry = 'JOIN movie_production_countries pc on pc.movie_id = m.id AND pc.iso_3166_1 = ? ';
+            $payload[] = $productionCountryCode;
+        }
+
         $sortByWatchDatePosition = '';
         if ($sortBySanitized === 'watched_at') {
             $sortByWatchDatePosition = "mh.position $sortOrder, ";
         }
 
         $whereQuery = 'WHERE m.title LIKE ? ';
+        $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
             if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
@@ -950,6 +988,7 @@ class MovieRepository
                 LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?
                 LEFT JOIN movie_genre mg on m.id = mg.movie_id
                 LEFT JOIN genre g on mg.genre_id = g.id
+                $joinProductionCountry
                 $whereQuery
                 GROUP BY m.id, title, release_date, watched_at, rating
                 ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition LOWER(title) asc
@@ -1105,6 +1144,14 @@ class MovieRepository
         return $data === false ? null : PersonalRating::create($data);
     }
 
+    public function findProductionCountriesByMovieId(int $movieId) : array
+    {
+        return $this->dbConnection->fetchFirstColumn(
+            'SELECT c.english_name FROM `movie_production_countries` mpc JOIN movary.country c on c.iso_3166_1 = mpc.iso_3166_1 WHERE movie_id = ?',
+            [$movieId],
+        );
+    }
+
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
     {
         $userRating = $this->dbConnection->fetchFirstColumn(
@@ -1178,6 +1225,20 @@ class MovieRepository
     public function updateLetterboxdId(int $id, string $letterboxdId) : void
     {
         $this->dbConnection->update('movie', ['letterboxd_id' => $letterboxdId, 'updated_at' => (string)DateTime::create()], ['id' => $id]);
+    }
+
+    public function updateProductionCountries(int $movieId, array $countriesIso31661) : void
+    {
+        $timestamp = (string)DateTime::create();
+
+        foreach ($countriesIso31661 as $index => $countryIso31661) {
+            $this->dbConnection->insert('movie_production_countries', [
+                'movie_id' => $movieId,
+                'iso_3166_1' => $countryIso31661,
+                'position' => $index,
+                'created_at' => $timestamp
+            ]);
+        }
     }
 
     public function updateTraktId(int $id, TraktId $traktId) : void

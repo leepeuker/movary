@@ -10,7 +10,9 @@ const searchSortOrderSelect = document.getElementById('searchSortOrderSelect');
 const searchGenreSelect = document.getElementById('searchGenreSelect');
 const searchLanguageSelect = document.getElementById('searchLanguageSelect');
 const searchReleaseYearSelect = document.getElementById('searchReleaseYearSelect');
+const searchProductionCountrySelect = document.getElementById('searchProductionCountrySelect');
 const searchPerPageSelect = document.getElementById('searchPerPageSelect');
+console.log(searchProductionCountrySelect)
 
 function search() {
     let sortBy = searchSortBySelect.value
@@ -18,6 +20,7 @@ function search() {
     let searchGenre = searchGenreSelect.value
     let searchLanguage = searchLanguageSelect.value
     let searchReleaseYear = searchReleaseYearSelect.value
+    let searchProductionCountry = searchProductionCountrySelect.value
     let searchPerPage = searchPerPageSelect.value
     let searchTerm = document.getElementById('searchTermInput').value
 
@@ -36,6 +39,9 @@ function search() {
     if (searchReleaseYear != '') {
         getParameters += '&ry=' + searchReleaseYear
     }
+    if (searchProductionCountry != '') {
+        getParameters += '&pc=' + searchProductionCountry
+    }
     if (searchTerm != '') {
         getParameters += '&s=' + searchTerm
     }
@@ -51,5 +57,6 @@ function resetSearchOptions() {
     searchGenreSelect.value = ''
     searchLanguageSelect.value = ''
     searchReleaseYearSelect.value = ''
+    searchProductionCountrySelect.value = ''
     searchPerPageSelect.value = '24'
 }

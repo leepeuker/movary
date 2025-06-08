@@ -63,6 +63,22 @@ class MovieWatchlistRepository
         );
     }
 
+    public function fetchUniqueMovieProductionCountries(int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT DISTINCT mpc.iso_3166_1, c.english_name
+            FROM watchlist w
+            JOIN movie m on w.movie_id = m.id
+            JOIN movie_production_countries mpc on mpc.movie_id = m.id
+            JOIN country c on c.iso_3166_1 = mpc.iso_3166_1
+            WHERE user_id = ?
+            ORDER BY c.english_name
+            SQL,
+            [$userId],
+        );
+    }
+
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
         if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
@@ -90,11 +106,25 @@ class MovieWatchlistRepository
         );
     }
 
-    public function fetchWatchlistCount(int $userId, ?string $searchTerm, ?Year $releaseYear, ?string $language, ?string $genre) : int
+    public function fetchWatchlistCount(
+        int $userId,
+        ?string $searchTerm,
+        ?Year $releaseYear,
+        ?string $language,
+        ?string $genre,
+        ?string $productionCountryCode = null,
+    ) : int
     {
-        $payload = [$userId, "%$searchTerm%"];
+        $payload = [$userId];
+
+        $joinProductionCountry = '';
+        if (empty($productionCountryCode) === false) {
+            $joinProductionCountry = 'JOIN movie_production_countries pc on pc.movie_id = m.id AND pc.iso_3166_1 = ? ';
+            $payload[] = $productionCountryCode;
+        }
 
         $whereQuery = 'WHERE m.title LIKE ? ';
+        $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
             if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
@@ -122,6 +152,7 @@ class MovieWatchlistRepository
             JOIN watchlist w on w.movie_id = m.id and w.user_id = ?
             LEFT JOIN movie_genre mg on m.id = mg.movie_id
             LEFT JOIN genre g on mg.genre_id = g.id
+            $joinProductionCountry
             $whereQuery
             SQL,
             $payload,
@@ -138,8 +169,9 @@ class MovieWatchlistRepository
         ?Year $releaseYear,
         ?string $language,
         ?string $genre,
+        ?string $productionCountryCode,
     ) : array {
-        $payload = [$userId, $userId, "%$searchTerm%"];
+        $payload = [$userId, $userId];
 
         $offset = ($limit * $page) - $limit;
 
@@ -151,7 +183,14 @@ class MovieWatchlistRepository
             default => 'title'
         };
 
+        $joinProductionCountry = '';
+        if (empty($productionCountryCode) === false) {
+            $joinProductionCountry = 'JOIN movie_production_countries pc on pc.movie_id = m.id AND pc.iso_3166_1 = ? ';
+            $payload[] = $productionCountryCode;
+        }
+
         $whereQuery = 'WHERE m.title LIKE ? ';
+        $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
             if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
@@ -181,6 +220,7 @@ class MovieWatchlistRepository
             LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?
             LEFT JOIN movie_genre mg on m.id = mg.movie_id
             LEFT JOIN genre g on mg.genre_id = g.id
+            $joinProductionCountry
             $whereQuery
             GROUP BY m.id, title, release_date, added_at, rating
             ORDER BY $sortBySanitized $sortOrder, title asc

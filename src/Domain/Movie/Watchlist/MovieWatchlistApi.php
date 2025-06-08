@@ -63,14 +63,26 @@ class MovieWatchlistApi
         return $uniqueLanguages;
     }
 
+    public function fetchUniqueMovieProductionCountries(int $userId) : array
+    {
+        return $this->repository->fetchUniqueMovieProductionCountries($userId);
+    }
+
     public function fetchUniqueMovieReleaseYears(int $userId) : array
     {
         return $this->repository->fetchUniqueMovieReleaseYears($userId);
     }
 
-    public function fetchWatchlistCount(int $userId, ?string $searchTerm = null, ?Year $releaseYear = null, ?string $language = null, ?string $genre = null) : int
+    public function fetchWatchlistCount(
+        int $userId,
+        ?string $searchTerm = null,
+        ?Year $releaseYear = null,
+        ?string $language = null,
+        ?string $genre = null,
+        ?string $productionCountry = null,
+    ) : int
     {
-        return $this->repository->fetchWatchlistCount($userId, $searchTerm, $releaseYear, $language, $genre);
+        return $this->repository->fetchWatchlistCount($userId, $searchTerm, $releaseYear, $language, $genre, $productionCountry);
     }
 
     public function fetchWatchlistPaginated(
@@ -83,6 +95,7 @@ class MovieWatchlistApi
         ?Year $releaseYear = null,
         ?string $language = null,
         ?string $genre = null,
+        ?string $productionCountryCode = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createDesc();
@@ -98,6 +111,7 @@ class MovieWatchlistApi
             $releaseYear,
             $language,
             $genre,
+            $productionCountryCode,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($watchlistEntries);

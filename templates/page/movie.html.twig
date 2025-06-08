@@ -240,7 +240,7 @@
 
         {# --- Director --- #}
 
-        <h6 style="margin-bottom: 0.4rem;margin-top: 0.8rem">Director</h6>
+        <h6 style="margin-top: 0.8rem">Director</h6>
         <div class="carousel">
             {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
@@ -255,6 +255,17 @@
                          alt="{{ director.name }} Poster">
                 </div>
             {% endfor %}
+        </div>
+
+        {# --- Production countries --- #}
+
+        <h6 style="margin-bottom: 0.4rem;margin-top: 1rem">Production countries</h6>
+        <div class="carousel">
+            <p style="margin-bottom: 0rem">
+                {% if movieProductionCountries|length == 0 %} - {% endif %}
+                {% for movieProductionCountry in movieProductionCountries %}{{ movieProductionCountry }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
         </div>
     </main>
 {% endblock %}
