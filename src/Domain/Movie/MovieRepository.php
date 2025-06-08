@@ -496,6 +496,21 @@ class MovieRepository
         );
     }
 
+    public function fetchMostWatchedProductionCountries(int $userId) : array
+    {
+        return $this->dbConnection->executeQuery(
+            'SELECT c.iso_3166_1 AS id, c.english_name AS name, COUNT(muwd.movie_id) AS count_movies
+            FROM movie_production_countries pc
+            JOIN movie_user_watch_dates muwd on pc.movie_id = muwd.movie_id
+            JOIN country c on pc.iso_3166_1 = c.iso_3166_1
+            WHERE muwd.user_id = ?
+            GROUP BY c.iso_3166_1
+            ORDER BY count_movies DESC
+            LIMIT 30',
+            [$userId],
+        )->fetchAllAssociative();
+    }
+
     public function fetchMostWatchedReleaseYears(int $userId) : array
     {
         if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
@@ -661,7 +676,8 @@ class MovieRepository
             JOIN movie_user_watch_dates muwd on location.id = muwd.location_id
             WHERE location.user_id = ?
             GROUP BY location_id
-            ORDER BY count_plays DESC',
+            ORDER BY count_plays DESC
+            LIMIT 30',
             [$userId],
         )->fetchAllAssociative();
     }

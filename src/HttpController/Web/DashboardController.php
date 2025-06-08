@@ -63,6 +63,26 @@ class DashboardController
         );
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+    private function fetchDashboardRowData(DashboardRow $row, int $requestedUserId, ?int $currentUserId) : array
+    {
+        return match (true) {
+            $row->isLastPlays() => ['lastPlays' => $this->movieHistoryApi->fetchLastPlays($requestedUserId)],
+            $row->isLastPlaysCinema() => ['lastPlaysCinema' => $this->movieHistoryApi->fetchLastPlaysCinema($requestedUserId)],
+            $row->isMostWatchedActors() => ['mostWatchedActors' => $this->movieHistoryApi->fetchActors($requestedUserId, 6, 1, gender: Gender::createMale(), personFilterUserId: $currentUserId)],
+            $row->isMostWatchedActresses() => ['mostWatchedActresses' => $this->movieHistoryApi->fetchActors($requestedUserId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $currentUserId)],
+            $row->isMostWatchedDirectors() => ['mostWatchedDirectors' => $this->movieHistoryApi->fetchDirectors($requestedUserId, 6, 1, personFilterUserId: $currentUserId)],
+            $row->isMostWatchedLanguages() => ['mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($requestedUserId)],
+            $row->isMostWatchedGenres() => ['mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($requestedUserId)],
+            $row->isMostWatchedProductionCompanies() => ['mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($requestedUserId, 12)],
+            $row->isMostWatchedReleaseYears() => ['mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($requestedUserId)],
+            $row->isWatchlist() => ['watchlistItems' => $this->movieWatchlistApi->fetchWatchlistPaginated($requestedUserId, 6, 1)],
+            $row->isTopLocations() => ['topLocations' => $this->movieHistoryApi->fetchTopLocations($requestedUserId)],
+            $row->isMostWatchedProductionCountries() => ['mostWatchedProductionCountries' => $this->movieHistoryApi->fetchMostWatchedProductionCountries($requestedUserId)],
+            default => [],
+        };
+    }
+
     private function fetchVisibleDashboardRowData(DashboardRowList $dashboardRows, int $requestedUserId, ?int $currentUserId) : array
     {
         $renderData = [];
@@ -79,24 +99,5 @@ class DashboardController
         }
 
         return $renderData;
-    }
-
-    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-    private function fetchDashboardRowData(DashboardRow $row, int $requestedUserId, ?int $currentUserId) : array
-    {
-        return match (true) {
-            $row->isLastPlays() => ['lastPlays' => $this->movieHistoryApi->fetchLastPlays($requestedUserId)],
-            $row->isLastPlaysCinema() => ['lastPlaysCinema' => $this->movieHistoryApi->fetchLastPlaysCinema($requestedUserId)],
-            $row->isMostWatchedActors() => ['mostWatchedActors' => $this->movieHistoryApi->fetchActors($requestedUserId, 6, 1, gender: Gender::createMale(), personFilterUserId: $currentUserId)],
-            $row->isMostWatchedActresses() => ['mostWatchedActresses' => $this->movieHistoryApi->fetchActors($requestedUserId, 6, 1, gender: Gender::createFemale(), personFilterUserId: $currentUserId)],
-            $row->isMostWatchedDirectors() => ['mostWatchedDirectors' => $this->movieHistoryApi->fetchDirectors($requestedUserId, 6, 1, personFilterUserId: $currentUserId)],
-            $row->isMostWatchedLanguages() => ['mostWatchedLanguages' => $this->movieHistoryApi->fetchMostWatchedLanguages($requestedUserId)],
-            $row->isMostWatchedGenres() => ['mostWatchedGenres' => $this->movieHistoryApi->fetchMostWatchedGenres($requestedUserId)],
-            $row->isMostWatchedProductionCompanies() => ['mostWatchedProductionCompanies' => $this->movieHistoryApi->fetchMostWatchedProductionCompanies($requestedUserId, 12)],
-            $row->isMostWatchedReleaseYears() => ['mostWatchedReleaseYears' => $this->movieHistoryApi->fetchMostWatchedReleaseYears($requestedUserId)],
-            $row->isWatchlist() => ['watchlistItems' => $this->movieWatchlistApi->fetchWatchlistPaginated($requestedUserId, 6, 1)],
-            $row->isTopLocations() => ['topLocations' => $this->movieHistoryApi->fetchTopLocations($requestedUserId)],
-            default => [],
-        };
     }
 }

@@ -67,8 +67,8 @@
                         {% import "component/dashboard/row-most-watched-languages.html.twig" as dashboardMostWatchedLanguages %}
                         {{ dashboardMostWatchedLanguages.create(dashboardRow, mostWatchedLanguages, routeUsername) }}
                     {% elseif dashboardRow.isMostWatchedProductionCompanies and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-production-companies.html.twig" as dashboardMostWatchedProductionCopmanies %}
-                        {{ dashboardMostWatchedProductionCopmanies.create(dashboardRow, mostWatchedProductionCompanies, routeUsername) }}
+                        {% import "component/dashboard/row-most-watched-production-companies.html.twig" as dashboardMostWatchedProductionCompanies %}
+                        {{ dashboardMostWatchedProductionCompanies.create(dashboardRow, mostWatchedProductionCompanies, routeUsername) }}
                     {% elseif dashboardRow.isMostWatchedReleaseYears and dashboardRow.isVisible %}
                         {% import "component/dashboard/row-most-watched-release-year.html.twig" as dashboardMostWatchedReleaseYears %}
                         {{ dashboardMostWatchedReleaseYears.create(dashboardRow, mostWatchedReleaseYears, routeUsername) }}
@@ -81,6 +81,9 @@
                     {% elseif dashboardRow.isLastPlaysCinema and dashboardRow.isVisible %}
                         {% import "component/dashboard/row-last-plays-cinema.html.twig" as dashboardTopLocations %}
                         {{ dashboardTopLocations.create(dashboardRow, lastPlaysCinema, routeUsername) }}
+                    {% elseif dashboardRow.isMostWatchedProductionCountries and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-most-watched-production-countries.html.twig" as dashboardMostWatchedProductionCountries %}
+                        {{ dashboardMostWatchedProductionCountries.create(dashboardRow, mostWatchedProductionCountries, routeUsername) }}
                     {% endif %}
                 {% endfor %}
             </div>
