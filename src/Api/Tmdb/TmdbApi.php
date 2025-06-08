@@ -3,7 +3,6 @@
 namespace Movary\Api\Tmdb;
 
 use Movary\Api\Tmdb\Cache\TmdbIsoLanguageCache;
-use Movary\Api\Tmdb\Dto\TmdbCompany;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbPerson;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderCollection;
@@ -16,13 +15,6 @@ class TmdbApi
         private readonly TmdbClient $client,
         private readonly TmdbIsoLanguageCache $iso6931,
     ) {
-    }
-
-    public function fetchCompany(int $companyId) : TmdbCompany
-    {
-        $data = $this->client->get('/company/' . $companyId);
-
-        return TmdbCompany::createFromArray($data);
     }
 
     public function fetchMovieDetails(int $movieId) : TmdbMovie
