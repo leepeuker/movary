@@ -11,8 +11,6 @@ $application->add($container->get(Movary\Command\TmdbPersonSync::class));
 $application->add($container->get(Movary\Command\TmdbImageCacheRefresh::class));
 $application->add($container->get(Movary\Command\TmdbImageCacheDelete::class));
 $application->add($container->get(Movary\Command\TmdbImageCacheCleanup::class));
-$application->add($container->get(Movary\Command\TmdbCountryCacheDelete::class));
-$application->add($container->get(Movary\Command\TmdbCountryCacheRefresh::class));
 $application->add($container->get(Movary\Command\DatabaseMigrationStatus::class));
 $application->add($container->get(Movary\Command\DatabaseMigrationMigrate::class));
 $application->add($container->get(Movary\Command\DatabaseMigrationRollback::class));
