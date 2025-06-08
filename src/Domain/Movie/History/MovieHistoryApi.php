@@ -249,6 +249,11 @@ class MovieHistoryApi
         return $mostWatchedProductionCompanies;
     }
 
+    public function fetchMostWatchedProductionCountries(int $userId) : array
+    {
+        return $this->movieRepository->fetchMostWatchedProductionCountries($userId);
+    }
+
     public function fetchMostWatchedReleaseYears(int $userId) : array
     {
         return $this->movieRepository->fetchMostWatchedReleaseYears($userId);
