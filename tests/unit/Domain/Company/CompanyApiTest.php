@@ -118,12 +118,12 @@ class CompanyApiTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('update')
-            ->with(self::ID, self::NAME, self::ORIGIN_COUNTRY)
+            ->with(self::ID, self::TMDB_ID, self::NAME, self::ORIGIN_COUNTRY)
             ->willReturn($companyData);
 
         self::assertEquals(
             CompanyEntity::createFromArray($companyData),
-            $this->subject->update(self::ID, self::NAME, self::ORIGIN_COUNTRY),
+            $this->subject->update(self::ID, self::TMDB_ID, self::NAME, self::ORIGIN_COUNTRY),
         );
     }
 

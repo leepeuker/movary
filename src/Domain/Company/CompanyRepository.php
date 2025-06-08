@@ -50,13 +50,14 @@ class CompanyRepository
         return $data === false ? null : $data;
     }
 
-    public function update(int $id, string $name, ?string $originCountry) : array
+    public function update(int $id, int $tmdbId, string $name, ?string $originCountry) : array
     {
         $this->dbConnection->update(
             self::TABLE_NAME,
             [
                 'name' => $name,
-                'origin_country' => $originCountry,
+                'origin_country' => (string)$originCountry,
+                'tmdb_id' => $tmdbId,
             ],
             [
                 'id' => $id,
