@@ -2,12 +2,12 @@
 
 ### Description
 
-Automatically add new [Kodi](https://kodi.tv/) movie plays to Movary. 
+Automatically add new [Kodi](https://kodi.tv/) movie plays to Movary.
 
 
 !!! Info
 
-    The installation of the [Movary Addon](https://github.com/leepeuker/movary-kodi-addon) in Kodi is required.
+    Only Kodi movies with tmdb ids can be logged to Movary.
 
 ### Instruction
 
