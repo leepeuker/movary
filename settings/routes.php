@@ -132,9 +132,12 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'deleteJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/emby', [Web\SettingsController::class, 'renderEmbyPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/emby', [Web\SettingsController::class, 'updateEmby'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/emby/webhook', [Web\EmbyController::class, 'getEmbyWebhookUrl']);
     $routes->add('PUT', '/settings/emby/webhook', [Web\EmbyController::class, 'regenerateEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/emby/webhook', [Web\EmbyController::class, 'deleteEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/kodi', [Web\SettingsController::class, 'renderKodiPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/kodi', [Web\SettingsController::class, 'updateKodi'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/kodi/webhook', [Web\KodiController::class, 'regenerateKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/kodi/webhook', [Web\KodiController::class, 'deleteKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/app', [Web\SettingsController::class, 'renderAppPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/netflix', [Web\SettingsController::class, 'renderNetflixPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -234,6 +237,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
     $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
     $routes->add('POST', '/webhook/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
+    $routes->add('POST', '/webhook/kodi/{id:.+}', [Api\KodiController::class, 'handleKodiWebhook']);
 
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 

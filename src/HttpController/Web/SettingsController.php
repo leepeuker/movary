@@ -235,6 +235,27 @@ class SettingsController
         );
     }
 
+    public function renderKodiPage() : Response
+    {
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $webhookId = $user->getKodiWebhookId();
+
+        if ($applicationUrl !== null && $webhookId !== null) {
+            $webhookUrl = $this->webhookUrlBuilder->buildKodiWebhookUrl($webhookId);
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-integration-kodi.html.twig', [
+                'isActive' => $applicationUrl !== null,
+                'kodiWebhookUrl' => $webhookUrl ?? '-',
+                'scrobbleWatches' => $user->hasKodiScrobbleWatchesEnabled(),
+            ]),
+        );
+    }
+
     public function renderGeneralAccountPage() : Response
     {
         $user = $this->authenticationService->getCurrentUser();
@@ -598,6 +619,19 @@ class SettingsController
         $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
 
         $this->userApi->updateEmbyScrobblerOptions($userId, $scrobbleWatches);
+
+        return Response::create(StatusCode::createNoContent());
+    }
+
+    public function updateKodi(Request $request) : Response
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $postParameters = Json::decode($request->getBody());
+
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
+
+        $this->userApi->updateKodiScrobblerOptions($userId, $scrobbleWatches);
 
         return Response::create(StatusCode::createNoContent());
     }

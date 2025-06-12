@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - Kodi
+{% endblock %}
+
+{% block scripts %}
+    <script src="/js/settings-integration-kodi.js"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="/css/settings.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-top: 1rem">
+                <h5>Kodi webhook url</h5>
+
+                <p class="text-muted" style="margin-bottom: 0.5rem">
+                    Keep Movary automatically up to date with your latest watches in Kodi.
+                </p>
+
+                <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem;padding-bottom: 0.5rem">
+                    <b>Configuration</b>
+                    <br style="margin-bottom: 0.5rem">
+                    <ul style="margin-bottom:  0.5rem">
+                        <li>Install <a href="https://github.com/leepeuker/movary-kodi-addon" target="_blank">Movary Addon</a> in Kodi</li>
+                        <li>Generate the Movary webhook url here</li>
+                        <li>Enter the Movary webhook url in the Kodi Addon settings</li>
+                        <li>Enable the Addon in the Kodi Addon settings</li>
+                    </ul>
+                </div>
+
+                <div id="kodiWebhookUrl"
+                     class="overflow-auto text-nowrap webhookUrl"
+                     data-active="{{ isActive }}"
+                     style="font-size:1rem;margin-top: 1rem;margin-bottom: 1rem;">
+                    {{ kodiWebhookUrl }}
+                </div>
+
+                <div id="alertWebhookUrlDiv">
+                    <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
+                         role="alert"
+                         style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
+                        Webhook disabled - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
+                    </div>
+                </div>
+
+                <button id="deleteKodiWebhookButton"
+                        type="button"
+                        class="btn btn-danger {% if kodiWebhookUrl == '-' %}disabled{% endif %}"
+                        onclick="deleteKodiWebhook()">
+                    Delete url
+                </button>
+                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateKodiWebhook()">Regenerate url</button>
+            </div>
+
+            <h5 style="margin-top: 1rem">Options</h5>
+
+            <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="1"
+                       id="scrobbleWatchesCheckbox"
+                       name="scrobbleWatches"
+                       {% if kodiWebhookUrl == '-' %}disabled{% endif %}
+                        {% if scrobbleWatches == true %}checked{% endif %}
+                       style="margin-right: 0.2rem">
+                <label class="form-check-label" for="scrobbleWatchesCheckbox">Scrobble completed watches</label>
+            </div>
+
+            <div id="alertWebhookOptionsDiv"></div>
+
+            <button type="submit" class="btn btn-primary" {% if kodiWebhookUrl == '-' %}disabled{% endif %} id="saveButton" onclick="updateScrobbleOptions()">Save</button>
+        </div>
+    </main>
+{% endblock %}
