@@ -21,18 +21,4 @@ class KodiWebhookDtoMapper
             Date::create(),
         );
     }
-
-    private function getWatchDate(?string $timestamp) : Date
-    {
-        $timestampWithoutMicroseconds = preg_replace('/\.\d+Z/', '', (string)$timestamp);
-
-        $dateTime = DateTime::createFromFormat('Y-m-d\TH:i:s', (string)$timestampWithoutMicroseconds, new DateTimeZone('UTC'));
-        if ($dateTime === false) {
-            throw new RuntimeException('Could not build date time from: ' . $timestamp);
-        }
-
-        $dateTime->setTimezone((new DateTime)->getTimezone());
-
-        return Date::createFromString($dateTime->format('Y-m-d'));
-    }
 }
