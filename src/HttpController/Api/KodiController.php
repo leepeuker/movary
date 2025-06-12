@@ -27,7 +27,7 @@ class KodiController
             return Response::createNotFound();
         }
 
-        $requestPayload = $request->getPostParameters()['data'];
+        $requestPayload = $request->getBody();
 
         $this->logger->debug('Kodi: Webhook triggered with payload: ' . $requestPayload);
 

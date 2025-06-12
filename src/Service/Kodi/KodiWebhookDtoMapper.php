@@ -17,8 +17,8 @@ class KodiWebhookDtoMapper
     {
         return KodiWebhookDto::create(
             $webhookPayload['title'] ?? null,
-            empty($webhookPayload['tmdb_id']) === true ? null : (int)$webhookPayload['tmdb_id'],
-            $this->getWatchDate($webhookPayload['Date'] ?? null),
+            empty($webhookPayload['uniqueIds']['tmdbId']) === true ? null : (int)$webhookPayload['uniqueIds']['tmdbId'],
+            Date::create(),
         );
     }
 
