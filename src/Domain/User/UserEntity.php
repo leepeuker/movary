@@ -194,6 +194,7 @@ class UserEntity
     {
         return $this->kodiScrobbleWatches;
     }
+
     public function hasLocationsEnabled() : bool
     {
         return $this->hasLocationsEnabled;

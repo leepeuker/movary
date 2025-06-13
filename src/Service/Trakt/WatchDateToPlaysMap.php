@@ -18,19 +18,14 @@ class WatchDateToPlaysMap extends AbstractMap
         return new self();
     }
 
-    public function set(Date $watchDate, int $plays) : void
+    public function containsDate(Date $watchDate) : bool
     {
-        $this->setKeyAndValue($watchDate, $plays);
+        return isset($this->data[(string)$watchDate]) === true;
     }
 
     public function get(Date $watchDate) : ?int
     {
         return $this->findByKey($watchDate);
-    }
-
-    public function containsDate(Date $watchDate) : bool
-    {
-        return isset($this->data[(string)$watchDate]) === true;
     }
 
     public function getPlaysForDate(Date $watchDate) : int
@@ -72,5 +67,10 @@ class WatchDateToPlaysMap extends AbstractMap
         }
 
         return $filteredList;
+    }
+
+    public function set(Date $watchDate, int $plays) : void
+    {
+        $this->setKeyAndValue($watchDate, $plays);
     }
 }

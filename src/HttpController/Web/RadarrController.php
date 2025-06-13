@@ -5,7 +5,6 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Radarr\RadarrFeedUrlGenerator;
-use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Response;
 
