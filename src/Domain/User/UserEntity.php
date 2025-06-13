@@ -21,12 +21,14 @@ class UserEntity
         private readonly ?string $plexWebhookUuid,
         private readonly ?string $jellyfinWebhookUuid,
         private readonly ?string $embyWebhookUuid,
+        private readonly ?string $kodiWebhookUuid,
         private readonly ?string $traktUserName,
         private readonly ?string $traktClientId,
         private readonly ?PlexAccessToken $plexAccessToken,
         private readonly ?Url $plexServerUrl,
         private readonly bool $jellyfinScrobbleWatches,
         private readonly bool $embyScrobbleWatches,
+        private readonly bool $kodiScrobbleWatches,
         private readonly bool $plexScrobbleWatches,
         private readonly bool $plexScrobbleRatings,
         private readonly ?string $radarrFeedUuid,
@@ -54,12 +56,14 @@ class UserEntity
             $data['plex_webhook_uuid'],
             $data['jellyfin_webhook_uuid'],
             $data['emby_webhook_uuid'],
+            $data['kodi_webhook_uuid'],
             $data['trakt_user_name'],
             $data['trakt_client_id'],
             $data['plex_access_token'] === null ? null : PlexAccessToken::create($data['plex_access_token']),
             empty($data['plex_server_url']) === true ? null : Url::createFromString($data['plex_server_url']),
             (bool)$data['jellyfin_scrobble_views'],
             (bool)$data['emby_scrobble_views'],
+            (bool)$data['kodi_scrobble_views'],
             (bool)$data['plex_scrobble_views'],
             (bool)$data['plex_scrobble_ratings'],
             $data['radarr_feed_uuid'],
@@ -114,6 +118,11 @@ class UserEntity
     public function getJellyfinWebhookId() : ?string
     {
         return $this->jellyfinWebhookUuid;
+    }
+
+    public function getKodiWebhookId() : ?string
+    {
+        return $this->kodiWebhookUuid;
     }
 
     public function getName() : string
@@ -179,6 +188,11 @@ class UserEntity
     public function hasJellyfinSyncEnabled() : bool
     {
         return $this->jellyfinSyncEnabled;
+    }
+
+    public function hasKodiScrobbleWatchesEnabled() : bool
+    {
+        return $this->kodiScrobbleWatches;
     }
 
     public function hasLocationsEnabled() : bool

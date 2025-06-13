@@ -330,11 +330,6 @@ class Factory
         );
     }
 
-    public static function getDatabaseSqlite(Config $config) : string
-    {
-        return $config->getAsString('DATABASE_SQLITE', self::DEFAULT_DATABASE_SQLITE);
-    }
-
     public static function getDatabaseMode(Config $config) : string
     {
         return $config->getAsString('DATABASE_MODE', self::DEFAULT_DATABASE_MODE);
@@ -348,6 +343,11 @@ class Factory
     public static function getDatabaseMysqlPort(Config $config) : int
     {
         return $config->getAsInt('DATABASE_MYSQL_PORT', self::DEFAULT_DATABASE_MYSQL_PORT);
+    }
+
+    public static function getDatabaseSqlite(Config $config) : string
+    {
+        return $config->getAsString('DATABASE_SQLITE', self::DEFAULT_DATABASE_SQLITE);
     }
 
     private static function createDirectoryAppRoot() : string

@@ -18,6 +18,11 @@ class WebhookUrlBuilder
         return $this->buildUrl('jellyfin', $webhookId);
     }
 
+    public function buildKodiWebhookUrl(string $webhookId) : ?string
+    {
+        return $this->buildUrl('kodi', $webhookId);
+    }
+
     public function buildPlexWebhookUrl(string $webhookId) : ?string
     {
         return $this->buildUrl('plex', $webhookId);

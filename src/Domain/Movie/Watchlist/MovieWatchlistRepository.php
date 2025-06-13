@@ -113,8 +113,7 @@ class MovieWatchlistRepository
         ?string $language,
         ?string $genre,
         ?string $productionCountryCode = null,
-    ) : int
-    {
+    ) : int {
         $payload = [$userId];
 
         $joinProductionCountry = '';

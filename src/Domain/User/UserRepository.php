@@ -417,6 +417,17 @@ class UserRepository
         return (int)$id;
     }
 
+    public function findUserIdByKodiWebhookId(string $webhookId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `kodi_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `plex_webhook_uuid` = ?', [$webhookId]);
@@ -493,6 +504,19 @@ class UserRepository
             'user',
             [
                 'jellyfin_webhook_uuid' => $jellyfinWebhookId,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function setKodiWebhookId(int $userId, ?string $kodiWebhookId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'kodi_webhook_uuid' => $kodiWebhookId,
             ],
             [
                 'id' => $userId,
@@ -676,6 +700,19 @@ class UserRepository
             'user',
             [
                 'jellyfin_sync_enabled' => (int)$enabledSync,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateKodiScrobblerOptions(int $userId, bool $scrobbleWatches) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'kodi_scrobble_views' => (int)$scrobbleWatches,
             ],
             [
                 'id' => $userId,

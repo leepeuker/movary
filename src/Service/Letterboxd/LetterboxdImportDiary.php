@@ -12,7 +12,6 @@ use Movary\Service\Letterboxd\Service\LetterboxdMovieImporter;
 use Movary\Service\Letterboxd\ValueObject\CsvLineDiary;
 use Movary\Service\Trakt\WatchDateToPlaysMap;
 use Movary\Util;
-use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -86,7 +85,6 @@ class LetterboxdImportDiary
             $movie = $this->movieApi->fetchById($movieId);
 
             foreach ($watchDateToPlaysMap as $watchDate => $plays) {
-
                 if ($this->movieApi->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchDate) !== null) {
                     $this->logger->info('Letterboxd import: Ignoring movie watch date because it was already set for movie: ' . $movie->getTitle());
 

@@ -49,6 +49,11 @@ class UserApi
         $this->repository->setJellyfinWebhookId($userId, null);
     }
 
+    public function deleteKodiWebhookId(int $userId) : void
+    {
+        $this->repository->setKodiWebhookId($userId, null);
+    }
+
     public function deletePlexWebhookId(int $userId) : void
     {
         $this->repository->setPlexWebhookId($userId, null);
@@ -237,6 +242,11 @@ class UserApi
         return $this->repository->findUserIdByJellyfinWebhookId($webhookId);
     }
 
+    public function findUserIdByKodiWebhookId(mixed $webhookId) : ?int
+    {
+        return $this->repository->findUserIdByKodiWebhookId($webhookId);
+    }
+
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByPlexWebhookId($webhookId);
@@ -296,6 +306,15 @@ class UserApi
         $this->repository->setJellyfinWebhookId($userId, $jellyfinWebhookId);
 
         return $jellyfinWebhookId;
+    }
+
+    public function regenerateKodiWebhookId(int $userId) : string
+    {
+        $kodiWebhookId = (string)Uuid::uuid4();
+
+        $this->repository->setKodiWebhookId($userId, $kodiWebhookId);
+
+        return $kodiWebhookId;
     }
 
     public function regeneratePlexWebhookId(int $userId) : string
@@ -380,6 +399,11 @@ class UserApi
     public function updateJellyfinSyncEnabled(int $userId, bool $enabledSync) : void
     {
         $this->repository->updateJellyfinSyncEnabled($userId, $enabledSync);
+    }
+
+    public function updateKodiScrobblerOptions(int $userId, bool $scrobbleWatches) : void
+    {
+        $this->repository->updateKodiScrobblerOptions($userId, $scrobbleWatches);
     }
 
     public function updateLocationsEnabled(int $userId, bool $locationsEnabled) : void

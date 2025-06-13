@@ -80,8 +80,7 @@ class MovieWatchlistApi
         ?string $language = null,
         ?string $genre = null,
         ?string $productionCountry = null,
-    ) : int
-    {
+    ) : int {
         return $this->repository->fetchWatchlistCount($userId, $searchTerm, $releaseYear, $language, $genre, $productionCountry);
     }
 
