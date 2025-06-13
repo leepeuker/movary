@@ -1163,7 +1163,7 @@ class MovieRepository
     public function findProductionCountriesByMovieId(int $movieId) : array
     {
         return $this->dbConnection->fetchFirstColumn(
-            'SELECT c.english_name FROM `movie_production_countries` mpc JOIN movary.country c on c.iso_3166_1 = mpc.iso_3166_1 WHERE movie_id = ?',
+            'SELECT c.english_name FROM `movie_production_countries` mpc JOIN `country` c on c.iso_3166_1 = mpc.iso_3166_1 WHERE movie_id = ?',
             [$movieId],
         );
     }
