@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="{{ applicationUrl }}/css/login.css">
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/login.js"></script>
+    <script src="{{ applicationUrl }}/js/login.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -51,7 +51,7 @@
                 {% endif %}
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">Sign in</button>
                 {% if registrationEnabled == true %}
-                    <a href="/create-user">Create new user</a>
+                    <a href="{{ applicationUrl }}/create-user">Create new user</a>
                 {% endif %}
             </div>
             <div id="totpForm" class="d-none">
@@ -67,7 +67,7 @@
                     required>
                 <div id="totpErrors"></div>
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" style="margin-bottom: .7rem!important;" onclick="submitCredentials()">Continue</button>
-                <a href="/">Back</a>
+                <a href="{{ applicationUrl }}/">Back</a>
             </div>
         </main>
 {% endblock %}

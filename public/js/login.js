@@ -2,7 +2,7 @@ const MOVARY_CLIENT_IDENTIFIER = 'Movary Web';
 
 async function submitCredentials() {
     const urlParams = new URLSearchParams(window.location.search);
-    const redirect = urlParams.get('redirect') ?? '/';
+    const redirect = urlParams.get('redirect') ?? APPLICATION_URL + '/';
 
     const response = await loginRequest();
 
@@ -47,7 +47,7 @@ async function submitCredentials() {
 }
 
 function loginRequest() {
-    return fetch('/api/authentication/token', {
+    return fetch(APPLICATION_URL + '/api/authentication/token', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',

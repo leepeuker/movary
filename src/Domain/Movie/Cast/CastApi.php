@@ -2,13 +2,13 @@
 
 namespace Movary\Domain\Movie\Cast;
 
-use Movary\Service\UrlGenerator;
+use Movary\Service\ImageUrlService;
 
 class CastApi
 {
     public function __construct(
         private readonly CastRepository $repository,
-        private readonly UrlGenerator $urlGenerator,
+        private readonly ImageUrlService $urlGenerator,
     ) {
     }
 

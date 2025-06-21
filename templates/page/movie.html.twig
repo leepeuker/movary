@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="/css/movie.css" rel="stylesheet">
+    <link href="{{ applicationUrl }}/css/movie.css" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/movie.js"></script>
-    <script src="/js/component/user-select.js"></script>
+    <script src="{{ applicationUrl }}/js/movie.js"></script>
+    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -89,7 +89,7 @@
             {% if movie.imdbId is not null %}
                 <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.imdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %}"
                    href="{{ movie.imdbUrl }}" target="_blank">
-                    <img src="/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
+                    <img src="{{ applicationUrl }}/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
                 </a>
                 {% if movie.imdbRatingAverage is not empty %}
                     <p style="margin-bottom: 0;margin-right: 0.5rem;text-align: center">
@@ -101,7 +101,7 @@
             {% endif %}
             <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.tmdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %};text-align: center"
                href="{{ movie.tmdbUrl }}" target="_blank">
-                <img src="/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
+                <img src="{{ applicationUrl }}/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
             </a>
             {% if movie.tmdbRatingAverage is not empty and movie.tmdbRatingAverage != 0.0 %}
                 <p style="margin-bottom: 0;margin-right: .5rem">
@@ -211,7 +211,7 @@
                 <div class="card" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;">
                     <div class="card-header text-truncate"
                          id="castMemberName"
-                         onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
+                         onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
                          data-bs-toggle="tooltip"
                          data-bs-title="{{ castMember.name }}"
                          style="padding: 0.1rem;text-align: center">
@@ -223,7 +223,7 @@
                     <img src="{{ castMember.posterPath }}"
                          alt="{{ castMember.name }} Poster"
                          class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
-                         onclick="window.location='/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
+                         onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
                          style="cursor: pointer">
                     {% if displayCharacterNames == true %}
                         <div class="card-footer text-truncate"
@@ -244,7 +244,7 @@
         <div class="carousel">
             {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
-                <div class="card" onclick="window.location='/users/{{ routeUsername }}/persons/{{ director.id }}'"
+                <div class="card" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}'"
                      style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>

@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\UserApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -10,6 +11,7 @@ class ServerHasUsers implements MiddlewareInterface
 {
     public function __construct(
         private readonly UserApi $userApi,
+        private readonly ApplicationUrlService $urlService,
     ) {
     }
 
@@ -20,6 +22,6 @@ class ServerHasUsers implements MiddlewareInterface
             return null;
         }
 
-        return Response::createSeeOther('/');
+        return Response::createSeeOther($this->urlService->createApplicationUrl());
     }
 }

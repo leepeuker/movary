@@ -25,13 +25,14 @@ use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
+use Movary\Service\ImageUrlService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
-use Movary\Service\UrlGenerator;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -195,6 +196,7 @@ class Factory
             $container->get(JobQueueApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
+            $container->get(ApplicationUrlService::class),
             self::createDirectoryStorageApp(),
         );
     }
@@ -256,6 +258,7 @@ class Factory
         return new OpenApiController(
             $container->get(File::class),
             $container->get(ServerSettings::class),
+            $container->get(ApplicationUrlService::class),
             self::createDirectoryDocs(),
         );
     }
@@ -301,6 +304,12 @@ class Factory
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
+        $applicationUrl = $container->get(ApplicationUrlService::class)->createApplicationUrl();
+        if ($applicationUrl === '/') {
+            $applicationUrl = '';
+        }
+
+        $twig->addGlobal('applicationUrl', $applicationUrl);
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
         $twig->addGlobal('applicationTimezone', $container->get(ServerSettings::class)->getApplicationTimezone() ?? DateTime::DEFAULT_TIME_ZONE);
         $twig->addGlobal('currentUserName', $user?->getName());
@@ -321,11 +330,12 @@ class Factory
         return new Twig\Loader\FilesystemLoader(self::createDirectoryAppRoot() . 'templates');
     }
 
-    public static function createUrlGenerator(ContainerInterface $container, Config $config) : UrlGenerator
+    public static function createUrlGenerator(ContainerInterface $container, Config $config) : ImageUrlService
     {
-        return new UrlGenerator(
+        return new ImageUrlService(
             $container->get(TmdbUrlGenerator::class),
             $container->get(ImageCacheService::class),
+            $container->get(ApplicationUrlService::class),
             self::getTmdbEnabledImageCaching($config),
         );
     }

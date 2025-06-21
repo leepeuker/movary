@@ -2,17 +2,20 @@
 
 namespace Movary\Service\Radarr;
 
-use Movary\Service\ServerSettings;
+use Movary\Service\ApplicationUrlService;
+use Movary\ValueObject\RelativeUrl;
 
 class RadarrFeedUrlGenerator
 {
     public function __construct(
-        private readonly ServerSettings $serverSettings,
+        private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
 
     public function generateUrl(string $feedId) : string
     {
-        return $this->serverSettings->getApplicationUrl() . '/api/feed/radarr/' . $feedId;
+        return $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create('/api/feed/radarr/' . $feedId),
+        );
     }
 }

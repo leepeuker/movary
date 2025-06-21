@@ -58,7 +58,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 });
 
 function updatePassword(currentPassword, newPassword) {
-    return fetch('/settings/account/security/update-password', {
+    return fetch(APPLICATION_URL + '/settings/account/security/update-password', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -71,7 +71,7 @@ function updatePassword(currentPassword, newPassword) {
 }
 
 async function showAddTwoFactorAuthenticationModal() {
-    const request = await fetch('/settings/account/security/create-totp-uri', {
+    const request = await fetch(APPLICATION_URL + '/settings/account/security/create-totp-uri', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -110,7 +110,7 @@ async function enableTOTP() {
         return false;
     }
 
-    await fetch('/settings/account/security/enable-totp', {
+    await fetch(APPLICATION_URL + '/settings/account/security/enable-totp', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -133,7 +133,7 @@ async function enableTOTP() {
 }
 
 async function disableTOTP() {
-    await fetch('/settings/account/security/disable-totp', {
+    await fetch(APPLICATION_URL + '/settings/account/security/disable-totp', {
         method: 'POST'
     }).then(function(response) {
         if(response.ok) {

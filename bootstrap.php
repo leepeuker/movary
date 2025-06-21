@@ -12,7 +12,7 @@ $builder->addDefinitions(
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
-        \Movary\Service\UrlGenerator::class => DI\factory([Factory::class, 'createUrlGenerator']),
+        \Movary\Service\ImageUrlService::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\Service\Export\ExportService::class => DI\factory([Factory::class, 'createExportService']),
         \Movary\HttpController\Api\OpenApiController::class => DI\factory([Factory::class, 'createOpenApiController']),
         \Movary\HttpController\Web\CreateUserController::class => DI\factory([Factory::class, 'createCreateUserController']),

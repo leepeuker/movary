@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-integration-plex.js"></script>
-    <script src="/js/component/modal-job.js"></script>
+    <script src="{{ applicationUrl }}/js/settings-integration-plex.js"></script>
+    <script src="{{ applicationUrl }}/js/component/modal-job.js"></script>
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
+    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -37,7 +37,7 @@
                     <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
                          role="alert"
                          style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Webhook disabled - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
+                        Webhook disabled - {% if currentUserIsAdmin == true %}<a href="{{ applicationUrl }}/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
                     </div>
                 </div>
 
@@ -91,7 +91,7 @@
                 <div class="alert alert-warning {% if plexTokenExists == true or isActive != '' %}d-none{% endif %}"
                      role="alert"
                      style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                    Authentication disabled - {% if currentUserIsAdmin == true %}<a href="/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
+                    Authentication disabled - {% if currentUserIsAdmin == true %}<a href="{{ applicationUrl }}/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
                 </div>
                 <div class="alert alert-warning {% if hasServerPlexIdentifier == true %}d-none{% endif %}"
                      role="alert"

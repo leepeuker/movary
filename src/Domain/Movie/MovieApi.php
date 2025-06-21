@@ -18,7 +18,7 @@ use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\Person\PersonApi;
-use Movary\Service\UrlGenerator;
+use Movary\Service\ImageUrlService;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
@@ -42,7 +42,7 @@ class MovieApi
         private readonly VoteCountFormatter $voteCountFormatter,
         private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
         private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
-        private readonly UrlGenerator $urlGenerator,
+        private readonly ImageUrlService $urlGenerator,
         private readonly MovieRepository $repository,
         private readonly ProductionCompanyApi $movieProductionCompanyApi,
         private readonly PersonApi $personApi,

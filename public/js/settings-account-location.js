@@ -38,7 +38,7 @@ async function reloadTable(featureIsEnabled = true) {
 
     document.getElementById('locationsTableLoadingSpinner').classList.remove('d-none')
 
-    const response = await fetch('/settings/locations');
+    const response = await fetch(APPLICATION_URL + '/settings/locations');
 
     console.log(response.status)
     if (response.status !== 200) {
@@ -135,7 +135,7 @@ document.getElementById('createLocationButton').addEventListener('click', async 
 
     let categoryName = document.getElementById('locationModalNameInput').value;
     let isCinema = document.getElementById('locationModalCinemaInput').checked;
-    const response = await fetch('/settings/locations', {
+    const response = await fetch(APPLICATION_URL + '/settings/locations', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -189,7 +189,7 @@ document.getElementById('deleteLocationButton').addEventListener('click', async 
         return
     }
 
-    const response = await fetch('/settings/locations/' + document.getElementById('locationModalIdInput').value, {
+    const response = await fetch(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
         method: 'DELETE'
     });
 
@@ -215,7 +215,7 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
 
     let locationName = document.getElementById('locationModalNameInput').value;
     let isCinema = document.getElementById('locationModalCinemaInput').checked;
-    const response = await fetch('/settings/locations/' + document.getElementById('locationModalIdInput').value, {
+    const response = await fetch(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -280,7 +280,7 @@ function setLocationTableState(featureIsEnabled) {
 }
 
 async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
-    const response = await fetch('/settings/locations/toggle-feature', {
+    const response = await fetch(APPLICATION_URL + '/settings/locations/toggle-feature', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -297,7 +297,7 @@ async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
 
 
 async function sendRequestFetchIsLocationsFeatureEnabled() {
-    const response = await fetch('/settings/locations/toggle-feature', {method: 'GET'})
+    const response = await fetch(APPLICATION_URL + '/settings/locations/toggle-feature', {method: 'GET'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

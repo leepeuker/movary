@@ -3,7 +3,7 @@
 namespace Movary\Domain\Movie\Crew;
 
 use Movary\Domain\Person\PersonApi;
-use Movary\Service\UrlGenerator;
+use Movary\Service\ImageUrlService;
 
 class CrewApi
 {
@@ -24,7 +24,7 @@ class CrewApi
     public function __construct(
         private readonly CrewRepository $repository,
         private readonly PersonApi $personApi,
-        private readonly UrlGenerator $urlGenerator,
+        private readonly ImageUrlService $urlGenerator,
     ) {
     }
 

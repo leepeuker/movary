@@ -6,6 +6,7 @@ use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\Plex\PlexScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
@@ -15,6 +16,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -28,6 +30,7 @@ class PlexController
         private readonly PlexApi $plexApi,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
+        private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
 
@@ -101,7 +104,11 @@ class PlexController
             $this->userApi->updatePlexAccountId($this->authenticationService->getCurrentUserId(), (string)$plexAccountId);
         }
 
-        return Response::createSeeOther('/settings/integrations/plex');
+        return Response::createSeeOther(
+            $this->applicationUrlService->createApplicationUrl(
+                RelativeUrl::create('/settings/integrations/plex'),
+            ),
+        );
     }
 
     public function regeneratePlexWebhookUrl() : Response

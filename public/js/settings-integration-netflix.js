@@ -21,7 +21,7 @@ async function importNetflixHistory() {
     disable(document.getElementById('importNetflixButton'));
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
-    await fetch('/settings/netflix/import', {
+    await fetch(APPLICATION_URL + '/settings/netflix/import', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -52,7 +52,7 @@ async function uploadNetflixHistory() {
     setDefaultTable()
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
-    await fetch('/settings/netflix', {
+    await fetch(APPLICATION_URL + '/settings/netflix', {
         method: 'POST', body: requestFormData
     }).then(response => {
         document.getElementById('netflixTableBody').querySelector('div.spinner-border').parentElement.remove();
@@ -80,7 +80,7 @@ async function searchTMDB() {
     let searchQuery = document.getElementById('tmdbSearchModalInput').value;
 
     await createSpinner(document.getElementById('tmdbSearchResultsDiv'), 'tmdb');
-    await fetch('/settings/netflix/search', {
+    await fetch(APPLICATION_URL + '/settings/netflix/search', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -320,7 +320,7 @@ function processTMDBData(data) {
 
         media_div.setAttribute('data-tmdbid', item['id'])
 
-        img.src = item['poster_path'] != null ? 'https://image.tmdb.org/t/p/w92' + item['poster_path'] : '/images/placeholder-image.png';
+        img.src = item['poster_path'] != null ? 'https://image.tmdb.org/t/p/w92' + item['poster_path'] : APPLICATION_URL + '/images/placeholder-image.png';
         img.className = 'img-fluid';
         img.alt = 'Cover of ' + item['title'];
         img.style.width = '92px';
@@ -439,7 +439,7 @@ function processNetflixData(netflixActivityItems) {
         }
 
         if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.poster_path === null) {
-            tmdb_cover.src = '/images/placeholder-image.png';
+            tmdb_cover.src = APPLICATION_URL + '/images/placeholder-image.png';
             tmdb_link.innerText = 'Image not found on TMDB';
         } else {
             tmdb_cover.src = 'https://image.tmdb.org/t/p/w92' + netflixActivityItem.tmdbMatch.poster_path;

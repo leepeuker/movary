@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/component/user-select.js"></script>
-    <script src="/js/component/modal-advanced-search-movie.html.js"></script>
+    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ applicationUrl }}/js/component/modal-advanced-search-movie.html.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -31,7 +31,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for movie in movies %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ movie.id }}'">
+                        <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}'">
                             <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title }} Poster">
 
                             {% if movie.userRating is not null %}
@@ -55,7 +55,7 @@
             {% set minUserRatingQuery = (hasUserRating is null or minUserRating is null) ? '' : "minur=#{minUserRating}&" %}
             {% set maxUserRatingQuery = (hasUserRating is null or maxUserRating is null) ? '' : "maxur=#{maxUserRating}&" %}
             {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
-            {% set baseUrl = '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ hasUserRatingQuery ~ minUserRatingQuery ~ maxUserRatingQuery ~ productionCountryCode %}
+            {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ hasUserRatingQuery ~ minUserRatingQuery ~ maxUserRatingQuery ~ productionCountryCode %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}
