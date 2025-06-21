@@ -3,13 +3,16 @@
 namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Service\ApplicationUrlService;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\RelativeUrl;
 
 class UserIsAuthenticated implements MiddlewareInterface
 {
     public function __construct(
         private readonly Authentication $authenticationService,
+        private readonly ApplicationUrlService $urlService,
     ) {
     }
 
@@ -20,6 +23,10 @@ class UserIsAuthenticated implements MiddlewareInterface
             return null;
         }
 
-        return Response::createForbiddenRedirect($_SERVER['REQUEST_URI']);
+        return Response::createForbiddenRedirect(
+            $this->urlService->createApplicationUrl(
+                RelativeUrl::create($_SERVER['REQUEST_URI']),
+            ),
+        );
     }
 }

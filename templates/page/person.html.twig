@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/component/user-select.js"></script>
-    <script src="/js/person.js"></script>
+    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ applicationUrl }}/js/person.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -59,11 +59,11 @@
         <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
             {% if person.imdbUrl is not null %}
                 <a style="display: flex; align-items: center;cursor:pointer;margin-right: 0.6rem" href="{{ person.imdbUrl }}" target="_blank">
-                    <img src="/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
+                    <img src="{{ applicationUrl }}/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
                 </a>
             {% endif %}
             <a style="display: flex; align-items: center;cursor:pointer;" href="{{ person.tmdbUrl }}" target="_blank">
-                <img src="/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
+                <img src="{{ applicationUrl }}/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
             </a>
         </div>
 
@@ -122,7 +122,7 @@
                         {% for movieAsActor in moviesAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer"
-                                     onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
+                                     onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -143,7 +143,7 @@
                         {% for movieAsActor in moviesFromWatchlistAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <div class="card h-100 position-relative" style="cursor: pointer"
-                                     onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
+                                     onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -166,7 +166,7 @@
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative" style="padding-bottom: 1rem">
                             <div class="card h-100 position-relative" style="cursor: pointer"
-                                 onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                                 onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
                                 <div class="position-relative">
                                     <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
@@ -187,7 +187,7 @@
                       {% for movieAsDirector in moviesFromWatchlistAsDirector %}
                           <div class="col position-relative" style="padding-bottom: 1rem">
                               <div class="card h-100 position-relative" style="cursor: pointer"
-                                   onclick="window.location='/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                                   onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
                                   <div class="position-relative">
                                       <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 

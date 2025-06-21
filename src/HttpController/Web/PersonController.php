@@ -9,8 +9,8 @@ use Movary\Domain\Person;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
+use Movary\Service\ImageUrlService;
 use Movary\Service\Tmdb\SyncPerson;
-use Movary\Service\UrlGenerator;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -24,7 +24,7 @@ class PersonController
         private readonly MovieApi $movieApi,
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
-        private readonly UrlGenerator $urlGenerator,
+        private readonly ImageUrlService $urlGenerator,
         private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
         private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly SyncPerson $tmdbPersonSync,

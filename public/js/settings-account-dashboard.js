@@ -77,7 +77,7 @@ async function updateDashboardRows() {
     let orderRows = getRowOrder();
     let visibleRows = getVisibleRows();
     let extendedRows = getExtendedRows();
-    await fetch('/settings/account/update-dashboard-rows', {
+    await fetch(APPLICATION_URL + '/settings/account/update-dashboard-rows', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -103,7 +103,7 @@ async function updateDashboardRows() {
 }
 
 async function resetDashboardRows() {
-    await fetch('/settings/account/reset-dashboard-rows', {
+    await fetch(APPLICATION_URL + '/settings/account/reset-dashboard-rows', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

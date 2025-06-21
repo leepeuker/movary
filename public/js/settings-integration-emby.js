@@ -31,7 +31,7 @@ function deleteEmbyWebhook() {
 }
 
 async function regenerateEmbyWebhookRequest() {
-    const response = await fetch('/settings/emby/webhook', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/settings/emby/webhook', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -42,7 +42,7 @@ async function regenerateEmbyWebhookRequest() {
 }
 
 async function deleteEmbyWebhookRequest() {
-    const response = await fetch('/settings/emby/webhook', {'method': 'delete'})
+    const response = await fetch(APPLICATION_URL + '/settings/emby/webhook', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -66,7 +66,7 @@ function setEmbyWebhookUrl(webhookUrl) {
 async function updateScrobbleOptions() {
     removeAlert('alertWebhookOptionsDiv')
 
-    await fetch('/settings/emby', {
+    await fetch(APPLICATION_URL + '/settings/emby', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'

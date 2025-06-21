@@ -6,7 +6,7 @@ use Movary\Api\Tmdb;
 use Movary\Domain\Movie;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
-use Movary\Service\UrlGenerator;
+use Movary\Service\ImageUrlService;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\SortOrder;
@@ -18,7 +18,7 @@ class MovieHistoryApi
         private readonly MovieHistoryRepository $repository,
         private readonly Movie\MovieRepository $movieRepository,
         private readonly Tmdb\TmdbApi $tmdbApi,
-        private readonly UrlGenerator $urlGenerator,
+        private readonly ImageUrlService $urlGenerator,
         private readonly JobQueueApi $jobQueueApi,
         private readonly UserApi $userApi,
     ) {

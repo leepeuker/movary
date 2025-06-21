@@ -32,7 +32,7 @@ function deletePlexWebhook() {
 }
 
 async function regeneratePlexWebhookRequest() {
-    const response = await fetch('/settings/plex/webhook', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/settings/plex/webhook', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -43,7 +43,7 @@ async function regeneratePlexWebhookRequest() {
 }
 
 async function deletePlexWebhookRequest() {
-    const response = await fetch('/settings/plex/webhook', {'method': 'delete'})
+    const response = await fetch(APPLICATION_URL + '/settings/plex/webhook', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -69,7 +69,7 @@ function setPlexWebhookUrl(webhookUrl) {
 async function updateScrobbleOptions() {
     removeAlert('alertWebhookOptionsDiv')
 
-    await fetch('/settings/plex', {
+    await fetch(APPLICATION_URL + '/settings/plex', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -94,7 +94,7 @@ async function updateScrobbleOptions() {
 
 async function authenticateWithPlex() {
     const response = await fetch(
-        '/settings/plex/authentication-url',
+        APPLICATION_URL + '/settings/plex/authentication-url',
         {signal: AbortSignal.timeout(4000)}
     ).catch(function (error) {
         document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
@@ -122,7 +122,7 @@ async function authenticateWithPlex() {
 
 async function removePlexAuthentication() {
     const response = await fetch(
-        '/settings/plex/logout',
+        APPLICATION_URL + '/settings/plex/logout',
         {signal: AbortSignal.timeout(4000)}
     ).catch(function (error) {
         console.log(error)
@@ -148,7 +148,7 @@ async function removePlexAuthentication() {
 }
 
 async function savePlexServerUrl() {
-    const response = await fetch('/settings/plex/server-url-save', {
+    const response = await fetch(APPLICATION_URL + '/settings/plex/server-url-save', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -184,7 +184,7 @@ async function verifyPlexServerUrl() {
     document.getElementById('alertPlexServerUrlLoadingSpinner').classList.remove('d-none')
     removeAlert('alertPlexServerUrlDiv')
 
-    const response = await fetch('/settings/plex/server-url-verify', {
+    const response = await fetch(APPLICATION_URL + '/settings/plex/server-url-verify', {
         signal: AbortSignal.timeout(4000),
         method: 'POST',
         headers: {
@@ -226,7 +226,7 @@ document.getElementById('plexServerUrlInput').addEventListener('input', function
 
 async function importPlexWatchlist() {
     const response = await fetch(
-        '/jobs/schedule/plex-watchlist-sync',
+        APPLICATION_URL + '/jobs/schedule/plex-watchlist-sync',
         {'method': 'get'}
     ).catch(function (error) {
         addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')

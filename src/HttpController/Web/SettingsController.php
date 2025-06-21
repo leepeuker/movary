@@ -13,6 +13,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
@@ -54,6 +55,7 @@ class SettingsController
         private readonly EmailService $emailService,
         private readonly CountryApi $countryApi,
         private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
+        private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
 
@@ -218,17 +220,17 @@ class SettingsController
     {
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getEmbyWebhookId();
 
-        if ($applicationUrl !== null && $webhookId !== null) {
+        if ($hasApplicationUrl === true && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildEmbyWebhookUrl($webhookId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-emby.html.twig', [
-                'isActive' => $applicationUrl !== null,
+                'isActive' => $hasApplicationUrl,
                 'embyWebhookUrl' => $webhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasEmbyScrobbleWatchesEnabled(),
             ]),
@@ -260,7 +262,7 @@ class SettingsController
     {
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getJellyfinWebhookId();
 
         $jellyfinDeviceId = $this->serverSettings->getJellyfinDeviceId();
@@ -272,14 +274,14 @@ class SettingsController
             $jellyfinUsername = $this->jellyfinApi->findJellyfinUser($jellyfinAuthentication);
         }
 
-        if ($applicationUrl !== null && $webhookId !== null) {
+        if ($hasApplicationUrl === true && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-jellyfin.html.twig', [
-                'isActive' => $applicationUrl !== null,
+                'isActive' => $hasApplicationUrl,
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'jellyfinServerUrl' => $jellyfinServerUrl,
                 'jellyfinIsAuthenticated' => $jellyfinAuthentication !== null,
@@ -295,17 +297,17 @@ class SettingsController
     {
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getKodiWebhookId();
 
-        if ($applicationUrl !== null && $webhookId !== null) {
+        if ($hasApplicationUrl === true && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildKodiWebhookUrl($webhookId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-kodi.html.twig', [
-                'isActive' => $applicationUrl !== null,
+                'isActive' => $hasApplicationUrl,
                 'kodiWebhookUrl' => $webhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasKodiScrobbleWatchesEnabled(),
             ]),
@@ -380,17 +382,17 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $plexWebhookId = $user->getPlexWebhookId();
 
-        if ($applicationUrl !== null && $plexWebhookId !== null) {
+        if ($hasApplicationUrl === true && $plexWebhookId !== null) {
             $plexWebhookUrl = $this->webhookUrlBuilder->buildPlexWebhookUrl($plexWebhookId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-plex.html.twig', [
-                'isActive' => $applicationUrl !== null,
+                'isActive' => $hasApplicationUrl,
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
@@ -407,9 +409,9 @@ class SettingsController
         $user = $this->authenticationService->getCurrentUser();
 
         $radarrFeedId = $user->getRadarrFeedId();
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
 
-        if ($applicationUrl !== null && $radarrFeedId !== null) {
+        if ($hasApplicationUrl === true && $radarrFeedId !== null) {
             $radarrFeedUrl = $this->radarrFeedUrlGenerator->generateUrl($radarrFeedId);
         }
 
@@ -417,7 +419,7 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-radarr.html.twig', [
                 'radarrFeedUrl' => $radarrFeedUrl ?? '-',
-                'isActive' => $applicationUrl !== null
+                'isActive' => $hasApplicationUrl
             ]),
         );
     }

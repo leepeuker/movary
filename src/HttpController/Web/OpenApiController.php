@@ -2,32 +2,30 @@
 
 namespace Movary\HttpController\Web;
 
-use Movary\Service\ServerSettings;
+use Movary\Service\ApplicationUrlService;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\RelativeUrl;
 use Twig\Environment;
 
 class OpenApiController
 {
     public function __construct(
         private readonly Environment $twig,
-        private readonly ServerSettings $serverSettings,
+        private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
 
     public function renderPage() : Response
     {
-        $openApiJsonUrl = '/api/openapi';
-
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
-        if ($applicationUrl !== null) {
-            $openApiJsonUrl = trim($applicationUrl, '/') . $openApiJsonUrl;
-        }
+        $applicationUrl = $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create('/api/openapi'),
+        );
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/api.html.twig', [
-                'openApiJsonUrl' => $openApiJsonUrl
+                'openApiJsonUrl' => $applicationUrl
             ]),
         );
     }

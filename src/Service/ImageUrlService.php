@@ -3,12 +3,14 @@
 namespace Movary\Service;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
+use Movary\ValueObject\RelativeUrl;
 
-class UrlGenerator
+class ImageUrlService
 {
     public function __construct(
         private readonly TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly ImageCacheService $imageCacheService,
+        private readonly ApplicationUrlService $urlService,
         private readonly bool $enableImageCaching,
     ) {
     }
@@ -16,14 +18,14 @@ class UrlGenerator
     public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath) : string
     {
         if ($this->enableImageCaching === true && empty($posterPath) === false && $this->imageCacheService->posterPathExists($posterPath) === true) {
-            return '/' . trim($posterPath, '/');
+            return $this->urlService->createApplicationUrl(RelativeUrl::create('/' . trim($posterPath, '/')));
         }
 
         if (empty($tmdbPosterPath) === false) {
             return (string)$this->tmdbUrlGenerator->generateImageUrl($tmdbPosterPath);
         }
 
-        return '/images/placeholder-image.png';
+        return $this->urlService->createApplicationUrl(RelativeUrl::create('/images/placeholder-image.png'));
     }
 
     public function replacePosterPathWithImageSrcUrl(array $dbResults) : array

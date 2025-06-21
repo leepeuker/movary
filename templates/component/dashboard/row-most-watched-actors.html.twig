@@ -7,7 +7,7 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for mostWatchedActor in mostWatchedActors %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <div class="card h-100 position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}'"
+                    <div class="card h-100 position-relative" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}'"
                          style="cursor: pointer;">
                         <div class="card-header text-truncate" style="padding: 0.2rem">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
@@ -21,7 +21,7 @@
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
+        <a class="btn btn-outline-secondary btn-sm" href="{{ applicationUrl }}/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
            style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
     </li>
 {% endmacro %}

@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/component/user-select.js"></script>
-    <script src="/js/component/modal-advanced-search-person.html.js"></script>
+    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ applicationUrl }}/js/component/modal-advanced-search-person.html.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -31,7 +31,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedActor in mostWatchedActors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative" onclick="window.location='/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}'" style="cursor: pointer">
+                        <div class="card h-100  position-relative" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}'" style="cursor: pointer">
                             <div class="card-header text-truncate" style="padding: 0.2rem">
                                 <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                             </div>
@@ -54,7 +54,7 @@
             {% set sortOrderQuery = (sortOrder is null) ? '' : "so=#{sortOrder}&" %}
             {% set perPageQuery = (perPage is null) ? '' : "pp=#{perPage}&" %}
             {% set genderQuery = (filterGender is null) ? '' : "ge=#{filterGender}&" %}
-            {% set baseUrl = '/users/' ~ routeUsername ~ '/actors?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
+            {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/actors?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

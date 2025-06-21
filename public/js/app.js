@@ -1,7 +1,7 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker
-            .register('/serviceWorker.js')
+            .register(APPLICATION_URL + '/serviceWorker.js')
             .then(function (registration) {
                 console.log('Service Worker registered with scope:', registration.scope);
             })
@@ -13,6 +13,7 @@ if ('serviceWorker' in navigator) {
 
 const PASSWORD_MIN_LENGTH = 8
 let currentModalVersion = 1;
+const APPLICATION_URL = document.getElementById('applicationUrl').value;
 
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
@@ -127,7 +128,7 @@ async function searchTmdbWithLogModalSearchInput() {
 
     let targetModalVersion = currentModalVersion
 
-    const data = await fetch('/settings/netflix/search', {
+    const data = await fetch(APPLICATION_URL + '/settings/netflix/search', {
         signal: AbortSignal.timeout(4000),
         method: 'POST',
         headers: {
@@ -205,7 +206,7 @@ function loadLogModalSearchResults(data) {
         }
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
-        posterPath = item.poster_path != null ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : '/images/placeholder-image.png';
+        posterPath = item.poster_path != null ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : APPLICATION_URL + '/images/placeholder-image.png';
         listElement.innerHTML = '<img src="' + posterPath + '" alt="Girl in a jacket" style="margin-right: .5rem;width: 3rem"><span>' + item.title + ' (' + releaseYear + ')</span>'
 
         listElement.dataset.tmdbId = item.id
@@ -287,7 +288,7 @@ function resetLogModalLogInputs() {
 function addToWatchlist(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
 
-    fetch('/add-movie-to-watchlist', {
+    fetch(APPLICATION_URL + '/add-movie-to-watchlist', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -321,7 +322,7 @@ function logMovie(context) {
         return
     }
 
-    fetch('/log-movie', {
+    fetch(APPLICATION_URL + '/log-movie', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -435,7 +436,7 @@ function getCurrentDate() {
  * Rating star logic starting here
  */
 async function fetchRating(tmdbId) {
-    const response = await fetch('/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
+    const response = await fetch(APPLICATION_URL + '/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -505,16 +506,16 @@ function removeAlert(parentDivId) {
 }
 
 async function logout() {
-    await fetch('/api/authentication/token', {
+    await fetch(APPLICATION_URL + '/api/authentication/token', {
         method: 'DELETE',
     });
 
-    window.location.href = '/'
+    window.location.href = APPLICATION_URL + '/'
 }
 
 async function fetchLocations() {
     const response = await fetch(
-        '/settings/locations',
+        APPLICATION_URL + '/settings/locations',
         {signal: AbortSignal.timeout(4000)}
     )
 

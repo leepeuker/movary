@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/component/user-select.js"></script>
-    <script src="/js/watchlist.js"></script>
-    <script src="/js/component/modal-advanced-search-watchlist.html.js"></script>
+    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ applicationUrl }}/js/watchlist.js"></script>
+    <script src="{{ applicationUrl }}/js/component/modal-advanced-search-watchlist.html.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -49,7 +49,7 @@
             {% set genreQuery = (genre is null) ? '' : "ge=#{genre}&" %}
             {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
             {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
-            {% set baseUrl = '/users/' ~ routeUsername ~ '/watchlist?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ productionCountryCode %}
+            {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/watchlist?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ productionCountryCode %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

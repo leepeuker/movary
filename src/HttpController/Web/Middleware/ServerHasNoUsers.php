@@ -3,13 +3,18 @@
 namespace Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\UserApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\RelativeUrl;
 
 class ServerHasNoUsers implements MiddlewareInterface
 {
+    private const string CREATE_USER_URL_PATH = '/create-user';
+
     public function __construct(
         private readonly UserApi $userApi,
+        private readonly ApplicationUrlService $urlService,
     ) {
     }
 
@@ -20,6 +25,10 @@ class ServerHasNoUsers implements MiddlewareInterface
             return null;
         }
 
-        return Response::createSeeOther('/create-user');
+        return Response::createSeeOther(
+            $this->urlService->createApplicationUrl(
+                RelativeUrl::create(self::CREATE_USER_URL_PATH),
+            ),
+        );
     }
 }

@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-integration-trakt.js"></script>
-    <script src="/js/component/modal-job.js"></script>
+    <script src="{{ applicationUrl }}/js/settings-integration-trakt.js"></script>
+    <script src="{{ applicationUrl }}/js/component/modal-job.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -22,7 +22,7 @@
                 <p class="text-muted" style="margin-bottom: 0.5rem">To get your username and client id from Trakt visit <a href="https://trakt.tv/oauth/applications"
                                                                                                                            target="_blank">this url</a>.</p>
 
-                <form action="/settings/trakt" method="post">
+                <form action="{{ applicationUrl }}/settings/trakt" method="post">
                     <p style="margin-bottom: 0.5rem">Username:</p>
                     <div class="input-group mb-3">
                         <input type="text"
@@ -83,7 +83,7 @@
                 <div style="margin-top: 0.9rem">
                     <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_history')" style="margin-right: .3rem">Show imports</button>
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       href="/jobs/schedule/trakt-history-sync">Import history</a>
+                       href="{{ applicationUrl }}/jobs/schedule/trakt-history-sync">Import history</a>
 
                     <br>
 
@@ -96,7 +96,7 @@
 
                     <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_ratings')" style="margin-right: .3rem;margin-top: 1rem">Show imports</button>
                     <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       href="/jobs/schedule/trakt-ratings-sync" style="margin-top: 1rem">Import ratings</a>
+                       href="{{ applicationUrl }}/jobs/schedule/trakt-ratings-sync" style="margin-top: 1rem">Import ratings</a>
                 </div>
             </div>
         </div>
