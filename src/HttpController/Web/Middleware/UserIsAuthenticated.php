@@ -27,6 +27,7 @@ class UserIsAuthenticated implements MiddlewareInterface
             $this->urlService->createApplicationUrl(
                 RelativeUrl::create($_SERVER['REQUEST_URI']),
             ),
+            $this->urlService->createApplicationUrl(),
         );
     }
 }

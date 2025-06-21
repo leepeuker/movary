@@ -15,10 +15,14 @@ class ApplicationUrlService
     {
         $customApplicationUrl = $this->serverSettings->getApplicationUrl();
         if ($customApplicationUrl === null) {
-            return $relativeUrl === null ? '' : (string)$relativeUrl;
+            if ($relativeUrl === null) {
+                return  '/';
+            }
+
+            return  rtrim((string)$relativeUrl, '/');
         }
 
-        return trim($customApplicationUrl, '/') . $relativeUrl;
+        return rtrim($customApplicationUrl, '/') . rtrim((string)$relativeUrl, '/');
     }
 
     public function hasApplicationUrl() : bool

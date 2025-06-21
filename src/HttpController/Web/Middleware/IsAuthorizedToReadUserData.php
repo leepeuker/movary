@@ -35,6 +35,7 @@ class IsAuthorizedToReadUserData implements MiddlewareInterface
             $this->urlService->createApplicationUrl(
                 RelativeUrl::create($request->getPath()),
             ),
+            $this->urlService->createApplicationUrl(),
         );
     }
 }

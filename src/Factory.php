@@ -304,7 +304,12 @@ class Factory
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
-        $twig->addGlobal('applicationUrl', $container->get(ApplicationUrlService::class)->createApplicationUrl());
+        $applicationUrl = $container->get(ApplicationUrlService::class)->createApplicationUrl();
+        if ($applicationUrl === '/') {
+            $applicationUrl = '';
+        }
+
+        $twig->addGlobal('applicationUrl', $applicationUrl);
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
         $twig->addGlobal('applicationTimezone', $container->get(ServerSettings::class)->getApplicationTimezone() ?? DateTime::DEFAULT_TIME_ZONE);
         $twig->addGlobal('currentUserName', $user?->getName());
