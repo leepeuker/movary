@@ -21,7 +21,6 @@ class ServerHasUsers implements MiddlewareInterface
         if ($this->userApi->hasUsers() === false) {
             return null;
         }
-        exit;
 
         return Response::createSeeOther($this->urlService->createApplicationUrl());
     }
