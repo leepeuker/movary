@@ -477,7 +477,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-general.html.twig', [
-                'applicationUrlRaw' => $this->serverSettings->getApplicationUrl(),
+                'applicationUrl' => $this->serverSettings->getApplicationUrl(),
                 'applicationName' => $this->serverSettings->getApplicationName(),
                 'applicationTimezone' => $this->serverSettings->getApplicationTimezone(),
                 'applicationTimezoneDefault' => DateTime::DEFAULT_TIME_ZONE,
