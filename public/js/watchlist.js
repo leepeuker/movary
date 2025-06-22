@@ -29,10 +29,28 @@ function openOptionsModal(trigger) {
 }
 
 function goToMovie() {
-    const currentRouteUsername = window.location.pathname.match(/(?<!^)\/([a-zA-Z0-9]+)\//)[1];
-    let movieId = document.getElementById('optionsModal').dataset.movieid;
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const userIndex = pathSegments.indexOf('users');
 
-    window.location.href = APPLICATION_URL + '/users/' + currentRouteUsername + '/movies/' + movieId;
+    if (userIndex === -1 || pathSegments.length <= userIndex + 1) {
+        console.error("Username could not be extracted from the URL.");
+        return;
+    }
+
+    const currentRouteUsername = pathSegments[userIndex + 1];
+    const movieId = document.getElementById('optionsModal')?.dataset.movieid;
+
+    if (!movieId) {
+        console.error("movieId is missing in #optionsModal dataset.");
+        return;
+    }
+
+    if (typeof APPLICATION_URL === 'undefined') {
+        console.error("APPLICATION_URL is not defined.");
+        return;
+    }
+
+    window.location.href = `${APPLICATION_URL}/users/${currentRouteUsername}/movies/${movieId}`;
 }
 
 document.getElementById('optionsModal').addEventListener('hidden.bs.modal', () => {

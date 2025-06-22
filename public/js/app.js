@@ -13,7 +13,6 @@ if ('serviceWorker' in navigator) {
 
 const PASSWORD_MIN_LENGTH = 8
 let currentModalVersion = 1;
-const APPLICATION_URL = document.getElementById('applicationUrl').value;
 
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
