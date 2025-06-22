@@ -17,10 +17,10 @@
 
 <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
 <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
-<input value="{{ applicationUrl }}" id="applicationUrl" hidden>
 
 {% block body %}{% endblock %}
 
+<script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
 <script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
 <script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
 <script src="{{ applicationUrl }}/js/datepicker-full-1.2.0.min.js"></script>
