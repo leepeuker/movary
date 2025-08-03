@@ -1006,7 +1006,7 @@ class MovieRepository
                 LEFT JOIN genre g on mg.genre_id = g.id
                 $joinProductionCountry
                 $whereQuery
-                GROUP BY m.id, title, release_date, watched_at, rating
+                GROUP BY m.id, title, release_date, watched_at, rating, mh.position
                 ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition LOWER(title) asc
             ) a
             WHERE rn = 1
