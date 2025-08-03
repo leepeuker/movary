@@ -408,7 +408,7 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.*, mh.watched_at, mur.rating as userRating, mh.location_id as locationId
+            SELECT m.*, mh.watched_at, mh.position, mur.rating as userRating, mh.location_id as locationId
             FROM movie m
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
