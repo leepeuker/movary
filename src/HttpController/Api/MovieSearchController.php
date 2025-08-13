@@ -16,7 +16,7 @@ class MovieSearchController
         private readonly TmdbApi $tmdbApi,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly SearchRequestMapper $searchRequestMapper,
-        private readonly MovieSearchResponseMapper $historyResponseMapper,
+        private readonly MovieSearchResponseMapper $movieSearchResponseMapper,
     ) {
     }
 
@@ -24,11 +24,27 @@ class MovieSearchController
     {
         $requestData = $this->searchRequestMapper->mapRequest($request);
 
-        $tmdbResponse = $this->tmdbApi->searchMovie(
-            $requestData->getSearchTerm(),
-            $requestData->getYear(),
-            $requestData->getPage(),
-        );
+        $searchterm = $requestData->getSearchTerm();
+
+        // TODO ckeck if $searchterm is a TMDB url
+        if (str_starts_with($searchterm, 'https://') === true) {
+            // TODO extract TMDB id from $searchterm url
+            $tmdbId = 42;
+
+            $movieDetails = $this->tmdbApi->fetchMovieDetails($tmdbId);
+
+            // TODO implement mapMovieSearchResult(), match the mapMovieSearchResults() return type!
+            $results = $this->movieSearchResponseMapper->mapMovieSearchResult($movieDetails);
+        } else {
+            $tmdbResponse = $this->tmdbApi->searchMovie(
+                $requestData->getSearchTerm(),
+                $requestData->getYear(),
+                $requestData->getPage(),
+            );
+
+            $results = $this->movieSearchResponseMapper->mapMovieSearchResults($tmdbResponse);
+        }
+
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
             $tmdbResponse['total_results'],
@@ -38,7 +54,7 @@ class MovieSearchController
 
         return Response::createJson(
             Json::encode([
-                'results' => $this->historyResponseMapper->mapMovieSearchResults($tmdbResponse),
+                'results' => $results,
                 'currentPage' => $paginationElements->getCurrentPage(),
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),
