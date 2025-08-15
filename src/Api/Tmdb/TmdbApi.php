@@ -7,6 +7,7 @@ use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbPerson;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderCollection;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderList;
+use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
 use Movary\ValueObject\Year;
 
 class TmdbApi
@@ -51,15 +52,29 @@ class TmdbApi
         );
     }
 
-    /** searchID — directly exposes data in TMDB format to frontend given a TMDB ID */
-    public function searchID(int $movieId) : array
-    {
-        return $this->client->get('/movie/' . $movieId);
-    }
-
     /** searchMovie — directly exposes data in TMDB format to frontend given a search query */
     public function searchMovie(string $searchTerm, ?Year $year = null, ?int $page = null) : array
     {
+        $searchTermContainsTmdbId = preg_match('#themoviedb.org/movie/(\\d+)($|-)#i', $searchTerm, $tmdbIdsMatches);
+
+        if ($searchTermContainsTmdbId === 1) {
+            $tmdbId = (int)$tmdbIdsMatches[1];
+
+            if ($tmdbId === 0) {
+                return ['results' => []];
+            }
+
+            $movie = $this->findMovie($tmdbId);
+
+            if (count($movie) === 0) {
+                return ['results' => []];
+            }
+
+            return [
+                'results' => [$this->findMovie($tmdbId)]
+            ];
+        }
+
         $getParameters = ['query' => urlencode($searchTerm)];
 
         if ($year !== null) {
@@ -71,5 +86,14 @@ class TmdbApi
         }
 
         return $this->client->get('/search/movie', $getParameters);
+    }
+
+    private function findMovie(int $movieId) : array
+    {
+        try {
+            return $this->client->get('/movie/' . $movieId);
+        } catch (TmdbResourceNotFound) {
+            return [];
+        }
     }
 }

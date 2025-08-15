@@ -68,17 +68,7 @@ class NetflixController
     {
         $input = Json::decode($request->getBody());
 
-        // direct input of TMDB URL
-        if (preg_match('#themoviedb.org/movie/(\\d+)($|-)#i', $input['query'], $tmdb_ids)) {
-            $tmdb_id = intval($tmdb_ids[1]);
-            $tmdbSearchResult = [
-                "results"=>[
-                    $this->tmdbApi->searchID($tmdb_id)
-                ]
-            ];
-        } else { // search as normal
-            $tmdbSearchResult = $this->tmdbApi->searchMovie($input['query']);
-        }
+        $tmdbSearchResult = $this->tmdbApi->searchMovie($input['query']);
 
         return Response::createJson(Json::encode($tmdbSearchResult['results']));
     }
