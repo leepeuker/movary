@@ -186,7 +186,7 @@
         {% if movie.tagline is not null %}
             <h6 style="margin-bottom: 0.3rem;">Tagline</h6>
             <div class="carousel">
-                <p class="fw-lighter" style="margin-bottom: 0">
+                <p style="margin-bottom: 0">
                     {{ movie.tagline }}
                 </p>
             </div>
@@ -196,7 +196,7 @@
 
         <h6 style="margin-bottom: 0.4rem;">Plot</h6>
         <div class="carousel">
-            <p style="margin-bottom: 0rem">
+            <p style="margin-bottom: 0">
                 {% if movie.overview == '' %} - {% endif %}
                 {{ movie.overview }}
             </p>
@@ -261,7 +261,7 @@
 
         <h6 style="margin-bottom: 0.4rem;margin-top: 1rem">Production countries</h6>
         <div class="carousel">
-            <p style="margin-bottom: 0rem">
+            <p style="margin-bottom: 0">
                 {% if movieProductionCountries|length == 0 %} - {% endif %}
                 {% for movieProductionCountry in movieProductionCountries %}{{ movieProductionCountry }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
