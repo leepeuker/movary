@@ -46,8 +46,9 @@ class ImportService
 
             $tmdbId = (int)$record['tmdbId'];
             $watchDate = empty($record['watchedAt']) === false ? Date::createFromString($record['watchedAt']) : null;
+            $imdbId = $record['imdbId'] === '' ? null : (string)$record['imdbId'];
 
-            $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
+            $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], $imdbId);
 
             $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
 
@@ -72,8 +73,9 @@ class ImportService
             }
 
             $tmdbId = (int)$record['tmdbId'];
+            $imdbId = $record['imdbId'] === '' ? null : (string)$record['imdbId'];
 
-            $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], (string)$record['imdbId']);
+            $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], $imdbId);
 
             $this->movieApi->updateUserRating($movie->getId(), $userId, PersonalRating::create((int)$record['userRating']));
         }
@@ -89,7 +91,9 @@ class ImportService
                 throw new RuntimeException('Import csv is missing data');
             }
 
-            $movie = $this->findOrCreateMovie((int)$record['tmdbId'], (string)$record['title'], (string)$record['imdbId']);
+            $imdbId = $record['imdbId'] === '' ? null : (string)$record['imdbId'];
+
+            $movie = $this->findOrCreateMovie((int)$record['tmdbId'], (string)$record['title'], $imdbId);
 
             $this->watchlistApi->addMovieToWatchlist($userId, $movie->getId(), DateTime::createFromString((string)$record['addedAt']));
         }
