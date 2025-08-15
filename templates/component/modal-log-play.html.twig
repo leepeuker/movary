@@ -11,7 +11,7 @@
                         <div class="input-group">
                             <input type="text"
                                    class="form-control"
-                                   placeholder="Search"
+                                   placeholder="Search or enter TMDB URL"
                                    value="{{ (searchTerm is null) ? '' : searchTerm }}"
                                    id="logPlayModalSearchInput"
                                    tabindex="0"
@@ -32,7 +32,7 @@
                             Something went wrong. Please try again.
                         </div>
                         <div class="alert alert-secondary d-none" role="alert" id="logPlayModalSearchNoResultAlert" style="margin-top: 1rem;margin-bottom: 0">
-                            No search results...
+                            No search results… try entering direct URL from <a href="https://www.themoviedb.org/">TMDB</a>?
                         </div>
                         <div class="text-center d-none" style="margin-top: 1rem;margin-bottom: 0" id="logPlayModalSearchSpinner">
                             <div class="spinner-border" role="status">

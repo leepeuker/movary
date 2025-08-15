@@ -51,6 +51,13 @@ class TmdbApi
         );
     }
 
+    /** searchID — directly exposes data in TMDB format to frontend given a TMDB ID */
+    public function searchID(int $movieId) : array
+    {
+        return $this->client->get('/movie/' . $movieId);
+    }
+
+    /** searchMovie — directly exposes data in TMDB format to frontend given a search query */
     public function searchMovie(string $searchTerm, ?Year $year = null, ?int $page = null) : array
     {
         $getParameters = ['query' => urlencode($searchTerm)];
