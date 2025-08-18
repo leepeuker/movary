@@ -31,7 +31,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedDirector in mostWatchedDirectors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100  position-relative" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedDirector.id }}'" style="cursor: pointer">
+                        <a class="card h-100  position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedDirector.id }}" style="cursor: pointer">
                             <div class="card-header text-truncate" style="padding: 0.2rem">
                                 <small class="text-muted" style="font-siz1e: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                             </div>
@@ -44,7 +44,7 @@
                                     </small>
                                 </div>
                             {% endif %}
-                        </div>
+                        </a>
                     </div>
                 {% endfor %}
             </div>
