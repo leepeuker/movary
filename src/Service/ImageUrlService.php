@@ -31,10 +31,16 @@ class ImageUrlService
     public function replacePosterPathWithImageSrcUrl(array $dbResults) : array
     {
         foreach ($dbResults as $index => $dbResult) {
-            $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters(
+            $imageSrcUrl = $this->generateImageSrcUrlFromParameters(
                 $dbResult['tmdb_poster_path'] ?? null,
                 $dbResult['poster_path'] ?? null,
             );
+            if (str_ends_with($imageSrcUrl, "/images/placeholder-image.png"))
+                $dbResults[$index]['poster_path_is_placeholder'] = true;
+            else
+                $dbResults[$index]['poster_path_is_placeholder'] = false;
+                        
+            $dbResults[$index]['poster_path'] = $imageSrcUrl;
         }
 
         return $dbResults;
