@@ -35,7 +35,10 @@
                 {% for watchlistEntry in watchlistEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100" style="cursor: pointer; position: relative;" id="card-{{ watchlistEntry.id }}">
-                            <img onclick="openOptionsModal(this)" data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
+                            <div class="card-header text-truncate" style="padding: 0.2rem">
+                                <small class="text-muted" style="font-size: 0.9rem;" title="{{ watchlistEntry.title }}">{{ watchlistEntry.title }}</small>
+                            </div>
+                            <img onclick="openOptionsModal(this)" data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
                        </div>
                     </div>
                 {% endfor %}

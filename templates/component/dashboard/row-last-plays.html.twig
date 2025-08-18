@@ -8,12 +8,12 @@
             {% for lastPlay in lastPlays %}
                 <div class="col" style="padding-bottom: 1rem;">
                     <div class="card h-100" style="cursor: pointer" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}'">
-                        <div style="height: 100%">
+                        <div class="card-header text-truncate" style="padding: 0.2rem">
+                            <small class="text-muted" style="font-size: 0.9rem;" title="{{ lastPlay.title }}">{{ lastPlay.title }}</small>
+                        </div>
                             <img src="{{ lastPlay.poster_path }}"
-                                 class="card-img-top"
                                  alt="{{ lastPlay.title }} Poster">
 
-                        </div>
                         <div class="card-footer" style="padding: 0.1rem">
                             <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>
                         </div>
