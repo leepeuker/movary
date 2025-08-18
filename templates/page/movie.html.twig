@@ -209,22 +209,20 @@
             {% if castMembers|length == 0 %} - {% endif %}
             {% for castMember in castMembers|slice(0, 40) %}
                 <div class="card" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;">
-                    <div class="card-header text-truncate"
+                    <a class="card-header text-truncate"
                          id="castMemberName"
-                         onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
+                         href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}"
                          data-bs-toggle="tooltip"
                          data-bs-title="{{ castMember.name }}"
                          style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">
                             {{ castMember.name }}
                         </small>
-                    </div>
+                    </a>
 
                     <img src="{{ castMember.posterPath }}"
                          alt="{{ castMember.name }} Poster"
-                         class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
-                         onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
-                         style="cursor: pointer">
+                         class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}">
                     {% if displayCharacterNames == true %}
                         <div class="card-footer text-truncate"
                              id="castCharacterName"
@@ -244,7 +242,7 @@
         <div class="carousel">
             {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
-                <div class="card" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}'"
+                <a class="card" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}"
                      style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
@@ -253,7 +251,7 @@
                     <img src="{{ director.posterPath }}"
                          class="card-img-bottom"
                          alt="{{ director.name }} Poster">
-                </div>
+                </a>
             {% endfor %}
         </div>
 

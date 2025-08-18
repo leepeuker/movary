@@ -121,8 +121,8 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                         {% for movieAsActor in moviesAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" style="cursor: pointer"
-                                     onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
+                                <a class="card h-100 position-relative" style="cursor: pointer"
+                                     href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -132,7 +132,7 @@
                                             {{ movieAsActor.userRating }}
                                         </span>
                                     {% endif %}
-                                </div>
+                                </a>
                             </div>
                         {% endfor %}
                     </div>
@@ -142,8 +142,8 @@
                     <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                         {% for movieAsActor in moviesFromWatchlistAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <div class="card h-100 position-relative" style="cursor: pointer"
-                                     onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}'">
+                                <a class="card h-100 position-relative" style="cursor: pointer"
+                                     href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -153,7 +153,7 @@
                                             {{ movieAsActor.userRating }}
                                         </span>
                                     {% endif %}
-                                </div>
+                                </a>
                             </div>
                         {% endfor %}
                     </div>
@@ -165,8 +165,8 @@
                 <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative" style="padding-bottom: 1rem">
-                            <div class="card h-100 position-relative" style="cursor: pointer"
-                                 onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                            <a class="card h-100 position-relative" style="cursor: pointer"
+                                 href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
                                 <div class="position-relative">
                                     <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
@@ -176,7 +176,7 @@
                                         {{ movieAsDirector.userRating }}
                                     </span>
                                 {% endif %}
-                            </div>
+                            </a>
                         </div>
                     {% endfor %}
                 </div>
@@ -186,8 +186,8 @@
                   <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
                       {% for movieAsDirector in moviesFromWatchlistAsDirector %}
                           <div class="col position-relative" style="padding-bottom: 1rem">
-                              <div class="card h-100 position-relative" style="cursor: pointer"
-                                   onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}'">
+                              <a class="card h-100 position-relative" style="cursor: pointer"
+                                   href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
                                   <div class="position-relative">
                                       <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
@@ -197,7 +197,7 @@
                                           {{ movieAsDirector.userRating }}
                                       </span>
                                   {% endif %}
-                              </div>
+                              </a>
                           </div>
                       {% endfor %}
                       </div>
