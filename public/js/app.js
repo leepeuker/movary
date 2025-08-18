@@ -206,7 +206,7 @@ function loadLogModalSearchResults(data) {
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
         posterPath = item.poster_path != null ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : APPLICATION_URL + '/images/placeholder-image.png';
-        listElement.innerHTML = '<img src="' + posterPath + '" alt="Girl in a jacket" style="margin-right: .5rem;width: 3rem"><span>' + item.title + ' (' + releaseYear + ')</span>'
+        listElement.innerHTML = '<img src="' + posterPath + '" alt="Girl in a jacket" style="margin-right: .5rem;width: 3rem"><p style="margin:0;"><span><b>' + item.title + '</b> (' + releaseYear + ')</span><br><span style="opacity:0.75; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; max-height:2lh;">' + item.overview + '</span></p>'
 
         listElement.dataset.tmdbId = item.id
         listElement.dataset.poster = item.poster_path
