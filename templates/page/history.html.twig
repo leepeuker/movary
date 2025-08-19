@@ -25,12 +25,11 @@
                 {% for historyEntry in historyEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ historyEntry.id }}'">
-                            <div style="height:100%; position:relative; background-color: #ebebeb;">
+                            <div style="height:100%; position:relative; background-color: #ebebeb; aspect-ratio: 342 / 513;">
                                 {% if historyEntry.poster_path_is_placeholder == false %}
                                     <img style="position:relative" src="{{ historyEntry.poster_path }}" class="card-img-top" alt="{{ historyEntry.title }} Poster">
                                 {% else %}
-                                    <img style="opacity:0;" src="{{ historyEntry.poster_path }}" class="card-img-top" alt="{{ historyEntry.title }} Poster">
-                                    <i style="position:absolute; inset:0; margin:auto; height:min-content;font-family: 'Courier New', monospace; font-weight: bold;">
+                                    <i style="position:absolute; inset:0; margin:auto; height:min-content;font-family: 'Courier New', monospace; font-weight: bold; color: #999;">
                                         {{ historyEntry.title }}
                                     </i>
                                 {% endif %}
