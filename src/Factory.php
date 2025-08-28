@@ -286,6 +286,7 @@ class Factory
 
         $currentRequest = $container->get(Request::class);
         $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;
+        $routeIgnorableNameSlug = $currentRequest->getRouteParameters()['ignorablenameslug'] ?? null;
 
         $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticatedWithCookie();
 
@@ -309,6 +310,8 @@ class Factory
             $applicationUrl = '';
         }
 
+        $request_url_path = self::createCurrentHttpRequest()->getPath();
+
         $twig->addGlobal('applicationUrl', $applicationUrl);
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
         $twig->addGlobal('applicationTimezone', $container->get(ServerSettings::class)->getApplicationTimezone() ?? DateTime::DEFAULT_TIME_ZONE);
@@ -319,7 +322,11 @@ class Factory
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
-        $twig->addGlobal('requestUrlPath', self::createCurrentHttpRequest()->getPath());
+        $twig->addGlobal('requestUrlPath', $request_url_path);
+        $twig->addGlobal(
+            'canonicalPath',
+            preg_replace('/-?' . $routeIgnorableNameSlug . '$/', "", $request_url_path)
+        );
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
 
         return $twig;

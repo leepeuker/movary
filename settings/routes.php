@@ -184,8 +184,11 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies', [Web\MoviesController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/actors', [Web\ActorsController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/directors', [Web\DirectorsController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    // the following routes (/movies/ and /persons/) can have any non-slash characters following the URL after a -
+    //   e.g., http://movary.test/users/alifeee/movies/14-freakier-friday which is identical to
+    //         http://movary.test/users/alifeee/movies/14
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}[-{ignorablenameslug:[^/]*}]', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}[-{ignorablenameslug:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
         Web\HistoryController::class,
         'deleteHistoryEntry'
