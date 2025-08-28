@@ -68,3 +68,4 @@ The documentation for the latest release is located [here](https://docs.movary.o
 * [@leepeuker](https://github.com/leepeuker) as Lee Peuker
 * [@JVT038](https://github.com/JVT038) as JVT038
 * [@pbogre](https://github.com/pbogre) as Pietro Bonaldo Gregori
+* [@alifeee](https://github.com/alifeee) as alifeee
