@@ -329,6 +329,15 @@ class Factory
         );
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
 
+        // slugify filter for "nice looking" URLs
+        //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
+        $twig->addFilter(new \Twig\TwigFilter('slugify', function ($string) {
+            $string = strtolower($string);
+            $string = preg_replace('/[^a-z-]/', "-", $string);
+            $string = preg_replace('/-+/', '-', $string);
+            return $string ? $string : "";
+        }));
+        
         return $twig;
     }
 

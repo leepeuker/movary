@@ -7,7 +7,7 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for watchlistItem in watchlistItems %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}"
+                    <a class="card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}{{ ("-" ~ watchlistItem.title)|slugify }}"
                          style="cursor: pointer;">
                         <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title }}" type="hidden">
                         <div style="height: 100%">

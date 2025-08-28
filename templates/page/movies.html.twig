@@ -31,7 +31,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for movie in movies %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}">
+                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}{{ ("-" ~ movie.title)|slugify }}">
                             <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title }} Poster">
 
                             {% if movie.userRating is not null %}
