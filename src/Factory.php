@@ -33,6 +33,7 @@ use Movary\Service\ImageUrlService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
+use Movary\Service\SlugifyService;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -46,6 +47,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
 use Twig;
+use Twig\TwigFilter;
 
 class Factory
 {
@@ -331,12 +333,7 @@ class Factory
 
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
-        $twig->addFilter(new \Twig\TwigFilter('slugify', function ($string) {
-            $string = strtolower($string);
-            $string = preg_replace('/[^a-z-]/', "-", $string);
-            $string = preg_replace('/-+/', '-', $string);
-            return $string ? $string : "";
-        }));
+        $twig->addFilter(new TwigFilter('slugify', [$container->get(SlugifyService::class), 'slugify']));
         
         return $twig;
     }
