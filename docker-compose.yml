@@ -9,5 +9,6 @@ services:
     ports:
       - "${HTTP_PORT:-80}:8080"
     environment:
+      XDEBUG_MODE: "${XDEBUG_MODE:-false}"
       TMDB_API_KEY: "${TMDB_API_KEY:-XXXXX}"
       TMDB_ENABLE_IMAGE_CACHING: "${TMDB_ENABLE_IMAGE_CACHING:-0}"
