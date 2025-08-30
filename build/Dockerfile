@@ -71,7 +71,7 @@ RUN apk add --no-cache php84-pecl-xdebug
 ARG XDEBUG_INI="$PHP_INI_DIR/conf.d/xdebug.ini"
 RUN echo 'zend_extension=xdebug.so' > $XDEBUG_INI \
     && echo "[xdebug]" >> $XDEBUG_INI \
-    && echo "xdebug.mode=\${XDEBUG_MODE:-false}" >> $XDEBUG_INI \
+    && echo "xdebug.mode=\${XDEBUG_MODE:-off}" >> $XDEBUG_INI \
     && echo "xdebug.discover_client_host=true" >> $XDEBUG_INI \
     && echo "xdebug.start_with_request=yes" >> $XDEBUG_INI \
     && echo "xdebug.trigger_value=yes" >> $XDEBUG_INI \
