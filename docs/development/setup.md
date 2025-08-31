@@ -26,6 +26,29 @@ Use the following cli commands to manage your local environment:
 - `make app_database_migrate` execute the database migrations
 - `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
 
+### Xdebug
+
+You can change `XDEBUG_MODE` to `debug` in the `.env` file to enable debugging using [Xdebug](https://xdebug.org/) in the development docker container.
+
+For example, in VSCode or VSCodium, the following debug configuration would allow you to set breakpoints and debug the PHP code:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/app": "${workspaceRoot}"
+      }
+    }
+  ]
+}
+```
+
 ### IDE recommendation: PhpStorm
 
 We recommend to use PhpStorm and to import the Movary code style scheme (found at `settings/phpstorm.xml`).
