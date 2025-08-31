@@ -56,7 +56,7 @@ Use the `public` directory as the document root of the web server.
 
 The `jobs:process` cli command has to be executed to keep the Movary data up to date and process all background jobs.
 
-Here are two recommanded ways.
+Here are two recommended ways.
 
 #### Supervisor
 Supervisor manages a process to execute the cli command contentiously.  
