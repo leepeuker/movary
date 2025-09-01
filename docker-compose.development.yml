@@ -6,5 +6,7 @@ services:
       target: development
       args:
         - USER_ID=${USER_ID:-1000}
+    extra_hosts:
+      host.docker.internal: host-gateway
     volumes:
       - ./:/app
