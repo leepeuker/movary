@@ -211,7 +211,7 @@
                 <div class="card" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;">
                     <a class="card-header text-truncate"
                          id="castMemberName"
-                         href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}{{ ("-" ~ castMember.name)|slugify }}"
+                         href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}-{{ castMember.name|slugify }}"
                          data-bs-toggle="tooltip"
                          data-bs-title="{{ castMember.name }}"
                          style="padding: 0.1rem;text-align: center">
@@ -242,7 +242,7 @@
         <div class="carousel">
             {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
-                <a class="card" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}{{ ("-" ~ director.name)|slugify }}"
+                <a class="card" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}-{{ director.name|slugify }}"
                      style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
                     <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
                         <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
