@@ -114,8 +114,19 @@
 
         {# --- Buttons --- #}
 
-        <div class="container text-center" id="toggleWatchDatesButtonDiv" style="margin-bottom: 0.5rem">
-            <div class="row">
+        <div class="container text-center" id="toggleWatchDatesButtonDiv">
+            {% if isOnWatchlist %}
+            <div class="row mb-2">
+                <a
+                    href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/watchlist"
+                    class="col-lg-5 col-xl-4 col-xxl-3 btn bg-primary text-light"
+                    id="onWatchListNote"
+                >
+                    On Watchlist
+                </a>
+            </div>
+            {% endif %}
+            <div class="row mb-2">
                 <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-light' : 'btn-dark' }}"
                         onclick="toggleWatchDates()"
                         id="toggleWatchDatesButton"
@@ -154,12 +165,22 @@
         </div>
 
         {% if currentUserName == routeUsername %}
-            <div class="container" style="margin-bottom: 0.5rem">
-                <div class="row">
+            <div class="container">
+                <div class="row mb-2">
                     <button type="button"
                             class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="logSpecificMovieButton"
                             onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
+                    </button>
+                </div>
+                <div class="row mb-2">
+                    <button
+                        type="button"
+                        class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
+                        id="watchlistButton"
+                        onclick="toggleWatchlist({{ isOnWatchlist }})"
+                    >
+                        {{ isOnWatchlist == true ? 'Remove from' : 'Add to' }} Watchlist
                     </button>
                 </div>
             </div>
