@@ -53,12 +53,14 @@ class WatchlistController
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId());
 
+        $responsejson = json_encode([
+            "id" => (string)$movie->getId(),
+            "titleslug" => $this->slugify->slugify($movie->getTitle()),
+        ]);
+
         return Response::create(
             StatusCode::createOk(),
-            json_encode([
-                "id" => (string)$movie->getId(),
-                "titleslug" => $this->slugify->slugify($movie->getTitle()),
-            ])
+            $responsejson ? $responsejson : "{}",
         );
     }
 
