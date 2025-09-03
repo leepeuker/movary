@@ -64,4 +64,22 @@ RUN composer install --no-dev
 
 FROM base AS development
 
+USER root
+
+RUN apk add --no-cache php84-pecl-xdebug
+
+ARG XDEBUG_INI="$PHP_INI_DIR/conf.d/xdebug.ini"
+RUN echo 'zend_extension=xdebug.so' > $XDEBUG_INI \
+    && echo "[xdebug]" >> $XDEBUG_INI \
+    && echo "xdebug.mode=\${XDEBUG_MODE:-off}" >> $XDEBUG_INI \
+    && echo "xdebug.discover_client_host=true" >> $XDEBUG_INI \
+    && echo "xdebug.start_with_request=yes" >> $XDEBUG_INI \
+    && echo "xdebug.trigger_value=yes" >> $XDEBUG_INI \
+    && echo "xdebug.log_level=0" >> $XDEBUG_INI \
+    && echo "xdebug.idekey=docker" >> $XDEBUG_INI \
+    && echo "xdebug.client_host=\${XDEBUG_HOST:-host.docker.internal}" >> $XDEBUG_INI \
+    && echo "xdebug.client_port=\${XDEBUG_PORT:-9003}" >> $XDEBUG_INI
+
+USER application
+
 RUN composer install
