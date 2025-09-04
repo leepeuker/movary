@@ -2,6 +2,7 @@
 
 use Movary\HttpController\Api;
 use Movary\HttpController\Web;
+use Movary\HttpController\ActivityPub;
 use Movary\HttpController\Web\RadarrController;
 use Movary\Service\Router\Dto\RouteList;
 use Movary\Service\Router\RouterService;
@@ -11,6 +12,7 @@ return function (FastRoute\RouteCollector $routeCollector) {
 
     $routeCollector->addGroup('', fn($routeCollector) => addWebRoutes($routerService, $routeCollector));
     $routeCollector->addGroup('/api', fn($routeCollector) => addApiRoutes($routerService, $routeCollector));
+    $routeCollector->addGroup('', fn($routeCollector) => addActivityPubRoutes($routerService, $routeCollector));
 };
 
 function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
@@ -240,6 +242,18 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/webhook/kodi/{id:.+}', [Api\KodiController::class, 'handleKodiWebhook']);
 
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
+
+    $routerService->addRoutesToRouteCollector($routeCollector, $routes);
+}
+
+function addActivityPubRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector): void
+{
+    $routes = RouteList::create();
+
+    $routes->add("GET", "/.well-known/host-meta", [ActivityPub\WellKnownController::class, 'handleHostMeta']);
+    $routes->add("GET", "/.well-known/webfinger", [ActivityPub\WellKnownController::class, 'handleWebfinger']);
+    $routes->add("GET", "/.well-known/nodeinfo", [ActivityPub\WellKnownController::class, 'handleNodeInfoMeta']);
+    $routes->add("GET", "/nodeinfo/2.1", [ActivityPub\WellKnownController::class, 'handleNodeInfo']);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

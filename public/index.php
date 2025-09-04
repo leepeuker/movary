@@ -52,7 +52,11 @@ try {
             throw new LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
     }
 
-    if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
+    if (
+        $response->getStatusCode()->getCode() === 404
+        && str_starts_with($uri, '/api') === false
+        && str_starts_with($uri, '/.well-known') === false
+        ) {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
 } catch (Throwable $t) {

@@ -25,6 +25,14 @@ class ApplicationUrlService
         return rtrim($customApplicationUrl, '/') . rtrim((string)$relativeUrl, '/');
     }
 
+    // create e.g., "movary.test" from "https://movary.test"
+    public function createApplicationDomain(): string
+    {
+        $application_url = $this->createApplicationUrl();
+        $domain = (string)preg_replace("/(^https?:\/\/|\/?$)/", "", $application_url);
+        return $domain;
+    }
+
     public function hasApplicationUrl() : bool
     {
         return $this->serverSettings->getApplicationUrl() !== null;

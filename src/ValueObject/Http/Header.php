@@ -20,6 +20,16 @@ class Header
         return new self('Content-Type', 'application/json');
     }
 
+    public static function createContentTypeActivityJson() : self
+    {
+        return new self('Content-Type', 'application/application+json');
+    }
+
+    public static function createContentTypeXRDXML() : self
+    {
+        return new self('Content-Type', 'application/xrd+xml');
+    }
+
     public static function createLocation(string $value) : self
     {
         return new self('Location', $value);
