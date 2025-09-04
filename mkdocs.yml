@@ -54,4 +54,5 @@ nav:
       - Directory structure: development/file-structure.md
       - How does the backend work?: development/structure.md
       - Database migrations: development/database-migrations.md
+      - ActivityPub: development/activitypub.md
   - FAQ: 'faq.md'
