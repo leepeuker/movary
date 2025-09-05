@@ -85,16 +85,15 @@ class WellKnownController
         );
     }
 
-    public function handleWebfinger(): Response
+    public function handleWebfinger(Request $request): Response
     {
-        parse_str($_SERVER['QUERY_STRING'], $query);
+        $resource = $request->getGetParameters()['resource'] ?? null;
 
         // no resource provided
         // example bad request: http://movary.test/.well-known/webfinger
-        if (!key_exists("resource", $query)) {
+        if (!$resource) {
             return Response::createBadRequest("no resource query string provided");
         }
-        $resource = $query["resource"];
 
         // resource is not string
         // example bad request: http://movary.test/.well-known/webfinger?resource[]=acct:alifeee@movary.test&resource[]=2
