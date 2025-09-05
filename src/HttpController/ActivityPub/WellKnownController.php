@@ -112,7 +112,7 @@ class WellKnownController
         $username = $matches[1];
         $domain = $matches[2];
 
-        $application_url = $this->applicationUrlService->createApplicationDomain();
+        $application_url = $this->applicationUrlService->createApplicationUrl();
         $application_domain = $this->applicationUrlService->createApplicationDomain();
 
         // domain does not match
