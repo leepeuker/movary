@@ -56,6 +56,7 @@ try {
         $response->getStatusCode()->getCode() === 404
         && str_starts_with($uri, '/api') === false
         && str_starts_with($uri, '/.well-known') === false
+        && str_starts_with($uri, '/activitypub') === false
         ) {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }

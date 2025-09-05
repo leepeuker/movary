@@ -250,10 +250,29 @@ function addActivityPubRoutes(RouterService $routerService, FastRoute\RouteColle
 {
     $routes = RouteList::create();
 
+    // meta AP routes
     $routes->add("GET", "/.well-known/host-meta", [ActivityPub\WellKnownController::class, 'handleHostMeta']);
     $routes->add("GET", "/.well-known/webfinger", [ActivityPub\WellKnownController::class, 'handleWebfinger']);
     $routes->add("GET", "/.well-known/nodeinfo", [ActivityPub\WellKnownController::class, 'handleNodeInfoMeta']);
     $routes->add("GET", "/nodeinfo/2.1", [ActivityPub\WellKnownController::class, 'handleNodeInfo']);
+
+    // movie object
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/movies", [ActivityPub\ActivityPubController::class, 'handleMovies']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}", [ActivityPub\ActivityPubController::class, 'handleMovie']);
+
+    // user
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}", [ActivityPub\ActivityPubController::class, 'handleActor']);
+    $routes->add("POST", "/activitypub/users/{username:[a-zA-Z0-9]+}/inbox", [ActivityPub\ActivityPubController::class, 'handleActorInbox']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/outbox", [ActivityPub\ActivityPubController::class, 'handleActorOutbox']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/following", [ActivityPub\ActivityPubController::class, 'handleActorFollowers']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/followers", [ActivityPub\ActivityPubController::class, 'handleActorFollowing']);
+    // user objects (plays & watchlist items)
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/plays", [ActivityPub\ActivityPubController::class, 'handleActorPlays']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/plays/{id:\d+}/{watchdate:[-0-9]+}", [ActivityPub\ActivityPubController::class, 'handleActorPlay']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/watchlist", [ActivityPub\ActivityPubController::class, 'handleActorWatchlist']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/watchlist/{id:\d+}", [ActivityPub\ActivityPubController::class, 'handleActorWatchlistItem']);
+
+    // film
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }
