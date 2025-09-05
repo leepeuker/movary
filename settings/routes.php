@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Movary\HttpController\Api;
 use Movary\HttpController\Web;
@@ -15,7 +17,7 @@ return function (FastRoute\RouteCollector $routeCollector) {
     $routeCollector->addGroup('', fn($routeCollector) => addActivityPubRoutes($routerService, $routeCollector));
 };
 
-function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
+function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector): void
 {
     $routes = RouteList::create();
 
@@ -207,7 +209,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }
 
-function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
+function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector): void
 {
     $routes = RouteList::create();
 
