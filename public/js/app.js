@@ -248,11 +248,15 @@ async function selectLogModalTmdbItemForLogging(event) {
 
     document.getElementById('logPlayModalTitle').innerHTML = item.dataset.title + ' (' + item.dataset.releaseYear + ')'
     document.getElementById('logPlayModalTmdbIdInput').value = item.dataset.tmdbId
+    document.getElementById('logPlayModalFooterTMDBLink').setAttribute(
+        "href", "https://www.themoviedb.org/movie/" + item.dataset.tmdbId
+    )
 
     const rating = await fetchRating(item.dataset.tmdbId)
     setRatingStars('logPlayModal', rating)
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterTMDBLink').classList.remove('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
     document.getElementById('logPlayModalFooterWatchlistButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
@@ -361,6 +365,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterTMDBLink').classList.add('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.add('d-none')
     document.getElementById('logPlayModalFooterWatchlistButton').classList.add('d-none')
 
