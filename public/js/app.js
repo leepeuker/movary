@@ -299,7 +299,7 @@ function addToWatchlist(context) {
         })
     }).then(function (response) {
         if (response.status === 200) {
-            location.reload();
+            window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/watchlist"
 
             return
         }
