@@ -6,7 +6,6 @@
 
 {% block scripts %}
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
-    <script src="{{ applicationUrl }}/js/watchlist.js"></script>
     <script src="{{ applicationUrl }}/js/component/modal-advanced-search-watchlist.html.js"></script>
 {% endblock %}
 
@@ -34,9 +33,14 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for watchlistEntry in watchlistEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100" style="cursor: pointer; position: relative;" id="card-{{ watchlistEntry.id }}">
-                            <img onclick="openOptionsModal(this)" data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
-                       </div>
+                        <a
+                            href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistEntry.id }}-{{ watchlistEntry.title|slugify }}"
+                            class="card h-100"
+                            style="cursor: pointer; position: relative;"
+                            id="card-{{ watchlistEntry.id }}"
+                        >
+                            <img data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
+                       </a>
                     </div>
                 {% endfor %}
             </div>
@@ -86,8 +90,6 @@
                     </li>
                 {% endif %}
             </ul>
-            
-            {{ include('component/modal-remove-from-watchlist.html.twig') }}
         </div>
     </main>
 {% endblock %}

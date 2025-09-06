@@ -10,6 +10,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ImageUrlService;
+use Movary\Service\SlugifyService;
 use Movary\Service\Tmdb\SyncPerson;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -25,12 +26,14 @@ class PersonController
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly ImageUrlService $urlGenerator,
+        private readonly SlugifyService $slugify,
         private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
         private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly SyncPerson $tmdbPersonSync,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
     ) {
+        $slugify = new SlugifyService();
     }
 
     public function hideInTopLists(Request $request) : Response
@@ -122,6 +125,7 @@ class PersonController
                 'moviesFromWatchlistAsActor' => $this->movieApi->fetchFromWatchlistWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
                 'moviesFromWatchlistAsDirector' => $this->movieApi->fetchFromWatchlistWithDirector($personId, $userId),
+                'canonicalExtra' => '-' . $this->slugify->slugify($person->getName()),
             ]),
         );
     }
