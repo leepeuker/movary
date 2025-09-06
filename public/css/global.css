@@ -1,0 +1,7 @@
+/* remove underline on cards */
+a.card,
+a.card:visited,
+a.card-header,
+a.card-header:visited {
+  text-decoration: none;
+}

@@ -9,6 +9,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
+use Movary\Service\SlugifyService;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -24,10 +25,12 @@ class MovieController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly SyncMovie $tmdbMovieSync,
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
+        private readonly SlugifyService $slugify,
         private readonly CountryApi $countryApi,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
     ) {
+        $slugify = new SlugifyService();
     }
 
     public function refreshImdbRating(Request $request) : Response
@@ -96,6 +99,7 @@ class MovieController
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
                 'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
+                'canonicalExtra' => "-" . $this->slugify->slugify($movie["title"]),
             ]),
         );
     }

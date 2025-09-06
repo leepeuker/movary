@@ -8,6 +8,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\WatchlistRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
+use Movary\Service\SlugifyService;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -25,9 +26,11 @@ class WatchlistController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly Authentication $authenticationService,
+        private readonly SlugifyService $slugify,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
     ) {
+        $slugify = new SlugifyService();
     }
 
     public function addMovieToWatchlist(Request $request) : Response
@@ -50,7 +53,15 @@ class WatchlistController
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId());
 
-        return Response::create(StatusCode::createOk());
+        $responsejson = json_encode([
+            "id" => (string)$movie->getId(),
+            "titleslug" => $this->slugify->slugify($movie->getTitle()),
+        ]);
+
+        return Response::create(
+            StatusCode::createOk(),
+            $responsejson ? $responsejson : "{}",
+        );
     }
 
     public function renderWatchlist(Request $request) : Response

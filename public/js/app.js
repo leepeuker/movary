@@ -299,12 +299,14 @@ function addToWatchlist(context) {
         })
     }).then(function (response) {
         if (response.status === 200) {
-            location.reload();
-
-            return
+            return response.json()
         }
 
         addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
+    }).then(function (json) {
+        let id = json["id"]
+        let titleslug = json["titleslug"]
+        window.location = APPLICATION_URL + "/users/" + document.getElementById('username').value + "/movies/" + id + "-" + titleslug
     }).catch(function (error) {
         console.log(error)
         addAlert('logPlayModalAlert', 'Could not add to watchlist. Please try again.', 'danger')
