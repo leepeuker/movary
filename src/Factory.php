@@ -325,10 +325,7 @@ class Factory
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
         $twig->addGlobal('requestUrlPath', $request_url_path);
-        $twig->addGlobal(
-            'canonicalPath',
-            preg_replace('/-?' . $routeIgnorableNameSlug . '$/', "", $request_url_path)
-        );
+        $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routeIgnorableNameSlug . '$/', '', $request_url_path));
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
 
         // slugify filter for "nice looking" URLs

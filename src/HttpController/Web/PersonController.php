@@ -125,7 +125,7 @@ class PersonController
                 'moviesFromWatchlistAsActor' => $this->movieApi->fetchFromWatchlistWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
                 'moviesFromWatchlistAsDirector' => $this->movieApi->fetchFromWatchlistWithDirector($personId, $userId),
-                'canonicalExtra' => "-" . $this->slugify->slugify($person->getName()),
+                'canonicalExtra' => '-' . $this->slugify->slugify($person->getName()),
             ]),
         );
     }

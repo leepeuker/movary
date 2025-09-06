@@ -30,7 +30,6 @@ class MovieController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
     ) {
-        $slugify = new SlugifyService();
     }
 
     public function refreshImdbRating(Request $request) : Response
@@ -99,7 +98,7 @@ class MovieController
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
                 'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
-                'canonicalExtra' => "-" . $this->slugify->slugify($movie["title"]),
+                'canonicalExtra' => '-' . $this->slugify->slugify($movie['title']),
             ]),
         );
     }
