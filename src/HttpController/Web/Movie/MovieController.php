@@ -82,6 +82,14 @@ class MovieController
             return Response::createNotFound();
         }
 
+        $ignorablenameslug = (string)$request->getRouteParameters()['ignorablenameslug'];
+        if ($ignorablenameslug == "") {
+            // redirect!
+            return Response::createMovedPermanently(
+                $request->getPath() . "-" . $this->slugify->slugify($movie['title'])
+            );
+        }
+
         $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
         return Response::create(

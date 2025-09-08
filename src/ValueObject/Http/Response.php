@@ -66,6 +66,11 @@ class Response
         return new self(StatusCode::createOk());
     }
 
+    public static function createMovedPermanently(string $targetUrl) : self
+    {
+        return new self(StatusCode::createMovedPermanently(), null, [Header::createLocation($targetUrl)]);
+    }
+
     public static function createSeeOther(string $targetUrl) : self
     {
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
