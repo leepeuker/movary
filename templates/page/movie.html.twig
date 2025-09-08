@@ -114,8 +114,8 @@
 
         {# --- Buttons --- #}
 
-        <div class="container text-center" id="toggleWatchDatesButtonDiv" style="margin-bottom: 0.5rem">
-            <div class="row">
+        <div class="container text-center" id="toggleWatchDatesButtonDiv">
+            <div class="row mb-2">
                 <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-light' : 'btn-dark' }}"
                         onclick="toggleWatchDates()"
                         id="toggleWatchDatesButton"
@@ -154,12 +154,22 @@
         </div>
 
         {% if currentUserName == routeUsername %}
-            <div class="container" style="margin-bottom: 0.5rem">
-                <div class="row">
+            <div class="container">
+                <div class="row mb-2">
                     <button type="button"
                             class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="logSpecificMovieButton"
                             onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
+                    </button>
+                </div>
+                <div class="row mb-2">
+                    <button
+                        type="button"
+                        class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
+                        id="watchlistButton"
+                        onclick="toggleWatchlist({{ isOnWatchlist }})"
+                    >
+                        {{ isOnWatchlist == true ? 'Remove from' : 'Add to' }} Watchlist
                     </button>
                 </div>
             </div>
@@ -208,31 +218,41 @@
         <div class="carousel">
             {% if castMembers|length == 0 %} - {% endif %}
             {% for castMember in castMembers|slice(0, 40) %}
-                <div class="card" style="width: 1rem;min-width: 110px;margin-right: 0.5rem;">
-                    <div class="card-header text-truncate"
-                         id="castMemberName"
-                         onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
-                         data-bs-toggle="tooltip"
-                         data-bs-title="{{ castMember.name }}"
-                         style="padding: 0.1rem;text-align: center">
+                <div
+                    class="card"
+                    style="width: 1rem;min-width: 110px;margin-right: 0.5rem;"
+                >
+                    <div
+                        class="card-header text-truncate castMemberName"
+                        data-bs-toggle="tooltip"
+                        data-bs-title="{{ castMember.name }}"
+                        style="padding: 0.1rem;text-align: center"
+                    >
                         <small class="text-muted" style="font-size: 0.9rem;">
                             {{ castMember.name }}
                         </small>
                     </div>
 
-                    <img src="{{ castMember.posterPath }}"
-                         alt="{{ castMember.name }} Poster"
-                         class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
-                         onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}'"
-                         style="cursor: pointer">
+                    <a
+                        href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}-{{ castMember.name|slugify }}"
+                        class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
+                        >
+                        <img src="{{ castMember.posterPath }}"
+                            alt="{{ castMember.name }} Poster"
+                            style="max-width:100%"
+                            >
+                    </a>
                     {% if displayCharacterNames == true %}
-                        <div class="card-footer text-truncate"
-                             id="castCharacterName"
-                             data-bs-toggle="tooltip"
-                             data-bs-title="{{ castMember.characterName }}"
-                             style="padding: 0.1rem;text-align: center">
-                            <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.characterName }}</small>
-                        </div>
+                        <span
+                            class="card-footer text-truncate castCharacterName"
+                            data-bs-toggle="tooltip"
+                            data-bs-title="{{ castMember.characterName }}"
+                            style="padding: 0.1rem;text-align: center"
+                        >
+                            <small class="text-muted" style="font-size: 0.9rem;">
+                                {{ castMember.characterName }}
+                            </small>
+                        </span>
                     {% endif %}
                 </div>
             {% endfor %}
@@ -244,15 +264,31 @@
         <div class="carousel">
             {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
-                <div class="card" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}'"
-                     style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
-                    <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
-                        <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
-                    </div>
+                <div
+                    class="card" 
+                    style="width: 1rem; min-width: 110px; margin-right: 0.5rem;"
+                >
+                    <span
+                        class="card-header text-truncate directorName"
+                        data-bs-toggle="tooltip"
+                        data-bs-title="{{ director.name }}"
+                        style="padding: 0.1rem; text-align: center"
+                    >
+                        <small class="text-muted" style="font-size: 0.9rem;">
+                            {{ director.name }}
+                        </small>
+                    </span>
 
-                    <img src="{{ director.posterPath }}"
-                         class="card-img-bottom"
-                         alt="{{ director.name }} Poster">
+                    <a
+                        class="card-img-bottom"
+                        href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}-{{ director.name|slugify }}"
+                    >
+                        <img src="{{ director.posterPath }}"
+                            class="card-img-bottom"
+                            style="max-width:100%"
+                            alt="{{ director.name }} Poster"
+                        >
+                    </a>
                 </div>
             {% endfor %}
         </div>

@@ -197,23 +197,19 @@ function loadRatingModal() {
 }
 
 function toggleWatchlist(isOnWatchlist) {
-    removeAlert('alertMovieOptionModalDiv')
-
-    disableMoreModalButtons();
-
     if (isOnWatchlist == null) {
         addToWatchlistRequest().then(() => {
             location.reload()
         }).catch(() => {
-            addAlert('alertMovieOptionModalDiv', 'Could not add to Watchlist', 'danger')
-            disableMoreModalButtons(false);
+            alert('Could not add to Watchlist')
         })
     } else {
+        if (! confirm("Remove from watchlist?"))
+            return;
         removeFromWatchlistRequest().then(() => {
             location.reload()
         }).catch(() => {
-            addAlert('alertMovieOptionModalDiv', 'Could not remove from Watchlist', 'danger')
-            disableMoreModalButtons(false);
+            alert('Could not remove from Watchlist')
         })
     }
 }
@@ -405,7 +401,7 @@ function isTruncated(el) {
     return el.scrollWidth > el.clientWidth
 }
 
-const tooltipTriggerListCast = document.querySelectorAll('[data-bs-toggle="tooltip"]#castMemberName, [data-bs-toggle="tooltip"]#castCharacterName')
+const tooltipTriggerListCast = document.querySelectorAll('[data-bs-toggle="tooltip"].castMemberName, [data-bs-toggle="tooltip"].castCharacterName')
 const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
     if (isTruncated(tooltipTriggerEl) === false) {
         return
@@ -419,5 +415,5 @@ const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
     new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
 })
 
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1')
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1, [data-bs-toggle="tooltip"].directorName')
 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
