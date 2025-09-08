@@ -23,6 +23,12 @@
         <input type="hidden" id="movieId" value="{{ movie.id }}">
         <input type="hidden" id="username" value="{{ routeUsername }}">
 
+        {% if isOnWatchlist %}
+        <span>
+            on <a href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/watchlist">watchlist</a>
+        </span>
+        {%endif%}
+
         <div class="fw-light" id="ratingStars"
              style="color: rgb(255, 193, 7);font-size: 1.5rem;margin-bottom: 0.5rem;cursor: default">
             <span id="ratingStarsSpan">
