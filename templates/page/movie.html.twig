@@ -115,17 +115,6 @@
         {# --- Buttons --- #}
 
         <div class="container text-center" id="toggleWatchDatesButtonDiv">
-            {% if isOnWatchlist %}
-            <div class="row mb-2">
-                <a
-                    href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/watchlist"
-                    class="col-lg-5 col-xl-4 col-xxl-3 btn bg-primary text-light"
-                    id="onWatchListNote"
-                >
-                    On Watchlist
-                </a>
-            </div>
-            {% endif %}
             <div class="row mb-2">
                 <button type="button" class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-light' : 'btn-dark' }}"
                         onclick="toggleWatchDates()"
