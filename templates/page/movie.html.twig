@@ -233,17 +233,16 @@
                     class="card"
                     style="width: 1rem;min-width: 110px;margin-right: 0.5rem;"
                 >
-                    <a 
-                        href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}-{{ castMember.name|slugify }}"
-                        class="card-header text-truncate"
-                         id="castMemberName"
-                         data-bs-toggle="tooltip"
-                         data-bs-title="{{ castMember.name }}"
-                         style="padding: 0.1rem;text-align: center">
+                    <div
+                        class="card-header text-truncate castMemberName"
+                        data-bs-toggle="tooltip"
+                        data-bs-title="{{ castMember.name }}"
+                        style="padding: 0.1rem;text-align: center"
+                    >
                         <small class="text-muted" style="font-size: 0.9rem;">
                             {{ castMember.name }}
                         </small>
-                    </a>
+                    </div>
 
                     <a
                         href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}-{{ castMember.name|slugify }}"
@@ -255,12 +254,15 @@
                             >
                     </a>
                     {% if displayCharacterNames == true %}
-                        <span class="card-footer text-truncate"
-                             id="castCharacterName"
-                             data-bs-toggle="tooltip"
-                             data-bs-title="{{ castMember.characterName }}"
-                             style="padding: 0.1rem;text-align: center">
-                            <small class="text-muted" style="font-size: 0.9rem;">{{ castMember.characterName }}</small>
+                        <span
+                            class="card-footer text-truncate castCharacterName"
+                            data-bs-toggle="tooltip"
+                            data-bs-title="{{ castMember.characterName }}"
+                            style="padding: 0.1rem;text-align: center"
+                        >
+                            <small class="text-muted" style="font-size: 0.9rem;">
+                                {{ castMember.characterName }}
+                            </small>
                         </span>
                     {% endif %}
                 </div>
@@ -273,16 +275,32 @@
         <div class="carousel">
             {% if directors|length == 0 %} - {% endif %}
             {% for director in directors|slice(0, 25) %}
-                <a class="card" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}-{{ director.name|slugify }}"
-                     style="width: 1rem;min-width: 110px;margin-right: 0.5rem;cursor: pointer">
-                    <div class="card-header text-truncate" style="padding: 0.1rem;text-align: center">
-                        <small class="text-muted" style="font-size: 0.9rem;">{{ director.name }}</small>
-                    </div>
+                <div
+                    class="card" 
+                    style="width: 1rem; min-width: 110px; margin-right: 0.5rem;"
+                >
+                    <span
+                        class="card-header text-truncate directorName"
+                        data-bs-toggle="tooltip"
+                        data-bs-title="{{ director.name }}"
+                        style="padding: 0.1rem; text-align: center"
+                    >
+                        <small class="text-muted" style="font-size: 0.9rem;">
+                            {{ director.name }}
+                        </small>
+                    </span>
 
-                    <img src="{{ director.posterPath }}"
-                         class="card-img-bottom"
-                         alt="{{ director.name }} Poster">
-                </a>
+                    <a
+                        class="card-img-bottom"
+                        href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}-{{ director.name|slugify }}"
+                    >
+                        <img src="{{ director.posterPath }}"
+                            class="card-img-bottom"
+                            style="max-width:100%"
+                            alt="{{ director.name }} Poster"
+                        >
+                    </a>
+                </div>
             {% endfor %}
         </div>
 
