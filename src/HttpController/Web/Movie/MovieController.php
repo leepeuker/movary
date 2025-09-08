@@ -83,10 +83,11 @@ class MovieController
         }
 
         $ignorablenameslug = (string)$request->getRouteParameters()['ignorablenameslug'];
-        if ($ignorablenameslug == "") {
-            // redirect!
+        $movie_title_slug = $this->slugify->slugify($movie['title']);
+        // redirect! if no slug or if slug is wrong
+        if ($ignorablenameslug == "" || $ignorablenameslug != $movie_title_slug) {
             return Response::createMovedPermanently(
-                $request->getPath() . "-" . $this->slugify->slugify($movie['title'])
+                $request->getPath() . "-" . $movie_title_slug
             );
         }
 
