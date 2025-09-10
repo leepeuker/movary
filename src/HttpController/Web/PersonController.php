@@ -33,7 +33,6 @@ class PersonController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
     ) {
-        $slugify = new SlugifyService();
     }
 
     public function hideInTopLists(Request $request) : Response
@@ -68,13 +67,28 @@ class PersonController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
+        $userName = (string)$request->getRouteParameters()['username'];
+        $userId = $this->userApi->fetchUserByName($userName)->getId();
         $personId = (int)$request->getRouteParameters()['id'];
 
         $person = $this->personApi->findById($personId);
 
         if ($person === null) {
             return Response::createNotFound();
+        }
+
+        // redirect! if no slug or if slug is wrong
+        $ignorablenameslug = (string)$request->getRouteParameters()['ignorablenameslug'];
+        $person_name_slug = $this->slugify->slugify($person->getName());
+        if ($ignorablenameslug == "" || $ignorablenameslug != $person_name_slug) {
+            return Response::createMovedPermanently(
+                "/users/"
+                    . $userName
+                    . "/persons/"
+                    . $personId
+                    . "-"
+                    . $person_name_slug
+            );
         }
 
         $birthDate = $person->getBirthDate();
