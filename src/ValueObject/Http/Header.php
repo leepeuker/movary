@@ -20,6 +20,11 @@ class Header
         return new self('Content-Type', 'application/json');
     }
 
+    public static function createContentTypeSVG() : self
+    {
+        return new self('Content-Type', 'image/svg+xml');
+    }
+
     public static function createLocation(string $value) : self
     {
         return new self('Location', $value);

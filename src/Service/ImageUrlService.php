@@ -15,7 +15,7 @@ class ImageUrlService
     ) {
     }
 
-    public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath) : string
+    public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath, string $fallbackName = "NO IMAGE") : string
     {
         if ($this->enableImageCaching === true && empty($posterPath) === false && $this->imageCacheService->posterPathExists($posterPath) === true) {
             return $this->urlService->createApplicationUrl(RelativeUrl::create('/' . trim($posterPath, '/')));
@@ -25,7 +25,7 @@ class ImageUrlService
             return (string)$this->tmdbUrlGenerator->generateImageUrl($tmdbPosterPath);
         }
 
-        return $this->urlService->createApplicationUrl(RelativeUrl::create('/images/placeholder-image.png'));
+        return $this->urlService->createApplicationUrl(RelativeUrl::create('/images/placeholder/' . base64_encode($fallbackName)));
     }
 
     public function replacePosterPathWithImageSrcUrl(array $dbResults) : array
@@ -34,6 +34,9 @@ class ImageUrlService
             $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters(
                 $dbResult['tmdb_poster_path'] ?? null,
                 $dbResult['poster_path'] ?? null,
+                key_exists("name", $dbResult)
+                    ? $dbResult['name']
+                    : (key_exists("title", $dbResult) ? $dbResult['title'] : "NO IMAGE"),
             );
         }
 

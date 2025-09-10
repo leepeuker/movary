@@ -426,7 +426,9 @@ class MovieApi
             'imdbId' => $entity->getImdbId(),
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
-            'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($entity->getTmdbPosterPath(), $entity->getPosterPath()),
+            'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters(
+                $entity->getTmdbPosterPath(), $entity->getPosterPath(), $entity->getTitle(),
+            ),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,

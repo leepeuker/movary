@@ -109,7 +109,9 @@ class PersonController
                 'person' => [
                     'id' => $person->getId(),
                     'name' => $person->getName(),
-                    'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
+                    'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters(
+                        $person->getTmdbPosterPath(), $person->getPosterPath(), $person->getName(),
+                    ),
                     'knownForDepartment' => $person->getKnownForDepartment(),
                     'gender' => $person->getGender(),
                     'age' => $age,
