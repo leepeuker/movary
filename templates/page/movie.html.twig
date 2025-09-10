@@ -129,24 +129,51 @@
             <div class="row">
                 <ul class="list-group col-lg-5 col-xl-4 col-xxl-3" style="padding-right: 0">
                     {% for watchDate in watchDates|reverse %}
-                        <li class="list-group-item {% if currentUserName == routeUsername %}list-group-item-action{% endif %}"
-                            style="text-align: center;{% if currentUserName == routeUsername %}cursor: pointer;{% endif %}position:relative;"
-                            {% if currentUserName == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
-                            data-watch-date="{{ watchDate.watched_at is null ? '' : watchDate.watched_at|date(dateFormatPhp) }}"
-                            data-plays="{{ watchDate.plays }}"
-                            data-comment="{{ watchDate.comment }}"
-                            data-position="{{ watchDate.position }}"
-                            data-location="{{ watchDate.location_id }}">
-                            {{ watchDate.watched_at is null ? 'Unkown date' : watchDate.watched_at|date(dateFormatPhp) }}
-                            {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
-                            <span style="position: absolute; right:.7rem; top:50%; transform: translateY(-50%); display: flex; gap: 0.5rem;">
-                                {% if watchDate.comment != '' %}
-                                    <i class="bi bi-chat-square-text"></i>
-                                {% endif %}
-                                {% if watchDate.location_id != '' and currentUserLocationsEnabled %}
-                                    <i class="bi bi-pin-map-fill"></i>
-                                {% endif %}
-                            </span>
+                        <li
+                            class="watchDateItem list-group-item px-0"
+                            style="text-align: center;"
+                        >
+                            <details>
+                                <summary
+                                    style="{%if watchDate.comment == '' and currentUserName != routeUsername %}pointer-events:none;{% endif %}"
+                                >
+                                    {{ watchDate.watched_at is null ? 'Unkown date' : watchDate.watched_at|date(dateFormatPhp) }}
+                                    {% if watchDate.plays > 1 %}({{ watchDate.plays }}x){% endif %}
+                                    <span
+                                        style="position: absolute; right:.7rem; top:50%; transform: translateY(-50%); display: flex; gap: 0.5rem;"
+                                    >
+                                        {% if watchDate.comment != '' %}
+                                        <i class="icon-open bi bi-chat-square-text"></i>
+                                        <i class="icon-closed bi bi-chat-square-text-fill"></i>
+                                        {% elseif currentUserName == routeUsername %}
+                                        <i class="icon-open bi bi-pencil"></i>
+                                        <i class="icon-closed bi bi-pencil-fill"></i>
+                                        {% endif %}
+                                        {% if watchDate.location_id != '' and currentUserLocationsEnabled %}
+                                        <i class="bi bi-pin-map-fill"></i>
+                                        {% endif %}
+                                    </span>
+                                </summary>
+                                <div class="comment px-2">
+                                    <p class="my-0">
+                                        {{ watchDate.comment | nl2br }}
+                                    </p>
+                                    {% if currentUserName == routeUsername %}
+                                    <button
+                                        class="btn btn-sm btn-outline-dark my-2"
+                                        type="button"
+                                        onclick="loadWatchDateModal(this)"
+                                        data-watch-date="{{ watchDate.watched_at is null ? '' : watchDate.watched_at|date(dateFormatPhp) }}"
+                                        data-plays="{{ watchDate.plays }}"
+                                        data-comment="{{ watchDate.comment }}"
+                                        data-position="{{ watchDate.position }}"
+                                        data-location="{{ watchDate.location_id }}"
+                                    >
+                                        edit
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </details>
                         </li>
                     {% endfor %}
                 </ul>

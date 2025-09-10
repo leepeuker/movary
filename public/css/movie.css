@@ -13,3 +13,21 @@
     border: black solid;
     border-width: 0.1rem;
 }
+
+.watchDateItem details summary {
+    position: relative;
+    list-style: none;
+}
+.watchDateItem details summary::marker {
+    display:none;
+}
+
+.watchDateItem details[open] .icon-open,
+.watchDateItem details .icon-closed {
+    display: none;
+}
+
+.watchDateItem details .icon-open,
+.watchDateItem details[open] .icon-closed {
+    display: block;
+}

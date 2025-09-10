@@ -25,6 +25,7 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-arrow-up::before { content: "\f148"; }
 .bi-calendar-date::before { content: "\f1e4"; }
 .bi-chat-square-text::before { content: "\f264"; }
+.bi-chat-square-text-fill::before { content: "\f263"; }
 .bi-check-circle-fill::before { content: "\f26a"; }
 .bi-chevron-down::before { content: "\f282"; }
 .bi-chevron-up::before { content: "\f286"; }
@@ -32,6 +33,8 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-eye-slash::before { content: "\f340"; }
 .bi-gear::before { content: "\f3e5"; }
 .bi-moon-fill::before { content: "\f494"; }
+.bi-pencil::before { content: "\f4cb"; }
+.bi-pencil-fill::before { content: "\f4c9"; }
 .bi-pencil-square::before { content: "\f4ca"; }
 .bi-search::before { content: "\f52a"; }
 .bi-star::before { content: "\f588"; }
