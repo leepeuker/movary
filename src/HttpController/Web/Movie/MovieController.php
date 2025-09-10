@@ -9,7 +9,6 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
-use Movary\Service\ServerSettings;
 use Movary\Service\SlugifyService;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\ValueObject\Http\Request;
@@ -30,7 +29,6 @@ class MovieController
         private readonly CountryApi $countryApi,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly ServerSettings $serverSettings,
     ) {
     }
 
@@ -85,13 +83,12 @@ class MovieController
             return Response::createNotFound();
         }
 
+        // redirect! if no slug or if slug is wrong
         $ignorablenameslug = (string)$request->getRouteParameters()['ignorablenameslug'];
         $movie_title_slug = $this->slugify->slugify($movie['title']);
-        // redirect! if no slug or if slug is wrong
         if ($ignorablenameslug == "" || $ignorablenameslug != $movie_title_slug) {
             return Response::createMovedPermanently(
-                $this->serverSettings->getApplicationUrl()
-                    . "/users/"
+                "/users/"
                     . $userName
                     . "/movies/"
                     . $movieId
