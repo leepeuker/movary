@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
             document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
+            document.getElementById("openedFromMoviePage").setAttribute("value", "")
 
             currentModalVersion++
         })
@@ -338,7 +339,12 @@ function logMovie(context) {
         })
     }).then(function (response) {
         if (response.status === 200) {
-            window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/history"
+            // do not redirect to /history/ page if play logged from /movies/<id> page
+            if (document.getElementById("openedFromMoviePage").getAttribute("value") == "1") {
+                window.location.reload()
+            }else {
+                window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/history"
+            }
 
             return
         }
@@ -370,6 +376,8 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
     document.getElementById('logPlayModalFooterWatchlistButton').classList.add('d-none')
 
     myModal.show()
+
+    document.getElementById("openedFromMoviePage").setAttribute("value", "1") // after bs.open event
 }
 
 /**
