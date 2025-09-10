@@ -31,6 +31,7 @@ class MovieController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly ServerSettings $serverSettings,
+    ) {
     }
 
     public function refreshImdbRating(Request $request) : Response
