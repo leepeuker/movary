@@ -39,7 +39,7 @@
                             style="cursor: pointer; position: relative;"
                             id="card-{{ watchlistEntry.id }}"
                         >
-                            <img data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom" alt="{{ watchlistEntry.title }} Poster">
+                            <img data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom object-fit-cover h-100" alt="{{ watchlistEntry.title }} Poster">
                        </a>
                     </div>
                 {% endfor %}
