@@ -87,7 +87,13 @@
 
         <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
             {% if isOnWatchlist %}
-                <p style="margin-bottom: 0;margin-right: .5rem">
+                <p
+                    style="margin-bottom: 0;
+                    margin-right: .5rem"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="On Watchlist"
+                    id="bookmarkIcon"
+                >
                     <a class="bi bi-bookmark-fill h5" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"></a>
                 </p>
             {% endif %}

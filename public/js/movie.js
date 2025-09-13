@@ -415,5 +415,5 @@ const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
     new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
 })
 
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1, [data-bs-toggle="tooltip"].directorName')
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1, [data-bs-toggle="tooltip"].directorName, [data-bs-toggle="tooltip"]#bookmarkIcon')
 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
