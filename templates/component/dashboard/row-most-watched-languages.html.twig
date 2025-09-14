@@ -1,7 +1,7 @@
 {% macro create(dashboardRow, mostWatchedLanguages, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
-    {% import 'macros/url-macros.html.twig' as urlMacros %}
+    {% import 'macros/url-generator.html.twig' as urlMacros %}
     {{ rowItemToggle.create(dashboardRow) }}
 
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">

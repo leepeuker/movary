@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Settings - Netflix
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsUrl('settings-integration-netflix.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('settings-integration-netflix.js') }}"></script>
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ urlMacros.cssUrl('settings.css') }}" rel="stylesheet">
-    <link href="{{ urlMacros.cssUrl('netflix.css') }}" rel="stylesheet">
-    <link href="{{ urlMacros.cssUrl('bootstrap-icons-1.10.2.css') }}" rel="stylesheet">
+    <link href="{{ urlGenerator.cssUrl('settings.css') }}" rel="stylesheet">
+    <link href="{{ urlGenerator.cssUrl('netflix.css') }}" rel="stylesheet">
+    <link href="{{ urlGenerator.cssUrl('bootstrap-icons-1.10.2.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}

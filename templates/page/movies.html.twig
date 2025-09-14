@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Movies
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
-    <script src="{{ urlMacros.jsComponentUrl('modal-advanced-search-movie.html.js') }}"></script>
+    <script src="{{ urlGenerator.jsComponentUrl('user-select.js') }}"></script>
+    <script src="{{ urlGenerator.jsComponentUrl('modal-advanced-search-movie.html.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -32,7 +32,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for movie in movies %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ urlMacros.userMovieUrl(routeUsername, movie) }}">
+                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ urlGenerator.userMovieUrl(routeUsername, movie) }}">
                             <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom object-fit-cover h-100" alt="{{ movie.title }} Poster">
 
                             {% if movie.userRating is not null %}
@@ -57,7 +57,7 @@
             {% set maxUserRatingQuery = (hasUserRating is null or maxUserRating is null) ? '' : "maxur=#{maxUserRating}&" %}
             {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
             {% set queryParams = searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ hasUserRatingQuery ~ minUserRatingQuery ~ maxUserRatingQuery ~ productionCountryCode %}
-            {% set baseUrl = urlMacros.userMoviesWithQueryUrl(routeUsername, queryParams) %}
+            {% set baseUrl = urlGenerator.userMoviesWithQueryUrl(routeUsername, queryParams) %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

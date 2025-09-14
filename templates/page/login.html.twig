@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Login
 {% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ urlMacros.cssUrl('login.css') }}">
+    <link rel="stylesheet" href="{{ urlGenerator.cssUrl('login.css') }}">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsUrl('login.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('login.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -52,7 +52,7 @@
                 {% endif %}
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">Sign in</button>
                 {% if registrationEnabled == true %}
-                    <a href="{{ urlMacros.createUserUrl() }}">Create new user</a>
+                    <a href="{{ urlGenerator.createUserUrl() }}">Create new user</a>
                 {% endif %}
             </div>
             <div id="totpForm" class="d-none">
@@ -68,7 +68,7 @@
                     required>
                 <div id="totpErrors"></div>
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" style="margin-bottom: .7rem!important;" onclick="submitCredentials()">Continue</button>
-                <a href="{{ urlMacros.baseUrl() }}">Back</a>
+                <a href="{{ urlGenerator.baseUrl() }}">Back</a>
             </div>
         </main>
 {% endblock %}

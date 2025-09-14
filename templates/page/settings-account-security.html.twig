@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Settings - Password
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ urlMacros.cssUrl('settings.css') }}" rel="stylesheet">
+    <link href="{{ urlGenerator.cssUrl('settings.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsUrl('qrcode.min.js') }}"></script>
-    <script src="{{ urlMacros.jsUrl('settings-account-security.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('qrcode.min.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('settings-account-security.js') }}"></script>
 {% endblock %}
 
 {% block body %}

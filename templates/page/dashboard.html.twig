@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Dashboard
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ urlMacros.cssUrl('dashboard.css') }}" rel="stylesheet">
+    <link href="{{ urlGenerator.cssUrl('dashboard.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsUrl('dashboard.js') }}"></script>
-    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('dashboard.js') }}"></script>
+    <script src="{{ urlGenerator.jsComponentUrl('user-select.js') }}"></script>
 {% endblock %}
 
 {% block body %}

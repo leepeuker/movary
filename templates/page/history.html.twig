@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     History
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
+    <script src="{{ urlGenerator.jsComponentUrl('user-select.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -16,7 +16,7 @@
         <div style="text-align: center">
             {{ include('component/user-select.html.twig') }}
 
-            <form action="{{ urlMacros.userHistoryUrl(routeUsername) }}" method="GET">
+            <form action="{{ urlGenerator.userHistoryUrl(routeUsername) }}" method="GET">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" name="s" placeholder="Search history" value="{{ (searchTerm is null) ? '' : searchTerm }}">
                     <button class="btn btn-primary" type="submit">Search</button>
@@ -25,7 +25,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for historyEntry in historyEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ urlMacros.userMovieUrl(routeUsername, historyEntry) }}">
+                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ urlGenerator.userMovieUrl(routeUsername, historyEntry) }}">
                             <img src="{{ historyEntry.poster_path }}" class="card-img-top object-fit-cover h-100" alt="{{ historyEntry.title }} Poster">
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date(dateFormatPhp) }}</small>
@@ -48,12 +48,12 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ urlMacros.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p=1">
+                        <a class="page-link" href="{{ urlGenerator.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p=1">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="{{ urlMacros.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p={{ paginationElements.previous }}">
+                        <a class="page-link" href="{{ urlGenerator.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p={{ paginationElements.previous }}">
                             <span aria-hidden="true">&lsaquo;</span>
                         </a>
                     </li>
@@ -66,12 +66,12 @@
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&raquo;</span></p></li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ urlMacros.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p={{ paginationElements.next }}">
+                        <a class="page-link" href="{{ urlGenerator.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p={{ paginationElements.next }}">
                             <span aria-hidden="true">&rsaquo;</span>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="{{ urlMacros.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p={{ paginationElements.maxPage }}">
+                        <a class="page-link" href="{{ urlGenerator.userHistoryWithQueryUrl(routeUsername, (searchTerm is null) ? '' : "s=#{searchTerm}&") }}p={{ paginationElements.maxPage }}">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

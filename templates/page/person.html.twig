@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Person: {{ person.name }}
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
-    <script src="{{ urlMacros.jsUrl('person.js') }}"></script>
+    <script src="{{ urlGenerator.jsComponentUrl('user-select.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('person.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -60,11 +60,11 @@
         <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
             {% if person.imdbUrl is not null %}
                 <a style="display: flex; align-items: center;cursor:pointer;margin-right: 0.6rem" href="{{ person.imdbUrl }}" target="_blank">
-                    <img src="{{ urlMacros.imageUrl('imdb-logo.svg') }}" style="width: 3rem" alt="imdb logo">
+                    <img src="{{ urlGenerator.imageUrl('imdb-logo.svg') }}" style="width: 3rem" alt="imdb logo">
                 </a>
             {% endif %}
             <a style="display: flex; align-items: center;cursor:pointer;" href="{{ person.tmdbUrl }}" target="_blank">
-                <img src="{{ urlMacros.imageUrl('tmdb-logo.svg') }}" style="width: 2rem" alt="tmdb logo">
+                <img src="{{ urlGenerator.imageUrl('tmdb-logo.svg') }}" style="width: 2rem" alt="tmdb logo">
             </a>
         </div>
 
@@ -123,7 +123,7 @@
                         {% for movieAsActor in moviesAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <a class="card h-100 position-relative" style="cursor: pointer"
-                                     href="{{ urlMacros.userMovieUrl(routeUsername, movieAsActor) }}">
+                                     href="{{ urlGenerator.userMovieUrl(routeUsername, movieAsActor) }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -144,7 +144,7 @@
                         {% for movieAsActor in moviesFromWatchlistAsActor %}
                             <div class="col position-relative" style="padding-bottom: 1rem;">
                                 <a class="card h-100 position-relative" style="cursor: pointer"
-                                     href="{{ urlMacros.userMovieUrl(routeUsername, movieAsActor) }}">
+                                     href="{{ urlGenerator.userMovieUrl(routeUsername, movieAsActor) }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
@@ -167,7 +167,7 @@
                     {% for movieAsDirector in moviesAsDirector %}
                         <div class="col position-relative" style="padding-bottom: 1rem">
                             <a class="card h-100 position-relative" style="cursor: pointer"
-                                 href="{{ urlMacros.userMovieUrl(routeUsername, movieAsDirector) }}">
+                                 href="{{ urlGenerator.userMovieUrl(routeUsername, movieAsDirector) }}">
                                 <div class="position-relative">
                                     <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
@@ -188,7 +188,7 @@
                       {% for movieAsDirector in moviesFromWatchlistAsDirector %}
                           <div class="col position-relative" style="padding-bottom: 1rem">
                               <a class="card h-100 position-relative" style="cursor: pointer"
-                                   href="{{ urlMacros.userMovieUrl(routeUsername, movieAsDirector) }}">
+                                   href="{{ urlGenerator.userMovieUrl(routeUsername, movieAsDirector) }}">
                                   <div class="position-relative">
                                       <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 

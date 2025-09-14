@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Settings - App
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ urlMacros.cssUrl('settings.css') }}" rel="stylesheet">
+    <link href="{{ urlGenerator.cssUrl('settings.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsUrl('settings-server-jobs.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('settings-server-jobs.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -64,9 +64,9 @@
 
                 {% if jobs|length == 0 %}<p>No jobs in queue</p>{% endif %}
                 <div class="d-grid gap-2">
-                    <a class="btn btn-warning" type="button" href="{{ urlMacros.jobQueueUrl('purge-processed') }}"
+                    <a class="btn btn-warning" type="button" href="{{ urlGenerator.jobQueueUrl('purge-processed') }}"
                        onclick="return confirm('Are you sure you want to remove all processed jobs (done + failed)?')">Remove processed jobs</a>
-                    <a class="btn btn-danger" type="button" href="{{ urlMacros.jobQueueUrl('purge-all') }}"
+                    <a class="btn btn-danger" type="button" href="{{ urlGenerator.jobQueueUrl('purge-all') }}"
                        onclick="return confirm('Are you sure you want to remove all jobs? This will not stop active job processes')">Remove all jobs</a>
                 </div>
                 <br>

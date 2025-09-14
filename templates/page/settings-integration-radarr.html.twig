@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 
 {% block title %}
     Settings - Radarr
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ urlMacros.jsUrl('settings-integration-radarr.js') }}"></script>
+    <script src="{{ urlGenerator.jsUrl('settings-integration-radarr.js') }}"></script>
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ urlMacros.cssUrl('settings.css') }}" rel="stylesheet">
+    <link href="{{ urlGenerator.cssUrl('settings.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -50,7 +50,7 @@
                     <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
                          role="alert"
                          style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Radarr feed disabled - {% if currentUserIsAdmin == true %}<a href="{{ urlMacros.settingsServerUrl('general') }}">Application url</a>{% else %}Application url{% endif %} required
+                        Radarr feed disabled - {% if currentUserIsAdmin == true %}<a href="{{ urlGenerator.settingsServerUrl('general') }}">Application url</a>{% else %}Application url{% endif %} required
                     </div>
                 </div>
 

@@ -1,15 +1,15 @@
-{% import 'macros/url-macros.html.twig' as urlMacros %}
+{% import 'macros/url-generator.html.twig' as urlGenerator %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Movary API</title>
-    <link rel="stylesheet" href="{{ urlMacros.cssUrl('swagger-ui-5.12.0.css') }}"/>
+    <link rel="stylesheet" href="{{ urlGenerator.cssUrl('swagger-ui-5.12.0.css') }}"/>
 </head>
 <body>
 <div id="swagger-ui"></div>
-<script src="{{ urlMacros.jsUrl('swagger-ui-bundle-5.12.0.js') }}" crossorigin></script>
+<script src="{{ urlGenerator.jsUrl('swagger-ui-bundle-5.12.0.js') }}" crossorigin></script>
 <script>
     window.onload = () => {
         window.ui = SwaggerUIBundle({
