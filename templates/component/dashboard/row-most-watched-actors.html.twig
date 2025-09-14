@@ -1,13 +1,14 @@
 {% macro create(dashboardRow, mostWatchedActors, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {% import 'macros/url-macros.html.twig' as urlMacros %}
     {{ rowItemToggle.create(dashboardRow) }}
 
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for mostWatchedActor in mostWatchedActors %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}-{{ mostWatchedActor.name|slugify }}"
+                    <a class="card h-100 position-relative" href="{{ urlMacros.userPersonUrl(applicationUrl, routeUsername, mostWatchedActor) }}"
                          style="cursor: pointer;">
                         <div class="card-header text-truncate" style="padding: 0.2rem">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>

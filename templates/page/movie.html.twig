@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Movie: {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
@@ -245,7 +246,7 @@
                     </div>
 
                     <a
-                        href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}-{{ castMember.name|slugify }}"
+                        href="{{ urlMacros.userPersonUrl(applicationUrl, routeUsername, castMember) }}"
                         class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
                         >
                         <img src="{{ castMember.posterPath }}"
@@ -292,7 +293,7 @@
 
                     <a
                         class="card-img-bottom"
-                        href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}-{{ director.name|slugify }}"
+                        href="{{ urlMacros.userPersonUrl(applicationUrl, routeUsername, director) }}"
                     >
                         <img src="{{ director.posterPath }}"
                             class="card-img-bottom"

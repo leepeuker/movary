@@ -1,13 +1,14 @@
 {% macro create(dashboardRow, watchlistItems, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {% import 'macros/url-macros.html.twig' as urlMacros %}
     {{ rowItemToggle.create(dashboardRow) }}
 
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for watchlistItem in watchlistItems %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}-{{ watchlistItem.title|slugify }}"
+                    <a class="card h-100 position-relative" href="{{ urlMacros.userMovieUrl(applicationUrl, routeUsername, watchlistItem) }}"
                          style="cursor: pointer;">
                         <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title }}" type="hidden">
                         <div style="height: 100%">
@@ -23,7 +24,7 @@
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"
+        <a class="btn btn-outline-secondary btn-sm" href="{{ urlMacros.userWatchlistUrl(applicationUrl, routeUsername) }}"
            style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
     </li>
 {% endmacro %}
