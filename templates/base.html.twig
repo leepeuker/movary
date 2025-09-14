@@ -7,7 +7,7 @@
     <link href="{{ urlMacros.cssUrl('bootstrap.min.css') }}" rel="stylesheet">
     <link rel="shortcut icon" href="{{ urlMacros.imageUrl('favicon.ico') }}" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="manifest" href="{{ urlMacros.applicationUrl('manifest.json') }}">
+    <link rel="manifest" href="{{ urlMacros.baseUrlWith('manifest.json') }}">
     <meta name="theme-color" content="white">
     <link rel="canonical" href="{{ urlMacros.canonicalUrl(canonicalPath, canonicalExtra) }}" />
     <link rel="stylesheet" href="{{ urlMacros.cssUrl('bootstrap-icons-1.10.2.css') }}">
@@ -25,7 +25,7 @@
 
 {% block body %}{% endblock %}
 
-<script>window.APPLICATION_URL = "{{- urlMacros.applicationUrl() -}}";</script>
+<script>window.APPLICATION_URL = "{{- applicationUrl -}}";</script>
 <script src="{{ urlMacros.jsUrl('jquery-3.3.1.js') }}"></script>
 <script src="{{ urlMacros.jsUrl('bootstrap.bundle.min.js') }}"></script>
 <script src="{{ urlMacros.jsUrl('datepicker-full-1.2.0.min.js') }}"></script>

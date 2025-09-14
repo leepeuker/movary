@@ -7,8 +7,12 @@
    NAVIGATION & AUTH URLs
    ======================================== #}
 
-{% macro applicationUrl(path) %}
-    {{- applicationUrl }}{{ path -}}
+{% macro baseUrl() %}
+    {{- applicationUrl | default ('/') -}}
+{% endmacro %}
+
+{% macro baseUrlWith(path) %}
+    {{- applicationUrl }}/{{ path -}}
 {% endmacro %}
 
 {% macro loginUrl() %}
