@@ -33,7 +33,6 @@ class PersonController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
     ) {
-        $slugify = new SlugifyService();
     }
 
     public function hideInTopLists(Request $request) : Response
@@ -68,7 +67,8 @@ class PersonController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
+        $userName = (string)$request->getRouteParameters()['username'];
+        $userId = $this->userApi->fetchUserByName($userName)->getId();
         $personId = (int)$request->getRouteParameters()['id'];
 
         $person = $this->personApi->findById($personId);

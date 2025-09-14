@@ -187,8 +187,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     // the following routes (/movies/ and /persons/) can have any non-slash characters following the URL after a -
     //   e.g., http://movary.test/users/alifeee/movies/14-freakier-friday which is identical to
     //         http://movary.test/users/alifeee/movies/14
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}[-{ignorablenameslug:[^/]*}]', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}[-{ignorablenameslug:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class, Web\Middleware\MovieSlugRedirector::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class, Web\Middleware\PersonSlugRedirector::class]);
     $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
         Web\HistoryController::class,
         'deleteHistoryEntry'

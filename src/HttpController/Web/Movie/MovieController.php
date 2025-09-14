@@ -67,7 +67,8 @@ class MovieController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
+        $userName = (string)$request->getRouteParameters()['username'];
+        $userId = $this->userApi->fetchUserByName($userName)->getId();
 
         $currentUser = null;
         if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
