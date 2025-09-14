@@ -1,13 +1,14 @@
 {% macro create(dashboardRow, lastPlaysCinema, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {% import 'macros/url-macros.html.twig' as urlMacros %}
     {{ rowItemToggle.create(dashboardRow) }}
 
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for lastPlay in lastPlaysCinema %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}-{{ lastPlay.title|slugify }}">
+                    <a class="card h-100" style="cursor: pointer" href="{{ urlMacros.userMovieUrl(applicationUrl, routeUsername, lastPlay) }}">
                         <div style="height: 100%">
                             <img src="{{ lastPlay.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
@@ -27,6 +28,6 @@
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="{{ applicationUrl }}/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ urlMacros.userHistoryUrl(applicationUrl, routeUsername) }}" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
     </li>
 {% endmacro %}
