@@ -77,20 +77,6 @@ class PersonController
             return Response::createNotFound();
         }
 
-        // redirect! if no slug or if slug is wrong
-        $ignorablenameslug = (string)$request->getRouteParameters()['ignorablenameslug'];
-        $person_name_slug = $this->slugify->slugify($person->getName());
-        if ($ignorablenameslug == "" || $ignorablenameslug != $person_name_slug) {
-            return Response::createMovedPermanently(
-                "/users/"
-                    . $userName
-                    . "/persons/"
-                    . $personId
-                    . "-"
-                    . $person_name_slug
-            );
-        }
-
         $birthDate = $person->getBirthDate();
         $deathDate = $person->getDeathDate();
 

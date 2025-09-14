@@ -83,20 +83,6 @@ class MovieController
             return Response::createNotFound();
         }
 
-        // redirect! if no slug or if slug is wrong
-        $ignorablenameslug = (string)$request->getRouteParameters()['ignorablenameslug'];
-        $movie_title_slug = $this->slugify->slugify($movie['title']);
-        if ($ignorablenameslug == "" || $ignorablenameslug != $movie_title_slug) {
-            return Response::createMovedPermanently(
-                "/users/"
-                    . $userName
-                    . "/movies/"
-                    . $movieId
-                    . "-"
-                    . $movie_title_slug
-            );
-        }
-
         $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
         return Response::create(
