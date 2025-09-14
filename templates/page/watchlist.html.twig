@@ -54,7 +54,8 @@
             {% set genreQuery = (genre is null) ? '' : "ge=#{genre}&" %}
             {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
             {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
-            {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/watchlist?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ productionCountryCode %}
+            {% set queryParams = searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ productionCountryCode %}
+            {% set baseUrl = urlMacros.userWatchlistWithQueryUrl(applicationUrl, routeUsername, queryParams) %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

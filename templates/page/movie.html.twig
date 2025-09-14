@@ -95,7 +95,7 @@
                     data-bs-title="On Watchlist"
                     id="bookmarkIcon"
                 >
-                    <a class="bi bi-bookmark-fill h5" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"></a>
+                    <a class="bi bi-bookmark-fill h5" href="{{ urlMacros.userWatchlistUrl(applicationUrl, routeUsername) }}"></a>
                 </p>
             {% endif %}
             {% if movie.imdbId is not null %}

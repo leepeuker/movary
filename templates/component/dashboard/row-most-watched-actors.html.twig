@@ -22,7 +22,7 @@
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="{{ applicationUrl }}/users/{{ routeUsername }}/actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24"
+        <a class="btn btn-outline-secondary btn-sm" href="{{ urlMacros.userActorsWithGenderSortedByUniqueAppearances(applicationUrl, routeUsername, 2) }}"
            style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
     </li>
 {% endmacro %}

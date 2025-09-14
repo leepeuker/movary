@@ -56,7 +56,8 @@
             {% set minUserRatingQuery = (hasUserRating is null or minUserRating is null) ? '' : "minur=#{minUserRating}&" %}
             {% set maxUserRatingQuery = (hasUserRating is null or maxUserRating is null) ? '' : "maxur=#{maxUserRating}&" %}
             {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
-            {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ hasUserRatingQuery ~ minUserRatingQuery ~ maxUserRatingQuery ~ productionCountryCode %}
+            {% set queryParams = searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ hasUserRatingQuery ~ minUserRatingQuery ~ maxUserRatingQuery ~ productionCountryCode %}
+            {% set baseUrl = urlMacros.userMoviesWithQueryUrl(applicationUrl, routeUsername, queryParams) %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

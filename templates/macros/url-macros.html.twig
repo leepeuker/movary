@@ -24,22 +24,70 @@
     {{ _self.userPageUrl(applicationUrl, username, 'watchlist') }}
 {% endmacro %}
 
-{% macro userMoviesUrl(applicationUrl, username) %}
-    {{ _self.userPageUrl(applicationUrl, username, 'movies') }}
+{% macro userWatchlistWithQueryUrl(applicationUrl, username, queryParams) %}
+    {{ _self.userWatchlistUrl(applicationUrl, username) }}?{{ queryParams }}
 {% endmacro %}
 
-{% macro userActorsUrl(applicationUrl, username) %}
-    {{ _self.userPageUrl(applicationUrl, username, 'actors') }}
+{% macro userPersonUrl(applicationUrl, username, person) %}
+    {{ _self.userPageUrl(applicationUrl, username, 'persons/' ~ person.id ~ '-' ~ person.name|slugify) }}
 {% endmacro %}
 
 {% macro userDirectorsUrl(applicationUrl, username) %}
     {{ _self.userPageUrl(applicationUrl, username, 'directors') }}
 {% endmacro %}
 
+{% macro userDirectorsWithQueryUrl(applicationUrl, username, queryParams) %}
+    {{ _self.userDirectorsUrl(applicationUrl, username) }}?{{ queryParams }}
+{% endmacro %}
+
+{% macro userActorsUrl(applicationUrl, username) %}
+    {{ _self.userPageUrl(applicationUrl, username, 'actors') }}
+{% endmacro %}
+
+{% macro userActorsWithGenderUrl(applicationUrl, username, genderCode) %}
+    {{ _self.userActorsUrl(applicationUrl, username) }}?ge={{ genderCode }}
+{% endmacro %}
+
+{% macro userActorsWithGenderSortedByUniqueAppearances(applicationUrl, username, genderCode) %}
+    {{ _self.userActorsWithGenderUrl(applicationUrl, username, genderCode) }}&sb=uniqueAppearances&so=desc
+{% endmacro %}
+
+{% macro userActorsWithQueryUrl(applicationUrl, username, queryParams) %}
+    {{ _self.userActorsUrl(applicationUrl, username) }}?{{ queryParams }}
+{% endmacro %}
+
 {% macro userMovieUrl(applicationUrl, username, movie) %}
     {{ _self.userPageUrl(applicationUrl, username, 'movies/' ~ movie.id ~ '-' ~ movie.title|slugify) }}
 {% endmacro %}
 
-{% macro userPersonUrl(applicationUrl, username, person) %}
-    {{ _self.userPageUrl(applicationUrl, username, 'persons/' ~ person.id ~ '-' ~ person.name|slugify) }}
+{% macro userMoviesUrl(applicationUrl, username) %}
+    {{ _self.userPageUrl(applicationUrl, username, 'movies') }}
+{% endmacro %}
+
+{% macro userMoviesWithLanguageUrl(applicationUrl, username, languageCode) %}
+    {{ _self.userMoviesUrl(applicationUrl, username) }}?la={{ languageCode }}
+{% endmacro %}
+
+{% macro userMoviesWithGenreUrl(applicationUrl, username, genreName) %}
+    {{ _self.userMoviesUrl(applicationUrl, username) }}?ge={{ genreName }}
+{% endmacro %}
+
+{% macro userMoviesWithProductionCountryUrl(applicationUrl, username, countryCode) %}
+    {{ _self.userMoviesUrl(applicationUrl, username) }}?pc={{ countryCode }}
+{% endmacro %}
+
+{% macro userMoviesWithReleaseYearUrl(applicationUrl, username, releaseYear) %}
+    {{ _self.userMoviesUrl(applicationUrl, username) }}?ry={{ releaseYear }}
+{% endmacro %}
+
+{% macro userMoviesWithLocationUrl(applicationUrl, username, locationId) %}
+    {{ _self.userMoviesUrl(applicationUrl, username) }}?loc={{ locationId }}
+{% endmacro %}
+
+{% macro userMoviesWithQueryUrl(applicationUrl, username, queryParams) %}
+    {{ _self.userMoviesUrl(applicationUrl, username) }}?{{ queryParams }}
+{% endmacro %}
+
+{% macro userHistoryWithQueryUrl(applicationUrl, username, queryParams) %}
+    {{ _self.userHistoryUrl(applicationUrl, username) }}?{{ queryParams }}
 {% endmacro %}

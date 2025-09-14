@@ -1,6 +1,7 @@
 {% macro create(dashboardRow, mostWatchedProductionCountries, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {% import 'macros/url-macros.html.twig' as urlMacros %}
     {{ rowItemToggle.create(dashboardRow) }}
 
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
@@ -10,7 +11,7 @@
                     <div class="col" style="padding-bottom: 1rem;">
                         <a class="card h-100 position-relative"
                              style="cursor: pointer"
-                             href="{{ applicationUrl }}/users/{{ routeUsername }}/movies?pc={{ mostWatchedProductionCountry.id }}">
+                             href="{{ urlMacros.userMoviesWithProductionCountryUrl(applicationUrl, routeUsername, mostWatchedProductionCountry.id) }}">
                             <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                 <small class="text-muted" style="font-size: 0.9rem;font-weight: bold">{{ mostWatchedProductionCountry.name }}</small>
                             </div>
