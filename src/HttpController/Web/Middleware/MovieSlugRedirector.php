@@ -37,8 +37,7 @@ class MovieSlugRedirector implements MiddlewareInterface
                 . "/movies/"
                 . $movieId
                 . "-"
-                . $movieTitleSlug
-                . "-",
+                . $movieTitleSlug,
             );
         }
 
