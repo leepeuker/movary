@@ -1,3 +1,4 @@
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 <div class="modal fade" id="editWatchDateModal" tabindex="-1" aria-labelledby="editWatchDateModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -28,7 +29,7 @@
                 <div class="input-group {% if currentUserLocationsEnabled == false %}d-none{% endif %}" style="margin-top: 1rem;margin-bottom: 1rem">
                     <i class="input-group-text"><i class="bi bi-pin-map-fill"></i></i>
                     <select class="form-select"  id="editWatchDateModalLocationInput" aria-describedby="location"></select>
-                    <a class="btn btn-outline-secondary rounded-end" href="{{ applicationUrl }}/settings/account/locations"><i class="bi bi-gear"></i></a>
+                    <a class="btn btn-outline-secondary rounded-end" href="{{ urlMacros.settingsAccountUrl('locations') }}"><i class="bi bi-gear"></i></a>
                 </div>
                 <div id="advancedWatchDateDetails" class="d-none">
                     <div class="input-group" style="margin-top: 1rem">

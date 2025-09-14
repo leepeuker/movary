@@ -1,12 +1,13 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Settings - App
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/marked-5.0.2.min.js"></script>
-    <script src="{{ applicationUrl }}/js/settings-app.js"></script>
+    <script src="{{ urlMacros.jsUrl('marked-5.0.2.min.js') }}"></script>
+    <script src="{{ urlMacros.jsUrl('settings-app.js') }}"></script>
 {% endblock %}
 
 {% block body %}

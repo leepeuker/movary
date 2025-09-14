@@ -1,17 +1,18 @@
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 <!DOCTYPE html>
 <html id="html" data-bs-theme="{{ theme }}">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-    <link href="{{ applicationUrl }}/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
+    <link href="{{ urlMacros.cssUrl('bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ urlMacros.imageUrl('favicon.ico') }}" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
+    <link rel="manifest" href="{{ urlMacros.applicationUrl('manifest.json') }}">
     <meta name="theme-color" content="white">
-    <link rel="canonical" href="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/bootstrap-icons-1.10.2.css">
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/datepicker-1.2.0.min.css">
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css">
+    <link rel="canonical" href="{{ urlMacros.canonicalUrl(canonicalPath, canonicalExtra) }}" />
+    <link rel="stylesheet" href="{{ urlMacros.cssUrl('bootstrap-icons-1.10.2.css') }}">
+    <link rel="stylesheet" href="{{ urlMacros.cssUrl('datepicker-1.2.0.min.css') }}">
+    <link rel="stylesheet" href="{{ urlMacros.cssUrl('global.css') }}">
     {% block stylesheets %}
     {% endblock %}
 </head>
@@ -24,11 +25,11 @@
 
 {% block body %}{% endblock %}
 
-<script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
-<script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
-<script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
-<script src="{{ applicationUrl }}/js/datepicker-full-1.2.0.min.js"></script>
-<script src="{{ applicationUrl }}/js/app.js"></script>
+<script>window.APPLICATION_URL = "{{- urlMacros.applicationUrl() -}}";</script>
+<script src="{{ urlMacros.jsUrl('jquery-3.3.1.js') }}"></script>
+<script src="{{ urlMacros.jsUrl('bootstrap.bundle.min.js') }}"></script>
+<script src="{{ urlMacros.jsUrl('datepicker-full-1.2.0.min.js') }}"></script>
+<script src="{{ urlMacros.jsUrl('app.js') }}"></script>
 
 {% block scripts %}{% endblock %}
 </body>

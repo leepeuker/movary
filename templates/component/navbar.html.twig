@@ -1,7 +1,7 @@
 {% import 'macros/url-macros.html.twig' as urlMacros %}
 <nav class="navbar navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="{{ applicationUrl }}/" id="navbarBrand">{{ applicationName ?? 'Movary' }}</a>
+        <a class="navbar-brand" href="{{ urlMacros.applicationUrl() }}" id="navbarBrand">{{ applicationName ?? 'Movary' }}</a>
         {% if loggedIn == true %}
         <div class="btn-group">
             {% endif %}
@@ -16,31 +16,31 @@
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
                     <a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}"
-                       href="{{ urlMacros.userDashboardUrl(applicationUrl, routeUsername ?: currentUserName) }}">
+                       href="{{ urlMacros.userDashboardUrl(routeUsername ?: currentUserName) }}">
                         Dashboard
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/history#' %}active{% endif %}"
-                       href="{{ urlMacros.userHistoryUrl(applicationUrl, routeUsername ?: currentUserName) }}">
+                       href="{{ urlMacros.userHistoryUrl(routeUsername ?: currentUserName) }}">
                         History
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/watchlist#' %}active{% endif %}"
-                       href="{{ urlMacros.userWatchlistUrl(applicationUrl, routeUsername ?: currentUserName) }}">
+                       href="{{ urlMacros.userWatchlistUrl(routeUsername ?: currentUserName) }}">
                         Watchlist
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/movies#' %}active{% endif %}"
-                       href="{{ urlMacros.userMoviesUrl(applicationUrl, routeUsername ?: currentUserName) }}">
+                       href="{{ urlMacros.userMoviesUrl(routeUsername ?: currentUserName) }}">
                         All Movies</a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/actors#' %}active{% endif %}"
-                       href="{{ urlMacros.userActorsUrl(applicationUrl, routeUsername ?: currentUserName) }}">
+                       href="{{ urlMacros.userActorsUrl(routeUsername ?: currentUserName) }}">
                         Top Actors
                     </a>
                 </li>
                 <li><a class="dropdown-item {% if requestUrlPath matches '#\/.+\/directors#' %}active{% endif %}"
-                       href="{{ urlMacros.userDirectorsUrl(applicationUrl, routeUsername ?: currentUserName) }}">
+                       href="{{ urlMacros.userDirectorsUrl(routeUsername ?: currentUserName) }}">
                         Top Directors
                     </a>
                 </li>
@@ -48,10 +48,10 @@
                     <hr class="dropdown-divider">
                 </li>
                 {% if loggedIn == true %}
-                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/general">Settings</a></li>
+                    <li><a class="dropdown-item {% if requestUrlPath starts with '/settings/' %}active{% endif %}" href="{{ urlMacros.settingsAccountUrl('general') }}">Settings</a></li>
                     <li><button class="dropdown-item" onclick="logout()" style="cursor: pointer">Logout</button></li>
                 {% else %}
-                    <li><a class="dropdown-item" href="{{ applicationUrl }}/login">Login</a></li>
+                    <li><a class="dropdown-item" href="{{ urlMacros.loginUrl() }}">Login</a></li>
                 {% endif %}
                 <li>
                     <hr class="dropdown-divider">

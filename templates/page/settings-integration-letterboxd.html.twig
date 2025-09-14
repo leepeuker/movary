@@ -1,12 +1,13 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Settings - Letterboxd
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/settings-integration-letterboxd.js"></script>
-    <script src="{{ applicationUrl }}/js/component/modal-job.js"></script>
+    <script src="{{ urlMacros.jsUrl('settings-integration-letterboxd.js') }}"></script>
+    <script src="{{ urlMacros.jsComponentUrl('modal-job.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -34,7 +35,7 @@
                     </ul>
                 </div>
 
-                <form action="{{ applicationUrl }}/jobs/schedule/letterboxd-diary-sync" method="post" enctype="multipart/form-data">
+                <form action="{{ urlMacros.jobScheduleUrl('letterboxd-diary-sync') }}" method="post" enctype="multipart/form-data">
                     <h5 style="margin-bottom: 0.5rem">Import History</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the diary.csv file</p>
                     <div class="input-group mb-3">
@@ -62,7 +63,7 @@
 
                 <br>
 
-                <form action="{{ applicationUrl }}/jobs/schedule/letterboxd-ratings-sync" method="post" enctype="multipart/form-data">
+                <form action="{{ urlMacros.jobScheduleUrl('letterboxd-ratings-sync') }}" method="post" enctype="multipart/form-data">
                     <h5 style="margin-bottom: 0.5rem">Import Ratings</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
                     <div class="input-group mb-3">
@@ -97,7 +98,7 @@
                     The downloaded zip archive may contain multiple files, every one of them has to be imported.
                 </p>
 
-                <a class="btn btn-primary" href="{{ applicationUrl }}/settings/letterboxd-export" target="_blank">Generate export data</a>
+                <a class="btn btn-primary" href="{{ urlMacros.settingsLetterboxdExportUrl() }}" target="_blank">Generate export data</a>
             </div>
         </div>
 

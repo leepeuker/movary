@@ -1,15 +1,16 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Settings - App
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet">
+    <link href="{{ urlMacros.cssUrl('settings.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/settings-server-email.js"></script>
+    <script src="{{ urlMacros.jsUrl('settings-server-email.js') }}"></script>
 {% endblock %}
 
 {% block body %}

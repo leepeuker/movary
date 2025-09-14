@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
-    <script src="{{ applicationUrl }}/js/component/modal-advanced-search-person.html.js"></script>
+    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
+    <script src="{{ urlMacros.jsComponentUrl('modal-advanced-search-person.html.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -32,7 +32,7 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for mostWatchedDirector in mostWatchedDirectors %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <a class="card h-100  position-relative" href="{{ urlMacros.userPersonUrl(applicationUrl, routeUsername, mostWatchedDirector) }}" style="cursor: pointer">
+                        <a class="card h-100  position-relative" href="{{ urlMacros.userPersonUrl(routeUsername, mostWatchedDirector) }}" style="cursor: pointer">
                             <div class="card-header text-truncate" style="padding: 0.2rem">
                                 <small class="text-muted" style="font-siz1e: 0.9rem;">{{ mostWatchedDirector.name }}</small>
                             </div>
@@ -57,7 +57,7 @@
             {% set perPageQuery = (perPage is null) ? '' : "pp=#{perPage}&" %}
             {% set genderQuery = (filterGender is null) ? '' : "ge=#{filterGender}&" %}
             {% set queryParams = searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
-            {% set baseUrl = urlMacros.userDirectorsWithQueryUrl(applicationUrl, routeUsername, queryParams) %}
+            {% set baseUrl = urlMacros.userDirectorsWithQueryUrl(routeUsername, queryParams) %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

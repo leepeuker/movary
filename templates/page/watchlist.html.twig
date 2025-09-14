@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
-    <script src="{{ applicationUrl }}/js/component/modal-advanced-search-watchlist.html.js"></script>
+    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
+    <script src="{{ urlMacros.jsComponentUrl('modal-advanced-search-watchlist.html.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -35,7 +35,7 @@
                 {% for watchlistEntry in watchlistEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <a
-                            href="{{ urlMacros.userMovieUrl(applicationUrl, routeUsername, watchlistEntry) }}"
+                            href="{{ urlMacros.userMovieUrl(routeUsername, watchlistEntry) }}"
                             class="card h-100"
                             style="cursor: pointer; position: relative;"
                             id="card-{{ watchlistEntry.id }}"
@@ -55,7 +55,7 @@
             {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
             {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
             {% set queryParams = searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ productionCountryCode %}
-            {% set baseUrl = urlMacros.userWatchlistWithQueryUrl(applicationUrl, routeUsername, queryParams) %}
+            {% set baseUrl = urlMacros.userWatchlistWithQueryUrl(routeUsername, queryParams) %}
 
             <ul class="pagination justify-content-center">
                 {% if paginationElements.previous is null %}

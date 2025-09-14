@@ -6,12 +6,12 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ applicationUrl }}/css/movie.css" rel="stylesheet">
+    <link href="{{ urlMacros.cssUrl('movie.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/movie.js"></script>
-    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ urlMacros.jsUrl('movie.js') }}"></script>
+    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -95,13 +95,13 @@
                     data-bs-title="On Watchlist"
                     id="bookmarkIcon"
                 >
-                    <a class="bi bi-bookmark-fill h5" href="{{ urlMacros.userWatchlistUrl(applicationUrl, routeUsername) }}"></a>
+                    <a class="bi bi-bookmark-fill h5" href="{{ urlMacros.userWatchlistUrl(routeUsername) }}"></a>
                 </p>
             {% endif %}
             {% if movie.imdbId is not null %}
                 <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.imdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %}"
                    href="{{ movie.imdbUrl }}" target="_blank">
-                    <img src="{{ applicationUrl }}/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
+                    <img src="{{ urlMacros.imageUrl('imdb-logo.svg') }}" style="width: 3rem" alt="imdb logo">
                 </a>
                 {% if movie.imdbRatingAverage is not empty %}
                     <p style="margin-bottom: 0;margin-right: 0.5rem;text-align: center">
@@ -113,7 +113,7 @@
             {% endif %}
             <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.tmdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %};text-align: center"
                href="{{ movie.tmdbUrl }}" target="_blank">
-                <img src="{{ applicationUrl }}/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
+                <img src="{{ urlMacros.imageUrl('tmdb-logo.svg') }}" style="width: 2rem" alt="tmdb logo">
             </a>
             {% if movie.tmdbRatingAverage is not empty and movie.tmdbRatingAverage != 0.0 %}
                 <p style="margin-bottom: 0;margin-right: .5rem">
@@ -246,7 +246,7 @@
                     </div>
 
                     <a
-                        href="{{ urlMacros.userPersonUrl(applicationUrl, routeUsername, castMember) }}"
+                        href="{{ urlMacros.userPersonUrl(routeUsername, castMember) }}"
                         class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
                         >
                         <img src="{{ castMember.posterPath }}"
@@ -293,7 +293,7 @@
 
                     <a
                         class="card-img-bottom"
-                        href="{{ urlMacros.userPersonUrl(applicationUrl, routeUsername, director) }}"
+                        href="{{ urlMacros.userPersonUrl(routeUsername, director) }}"
                     >
                         <img src="{{ director.posterPath }}"
                             class="card-img-bottom"

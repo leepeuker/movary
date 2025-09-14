@@ -1,16 +1,17 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Dashboard
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ applicationUrl }}/css/dashboard.css" rel="stylesheet">
+    <link href="{{ urlMacros.cssUrl('dashboard.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/dashboard.js"></script>
-    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ urlMacros.jsUrl('dashboard.js') }}"></script>
+    <script src="{{ urlMacros.jsComponentUrl('user-select.js') }}"></script>
 {% endblock %}
 
 {% block body %}

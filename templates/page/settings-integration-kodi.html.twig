@@ -1,15 +1,16 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Settings - Kodi
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/settings-integration-kodi.js"></script>
+    <script src="{{ urlMacros.jsUrl('settings-integration-kodi.js') }}"></script>
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet">
+    <link href="{{ urlMacros.cssUrl('settings.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -48,7 +49,7 @@
                     <div class="alert alert-warning {% if isActive != '' %}d-none{% endif %}"
                          role="alert"
                          style="margin-left: 5%;margin-right: 5%;margin-bottom: 1rem!important;">
-                        Webhook disabled - {% if currentUserIsAdmin == true %}<a href="{{ applicationUrl }}/settings/server/general">Application url</a>{% else %}Application url{% endif %} required
+                        Webhook disabled - {% if currentUserIsAdmin == true %}<a href="{{ urlMacros.settingsServerUrl('general') }}">Application url</a>{% else %}Application url{% endif %} required
                     </div>
                 </div>
 

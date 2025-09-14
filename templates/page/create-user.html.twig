@@ -1,11 +1,12 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Create user
 {% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/createUser.css">
+    <link rel="stylesheet" href="{{ urlMacros.cssUrl('createUser.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -13,7 +14,7 @@
         if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
     </script>
     <main role="main" class="form-signin w-100 m-auto text-center">
-        <form action="{{ applicationUrl }}/create-user" method="post" enctype="multipart/form-data">
+        <form action="{{ urlMacros.createUserUrl() }}" method="post" enctype="multipart/form-data">
             <h1 class="">Movary</h1>
             <p>{{ subtitle }}</p>
             <div class="form-floating" style="margin-bottom: 0.3rem">

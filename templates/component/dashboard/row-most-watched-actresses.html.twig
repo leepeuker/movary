@@ -8,7 +8,7 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for mostWatchedActress in mostWatchedActresses %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100 position-relative" href="{{ urlMacros.userPersonUrl(applicationUrl, routeUsername, mostWatchedActress) }}"
+                    <a class="card h-100 position-relative" href="{{ urlMacros.userPersonUrl(routeUsername, mostWatchedActress) }}"
                          style="cursor: pointer;">
                         <div class="card-header text-truncate" style="padding: 0.2rem">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
@@ -22,7 +22,7 @@
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="{{ urlMacros.userActorsWithGenderSortedByUniqueAppearances(applicationUrl, routeUsername, 1) }}"
+        <a class="btn btn-outline-secondary btn-sm" href="{{ urlMacros.userActorsWithGenderSortedByUniqueAppearances(routeUsername, 1) }}"
            style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
     </li>
 {% endmacro %}
