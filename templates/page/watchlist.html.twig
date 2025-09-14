@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-{% import 'macros/url-macros.html.twig' as urlMacros %}
 
 {% block title %}
     Watchlist
@@ -35,7 +34,7 @@
                 {% for watchlistEntry in watchlistEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <a
-                            href="{{ urlMacros.userMovieUrl(applicationUrl, routeUsername, watchlistEntry) }}"
+                            href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistEntry.id }}-{{ watchlistEntry.title|slugify }}"
                             class="card h-100"
                             style="cursor: pointer; position: relative;"
                             id="card-{{ watchlistEntry.id }}"
