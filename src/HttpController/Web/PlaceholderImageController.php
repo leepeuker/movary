@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Movary\HttpController\Web;
 
+use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 use Twig\Environment;
 
 class PlaceholderImageController
@@ -27,6 +29,10 @@ class PlaceholderImageController
             ],
         );
 
-        return Response::createSVG($renderedTemplate);
+        return Response::createSVG(
+            $renderedTemplate,
+            StatusCode::createOk(),
+            [Header::createCache(2419200)],
+        );
     }
 }

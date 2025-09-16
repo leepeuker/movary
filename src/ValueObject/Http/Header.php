@@ -30,6 +30,10 @@ class Header
         return new self('Location', $value);
     }
 
+    public static function createCache(int $cache_s) : self {
+        return new self('cache-control', 'public, max-age=' . $cache_s);
+    }
+
     public function __toString() : string
     {
         return $this->name . ': ' . $this->value;
