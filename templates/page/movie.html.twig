@@ -97,6 +97,17 @@
                     <a class="bi bi-bookmark-fill h5" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"></a>
                 </p>
             {% endif %}
+            <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.tmdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %};text-align: center"
+               href="{{ movie.tmdbUrl }}" target="_blank">
+                <img src="{{ applicationUrl }}/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
+            </a>
+            {% if movie.tmdbRatingAverage is not empty and movie.tmdbRatingAverage != 0.0 %}
+                <p style="margin-bottom: 0;margin-right: .5rem">
+                    {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
+                    <span class="fw-bold">{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}</span><span
+                            class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
+                </p>
+            {% endif %}
             {% if movie.imdbId is not null %}
                 <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.imdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %}"
                    href="{{ movie.imdbUrl }}" target="_blank">
@@ -110,17 +121,10 @@
                     </p>
                 {% endif %}
             {% endif %}
-            <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if movie.tmdbRatingAverage is null %}0.6rem{% else %}0.3rem{% endif %};text-align: center"
-               href="{{ movie.tmdbUrl }}" target="_blank">
-                <img src="{{ applicationUrl }}/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
+            <a style="display: flex; align-items: center;cursor:pointer;margin-right: 0.3rem;text-align: center"
+               href="https://letterboxd.com/tmdb/{{ movie.tmdbId }}" target="_blank">
+                <img src="{{ applicationUrl }}/images/letterboxd-logo.png" style="width: 1.5rem" alt="letterboxd logo">
             </a>
-            {% if movie.tmdbRatingAverage is not empty and movie.tmdbRatingAverage != 0.0 %}
-                <p style="margin-bottom: 0;margin-right: .5rem">
-                    {# Must be in one line otherwise there is a whitespace between the slash and the vote count which looks ugly #}
-                    <span class="fw-bold">{{ movie.tmdbRatingAverage|number_format(1, '.', ',') }}</span><span
-                            class="fw-lighter">/{{ movie.tmdbRatingVoteCount|default('-') }}</span>
-                </p>
-            {% endif %}
         </div>
 
         {# --- Buttons --- #}
