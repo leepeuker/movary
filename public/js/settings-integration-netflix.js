@@ -320,7 +320,7 @@ function processTMDBData(data) {
 
         media_div.setAttribute('data-tmdbid', item['id'])
 
-        img.src = item['poster_path'] != null ? 'https://image.tmdb.org/t/p/w92' + item['poster_path'] : APPLICATION_URL + '/images/placeholder-image.png';
+        img.src = item['poster_path'] != null ? 'https://image.tmdb.org/t/p/w92' + item['poster_path'] : APPLICATION_URL + '/images/placeholder/' + btoa(item.title);
         img.className = 'img-fluid';
         img.alt = 'Cover of ' + item['title'];
         img.style.width = '92px';
@@ -439,7 +439,7 @@ function processNetflixData(netflixActivityItems) {
         }
 
         if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.poster_path === null) {
-            tmdb_cover.src = APPLICATION_URL + '/images/placeholder-image.png';
+            tmdb_cover.src = APPLICATION_URL + '/images/placeholder/' + btoa(item.title);
             tmdb_link.innerText = 'Image not found on TMDB';
         } else {
             tmdb_cover.src = 'https://image.tmdb.org/t/p/w92' + netflixActivityItem.tmdbMatch.poster_path;
