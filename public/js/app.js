@@ -84,14 +84,17 @@ function setTheme(theme, force = false) {
 }
 
 function updateHtmlThemeColors(mainColor, secondaryColor) {
-    const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
-    const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
+    const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
+    const watchlistButton = document.getElementById('watchlistButton');
+    const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
         toggleWatchDatesButton.classList.add('btn-' + secondaryColor)
         toggleWatchDatesButton.classList.remove('btn-' + mainColor)
         logSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+        watchlistButton.classList.add('btn-outline-' + secondaryColor)
+        watchlistButton.classList.remove('btn-outline-' + mainColor)
         moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         moreSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
     }
