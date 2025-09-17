@@ -56,10 +56,11 @@ class ActivityStream implements JsonSerializable
     public static function createNote(
         string $id,
         string $name,
-        Date $published,
+        DateTime $published,
         ActivityStream $attributedTo,
         ActivityStream $cc,
         string $content,
+        array $extra_AP_items,
     ): ActivityStream {
         $attributedTo->compact = true;
         $cc->compact = true;
@@ -68,7 +69,7 @@ class ActivityStream implements JsonSerializable
             $id,
             $name,
             [
-                "published" => $published,
+                "published" => $published->format("Y-m-d\TH:i:sp"),
                 "attributedTo" => $attributedTo,
                 "content" => $content,
                 "to" => [
@@ -76,7 +77,8 @@ class ActivityStream implements JsonSerializable
                 ],
                 "cc" => [
                     $cc,
-                ]
+                ],
+                ...$extra_AP_items,
             ]
         );
     }
@@ -103,7 +105,7 @@ class ActivityStream implements JsonSerializable
 
         $orderedCollectionPage1 = ActivityStream::createOrderedCollectionPage(
             $application_url,
-            $collection_url,
+            $collection_path,
             $totalItems,
             $itemsPerPage,
             $orderedCollection,
@@ -113,7 +115,7 @@ class ActivityStream implements JsonSerializable
         $orderedCollectionPage1->compact = true;
         $orderedCollectionPage2 = ActivityStream::createOrderedCollectionPage(
             $application_url,
-            $collection_url,
+            $collection_path,
             $totalItems,
             $itemsPerPage,
             $orderedCollection,
@@ -211,6 +213,53 @@ class ActivityStream implements JsonSerializable
                 "movaryId" => $movie->getId(),
                 "tmdbId" => $movie->getTmdbId(),
             ]
+        );
+    }
+
+    public static function createPlay(
+        $application_url,
+        $application_name,
+        UserEntity $user,
+        MovieEntity $movie,
+        array $watch,
+    ) {
+        $id = (
+            $application_url
+            . "/activitypub/users/"
+            . $user->getName()
+            . "/plays/"
+            . $movie->getId()
+            . "/"
+            . $watch["watched_at"]
+        );
+        $summaryContent = $user->getName() . " watched " . $movie->getTitle();
+
+        $movieObject = ActivityStream::createMovie($application_url, $user, $movie);
+        $movieObject->compact = true;
+        $userObject = ActivityStream::createPerson($application_url, $application_name, $user);
+        $userObject->compact = true;
+        $followersObject = ActivityStream::createOrderedCollection(
+            $application_url,
+            "/activitypub/users/" . $user->getName() . "/followers",
+            -1,
+            -1,
+            "followers",
+        );
+        $followersObject->compact = true;
+
+        return ActivityStream::createNote(
+            $id,
+            $summaryContent,
+            DateTime::createFromString($watch["created_at"]),
+            $userObject,
+            $followersObject,
+            $summaryContent,
+            [
+
+                "summary" => $summaryContent,
+                "actor" => $userObject,
+                "inReplyTo" => $movieObject,
+            ],
         );
     }
 

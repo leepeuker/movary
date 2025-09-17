@@ -16,10 +16,12 @@ use Movary\Service\ServerSettings;
 use Movary\Util\Json;
 use Movary\ValueObject\ActivityStream;
 use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 
 class ActivityPubController
 {
-    private const DEFAULT_MOVIE_PAGINATION_LIMIT = 5;
+    private const DEFAULT_MOVIE_PAGINATION_LIMIT = 50;
+    private const DEFAULT_PLAYS_PAGINATION_LIMIT = 50;
 
     public function __construct(
         private readonly UserApi $userApi,
@@ -88,23 +90,6 @@ class ActivityPubController
     //    movie
     // ###########
 
-    function getHistoryPaginated($application_url, $user, $paginationLimit, $page): array
-    {
-        return array_map(
-            function (array $movie_arr) use ($application_url, $user) {
-                $movie = $this->movieApi->findById($movie_arr["id"]);
-                $movieAPObj = ActivityStream::createMovie($application_url, $user, $movie);
-                $movieAPObj->compact = true;
-                return $movieAPObj;
-            },
-            $this->movieHistoryApi->fetchHistoryPaginated(
-                $user->getId(),
-                $paginationLimit,
-                (int)$page,
-            )
-        );
-    }
-
     public function handleMovies(Request $request): Response
     {
         # does user exist
@@ -113,17 +98,11 @@ class ActivityPubController
             return Response::createNotFound();
 
         $application_url = $this->applicationUrlService->createApplicationUrl();
-        $historyCount = $this->movieHistoryApi->fetchHistoryCount($user->getId());
-        $collection_url = "activitypub/" . $user->getName() . "/movies";
+        $historyCount = $this->movieApi->fetchTotalPlayCountUnique($user->getId());
+        $collection_url = "activitypub/users/" . $user->getName() . "/movies";
 
         # function to get history
         $getHistoryPaginated = function ($page) use ($application_url, $user) {
-            $movies = $this->movieHistoryApi->fetchHistoryPaginated(
-                $user->getId(),
-                $this::DEFAULT_MOVIE_PAGINATION_LIMIT,
-                (int)$page,
-            );
-
             return array_map(
                 function (array $movie_arr) use ($application_url, $user) {
                     $movie = $this->movieApi->findById($movie_arr["id"]);
@@ -131,7 +110,7 @@ class ActivityPubController
                     $movieAPObj->compact = true;
                     return $movieAPObj;
                 },
-                $this->movieHistoryApi->fetchHistoryPaginated(
+                $this->movieHistoryApi->fetchUniqueWatchedMoviesPaginated(
                     $user->getId(),
                     $this::DEFAULT_MOVIE_PAGINATION_LIMIT,
                     (int)$page,
@@ -239,11 +218,97 @@ class ActivityPubController
     //    user plays
     // ################
 
-    public function handleActorPlays(): Response
+    public function handleActorPlays(Request $request): Response
     {
-        return Response::create(
-            StatusCode::createOk(),
-            "plays orderedcollection goes here"
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $application_name = $this->serverSettings->getApplicationName();
+        $historyCount = $this->movieHistoryApi->fetchHistoryCount($user->getId());
+        $collection_url = "activitypub/users/" . $user->getName() . "/plays";
+
+        # function to get all plays in order
+        $getPlaysPaginated = function ($page) use ($application_url, $application_name, $user) {
+            return array_map(
+                function (array $movie_arr) use ($application_url, $application_name, $user) {
+                    $movie = $this->movieApi->findById($movie_arr["id"]);
+                    $playObject = ActivityStream::createPlay(
+                        $application_url,
+                        $application_name,
+                        $user,
+                        $movie,
+                        $movie_arr,
+                    );
+                    $playObject->compact = true;
+                    return $playObject;
+                },
+                $this->movieHistoryApi->fetchHistoryPaginated(
+                    $user->getId(),
+                    $this::DEFAULT_PLAYS_PAGINATION_LIMIT,
+                    (int)$page,
+                )
+            );
+        };
+
+        # actual logic
+        return $this::handleOrderedCollectionRequest(
+            $request,
+            $application_url,
+            $historyCount,
+            $collection_url,
+            $getPlaysPaginated,
+            $this::DEFAULT_PLAYS_PAGINATION_LIMIT,
+        );
+    }
+    public function handleActorPlaysForMovie(Request $request): Response
+    {
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        # does movie exist
+        $movie_id = (int)$request->getRouteParameters()['id'];
+        $movie = $this->movieApi->findById($movie_id);
+        if (!$movie)
+            return Response::createNotFound();
+
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $application_name = $this->serverSettings->getApplicationName();
+        $history = $this->movieApi->fetchHistoryByMovieId($movie->getId(), $user->getId());
+        $historyCount = count($history);
+        $collection_url = "activitypub/users/" . $user->getName() . "/plays/" . $movie->getId();
+
+        # function to get all plays for single film in order
+        $getMoviePlaysPaginated = function () use ($application_url, $application_name, $history, $user) {
+            return array_map(
+                function (array $movie_arr) use ($application_url, $application_name, $user) {
+                    $movie = $this->movieApi->findById($movie_arr["movie_id"]);
+                    $playObject = ActivityStream::createPlay(
+                        $application_url,
+                        $application_name,
+                        $user,
+                        $movie,
+                        $movie_arr,
+                    );
+                    $playObject->compact = true;
+                    return $playObject;
+                },
+                $history,
+            );
+        };
+
+        # actual logic
+        return $this::handleOrderedCollectionRequest(
+            $request,
+            $application_url,
+            $historyCount,
+            $collection_url,
+            $getMoviePlaysPaginated,
+            $this::DEFAULT_PLAYS_PAGINATION_LIMIT,
         );
     }
     public function handleActorPlay(Request $request): Response
@@ -255,7 +320,7 @@ class ActivityPubController
 
         # does movie exist
         $movie_id = (int)$request->getRouteParameters()['id'];
-        $movie = $this->movieApi->findByIdFormatted($movie_id);
+        $movie = $this->movieApi->findById($movie_id);
         if (!$movie)
             return Response::createNotFound();
 
@@ -267,47 +332,21 @@ class ActivityPubController
         );
         if (count($watch_dates) < 1)
             return Response::createNotFound();
-        $watch = $watch_dates[0];
+        $watch = array_values($watch_dates)[0];
 
-        # required variables to create object
+        # create play object
         $application_url = $this->applicationUrlService->createApplicationUrl();
-
-        # turn Movie into AP object with type "Video"
-        $movie['personalRating'] = $this->movieApi->findUserRating($movie_id, $user->getId())?->asInt();
-        $movie['@context'] = "https://www.w3.org/ns/activitystreams";
-        $movie['type'] = "Video";
-        $movie['id'] = $application_url . "/users/" . $user->getName() . "/movies/" . $movie['id'];
-        $movie['name'] = $movie['title'];
-
-        # create ActivityPub Note
-        $note = [
-            "@context" => "https://www.w3.org/ns/activitystreams",
-            "type" => "Note",
-            "id" => (
-                $application_url
-                . "/activitypub/users/"
-                . $user->getName()
-                . "/plays/"
-                . $movie_id
-                . "/"
-                . $watch["watched_at"]
-            ),
-            "summary" => $user->getName() . " watched " . $movie["title"],
-            "content" => $user->getName() . " watched " . $movie["title"],
-            "published" => "???",
-            "actor" => $application_url . "/activitypub/users/" . $user->getName(),
-            "inReplyTo" => $movie,
-            "attributedTo" => $application_url . "/activitypub/users/" . $user->getName(),
-            "to" => [
-                "https://www.w3.org/ns/activitystreams#Public"
-            ],
-            "cc" => [
-                $application_url . "/activitypub/users/alifeee/followers"
-            ],
-        ];
+        $application_name = $this->serverSettings->getApplicationName();
+        $playObject = ActivityStream::createPlay(
+            $application_url,
+            $application_name,
+            $user,
+            $movie,
+            $watch,
+        );
 
         return Response::createActivityJson(
-            Json::encode($note)
+            Json::encode($playObject)
         );
     }
 

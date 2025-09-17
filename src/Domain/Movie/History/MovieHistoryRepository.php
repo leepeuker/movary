@@ -4,6 +4,7 @@ namespace Movary\Domain\Movie\History;
 
 use Doctrine\DBAL\Connection;
 use Movary\ValueObject\Date;
+use Movary\ValueObject\DateTime;
 
 class MovieHistoryRepository
 {
@@ -14,7 +15,7 @@ class MovieHistoryRepository
     public function create(int $movieId, int $userId, ?Date $watchedAt, int $plays, ?string $comment, int $position, ?int $locationId) : void
     {
         $this->dbConnection->executeStatement(
-            'INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`, `position`, `location_id`) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, `comment`, `position`, `location_id`, `created_at`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $movieId,
                 $userId,
@@ -23,6 +24,7 @@ class MovieHistoryRepository
                 $comment,
                 $position,
                 $locationId,
+                (string)DateTime::create(),
             ],
         );
     }
