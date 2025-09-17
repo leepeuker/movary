@@ -29,48 +29,68 @@ class ActivityPubController
         private readonly MovieHistoryApi $movieHistoryApi,
     ) {}
 
-    // ###########
-    //    movie
-    // ###########
+    // #################################
+    //    ordered collection generics
+    // #################################
 
-
-    public function handleMovies(Request $request): Response
-    {
-        # does user exist
-        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
-        if (!$user)
-            return Response::createNotFound();
-
+    static public function handleOrderedCollectionRequest(
+        Request $request,
+        string $application_url,
+        int $totalItems,
+        string $collection_path,
+        callable $getCollectionItems,
+        int $paginationLimit = 50,
+    ): Response {
         $page = $request->getGetParameters()['p'];
 
-        $application_url = $this->applicationUrlService->createApplicationUrl();
-        $historyCount = $this->movieHistoryApi->fetchHistoryCount($user->getId());
-        $lastPage = intdiv($historyCount + $this::DEFAULT_MOVIE_PAGINATION_LIMIT - 1,  $this::DEFAULT_MOVIE_PAGINATION_LIMIT);
-        $collection_url = "activitypub/" . $user->getName() . "/movies";
+        $lastPage = intdiv($totalItems + $paginationLimit - 1,  $paginationLimit);
 
-        $moviesCollection = ActivityStream::createOrderedCollection(
+        $orderedCollection = ActivityStream::createOrderedCollection(
             $application_url,
-            $collection_url,
-            $historyCount,
-            $this::DEFAULT_MOVIE_PAGINATION_LIMIT
+            $collection_path,
+            $totalItems,
+            $paginationLimit,
         );
 
         # return parent OrderedCollection if no page requested
         if ($page == null) {
             return Response::createActivityJson(
-                Json::encode($moviesCollection)
+                Json::encode($orderedCollection)
             );
         }
 
         # otherwise return requested OrderedCollectionPage
-
         $page = (int)$page;
         # page number too big
         if ($page > $lastPage || $page < 1)
             return Response::createBadRequest();
 
-        # get history
-        $historyPaginated = array_map(
+        $items = call_user_func($getCollectionItems, $page);
+
+        $orderedCollectionPage = ActivityStream::createOrderedCollectionPage(
+            $application_url,
+            $collection_path,
+            $totalItems,
+            $paginationLimit,
+            $orderedCollection,
+            $page,
+            $items,
+        );
+
+        $orderedCollection->compact = true;
+
+        return Response::createActivityJson(
+            Json::encode($orderedCollectionPage)
+        );
+    }
+
+    // ###########
+    //    movie
+    // ###########
+
+    function getHistoryPaginated($application_url, $user, $paginationLimit, $page): array
+    {
+        return array_map(
             function (array $movie_arr) use ($application_url, $user) {
                 $movie = $this->movieApi->findById($movie_arr["id"]);
                 $movieAPObj = ActivityStream::createMovie($application_url, $user, $movie);
@@ -79,25 +99,54 @@ class ActivityPubController
             },
             $this->movieHistoryApi->fetchHistoryPaginated(
                 $user->getId(),
-                $this::DEFAULT_MOVIE_PAGINATION_LIMIT,
+                $paginationLimit,
                 (int)$page,
             )
         );
+    }
 
-        $moviesCollectionPage = ActivityStream::createOrderedCollectionPage(
+    public function handleMovies(Request $request): Response
+    {
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $historyCount = $this->movieHistoryApi->fetchHistoryCount($user->getId());
+        $collection_url = "activitypub/" . $user->getName() . "/movies";
+
+        # function to get history
+        $getHistoryPaginated = function ($page) use ($application_url, $user) {
+            $movies = $this->movieHistoryApi->fetchHistoryPaginated(
+                $user->getId(),
+                $this::DEFAULT_MOVIE_PAGINATION_LIMIT,
+                (int)$page,
+            );
+
+            return array_map(
+                function (array $movie_arr) use ($application_url, $user) {
+                    $movie = $this->movieApi->findById($movie_arr["id"]);
+                    $movieAPObj = ActivityStream::createMovie($application_url, $user, $movie);
+                    $movieAPObj->compact = true;
+                    return $movieAPObj;
+                },
+                $this->movieHistoryApi->fetchHistoryPaginated(
+                    $user->getId(),
+                    $this::DEFAULT_MOVIE_PAGINATION_LIMIT,
+                    (int)$page,
+                )
+            );
+        };
+
+        # actual logic
+        return $this::handleOrderedCollectionRequest(
+            $request,
             $application_url,
-            $collection_url,
             $historyCount,
+            $collection_url,
+            $getHistoryPaginated,
             $this::DEFAULT_MOVIE_PAGINATION_LIMIT,
-            $moviesCollection,
-            $page,
-            $historyPaginated,
-        );
-
-        $moviesCollection->compact = true;
-
-        return Response::createActivityJson(
-            Json::encode($moviesCollectionPage)
         );
     }
     public function handleMovie(Request $request): Response
