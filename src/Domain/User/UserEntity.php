@@ -37,6 +37,7 @@ class UserEntity
         private readonly bool $jellyfinSyncEnabled,
         private readonly bool $displayCharacterNames,
         private readonly bool $hasLocationsEnabled,
+        private readonly string $createdAt,
     ) {
     }
 
@@ -72,6 +73,7 @@ class UserEntity
             (bool)$data['jellyfin_sync_enabled'],
             (bool)$data['display_character_names'],
             (bool)$data['locations_enabled'],
+            (string)$data['created_at'],
         );
     }
 
@@ -168,6 +170,11 @@ class UserEntity
     public function getTraktUserName() : ?string
     {
         return $this->traktUserName;
+    }
+
+    public function getCreatedAt() : string
+    {
+        return $this->createdAt;
     }
 
     public function hasCoreAccountChangesDisabled() : bool

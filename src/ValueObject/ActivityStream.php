@@ -181,7 +181,7 @@ class ActivityStream implements JsonSerializable
                 "manuallyApproveFollowers" => false,
                 "discoverable" => true,
                 "indexable" => true,
-                "published" => "???",
+                "published" => DateTime::createFromString($user->getCreatedAt())->format("Y-m-d\TH:i:sp"),
                 "publicKey" => [
                     "id" => $user_url . "#main-key",
                     "owner" => $user_url,
