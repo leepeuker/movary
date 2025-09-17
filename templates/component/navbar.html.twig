@@ -14,8 +14,8 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <a class="dropdown-item {% if requestUrlPath matches '#\/.+\/dashboard#' %}active{% endif %}"
-                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}/dashboard">
+                    <a class="dropdown-item {% if requestUrlPath matches '#^\/[^\/]+\/[^\/]+$#' %}active{% endif %}"
+                       href="{{ applicationUrl }}/users/{{ routeUsername ?: currentUserName }}">
                         Dashboard
                     </a>
                 </li>
