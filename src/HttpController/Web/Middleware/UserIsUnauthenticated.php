@@ -27,7 +27,7 @@ class UserIsUnauthenticated implements MiddlewareInterface
 
         return Response::createSeeOther(
             $this->urlService->createApplicationUrl(
-                RelativeUrl::create("/users/$userName/dashboard"),
+                RelativeUrl::create("/users/$userName"),
             ),
         );
     }
