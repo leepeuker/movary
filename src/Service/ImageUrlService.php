@@ -7,6 +7,8 @@ use Movary\ValueObject\RelativeUrl;
 
 class ImageUrlService
 {
+    private const string PLACEHOLDER_IMAGE_NAME_FALLBACK = 'NO IMAGE';
+
     public function __construct(
         private readonly TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly ImageCacheService $imageCacheService,
@@ -15,8 +17,11 @@ class ImageUrlService
     ) {
     }
 
-    public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath, ?string $fallbackName = "NO IMAGE") : string
-    {
+    public function generateImageSrcUrlFromParameters(
+        ?string $tmdbPosterPath,
+        ?string $posterPath,
+        ?string $fallbackName = self::PLACEHOLDER_IMAGE_NAME_FALLBACK,
+    ) : string {
         if ($this->enableImageCaching === true && empty($posterPath) === false && $this->imageCacheService->posterPathExists($posterPath) === true) {
             return $this->urlService->createApplicationUrl(RelativeUrl::create('/' . trim($posterPath, '/')));
         }
@@ -26,7 +31,7 @@ class ImageUrlService
         }
 
         if ($fallbackName == null) {
-            $fallbackName = "NO IMAGE";
+            $fallbackName = self::PLACEHOLDER_IMAGE_NAME_FALLBACK;
         }
 
         return $this->urlService->createApplicationUrl(RelativeUrl::create('/images/placeholder/' . base64_encode($fallbackName)));
@@ -38,9 +43,7 @@ class ImageUrlService
             $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters(
                 $dbResult['tmdb_poster_path'] ?? null,
                 $dbResult['poster_path'] ?? null,
-                key_exists("name", $dbResult)
-                    ? $dbResult['name']
-                    : (key_exists("title", $dbResult) ? $dbResult['title'] : "NO IMAGE"),
+                $dbResult['name'] ?? $dbResult['title'] ?? self::PLACEHOLDER_IMAGE_NAME_FALLBACK,
             );
         }
 

@@ -20,10 +20,10 @@ class PlaceholderImageController
 
     public function renderPlaceholderImage(Request $request) : Response
     {
-        $imageNameBase64Encoded = $request->getRouteParameters()['name_encoded'] ?? null;
+        $imageNameBase64Encoded = $request->getRouteParameters()['imageNameBase64Encoded'] ?? null;
 
         if ($imageNameBase64Encoded === null) {
-            return Response::createBadRequest('Missing route parameter: name_encoded');
+            return Response::createBadRequest('Missing route parameter: imageNameBase64Encoded');
         }
 
         $imageNameBase64Decoded = base64_decode($imageNameBase64Encoded);

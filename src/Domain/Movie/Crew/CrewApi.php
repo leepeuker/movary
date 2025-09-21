@@ -53,7 +53,9 @@ class CrewApi
                 'id' => $person?->getId(),
                 'name' => $person?->getName(),
                 'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters(
-                    $person?->getTmdbPosterPath(), $person?->getPosterPath(), $person?->getName(),
+                    $person?->getTmdbPosterPath(),
+                    $person?->getPosterPath(),
+                    $person?->getName(),
                 ),
             ];
         }

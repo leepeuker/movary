@@ -28,7 +28,9 @@ class CastApi
 
         foreach ($this->repository->findByMovieId($movieId) as $cast) {
             $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
-                $cast['tmdb_poster_path'], $cast['poster_path'], $cast['name'],
+                $cast['tmdb_poster_path'],
+                $cast['poster_path'],
+                $cast['name'],
             );
 
             $castMembers[] = [
