@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Movary\HttpController\Web;
 
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -12,27 +11,35 @@ use Twig\Environment;
 
 class PlaceholderImageController
 {
+    private const int CACHE_DURATION_IN_SECONDS = 2419200;
+
     public function __construct(
         private readonly Environment $twig,
-    ) {}
+    ) {
+    }
 
-    public function renderPlaceholderImage(Request $request): Response
+    public function renderPlaceholderImage(Request $request) : Response
     {
-        $name_encoded = (string)$request->getRouteParameters()['name_encoded'];
-        $name = base64_decode($name_encoded);
-        $name_safe = htmlspecialchars($name, ENT_XML1, "UTF-8");
+        $imageNameBase64Encoded = $request->getRouteParameters()['name_encoded'] ?? null;
+
+        if ($imageNameBase64Encoded === null) {
+            return Response::createBadRequest('Missing route parameter: name_encoded');
+        }
+
+        $imageNameBase64Decoded = base64_decode($imageNameBase64Encoded);
+        $imageNameHtmlEncoded = htmlspecialchars($imageNameBase64Decoded, ENT_XML1, "UTF-8");
 
         $renderedTemplate = $this->twig->render(
             'component/placeholder-image.svg.twig',
             [
-                'name' => $name_safe,
+                'name' => $imageNameHtmlEncoded,
             ],
         );
 
         return Response::createSVG(
             $renderedTemplate,
             StatusCode::createOk(),
-            [Header::createCache(2419200)],
+            self::CACHE_DURATION_IN_SECONDS,
         );
     }
 }

@@ -46,9 +46,16 @@ class Response
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
 
-    public static function createSVG(string $body, ?StatusCode $statusCode = null, array $headers = []) : self
+    public static function createSVG(string $body, ?StatusCode $statusCode = null, int $cacheDurationInSeconds = 0) : self
     {
-        return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeSVG(), ...$headers]);
+        return new self(
+            $statusCode ?? StatusCode::createOk(),
+            $body,
+            [
+                Header::createContentTypeSVG(),
+                Header::createCache($cacheDurationInSeconds)
+            ],
+        );
     }
 
     public static function createMethodNotAllowed() : self

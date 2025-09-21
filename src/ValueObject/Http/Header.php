@@ -30,8 +30,9 @@ class Header
         return new self('Location', $value);
     }
 
-    public static function createCache(int $cache_s) : self {
-        return new self('cache-control', 'public, max-age=' . $cache_s);
+    public static function createCache(int $maxAgeInSeconds) : self
+    {
+        return new self('Cache-Control', 'public, max-age=' . $maxAgeInSeconds);
     }
 
     public function __toString() : string
