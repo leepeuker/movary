@@ -37,6 +37,8 @@ class UserEntity
         private readonly bool $jellyfinSyncEnabled,
         private readonly bool $displayCharacterNames,
         private readonly bool $hasLocationsEnabled,
+        private readonly bool $displayTmdbRating,
+        private readonly bool $displayImdbRating,
     ) {
     }
 
@@ -72,6 +74,8 @@ class UserEntity
             (bool)$data['jellyfin_sync_enabled'],
             (bool)$data['display_character_names'],
             (bool)$data['locations_enabled'],
+            (bool)$data['display_tmdb_rating'],
+            (bool)$data['display_imdb_rating'],
         );
     }
 
@@ -108,6 +112,16 @@ class UserEntity
     public function getEmbyWebhookId() : ?string
     {
         return $this->embyWebhookUuid;
+    }
+
+    public function getDisplayImdbRating() : bool
+    {
+        return $this->displayImdbRating;
+    }
+
+    public function getDisplayTmdbRating() : bool
+    {
+        return $this->displayTmdbRating;
     }
 
     public function getId() : int

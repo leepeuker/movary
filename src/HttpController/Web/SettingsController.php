@@ -254,6 +254,8 @@ class SettingsController
                 'userCountry' => $user->getCountry(),
                 'apiToken' => $this->userApi->findApiTokenByUserId($user->getId()),
                 'displayCharacterNamesInput' => $user->getDisplayCharacterNames(),
+                'displayTmdbRatingsInput' => $user->getDisplayTmdbRating(),
+                'displayImdbRatingsInput' => $user->getDisplayImdbRating(),
             ]),
         );
     }
@@ -635,6 +637,8 @@ class SettingsController
         $country = $requestData['country'] ?? null;
         $enableAutomaticWatchlistRemoval = isset($requestData['enableAutomaticWatchlistRemoval']) === false ? false : (bool)$requestData['enableAutomaticWatchlistRemoval'];
         $displayCharacterNames = isset($requestData['displayCharacterNames']) === false ? false : (bool)$requestData['displayCharacterNames'];
+        $displayTmdbRatings = isset($requestData['displayTmdbRatings']) === false ? false : (bool)$requestData['displayTmdbRatings'];
+        $displayImdbRatings = isset($requestData['displayImdbRatings']) === false ? false : (bool)$requestData['displayImdbRatings'];
 
         $userId = $this->authenticationService->getCurrentUserId();
 
@@ -645,6 +649,8 @@ class SettingsController
             $this->userApi->updateName($userId, (string)$name);
             $this->userApi->updateWatchlistAutomaticRemovalEnabled($userId, $enableAutomaticWatchlistRemoval);
             $this->userApi->updateDisplayCharacterNames($userId, $displayCharacterNames);
+            $this->userApi->updateDisplayTmdbRating($userId, $displayTmdbRatings);
+            $this->userApi->updateDisplayImdbRating($userId, $displayImdbRatings);
         } catch (User\Exception\UsernameInvalidFormat) {
             return Response::createBadRequest('Username not meeting requirements');
         } catch (User\Exception\UsernameNotUnique) {

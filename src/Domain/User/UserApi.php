@@ -355,6 +355,16 @@ class UserApi
         $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
     }
 
+    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->repository->updateDisplayTmdbRating($userId, $displayTmdbRating);
+    }
+
+    public function updateDisplayImdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->repository->updateDisplayImdbRating($userId, $displayTmdbRating);
+    }
+
     public function updateEmail(int $userId, string $email) : void
     {
         $this->userValidator->ensureEmailIsUnique($email, $userId);

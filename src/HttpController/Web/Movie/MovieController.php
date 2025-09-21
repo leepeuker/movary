@@ -100,6 +100,8 @@ class MovieController
                 'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
                 'canonicalExtra' => '-' . $this->slugify->slugify($movie['title']),
+                'displayTmdbRating' => $currentUser?->getDisplayTmdbRating() ?? true,
+                'displayImdbRating' => $currentUser?->getDisplayImdbRating() ?? true,
             ]),
         );
     }
