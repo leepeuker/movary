@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="watchDateModalTitle">Edit Watch Date</h5>
+                <h5 class="modal-title" id="watchDateModalTitle">{% if currentUserName == routeUsername %}Edit {% endif %}Watch Date</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="padding-bottom: 0">
@@ -11,9 +11,20 @@
                 <input type="hidden" value="" name="tmdbId" id="originalWatchDatePlays" required>
                 <div class="input-group" id="watchDateGroup">
                     <i class="bi bi-calendar-date input-group-text"></i>
-                    <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" id="editWatchDateModalInput" required
-                           onfocusout="validateWatchDate(this.value)">
-                    <button class="btn btn-primary rounded-end" onclick="document.getElementById('editWatchDateModalInput').value = null"><i class="bi bi-x-lg"></i></button>
+                    <input
+                        type="text"
+                        class="datepicker_input form-control"
+                        placeholder="Watch date"
+                        aria-label="Watch date"
+                        id="editWatchDateModalInput"
+                        required
+                        {% if currentUserName != routeUsername %}disabled{% endif %}
+                        onfocusout="validateWatchDate(this.value)"
+                    >
+                    <button
+                        class="btn btn-primary rounded-end {% if currentUserName != routeUsername %}d-none{% endif %}"
+                        onclick="document.getElementById('editWatchDateModalInput').value = null"
+                    ><i class="bi bi-x-lg"></i></button>
                     <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
                         Watch date is required!
                     </div>
@@ -23,7 +34,13 @@
                 </div>
                 <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
                     <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
-                    <textarea class="form-control" rows="1" aria-label="Comment" id="editWatchDateModalCommentInput"></textarea>
+                    <textarea
+                        class="form-control"
+                        rows="1"
+                        aria-label="Comment"
+                        id="editWatchDateModalCommentInput"
+                        {% if currentUserName != routeUsername %}disabled{% endif %}
+                    ></textarea>
                 </div>
                 <div class="input-group {% if currentUserLocationsEnabled == false %}d-none{% endif %}" style="margin-top: 1rem;margin-bottom: 1rem">
                     <i class="input-group-text"><i class="bi bi-pin-map-fill"></i></i>
@@ -46,13 +63,26 @@
                         </button>
                     </div>
                 </div>
-                <div id="alertMovieModalDiv"></div>
+                <div id="alertMovieModalDiv" class="{% if currentUserName != routeUsername %}d-none{% endif %}"></div>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="submit" class="btn btn-outline-primary float-start" onclick="toggleWatchDateAdvancedMode()" id="advancedWatchDateModeButton">Advanced mode</button>
+                <button
+                    type="submit"
+                    class="btn btn-outline-primary float-start {% if currentUserName != routeUsername %}d-none{% endif %}"
+                    onclick="toggleWatchDateAdvancedMode()"
+                    id="advancedWatchDateModeButton"
+                >Advanced mode</button>
                 <div class="float-end">
-                    <button type="submit" class="btn btn-danger" onclick="deleteWatchDate()">Delete</button>
-                    <button type="submit" class="btn btn-primary" onclick="editWatchDate()">Update</button>
+                    <button
+                        type="submit"
+                        class="btn btn-danger {% if currentUserName != routeUsername %}d-none{% endif %}"
+                        onclick="deleteWatchDate()"
+                    >Delete</button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary {% if currentUserName != routeUsername %}d-none{% endif %}"
+                        onclick="editWatchDate()"
+                    >Update</button>
                 </div>
             </div>
         </div>

@@ -144,9 +144,9 @@
             <div class="row">
                 <ul class="list-group col-lg-5 col-xl-4 col-xxl-3" style="padding-right: 0">
                     {% for watchDate in watchDates|reverse %}
-                        <li class="list-group-item {% if currentUserName == routeUsername %}list-group-item-action{% endif %}"
-                            style="text-align: center;{% if currentUserName == routeUsername %}cursor: pointer;{% endif %}position:relative;"
-                            {% if currentUserName == routeUsername %}onclick="loadWatchDateModal(this)"{% endif %}
+                        <li class="list-group-item list-group-item-action"
+                            style="text-align: center;cursor: pointer;position:relative;"
+                            onclick="loadWatchDateModal(this)"
                             data-watch-date="{{ watchDate.watched_at is null ? '' : watchDate.watched_at|date(dateFormatPhp) }}"
                             data-plays="{{ watchDate.plays }}"
                             data-comment="{{ watchDate.comment }}"
@@ -202,9 +202,10 @@
 
             {{ include('component/modal-where-to-watch.html.twig') }}
             {{ include('component/modal-edit-rating.html.twig') }}
-            {{ include('component/modal-edit-watch-date.html.twig') }}
             {{ include('component/modal-more-options.html.twig') }}
         {% endif %}
+        
+        {{ include('component/modal-edit-watch-date.html.twig') }}
 
         {# --- Tagline --- #}
 
