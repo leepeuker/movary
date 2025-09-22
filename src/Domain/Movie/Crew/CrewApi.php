@@ -52,7 +52,11 @@ class CrewApi
             $directors[] = [
                 'id' => $person?->getId(),
                 'name' => $person?->getName(),
-                'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person?->getTmdbPosterPath(), $person?->getPosterPath()),
+                'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters(
+                    $person?->getTmdbPosterPath(),
+                    $person?->getPosterPath(),
+                    $person?->getName(),
+                ),
             ];
         }
 

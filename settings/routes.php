@@ -30,6 +30,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\ServerHasRegistrationEnabled::class
     ]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
+    // placeholder image generator
+    $routes->add('GET', '/images/placeholder/{imageNameBase64Encoded:.+}', [Web\PlaceholderImageController::class, 'renderPlaceholderImage']);
 
     #####################
     # Webhook listeners # !!! Deprecated use new api routes

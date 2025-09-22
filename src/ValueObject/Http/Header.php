@@ -20,9 +20,19 @@ class Header
         return new self('Content-Type', 'application/json');
     }
 
+    public static function createContentTypeSVG() : self
+    {
+        return new self('Content-Type', 'image/svg+xml');
+    }
+
     public static function createLocation(string $value) : self
     {
         return new self('Location', $value);
+    }
+
+    public static function createCache(int $maxAgeInSeconds) : self
+    {
+        return new self('Cache-Control', 'public, max-age=' . $maxAgeInSeconds);
     }
 
     public function __toString() : string

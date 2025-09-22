@@ -102,6 +102,12 @@ class PersonController
             $isHiddenInTopLists = $this->userApi->hasHiddenPerson($userId, $personId);
         }
 
+        $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
+            $person->getTmdbPosterPath(),
+            $person->getPosterPath(),
+            $person->getName(),
+        );
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/person.html.twig', [
@@ -109,7 +115,7 @@ class PersonController
                 'person' => [
                     'id' => $person->getId(),
                     'name' => $person->getName(),
-                    'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
+                    'posterPath' => $posterPath,
                     'knownForDepartment' => $person->getKnownForDepartment(),
                     'gender' => $person->getGender(),
                     'age' => $age,
