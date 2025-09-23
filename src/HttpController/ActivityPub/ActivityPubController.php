@@ -195,7 +195,6 @@ class ActivityPubController
 
     public function handleActorOutbox(Request $request): Response
     {
-
         # does user exist
         $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
         if (!$user)
@@ -203,7 +202,6 @@ class ActivityPubController
 
         $application_url = $this->applicationUrlService->createApplicationUrl();
         $application_name = $this->serverSettings->getApplicationName();
-        $historyCount = $this->movieHistoryApi->fetchHistoryCount($user->getId());
         $collection_path = "activitypub/users/" . $user->getName() . "/outbox";
 
         # function to get all plays in order
@@ -281,7 +279,7 @@ class ActivityPubController
         $orderedCollection = ActivityStream::createOrderedCollectionWithItems(
             $application_url,
             $collection_path,
-            $historyCount,
+            count($notes),
             $notes,
         );
 
@@ -290,11 +288,25 @@ class ActivityPubController
         );
     }
 
-    public function handleActorFollowing(): Response
+    public function handleActorFollowing(Request $request): Response
     {
-        return Response::create(
-            StatusCode::createOk(),
-            "actor following goes here"
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $collection_path = "activitypub/users/" . $user->getName() . "/following";
+
+        $orderedCollection = ActivityStream::createOrderedCollectionWithItems(
+            $application_url,
+            $collection_path,
+            0,
+            [],
+        );
+
+        return Response::createActivityJson(
+            Json::encode($orderedCollection)
         );
     }
 

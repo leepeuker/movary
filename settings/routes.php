@@ -272,8 +272,8 @@ function addActivityPubRoutes(RouterService $routerService, FastRoute\RouteColle
     $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}", [ActivityPub\ActivityPubController::class, 'handleActor']);
     $routes->add("POST", "/activitypub/users/{username:[a-zA-Z0-9]+}/inbox", [ActivityPub\ActivityPubController::class, 'handleActorInbox']);
     $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/outbox", [ActivityPub\ActivityPubController::class, 'handleActorOutbox']);
-    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/following", [ActivityPub\ActivityPubController::class, 'handleActorFollowers']);
-    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/followers", [ActivityPub\ActivityPubController::class, 'handleActorFollowing']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/following", [ActivityPub\ActivityPubController::class, 'handleActorFollowing']);
+    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/followers", [ActivityPub\ActivityPubController::class, 'handleActorFollowers']);
     // user objects (plays & watchlist items)
     $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/plays", [ActivityPub\ActivityPubController::class, 'handleActorPlays']);
     $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/plays/{id:\d+}", [ActivityPub\ActivityPubController::class, 'handleActorPlaysForMovie']);
