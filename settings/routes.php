@@ -279,7 +279,6 @@ function addActivityPubRoutes(RouterService $routerService, FastRoute\RouteColle
     $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/plays/{id:\d+}", [ActivityPub\ActivityPubController::class, 'handleActorPlaysForMovie']);
     $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/plays/{id:\d+}/{watchdate:[-0-9]+}", [ActivityPub\ActivityPubController::class, 'handleActorPlay']);
     $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/watchlist", [ActivityPub\ActivityPubController::class, 'handleActorWatchlist']);
-    $routes->add("GET", "/activitypub/users/{username:[a-zA-Z0-9]+}/watchlist/{id:\d+}", [ActivityPub\ActivityPubController::class, 'handleActorWatchlistItem']);
 
     // film
 

@@ -10,6 +10,7 @@ use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\ServerSettings;
@@ -22,6 +23,7 @@ class ActivityPubController
 {
     private const DEFAULT_MOVIE_PAGINATION_LIMIT = 50;
     private const DEFAULT_PLAYS_PAGINATION_LIMIT = 50;
+    private const DEFAULT_WATCHLIST_PAGINATION_LIMIT = 50;
 
     public function __construct(
         private readonly UserApi $userApi,
@@ -29,6 +31,7 @@ class ActivityPubController
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly ServerSettings $serverSettings,
         private readonly MovieHistoryApi $movieHistoryApi,
+        private readonly MovieWatchlistApi $movieWatchlistApi,
     ) {}
 
     // #################################
@@ -354,18 +357,44 @@ class ActivityPubController
     //    user watchlist
     // ####################
 
-    public function handleActorWatchlist(): Response
+    public function handleActorWatchlist(Request $request): Response
     {
-        return Response::create(
-            StatusCode::createOk(),
-            "watchlist orderedcollection goes here"
-        );
-    }
-    public function handleActorWatchlistItem(): Response
-    {
-        return Response::create(
-            StatusCode::createOk(),
-            "watchlist item goes here"
+
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $application_name = $this->serverSettings->getApplicationName();
+        $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount($user->getId());
+        $collection_url = "activitypub/users/" . $user->getName() . "/watchlist";
+
+        # function to get all plays in order
+        $getWatchlistPaginated = function ($page) use ($application_url, $application_name, $user) {
+            return array_map(
+                function (array $movie_arr) use ($application_url, $application_name, $user) {
+                    $movie = $this->movieApi->findById($movie_arr["id"]);
+                    $movieAPObj = ActivityStream::createMovie($application_url, $user, $movie);
+                    $movieAPObj->compact = true;
+                    return $movieAPObj;
+                },
+                $this->movieWatchlistApi->fetchWatchlistPaginated(
+                    $user->getId(),
+                    $this::DEFAULT_WATCHLIST_PAGINATION_LIMIT,
+                    (int)$page,
+                )
+            );
+        };
+
+        # actual logic
+        return $this::handleOrderedCollectionRequest(
+            $request,
+            $application_url,
+            $watchlistCount,
+            $collection_url,
+            $getWatchlistPaginated,
+            $this::DEFAULT_WATCHLIST_PAGINATION_LIMIT,
         );
     }
 }
