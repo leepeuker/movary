@@ -7,10 +7,10 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for lastPlay in lastPlaysCinema %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <div class="card h-100" style="cursor: pointer" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}'">
+                    <a class="card h-100" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}-{{ lastPlay.title|slugify }}">
                         <div style="height: 100%">
                             <img src="{{ lastPlay.poster_path }}"
-                                 class="card-img-top"
+                                 class="card-img-top object-fit-cover h-100"
                                  alt="{{ lastPlay.title }} Poster">
 
                         </div>
@@ -23,7 +23,7 @@
                                             {{ lastPlay.user_rating }}
                                         </span>
                         {% endif %}
-                    </div>
+                    </a>
                 </div>
             {% endfor %}
         </div>

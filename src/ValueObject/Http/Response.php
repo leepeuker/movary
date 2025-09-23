@@ -50,6 +50,18 @@ class Response
     {
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeActivityJson()]);
     }
+    
+    public static function createSVG(string $body, ?StatusCode $statusCode = null, int $cacheDurationInSeconds = 0) : self
+    {
+        return new self(
+            $statusCode ?? StatusCode::createOk(),
+            $body,
+            [
+                Header::createContentTypeSVG(),
+                Header::createCache($cacheDurationInSeconds)
+            ],
+        );
+    }
 
     public static function createMethodNotAllowed() : self
     {
@@ -69,6 +81,11 @@ class Response
     public static function createOk() : self
     {
         return new self(StatusCode::createOk());
+    }
+
+    public static function createMovedPermanently(string $targetUrl) : self
+    {
+        return new self(StatusCode::createMovedPermanently(), null, [Header::createLocation($targetUrl)]);
     }
 
     public static function createSeeOther(string $targetUrl) : self

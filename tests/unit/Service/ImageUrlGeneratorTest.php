@@ -48,7 +48,7 @@ class ImageUrlGeneratorTest extends TestCase
             [
                 'tmdbPosterPath' => null,
                 'posterPath' => 'bar',
-                'expectedResult' => '/images/placeholder-image.png',
+                'expectedResult' => '/images/placeholder/Tk8gSU1BR0U=',
                 'posterPathExists' => false,
             ],
             [
@@ -60,7 +60,7 @@ class ImageUrlGeneratorTest extends TestCase
             [
                 'tmdbPosterPath' => null,
                 'posterPath' => null,
-                'expectedResult' => '/images/placeholder-image.png',
+                'expectedResult' => '/images/placeholder/Tk8gSU1BR0U=',
                 'posterPathExists' => true,
             ],
         ];

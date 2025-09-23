@@ -24,8 +24,8 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for historyEntry in historyEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ historyEntry.id }}'">
-                            <img src="{{ historyEntry.poster_path }}" class="card-img-top" alt="{{ historyEntry.title }} Poster">
+                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ historyEntry.id }}-{{ historyEntry.title|slugify }}">
+                            <img src="{{ historyEntry.poster_path }}" class="card-img-top object-fit-cover h-100" alt="{{ historyEntry.title }} Poster">
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.8rem">{{ historyEntry.watched_at|date(dateFormatPhp) }}</small>
                             </div>
@@ -35,7 +35,7 @@
                                     {{ historyEntry.userRating }}
                                 </span>
                             {% endif %}
-                        </div>
+                        </a>
                     </div>
                     {% set lastDate = historyEntry.watched_at %}
                 {% endfor %}

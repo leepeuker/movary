@@ -641,6 +641,32 @@ class UserRepository
         );
     }
 
+    public function updateDisplayImdbRating(int $userId, bool $displayImdbRating) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_imdb_rating' => (int)$displayImdbRating,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_tmdb_rating' => (int)$displayTmdbRating,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateIsAdmin(int $userId, bool $isAdmin) : void
     {
         $this->dbConnection->update(

@@ -31,15 +31,15 @@
             <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for movie in movies %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100 position-relative" style="cursor: pointer" onclick="window.location='{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}'">
-                            <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title }} Poster">
+                        <a class="card h-100 position-relative" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}-{{ movie.title|slugify }}">
+                            <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom object-fit-cover h-100" alt="{{ movie.title }} Poster">
 
                             {% if movie.userRating is not null %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
                                     {{ movie.userRating }}
                                 </span>
                             {% endif %}
-                        </div>
+                        </a>
                     </div>
                 {% endfor %}
             </div>

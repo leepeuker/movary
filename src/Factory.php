@@ -33,6 +33,7 @@ use Movary\Service\ImageUrlService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
+use Movary\Service\SlugifyService;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -46,6 +47,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
 use Twig;
+use Twig\TwigFilter;
 
 class Factory
 {
@@ -286,6 +288,7 @@ class Factory
 
         $currentRequest = $container->get(Request::class);
         $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;
+        $routenameSlugSuffix = $currentRequest->getRouteParameters()['nameSlugSuffix'] ?? null;
 
         $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticatedWithCookie();
 
@@ -319,9 +322,14 @@ class Factory
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
-        $twig->addGlobal('requestUrlPath', self::createCurrentHttpRequest()->getPath());
+        $twig->addGlobal('requestUrlPath', $currentRequest->getPath());
+        $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routenameSlugSuffix . '$/', '', $currentRequest->getPath()));
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
 
+        // slugify filter for "nice looking" URLs
+        //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
+        $twig->addFilter(new TwigFilter('slugify', [$container->get(SlugifyService::class), 'slugify']));
+        
         return $twig;
     }
 

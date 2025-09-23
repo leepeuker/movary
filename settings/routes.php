@@ -34,6 +34,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\ServerHasRegistrationEnabled::class
     ]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
+    // placeholder image generator
+    $routes->add('GET', '/images/placeholder/{imageNameBase64Encoded:.+}', [Web\PlaceholderImageController::class, 'renderPlaceholderImage']);
 
     #####################
     # Webhook listeners # !!! Deprecated use new api routes
@@ -182,14 +184,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ##############
     # User media #
     ##############
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard', [Web\DashboardController::class, 'render'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard', [Web\DashboardController::class, 'redirectToDashboard'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}', [Web\DashboardController::class, 'render'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Web\HistoryController::class, 'renderHistory'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Web\WatchlistController::class, 'renderWatchlist'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies', [Web\MoviesController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/actors', [Web\ActorsController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/directors', [Web\DirectorsController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    // the following routes (/movies/ and /persons/) can have any non-slash characters following the URL after a -
+    //   e.g., http://movary.test/users/alifeee/movies/14-freakier-friday which is identical to
+    //         http://movary.test/users/alifeee/movies/14
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class, Web\Middleware\MovieSlugRedirector::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class, Web\Middleware\PersonSlugRedirector::class]);
     $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
         Web\HistoryController::class,
         'deleteHistoryEntry'

@@ -12,7 +12,6 @@ const searchLanguageSelect = document.getElementById('searchLanguageSelect');
 const searchReleaseYearSelect = document.getElementById('searchReleaseYearSelect');
 const searchProductionCountrySelect = document.getElementById('searchProductionCountrySelect');
 const searchPerPageSelect = document.getElementById('searchPerPageSelect');
-console.log(searchProductionCountrySelect)
 
 function search() {
     let sortBy = searchSortBySelect.value

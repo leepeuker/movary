@@ -31,6 +31,13 @@ class DashboardController
     ) {
     }
 
+    public function redirectToDashboard(Request $request) : Response
+    {
+        $requestedUserName = (string)$request->getRouteParameters()['username'];
+
+        return Response::createMovedPermanently('/users/' . $requestedUserName);
+    }
+
     public function render(Request $request) : Response
     {
         $requestedUserId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();

@@ -420,13 +420,19 @@ class MovieApi
 
         $imdbId = $entity->getImdbId();
 
+        $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
+            $entity->getTmdbPosterPath(),
+            $entity->getPosterPath(),
+            $entity->getTitle(),
+        );
+
         return [
             'id' => $entity->getId(),
             'tmdbId' => $entity->getTmdbId(),
             'imdbId' => $entity->getImdbId(),
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
-            'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($entity->getTmdbPosterPath(), $entity->getPosterPath()),
+            'posterPath' => $posterPath,
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,

@@ -10,6 +10,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ImageUrlService;
+use Movary\Service\SlugifyService;
 use Movary\Service\Tmdb\SyncPerson;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
@@ -25,6 +26,7 @@ class PersonController
         private readonly Environment $twig,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly ImageUrlService $urlGenerator,
+        private readonly SlugifyService $slugify,
         private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
         private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly SyncPerson $tmdbPersonSync,
@@ -65,7 +67,8 @@ class PersonController
 
     public function renderPage(Request $request) : Response
     {
-        $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
+        $userName = (string)$request->getRouteParameters()['username'];
+        $userId = $this->userApi->fetchUserByName($userName)->getId();
         $personId = (int)$request->getRouteParameters()['id'];
 
         $person = $this->personApi->findById($personId);
@@ -99,6 +102,12 @@ class PersonController
             $isHiddenInTopLists = $this->userApi->hasHiddenPerson($userId, $personId);
         }
 
+        $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
+            $person->getTmdbPosterPath(),
+            $person->getPosterPath(),
+            $person->getName(),
+        );
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/person.html.twig', [
@@ -106,7 +115,7 @@ class PersonController
                 'person' => [
                     'id' => $person->getId(),
                     'name' => $person->getName(),
-                    'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($person->getTmdbPosterPath(), $person->getPosterPath()),
+                    'posterPath' => $posterPath,
                     'knownForDepartment' => $person->getKnownForDepartment(),
                     'gender' => $person->getGender(),
                     'age' => $age,
@@ -122,6 +131,7 @@ class PersonController
                 'moviesFromWatchlistAsActor' => $this->movieApi->fetchFromWatchlistWithActor($personId, $userId),
                 'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
                 'moviesFromWatchlistAsDirector' => $this->movieApi->fetchFromWatchlistWithDirector($personId, $userId),
+                'canonicalExtra' => '-' . $this->slugify->slugify($person->getName()),
             ]),
         );
     }
