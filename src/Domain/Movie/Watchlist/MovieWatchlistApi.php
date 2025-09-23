@@ -39,6 +39,11 @@ class MovieWatchlistApi
         return $this->repository->fetchAllWatchlistItems($userId);
     }
 
+    public function fetchWatchlistItem(int $userId, int $movieId) : array
+    {
+        return $this->repository->fetchWatchlistItem($userId, $movieId);
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->repository->fetchUniqueMovieGenres($userId);

@@ -29,7 +29,14 @@ class MovieWatchlistRepository
     public function fetchAllWatchlistItems(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT title, tmdb_id, imdb_id, added_at FROM watchlist JOIN movie m ON movie_id = m.id WHERE user_id = ?', [$userId],
+            'SELECT title, tmdb_id, imdb_id, added_at, movie_id as id FROM watchlist JOIN movie m ON movie_id = m.id WHERE user_id = ?', [$userId],
+        );
+    }
+
+    public function fetchWatchlistItem(int $userId, int $movieId) : array
+    {
+        return $this->dbConnection->fetchAssociative(
+            'SELECT title, tmdb_id, imdb_id, added_at, movie_id as id FROM watchlist JOIN movie m ON movie_id = m.id WHERE user_id = ? AND movie_id = ?', [$userId, $movieId],
         );
     }
 

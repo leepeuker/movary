@@ -193,11 +193,100 @@ class ActivityPubController
         );
     }
 
-    public function handleActorOutbox(): Response
+    public function handleActorOutbox(Request $request): Response
     {
-        return Response::create(
-            StatusCode::createOk(),
-            "actor outbox goes here"
+
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $application_name = $this->serverSettings->getApplicationName();
+        $historyCount = $this->movieHistoryApi->fetchHistoryCount($user->getId());
+        $collection_path = "activitypub/users/" . $user->getName() . "/outbox";
+
+        # function to get all plays in order
+        $allWatchlistItems = $this->movieWatchlistApi->fetchAllWatchlistItems($user->getId());
+        $allWatchlistCreateObjects = array_map(
+            function ($watchlistItem) use ($application_url, $application_name, $user) {
+                $movie = $this->movieApi->findById($watchlistItem["id"]);
+
+                $watchlistObject = ActivityStream::createWatchlistItem(
+                    $application_url,
+                    $application_name,
+                    $user,
+                    $movie,
+                    $watchlistItem,
+                );
+                $watchlistObject->compact = true;
+
+                $actorObject = ActivityStream::createPerson($application_url, $application_name, $user);
+                $actorObject->compact = true;
+
+                $createObject = ActivityStream::createCreate(
+                    $application_url . "/activitypub/users/" . $user->getName() . "/create/watchlist/" . $movie->getId(),
+                    "created a watchlist item",
+                    $actorObject,
+                    $watchlistObject,
+                    DateTime::createFromString($watchlistItem["added_at"]),
+                );
+
+                return $createObject;
+            },
+            $allWatchlistItems,
+        );
+        $allPlays = $this->movieHistoryApi->fetchHistoryPaginated($user->getId(), 999999, 1);
+        $allPlaysCreateObjects = array_map(
+            function ($watch) use ($application_url, $application_name, $user) {
+                $movie = $this->movieApi->findById($watch["id"]);
+                $playObject = ActivityStream::createPlay(
+                    $application_url,
+                    $application_name,
+                    $user,
+                    $movie,
+                    $watch,
+                );
+                $playObject->compact = true;
+
+                $actorObject = ActivityStream::createPerson($application_url, $application_name, $user);
+                $actorObject->compact = true;
+
+                $createObject = ActivityStream::createCreate(
+                    $application_url . "/activitypub/users/" . $user->getName() . "/create/play/" . $movie->getId() . "/" . $watch["watched_at"],
+                    "marked a movie as played",
+                    $actorObject,
+                    $playObject,
+                    DateTime::createFromString($watch["created_at"]),
+                );
+
+                return $createObject;
+            },
+            $allPlays,
+        );
+
+        $notes = [
+            ...$allWatchlistCreateObjects,
+            ...$allPlaysCreateObjects,
+        ];
+
+        usort($notes, function ($a, $b) {
+            return strcmp(
+                $a->get_published(),
+                $b->get_published(),
+            );
+        });
+
+        # actual logic
+        $orderedCollection = ActivityStream::createOrderedCollectionWithItems(
+            $application_url,
+            $collection_path,
+            $historyCount,
+            $notes,
+        );
+
+        return Response::createActivityJson(
+            Json::encode($orderedCollection)
         );
     }
 
@@ -359,7 +448,6 @@ class ActivityPubController
 
     public function handleActorWatchlist(Request $request): Response
     {
-
         # does user exist
         $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
         if (!$user)
@@ -370,7 +458,7 @@ class ActivityPubController
         $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount($user->getId());
         $collection_url = "activitypub/users/" . $user->getName() . "/watchlist";
 
-        # function to get all plays in order
+        # function to get all watchlist items in order
         $getWatchlistPaginated = function ($page) use ($application_url, $application_name, $user) {
             return array_map(
                 function (array $movie_arr) use ($application_url, $application_name, $user) {
@@ -395,6 +483,141 @@ class ActivityPubController
             $collection_url,
             $getWatchlistPaginated,
             $this::DEFAULT_WATCHLIST_PAGINATION_LIMIT,
+        );
+    }
+
+    public function handleActorWatchlistItem(Request $request): Response
+    {
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        # does movie exist
+        $movie_id = (int)$request->getRouteParameters()['id'];
+        $movie = $this->movieApi->findById($movie_id);
+        if (!$movie)
+            return Response::createNotFound();
+
+        # is movie in watchlist
+        if (!$this->movieWatchlistApi->hasMovieInWatchlist($user->getId(), $movie->getId()))
+            return Response::createNotFound();
+
+        $watchlist_item = $this->movieWatchlistApi->fetchWatchlistItem($user->getId(), $movie->getId());
+
+        # create watchlist object (Note)
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $application_name = $this->serverSettings->getApplicationName();
+        $watchlistObject = ActivityStream::createWatchlistItem(
+            $application_url,
+            $application_name,
+            $user,
+            $movie,
+            $watchlist_item,
+        );
+
+        return Response::createActivityJson(
+            Json::encode($watchlistObject)
+        );
+    }
+
+    // ####################
+    //    meta create AP
+    // ####################
+
+    public function handleCreatePlayItem(Request $request): Response
+    {
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        # does movie exist
+        $movie_id = (int)$request->getRouteParameters()['id'];
+        $movie = $this->movieApi->findById($movie_id);
+        if (!$movie)
+            return Response::createNotFound();
+
+        # does watchdate exist
+        $request_watchdate = (string)$request->getRouteParameters()['watchdate'];
+        $watch_dates = array_filter(
+            $this->movieApi->fetchHistoryByMovieId($movie_id, $user->getId()),
+            fn($wd) => $wd["watched_at"] == $request_watchdate
+        );
+        if (count($watch_dates) < 1)
+            return Response::createNotFound();
+        $watch = array_values($watch_dates)[0];
+
+        # create play object (Note)
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $application_name = $this->serverSettings->getApplicationName();
+        $playObject = ActivityStream::createPlay(
+            $application_url,
+            $application_name,
+            $user,
+            $movie,
+            $watch,
+        );
+
+        $actorObject = ActivityStream::createPerson($application_url, $application_name, $user);
+        $actorObject->compact = true;
+
+        $createObject = ActivityStream::createCreate(
+            $application_url . "/activitypub/users/" . $user->getName() . "/create/watchlist/" . $movie->getId(),
+            "marked a movie as played",
+            $actorObject,
+            $playObject,
+            DateTime::createFromString($watch["created_at"]),
+        );
+
+        return Response::createActivityJson(
+            Json::encode($createObject)
+        );
+    }
+
+    public function handleCreateWatchlistItem(Request $request): Response
+    {
+        # does user exist
+        $user = $this->userApi->findUserByName((string)$request->getRouteParameters()['username']);
+        if (!$user)
+            return Response::createNotFound();
+
+        # does movie exist
+        $movie_id = (int)$request->getRouteParameters()['id'];
+        $movie = $this->movieApi->findById($movie_id);
+        if (!$movie)
+            return Response::createNotFound();
+
+        # is movie in watchlist
+        if (!$this->movieWatchlistApi->hasMovieInWatchlist($user->getId(), $movie->getId()))
+            return Response::createNotFound();
+
+        $watchlist_item = $this->movieWatchlistApi->fetchWatchlistItem($user->getId(), $movie->getId());
+
+        # create watchlist object (Note)
+        $application_url = $this->applicationUrlService->createApplicationUrl();
+        $application_name = $this->serverSettings->getApplicationName();
+        $watchlistObject = ActivityStream::createWatchlistItem(
+            $application_url,
+            $application_name,
+            $user,
+            $movie,
+            $watchlist_item,
+        );
+
+        $actorObject = ActivityStream::createPerson($application_url, $application_name, $user);
+        $actorObject->compact = true;
+
+        $createObject = ActivityStream::createCreate(
+            $application_url . "/activitypub/users/" . $user->getName() . "/create/watchlist/" . $movie->getId(),
+            "created a watchlist item",
+            $actorObject,
+            $watchlistObject,
+            DateTime::createFromString($watchlist_item["added_at"]),
+        );
+
+        return Response::createActivityJson(
+            Json::encode($createObject)
         );
     }
 }

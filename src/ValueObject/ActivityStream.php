@@ -53,6 +53,32 @@ class ActivityStream implements JsonSerializable
         ];
     }
 
+    public function get_published()
+    {
+        if (key_exists("published", $this->extra_AP_items))
+            return $this->extra_AP_items["published"];
+        return "";
+    }
+
+    public static function createCreate(
+        string $id,
+        string $name,
+        ActivityStream $actor,
+        ActivityStream $object,
+        DateTime $published,
+    ) {
+        return new self(
+            "Create",
+            $id,
+            $name,
+            [
+                "published" => $published->format("Y-m-d\TH:i:sp"),
+                "actor" => $actor,
+                "object" => $object,
+            ]
+        );
+    }
+
     public static function createNote(
         string $id,
         string $name,
@@ -82,6 +108,30 @@ class ActivityStream implements JsonSerializable
             ]
         );
     }
+
+    public static function createOrderedCollectionWithItems(
+        string $application_url,
+        string $collection_path,
+        int $totalItems,
+        array $items,
+        string $name = "",
+    ) {
+        $collection_url = $application_url . "/" . $collection_path;
+
+        $orderedCollection = new self(
+            "OrderedCollection",
+            $collection_url,
+            $name,
+            [
+                "totalItems" => $totalItems,
+                "startIndex" => 0,
+                "orderedItems" => $items,
+            ]
+        );
+
+        return $orderedCollection;
+    }
+
 
     public static function createOrderedCollection(
         string $application_url,
@@ -260,6 +310,50 @@ class ActivityStream implements JsonSerializable
                 "actor" => $userObject,
                 "inReplyTo" => $movieObject,
             ],
+        );
+    }
+
+    public static function createWatchlistItem(
+        $application_url,
+        $application_name,
+        UserEntity $user,
+        MovieEntity $movie,
+        array $watchlistItem,
+    ) {
+        $id = (
+            $application_url
+            . "/activitypub/users/"
+            . $user->getName()
+            . "/watchlist/"
+            . $movie->getId()
+        );
+        $summaryContent = $user->getName() . " added " . $movie->getTitle() . " to their watchlist";
+
+        $movieObject = ActivityStream::createMovie($application_url, $user, $movie);
+        $movieObject->compact = true;
+        $userObject = ActivityStream::createPerson($application_url, $application_name, $user);
+        $userObject->compact = true;
+        $followersObject = ActivityStream::createOrderedCollection(
+            $application_url,
+            "/activitypub/users/" . $user->getName() . "/followers",
+            -1,
+            -1,
+            "followers",
+        );
+        $followersObject->compact = true;
+
+        return ActivityStream::createNote(
+            $id,
+            $summaryContent,
+            DateTime::createFromString($watchlistItem["added_at"]),
+            $userObject,
+            $followersObject,
+            $summaryContent,
+            [
+                "summary" => $summaryContent,
+                "actor" => $userObject,
+                "inReplyTo" => $movieObject,
+            ]
         );
     }
 

@@ -22,7 +22,7 @@ class Header
 
     public static function createContentTypeActivityJson() : self
     {
-        return new self('Content-Type', 'application/application+json');
+        return new self('Content-Type', 'application/activity+json');
     }
 
     public static function createContentTypeXRDXML() : self
