@@ -855,8 +855,9 @@ class SettingsController
         $mastodonAccessToken = $postParameters["mastodonAccessToken"];
         
         $mastodonVisibility = $postParameters["mastodonVisibility"];
-        if (!in_array($mastodonVisibility, ["public", "unlisted", "private"]))
+        if (!in_array($mastodonVisibility, ["public", "unlisted", "private"])) {
             $mastodonVisibility = "public";
+        }
         
         $this->userApi->updateMastodonXPostEnabled($userId, $mastodonEnable);
         $this->userApi->updateMastodonXPostAutomatic($userId, $mastodonOnByDefault);

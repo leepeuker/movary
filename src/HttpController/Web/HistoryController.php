@@ -116,6 +116,7 @@ class HistoryController
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
         $this->movieApi->updateHistoryLocation($movie->getId(), $userId, $watchDate, $locationId);
         if ($postToMastodon) {
+            $a = 1;
             // create "post to mastodon" job here ;]
         }
 

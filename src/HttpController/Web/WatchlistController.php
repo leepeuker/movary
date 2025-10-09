@@ -51,6 +51,7 @@ class WatchlistController
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId());
         if ($postToMastodon) {
+            $a = 1;
             // create "post to mastodon" job here ;]
         }
 
