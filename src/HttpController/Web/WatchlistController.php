@@ -41,6 +41,7 @@ class WatchlistController
         }
 
         $tmdbId = (int)$requestData['tmdbId'];
+        $postToMastodon = empty($requestData['postToMastodon']) === true ? false : (bool)$requestData['postToMastodon'];
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -49,6 +50,10 @@ class WatchlistController
         }
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId());
+        if ($postToMastodon) {
+            $a = 1;
+            // create "post to mastodon" job here ;]
+        }
 
         return Response::create(StatusCode::createOk());
     }

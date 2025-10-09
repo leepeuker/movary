@@ -39,6 +39,11 @@ class UserEntity
         private readonly bool $hasLocationsEnabled,
         private readonly bool $displayTmdbRating,
         private readonly bool $displayImdbRating,
+        private readonly bool $mastodonXPostEnabled,
+        private readonly bool $mastodonXPostAutomatic,
+        private readonly ?string $mastodonXPostUsername,
+        private readonly ?string $mastodonXPostAccessToken,
+        private readonly ?string $mastodonXPostPostVisibility,
     ) {
     }
 
@@ -76,6 +81,11 @@ class UserEntity
             (bool)$data['locations_enabled'],
             (bool)$data['display_tmdb_rating'],
             (bool)$data['display_imdb_rating'],
+            (bool)$data['mastodon_xpost_enabled'],
+            (bool)$data['mastodon_xpost_automatic'],
+            $data['mastodon_xpost_username'],
+            $data['mastodon_xpost_access_token'],
+            $data['mastodon_xpost_post_visibility'],
         );
     }
 
@@ -232,5 +242,27 @@ class UserEntity
     public function isAdmin() : bool
     {
         return $this->isAdmin;
+    }
+
+    // Mastodon cross posting
+    public function hasMastodonXPostEnabled() : bool
+    {
+        return $this->mastodonXPostEnabled;
+    }
+    public function hasMastodonXPostAutomatic() : bool
+    {
+        return $this->mastodonXPostAutomatic;
+    }
+    public function getMastodonXPostUsername() : ?string
+    {
+        return $this->mastodonXPostUsername;
+    }
+    public function getMastodonXPostAccessToken() : ?string
+    {
+        return $this->mastodonXPostAccessToken;
+    }
+    public function getMastodonXPostPostVisibility() : ?string
+    {
+        return $this->mastodonXPostPostVisibility;
     }
 }
