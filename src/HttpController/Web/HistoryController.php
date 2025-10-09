@@ -103,6 +103,7 @@ class HistoryController
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
         $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
         $locationId = empty($requestData['locationId']) === true ? null : (int)$requestData['locationId'];
+        $postToMastodon = empty($requestData['postToMastodon']) === true ? false : (bool)$requestData['postToMastodon'];
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -114,6 +115,9 @@ class HistoryController
         $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
         $this->movieApi->updateHistoryLocation($movie->getId(), $userId, $watchDate, $locationId);
+        if ($postToMastodon) {
+            // create "post to mastodon" job here ;]
+        }
 
         return Response::create(StatusCode::createOk());
     }

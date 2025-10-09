@@ -514,4 +514,29 @@ class UserApi
     {
         $this->repository->updateWatchlistAutomaticRemovalEnabled($userId, $watchlistAutomaticRemovalEnabled);
     }
+
+    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
+    {
+        $this->repository->updateMastodonXPostEnabled($userId, $mastodonXPostEnabled);
+    }
+
+    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
+    {
+        $this->repository->updateMastodonXPostAutomatic($userId, $mastodonXPostAutomatic);
+    }
+
+    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
+    {
+        $this->repository->updateMastodonXPostPostVisibility($userId, $mastodonXPostPostVisibility);
+    }
+
+    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
+    {
+        $this->repository->updateMastodonXPostUsername($userId, $mastodonXPostUsername);
+    }
+
+    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
+    {
+        $this->repository->updateMastodonXPostAccessToken($userId, $mastodonXPostAccessToken);
+    }
 }

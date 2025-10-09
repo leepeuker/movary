@@ -954,4 +954,69 @@ class UserRepository
             ],
         );
     }
+
+    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_enabled' => (int)$mastodonXPostEnabled,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_automatic' => (int)$mastodonXPostAutomatic,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_post_visibility' => $mastodonXPostPostVisibility,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_username' => $mastodonXPostUsername,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_access_token' => $mastodonXPostAccessToken,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
 }
