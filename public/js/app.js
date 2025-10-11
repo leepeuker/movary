@@ -131,15 +131,12 @@ async function searchTmdbWithLogModalSearchInput() {
 
     let targetModalVersion = currentModalVersion
 
-    const data = await fetch(APPLICATION_URL + '/settings/netflix/search', {
+    const data = await fetch(APPLICATION_URL + '/api/movies/search?search=' + document.getElementById('logPlayModalSearchInput').value, {
         signal: AbortSignal.timeout(4000),
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'query': document.getElementById('logPlayModalSearchInput').value
-        })
+        }
     }).then(response => {
         if (!response.ok) {
             console.error(response);
@@ -175,7 +172,7 @@ async function searchTmdbWithLogModalSearchInput() {
 
     if (data !== null && targetModalVersion === currentModalVersion) {
         setLogPlayModalSearchSpinner(false)
-        loadLogModalSearchResults(data)
+        loadLogModalSearchResults(data.results || [])
     }
 }
 
@@ -187,12 +184,14 @@ function displayLogModalTmdbSearchError(message) {
 function loadLogModalSearchResults(data) {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
 
-    if (data.length == 0) {
+    if (data.length === 0) {
         document.getElementById('logPlayModalSearchNoResultAlert').classList.remove('d-none')
         return
     }
 
     searchResultList.style.marginTop = '1rem'
+
+    console.log(data)
 
     data.forEach((item, index) => {
         let listElement = document.createElement('li');
@@ -204,16 +203,16 @@ function loadLogModalSearchResults(data) {
         listElement.id = 'searchResult-' + index
 
         let releaseYear = '?'
-        if (item.release_date != null && item.release_date.length > 4) {
-            releaseYear = item.release_date.substring(0, 4)
+        if (item.releaseDate != null && item.releaseDate.length > 4) {
+            releaseYear = item.releaseDate.substring(0, 4)
         }
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
-        posterPath = item.poster_path != null ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
+        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
         listElement.innerHTML = '<img src="' + posterPath + '" alt="Girl in a jacket" style="margin-right: .5rem;width: 3rem"><p style="margin:0;"><span><b>' + item.title + '</b> (' + releaseYear + ')</span><br><span style="opacity:0.75; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; max-height:2lh;">' + item.overview + '</span></p>'
 
-        listElement.dataset.tmdbId = item.id
-        listElement.dataset.poster = item.poster_path
+        listElement.dataset.tmdbId = item.ids.tmdb
+        listElement.dataset.poster = item.tmdbPosterPath
         listElement.dataset.title = item.title
         listElement.dataset.releaseYear = releaseYear
 
