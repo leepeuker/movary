@@ -94,7 +94,7 @@
                     data-bs-title="On Watchlist"
                     id="bookmarkIcon"
                 >
-                    <a class="bi bi-bookmark-fill h5" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"></a>
+                    <a class="bi bi-bookmark h5" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"></a>
                 </p>
             {% endif %}
             <a style="display: flex; align-items: center;cursor:pointer;margin-right: {% if displayTmdbRating == false or movie.tmdbRatingAverage is null %}0.6rem{% else %}0.2rem{% endif %};text-align: center"

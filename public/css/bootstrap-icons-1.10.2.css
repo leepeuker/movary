@@ -23,7 +23,7 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-arrow-clockwise::before { content: "\f116"; }
 .bi-arrow-down::before { content: "\f128"; }
 .bi-arrow-up::before { content: "\f148"; }
-.bi-bookmark-fill::before { content: "\f199"; }
+.bi-bookmark::before { content: "\f1a2"; }
 .bi-calendar-date::before { content: "\f1e4"; }
 .bi-chat-square-text::before { content: "\f264"; }
 .bi-check-circle-fill::before { content: "\f26a"; }
@@ -48,4 +48,4 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-question-lg::before { content: "\f64e"; }
 .bi-filter::before{content:"\f3ca"}
 .bi-pin-map-fill::before{content:"\f64b"}
-.bi-camera-reels-fill::before{ content: "\f21a" }
+.bi-camera-reels::before{ content: "\f21b" }
