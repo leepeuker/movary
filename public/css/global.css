@@ -7,8 +7,8 @@ a.card-header:visited {
 }
 
 /* icon padding in log play modal */
-#logPlayModalSearchResultList i:last-child {
-  margin-right: 0.5rem;
+#logPlayModalSearchResultList i.bi {
+  margin-right: 0.25rem;
 }
 
 /*  */
