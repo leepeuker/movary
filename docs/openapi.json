@@ -1005,6 +1005,16 @@
                                 "$ref": "#/components/schemas/id"
                               }
                             }
+                          },
+                          "isWatched": {
+                            "type": "boolean",
+                            "description": "True if user has watched the movie, false if not.",
+                            "example": false
+                          },
+                          "isOnWatchlist": {
+                            "type": "boolean",
+                            "description": "True if user has the movie on the watchlist, false if not.",
+                            "example": false
                           }
                         }
                       }
