@@ -11,7 +11,7 @@ a.card-header:visited {
   margin-right: 0.25rem;
 }
 
-/*  */
+/* smaller font size on "watched before" element under title */
 #logPlayModalTitle i {
   font-size: small;
 }
