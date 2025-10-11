@@ -212,6 +212,8 @@ function loadLogModalSearchResults(data) {
         listElement.innerHTML = '<img src="' + posterPath + '" alt="Poster for ' + item.title + '" style="margin-right: .5rem;width: 3rem"><p style="margin:0;"><span><span>' + isWatchedEl + isOnWatchlistEl + '</span><b>' + item.title + '</b> (' + releaseYear + ')</span><br><span style="opacity:0.75; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; max-height:2lh;">' + item.overview + '</span></p>'
 
         listElement.dataset.tmdbId = item.ids.tmdb
+        if (item.ids.movary)
+            listElement.dataset.movaryId = item.ids.movary
         listElement.dataset.poster = item.tmdbPosterPath
         listElement.dataset.title = item.title
         listElement.dataset.releaseYear = releaseYear
@@ -266,12 +268,20 @@ async function selectLogModalTmdbItemForLogging(event) {
     document.getElementById('logPlayModalFooterTMDBLink').setAttribute(
         "href", "https://www.themoviedb.org/movie/" + item.dataset.tmdbId
     )
+    if (item.dataset.movaryId)
+        document.getElementById('logPlayModalFooterMovaryLink').setAttribute(
+            "href", "/users/" + document.getElementById('currentUserName').value + "/movies/" + item.dataset.movaryId
+        )
 
     const rating = await fetchRating(item.dataset.tmdbId)
     setRatingStars('logPlayModal', rating)
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalFooterTMDBLink').classList.remove('d-none')
+    if (item.dataset.movaryId)
+        document.getElementById('logPlayModalFooterMovaryLink').classList.remove('d-none')
+    else
+        document.getElementById('logPlayModalFooterMovaryLink').classList.add('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
     document.getElementById('logPlayModalFooterWatchlistButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
@@ -386,6 +396,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
     document.getElementById('logPlayModalFooterTMDBLink').classList.add('d-none')
+    document.getElementById('logPlayModalFooterMovaryLink').classList.add('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.add('d-none')
     document.getElementById('logPlayModalFooterWatchlistButton').classList.add('d-none')
 
