@@ -191,8 +191,6 @@ function loadLogModalSearchResults(data) {
 
     searchResultList.style.marginTop = '1rem'
 
-    console.log(data)
-
     data.forEach((item, index) => {
         let listElement = document.createElement('li');
         listElement.className = 'list-group-item list-group-item-action'
