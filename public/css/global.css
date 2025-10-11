@@ -5,3 +5,13 @@ a.card-header,
 a.card-header:visited {
   text-decoration: none;
 }
+
+/* icon padding in log play modal */
+#logPlayModalSearchResultList i:last-child {
+  margin-right: 0.5rem;
+}
+
+/*  */
+#logPlayModalTitle i {
+  font-size: small;
+}
