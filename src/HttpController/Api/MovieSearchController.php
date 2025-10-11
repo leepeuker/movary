@@ -31,8 +31,8 @@ class MovieSearchController
         );
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
-            $tmdbResponse['total_results'],
-            (int)floor($tmdbResponse['total_results'] / $tmdbResponse['total_pages']),
+            (int)$tmdbResponse['total_results'],
+            (int)floor((int)$tmdbResponse['total_results'] / (int)$tmdbResponse['total_pages']),
             $requestData->getPage(),
         );
 
