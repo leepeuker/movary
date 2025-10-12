@@ -44,6 +44,7 @@ nav:
       - Plex: features/plex.md
       - Jellyfin: features/jellyfin.md
       - Emby: features/emby.md
+      - Kodi: features/kodi.md
       - Letterboxd: features/letterboxd.md
       - Trakt TV: features/trakt.md
       - Netflix: features/netflix.md

@@ -7,10 +7,10 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for lastPlay in lastPlays %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <div class="card h-100" style="cursor: pointer" onclick="window.location='/users/{{ routeUsername }}/movies/{{ lastPlay.id }}'">
+                    <a class="card h-100" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}-{{ lastPlay.title|slugify }}">
                         <div style="height: 100%">
                             <img src="{{ lastPlay.poster_path }}"
-                                 class="card-img-top"
+                                 class="card-img-top object-fit-cover h-100"
                                  alt="{{ lastPlay.title }} Poster">
 
                         </div>
@@ -23,10 +23,10 @@
                                             {{ lastPlay.user_rating }}
                                         </span>
                         {% endif %}
-                    </div>
+                    </a>
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{{ applicationUrl }}/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
     </li>
 {% endmacro %}

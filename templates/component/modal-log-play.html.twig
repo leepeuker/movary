@@ -1,5 +1,6 @@
 {% if loggedIn == true %}
     <div class="modal fade" id="logPlayModal" tabindex="-1" role="dialog" data-bs-backdrop="static" aria-labelledby="logPlayModal" aria-hidden="true">
+        <input hidden="true" name="openedFromMoviePage" id="openedFromMoviePage" value="">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -11,7 +12,7 @@
                         <div class="input-group">
                             <input type="text"
                                    class="form-control"
-                                   placeholder="Search"
+                                   placeholder="Search or enter TMDB URL"
                                    value="{{ (searchTerm is null) ? '' : searchTerm }}"
                                    id="logPlayModalSearchInput"
                                    tabindex="0"
@@ -32,7 +33,7 @@
                             Something went wrong. Please try again.
                         </div>
                         <div class="alert alert-secondary d-none" role="alert" id="logPlayModalSearchNoResultAlert" style="margin-top: 1rem;margin-bottom: 0">
-                            No search results...
+                            No search results… try entering direct URL from <a href="https://www.themoviedb.org/" target="_blank">TMDB</a>?
                         </div>
                         <div class="text-center d-none" style="margin-top: 1rem;margin-bottom: 0" id="logPlayModalSearchSpinner">
                             <div class="spinner-border" role="status">
@@ -84,7 +85,7 @@
                             <i class="input-group-text"><i class="bi bi-pin-map-fill"></i></i>
                             <select class="form-select" style="" id="logPlayModalLocationInput" aria-describedby="location" required>
                             </select>
-                            <a class="btn btn-outline-secondary rounded-end" href="/settings/account/locations"><i class="bi bi-gear"></i></a>
+                            <a class="btn btn-outline-secondary rounded-end" href="{{ applicationUrl }}/settings/account/locations"><i class="bi bi-gear"></i></a>
                         </div>
                     </div>
 
@@ -92,6 +93,7 @@
                 </div>
                 <div class="modal-footer d-none" id="logPlayModalFooter">
                     <button type="submit" class="btn btn-secondary me-auto" onclick="backToLogModalSearchResults()" id="logPlayModalFooterBackButton">Back</button>
+                    <a id="logPlayModalFooterTMDBLink" style="display: flex; align-items: center;cursor:pointer;margin-right: 0.3rem;text-align: center" href="" target="_blank"><img src="{{ applicationUrl }}/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo"></a>
                     <button type="submit" class="btn btn-primary" onclick="addToWatchlist('logPlayModal')" id="logPlayModalFooterWatchlistButton">Add to watchlist</button>
                     <button type="submit" class="btn btn-primary" onclick="logMovie('logPlayModal')">Add play</button>
                 </div>

@@ -4,9 +4,10 @@ namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\DateTime */
+#[CoversClass(\Movary\ValueObject\DateTime::class)]
 class DateTimeTest extends TestCase
 {
     public function testDiffInHours() : void
@@ -33,11 +34,10 @@ class DateTimeTest extends TestCase
     {
         $subject = DateTime::createFromString('2022-05-02 13:02:50');
 
-        $dateTimeSame = DateTime::createFromString('2022-05-02 13:02:50');
         $dateTimeBefore = DateTime::createFromString('2022-05-03 13:02:50');
         $dateTimeAfter = DateTime::createFromString('2022-05-01 13:02:50');
 
-        self::assertFalse($subject->isAfter($dateTimeSame));
+        self::assertFalse($subject->isAfter($subject));
         self::assertFalse($subject->isAfter($dateTimeBefore));
         self::assertTrue($subject->isAfter($dateTimeAfter));
     }

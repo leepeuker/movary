@@ -1,27 +1,53 @@
 ### Local development setup
 
-To set up a basic local development environment follow these steps:
+First steps for local development setup:
 
-- clone the repository
-- copy the file `.env.development.example` to `.env` and customize it for your local environment
-    - make sure the `USER_ID` matches your UID (`echo $UID`)
-    - adjust `DOCKER_COMPOSE_BIN` if you have the legacy docker-compose binary
-    - add your `TMDB_API_KEY`
-- run `make build` to build the docker containers and to run all necessary steps for an initial setup like
-    - create the database
-    - install composer dependencies
-    - run database migrations
-    - create the storage symlink
+- Clone the repository
+- Copy the file `.env.example` to `.env` and customize it for your local environment
+    - Set `USER_ID` to the UID owning the local files (`echo $UID`)
+    - Add your `TMDB_API_KEY`
+- Run `make build_development` to create your local development environment 
+    - Build and start the development stage of the docker image from scratch
+    - Mount project files in to the docker container (changes to files affect application in realtime)
+    - Install composer dependencies
+    - Create the database (sqlite on default)
+    - Run database migrations
+    - Create the storage symlink
 
 The application should be up-to-date and running locally now.
 
 Use the following cli commands to manage your local environment:
 
-- run `make up` to start all containers again (`build` is only for the initial setup!)
-- run `make down` to stop all containers
-- run `make reup` to stop and restart all containers
-- run `make app_database_migrate` execute the database migrations
-- run `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
+- `make up` to start the application in production stage using SQLite (using docker volumes)
+- `make up_mysql` to start the application in production stage using MySQL (using docker volumes)
+- `make up_development` to start the application in development stage using SQLite (mounting local files)
+- `make up_development_myqsl` to start the application in development stage using MySQL (mounting local files)
+- `make down` to stop all containers
+- `make app_database_migrate` execute the database migrations
+- `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
+
+### Xdebug
+
+You can change `XDEBUG_MODE` to `debug` in the `.env` file to enable debugging using [Xdebug](https://xdebug.org/) in the development docker container.
+
+For example, in VSCode or VSCodium, the following debug configuration would allow you to set breakpoints and debug the PHP code:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/app": "${workspaceRoot}"
+      }
+    }
+  ]
+}
+```
 
 ### IDE recommendation: PhpStorm
 
@@ -44,19 +70,25 @@ Notes:
 
 #### General
 
+##### Description
+
 We use [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) for the documentation.
 
 This is part of the default development docker compose setup and can be reached via `http://127.0.0.1:8000`.
 
 To adjust the documentation files look into the `docs` directory and the configuration of MkDocs is in `mkdocs.yml`. 
 
-#### Api
+##### Setup
+
+Run `make up_docs` to start MkDocs. Set environment variable `HTTP_PORT_DOCS` to adjust host port. 
+
+#### REST-Api
 
 Checkout the API docs via the url `http://127.0.0.1/docs/api`.
 
 This uses the schema defined in the file `/docs/openapi.json`. Please adjust openapi schema if you change the API.
 
-### Useful links
+#### Useful links
 
 - [Trakt API docs](https://trakt.docs.apiary.io/)
 - [TMDB API docs](https://developers.themoviedb.org/3)

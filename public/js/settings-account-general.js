@@ -4,6 +4,8 @@ const privacyInput = document.getElementById('privacyInput')
 const enableAutomaticWatchlistRemovalInput = document.getElementById('enableAutomaticWatchlistRemovalInput')
 const countryInput = document.getElementById('countryInput')
 const displayCharacterNamesInput = document.getElementById('displayCharacterNamesInput')
+const displayTmdbRatingsInput = document.getElementById('displayTmdbRatingsInput')
+const displayImdbRatingsInput = document.getElementById('displayImdbRatingsInput')
 
 document.getElementById('generalAccountUpdateButton').addEventListener('click', async () => {
     nameInput.classList.remove('invalid-input');
@@ -20,7 +22,9 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
         privacyInput.value,
         enableAutomaticWatchlistRemovalInput.checked,
         countryInput.value,
-        displayCharacterNamesInput.checked
+        displayCharacterNamesInput.checked,
+        displayTmdbRatingsInput.checked,
+        displayImdbRatingsInput.checked
     )
 
     switch (response.status) {
@@ -40,8 +44,8 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
     }
 });
 
-function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country, displayCharacterNames) {
-    return fetch('/settings/account', {
+function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country, displayCharacterNames, displayTmdbRatings, displayImdbRatings) {
+    return fetch(APPLICATION_URL + '/settings/account', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -53,6 +57,8 @@ function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchl
             'enableAutomaticWatchlistRemoval': enableAutomaticWatchlistRemoval,
             'country': country,
             'displayCharacterNames': displayCharacterNames,
+            'displayTmdbRatings': displayTmdbRatings,
+            'displayImdbRatings': displayImdbRatings
         })
     })
 }
@@ -90,7 +96,7 @@ function regenerateApiToken() {
 }
 
 async function deleteApiTokenRequest() {
-    const response = await fetch('/settings/account/general/api-token', {'method': 'delete'})
+    const response = await fetch(APPLICATION_URL + '/settings/account/general/api-token', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -98,7 +104,7 @@ async function deleteApiTokenRequest() {
 }
 
 async function regenerateApiTokenRequest() {
-    const response = await fetch('/settings/account/general/api-token', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/settings/account/general/api-token', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -114,7 +120,7 @@ function setApiToken(apiToken) {
 }
 
 fetch(
-    '/settings/account/general/api-token'
+    APPLICATION_URL + '/settings/account/general/api-token'
 ).then(async function (response) {
     if (response.status === 200) {
         const responseData = await response.json();

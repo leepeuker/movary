@@ -6,7 +6,7 @@ use Movary\Api\Tmdb;
 use Movary\Domain\Movie;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
-use Movary\Service\UrlGenerator;
+use Movary\Service\ImageUrlService;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\SortOrder;
@@ -18,7 +18,7 @@ class MovieHistoryApi
         private readonly MovieHistoryRepository $repository,
         private readonly Movie\MovieRepository $movieRepository,
         private readonly Tmdb\TmdbApi $tmdbApi,
-        private readonly UrlGenerator $urlGenerator,
+        private readonly ImageUrlService $urlGenerator,
         private readonly JobQueueApi $jobQueueApi,
         private readonly UserApi $userApi,
     ) {
@@ -249,6 +249,11 @@ class MovieHistoryApi
         return $mostWatchedProductionCompanies;
     }
 
+    public function fetchMostWatchedProductionCountries(int $userId) : array
+    {
+        return $this->movieRepository->fetchMostWatchedProductionCountries($userId);
+    }
+
     public function fetchMostWatchedReleaseYears(int $userId) : array
     {
         return $this->movieRepository->fetchMostWatchedReleaseYears($userId);
@@ -273,6 +278,7 @@ class MovieHistoryApi
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
         ?int $locationId = null,
+        ?string $productionCountryCode = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -292,6 +298,7 @@ class MovieHistoryApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -417,6 +424,11 @@ class MovieHistoryApi
         return $this->movieRepository->fetchUniqueMovieReleaseYears($userId);
     }
 
+    public function fetchUniqueProductionCountries(int $userId) : array
+    {
+        return $this->movieRepository->fetchUniqueProductionCountries($userId);
+    }
+
     public function fetchUniqueWatchedMoviesCount(
         int $userId,
         ?string $searchTerm = null,
@@ -427,6 +439,7 @@ class MovieHistoryApi
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
         ?int $locationId = null,
+        ?string $productionCountryCode = null,
     ) : int {
         return $this->movieRepository->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -438,6 +451,7 @@ class MovieHistoryApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
     }
 
@@ -455,6 +469,7 @@ class MovieHistoryApi
         ?int $userRatingMin = null,
         ?int $userRatingMax = null,
         ?int $locationId = null,
+        ?string $productionCountryCode = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -474,6 +489,7 @@ class MovieHistoryApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);

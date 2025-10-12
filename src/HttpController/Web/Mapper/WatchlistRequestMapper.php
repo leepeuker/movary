@@ -11,6 +11,8 @@ use RuntimeException;
 
 class WatchlistRequestMapper
 {
+    private const null DEFAULT_PRODUCTION_COUNTRY_CODE = null;
+
     private const null DEFAULT_GENRE = null;
 
     private const null DEFAULT_RELEASE_YEAR = null;
@@ -41,6 +43,7 @@ class WatchlistRequestMapper
         $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
         $language = $getParameters['la'] ?? null;
         $genre = $getParameters['ge'] ?? self::DEFAULT_GENRE;
+        $productionCountryCode = $getParameters['pc'] ?? self::DEFAULT_PRODUCTION_COUNTRY_CODE;
 
         return MoviesRequestDto::createFromParameters(
             $userId,
@@ -52,6 +55,7 @@ class WatchlistRequestMapper
             $releaseYear,
             $language,
             $genre,
+            $productionCountryCode,
         );
     }
 

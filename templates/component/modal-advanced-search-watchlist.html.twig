@@ -56,6 +56,15 @@
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Production country</span>
+                        <select class="form-control" name="pc" id="searchProductionCountrySelect">
+                            <option value="" {{ productionCountryCode is null ? 'selected' }}></option>
+                            {% for uniqueProductionCountry in uniqueProductionCountries %}
+                                <option value="{{ uniqueProductionCountry.iso_3166_1 }}" {{ productionCountryCode == uniqueProductionCountry.iso_3166_1 ? 'selected' }}>{{ uniqueProductionCountry.english_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                     <h6 class="text-center">Pagination</h6>
 

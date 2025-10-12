@@ -13,9 +13,9 @@ class ImdbWebScrapper
 
     private const string USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:111.0) Gecko/20100101 Firefox/111.0';
 
-    private const string VOTING_AVERAGE_CLASS_NAME = 'imUuxf';
+    private const string VOTING_AVERAGE_CLASS_NAME = 'lbQcRY';
 
-    private const string VOTING_COUNT_CLASS_NAME = 'dwhNqC';
+    private const string VOTING_COUNT_CLASS_NAME = 'eNfgcR';
 
     public function __construct(
         private readonly Client $httpClient,

@@ -5,9 +5,10 @@ namespace Tests\Unit\Movary\ValueObject\Http;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\Http\Response */
+#[CoversClass(\Movary\ValueObject\Http\Response::class)]
 class ResponseTest extends TestCase
 {
     public function testCreateBadRequest() : void

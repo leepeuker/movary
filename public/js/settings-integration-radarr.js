@@ -12,7 +12,7 @@ async function regenerateRadarrFeedId() {
 }
 
 async function regenerateRadarrFeedRequest() {
-    const response = await fetch('/settings/radarr/feed', {'method': 'put'})
+    const response = await fetch(APPLICATION_URL + '/settings/radarr/feed', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -23,7 +23,7 @@ async function regenerateRadarrFeedRequest() {
 }
 
 async function deleteRadarrFeedId() {
-    await fetch('/settings/radarr/feed', {'method': 'delete'}).then(response => {
+    await fetch(APPLICATION_URL + '/settings/radarr/feed', {'method': 'delete'}).then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
         }

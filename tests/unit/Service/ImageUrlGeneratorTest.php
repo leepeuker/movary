@@ -3,22 +3,28 @@
 namespace Tests\Unit\Movary\Service;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\ImageCacheService;
-use Movary\Service\UrlGenerator;
+use Movary\Service\ImageUrlService;
+use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Service\UrlGenerator */
-class UrlGeneratorTest extends TestCase
+#[CoversClass(\Movary\Service\ImageUrlService::class)]
+class ImageUrlGeneratorTest extends TestCase
 {
     private ImageCacheService|MockObject $imageCacheServiceMock;
 
-    private UrlGenerator $subject;
+    private ApplicationUrlService|MockObject $applicationUrlServiceMock;
+
+    private ImageUrlService $subject;
 
     private MockObject|TmdbUrlGenerator $tmdbUrlGeneratorMock;
 
-    public function provideTestGenerateImageSrcUrlFromParametersData() : array
+    public static function provideTestGenerateImageSrcUrlFromParametersData() : array
     {
         return [
             [
@@ -42,7 +48,7 @@ class UrlGeneratorTest extends TestCase
             [
                 'tmdbPosterPath' => null,
                 'posterPath' => 'bar',
-                'expectedResult' => '/images/placeholder-image.png',
+                'expectedResult' => '/images/placeholder/Tk8gSU1BR0U=',
                 'posterPathExists' => false,
             ],
             [
@@ -54,7 +60,7 @@ class UrlGeneratorTest extends TestCase
             [
                 'tmdbPosterPath' => null,
                 'posterPath' => null,
-                'expectedResult' => '/images/placeholder-image.png',
+                'expectedResult' => '/images/placeholder/Tk8gSU1BR0U=',
                 'posterPathExists' => true,
             ],
         ];
@@ -64,15 +70,17 @@ class UrlGeneratorTest extends TestCase
     {
         $this->tmdbUrlGeneratorMock = $this->createMock(TmdbUrlGenerator::class);
         $this->imageCacheServiceMock = $this->createMock(ImageCacheService::class);
+        $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
 
-        $this->subject = new UrlGenerator(
+        $this->subject = new ImageUrlService(
             $this->tmdbUrlGeneratorMock,
             $this->imageCacheServiceMock,
-            true
+            $this->applicationUrlServiceMock,
+            true,
         );
     }
 
-    /** @dataProvider provideTestGenerateImageSrcUrlFromParametersData */
+    #[DataProvider('provideTestGenerateImageSrcUrlFromParametersData')]
     public function testGenerateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath, string $expectedResult, bool $posterPathExists) : void
     {
         if ($posterPath !== null) {
@@ -81,6 +89,12 @@ class UrlGeneratorTest extends TestCase
                 ->method('posterPathExists')
                 ->with($posterPath)
                 ->willReturn($posterPathExists);
+
+            $this->applicationUrlServiceMock
+                ->expects(self::once())
+                ->method('createApplicationUrl')
+                ->with(RelativeUrl::create($expectedResult))
+                ->willReturn($expectedResult);
         }
 
         if ($posterPath === null && $tmdbPosterPath !== null) {
@@ -89,6 +103,14 @@ class UrlGeneratorTest extends TestCase
                 ->method('generateImageUrl')
                 ->with($tmdbPosterPath)
                 ->willReturn(Url::createFromString($expectedResult));
+        }
+
+        if ($posterPath === null && $tmdbPosterPath === null) {
+            $this->applicationUrlServiceMock
+                ->expects(self::once())
+                ->method('createApplicationUrl')
+                ->with(RelativeUrl::create($expectedResult))
+                ->willReturn($expectedResult);
         }
 
         self::assertEquals(
@@ -130,6 +152,12 @@ class UrlGeneratorTest extends TestCase
             'poster_path' => 'http://localhost',
             'tmdb_poster_path' => 'tmdb_poster_path'
         ];
+
+        $this->applicationUrlServiceMock
+            ->expects(self::once())
+            ->method('createApplicationUrl')
+            ->with(RelativeUrl::create('/poster_path'))
+            ->willReturn('/poster_path');
 
         self::assertEquals(
             $expectedResult,

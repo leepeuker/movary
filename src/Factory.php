@@ -25,13 +25,15 @@ use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
+use Movary\Service\ImageUrlService;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
-use Movary\Service\UrlGenerator;
+use Movary\Service\SlugifyService;
 use Movary\Util\File;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
@@ -45,9 +47,14 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
 use Twig;
+use Twig\TwigFilter;
 
 class Factory
 {
+    private const string DEFAULT_DATABASE_SQLITE = 'storage/movary.sqlite';
+
+    private const string DEFAULT_DATABASE_MODE = 'sqlite';
+
     private const string SRC_DIRECTORY_NAME = 'src';
 
     private const int DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
@@ -133,7 +140,7 @@ class Factory
         $config = match ($databaseMode) {
             'sqlite' => [
                 'driver' => 'sqlite3',
-                'path' => self::createDirectoryAppRoot() . $config->getAsString('DATABASE_SQLITE'),
+                'path' => self::createDirectoryAppRoot() . $config->getAsString('DATABASE_SQLITE', self::DEFAULT_DATABASE_SQLITE),
             ],
             'mysql' => [
                 'driver' => 'pdo_mysql',
@@ -191,6 +198,7 @@ class Factory
             $container->get(JobQueueApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
+            $container->get(ApplicationUrlService::class),
             self::createDirectoryStorageApp(),
         );
     }
@@ -252,6 +260,7 @@ class Factory
         return new OpenApiController(
             $container->get(File::class),
             $container->get(ServerSettings::class),
+            $container->get(ApplicationUrlService::class),
             self::createDirectoryDocs(),
         );
     }
@@ -279,6 +288,7 @@ class Factory
 
         $currentRequest = $container->get(Request::class);
         $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;
+        $routenameSlugSuffix = $currentRequest->getRouteParameters()['nameSlugSuffix'] ?? null;
 
         $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticatedWithCookie();
 
@@ -293,12 +303,16 @@ class Factory
             /** @var User\UserEntity $user */
             $user = $container->get(User\UserApi::class)->findUserById($currentUserId);
 
-            if ($user !== null) {
-                $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
-                $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
-            }
+            $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
+            $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }
 
+        $applicationUrl = $container->get(ApplicationUrlService::class)->createApplicationUrl();
+        if ($applicationUrl === '/') {
+            $applicationUrl = '';
+        }
+
+        $twig->addGlobal('applicationUrl', $applicationUrl);
         $twig->addGlobal('applicationName', $container->get(ServerSettings::class)->getApplicationName() ?? 'Movary');
         $twig->addGlobal('applicationTimezone', $container->get(ServerSettings::class)->getApplicationTimezone() ?? DateTime::DEFAULT_TIME_ZONE);
         $twig->addGlobal('currentUserName', $user?->getName());
@@ -308,9 +322,14 @@ class Factory
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
-        $twig->addGlobal('requestUrlPath', self::createCurrentHttpRequest()->getPath());
+        $twig->addGlobal('requestUrlPath', $currentRequest->getPath());
+        $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routenameSlugSuffix . '$/', '', $currentRequest->getPath()));
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
 
+        // slugify filter for "nice looking" URLs
+        //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
+        $twig->addFilter(new TwigFilter('slugify', [$container->get(SlugifyService::class), 'slugify']));
+        
         return $twig;
     }
 
@@ -319,18 +338,19 @@ class Factory
         return new Twig\Loader\FilesystemLoader(self::createDirectoryAppRoot() . 'templates');
     }
 
-    public static function createUrlGenerator(ContainerInterface $container, Config $config) : UrlGenerator
+    public static function createUrlGenerator(ContainerInterface $container, Config $config) : ImageUrlService
     {
-        return new UrlGenerator(
+        return new ImageUrlService(
             $container->get(TmdbUrlGenerator::class),
             $container->get(ImageCacheService::class),
+            $container->get(ApplicationUrlService::class),
             self::getTmdbEnabledImageCaching($config),
         );
     }
 
     public static function getDatabaseMode(Config $config) : string
     {
-        return $config->getAsString('DATABASE_MODE');
+        return $config->getAsString('DATABASE_MODE', self::DEFAULT_DATABASE_MODE);
     }
 
     public static function getDatabaseMysqlCharset(mixed $config) : string
@@ -341,6 +361,11 @@ class Factory
     public static function getDatabaseMysqlPort(Config $config) : int
     {
         return $config->getAsInt('DATABASE_MYSQL_PORT', self::DEFAULT_DATABASE_MYSQL_PORT);
+    }
+
+    public static function getDatabaseSqlite(Config $config) : string
+    {
+        return $config->getAsString('DATABASE_SQLITE', self::DEFAULT_DATABASE_SQLITE);
     }
 
     private static function createDirectoryAppRoot() : string

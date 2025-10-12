@@ -19,7 +19,7 @@ class SyncMovie
         private readonly TmdbApi $tmdbApi,
         private readonly MovieApi $movieApi,
         private readonly GenreConverter $genreConverter,
-        private readonly ProductionCompanyConverter $productionCompanyConverter,
+        private readonly SyncProductionCompany $productionCompanyConverter,
         private readonly Connection $dbConnection,
         private readonly JobQueueScheduler $jobScheduler,
         private readonly LoggerInterface $logger,
@@ -86,10 +86,12 @@ class SyncMovie
             }
 
             $this->movieApi->updateGenres($movie->getId(), $this->genreConverter->getMovaryGenresFromTmdbMovie($tmdbMovie));
-            $this->movieApi->updateProductionCompanies($movie->getId(), $this->productionCompanyConverter->getMovaryProductionCompaniesFromTmdbMovie($tmdbMovie));
+            $productionCompanies = $this->productionCompanyConverter->syncMovaryProductionCompaniesFromTmdbMovie($tmdbMovie);
+            $this->movieApi->updateProductionCompanies($movie->getId(), $productionCompanies);
 
             $this->movieApi->updateCast($movie->getId(), $tmdbMovie->getCredits()->getCast());
             $this->movieApi->updateCrew($movie->getId(), $tmdbMovie->getCredits()->getCrew());
+            $this->movieApi->updateProductionCountries($movie->getId(), $tmdbMovie->getProductionCountries()->asArray());
 
             $this->dbConnection->commit();
         } catch (Exception $e) {

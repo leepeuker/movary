@@ -32,6 +32,9 @@
         <PossiblyUndefinedArrayOffset errorLevel="info"/>
         <RiskyTruthyFalsyComparison errorLevel="info"/>
         <RiskyCast errorLevel="info"/>
+        <ClassMustBeFinal errorLevel="suppress"/>
+        <MissingOverrideAttribute errorLevel="suppress"/>
+        <InvalidOperand errorLevel="suppress"/>
 
         <PossiblyInvalidCast>
             <errorLevel type="suppress">
@@ -44,26 +47,17 @@
             </errorLevel>
         </ArgumentTypeCoercion>
 
-        <InternalMethod>
-            <errorLevel type="suppress">
-                <directory name="tests/unit"/>
-            </errorLevel>
-        </InternalMethod>
         <PossiblyUndefinedMethod>
             <errorLevel type="suppress">
                 <directory name="tests/unit"/>
             </errorLevel>
         </PossiblyUndefinedMethod>
-        <RedundantCondition>
+
+        <UndefinedMagicMethod>
             <errorLevel type="suppress">
                 <directory name="tests/unit"/>
             </errorLevel>
-        </RedundantCondition>
-        <PossiblyInvalidArgument>
-            <errorLevel type="suppress">
-                <directory name="tests/unit"/>
-            </errorLevel>
-        </PossiblyInvalidArgument>
+        </UndefinedMagicMethod>
     </issueHandlers>
 
     <plugins>

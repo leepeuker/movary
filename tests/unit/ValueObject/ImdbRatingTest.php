@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\ImdbRating;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\ImdbRating */
+#[CoversClass(\Movary\ValueObject\ImdbRating::class)]
 class ImdbRatingTest extends TestCase
 {
     private ImdbRating $subject;

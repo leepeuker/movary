@@ -47,17 +47,6 @@ abstract class AbstractMap implements Countable, Iterator
         return $this->values[$this->objectHashes[$this->currentIteratorIndex]]['value'];
     }
 
-    protected function getContainedKeys() : array
-    {
-        $keys = [];
-
-        foreach ($this->values as $mapEntry) {
-            $keys[] = $mapEntry['key'];
-        }
-
-        return $keys;
-    }
-
     /**
      * @return TKey
      */
@@ -98,6 +87,17 @@ abstract class AbstractMap implements Countable, Iterator
         }
 
         return null;
+    }
+
+    protected function getContainedKeys() : array
+    {
+        $keys = [];
+
+        foreach ($this->values as $mapEntry) {
+            $keys[] = $mapEntry['key'];
+        }
+
+        return $keys;
     }
 
     protected function getObjectMapKey(mixed $object) : string

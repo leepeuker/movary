@@ -35,7 +35,7 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
 });
 
 function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
-    return fetch('/settings/server/email', {
+    return fetch(APPLICATION_URL + '/settings/server/email', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({
@@ -103,7 +103,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
 });
 
 function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
-    return fetch('/settings/server/email-test', {
+    return fetch(APPLICATION_URL + '/settings/server/email-test', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({

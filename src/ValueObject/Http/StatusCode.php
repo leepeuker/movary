@@ -50,6 +50,11 @@ class StatusCode
         return new self(200, 'OK');
     }
 
+    public static function createMovedPermanently() : self
+    {
+        return new self(301, 'Moved Permanently');
+    }
+
     public static function createSeeOther() : self
     {
         return new self(303, 'See Other');

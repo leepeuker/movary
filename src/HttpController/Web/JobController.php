@@ -4,6 +4,7 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
@@ -12,6 +13,7 @@ use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\JobType;
+use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 
 class JobController
@@ -21,6 +23,7 @@ class JobController
         private readonly JobQueueApi $jobQueueApi,
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly ApplicationUrlService $applicationUrlService,
         private readonly string $appStorageDirectory,
     ) {
     }
@@ -40,14 +43,22 @@ class JobController
     {
         $this->jobQueueApi->purgeAllJobs();
 
-        return Response::createSeeOther('/settings/server/jobs');
+        return Response::createSeeOther(
+            $this->applicationUrlService->createApplicationUrl(
+                RelativeUrl::create('/settings/server/jobs'),
+            ),
+        );
     }
 
     public function purgeProcessedJobs() : Response
     {
         $this->jobQueueApi->purgeProcessedJobs();
 
-        return Response::createSeeOther('/settings/server/jobs');
+        return Response::createSeeOther(
+            $this->applicationUrlService->createApplicationUrl(
+                RelativeUrl::create('/settings/server/jobs'),
+            ),
+        );
     }
 
     public function scheduleJellyfinExportHistory() : Response

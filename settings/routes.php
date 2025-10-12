@@ -30,6 +30,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\ServerHasRegistrationEnabled::class
     ]);
     $routes->add('GET', '/docs/api', [Web\OpenApiController::class, 'renderPage']);
+    // placeholder image generator
+    $routes->add('GET', '/images/placeholder/{imageNameBase64Encoded:.+}', [Web\PlaceholderImageController::class, 'renderPlaceholderImage']);
 
     #####################
     # Webhook listeners # !!! Deprecated use new api routes
@@ -132,14 +134,16 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', '/settings/jellyfin/webhook', [Web\JellyfinController::class, 'deleteJellyfinWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/emby', [Web\SettingsController::class, 'renderEmbyPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/emby', [Web\SettingsController::class, 'updateEmby'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/emby/webhook', [Web\EmbyController::class, 'getEmbyWebhookUrl']);
     $routes->add('PUT', '/settings/emby/webhook', [Web\EmbyController::class, 'regenerateEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/emby/webhook', [Web\EmbyController::class, 'deleteEmbyWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/integrations/kodi', [Web\SettingsController::class, 'renderKodiPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/kodi', [Web\SettingsController::class, 'updateKodi'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/kodi/webhook', [Web\KodiController::class, 'regenerateKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/kodi/webhook', [Web\KodiController::class, 'deleteKodiWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/app', [Web\SettingsController::class, 'renderAppPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/netflix', [Web\SettingsController::class, 'renderNetflixPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/settings/netflix/search', [Web\NetflixController::class, 'searchTmbd'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/users', [Web\UserController::class, 'fetchUsers']);
     $routes->add('POST', '/settings/users', [Web\UserController::class, 'createUser']);
     $routes->add('PUT', '/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -175,14 +179,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ##############
     # User media #
     ##############
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard', [Web\DashboardController::class, 'render'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard', [Web\DashboardController::class, 'redirectToDashboard'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}', [Web\DashboardController::class, 'render'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/history', [Web\HistoryController::class, 'renderHistory'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/watchlist', [Web\WatchlistController::class, 'renderWatchlist'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies', [Web\MoviesController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/actors', [Web\ActorsController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/directors', [Web\DirectorsController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
-    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class]);
+    // the following routes (/movies/ and /persons/) can have any non-slash characters following the URL after a -
+    //   e.g., http://movary.test/users/alifeee/movies/14-freakier-friday which is identical to
+    //         http://movary.test/users/alifeee/movies/14
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\Movie\MovieController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class, Web\Middleware\MovieSlugRedirector::class]);
+    $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/persons/{id:\d+}[-{nameSlugSuffix:[^/]*}]', [Web\PersonController::class, 'renderPage'], [Web\Middleware\IsAuthorizedToReadUserData::class, Web\Middleware\PersonSlugRedirector::class]);
     $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/history', [
         Web\HistoryController::class,
         'deleteHistoryEntry'
@@ -231,11 +239,13 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', $routeUserPlayed, [Api\PlayedController::class, 'deleteFromPlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('PUT', $routeUserPlayed, [Api\PlayedController::class, 'updatePlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
+    $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
 
     $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
     $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
     $routes->add('POST', '/webhook/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
+    $routes->add('POST', '/webhook/kodi/{id:.+}', [Api\KodiController::class, 'handleKodiWebhook']);
 
     $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 

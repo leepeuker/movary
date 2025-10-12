@@ -21,7 +21,7 @@ async function importNetflixHistory() {
     disable(document.getElementById('importNetflixButton'));
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
-    await fetch('/settings/netflix/import', {
+    await fetch(APPLICATION_URL + '/settings/netflix/import', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -52,7 +52,7 @@ async function uploadNetflixHistory() {
     setDefaultTable()
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
-    await fetch('/settings/netflix', {
+    await fetch(APPLICATION_URL + '/settings/netflix', {
         method: 'POST', body: requestFormData
     }).then(response => {
         document.getElementById('netflixTableBody').querySelector('div.spinner-border').parentElement.remove();
@@ -80,14 +80,11 @@ async function searchTMDB() {
     let searchQuery = document.getElementById('tmdbSearchModalInput').value;
 
     await createSpinner(document.getElementById('tmdbSearchResultsDiv'), 'tmdb');
-    await fetch('/settings/netflix/search', {
-        method: 'POST',
+    await fetch(APPLICATION_URL + '/api/movies/search?search=' + searchQuery, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'query': searchQuery
-        })
+        }
     }).then(response => {
         document.getElementById('tmdbSearchResultsDiv').querySelector('div.spinner-border').remove();
 
@@ -99,10 +96,10 @@ async function searchTMDB() {
 
         return response.json();
     }).then(data => {
-        processTMDBData(data);
+        processTMDBData(data.results);
     }).catch(function (error) {
         console.error(error);
-        setAlert('tmdbSearchModalAlert', 'Could not ??', 'danger')
+        setAlert('tmdbSearchModalAlert', 'Could not process tmdb data.', 'danger')
     });
 }
 
@@ -318,19 +315,19 @@ function processTMDBData(data) {
         descr_div.className = 'flex-grow-1 ms-3 align-self-center';
         radio_div.className = 'input-group-text';
 
-        media_div.setAttribute('data-tmdbid', item['id'])
+        media_div.setAttribute('data-tmdbid', item['ids']['tmdb'])
 
-        img.src = item['poster_path'] != null ? 'https://image.tmdb.org/t/p/w92' + item['poster_path'] : '/images/placeholder-image.png';
+        img.src = item['tmdbPosterPath'] != null ? 'https://image.tmdb.org/t/p/w92' + item['tmdbPosterPath'] : APPLICATION_URL + '/images/placeholder/' + btoa(item.title);
         img.className = 'img-fluid';
         img.alt = 'Cover of ' + item['title'];
         img.style.width = '92px';
 
         link.innerText = item['title'];
-        link.href = 'https://www.themoviedb.org/movie/' + item['id'];
+        link.href = 'https://www.themoviedb.org/movie/' + item['ids']['tmdb'];
         link.target = '_blank';
         heading.append(link);
         paragraph.innerText = item['overview'];
-        release_date.innerText = "Release date: " + item['release_date'];
+        release_date.innerText = "Release date: " + item['releaseDate'];
 
         radio_div.style.height = 'fit-content';
         radio.className = 'form-check-input tmdbradio';
@@ -439,7 +436,7 @@ function processNetflixData(netflixActivityItems) {
         }
 
         if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.poster_path === null) {
-            tmdb_cover.src = '/images/placeholder-image.png';
+            tmdb_cover.src = APPLICATION_URL + '/images/placeholder/' + btoa(item.title);
             tmdb_link.innerText = 'Image not found on TMDB';
         } else {
             tmdb_cover.src = 'https://image.tmdb.org/t/p/w92' + netflixActivityItem.tmdbMatch.poster_path;

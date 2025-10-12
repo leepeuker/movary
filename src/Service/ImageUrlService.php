@@ -3,27 +3,38 @@
 namespace Movary\Service;
 
 use Movary\Api\Tmdb\TmdbUrlGenerator;
+use Movary\ValueObject\RelativeUrl;
 
-class UrlGenerator
+class ImageUrlService
 {
+    private const string PLACEHOLDER_IMAGE_NAME_FALLBACK = 'NO IMAGE';
+
     public function __construct(
         private readonly TmdbUrlGenerator $tmdbUrlGenerator,
         private readonly ImageCacheService $imageCacheService,
+        private readonly ApplicationUrlService $urlService,
         private readonly bool $enableImageCaching,
     ) {
     }
 
-    public function generateImageSrcUrlFromParameters(?string $tmdbPosterPath, ?string $posterPath) : string
-    {
+    public function generateImageSrcUrlFromParameters(
+        ?string $tmdbPosterPath,
+        ?string $posterPath,
+        ?string $fallbackName = self::PLACEHOLDER_IMAGE_NAME_FALLBACK,
+    ) : string {
         if ($this->enableImageCaching === true && empty($posterPath) === false && $this->imageCacheService->posterPathExists($posterPath) === true) {
-            return '/' . trim($posterPath, '/');
+            return $this->urlService->createApplicationUrl(RelativeUrl::create('/' . trim($posterPath, '/')));
         }
 
         if (empty($tmdbPosterPath) === false) {
             return (string)$this->tmdbUrlGenerator->generateImageUrl($tmdbPosterPath);
         }
 
-        return '/images/placeholder-image.png';
+        if ($fallbackName == null) {
+            $fallbackName = self::PLACEHOLDER_IMAGE_NAME_FALLBACK;
+        }
+
+        return $this->urlService->createApplicationUrl(RelativeUrl::create('/images/placeholder/' . base64_encode($fallbackName)));
     }
 
     public function replacePosterPathWithImageSrcUrl(array $dbResults) : array
@@ -32,6 +43,7 @@ class UrlGenerator
             $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters(
                 $dbResult['tmdb_poster_path'] ?? null,
                 $dbResult['poster_path'] ?? null,
+                $dbResult['name'] ?? $dbResult['title'] ?? self::PLACEHOLDER_IMAGE_NAME_FALLBACK,
             );
         }
 

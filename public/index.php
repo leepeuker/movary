@@ -34,6 +34,7 @@ try {
             break;
         case FastRoute\Dispatcher::FOUND:
             $handler = $routeInfo[1]['handler'];
+
             $httpRequest->addRouteParameters($routeInfo[2]);
 
             foreach ($routeInfo[1]['middleware'] as $middleware) {

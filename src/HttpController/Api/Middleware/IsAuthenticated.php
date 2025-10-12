@@ -15,7 +15,7 @@ class IsAuthenticated implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
-        if ($this->authenticationService->getUserIdByApiToken($request) === null) {
+        if ($this->authenticationService->getUserIdByToken($request) === null) {
             return Response::createForbidden();
         }
 

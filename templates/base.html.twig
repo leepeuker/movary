@@ -3,27 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <link href="{{ applicationUrl }}/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
     <meta name="theme-color" content="white">
-    <link rel="stylesheet" href="/css/bootstrap-icons-1.10.2.css">
-    <link rel="stylesheet" href="/css/datepicker-1.2.0.min.css">
-    {% block stylesheets %}{% endblock %}
+    <link rel="canonical" href="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
+    <link rel="stylesheet" href="{{ applicationUrl }}/css/bootstrap-icons-1.10.2.css">
+    <link rel="stylesheet" href="{{ applicationUrl }}/css/datepicker-1.2.0.min.css">
+    <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css">
+    {% block stylesheets %}
+    {% endblock %}
 </head>
 <body>
 <script>0</script>
 
 <input value="{{ dateFormatJavascript }}" id="dateFormatJavascript" hidden>
 <input value="{{ dateFormatPhp }}" id="dateFormatPhp" hidden>
+<input type="hidden" id="currentUserName" value="{{ currentUserName }}">
 
 {% block body %}{% endblock %}
 
-<script src="/js/jquery-3.3.1.js"></script>
-<script src="/js/bootstrap.bundle.min.js"></script>
-<script src="/js/datepicker-full-1.2.0.min.js"></script>
-<script src="/js/app.js"></script>
+<script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
+<script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
+<script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
+<script src="{{ applicationUrl }}/js/datepicker-full-1.2.0.min.js"></script>
+<script src="{{ applicationUrl }}/js/app.js"></script>
 
 {% block scripts %}{% endblock %}
 </body>

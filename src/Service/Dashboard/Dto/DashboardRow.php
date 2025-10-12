@@ -17,7 +17,7 @@ class DashboardRow
         return self::create(0, 'Last Plays', $isVisible, $isExtended);
     }
 
-    public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = true) : self
+    public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = false) : self
     {
         return self::create(11, 'Last Plays Cinema', $isVisible, $isExtended);
     }
@@ -50,6 +50,11 @@ class DashboardRow
     public static function createMostWatchedProductionCompanies(bool $isVisible = true, bool $isExtended = false) : self
     {
         return self::create(6, 'Most watched Production Companies', $isVisible, $isExtended);
+    }
+
+    public static function createMostWatchedProductionCountries(bool $isVisible = true, bool $isExtended = false) : self
+    {
+        return self::create(12, 'Most watched Production Countries', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedReleaseYears(bool $isVisible = true, bool $isExtended = false) : self
@@ -125,6 +130,11 @@ class DashboardRow
     public function isMostWatchedProductionCompanies() : bool
     {
         return $this->getId() === self::createMostWatchedProductionCompanies()->getId();
+    }
+
+    public function isMostWatchedProductionCountries() : bool
+    {
+        return $this->getId() === self::createMostWatchedProductionCountries()->getId();
     }
 
     public function isMostWatchedReleaseYears() : bool

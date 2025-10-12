@@ -4,19 +4,21 @@ namespace Tests\Unit\Movary\Api\Letterboxd;
 
 use GuzzleHttp\Client;
 use Movary\Api\Letterboxd\LetterboxdWebScrapper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-/** @covers \Movary\Api\Letterboxd\LetterboxdWebScrapper */
+#[CoversClass(\Movary\Api\Letterboxd\LetterboxdWebScrapper::class)]
 class LetterboxdWebScrapperTest extends TestCase
 {
     private Client|MockObject $httpClientMock;
 
     private LetterboxdWebScrapper $subject;
 
-    public function provideTestScrapeLetterboxIdByDiaryUriData() : array
+    public static function provideTestScrapeLetterboxIdByDiaryUriData() : array
     {
         return [
             [
@@ -37,7 +39,7 @@ class LetterboxdWebScrapperTest extends TestCase
         $this->subject = new LetterboxdWebScrapper($this->httpClientMock);
     }
 
-    /** @dataProvider provideTestScrapeLetterboxIdByDiaryUriData */
+    #[DataProvider('provideTestScrapeLetterboxIdByDiaryUriData')]
     public function testScrapeLetterboxIdByDiaryUri(string $responseContent, string $letterboxId) : void
     {
         $diaryUri = 'uri';

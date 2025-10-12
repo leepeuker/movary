@@ -18,6 +18,7 @@ class TmdbMovie
         private readonly int $voteCount,
         private readonly TmdbGenreList $genres,
         private readonly TmdbProductionCompanyList $productionCompanies,
+        private readonly TmdbCountryList $productionCountries,
         private readonly ?string $posterPath,
         private readonly ?string $backdropPath,
         private readonly ?string $imdbId,
@@ -39,6 +40,7 @@ class TmdbMovie
             $data['vote_count'],
             TmdbGenreList::createFromArray($data['genres']),
             TmdbProductionCompanyList::createFromArray($data['production_companies']),
+            TmdbCountryList::createFromArray($data['production_countries']),
             $data['poster_path'],
             $data['backdrop_path'],
             empty($data['imdb_id']) === true ? null : $data['imdb_id'],
@@ -89,6 +91,11 @@ class TmdbMovie
     public function getProductionCompanies() : TmdbProductionCompanyList
     {
         return $this->productionCompanies;
+    }
+
+    public function getProductionCountries() : TmdbCountryList
+    {
+        return $this->productionCountries;
     }
 
     public function getReleaseDate() : ?DateTime

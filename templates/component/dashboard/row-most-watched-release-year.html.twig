@@ -8,16 +8,16 @@
             {% for mostWatchedReleaseYear in mostWatchedReleaseYears %}
                 {% if loop.index <= 12 %}
                     <div class="col" style="padding-bottom: 1rem;">
-                        <div class="card h-100 position-relative"
+                        <a class="card h-100 position-relative"
                              style="cursor: pointer"
-                             onclick="window.location='/users/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}'">
+                             href="{{ applicationUrl }}/users/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}">
                             <div class="card-header text-truncate" style="padding: 0.2rem;border-bottom:0">
                                 <small class="text-muted" style="font-size: 0.9rem;font-weight: bold;">{{ mostWatchedReleaseYear.name }}</small>
                             </div>
                             <div class="card-footer" style="padding: 0.1rem">
                                 <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedReleaseYear.count }}x</small>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 {% endif %}
             {% endfor %}

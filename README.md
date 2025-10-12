@@ -27,7 +27,7 @@ Movary is a free and open source web application to track, rate and explore your
 You can host it for yourself and others.
 It offers detailed statistics, 
 third-party integrations for importing and exporting your history from platforms like Trakt, Letterboxd, or Netflix,
-automated play tracking for Plex, Jellyfin or Emby and much [more](#features).
+automated play tracking for Plex, Jellyfin, Emby or Kodi and much [more](#features).
 
 ![Movary Dashboard Example](https://raw.githubusercontent.com/leepeuker/movary/main/docs/images/dashboard-screenshot.png)
 
@@ -42,7 +42,7 @@ which can lead to sudden breaking changes from time to time, so keep the release
 - Statistics: Analyze your movie watching behavior and history, like e.g. most watched actors/directors/genres/languages/years
 - Customization: You decide how your dashboard should look like, what format to use when displaying dates and more
 - Third party integrations: Import and export your history and ratings from/to platforms like Trakt, Letterboxd, or Netflix
-- Scrobbler: Automatically add new plays and ratings from Plex, Jellyfin or Emby
+- Scrobbler: Automatically add new plays and ratings from Plex, Jellyfin, Emby or Kodi.
 - Own your personal data: Users can decide who can see their data and export/import/delete the data and their accounts at any time
 - Locally stored metadata: Using e.g. themoviedb.org and imdb as sources, all metadata movary uses for your history entries can be stored locally
 - PWA: Can be installed as a smartphone app ([How to install PWAs in chrome](https://support.google.com/chrome/answer/9658361?hl=en&co=GENIE.Platform%3DAndroid&oco=1))
@@ -68,3 +68,4 @@ The documentation for the latest release is located [here](https://docs.movary.o
 * [@leepeuker](https://github.com/leepeuker) as Lee Peuker
 * [@JVT038](https://github.com/JVT038) as JVT038
 * [@pbogre](https://github.com/pbogre) as Pietro Bonaldo Gregori
+* [@alifeee](https://github.com/alifeee) as alifeee

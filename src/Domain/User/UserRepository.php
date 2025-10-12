@@ -182,7 +182,7 @@ class UserRepository
         );
     }
 
-    public function findApiToken(int $userId) : ?string
+    public function findApiTokenByUserId(int $userId) : ?string
     {
         return $this->dbConnection->fetchFirstColumn(
             'SELECT token
@@ -368,6 +368,22 @@ class UserRepository
         return UserEntity::createFromArray($data);
     }
 
+    public function findUserIdByApiToken(string $apiToken) : ?int
+    {
+        $result = $this->dbConnection->fetchFirstColumn(
+            'SELECT user_id
+            FROM `user_api_token` 
+            WHERE token = ?',
+            [$apiToken],
+        );
+
+        if (count($result) !== 1) {
+            return null;
+        }
+
+        return (int)$result[0];
+    }
+
     public function findUserIdByAuthToken(string $token) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
@@ -393,6 +409,17 @@ class UserRepository
     public function findUserIdByJellyfinWebhookId(string $webhookId) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `jellyfin_webhook_uuid` = ?', [$webhookId]);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return (int)$id;
+    }
+
+    public function findUserIdByKodiWebhookId(string $webhookId) : ?int
+    {
+        $id = $this->dbConnection->fetchOne('SELECT `id` FROM `user` WHERE `kodi_webhook_uuid` = ?', [$webhookId]);
 
         if ($id === false) {
             return null;
@@ -477,6 +504,19 @@ class UserRepository
             'user',
             [
                 'jellyfin_webhook_uuid' => $jellyfinWebhookId,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function setKodiWebhookId(int $userId, ?string $kodiWebhookId) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'kodi_webhook_uuid' => $kodiWebhookId,
             ],
             [
                 'id' => $userId,
@@ -601,6 +641,32 @@ class UserRepository
         );
     }
 
+    public function updateDisplayImdbRating(int $userId, bool $displayImdbRating) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_imdb_rating' => (int)$displayImdbRating,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_tmdb_rating' => (int)$displayTmdbRating,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateIsAdmin(int $userId, bool $isAdmin) : void
     {
         $this->dbConnection->update(
@@ -660,6 +726,19 @@ class UserRepository
             'user',
             [
                 'jellyfin_sync_enabled' => (int)$enabledSync,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateKodiScrobblerOptions(int $userId, bool $scrobbleWatches) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'kodi_scrobble_views' => (int)$scrobbleWatches,
             ],
             [
                 'id' => $userId,

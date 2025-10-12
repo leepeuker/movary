@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\Api\Imdb;
 
 use Movary\Api\Imdb\ImdbUrlGenerator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Api\Imdb\ImdbUrlGenerator */
+#[CoversClass(\Movary\Api\Imdb\ImdbUrlGenerator::class)]
 class ImdbUrlGeneratorTest extends TestCase
 {
     private ImdbUrlGenerator $subject;

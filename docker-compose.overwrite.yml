@@ -1,0 +1,7 @@
+services:
+  app:
+    volumes:
+      - movary-storage:/app/storage
+
+volumes:
+  movary-storage:

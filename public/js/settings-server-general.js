@@ -65,7 +65,7 @@ document.getElementById('generalServerUpdateButton').addEventListener('click', a
 });
 
 function updateGeneral(tmdbApiKey, applicationUrl, applicationName, applicationTimezone) {
-    return fetch('/settings/server/general', {
+    return fetch(APPLICATION_URL + '/settings/server/general', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({

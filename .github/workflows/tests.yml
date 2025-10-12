@@ -8,13 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build docker development image
-        run: docker build --target development --tag movary ./build/php/
-
-      - name: Install dependencies
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer --no-interaction install
+        run: docker build --target development --tag movary -f ./build/Dockerfile .
 
       - name: Run all test tools/suites
-        run: docker run --rm -v /home/runner/work/movary/movary:/app movary composer test
+        run: docker run --rm movary composer test

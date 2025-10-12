@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
+    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-server-jobs.js"></script>
+    <script src="{{ applicationUrl }}/js/settings-server-jobs.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -63,9 +63,9 @@
 
                 {% if jobs|length == 0 %}<p>No jobs in queue</p>{% endif %}
                 <div class="d-grid gap-2">
-                    <a class="btn btn-warning" type="button" href="/job-queue/purge-processed"
+                    <a class="btn btn-warning" type="button" href="{{ applicationUrl }}/job-queue/purge-processed"
                        onclick="return confirm('Are you sure you want to remove all processed jobs (done + failed)?')">Remove processed jobs</a>
-                    <a class="btn btn-danger" type="button" href="/job-queue/purge-all"
+                    <a class="btn btn-danger" type="button" href="{{ applicationUrl }}/job-queue/purge-all"
                        onclick="return confirm('Are you sure you want to remove all jobs? This will not stop active job processes')">Remove all jobs</a>
                 </div>
                 <br>

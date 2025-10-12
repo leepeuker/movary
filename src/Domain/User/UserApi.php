@@ -49,6 +49,11 @@ class UserApi
         $this->repository->setJellyfinWebhookId($userId, null);
     }
 
+    public function deleteKodiWebhookId(int $userId) : void
+    {
+        $this->repository->setKodiWebhookId($userId, null);
+    }
+
     public function deletePlexWebhookId(int $userId) : void
     {
         $this->repository->setPlexWebhookId($userId, null);
@@ -139,7 +144,7 @@ class UserApi
 
     public function findApiTokenByUserId(int $userId) : ?string
     {
-        return $this->repository->findApiToken($userId);
+        return $this->repository->findApiTokenByUserId($userId);
     }
 
     public function findByToken(string $token) : ?UserEntity
@@ -222,6 +227,11 @@ class UserApi
         return $this->repository->findUserByName($name);
     }
 
+    public function findUserIdByApiToken(string $apiToken) : ?int
+    {
+        return $this->repository->findUserIdByApiToken($apiToken);
+    }
+
     public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByEmbyWebhookId($webhookId);
@@ -230,6 +240,11 @@ class UserApi
     public function findUserIdByJellyfinWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByJellyfinWebhookId($webhookId);
+    }
+
+    public function findUserIdByKodiWebhookId(mixed $webhookId) : ?int
+    {
+        return $this->repository->findUserIdByKodiWebhookId($webhookId);
     }
 
     public function findUserIdByPlexWebhookId(string $webhookId) : ?int
@@ -293,6 +308,15 @@ class UserApi
         return $jellyfinWebhookId;
     }
 
+    public function regenerateKodiWebhookId(int $userId) : string
+    {
+        $kodiWebhookId = (string)Uuid::uuid4();
+
+        $this->repository->setKodiWebhookId($userId, $kodiWebhookId);
+
+        return $kodiWebhookId;
+    }
+
     public function regeneratePlexWebhookId(int $userId) : string
     {
         $plexWebhookId = (string)Uuid::uuid4();
@@ -329,6 +353,16 @@ class UserApi
     public function updateDisplayCharacterNames(int $userId, bool $displayCharacterNames) : void
     {
         $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
+    }
+
+    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->repository->updateDisplayTmdbRating($userId, $displayTmdbRating);
+    }
+
+    public function updateDisplayImdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->repository->updateDisplayImdbRating($userId, $displayTmdbRating);
     }
 
     public function updateEmail(int $userId, string $email) : void
@@ -375,6 +409,11 @@ class UserApi
     public function updateJellyfinSyncEnabled(int $userId, bool $enabledSync) : void
     {
         $this->repository->updateJellyfinSyncEnabled($userId, $enabledSync);
+    }
+
+    public function updateKodiScrobblerOptions(int $userId, bool $scrobbleWatches) : void
+    {
+        $this->repository->updateKodiScrobblerOptions($userId, $scrobbleWatches);
     }
 
     public function updateLocationsEnabled(int $userId, bool $locationsEnabled) : void

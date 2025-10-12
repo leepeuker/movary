@@ -5,19 +5,19 @@
         </button>
         <ul class="dropdown-menu" style="width: 100%;">
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/account/general' %}active{% endif %}" href="/settings/account/general">General</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/account/general' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/general">General</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/account/security' %}active{% endif %}" href="/settings/account/security">Security</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/account/security' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/security">Security</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/account/locations' %}active{% endif %}" href="/settings/account/locations">Locations</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/account/locations' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/locations">Locations</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/account/dashboard' %}active{% endif %}" href="/settings/account/dashboard">Dashboard</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/account/dashboard' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/dashboard">Dashboard</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/account/data' %}active{% endif %}" href="/settings/account/data">Personal data</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/account/data' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/data">Personal data</a>
             </li>
         </ul>
     </li>
@@ -27,25 +27,28 @@
         </button>
         <ul class="dropdown-menu" style="width: 100%;">
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/plex' %}active{% endif %}" href="/settings/integrations/plex">Plex</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/plex' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/plex">Plex</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/jellyfin' %}active{% endif %}" href="/settings/integrations/jellyfin">Jellyfin</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/jellyfin' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/jellyfin">Jellyfin</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/emby' %}active{% endif %}" href="/settings/integrations/emby">Emby</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/emby' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/emby">Emby</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/radarr' %}active{% endif %}" href="/settings/integrations/radarr">Radarr</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/kodi' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/kodi">Kodi</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/trakt' %}active{% endif %}" href="/settings/integrations/trakt">Trakt.tv</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/radarr' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/radarr">Radarr</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/letterboxd' %}active{% endif %}" href="/settings/integrations/letterboxd">Letterboxd</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/trakt' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/trakt">Trakt.tv</a>
             </li>
             <li class="dropdown-item">
-                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/netflix' %}active{% endif %}" href="/settings/integrations/netflix">Netflix</a>
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/letterboxd' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/letterboxd">Letterboxd</a>
+            </li>
+            <li class="dropdown-item">
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/netflix' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/netflix">Netflix</a>
             </li>
         </ul>
     </li>
@@ -56,22 +59,22 @@
             </button>
             <ul class="dropdown-menu" style="width: 100%;">
                 <li class="dropdown-item">
-                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/general' %}active{% endif %}" href="/settings/server/general">General</a>
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/general' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/general">General</a>
                 </li>
                 <li class="dropdown-item">
-                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/users' %}active{% endif %}" href="/settings/server/users">Users</a>
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/users' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/users">Users</a>
                 </li>
                 <li class="dropdown-item">
-                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/email' %}active{% endif %}" href="/settings/server/email">Email</a>
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/email' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/email">Email</a>
                 </li>
                 <li class="dropdown-item">
-                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/jobs' %}active{% endif %}" href="/settings/server/jobs">Jobs</a>
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/jobs' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/jobs">Jobs</a>
                 </li>
             </ul>
         </li>
     {% endif %}
     <li class="nav-item">
-        <a class="nav-link {% if requestUrlPath starts with '/settings/app' %}active{% endif %}" href="/settings/app" id="navItemApp">App</a>
+        <a class="nav-link {% if requestUrlPath starts with '/settings/app' %}active{% endif %}" href="{{ applicationUrl }}/settings/app" id="navItemApp">App</a>
     </li>
 </ul>
 <hr style="margin-bottom: 0;margin-top: .5rem">

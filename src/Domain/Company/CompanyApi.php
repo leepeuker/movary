@@ -35,10 +35,10 @@ class CompanyApi
         return $data === null ? null : CompanyEntity::createFromArray($data);
     }
 
-    public function update(int $id, string $name, ?string $originCountry) : CompanyEntity
+    public function update(int $id, int $tmdbId, string $name, ?string $originCountry) : CompanyEntity
     {
         return CompanyEntity::createFromArray(
-            $this->repository->update($id, $name, $originCountry),
+            $this->repository->update($id, $tmdbId, $name, $originCountry),
         );
     }
 }

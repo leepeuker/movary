@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
+    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-server-general.js"></script>
+    <script src="{{ applicationUrl }}/js/settings-server-general.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -50,7 +50,7 @@
                     </label>
                     <input type="text"
                            class="form-control"
-                           value="{{ applicationUrl }}"
+                           value="{{ applicationUrlRaw }}"
                            id="applicationUrlInput"
                            style="text-align: center"
                             {{ applicationUrlSetInEnv == true ? 'disabled' }}

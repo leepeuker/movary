@@ -18,7 +18,7 @@ use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\Person\PersonApi;
-use Movary\Service\UrlGenerator;
+use Movary\Service\ImageUrlService;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
@@ -42,7 +42,7 @@ class MovieApi
         private readonly VoteCountFormatter $voteCountFormatter,
         private readonly Imdb\ImdbUrlGenerator $imdbUrlGenerator,
         private readonly Tmdb\TmdbUrlGenerator $tmdbUrlGenerator,
-        private readonly UrlGenerator $urlGenerator,
+        private readonly ImageUrlService $urlGenerator,
         private readonly MovieRepository $repository,
         private readonly ProductionCompanyApi $movieProductionCompanyApi,
         private readonly PersonApi $personApi,
@@ -298,6 +298,11 @@ class MovieApi
         return $this->historyApi->fetchUniqueMovieReleaseYears($userId);
     }
 
+    public function fetchUniqueProductionCountries(int $userId) : array
+    {
+        return $this->historyApi->fetchUniqueProductionCountries($userId);
+    }
+
     public function fetchUniqueWatchedMoviesCount(
         int $userId,
         ?string $searchTerm,
@@ -308,6 +313,7 @@ class MovieApi
         ?int $userRatingMin,
         ?int $userRatingMax,
         ?int $locationId,
+        ?string $productionCountryCode,
     ) : int {
         return $this->historyApi->fetchUniqueWatchedMoviesCount(
             $userId,
@@ -319,6 +325,7 @@ class MovieApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
     }
 
@@ -336,6 +343,7 @@ class MovieApi
         ?int $userRatingMin,
         ?int $userRatingMax,
         ?int $locationId,
+        ?string $productionCountryCode,
     ) : array {
         return $this->historyApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
@@ -351,6 +359,7 @@ class MovieApi
             $userRatingMin,
             $userRatingMax,
             $locationId,
+            $productionCountryCode,
         );
     }
 
@@ -411,13 +420,19 @@ class MovieApi
 
         $imdbId = $entity->getImdbId();
 
+        $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
+            $entity->getTmdbPosterPath(),
+            $entity->getPosterPath(),
+            $entity->getTitle(),
+        );
+
         return [
             'id' => $entity->getId(),
             'tmdbId' => $entity->getTmdbId(),
             'imdbId' => $entity->getImdbId(),
             'title' => $entity->getTitle(),
             'releaseDate' => $entity->getReleaseDate(),
-            'posterPath' => $this->urlGenerator->generateImageSrcUrlFromParameters($entity->getTmdbPosterPath(), $entity->getPosterPath()),
+            'posterPath' => $posterPath,
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,
@@ -481,6 +496,11 @@ class MovieApi
     public function findHistoryEntryForMovieByUserOnDate(int $id, int $userId, ?Date $watchedAt) : ?MovieHistoryEntity
     {
         return $this->historyApi->findHistoryEntryForMovieByUserOnDate($id, $userId, $watchedAt);
+    }
+
+    public function findProductionCountriesByMovieId(int $movieId) : ?array
+    {
+        return $this->movieRepository->findProductionCountriesByMovieId($movieId);
     }
 
     public function findUserRating(int $movieId, int $userId) : ?PersonalRating
@@ -655,6 +675,12 @@ class MovieApi
         foreach ($productionCompanies->getUniqueCompanies() as $position => $productionCompany) {
             $this->movieProductionCompanyApi->create($movieId, $productionCompany->getId(), (int)$position);
         }
+    }
+
+    public function updateProductionCountries(int $movieId, array $countriesIso31661) : void
+    {
+        $this->repository->deleteProductionCountries($movieId);
+        $this->repository->updateProductionCountries($movieId, $countriesIso31661);
     }
 
     public function updateTraktId(int $movieId, TraktId $traktId) : void

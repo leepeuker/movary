@@ -1,7 +1,7 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker
-            .register('/serviceWorker.js')
+            .register(APPLICATION_URL + '/serviceWorker.js')
             .then(function (registration) {
                 console.log('Service Worker registered with scope:', registration.scope);
             })
@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
             document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
+            document.getElementById("openedFromMoviePage").setAttribute("value", "")
 
             currentModalVersion++
         })
@@ -83,14 +84,17 @@ function setTheme(theme, force = false) {
 }
 
 function updateHtmlThemeColors(mainColor, secondaryColor) {
-    const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
-    const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
+    const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
+    const watchlistButton = document.getElementById('watchlistButton');
+    const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
         toggleWatchDatesButton.classList.add('btn-' + secondaryColor)
         toggleWatchDatesButton.classList.remove('btn-' + mainColor)
         logSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+        watchlistButton.classList.add('btn-outline-' + secondaryColor)
+        watchlistButton.classList.remove('btn-outline-' + mainColor)
         moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         moreSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
     }
@@ -127,15 +131,12 @@ async function searchTmdbWithLogModalSearchInput() {
 
     let targetModalVersion = currentModalVersion
 
-    const data = await fetch('/settings/netflix/search', {
+    const data = await fetch(APPLICATION_URL + '/api/movies/search?search=' + document.getElementById('logPlayModalSearchInput').value, {
         signal: AbortSignal.timeout(4000),
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'query': document.getElementById('logPlayModalSearchInput').value
-        })
+        }
     }).then(response => {
         if (!response.ok) {
             console.error(response);
@@ -171,7 +172,7 @@ async function searchTmdbWithLogModalSearchInput() {
 
     if (data !== null && targetModalVersion === currentModalVersion) {
         setLogPlayModalSearchSpinner(false)
-        loadLogModalSearchResults(data)
+        loadLogModalSearchResults(data.results || [])
     }
 }
 
@@ -183,7 +184,7 @@ function displayLogModalTmdbSearchError(message) {
 function loadLogModalSearchResults(data) {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
 
-    if (data.length == 0) {
+    if (data.length === 0) {
         document.getElementById('logPlayModalSearchNoResultAlert').classList.remove('d-none')
         return
     }
@@ -200,16 +201,16 @@ function loadLogModalSearchResults(data) {
         listElement.id = 'searchResult-' + index
 
         let releaseYear = '?'
-        if (item.release_date != null && item.release_date.length > 4) {
-            releaseYear = item.release_date.substring(0, 4)
+        if (item.releaseDate != null && item.releaseDate.length > 4) {
+            releaseYear = item.releaseDate.substring(0, 4)
         }
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
-        posterPath = item.poster_path != null ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : '/images/placeholder-image.png';
-        listElement.innerHTML = '<img src="' + posterPath + '" alt="Girl in a jacket" style="margin-right: .5rem;width: 3rem"><span>' + item.title + ' (' + releaseYear + ')</span>'
+        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
+        listElement.innerHTML = '<img src="' + posterPath + '" alt="Girl in a jacket" style="margin-right: .5rem;width: 3rem"><p style="margin:0;"><span><b>' + item.title + '</b> (' + releaseYear + ')</span><br><span style="opacity:0.75; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; max-height:2lh;">' + item.overview + '</span></p>'
 
-        listElement.dataset.tmdbId = item.id
-        listElement.dataset.poster = item.poster_path
+        listElement.dataset.tmdbId = item.ids.tmdb
+        listElement.dataset.poster = item.tmdbPosterPath
         listElement.dataset.title = item.title
         listElement.dataset.releaseYear = releaseYear
 
@@ -248,11 +249,15 @@ async function selectLogModalTmdbItemForLogging(event) {
 
     document.getElementById('logPlayModalTitle').innerHTML = item.dataset.title + ' (' + item.dataset.releaseYear + ')'
     document.getElementById('logPlayModalTmdbIdInput').value = item.dataset.tmdbId
+    document.getElementById('logPlayModalFooterTMDBLink').setAttribute(
+        "href", "https://www.themoviedb.org/movie/" + item.dataset.tmdbId
+    )
 
     const rating = await fetchRating(item.dataset.tmdbId)
     setRatingStars('logPlayModal', rating)
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterTMDBLink').classList.remove('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.remove('d-none')
     document.getElementById('logPlayModalFooterWatchlistButton').classList.remove('d-none')
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
@@ -287,7 +292,7 @@ function resetLogModalLogInputs() {
 function addToWatchlist(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
 
-    fetch('/add-movie-to-watchlist', {
+    fetch(APPLICATION_URL + '/add-movie-to-watchlist', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -295,7 +300,7 @@ function addToWatchlist(context) {
         })
     }).then(function (response) {
         if (response.status === 200) {
-            location.reload();
+            window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/watchlist"
 
             return
         }
@@ -321,7 +326,7 @@ function logMovie(context) {
         return
     }
 
-    fetch('/log-movie', {
+    fetch(APPLICATION_URL + '/log-movie', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -334,7 +339,12 @@ function logMovie(context) {
         })
     }).then(function (response) {
         if (response.status === 200) {
-            location.reload();
+            // do not redirect to /history/ page if play logged from /movies/<id> page
+            if (document.getElementById("openedFromMoviePage").getAttribute("value") == "1") {
+                window.location.reload()
+            }else {
+                window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/history"
+            }
 
             return
         }
@@ -361,10 +371,13 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
+    document.getElementById('logPlayModalFooterTMDBLink').classList.add('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.add('d-none')
     document.getElementById('logPlayModalFooterWatchlistButton').classList.add('d-none')
 
     myModal.show()
+
+    document.getElementById("openedFromMoviePage").setAttribute("value", "1") // after bs.open event
 }
 
 /**
@@ -435,7 +448,7 @@ function getCurrentDate() {
  * Rating star logic starting here
  */
 async function fetchRating(tmdbId) {
-    const response = await fetch('/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
+    const response = await fetch(APPLICATION_URL + '/fetchMovieRatingByTmdbdId?tmdbId=' + tmdbId)
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -505,16 +518,16 @@ function removeAlert(parentDivId) {
 }
 
 async function logout() {
-    await fetch('/api/authentication/token', {
+    await fetch(APPLICATION_URL + '/api/authentication/token', {
         method: 'DELETE',
     });
 
-    window.location.href = '/'
+    window.location.href = APPLICATION_URL + '/'
 }
 
 async function fetchLocations() {
     const response = await fetch(
-        '/settings/locations',
+        APPLICATION_URL + '/settings/locations',
         {signal: AbortSignal.timeout(4000)}
     )
 

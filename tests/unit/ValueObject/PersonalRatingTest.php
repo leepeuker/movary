@@ -3,10 +3,11 @@
 namespace Tests\Unit\Movary\ValueObject;
 
 use Movary\ValueObject\PersonalRating;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-/** @covers \Movary\ValueObject\Year */
+#[CoversClass(\Movary\ValueObject\Year::class)]
 class PersonalRatingTest extends TestCase
 {
     public function testAsInt() : void

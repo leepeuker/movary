@@ -2,10 +2,13 @@
 
 namespace Movary\Service;
 
+use Movary\ValueObject\RelativeUrl;
+
 class WebhookUrlBuilder
 {
-    public function __construct(private ServerSettings $serverSettings)
-    {
+    public function __construct(
+        private readonly ApplicationUrlService $applicationUrlService,
+    ) {
     }
 
     public function buildEmbyWebhookUrl(string $webhookId) : ?string
@@ -18,24 +21,24 @@ class WebhookUrlBuilder
         return $this->buildUrl('jellyfin', $webhookId);
     }
 
+    public function buildKodiWebhookUrl(string $webhookId) : ?string
+    {
+        return $this->buildUrl('kodi', $webhookId);
+    }
+
     public function buildPlexWebhookUrl(string $webhookId) : ?string
     {
         return $this->buildUrl('plex', $webhookId);
     }
 
-    public function buildRadarrFeedUrl(string $feedId) : ?string
-    {
-        return $this->buildUrl('api/feed/radarr', $feedId);
-    }
-
     private function buildUrl(string $webhookType, string $webhookId) : ?string
     {
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
-
-        if ($applicationUrl === null) {
+        if ($this->applicationUrlService->hasApplicationUrl() === false) {
             return null;
         }
 
-        return rtrim($applicationUrl, '/') . '/api/webhook/' . $webhookType . '/' . $webhookId;
+        return $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create('/api/webhook/' . $webhookType . '/' . $webhookId),
+        );
     }
 }

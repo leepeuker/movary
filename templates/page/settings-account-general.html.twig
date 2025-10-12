@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="/css/settings.css" rel="stylesheet">
+    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="/js/settings-account-general.js"></script>
+    <script src="{{ applicationUrl }}/js/settings-account-general.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -85,6 +85,26 @@
                            {% if displayCharacterNamesInput == true %}checked{% endif %}
                            style="margin-right: 0.2rem">
                     <label class="form-check-label" for="displayCharacterNamesInput">Display cast character names on movie pages</label>
+                </div>
+
+                <div style="padding-bottom: 1rem;">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="displayTmdbRatingsInput"
+                           {% if displayTmdbRatingsInput == true %}checked{% endif %}
+                           style="margin-right: 0.2rem">
+                    <label class="form-check-label" for="displayTmdbRatingsInput">Display TMDB ratings on movie pages</label>
+                </div>
+
+                <div style="padding-bottom: 1rem;">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="displayImdbRatingsInput"
+                           {% if displayImdbRatingsInput == true %}checked{% endif %}
+                           style="margin-right: 0.2rem">
+                    <label class="form-check-label" for="displayImdbRatingsInput">Display IMDb ratings on movie pages</label>
                 </div>
 
                 <div id="alertGeneralAccountDiv"></div>

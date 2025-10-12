@@ -5,9 +5,10 @@ namespace Tests\Unit\Movary\ValueObject;
 use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\ValueObject\Date */
+#[CoversClass(\Movary\ValueObject\Date::class)]
 class DateTest extends TestCase
 {
     public function create() : void

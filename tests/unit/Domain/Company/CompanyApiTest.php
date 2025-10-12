@@ -5,10 +5,11 @@ namespace Tests\Unit\Movary\Domain\Company;
 use Movary\Domain\Company\CompanyApi;
 use Movary\Domain\Company\CompanyEntity;
 use Movary\Domain\Company\CompanyRepository;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Movary\Domain\Company\CompanyApi */
+#[CoversClass(\Movary\Domain\Company\CompanyApi::class)]
 class CompanyApiTest extends TestCase
 {
     private const int ID = 12;
@@ -117,12 +118,12 @@ class CompanyApiTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('update')
-            ->with(self::ID, self::NAME, self::ORIGIN_COUNTRY)
+            ->with(self::ID, self::TMDB_ID, self::NAME, self::ORIGIN_COUNTRY)
             ->willReturn($companyData);
 
         self::assertEquals(
             CompanyEntity::createFromArray($companyData),
-            $this->subject->update(self::ID, self::NAME, self::ORIGIN_COUNTRY),
+            $this->subject->update(self::ID, self::TMDB_ID, self::NAME, self::ORIGIN_COUNTRY),
         );
     }
 

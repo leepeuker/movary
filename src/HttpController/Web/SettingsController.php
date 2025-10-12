@@ -5,19 +5,21 @@ namespace Movary\HttpController\Web;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Plex\PlexApi;
-use Movary\Api\Tmdb\Cache\TmdbIsoCountryCache;
 use Movary\Api\Trakt\TraktApi;
+use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Service\Radarr\RadarrFeedUrlGenerator;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
@@ -51,7 +53,9 @@ class SettingsController
         private readonly JobQueueApi $jobQueueApi,
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
-        private readonly TmdbIsoCountryCache $countryCache,
+        private readonly CountryApi $countryApi,
+        private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
+        private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
 
@@ -216,17 +220,17 @@ class SettingsController
     {
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getEmbyWebhookId();
 
-        if ($applicationUrl !== null && $webhookId !== null) {
+        if ($hasApplicationUrl === true && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildEmbyWebhookUrl($webhookId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-emby.html.twig', [
-                'isActive' => $applicationUrl !== null,
+                'isActive' => $hasApplicationUrl,
                 'embyWebhookUrl' => $webhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasEmbyScrobbleWatchesEnabled(),
             ]),
@@ -246,10 +250,12 @@ class SettingsController
                 'privacyLevel' => $user->getPrivacyLevel(),
                 'username' => $user->getName(),
                 'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
-                'countries' => $this->countryCache->fetchAll(),
+                'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'userCountry' => $user->getCountry(),
                 'apiToken' => $this->userApi->findApiTokenByUserId($user->getId()),
                 'displayCharacterNamesInput' => $user->getDisplayCharacterNames(),
+                'displayTmdbRatingsInput' => $user->getDisplayTmdbRating(),
+                'displayImdbRatingsInput' => $user->getDisplayImdbRating(),
             ]),
         );
     }
@@ -258,7 +264,7 @@ class SettingsController
     {
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getJellyfinWebhookId();
 
         $jellyfinDeviceId = $this->serverSettings->getJellyfinDeviceId();
@@ -270,14 +276,14 @@ class SettingsController
             $jellyfinUsername = $this->jellyfinApi->findJellyfinUser($jellyfinAuthentication);
         }
 
-        if ($applicationUrl !== null && $webhookId !== null) {
+        if ($hasApplicationUrl === true && $webhookId !== null) {
             $webhookUrl = $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-jellyfin.html.twig', [
-                'isActive' => $applicationUrl !== null,
+                'isActive' => $hasApplicationUrl,
                 'jellyfinWebhookUrl' => $webhookUrl ?? '-',
                 'jellyfinServerUrl' => $jellyfinServerUrl,
                 'jellyfinIsAuthenticated' => $jellyfinAuthentication !== null,
@@ -285,6 +291,27 @@ class SettingsController
                 'jellyfinDeviceId' => $jellyfinDeviceId,
                 'scrobbleWatches' => $user->hasJellyfinScrobbleWatchesEnabled(),
                 'jellyfinSyncEnabled' => $user->hasJellyfinSyncEnabled(),
+            ]),
+        );
+    }
+
+    public function renderKodiPage() : Response
+    {
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
+        $webhookId = $user->getKodiWebhookId();
+
+        if ($hasApplicationUrl === true && $webhookId !== null) {
+            $webhookUrl = $this->webhookUrlBuilder->buildKodiWebhookUrl($webhookId);
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-integration-kodi.html.twig', [
+                'isActive' => $hasApplicationUrl,
+                'kodiWebhookUrl' => $webhookUrl ?? '-',
+                'scrobbleWatches' => $user->hasKodiScrobbleWatchesEnabled(),
             ]),
         );
     }
@@ -357,17 +384,17 @@ class SettingsController
 
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $plexWebhookId = $user->getPlexWebhookId();
 
-        if ($applicationUrl !== null && $plexWebhookId !== null) {
+        if ($hasApplicationUrl === true && $plexWebhookId !== null) {
             $plexWebhookUrl = $this->webhookUrlBuilder->buildPlexWebhookUrl($plexWebhookId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-plex.html.twig', [
-                'isActive' => $applicationUrl !== null,
+                'isActive' => $hasApplicationUrl,
                 'plexWebhookUrl' => $plexWebhookUrl ?? '-',
                 'scrobbleWatches' => $user->hasPlexScrobbleWatchesEnabled(),
                 'scrobbleRatings' => $user->hasPlexScrobbleRatingsEnabled(),
@@ -384,17 +411,17 @@ class SettingsController
         $user = $this->authenticationService->getCurrentUser();
 
         $radarrFeedId = $user->getRadarrFeedId();
-        $applicationUrl = $this->serverSettings->getApplicationUrl();
+        $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
 
-        if ($applicationUrl !== null && $radarrFeedId !== null) {
-            $radarrFeedUrl = $this->webhookUrlBuilder->buildRadarrFeedUrl($radarrFeedId);
+        if ($hasApplicationUrl === true && $radarrFeedId !== null) {
+            $radarrFeedUrl = $this->radarrFeedUrlGenerator->generateUrl($radarrFeedId);
         }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-radarr.html.twig', [
                 'radarrFeedUrl' => $radarrFeedUrl ?? '-',
-                'isActive' => $applicationUrl !== null
+                'isActive' => $hasApplicationUrl
             ]),
         );
     }
@@ -452,7 +479,7 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-general.html.twig', [
-                'applicationUrl' => $this->serverSettings->getApplicationUrl(),
+                'applicationUrlRaw' => $this->serverSettings->getApplicationUrl(),
                 'applicationName' => $this->serverSettings->getApplicationName(),
                 'applicationTimezone' => $this->serverSettings->getApplicationTimezone(),
                 'applicationTimezoneDefault' => DateTime::DEFAULT_TIME_ZONE,
@@ -610,6 +637,8 @@ class SettingsController
         $country = $requestData['country'] ?? null;
         $enableAutomaticWatchlistRemoval = isset($requestData['enableAutomaticWatchlistRemoval']) === false ? false : (bool)$requestData['enableAutomaticWatchlistRemoval'];
         $displayCharacterNames = isset($requestData['displayCharacterNames']) === false ? false : (bool)$requestData['displayCharacterNames'];
+        $displayTmdbRatings = isset($requestData['displayTmdbRatings']) === false ? false : (bool)$requestData['displayTmdbRatings'];
+        $displayImdbRatings = isset($requestData['displayImdbRatings']) === false ? false : (bool)$requestData['displayImdbRatings'];
 
         $userId = $this->authenticationService->getCurrentUserId();
 
@@ -620,6 +649,8 @@ class SettingsController
             $this->userApi->updateName($userId, (string)$name);
             $this->userApi->updateWatchlistAutomaticRemovalEnabled($userId, $enableAutomaticWatchlistRemoval);
             $this->userApi->updateDisplayCharacterNames($userId, $displayCharacterNames);
+            $this->userApi->updateDisplayTmdbRating($userId, $displayTmdbRatings);
+            $this->userApi->updateDisplayImdbRating($userId, $displayImdbRatings);
         } catch (User\Exception\UsernameInvalidFormat) {
             return Response::createBadRequest('Username not meeting requirements');
         } catch (User\Exception\UsernameNotUnique) {
@@ -638,6 +669,19 @@ class SettingsController
         $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
 
         $this->userApi->updateJellyfinScrobblerOptions($userId, $scrobbleWatches);
+
+        return Response::create(StatusCode::createNoContent());
+    }
+
+    public function updateKodi(Request $request) : Response
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+
+        $postParameters = Json::decode($request->getBody());
+
+        $scrobbleWatches = (bool)$postParameters['scrobbleWatches'];
+
+        $this->userApi->updateKodiScrobblerOptions($userId, $scrobbleWatches);
 
         return Response::create(StatusCode::createNoContent());
     }
