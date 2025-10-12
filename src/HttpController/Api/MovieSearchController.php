@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Api\Tmdb\TmdbApi;
+use Movary\Domain\User\Service\Authentication;
 use Movary\HttpController\Api\RequestMapper\SearchRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\MovieSearchResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
@@ -17,12 +18,14 @@ class MovieSearchController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly SearchRequestMapper $searchRequestMapper,
         private readonly MovieSearchResponseMapper $historyResponseMapper,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
     public function search(Request $request) : Response
     {
         $requestData = $this->searchRequestMapper->mapRequest($request);
+        $userId = $this->authenticationService->getCurrentUserId();
 
         $tmdbResponse = $this->tmdbApi->searchMovie(
             $requestData->getSearchTerm(),
@@ -38,7 +41,7 @@ class MovieSearchController
 
         return Response::createJson(
             Json::encode([
-                'results' => $this->historyResponseMapper->mapMovieSearchResults($tmdbResponse),
+                'results' => $this->historyResponseMapper->mapMovieSearchResults($userId, $tmdbResponse),
                 'currentPage' => $paginationElements->getCurrentPage(),
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),
