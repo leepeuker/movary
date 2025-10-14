@@ -207,8 +207,8 @@ function loadLogModalSearchResults(data) {
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
         posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
-        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark"></i>' : '';
-        isWatchedEl = item.isWatched ? '<i class="bi bi-camera-reels"></i>' : '';
+        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill"></i>' : '';
+        isWatchedEl = item.isWatched ? '<i class="bi bi-camera-reels-fill"></i>' : '';
         listElement.innerHTML = '<img src="' + posterPath + '" alt="Poster for ' + item.title + '" style="margin-right: .5rem;width: 3rem"><p style="margin:0;"><span><span>' + isWatchedEl + isOnWatchlistEl + '</span><b>' + item.title + '</b> (' + releaseYear + ')</span><br><span style="opacity:0.75; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; max-height:2lh;">' + item.overview + '</span></p>'
 
         listElement.dataset.tmdbId = item.ids.tmdb
@@ -258,9 +258,9 @@ async function selectLogModalTmdbItemForLogging(event) {
     let onListsNotifier = ''
     if (item.dataset.isWatched || item.dataset.isOnWatchlist) {
         onListsNotifier += '<br><i>'
-        onListsNotifier += item.dataset.isWatched ? '<i class="bi bi-camera-reels"></i> watched before' : ''
+        onListsNotifier += item.dataset.isWatched ? '<i class="bi bi-camera-reels-fill"></i> watched before' : ''
         onListsNotifier += (item.dataset.isWatched && item.dataset.isOnWatchlist) ? ', ' : ''
-        onListsNotifier += item.dataset.isOnWatchlist ? '<i class="bi bi-bookmark"></i> on watchlist' : ''
+        onListsNotifier += item.dataset.isOnWatchlist ? '<i class="bi bi-bookmark-fill"></i> on watchlist' : ''
     }
 
     document.getElementById('logPlayModalTitle').innerHTML = item.dataset.title + ' (' + item.dataset.releaseYear + ')' + onListsNotifier
