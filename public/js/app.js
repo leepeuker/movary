@@ -207,9 +207,17 @@ function loadLogModalSearchResults(data) {
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
         posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
-        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill"></i>' : '';
-        isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill"></i>' : '';
-        listElement.innerHTML = '<img src="' + posterPath + '" alt="Poster for ' + item.title + '" style="margin-right: .5rem;width: 3rem"><p style="margin:0;"><span><span></span><b>' + item.title + '</b> (' + releaseYear + ')' + isWatchedEl + isOnWatchlistEl + '</span><br><span style="opacity:0.75; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; max-height:2lh;">' + item.overview + '</span></p>'
+        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : '';
+        isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : '';
+        listElement.innerHTML = `
+            <img src="${posterPath}" alt="Poster for ${item.title}" style="margin-right: .5rem; width: 3rem">
+            <p style="margin: 0;">
+                <b>${item.title}</b> (${releaseYear})${isWatchedEl}${isOnWatchlistEl}
+                <br>
+                <span style="opacity: 0.75; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-height: 2lh;">
+                    ${item.overview}
+                </span>
+            </p>`
 
         listElement.dataset.tmdbId = item.ids.tmdb
         if (item.ids.movary)
@@ -221,6 +229,10 @@ function loadLogModalSearchResults(data) {
             listElement.dataset.isOnWatchlist = 'on'
         if (item.isWatched)
             listElement.dataset.isWatched = 'on'
+
+        document.querySelectorAll("i.bi[data-bs-toggle='tooltip']").forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        });
 
         listElement.addEventListener('click', selectLogModalTmdbItemForLogging);
 
