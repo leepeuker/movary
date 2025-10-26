@@ -270,10 +270,11 @@ async function selectLogModalTmdbItemForLogging(event) {
     // icons indicating watched/on watchlist, linking to movary page if it exists (which it should)
     let isWatchedEl = item.dataset.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : ''
     let isOnWatchlistEl = item.dataset.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : ''
-    if (item.dataset.movaryId)
+    if (item.dataset.movaryId) {
         movaryUrl = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/movies/" + item.dataset.movaryId
         isWatchedEl = '<a href="' + movaryUrl + '">' + isWatchedEl + '</a>';
         isOnWatchlistEl = '<a href="' + movaryUrl + '">' + isOnWatchlistEl + '</a>';
+    }
         
     document.getElementById("logPlayModalTitle").innerHTML = item.dataset.title + " (" + item.dataset.releaseYear + ")" + isWatchedEl + isOnWatchlistEl;
     document.querySelectorAll("#logPlayModalTitle i.bi").forEach(tooltipTriggerEl => {
