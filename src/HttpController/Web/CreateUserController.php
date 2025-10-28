@@ -46,7 +46,7 @@ class CreateUserController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+                [Header::createLocation((string)$request->getHttpReferer())],
             );
         }
 
@@ -56,7 +56,7 @@ class CreateUserController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+                [Header::createLocation((string)$request->getHttpReferer())],
             );
         }
 
@@ -79,7 +79,7 @@ class CreateUserController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 

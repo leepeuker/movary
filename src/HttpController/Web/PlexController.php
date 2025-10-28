@@ -118,7 +118,7 @@ class PlexController
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildPlexWebhookUrl($webhookId)]));
     }
 
-    public function removePlexAccessTokens() : Response
+    public function removePlexAccessTokens(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
 
@@ -127,7 +127,7 @@ class PlexController
         $this->userApi->updatePlexAccountId($userId, null);
         $this->userApi->updateTemporaryPlexClientCode($userId, null);
 
-        return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation($_SERVER['HTTP_REFERER'])]);
+        return Response::create(StatusCode::createSeeOther(), null, [Header::createLocation((string)$request->getHttpReferer())]);
     }
 
     public function savePlexServerUrl(Request $request) : Response

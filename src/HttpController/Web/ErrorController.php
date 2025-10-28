@@ -29,23 +29,9 @@ class ErrorController
             $this->twig->render(
                 'page/404.html.twig',
                 [
-                    'referer' => $this->getReferer($request)
+                    'referer' => $request->getHttpReferer()
                 ],
             ),
         );
-    }
-
-    private function getReferer(Request $request) : ?string
-    {
-        $referer = $_SERVER['HTTP_REFERER'] ?? null;
-        if ($referer === null) {
-            return null;
-        }
-
-        if (parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH) === $request->getPath()) {
-            return null;
-        }
-
-        return $_SERVER['HTTP_REFERER'];
     }
 }

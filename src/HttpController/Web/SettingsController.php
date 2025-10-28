@@ -59,7 +59,7 @@ class SettingsController
     ) {
     }
 
-    public function deleteAccount() : Response
+    public function deleteAccount(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
@@ -77,7 +77,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
@@ -88,7 +88,7 @@ class SettingsController
         return Response::createOk();
     }
 
-    public function deleteHistory() : Response
+    public function deleteHistory(Request $request) : Response
     {
         $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
 
@@ -97,11 +97,11 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
-    public function deleteRatings() : Response
+    public function deleteRatings(Request $request) : Response
     {
         $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
 
@@ -110,7 +110,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
@@ -812,7 +812,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 }
