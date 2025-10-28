@@ -2,12 +2,12 @@ const MOVARY_CLIENT_IDENTIFIER = 'Movary Web';
 
 async function submitCredentials() {
     const urlParams = new URLSearchParams(window.location.search);
-    const redirect = urlParams.get('redirect') ?? APPLICATION_URL + '/';
+    const safeRedirect = getSafeRedirect(urlParams.get('redirect'), APPLICATION_URL);
 
     const response = await loginRequest();
 
     if (response.status === 200) {
-        window.location.href = redirect
+        window.location.href = safeRedirect
         return;
     }
 
@@ -65,5 +65,20 @@ function loginRequest() {
 function submitCredentialsOnEnter(event) {
     if (event.keyCode === 13) {
         submitCredentials()
+    }
+}
+
+function getSafeRedirect(redirectGetParameter, baseUrl) {
+    if (!redirectGetParameter) {
+        return baseUrl + '/';
+    }
+
+    try {
+        const parsed = new URL(redirectGetParameter, baseUrl);
+        const path = parsed.pathname + parsed.search + parsed.hash;
+
+        return baseUrl + path;
+    } catch {
+        return baseUrl + '/';
     }
 }
