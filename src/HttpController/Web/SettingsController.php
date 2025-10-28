@@ -30,6 +30,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 use Twig\Environment;
 use ZipStream;
@@ -59,7 +60,7 @@ class SettingsController
     ) {
     }
 
-    public function deleteAccount(Request $request) : Response
+    public function deleteAccount() : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
         $user = $this->userApi->fetchUser($userId);
@@ -72,12 +73,10 @@ class SettingsController
 
         $this->authenticationService->logout();
 
-        $this->sessionWrapper->set('deletedAccount', true);
-
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation((string)$request->getHttpReferer())],
+            [Header::createLocation($this->applicationUrlService->createApplicationUrl())],
         );
     }
 
@@ -92,8 +91,6 @@ class SettingsController
     {
         $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
 
-        $this->sessionWrapper->set('deletedUserHistory', true);
-
         return Response::create(
             StatusCode::createSeeOther(),
             null,
@@ -104,8 +101,6 @@ class SettingsController
     public function deleteRatings(Request $request) : Response
     {
         $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
-
-        $this->sessionWrapper->set('deletedUserRatings', true);
 
         return Response::create(
             StatusCode::createSeeOther(),
@@ -188,16 +183,12 @@ class SettingsController
         $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
         $importWatchlistSuccessful = $this->sessionWrapper->find('importWatchlistSuccessful');
         $importHistoryError = $this->sessionWrapper->find('importHistoryError');
-        $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
-        $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
 
         $this->sessionWrapper->unset(
             'importHistorySuccessful',
             'importRatingsSuccessful',
             'importWatchlistSuccessful',
             'importHistoryError',
-            'deletedUserHistory',
-            'deletedUserRatings',
         );
 
         $user = $this->userApi->fetchUser($userId);
@@ -210,8 +201,6 @@ class SettingsController
                 'importRatingsSuccessful' => $importRatingsSuccessful,
                 'importWatchlistSuccessful' => $importWatchlistSuccessful,
                 'importHistoryError' => $importHistoryError,
-                'deletedUserHistory' => $deletedUserHistory,
-                'deletedUserRatings' => $deletedUserRatings,
             ]),
         );
     }
