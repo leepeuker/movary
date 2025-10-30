@@ -73,11 +73,7 @@ class SettingsController
 
         $this->authenticationService->logout();
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($this->applicationUrlService->createApplicationUrl())],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function deleteApiToken() : Response
@@ -87,26 +83,18 @@ class SettingsController
         return Response::createOk();
     }
 
-    public function deleteHistory(Request $request) : Response
+    public function deleteHistory() : Response
     {
         $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation((string)$request->getHttpReferer())],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
-    public function deleteRatings(Request $request) : Response
+    public function deleteRatings() : Response
     {
         $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
 
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation((string)$request->getHttpReferer())],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function generateLetterboxdExportData() : Response
