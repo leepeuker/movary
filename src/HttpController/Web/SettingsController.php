@@ -30,7 +30,6 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
-use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 use Twig\Environment;
 use ZipStream;
@@ -330,6 +329,29 @@ class SettingsController
             $this->twig->render('page/settings-account-locations.html.twig', [
                 'locationsEnabled' => $user->hasLocationsEnabled(),
             ]),
+        );
+    }
+
+    public function renderMastodonPage() : Response
+    {
+        $mastodonCredentialsUpdated = $this->sessionWrapper->find('mastodonCredentialsUpdated');
+        $this->sessionWrapper->unset('mastodonCredentialsUpdated');
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render(
+                'page/settings-integration-mastodon.html.twig',
+                [
+                    'mastodonCredentialsUpdated' => $mastodonCredentialsUpdated,
+                    'mastodonEnable' => $user->hasMastodonXPostEnabled(),
+                    'mastodonOnByDefault' => $user->hasMastodonXPostAutomatic(),
+                    'mastodonUsername' => $user->getMastodonXPostUsername(),
+                    'mastodonVisibility' => $user->getMastodonXPostPostVisibility(),
+                    'mastodonAccessToken' => $user->getMastodonXPostAccessToken(),
+                ],
+            ),
         );
     }
 
@@ -663,6 +685,43 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
+    public function updateMastodon(Request $request) : Response
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = $request->getPostParameters();
+
+        $mastodonEnable = $postParameters['mastodonEnable'];
+        $mastodonEnable = $mastodonEnable == 'on';
+
+        $mastodonOnByDefault = $postParameters['mastodonOnByDefault'];
+        $mastodonOnByDefault = $mastodonOnByDefault == 'on';
+
+        $mastodonUsername = $postParameters['mastodonUsername'];
+
+        $mastodonAccessToken = $postParameters['mastodonAccessToken'];
+
+        $mastodonVisibility = $postParameters['mastodonVisibility'];
+        if (!in_array($mastodonVisibility, ['public', 'unlisted', 'private'])) {
+            $mastodonVisibility = 'public';
+        }
+
+        $this->userApi->updateMastodonXPostEnabled($userId, $mastodonEnable);
+        $this->userApi->updateMastodonXPostAutomatic($userId, $mastodonOnByDefault);
+        $this->userApi->updateMastodonXPostPostVisibility($userId, $mastodonVisibility);
+        $this->userApi->updateMastodonXPostUsername($userId, $mastodonUsername);
+        $this->userApi->updateMastodonXPostAccessToken($userId, $mastodonAccessToken);
+
+        $this->sessionWrapper->set('mastodonCredentialsUpdated', true);
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+        );
+    }
+
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
     public function updatePassword(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
@@ -703,7 +762,6 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
-    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function updateServerEmail(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());
@@ -790,64 +848,6 @@ class SettingsController
             StatusCode::createSeeOther(),
             null,
             [Header::createLocation((string)$request->getHttpReferer())],
-        );
-    }
-
-    public function renderMastodonPage() : Response
-    {
-        $mastodonCredentialsUpdated = $this->sessionWrapper->find('mastodonCredentialsUpdated');
-        $this->sessionWrapper->unset('mastodonCredentialsUpdated');
-
-        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
-
-        return Response::create(
-            StatusCode::createOk(),
-            $this->twig->render(
-                'page/settings-integration-mastodon.html.twig',
-                [
-                    'mastodonCredentialsUpdated' => $mastodonCredentialsUpdated,
-                    'mastodonEnable' => $user->hasMastodonXPostEnabled(),
-                    'mastodonOnByDefault' => $user->hasMastodonXPostAutomatic(),
-                    'mastodonUsername' => $user->getMastodonXPostUsername(),
-                    'mastodonVisibility' => $user->getMastodonXPostPostVisibility(),
-                    'mastodonAccessToken' => $user->getMastodonXPostAccessToken(),
-                ]
-            ),
-        );
-    }
-
-    public function updateMastodon(Request $request) : Response
-    {
-        $userId = $this->authenticationService->getCurrentUserId();
-        $postParameters = $request->getPostParameters();
-
-        $mastodonEnable = $postParameters['mastodonEnable'];
-        $mastodonEnable = $mastodonEnable == 'on';
-        
-        $mastodonOnByDefault = $postParameters['mastodonOnByDefault'];
-        $mastodonOnByDefault = $mastodonOnByDefault == 'on';
-
-        $mastodonUsername = $postParameters['mastodonUsername'];
-
-        $mastodonAccessToken = $postParameters['mastodonAccessToken'];
-        
-        $mastodonVisibility = $postParameters['mastodonVisibility'];
-        if (!in_array($mastodonVisibility, ['public', 'unlisted', 'private'])) {
-            $mastodonVisibility = 'public';
-        }
-        
-        $this->userApi->updateMastodonXPostEnabled($userId, $mastodonEnable);
-        $this->userApi->updateMastodonXPostAutomatic($userId, $mastodonOnByDefault);
-        $this->userApi->updateMastodonXPostPostVisibility($userId, $mastodonVisibility);
-        $this->userApi->updateMastodonXPostUsername($userId, $mastodonUsername);
-        $this->userApi->updateMastodonXPostAccessToken($userId, $mastodonAccessToken);
-
-        $this->sessionWrapper->set('mastodonCredentialsUpdated', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
         );
     }
 }

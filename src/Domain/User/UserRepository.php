@@ -602,6 +602,32 @@ class UserRepository
         );
     }
 
+    public function updateDisplayImdbRating(int $userId, bool $displayImdbRating) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_imdb_rating' => (int)$displayImdbRating,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'display_tmdb_rating' => (int)$displayTmdbRating,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
     public function updateEmail(int $userId, string $email) : void
     {
         $this->dbConnection->update(
@@ -634,32 +660,6 @@ class UserRepository
             'user',
             [
                 'dashboard_extended_rows' => $extendedRows,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateDisplayImdbRating(int $userId, bool $displayImdbRating) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'display_imdb_rating' => (int)$displayImdbRating,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'display_tmdb_rating' => (int)$displayTmdbRating,
             ],
             [
                 'id' => $userId,
@@ -752,6 +752,71 @@ class UserRepository
             'user',
             [
                 'locations_enabled' => (int)$locationsEnabled,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_access_token' => $mastodonXPostAccessToken,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_automatic' => (int)$mastodonXPostAutomatic,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_enabled' => (int)$mastodonXPostEnabled,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_post_visibility' => $mastodonXPostPostVisibility,
+            ],
+            [
+                'id' => $userId,
+            ],
+        );
+    }
+
+    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            [
+                'mastodon_xpost_username' => $mastodonXPostUsername,
             ],
             [
                 'id' => $userId,
@@ -948,71 +1013,6 @@ class UserRepository
             'user',
             [
                 'watchlist_automatic_removal_enabled' => (int)$watchlistAutomaticRemovalEnabled,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'mastodon_xpost_enabled' => (int)$mastodonXPostEnabled,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'mastodon_xpost_automatic' => (int)$mastodonXPostAutomatic,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'mastodon_xpost_post_visibility' => $mastodonXPostPostVisibility,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'mastodon_xpost_username' => $mastodonXPostUsername,
-            ],
-            [
-                'id' => $userId,
-            ],
-        );
-    }
-
-    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
-    {
-        $this->dbConnection->update(
-            'user',
-            [
-                'mastodon_xpost_access_token' => $mastodonXPostAccessToken,
             ],
             [
                 'id' => $userId,

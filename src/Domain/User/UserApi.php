@@ -355,14 +355,14 @@ class UserApi
         $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
     }
 
-    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
-    {
-        $this->repository->updateDisplayTmdbRating($userId, $displayTmdbRating);
-    }
-
     public function updateDisplayImdbRating(int $userId, bool $displayTmdbRating) : void
     {
         $this->repository->updateDisplayImdbRating($userId, $displayTmdbRating);
+    }
+
+    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->repository->updateDisplayTmdbRating($userId, $displayTmdbRating);
     }
 
     public function updateEmail(int $userId, string $email) : void
@@ -419,6 +419,31 @@ class UserApi
     public function updateLocationsEnabled(int $userId, bool $locationsEnabled) : void
     {
         $this->repository->updateLocationsEnabled($userId, $locationsEnabled);
+    }
+
+    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
+    {
+        $this->repository->updateMastodonXPostAccessToken($userId, $mastodonXPostAccessToken);
+    }
+
+    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
+    {
+        $this->repository->updateMastodonXPostAutomatic($userId, $mastodonXPostAutomatic);
+    }
+
+    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
+    {
+        $this->repository->updateMastodonXPostEnabled($userId, $mastodonXPostEnabled);
+    }
+
+    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
+    {
+        $this->repository->updateMastodonXPostPostVisibility($userId, $mastodonXPostPostVisibility);
+    }
+
+    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
+    {
+        $this->repository->updateMastodonXPostUsername($userId, $mastodonXPostUsername);
     }
 
     public function updateName(int $userId, string $name) : void
@@ -513,30 +538,5 @@ class UserApi
     public function updateWatchlistAutomaticRemovalEnabled(int $userId, bool $watchlistAutomaticRemovalEnabled) : void
     {
         $this->repository->updateWatchlistAutomaticRemovalEnabled($userId, $watchlistAutomaticRemovalEnabled);
-    }
-
-    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
-    {
-        $this->repository->updateMastodonXPostEnabled($userId, $mastodonXPostEnabled);
-    }
-
-    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
-    {
-        $this->repository->updateMastodonXPostAutomatic($userId, $mastodonXPostAutomatic);
-    }
-
-    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
-    {
-        $this->repository->updateMastodonXPostPostVisibility($userId, $mastodonXPostPostVisibility);
-    }
-
-    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
-    {
-        $this->repository->updateMastodonXPostUsername($userId, $mastodonXPostUsername);
-    }
-
-    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
-    {
-        $this->repository->updateMastodonXPostAccessToken($userId, $mastodonXPostAccessToken);
     }
 }

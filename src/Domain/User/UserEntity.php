@@ -119,11 +119,6 @@ class UserEntity
         return $this->displayCharacterNames;
     }
 
-    public function getEmbyWebhookId() : ?string
-    {
-        return $this->embyWebhookUuid;
-    }
-
     public function getDisplayImdbRating() : bool
     {
         return $this->displayImdbRating;
@@ -132,6 +127,11 @@ class UserEntity
     public function getDisplayTmdbRating() : bool
     {
         return $this->displayTmdbRating;
+    }
+
+    public function getEmbyWebhookId() : ?string
+    {
+        return $this->embyWebhookUuid;
     }
 
     public function getId() : int
@@ -147,6 +147,21 @@ class UserEntity
     public function getKodiWebhookId() : ?string
     {
         return $this->kodiWebhookUuid;
+    }
+
+    public function getMastodonXPostAccessToken() : ?string
+    {
+        return $this->mastodonXPostAccessToken;
+    }
+
+    public function getMastodonXPostPostVisibility() : ?string
+    {
+        return $this->mastodonXPostPostVisibility;
+    }
+
+    public function getMastodonXPostUsername() : ?string
+    {
+        return $this->mastodonXPostUsername;
     }
 
     public function getName() : string
@@ -224,6 +239,16 @@ class UserEntity
         return $this->hasLocationsEnabled;
     }
 
+    public function hasMastodonXPostAutomatic() : bool
+    {
+        return $this->mastodonXPostAutomatic;
+    }
+
+    public function hasMastodonXPostEnabled() : bool
+    {
+        return $this->mastodonXPostEnabled;
+    }
+
     public function hasPlexScrobbleRatingsEnabled() : bool
     {
         return $this->plexScrobbleRatings;
@@ -242,27 +267,5 @@ class UserEntity
     public function isAdmin() : bool
     {
         return $this->isAdmin;
-    }
-
-    // Mastodon cross posting
-    public function hasMastodonXPostEnabled() : bool
-    {
-        return $this->mastodonXPostEnabled;
-    }
-    public function hasMastodonXPostAutomatic() : bool
-    {
-        return $this->mastodonXPostAutomatic;
-    }
-    public function getMastodonXPostUsername() : ?string
-    {
-        return $this->mastodonXPostUsername;
-    }
-    public function getMastodonXPostAccessToken() : ?string
-    {
-        return $this->mastodonXPostAccessToken;
-    }
-    public function getMastodonXPostPostVisibility() : ?string
-    {
-        return $this->mastodonXPostPostVisibility;
     }
 }
