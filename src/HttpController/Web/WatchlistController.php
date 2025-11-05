@@ -7,6 +7,7 @@ use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\WatchlistRequestMapper;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
@@ -27,6 +28,7 @@ class WatchlistController
         private readonly Authentication $authenticationService,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
+        private readonly JobQueueApi $jobQueueApi,
     ) {
     }
 
@@ -50,9 +52,8 @@ class WatchlistController
         }
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId());
-        if ($postToMastodon) {
-            $a = 1;
-            // create "post to mastodon" job here ;]
+        if ($this->authenticationService->getCurrentUser()->hasMastodonXPostEnabled() === true && $postToMastodon === true) {
+            $this->jobQueueApi->addMastodonPostWatchlistJob($userId, $movie->getId());
         }
 
         return Response::create(StatusCode::createOk());

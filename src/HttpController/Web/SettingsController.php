@@ -720,8 +720,6 @@ class SettingsController
         );
     }
 
-    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-
     public function updatePassword(Request $request) : Response
     {
         $userId = $this->authenticationService->getCurrentUserId();
@@ -762,6 +760,7 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function updateServerEmail(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());

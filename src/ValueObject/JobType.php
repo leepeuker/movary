@@ -7,6 +7,10 @@ use RuntimeException;
 
 class JobType implements JsonSerializable
 {
+    private const string TYPE_MASTODON_POST_PLAY = 'mastodon_post_play';
+
+    private const string TYPE_MASTODON_POST_WATCHLIST = 'mastodon_post_watchlist';
+
     private const string TYPE_TMDB_PERSON_SYNC = 'tmdb_person_sync';
 
     private const string TYPE_IMDB_SYNC = 'imdb_sync';
@@ -76,6 +80,16 @@ class JobType implements JsonSerializable
     public static function createLetterboxdImportRatings() : self
     {
         return new self(self::TYPE_LETTERBOXD_IMPORT_RATINGS);
+    }
+
+    public static function createMastodonPostPlay() : self
+    {
+        return new self(self::TYPE_MASTODON_POST_PLAY);
+    }
+
+    public static function createMastodonPostWatchlist() : self
+    {
+        return new self(self::TYPE_MASTODON_POST_WATCHLIST);
     }
 
     public static function createPlexImportWatchlist() : self

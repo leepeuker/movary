@@ -7,6 +7,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
@@ -31,6 +32,7 @@ class HistoryController
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly JobQueueApi $jobQueueApi,
     ) {
     }
 
@@ -115,9 +117,8 @@ class HistoryController
         $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
         $this->movieApi->updateHistoryLocation($movie->getId(), $userId, $watchDate, $locationId);
-        if ($postToMastodon) {
-            $a = 1;
-            // create "post to mastodon" job here ;]
+        if ($this->authenticationService->getCurrentUser()->hasMastodonXPostEnabled() === true && $postToMastodon === true) {
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movie->getId());
         }
 
         return Response::create(StatusCode::createOk());

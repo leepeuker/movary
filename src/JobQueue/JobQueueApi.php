@@ -48,6 +48,16 @@ class JobQueueApi
         $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
     }
 
+    public function addMastodonPostPlayJob(int $userId, int $movieId) : void
+    {
+        $this->repository->addJob(JobType::createMastodonPostPlay(), JobStatus::createWaiting(), $userId, ['movieId' => $movieId]);
+    }
+
+    public function addMastodonPostWatchlistJob(int $userId, int $movieId) : void
+    {
+        $this->repository->addJob(JobType::createMastodonPostWatchlist(), JobStatus::createWaiting(), $userId, ['movieId' => $movieId]);
+    }
+
     public function addPlexImportWatchlistJob(int $userId, ?JobStatus $jobStatus = null) : int
     {
         return $this->repository->addJob(JobType::createPlexImportWatchlist(), $jobStatus ?? JobStatus::createWaiting(), $userId);
