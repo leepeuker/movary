@@ -215,7 +215,6 @@ class Factory
     {
         return new LandingPageController(
             $container->get(Twig\Environment::class),
-            $container->get(SessionWrapper::class),
             $config->getAsBool('ENABLE_REGISTRATION', false),
             $config->getAsStringNullable('DEFAULT_LOGIN_EMAIL'),
             $config->getAsStringNullable('DEFAULT_LOGIN_PASSWORD'),

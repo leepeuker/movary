@@ -15,6 +15,8 @@ class MovieSearchResultDto implements JsonSerializable
         private readonly ?string $originalLanguage,
         private readonly ?string $tmdbPosterPath,
         private readonly ?int $movaryId,
+        private readonly bool $isWatched,
+        private readonly bool $isOnWatchlist,
     ) {
     }
 
@@ -26,6 +28,8 @@ class MovieSearchResultDto implements JsonSerializable
         ?string $originalLanguage = null,
         ?string $tmdbPosterPath = null,
         ?int $movaryId = null,
+        bool $isWatched = false,
+        bool $isOnWatchlist = false,
     ) : self {
         return new self(
             $tmdbId,
@@ -35,6 +39,8 @@ class MovieSearchResultDto implements JsonSerializable
             $originalLanguage,
             $tmdbPosterPath,
             $movaryId,
+            $isWatched,
+            $isOnWatchlist,
         );
     }
 
@@ -55,10 +61,12 @@ class MovieSearchResultDto implements JsonSerializable
                 'movary' => $this->movaryId,
                 'tmdb' => $this->tmdbId,
             ],
+            'isWatched' => $this->isWatched,
+            'isOnWatchlist' => $this->isOnWatchlist,
         ];
     }
 
-    public function withMovaryId(int $id) : self
+    public function withIsOnWatchlist(bool $isOnWatchlist) : self
     {
         return MovieSearchResultDto::create(
             $this->tmdbId,
@@ -67,7 +75,39 @@ class MovieSearchResultDto implements JsonSerializable
             $this->releaseDate,
             $this->originalLanguage,
             $this->tmdbPosterPath,
-            $id,
+            $this->movaryId,
+            $this->isWatched,
+            $isOnWatchlist,
+        );
+    }
+
+    public function withIsWatched(bool $isWatched) : self
+    {
+        return MovieSearchResultDto::create(
+            $this->tmdbId,
+            $this->title,
+            $this->overview,
+            $this->releaseDate,
+            $this->originalLanguage,
+            $this->tmdbPosterPath,
+            $this->movaryId,
+            $isWatched,
+            $this->isOnWatchlist,
+        );
+    }
+
+    public function withMovaryId(int $movaryId) : self
+    {
+        return MovieSearchResultDto::create(
+            $this->tmdbId,
+            $this->title,
+            $this->overview,
+            $this->releaseDate,
+            $this->originalLanguage,
+            $this->tmdbPosterPath,
+            $movaryId,
+            $this->isWatched,
+            $this->isOnWatchlist,
         );
     }
 }

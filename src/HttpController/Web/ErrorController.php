@@ -5,6 +5,7 @@ namespace Movary\HttpController\Web;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\Url;
 use Twig\Environment;
 
 class ErrorController
@@ -24,28 +25,23 @@ class ErrorController
 
     public function renderNotFound(Request $request) : Response
     {
+        $httpReferer = $request->getHttpReferer();
+        if ($httpReferer !== null && $httpReferer != '') {
+            $url = Url::createFromString($httpReferer);
+            $httpReferer = $url->getPath();
+        } else  {
+            $httpReferer = null;
+        }
+
         return Response::create(
             StatusCode::createNotFound(),
             $this->twig->render(
                 'page/404.html.twig',
                 [
-                    'referer' => $this->getReferer($request)
+                    'referer' => $httpReferer,
+                    'currentUrl' => $request->getPath(),
                 ],
             ),
         );
-    }
-
-    private function getReferer(Request $request) : ?string
-    {
-        $referer = $_SERVER['HTTP_REFERER'] ?? null;
-        if ($referer === null) {
-            return null;
-        }
-
-        if (parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH) === $request->getPath()) {
-            return null;
-        }
-
-        return $_SERVER['HTTP_REFERER'];
     }
 }

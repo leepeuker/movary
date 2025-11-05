@@ -61,7 +61,7 @@ class JobController
         );
     }
 
-    public function scheduleJellyfinExportHistory() : Response
+    public function scheduleJellyfinExportHistory(Request $request) : Response
     {
         $currentUserId = $this->authenticationService->getCurrentUserId();
 
@@ -70,11 +70,11 @@ class JobController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
-    public function scheduleJellyfinImportHistory() : Response
+    public function scheduleJellyfinImportHistory(Request $request) : Response
     {
         $currentUserId = $this->authenticationService->getCurrentUserId();
 
@@ -83,7 +83,7 @@ class JobController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
@@ -106,7 +106,7 @@ class JobController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+                [Header::createLocation((string)$request->getHttpReferer())],
             );
         }
 
@@ -117,7 +117,7 @@ class JobController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
@@ -131,7 +131,7 @@ class JobController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+                [Header::createLocation((string)$request->getHttpReferer())],
             );
         }
 
@@ -146,7 +146,7 @@ class JobController
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation($_SERVER['HTTP_REFERER'])],
+                [Header::createLocation((string)$request->getHttpReferer())],
             );
         }
 
@@ -157,11 +157,11 @@ class JobController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
-    public function schedulePlexWatchlistImport() : Response
+    public function schedulePlexWatchlistImport(Request $request) : Response
     {
         $currentUser = $this->authenticationService->getCurrentUser();
 
@@ -170,11 +170,11 @@ class JobController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
-    public function scheduleTraktHistorySync() : Response
+    public function scheduleTraktHistorySync(Request $request) : Response
     {
         $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
@@ -183,11 +183,11 @@ class JobController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 
-    public function scheduleTraktRatingsSync() : Response
+    public function scheduleTraktRatingsSync(Request $request) : Response
     {
         $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
@@ -196,7 +196,7 @@ class JobController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 }

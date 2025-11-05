@@ -16,6 +16,8 @@ class Request
         private readonly array $filesParameters,
         private readonly array $headers,
         private readonly string $userAgent,
+        private readonly ?string $httpHost,
+        private readonly ?string $httpReferer,
     ) {
     }
 
@@ -23,6 +25,9 @@ class Request
     {
         $uri = self::extractRequestUri();
         $path = self::extractPath($uri);
+
+        $httpHost = self::getServerSetting('HTTP_HOST') ?? '';
+        $httpReferer = self::getServerSetting('HTTP_REFERER') ?? '';
 
         $getParameters = self::extractGetParameter();
         $postParameters = self::extractPostParameter();
@@ -32,7 +37,17 @@ class Request
 
         $body = (string)file_get_contents('php://input');
 
-        return new self($path, $getParameters, $postParameters, $body, $filesParameters, $headers, $userAgent);
+        return new self(
+            $path,
+            $getParameters,
+            $postParameters,
+            $body,
+            $filesParameters,
+            $headers,
+            $userAgent,
+            $httpHost,
+            $httpReferer,
+        );
     }
 
     private static function extractFilesParameter() : array
@@ -122,6 +137,16 @@ class Request
     public function getHeaders() : array
     {
         return $this->headers;
+    }
+
+    public function getHttpHost() : ?string
+    {
+        return $this->httpHost;
+    }
+
+    public function getHttpReferer() : ?string
+    {
+        return $this->httpReferer;
     }
 
     public function getPath() : string

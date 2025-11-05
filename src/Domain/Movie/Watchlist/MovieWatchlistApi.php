@@ -39,6 +39,17 @@ class MovieWatchlistApi
         return $this->repository->fetchAllWatchlistItems($userId);
     }
 
+    public function fetchTmdbIdsToWatchlistMap(int $userId, array $tmdbIds) : array
+    {
+        $map = [];
+
+        foreach ($this->repository->fetchTmdbIdsToWatchlistMap($userId, $tmdbIds) as $row) {
+            $map[$row['tmdb_id']] = true;
+        }
+
+        return $map;
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->repository->fetchUniqueMovieGenres($userId);

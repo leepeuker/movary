@@ -5,3 +5,13 @@ a.card-header,
 a.card-header:visited {
   text-decoration: none;
 }
+
+/* icon padding in log play modal */
+#logPlayModal i.bi.bi-bookmark-fill,
+#logPlayModal i.bi.bi-eye-fill {
+  margin-left: 0.25rem;
+}
+
+#logPlayModalTitle a, #logPlayModalTitle a:visited {
+  color: var(--bs-heading-color);
+}

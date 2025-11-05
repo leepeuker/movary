@@ -22,7 +22,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
         Web\Middleware\UserIsUnauthenticated::class,
         Web\Middleware\ServerHasUsers::class,
-        Web\Middleware\ServerHasRegistrationEnabled::class
+        Web\Middleware\ServerHasRegistrationEnabled::class,
+        Web\Middleware\HttpRefererIsAllowed::class,
     ]);
     $routes->add('GET', '/create-user', [Web\CreateUserController::class, 'renderPage'], [
         Web\Middleware\UserIsUnauthenticated::class,
@@ -46,15 +47,16 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/jobs', [Web\JobController::class, 'getJobs'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/job-queue/purge-processed', [Web\JobController::class, 'purgeProcessedJobs'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/job-queue/purge-all', [Web\JobController::class, 'purgeAllJobs'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
+    $routes->add('GET', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
+    $routes->add('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
+    $routes->add('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
+    $routes->add('GET', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
+    $routes->add('GET', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
     $routes->add('GET', '/jobs/schedule/jellyfin-export-history', [Web\JobController::class, 'scheduleJellyfinExportHistory'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserHasJellyfinToken::class
+        Web\Middleware\UserHasJellyfinToken::class,
+        Web\Middleware\HttpRefererIsAllowed::class,
     ]);
 
     ############
@@ -102,19 +104,19 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/settings/account/security/disable-totp', [Web\TwoFactorAuthenticationController::class, 'disableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/security/enable-totp', [Web\TwoFactorAuthenticationController::class, 'enableTotp'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/export/csv/{exportType:.+}', [Web\ExportController::class, 'getCsvExport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/settings/account/import/csv/{exportType:.+}', [Web\ImportController::class, 'handleCsvImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/account/delete-ratings', [Web\SettingsController::class, 'deleteRatings'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/account/delete-history', [Web\SettingsController::class, 'deleteHistory'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/account/delete-account', [Web\SettingsController::class, 'deleteAccount'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/import/csv/{exportType:.+}', [Web\ImportController::class, 'handleCsvImport'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
+    $routes->add('DELETE', '/settings/account/delete-ratings', [Web\SettingsController::class, 'deleteRatings'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/account/delete-history', [Web\SettingsController::class, 'deleteHistory'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/account/delete-account', [Web\SettingsController::class, 'deleteAccount'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/update-dashboard-rows', [Web\SettingsController::class, 'updateDashboardRows'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/reset-dashboard-rows', [Web\SettingsController::class, 'resetDashboardRows'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/trakt', [Web\SettingsController::class, 'renderTraktPage'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/settings/trakt', [Web\SettingsController::class, 'updateTrakt'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/trakt', [Web\SettingsController::class, 'updateTrakt'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
     $routes->add('POST', '/settings/trakt/verify-credentials', [Web\SettingsController::class, 'traktVerifyCredentials'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/letterboxd', [Web\SettingsController::class, 'renderLetterboxdPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/letterboxd-export', [Web\SettingsController::class, 'generateLetterboxdExportData'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/plex', [Web\SettingsController::class, 'renderPlexPage'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/plex/logout', [Web\PlexController::class, 'removePlexAccessTokens'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/plex/logout', [Web\PlexController::class, 'removePlexAccessTokens'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
     $routes->add('POST', '/settings/plex/server-url-save', [Web\PlexController::class, 'savePlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/plex/server-url-verify', [Web\PlexController::class, 'verifyPlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/plex/authentication-url', [Web\PlexController::class, 'generatePlexAuthenticationUrl'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -144,7 +146,6 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/settings/integrations/netflix', [Web\SettingsController::class, 'renderNetflixPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/settings/netflix/search', [Web\NetflixController::class, 'searchTmbd'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/mastodon', [Web\SettingsController::class, 'renderMastodonPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/integrations/mastodon', [Web\SettingsController::class, 'updateMastodon'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/users', [Web\UserController::class, 'fetchUsers']);

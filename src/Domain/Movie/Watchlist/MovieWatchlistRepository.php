@@ -33,6 +33,29 @@ class MovieWatchlistRepository
         );
     }
 
+    public function fetchTmdbIdsToWatchlistMap(int $userId, array $tmdbIds) : array
+    {
+        if (count($tmdbIds) === 0) {
+            return [];
+        }
+
+        $placeholders = trim(str_repeat('?, ', count($tmdbIds)), ', ');
+
+        return $this->dbConnection->fetchAllAssociative(
+            <<<SQL
+            SELECT tmdb_id
+            FROM watchlist
+            JOIN movie m on m.id = watchlist.movie_id
+            WHERE user_id = ? AND tmdb_id IN ($placeholders)
+            GROUP by tmdb_id
+            SQL,
+            [
+                $userId,
+                ...$tmdbIds
+            ],
+        );
+    }
+
     public function fetchUniqueMovieGenres(int $userId) : array
     {
         return $this->dbConnection->fetchFirstColumn(

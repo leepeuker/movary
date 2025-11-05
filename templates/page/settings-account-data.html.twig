@@ -4,9 +4,16 @@
     Settings - Personal data
 {% endblock %}
 
+{% block scripts %}
+    <script src="{{ applicationUrl }}/js/settings-account-data.js"></script>
+{% endblock %}
+
 {% block body %}
     <main role="main" class="container">
         {{ include('component/navbar.html.twig') }}
+        {{ include('component/modal-delete-history.html.twig') }}
+        {{ include('component/modal-delete-ratings.html.twig') }}
+        {{ include('component/modal-delete-account.html.twig') }}
 
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
@@ -89,27 +96,13 @@
                 <p class="text-muted">This will irrecoverable delete your data, so be sure that this is really what you want.</p>
 
                 <div style="margin-bottom: 1rem">
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="{{ applicationUrl }}/settings/account/delete-history"
-                       onclick="return confirm('Are you sure you want to delete your watch history?')">Delete history</a>
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="{{ applicationUrl }}/settings/account/delete-ratings"
-                       onclick="return confirm('Are you sure you want to delete your movie ratings?')">Delete ratings</a>
-                    {% if deletedUserHistory == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                            History deleted successfully.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
-                    {% if deletedUserRatings == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
-                            Ratings deleted successfully.
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
+                    <button class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" data-bs-toggle="modal" data-bs-target="#deleteHistoryModal">Delete history</button>
+                    <button class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" data-bs-toggle="modal" data-bs-target="#deleteRatingsModal">Delete ratings</button>
+
+                    <div id="alertDeletionsDiv" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem"></div>
                 </div>
                 <div style="margin-bottom: 1rem">
-                    <a class="btn btn-danger {% if coreAccountChangesDisabled == true %}disabled{% endif %}" href="{{ applicationUrl }}/settings/account/delete-account"
-                       onclick="return confirm('Are you sure you want to delete your account with all your data?')">Delete
-                        account</a>
+                    <button class="btn btn-danger {% if coreAccountChangesDisabled == true %}disabled{% endif %}" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete account</button>
                 </div>
             </div>
         </div>

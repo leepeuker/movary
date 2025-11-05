@@ -30,6 +30,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 use Twig\Environment;
 use ZipStream;
@@ -72,13 +73,7 @@ class SettingsController
 
         $this->authenticationService->logout();
 
-        $this->sessionWrapper->set('deletedAccount', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function deleteApiToken() : Response
@@ -92,26 +87,14 @@ class SettingsController
     {
         $this->movieApi->deleteHistoryByUserId($this->authenticationService->getCurrentUserId());
 
-        $this->sessionWrapper->set('deletedUserHistory', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function deleteRatings() : Response
     {
         $this->movieApi->deleteRatingsByUserId($this->authenticationService->getCurrentUserId());
 
-        $this->sessionWrapper->set('deletedUserRatings', true);
-
-        return Response::create(
-            StatusCode::createSeeOther(),
-            null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
-        );
+        return Response::create(StatusCode::createNoContent());
     }
 
     public function generateLetterboxdExportData() : Response
@@ -188,16 +171,12 @@ class SettingsController
         $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
         $importWatchlistSuccessful = $this->sessionWrapper->find('importWatchlistSuccessful');
         $importHistoryError = $this->sessionWrapper->find('importHistoryError');
-        $deletedUserHistory = $this->sessionWrapper->find('deletedUserHistory');
-        $deletedUserRatings = $this->sessionWrapper->find('deletedUserRatings');
 
         $this->sessionWrapper->unset(
             'importHistorySuccessful',
             'importRatingsSuccessful',
             'importWatchlistSuccessful',
             'importHistoryError',
-            'deletedUserHistory',
-            'deletedUserRatings',
         );
 
         $user = $this->userApi->fetchUser($userId);
@@ -210,8 +189,6 @@ class SettingsController
                 'importRatingsSuccessful' => $importRatingsSuccessful,
                 'importWatchlistSuccessful' => $importWatchlistSuccessful,
                 'importHistoryError' => $importHistoryError,
-                'deletedUserHistory' => $deletedUserHistory,
-                'deletedUserRatings' => $deletedUserRatings,
             ]),
         );
     }
@@ -812,7 +789,7 @@ class SettingsController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation((string)$request->getHttpReferer())],
         );
     }
 

@@ -16,7 +16,6 @@ class NetflixController
 {
     public function __construct(
         private readonly Authentication $authenticationService,
-        private readonly TmdbApi $tmdbApi,
         private readonly NetflixActivityCsvParser $netflixCsvParser,
         private readonly NetflixActivityItemsConverter $netflixActivityConverter,
         private readonly NetflixMovieImporter $netflixMovieImporter,
@@ -62,14 +61,5 @@ class NetflixController
         }
 
         return Response::createJson(Json::encode($tmdbMatches));
-    }
-
-    public function searchTmbd(Request $request) : Response
-    {
-        $input = Json::decode($request->getBody());
-
-        $tmdbSearchResult = $this->tmdbApi->searchMovie($input['query']);
-
-        return Response::createJson(Json::encode($tmdbSearchResult['results']));
     }
 }

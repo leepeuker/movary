@@ -131,15 +131,12 @@ async function searchTmdbWithLogModalSearchInput() {
 
     let targetModalVersion = currentModalVersion
 
-    const data = await fetch(APPLICATION_URL + '/settings/netflix/search', {
+    const data = await fetch(APPLICATION_URL + '/api/movies/search?search=' + document.getElementById('logPlayModalSearchInput').value, {
         signal: AbortSignal.timeout(4000),
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'query': document.getElementById('logPlayModalSearchInput').value
-        })
+        }
     }).then(response => {
         if (!response.ok) {
             console.error(response);
@@ -175,7 +172,7 @@ async function searchTmdbWithLogModalSearchInput() {
 
     if (data !== null && targetModalVersion === currentModalVersion) {
         setLogPlayModalSearchSpinner(false)
-        loadLogModalSearchResults(data)
+        loadLogModalSearchResults(data.results || [])
     }
 }
 
@@ -187,7 +184,7 @@ function displayLogModalTmdbSearchError(message) {
 function loadLogModalSearchResults(data) {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
 
-    if (data.length == 0) {
+    if (data.length === 0) {
         document.getElementById('logPlayModalSearchNoResultAlert').classList.remove('d-none')
         return
     }
@@ -204,18 +201,38 @@ function loadLogModalSearchResults(data) {
         listElement.id = 'searchResult-' + index
 
         let releaseYear = '?'
-        if (item.release_date != null && item.release_date.length > 4) {
-            releaseYear = item.release_date.substring(0, 4)
+        if (item.releaseDate != null && item.releaseDate.length > 4) {
+            releaseYear = item.releaseDate.substring(0, 4)
         }
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
-        posterPath = item.poster_path != null ? 'https://image.tmdb.org/t/p/w92' + item.poster_path : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
-        listElement.innerHTML = '<img src="' + posterPath + '" alt="Girl in a jacket" style="margin-right: .5rem;width: 3rem"><p style="margin:0;"><span><b>' + item.title + '</b> (' + releaseYear + ')</span><br><span style="opacity:0.75; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; max-height:2lh;">' + item.overview + '</span></p>'
+        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
+        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : '';
+        isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : '';
+        listElement.innerHTML = `
+            <img src="${posterPath}" alt="Poster for ${item.title}" style="margin-right: .5rem; width: 3rem">
+            <p style="margin: 0;">
+                <b>${item.title}</b> (${releaseYear})${isWatchedEl}${isOnWatchlistEl}
+                <br>
+                <span style="opacity: 0.75; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-height: 2lh;">
+                    ${item.overview}
+                </span>
+            </p>`
 
-        listElement.dataset.tmdbId = item.id
-        listElement.dataset.poster = item.poster_path
+        listElement.dataset.tmdbId = item.ids.tmdb
+        if (item.ids.movary)
+            listElement.dataset.movaryId = item.ids.movary
+        listElement.dataset.poster = item.tmdbPosterPath
         listElement.dataset.title = item.title
         listElement.dataset.releaseYear = releaseYear
+        if (item.isOnWatchlist)
+            listElement.dataset.isOnWatchlist = 'on'
+        if (item.isWatched)
+            listElement.dataset.isWatched = 'on'
+
+        document.querySelectorAll("i.bi[data-bs-toggle='tooltip']").forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        });
 
         listElement.addEventListener('click', selectLogModalTmdbItemForLogging);
 
@@ -250,7 +267,19 @@ function backToLogModalSearchResults() {
 async function selectLogModalTmdbItemForLogging(event) {
     const item = event.target.closest(".list-group-item")
 
-    document.getElementById('logPlayModalTitle').innerHTML = item.dataset.title + ' (' + item.dataset.releaseYear + ')'
+    // icons indicating watched/on watchlist, linking to movary page if it exists (which it should)
+    let isWatchedEl = item.dataset.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : ''
+    let isOnWatchlistEl = item.dataset.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : ''
+    if (item.dataset.movaryId) {
+        movaryUrl = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/movies/" + item.dataset.movaryId
+        isWatchedEl = '<a href="' + movaryUrl + '">' + isWatchedEl + '</a>';
+        isOnWatchlistEl = '<a href="' + movaryUrl + '">' + isOnWatchlistEl + '</a>';
+    }
+        
+    document.getElementById("logPlayModalTitle").innerHTML = item.dataset.title + " (" + item.dataset.releaseYear + ")" + isWatchedEl + isOnWatchlistEl;
+    document.querySelectorAll("#logPlayModalTitle i.bi").forEach(tooltipTriggerEl => {
+        new bootstrap.Tooltip(tooltipTriggerEl)
+    });
     document.getElementById('logPlayModalTmdbIdInput').value = item.dataset.tmdbId
     document.getElementById('logPlayModalFooterTMDBLink').setAttribute(
         "href", "https://www.themoviedb.org/movie/" + item.dataset.tmdbId
