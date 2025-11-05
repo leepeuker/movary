@@ -87,7 +87,7 @@
                             </select>
                             <a class="btn btn-outline-secondary rounded-end" href="{{ applicationUrl }}/settings/account/locations"><i class="bi bi-gear"></i></a>
                         </div>
-                        <div class="input-group {% if currentUserMastodonXPostEnabled == false %}d-none{% endif %}" style="margin-top: 0.5rem;">
+                        <div class="{% if currentUserMastodonXPostEnabled == false %}d-none{% endif %}" style="margin-top: 0.5rem;">
                             <input
                                 type="checkbox"
                                 class="form-check-input"
@@ -96,7 +96,7 @@
                                 style="margin-right:0.5rem"
                                 {% if currentUserMastodonXPostAutomatic %}checked{% endif %}
                             >
-                            <label for="postToMastodon" class="form-check-label">Post to Mastodon?</label>
+                            <label for="postToMastodon" class="form-check-label">Post to Mastodon</label>
                         </div>
                     </div>
 
