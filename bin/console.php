@@ -27,5 +27,7 @@ $application->add($container->get(Movary\Command\JellyfinCacheDelete::class));
 $application->add($container->get(Movary\Command\JellyfinCacheRefresh::class));
 $application->add($container->get(Movary\Command\JellyfinExport::class));
 $application->add($container->get(Movary\Command\JellyfinImport::class));
+$application->add($container->get(Movary\Command\MastodonPostPlay::class));
+$application->add($container->get(Movary\Command\MastodonPostWatchlist::class));
 
 $application->run();

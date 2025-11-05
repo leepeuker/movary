@@ -47,6 +47,8 @@ class JobType implements JsonSerializable
                 self::TYPE_PLEX_IMPORT_WATCHLIST,
                 self::TYPE_JELLYFIN_EXPORT_HISTORY,
                 self::TYPE_JELLYFIN_IMPORT_HISTORY,
+                self::TYPE_MASTODON_POST_PLAY,
+                self::TYPE_MASTODON_POST_WATCHLIST,
             ]) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
@@ -150,6 +152,16 @@ class JobType implements JsonSerializable
     public function isOfTypeLetterboxdImportRankings() : bool
     {
         return $this->type === self::TYPE_LETTERBOXD_IMPORT_RATINGS;
+    }
+
+    public function isOfTypeMastodonPostPlay() : bool
+    {
+        return $this->type === self::TYPE_MASTODON_POST_PLAY;
+    }
+
+    public function isOfTypeMastodonPostWatchlist() : bool
+    {
+        return $this->type === self::TYPE_MASTODON_POST_WATCHLIST;
     }
 
     public function isOfTypePlexImportWatchlist() : bool

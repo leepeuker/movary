@@ -112,6 +112,12 @@ app_imdb_sync_rating:
 app_jobs_process:
 	make exec_app_cmd CMD="php bin/console.php jobs:process"
 
+app_mastodon_post_play:
+	make exec_app_cmd CMD="php bin/console.php mastodon:post:play --userId=1 --movieId=1"
+
+app_mastodon_post_watchlist:
+	make exec_app_cmd CMD="php bin/console.php mastodon:post:watchlist --userId=1 --movieId=1"
+
 # Shortcuts
 php: exec_app_bash
 test: composer_test

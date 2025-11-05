@@ -6,6 +6,8 @@ use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
+use Movary\Service\Mastodon\MastodonPostPlayService;
+use Movary\Service\Mastodon\MastodonPostWatchlistService;
 use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\Service\Trakt\ImportWatchedMovies;
@@ -23,9 +25,12 @@ class JobProcessor
         private readonly PlexWatchlistImporter $plexWatchlistImporter,
         private readonly JellyfinMoviesExporter $jellyfinExporter,
         private readonly JellyfinMoviesImporter $jellyfinImporter,
+        private readonly MastodonPostPlayService $mastodonPostPlayService,
+        private readonly MastodonPostWatchlistService $mastodonPostWatchlistService,
     ) {
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function processJob(JobEntity $job) : void
     {
         match (true) {
@@ -38,6 +43,8 @@ class JobProcessor
             $job->getType()->isOfTypePlexImportWatchlist() => $this->plexWatchlistImporter->executeJob($job),
             $job->getType()->isOfTypeJellyfinExportMovies() => $this->jellyfinExporter->executeJob($job),
             $job->getType()->isOfTypeJellyfinImportMovies() => $this->jellyfinImporter->executeJob($job),
+            $job->getType()->isOfTypeMastodonPostPlay() => $this->mastodonPostPlayService->executeJob($job),
+            $job->getType()->isOfTypeMastodonPostWatchlist() => $this->mastodonPostWatchlistService->executeJob($job),
 
             default => throw new RuntimeException('Job type not supported: ' . $job->getType()),
         };
