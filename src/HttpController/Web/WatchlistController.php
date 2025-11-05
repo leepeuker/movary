@@ -52,7 +52,7 @@ class WatchlistController
         }
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId());
-        if ($this->authenticationService->getCurrentUser()->hasMastodonXPostEnabled() === true && $postToMastodon === true) {
+        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
             $this->jobQueueApi->addMastodonPostWatchlistJob($userId, $movie->getId());
         }
 

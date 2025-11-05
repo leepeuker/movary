@@ -421,29 +421,29 @@ class UserApi
         $this->repository->updateLocationsEnabled($userId, $locationsEnabled);
     }
 
-    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
+    public function updateMastodonAccessToken(int $userId, ?string $mastodonAccessToken) : void
     {
-        $this->repository->updateMastodonXPostAccessToken($userId, $mastodonXPostAccessToken);
+        $this->repository->updateMastodonAccessToken($userId, $mastodonAccessToken);
     }
 
-    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
+    public function updateMastodonPostAutomatic(int $userId, bool $mastodonPostAutomatic) : void
     {
-        $this->repository->updateMastodonXPostAutomatic($userId, $mastodonXPostAutomatic);
+        $this->repository->updateMastodonPostAutomatic($userId, $mastodonPostAutomatic);
     }
 
-    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
+    public function updateMastodonPostEnabled(int $userId, bool $mastodonPostEnabled) : void
     {
-        $this->repository->updateMastodonXPostEnabled($userId, $mastodonXPostEnabled);
+        $this->repository->updateMastodonPostEnabled($userId, $mastodonPostEnabled);
     }
 
-    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
+    public function updateMastodonPostVisibility(int $userId, ?string $mastodonPostVisibility) : void
     {
-        $this->repository->updateMastodonXPostPostVisibility($userId, $mastodonXPostPostVisibility);
+        $this->repository->updateMastodonPostVisibility($userId, $mastodonPostVisibility);
     }
 
-    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
+    public function updateMastodonUsername(int $userId, ?string $mastodonUsername) : void
     {
-        $this->repository->updateMastodonXPostUsername($userId, $mastodonXPostUsername);
+        $this->repository->updateMastodonUsername($userId, $mastodonUsername);
     }
 
     public function updateName(int $userId, string $name) : void

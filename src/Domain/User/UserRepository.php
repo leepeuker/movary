@@ -759,12 +759,12 @@ class UserRepository
         );
     }
 
-    public function updateMastodonXPostAccessToken(int $userId, ?string $mastodonXPostAccessToken) : void
+    public function updateMastodonAccessToken(int $userId, ?string $mastodonAccessToken) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'mastodon_xpost_access_token' => $mastodonXPostAccessToken,
+                'mastodon_access_token' => $mastodonAccessToken,
             ],
             [
                 'id' => $userId,
@@ -772,12 +772,12 @@ class UserRepository
         );
     }
 
-    public function updateMastodonXPostAutomatic(int $userId, bool $mastodonXPostAutomatic) : void
+    public function updateMastodonPostAutomatic(int $userId, bool $mastodonPostAutomatic) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'mastodon_xpost_automatic' => (int)$mastodonXPostAutomatic,
+                'mastodon_post_automatic' => (int)$mastodonPostAutomatic,
             ],
             [
                 'id' => $userId,
@@ -785,12 +785,12 @@ class UserRepository
         );
     }
 
-    public function updateMastodonXPostEnabled(int $userId, bool $mastodonXPostEnabled) : void
+    public function updateMastodonPostEnabled(int $userId, bool $mastodonPostEnabled) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'mastodon_xpost_enabled' => (int)$mastodonXPostEnabled,
+                'mastodon_enabled' => (int)$mastodonPostEnabled,
             ],
             [
                 'id' => $userId,
@@ -798,12 +798,12 @@ class UserRepository
         );
     }
 
-    public function updateMastodonXPostPostVisibility(int $userId, ?string $mastodonXPostPostVisibility) : void
+    public function updateMastodonPostVisibility(int $userId, ?string $mastodonPostVisibility) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'mastodon_xpost_post_visibility' => $mastodonXPostPostVisibility,
+                'mastodon_post_visibility' => $mastodonPostVisibility,
             ],
             [
                 'id' => $userId,
@@ -811,12 +811,12 @@ class UserRepository
         );
     }
 
-    public function updateMastodonXPostUsername(int $userId, ?string $mastodonXPostUsername) : void
+    public function updateMastodonUsername(int $userId, ?string $mastodonUsername) : void
     {
         $this->dbConnection->update(
             'user',
             [
-                'mastodon_xpost_username' => $mastodonXPostUsername,
+                'mastodon_username' => $mastodonUsername,
             ],
             [
                 'id' => $userId,

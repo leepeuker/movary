@@ -345,11 +345,11 @@ class SettingsController
                 'page/settings-integration-mastodon.html.twig',
                 [
                     'mastodonCredentialsUpdated' => $mastodonCredentialsUpdated,
-                    'mastodonEnable' => $user->hasMastodonXPostEnabled(),
-                    'mastodonOnByDefault' => $user->hasMastodonXPostAutomatic(),
-                    'mastodonUsername' => $user->getMastodonXPostUsername(),
-                    'mastodonVisibility' => $user->getMastodonXPostPostVisibility(),
-                    'mastodonAccessToken' => $user->getMastodonXPostAccessToken(),
+                    'mastodonEnable' => $user->isMastodonEnabled(),
+                    'mastodonOnByDefault' => $user->isMastodonPostAutomatic(),
+                    'mastodonUsername' => $user->getMastodonUsername(),
+                    'mastodonVisibility' => $user->getMastodonPostVisibility(),
+                    'mastodonAccessToken' => $user->getMastodonAccessToken(),
                 ],
             ),
         );
@@ -700,16 +700,16 @@ class SettingsController
 
         $mastodonAccessToken = $postParameters['mastodonAccessToken'];
 
-        $mastodonVisibility = $postParameters['mastodonVisibility'];
-        if (!in_array($mastodonVisibility, ['public', 'unlisted', 'private'])) {
-            $mastodonVisibility = 'public';
+        $mastodonPostVisibility = $postParameters['mastodonVisibility'];
+        if (!in_array($mastodonPostVisibility, ['public', 'unlisted', 'private'])) {
+            $mastodonPostVisibility = 'public';
         }
 
-        $this->userApi->updateMastodonXPostEnabled($userId, $mastodonEnable);
-        $this->userApi->updateMastodonXPostAutomatic($userId, $mastodonOnByDefault);
-        $this->userApi->updateMastodonXPostPostVisibility($userId, $mastodonVisibility);
-        $this->userApi->updateMastodonXPostUsername($userId, $mastodonUsername);
-        $this->userApi->updateMastodonXPostAccessToken($userId, $mastodonAccessToken);
+        $this->userApi->updateMastodonPostEnabled($userId, $mastodonEnable);
+        $this->userApi->updateMastodonUsername($userId, $mastodonUsername);
+        $this->userApi->updateMastodonAccessToken($userId, $mastodonAccessToken);
+        $this->userApi->updateMastodonPostAutomatic($userId, $mastodonOnByDefault);
+        $this->userApi->updateMastodonPostVisibility($userId, $mastodonPostVisibility);
 
         $this->sessionWrapper->set('mastodonCredentialsUpdated', true);
 

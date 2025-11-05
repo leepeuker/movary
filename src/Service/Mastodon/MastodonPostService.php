@@ -17,17 +17,17 @@ class MastodonPostService
     {
         $user = $this->userApi->fetchUser($userId);
 
-        $mastodonApiToken = $user->getMastodonXPostAccessToken();
+        $mastodonApiToken = $user->getMastodonAccessToken();
         if ($mastodonApiToken === null) {
             throw new RuntimeException('Mastodon access token missing');
         }
 
-        $mastodonUsername = $user->getMastodonXPostUsername();
+        $mastodonUsername = $user->getMastodonUsername();
         if ($mastodonUsername === null) {
             throw new RuntimeException('Mastodon username missing');
         }
 
-        $mastodonPostVisibility = $user->getMastodonXPostPostVisibility();
+        $mastodonPostVisibility = $user->getMastodonPostVisibility();
         if ($mastodonPostVisibility === null) {
             throw new RuntimeException('Mastodon post visibility missing');
         }

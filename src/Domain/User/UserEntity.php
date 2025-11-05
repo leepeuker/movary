@@ -39,11 +39,11 @@ class UserEntity
         private readonly bool $hasLocationsEnabled,
         private readonly bool $displayTmdbRating,
         private readonly bool $displayImdbRating,
-        private readonly bool $mastodonXPostEnabled,
-        private readonly bool $mastodonXPostAutomatic,
-        private readonly ?string $mastodonXPostUsername,
-        private readonly ?string $mastodonXPostAccessToken,
-        private readonly ?string $mastodonXPostPostVisibility,
+        private readonly bool $mastodonEnabled,
+        private readonly ?string $mastodonUsername,
+        private readonly ?string $mastodonAccessToken,
+        private readonly bool $mastodonPostAutomatic,
+        private readonly ?string $mastodonPostVisibility,
     ) {
     }
 
@@ -81,11 +81,11 @@ class UserEntity
             (bool)$data['locations_enabled'],
             (bool)$data['display_tmdb_rating'],
             (bool)$data['display_imdb_rating'],
-            (bool)$data['mastodon_xpost_enabled'],
-            (bool)$data['mastodon_xpost_automatic'],
-            $data['mastodon_xpost_username'],
-            $data['mastodon_xpost_access_token'],
-            $data['mastodon_xpost_post_visibility'],
+            (bool)$data['mastodon_enabled'],
+            $data['mastodon_username'],
+            $data['mastodon_access_token'],
+            (bool)$data['mastodon_post_automatic'],
+            $data['mastodon_post_visibility'],
         );
     }
 
@@ -149,19 +149,19 @@ class UserEntity
         return $this->kodiWebhookUuid;
     }
 
-    public function getMastodonXPostAccessToken() : ?string
+    public function getMastodonAccessToken() : ?string
     {
-        return $this->mastodonXPostAccessToken;
+        return $this->mastodonAccessToken;
     }
 
-    public function getMastodonXPostPostVisibility() : ?string
+    public function getMastodonPostVisibility() : ?string
     {
-        return $this->mastodonXPostPostVisibility;
+        return $this->mastodonPostVisibility;
     }
 
-    public function getMastodonXPostUsername() : ?string
+    public function getMastodonUsername() : ?string
     {
-        return $this->mastodonXPostUsername;
+        return $this->mastodonUsername;
     }
 
     public function getName() : string
@@ -239,14 +239,14 @@ class UserEntity
         return $this->hasLocationsEnabled;
     }
 
-    public function hasMastodonXPostAutomatic() : bool
+    public function isMastodonPostAutomatic() : bool
     {
-        return $this->mastodonXPostAutomatic;
+        return $this->mastodonPostAutomatic;
     }
 
-    public function hasMastodonXPostEnabled() : bool
+    public function isMastodonEnabled() : bool
     {
-        return $this->mastodonXPostEnabled;
+        return $this->mastodonEnabled;
     }
 
     public function hasPlexScrobbleRatingsEnabled() : bool

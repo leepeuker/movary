@@ -117,7 +117,7 @@ class HistoryController
         $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
         $this->movieApi->updateHistoryLocation($movie->getId(), $userId, $watchDate, $locationId);
-        if ($this->authenticationService->getCurrentUser()->hasMastodonXPostEnabled() === true && $postToMastodon === true) {
+        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
             $this->jobQueueApi->addMastodonPostPlayJob($userId, $movie->getId());
         }
 
