@@ -805,12 +805,12 @@ class SettingsController
             $this->twig->render(
                 'page/settings-integration-mastodon.html.twig',
                 [
-                    "mastodonCredentialsUpdated" => $mastodonCredentialsUpdated,
-                    "mastodonEnable" => $user->hasMastodonXPostEnabled(),
-                    "mastodonOnByDefault" => $user->hasMastodonXPostAutomatic(),
-                    "mastodonUsername" => $user->getMastodonXPostUsername(),
-                    "mastodonVisibility" => $user->getMastodonXPostPostVisibility(),
-                    "mastodonAccessToken" => $user->getMastodonXPostAccessToken(),
+                    'mastodonCredentialsUpdated' => $mastodonCredentialsUpdated,
+                    'mastodonEnable' => $user->hasMastodonXPostEnabled(),
+                    'mastodonOnByDefault' => $user->hasMastodonXPostAutomatic(),
+                    'mastodonUsername' => $user->getMastodonXPostUsername(),
+                    'mastodonVisibility' => $user->getMastodonXPostPostVisibility(),
+                    'mastodonAccessToken' => $user->getMastodonXPostAccessToken(),
                 ]
             ),
         );
@@ -821,19 +821,19 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
         $postParameters = $request->getPostParameters();
 
-        $mastodonEnable = $postParameters["mastodonEnable"];
-        $mastodonEnable = $mastodonEnable == "on" ? true : false;
+        $mastodonEnable = $postParameters['mastodonEnable'];
+        $mastodonEnable = $mastodonEnable == 'on';
         
-        $mastodonOnByDefault = $postParameters["mastodonOnByDefault"];
-        $mastodonOnByDefault = $mastodonOnByDefault == "on" ? true : false;
+        $mastodonOnByDefault = $postParameters['mastodonOnByDefault'];
+        $mastodonOnByDefault = $mastodonOnByDefault == 'on';
 
-        $mastodonUsername = $postParameters["mastodonUsername"];
+        $mastodonUsername = $postParameters['mastodonUsername'];
 
-        $mastodonAccessToken = $postParameters["mastodonAccessToken"];
+        $mastodonAccessToken = $postParameters['mastodonAccessToken'];
         
-        $mastodonVisibility = $postParameters["mastodonVisibility"];
-        if (!in_array($mastodonVisibility, ["public", "unlisted", "private"])) {
-            $mastodonVisibility = "public";
+        $mastodonVisibility = $postParameters['mastodonVisibility'];
+        if (!in_array($mastodonVisibility, ['public', 'unlisted', 'private'])) {
+            $mastodonVisibility = 'public';
         }
         
         $this->userApi->updateMastodonXPostEnabled($userId, $mastodonEnable);

@@ -1,203 +1,136 @@
-{% extends 'base.html.twig' %} {% block title %} Settings - Mastodon {% endblock
-%} {% block scripts %}
-<script src="{{ applicationUrl }}/js/settings-integration-mastodon.js"></script>
-{% endblock %} {% block stylesheets %}
-<link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet" />
-<link href="{{ applicationUrl }}/css/mastodon.css" rel="stylesheet" />
-{% endblock %} {% block body %}
-<main role="main" class="container">
-  {{ include("component/navbar.html.twig") }}
+{% extends 'base.html.twig' %}
 
-  <div style="text-align: center">
-    {{ include("component/settings-nav.html.twig") }}
+{% block title %}
+    Settings - Mastodon
+{% endblock %}
 
-    <div style="padding-top: 1rem">
-      <h5>Mastodon</h5>
+{% block scripts %}
+    <script src="{{ applicationUrl }}/js/settings-integration-mastodon.js"></script>
+{% endblock %}
 
-      <p class="text-muted" style="margin-bottom: 0.5rem">
-        use the <code>write:statuses</code> Mastodon API to post a note every
-        time you watch a film or add to your watchlist.
-      </p>
-    </div>
+{% block stylesheets %}
+    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet"/>
+    <link href="{{ applicationUrl }}/css/mastodon.css" rel="stylesheet"/>
+{% endblock %}
 
-    <h5 style="margin-top: 1rem">Options</h5>
+{% block body %}
+    <main role="main" class="container">
+        {{ include("component/navbar.html.twig") }}
 
-    <div
-      class="alert alert-secondary"
-      role="alert"
-      style="padding-top: 0.5rem; padding-bottom: 0.5rem"
-    >
-      <b>Configuration</b>
-      <br style="margin-bottom: 0.5rem" />
-      <ol style="margin-bottom: 0.5rem">
-        <li>
-          Create a new
-          <a
-            href="https://mastodon.social/settings/applications"
-            target="_blank"
-            >Mastodon Application</a
-          >
-          with <code>[name="Movary"]</code>
-          <code>[Redirect URI="urn:ietf:wg:oauth:2.0:oob"]</code>. Enable the
-          <code>write:statuses</code> scope.
-        </li>
-        <li>Copy "Your access token" below.</li>
-        <li>Click "Test"</li>
-      </ol>
-    </div>
+        <div style="text-align: center">
+            {{ include("component/settings-nav.html.twig") }}
 
-    <div
-      id="alerts"
-      style="
-        margin-left: 5%;
-        margin-right: 5%;
-        margin-bottom: 0.7rem !important;
-      "
-    >
-      {% if mastodonCredentialsUpdated == true %}
-      <div class="alert alert-success alert-dismissible" role="alert">
-        Settings updated.
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
-      </div>
-      {% endif %}
-    </div>
+            <div style="padding-top: 1rem">
+                <h5>Mastodon</h5>
 
-    <form
-      action="{{ applicationUrl }}/settings/integrations/mastodon"
-      method="post"
-      id="mastodonForm"
-    >
-      <input
-        {% if mastodonEnable %}checked{% endif %}
-        class="form-check-input"
-        type="checkbox"
-        id="mastodonEnable"
-        name="mastodonEnable"
-        style="margin-right: 0.2rem"
-      />
-      <label class="form-check-label" for="mastodonEnable">
-        Enable posting to Mastodon
-      </label>
-      <hr />
+                <p class="text-muted" style="margin-bottom: 0.5rem">
+                    Publish newly watched movies or watchlist additions as Mastodon posts.
+                </p>
+            </div>
 
-      <section id="enabledisable" class="{% if mastodonEnable == false %}disabled{% endif %}">
-        <p style="margin-bottom: 0.5rem">
-          Mastodon username (<code>@user@domain.com</code>):
-        </p>
-        <div class="input-group mb-3">
-          <input
-            {% if mastodonEnable == false %}disabled{% endif %}
-            type="text"
-            class="form-control"
-            name="mastodonUsername"
-            id="mastodonUsername"
-            placeholder="Enter Mastodon username (e.g., @alifeee@mastodon.social) here"
-            value="{{ mastodonUsername }}"
-            style="margin-left: 5%; margin-right: 5%; text-align: center"
-            pattern="@.*@.*"
-          />
+            <div class="alert alert-secondary" role="alert" style="padding-top: 0.5rem; padding-bottom: 0.5rem">
+                <b>Configuration </b>
+                <br style="margin-bottom: 0.5rem"/>
+                <ul style="margin-bottom: 0.5rem">
+                    <li>
+                        Create a new <a href="https://mastodon.social/settings/applications" target="_blank">Mastodon Application</a>
+                        with Redirect URI <code>urn:ietf:wg:oauth:2.0:oob</code> and the <code>write:statuses</code> scope
+                    </li>
+                    <li>Copy "Your access token" from the created Mastodon Application and paste it below</li>
+                    <li>Click "Test" to verify the connection</li>
+                    <li>Click "Save" to save the settings</li>
+                </ul>
+            </div>
+
+            <form action="{{ applicationUrl }}/settings/integrations/mastodon" method="post" id="mastodonForm">
+                <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                    <input
+                            {% if mastodonEnable %}checked{% endif %}
+                            class="form-check-input"
+                            type="checkbox"
+                            id="mastodonEnable"
+                            name="mastodonEnable"
+                            style="margin-right: 0.2rem"
+                    />
+                    <label class="form-check-label" for="mastodonEnable">
+                        Enable posting to Mastodon
+                    </label>
+                </div>
+
+                <section id="enabledisable" class="{% if mastodonEnable == false %}disabled{% endif %}">
+                    <p style="margin-bottom: 0.5rem">
+                        <b>Mastodon username</b>
+                    </p>
+                    <div class="input-group mb-3" style="margin-bottom: 0!important;">
+                        <input
+                                {% if mastodonEnable == false %}disabled{% endif %}
+                                type="text"
+                                class="form-control"
+                                name="mastodonUsername"
+                                id="mastodonUsername"
+                                value="{{ mastodonUsername }}"
+                                style="margin-left: 5%; margin-right: 5%; text-align: center"
+                                pattern="@.*@.*"
+                        />
+                    </div>
+                    <div class="form-text" style="margin-bottom: 1rem">Username format @.*@.* (e.g. <code>@username@mastodon.social</code>)</div>
+
+                    <p style="margin-bottom: 0.5rem"><b>Access Token</b></p>
+                    <div class="input-group mb-3" style="margin-bottom: 0!important;">
+                        <input
+                                {% if mastodonEnable == false %}disabled{% endif %}
+                                type="text"
+                                class="form-control"
+                                name="mastodonAccessToken"
+                                id="mastodonAccessToken"
+                                value="{{ mastodonAccessToken }}"
+                                style="margin-left: 5%; margin-right: 5%; text-align: center"
+                        />
+                    </div>
+                    <div class="form-text" style="margin-bottom: 1rem">Copy from your Mastodon application</div>
+
+                    <div class="mb-3" style="margin-left: 5%; margin-right: 5%; text-align: center">
+                        <label for="privacyInput" class="form-label"><b>Post visibility</b></label>
+                        <select class="form-select" name="mastodonVisibility" style="text-align: center;padding-right:0;" id="privacyInput" aria-describedby="privacyHelp"
+                                {% if mastodonEnable == false %}disabled{% endif %}>
+                            <option value="public" {% if mastodonVisibility == "public" %}selected{% endif %}>Public</option>
+                            <option value="unlisted" {% if mastodonVisibility == "unlisted" %}selected{% endif %}>Unlisted</option>
+                            <option value="private" {% if mastodonVisibility == "private" %}selected{% endif %}>Private</option>
+                        </select>
+                    </div>
+
+                    <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                        <input
+                                {% if mastodonEnable == false %}disabled{% endif %}
+                                class="form-check-input"
+                                type="checkbox"
+                                {% if mastodonOnByDefault %}checked{% endif %}
+                                id="mastodonOnByDefault"
+                                name="mastodonOnByDefault"
+                                style="margin-right: 0.2rem"
+                        />
+
+                        <label class="form-check-label" for="mastodonOnByDefault">
+                            Post to Mastodon by default
+                        </label>
+                    </div>
+                </section>
+
+                <div id="alerts" style="margin-left: 5%; margin-right: 5%; margin-bottom: 0.7rem !important;">
+                    {% if mastodonCredentialsUpdated == true %}
+                        <div class="alert alert-success alert-dismissible" role="alert">
+                            Settings updated.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button class="btn btn-outline-primary" type="button" onclick="testCredentials()" id="verifyButton">
+                    Test
+                </button>
+
+                <button class="btn btn-primary" type="submit">Save</button>
+            </form>
         </div>
-
-        <p style="margin-bottom: 0.5rem">Access Token:</p>
-        <div class="input-group mb-3">
-          <input
-            {% if mastodonEnable == false %}disabled{% endif %}
-            type="text"
-            class="form-control"
-            name="mastodonAccessToken"
-            id="mastodonAccessToken"
-            placeholder="Enter access token here"
-            value="{{ mastodonAccessToken }}"
-            style="margin-left: 5%; margin-right: 5%; text-align: center"
-          />
-        </div>
-
-        <fieldset>
-          <legend style="font-size: 1rem">post visibility:</legend>
-          <div>
-            <input
-              {% if mastodonEnable == false %}disabled{% endif %}
-              type="radio"
-              name="mastodonVisibility"
-              id="mastodonVisibility_public"
-              value="public"
-              {% if mastodonVisibility == "public" %}checked{% endif %}
-            />
-            <label for="mastodonVisibility_public">Public</label>
-          </div>
-          <div>
-            <input
-              {% if mastodonEnable == false %}disabled{% endif %}
-              type="radio"
-              name="mastodonVisibility"
-              id="mastodonVisibility_unlisted"
-              value="unlisted"
-              {% if mastodonVisibility == "unlisted" %}checked{% endif %}
-            />
-            <label for="mastodonVisibility_unlisted">Unlisted</label>
-          </div>
-          <div>
-            <input
-              {% if mastodonEnable == false %}disabled{% endif %}
-              type="radio"
-              name="mastodonVisibility"
-              id="mastodonVisibility_private"
-              value="private"
-              {% if mastodonVisibility == "private" %}checked{% endif %}
-            />
-            <label for="mastodonVisibility_private">Private</label>
-          </div>
-        </fieldset>
-
-        <input
-          {% if mastodonEnable == false %}disabled{% endif %}
-          class="form-check-input"
-          type="checkbox"
-          {% if mastodonOnByDefault %}checked{% endif %}
-          id="mastodonOnByDefault"
-          name="mastodonOnByDefault"
-          style="margin-right: 0.2rem"
-        />
-        <label class="form-check-label" for="mastodonOnByDefault">
-          post to Mastodon by default
-        </label>
-
-        <div
-          id="alerts"
-          style="
-            margin-left: 5%;
-            margin-right: 5%;
-            margin-bottom: 0.7rem !important;
-          "
-        >
-          {% if traktCredentialsUpdated == true %}
-          <div class="alert alert-success alert-dismissible" role="alert">
-            Trakt credentials were updated.
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
-          {% endif %}
-        </div>
-      </section>
-      <button
-        class="btn btn-outline-primary"
-        type="button"
-        onclick="testCredentials()"
-        id="verifyButton"
-      >
-        Test
-      </button>
-      <button class="btn btn-primary" type="submit">Save</button>
-    </form>
-  </div>
-</main>
+    </main>
 {% endblock %}
