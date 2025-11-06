@@ -843,10 +843,14 @@ class SettingsController
 
         $this->sessionWrapper->set('traktCredentialsUpdated', true);
 
+        $redirectUrl = $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create('/settings/integrations/trakt')
+        );
+
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation((string)$request->getHttpReferer())],
+            [Header::createLocation($redirectUrl)],
         );
     }
 }

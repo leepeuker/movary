@@ -44,3 +44,59 @@ function toggleTableVisibility() {
     document.getElementById('importTable').classList.remove('d-none')
     document.getElementById('showImportTableButton').disabled = true
 }
+
+async function traktImportRatings() {
+    const importRatingsModal = bootstrap.Modal.getInstance('#traktImportRatings');
+
+    const response = await importTraktRatings();
+
+    importRatingsModal.hide()
+
+    switch (response.status) {
+        case 204:
+            addAlert('alertRatingsImportDiv', 'Ratings import queued successfully', 'success');
+            break;
+        case 400:
+            const errorMessage = await response.text();
+
+            addAlert('alertRatingsImportDiv', errorMessage, 'danger');
+
+            break;
+        default:
+            addAlert('alertRatingsImportDiv', 'Unexpected server error', 'danger');
+    }
+}
+
+function importTraktRatings() {
+    return fetch(APPLICATION_URL + '/jobs/schedule/trakt-ratings-sync', {
+        method: 'POST',
+    })
+}
+
+async function traktImportHistory() {
+    const importHistoryModal = bootstrap.Modal.getInstance('#traktImportHistory');
+
+    const response = await importTraktHistory();
+
+    importHistoryModal.hide()
+
+    switch (response.status) {
+        case 204:
+            addAlert('alertHistoryImportDiv', 'History import queued successfully', 'success');
+            break;
+        case 400:
+            const errorMessage = await response.text();
+
+            addAlert('alertHistoryImportDiv', errorMessage, 'danger');
+
+            break;
+        default:
+            addAlert('alertHistoryImportDiv', 'Unexpected server error', 'danger');
+    }
+}
+
+function importTraktHistory() {
+    return fetch(APPLICATION_URL + '/jobs/schedule/trakt-history-sync', {
+        method: 'POST',
+    })
+}
