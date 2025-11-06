@@ -30,6 +30,7 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 use Twig\Environment;
 use ZipStream;
@@ -713,10 +714,14 @@ class SettingsController
 
         $this->sessionWrapper->set('mastodonCredentialsUpdated', true);
 
+        $redirectUrl = $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create('/settings/integrations/mastodon')
+        );
+
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation($_SERVER['HTTP_REFERER'])],
+            [Header::createLocation($redirectUrl)],
         );
     }
 

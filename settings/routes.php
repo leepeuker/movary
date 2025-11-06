@@ -147,7 +147,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/settings/netflix', [Web\NetflixController::class, 'matchNetflixActivityCsvWithTmdbMovies'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/netflix/import', [Web\NetflixController::class, 'importNetflixData'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/integrations/mastodon', [Web\SettingsController::class, 'renderMastodonPage'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('POST', '/settings/integrations/mastodon', [Web\SettingsController::class, 'updateMastodon'], [Web\Middleware\UserIsAuthenticated::class, Web\Middleware\HttpRefererIsAllowed::class]);
+    $routes->add('POST', '/settings/integrations/mastodon', [Web\SettingsController::class, 'updateMastodon'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/users', [Web\UserController::class, 'fetchUsers']);
     $routes->add('POST', '/settings/users', [Web\UserController::class, 'createUser']);
     $routes->add('PUT', '/settings/users/{userId:\d+}', [Web\UserController::class, 'updateUser'], [Web\Middleware\UserIsAuthenticated::class]);
