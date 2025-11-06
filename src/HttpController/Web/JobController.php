@@ -4,12 +4,15 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\JobType;
+use Movary\ValueObject\RelativeUrl;
+use RuntimeException;
 
 class JobController
 {
@@ -18,6 +21,7 @@ class JobController
         private readonly JobQueueApi $jobQueueApi,
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly ApplicationUrlService $applicationUrlService,
         private readonly string $appStorageDirectory,
     ) {
     }
@@ -70,7 +74,7 @@ class JobController
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['diaryCsv']['tmp_name']) === true) {
-            return Response::createBadRequest('Missing diary csv file');
+            throw new RuntimeException('Missing ratings csv file');
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -79,14 +83,24 @@ class JobController
         move_uploaded_file($fileParameters['diaryCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidDiaryCsv($targetFile) === false) {
-            return Response::createBadRequest('Diary csv file not valid');
+            $this->sessionWrapper->set('letterboxdDiaryImportFileInvalid', true);
+
+            return Response::createSeeOther(
+                $this->applicationUrlService->createApplicationUrl(
+                    RelativeUrl::create('/settings/integrations/letterboxd'),
+                ),
+            );
         }
 
         $this->jobQueueApi->addLetterboxdImportHistoryJob($userId, $targetFile);
 
         $this->sessionWrapper->set('letterboxdDiarySyncSuccessful', true);
 
-        return Response::createNoContent();
+        return Response::createSeeOther(
+            $this->applicationUrlService->createApplicationUrl(
+                RelativeUrl::create('/settings/integrations/letterboxd'),
+            ),
+        );
     }
 
     public function scheduleLetterboxdRatingsImport(Request $request) : Response
@@ -94,7 +108,13 @@ class JobController
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['ratingsCsv']['tmp_name']) === true) {
-            return Response::createBadRequest('Missing ratings csv file');
+            $this->sessionWrapper->set('letterboxdRatingsImportFileMissing', true);
+
+            return Response::createSeeOther(
+                $this->applicationUrlService->createApplicationUrl(
+                    RelativeUrl::create('/settings/integrations/letterboxd'),
+                ),
+            );
         }
 
         $userId = $this->authenticationService->getCurrentUserId();
@@ -103,14 +123,24 @@ class JobController
         move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidRatingsCsv($targetFile) === false) {
-            return Response::createBadRequest('Ratings csv file not valid');
+            $this->sessionWrapper->set('letterboxdRatingsImportFileInvalid', true);
+
+            return Response::createSeeOther(
+                $this->applicationUrlService->createApplicationUrl(
+                    RelativeUrl::create('/settings/integrations/letterboxd'),
+                ),
+            );
         }
 
         $this->jobQueueApi->addLetterboxdImportRatingsJob($userId, $targetFile);
 
         $this->sessionWrapper->set('letterboxdRatingsSyncSuccessful', true);
 
-        return Response::createNoContent();
+        return Response::createSeeOther(
+            $this->applicationUrlService->createApplicationUrl(
+                RelativeUrl::create('/settings/integrations/letterboxd'),
+            ),
+        );
     }
 
     public function schedulePlexWatchlistImport() : Response
