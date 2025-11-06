@@ -188,7 +188,6 @@ class Factory
             $container->get(JobQueueApi::class),
             $container->get(LetterboxdCsvValidator::class),
             $container->get(SessionWrapper::class),
-            $container->get(ApplicationUrlService::class),
             self::createDirectoryStorageApp(),
         );
     }
