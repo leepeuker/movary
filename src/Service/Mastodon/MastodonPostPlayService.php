@@ -5,8 +5,9 @@ namespace Movary\Service\Mastodon;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobEntity;
-use Movary\Service\ServerSettings;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\SlugifyService;
+use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 
 class MastodonPostPlayService
@@ -14,9 +15,9 @@ class MastodonPostPlayService
     public function __construct(
         private readonly MastodonPostService $mastodonPostService,
         private readonly MovieApi $movieApi,
-        private readonly ServerSettings $serverSettings,
         private readonly UserApi $userApi,
         private readonly SlugifyService $slugify,
+        private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
 
@@ -47,11 +48,12 @@ class MastodonPostPlayService
             throw new RuntimeException('User does not exist with id: ' . $movieId);
         }
 
-        $applicationUrl = $this->serverSettings->requireApplicationUrl();
-        $movieUrl = (
-            $applicationUrl . "/users/" . $user->getName() . "/movies/"
-            . $movieId . '-' . $this->slugify->slugify($movie->getTitle())
+        $movieUrl = $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create(
+                '/users/' . $user->getName() . '/movies/' . $movieId . '-' . $this->slugify->slugify($movie->getTitle())
+            )
         );
+
         // link only renders on mastodon if https, not for http
         $message = (
             'Watched movie: '
