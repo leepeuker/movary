@@ -54,7 +54,7 @@ async function traktImportRatings() {
 
     switch (response.status) {
         case 204:
-            addAlert('alertRatingsImportDiv', 'History import queued successfully', 'success');
+            addAlert('alertRatingsImportDiv', 'Ratings import queued successfully', 'success');
             break;
         case 400:
             const errorMessage = await response.text();
