@@ -33,9 +33,22 @@ class MovieSearchController
             $requestData->getPage(),
         );
 
+        $totalResults = (int)$tmdbResponse['total_results'];
+        if ($totalResults === 0) {
+            return Response::createJson(
+                Json::encode([
+                    'results' => [],
+                    'currentPage' => 0,
+                    'maxPage' => 0,
+                ]),
+            );
+        }
+
+        $limit = (int)floor($totalResults / (int)$tmdbResponse['total_pages']);
+
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
-            (int)$tmdbResponse['total_results'],
-            (int)floor((int)$tmdbResponse['total_results'] / (int)$tmdbResponse['total_pages']),
+            $totalResults,
+            $limit,
             $requestData->getPage(),
         );
 
