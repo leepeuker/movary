@@ -46,8 +46,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/jobs', [Web\JobController::class, 'getJobs'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/job-queue/purge-processed', [Web\JobController::class, 'purgeProcessedJobs'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/job-queue/purge-all', [Web\JobController::class, 'purgeAllJobs'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/jobs/schedule/trakt-history-sync', [Web\JobController::class, 'scheduleTraktHistorySync'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/jobs/schedule/trakt-ratings-sync', [Web\JobController::class, 'scheduleTraktRatingsSync'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport'], [Web\Middleware\UserIsAuthenticated::class]);

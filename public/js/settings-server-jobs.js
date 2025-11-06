@@ -27,6 +27,8 @@ function refreshPage() {
 }
 
 async function removeAllJobs() {
+    const jobsRemoveAllModal = bootstrap.Modal.getInstance('#jobsRemoveAllModal');
+
     const response = await fetch(
         APPLICATION_URL + '/job-queue/purge-all', {
             method: 'POST',
@@ -36,6 +38,8 @@ async function removeAllJobs() {
         console.error(error)
         addAlert('alertJobsDiv', 'Could not remove all jobs', 'danger');
     });
+
+    jobsRemoveAllModal.hide()
 
     if (!response.ok) {
         addAlert('alertJobsDiv', 'Could not remove all jobs', 'danger');
@@ -48,6 +52,8 @@ async function removeAllJobs() {
 }
 
 async function removeProcessedJobs() {
+    const jobsRemoveProcessedModal = bootstrap.Modal.getInstance('#jobsRemoveProcessedModal');
+
     const response = await fetch(
         APPLICATION_URL + '/job-queue/purge-processed', {
             method: 'POST',
@@ -57,6 +63,8 @@ async function removeProcessedJobs() {
         console.error(error)
         addAlert('alertJobsDiv', 'Could not remove processed jobs', 'danger');
     });
+
+    jobsRemoveProcessedModal.hide()
 
     if (!response.ok) {
         addAlert('alertJobsDiv', 'Could not remove processed jobs', 'danger');
