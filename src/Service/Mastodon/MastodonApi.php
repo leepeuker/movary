@@ -26,7 +26,7 @@ class MastodonApi
             throw new RuntimeException('Could not extract domain from username: ' . $username);
         }
 
-        $requestUrl = 'https://' . $username . '/api/v1/statuses';
+        $requestUrl = 'https://' . $domain . '/api/v1/statuses';
         $requestOptions = [
             'connect_timeout' => self::DEFAULT_TIMEOUT,
             'headers' => [
