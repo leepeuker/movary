@@ -21,8 +21,8 @@ class MastodonApi
             throw new RuntimeException('Could not extract domain from username: ' . $username);
         }
 
-        $domain = $matches[1] ?? null;
-        if ($domain === null) {
+        $domain = $matches[1];
+        if ($domain == null) {
             throw new RuntimeException('Could not extract domain from username: ' . $username);
         }
 
