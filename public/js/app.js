@@ -323,12 +323,14 @@ function resetLogModalLogInputs() {
 
 function addToWatchlist(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
+    const postToMastodon = document.getElementById('postToMastodon').value
 
     fetch(APPLICATION_URL + '/add-movie-to-watchlist', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
             'tmdbId': tmdbId,
+            'postToMastodon': postToMastodon,
         })
     }).then(function (response) {
         if (response.status === 200) {
@@ -350,6 +352,7 @@ function logMovie(context) {
     const watchDate = document.getElementById(context + 'WatchDateInput').value
     const comment = document.getElementById(context + 'CommentInput').value
     const locationId = document.getElementById(context + 'LocationInput').value
+    const postToMastodon = document.getElementById('postToMastodon').checked
     const dateFormatPhp = document.getElementById('dateFormatPhp').value
 
     removeAlert('logPlayModalAlert')
@@ -367,7 +370,8 @@ function logMovie(context) {
             'comment': comment,
             'dateFormat': dateFormatPhp,
             'personalRating': rating,
-            'locationId': locationId
+            'locationId': locationId,
+            'postToMastodon': postToMastodon,
         })
     }).then(function (response) {
         if (response.status === 200) {

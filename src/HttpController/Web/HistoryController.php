@@ -7,6 +7,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
@@ -31,6 +32,7 @@ class HistoryController
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly JobQueueApi $jobQueueApi,
     ) {
     }
 
@@ -103,6 +105,7 @@ class HistoryController
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
         $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
         $locationId = empty($requestData['locationId']) === true ? null : (int)$requestData['locationId'];
+        $postToMastodon = empty($requestData['postToMastodon']) === true ? false : (bool)$requestData['postToMastodon'];
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -114,6 +117,9 @@ class HistoryController
         $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
         $this->movieApi->updateHistoryLocation($movie->getId(), $userId, $watchDate, $locationId);
+        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movie->getId());
+        }
 
         return Response::create(StatusCode::createOk());
     }

@@ -39,6 +39,11 @@ class UserEntity
         private readonly bool $hasLocationsEnabled,
         private readonly bool $displayTmdbRating,
         private readonly bool $displayImdbRating,
+        private readonly bool $mastodonEnabled,
+        private readonly ?string $mastodonUsername,
+        private readonly ?string $mastodonAccessToken,
+        private readonly bool $mastodonPostAutomatic,
+        private readonly ?string $mastodonPostVisibility,
     ) {
     }
 
@@ -76,6 +81,11 @@ class UserEntity
             (bool)$data['locations_enabled'],
             (bool)$data['display_tmdb_rating'],
             (bool)$data['display_imdb_rating'],
+            (bool)$data['mastodon_enabled'],
+            $data['mastodon_username'],
+            $data['mastodon_access_token'],
+            (bool)$data['mastodon_post_automatic'],
+            $data['mastodon_post_visibility'],
         );
     }
 
@@ -109,11 +119,6 @@ class UserEntity
         return $this->displayCharacterNames;
     }
 
-    public function getEmbyWebhookId() : ?string
-    {
-        return $this->embyWebhookUuid;
-    }
-
     public function getDisplayImdbRating() : bool
     {
         return $this->displayImdbRating;
@@ -122,6 +127,11 @@ class UserEntity
     public function getDisplayTmdbRating() : bool
     {
         return $this->displayTmdbRating;
+    }
+
+    public function getEmbyWebhookId() : ?string
+    {
+        return $this->embyWebhookUuid;
     }
 
     public function getId() : int
@@ -137,6 +147,21 @@ class UserEntity
     public function getKodiWebhookId() : ?string
     {
         return $this->kodiWebhookUuid;
+    }
+
+    public function getMastodonAccessToken() : ?string
+    {
+        return $this->mastodonAccessToken;
+    }
+
+    public function getMastodonPostVisibility() : ?string
+    {
+        return $this->mastodonPostVisibility;
+    }
+
+    public function getMastodonUsername() : ?string
+    {
+        return $this->mastodonUsername;
     }
 
     public function getName() : string
@@ -212,6 +237,16 @@ class UserEntity
     public function hasLocationsEnabled() : bool
     {
         return $this->hasLocationsEnabled;
+    }
+
+    public function isMastodonPostAutomatic() : bool
+    {
+        return $this->mastodonPostAutomatic;
+    }
+
+    public function isMastodonEnabled() : bool
+    {
+        return $this->mastodonEnabled;
     }
 
     public function hasPlexScrobbleRatingsEnabled() : bool

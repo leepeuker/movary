@@ -50,6 +50,9 @@
             <li class="dropdown-item">
                 <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/netflix' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/netflix">Netflix</a>
             </li>
+            <li class="dropdown-item">
+                <a class="nav-link {% if requestUrlPath starts with '/settings/integrations/mastodon' %}active{% endif %}" href="{{ applicationUrl }}/settings/integrations/mastodon">Mastodon</a>
+            </li>
         </ul>
     </li>
     {% if currentUserIsAdmin == true %}

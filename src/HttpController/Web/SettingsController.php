@@ -333,6 +333,29 @@ class SettingsController
         );
     }
 
+    public function renderMastodonPage() : Response
+    {
+        $mastodonCredentialsUpdated = $this->sessionWrapper->find('mastodonCredentialsUpdated');
+        $this->sessionWrapper->unset('mastodonCredentialsUpdated');
+
+        $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render(
+                'page/settings-integration-mastodon.html.twig',
+                [
+                    'mastodonCredentialsUpdated' => $mastodonCredentialsUpdated,
+                    'mastodonEnable' => $user->isMastodonEnabled(),
+                    'mastodonOnByDefault' => $user->isMastodonPostAutomatic(),
+                    'mastodonUsername' => $user->getMastodonUsername(),
+                    'mastodonVisibility' => $user->getMastodonPostVisibility(),
+                    'mastodonAccessToken' => $user->getMastodonAccessToken(),
+                ],
+            ),
+        );
+    }
+
     public function renderNetflixPage() : Response
     {
         return Response::create(
@@ -661,6 +684,45 @@ class SettingsController
         $this->userApi->updateKodiScrobblerOptions($userId, $scrobbleWatches);
 
         return Response::create(StatusCode::createNoContent());
+    }
+
+    public function updateMastodon(Request $request) : Response
+    {
+        $userId = $this->authenticationService->getCurrentUserId();
+        $postParameters = $request->getPostParameters();
+
+        $mastodonEnable = $postParameters['mastodonEnable'];
+        $mastodonEnable = $mastodonEnable == 'on';
+
+        $mastodonOnByDefault = $postParameters['mastodonOnByDefault'];
+        $mastodonOnByDefault = $mastodonOnByDefault == 'on';
+
+        $mastodonUsername = $postParameters['mastodonUsername'];
+
+        $mastodonAccessToken = $postParameters['mastodonAccessToken'];
+
+        $mastodonPostVisibility = $postParameters['mastodonVisibility'];
+        if (!in_array($mastodonPostVisibility, ['public', 'unlisted', 'private'])) {
+            $mastodonPostVisibility = 'public';
+        }
+
+        $this->userApi->updateMastodonPostEnabled($userId, $mastodonEnable);
+        $this->userApi->updateMastodonUsername($userId, $mastodonUsername);
+        $this->userApi->updateMastodonAccessToken($userId, $mastodonAccessToken);
+        $this->userApi->updateMastodonPostAutomatic($userId, $mastodonOnByDefault);
+        $this->userApi->updateMastodonPostVisibility($userId, $mastodonPostVisibility);
+
+        $this->sessionWrapper->set('mastodonCredentialsUpdated', true);
+
+        $redirectUrl = $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create('/settings/integrations/mastodon')
+        );
+
+        return Response::create(
+            StatusCode::createSeeOther(),
+            null,
+            [Header::createLocation($redirectUrl)],
+        );
     }
 
     public function updatePassword(Request $request) : Response

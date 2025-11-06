@@ -1,0 +1,66 @@
+<?php declare(strict_types=1);
+
+namespace Movary\Service\Mastodon;
+
+use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\User\UserApi;
+use Movary\JobQueue\JobEntity;
+use Movary\Service\ApplicationUrlService;
+use Movary\Service\SlugifyService;
+use Movary\ValueObject\RelativeUrl;
+use RuntimeException;
+
+class MastodonPostPlayService
+{
+    public function __construct(
+        private readonly MastodonPostService $mastodonPostService,
+        private readonly MovieApi $movieApi,
+        private readonly UserApi $userApi,
+        private readonly SlugifyService $slugify,
+        private readonly ApplicationUrlService $applicationUrlService,
+    ) {
+    }
+
+    public function executeJob(JobEntity $job) : void
+    {
+        $userId = $job->getUserId();
+        if ($userId === null) {
+            throw new RuntimeException('Missing parameter: userId');
+        }
+
+        $movieId = $job->getParameters()['movieId'] ?? null;
+        if ($movieId === null) {
+            throw new RuntimeException('Missing parameter: movieId');
+        }
+
+        $this->postPlay($userId, $movieId);
+    }
+
+    public function postPlay(int $userId, int $movieId) : void
+    {
+        $movie = $this->movieApi->findById($movieId);
+        if ($movie === null) {
+            throw new RuntimeException('Movie does not exist with id: ' . $movieId);
+        }
+
+        $user = $this->userApi->findUserById($userId);
+        if ($user === null) {
+            throw new RuntimeException('User does not exist with id: ' . $movieId);
+        }
+
+        $movieUrl = $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create(
+                '/users/' . $user->getName() . '/movies/' . $movieId . '-' . $this->slugify->slugify($movie->getTitle())
+            )
+        );
+
+        // link only renders on mastodon if https, not for http
+        $message = (
+            'Watched movie: '
+            . $movie->getTitle() . ' (' . $movie->getReleaseDate()?->format('Y') . ')'
+            . "\n\n" . $movieUrl
+        );
+
+        $this->mastodonPostService->postMessageForUser($userId, $message);
+    }
+}

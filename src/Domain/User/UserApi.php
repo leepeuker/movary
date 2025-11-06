@@ -355,14 +355,14 @@ class UserApi
         $this->repository->updateDisplayCharacterNames($userId, $displayCharacterNames);
     }
 
-    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
-    {
-        $this->repository->updateDisplayTmdbRating($userId, $displayTmdbRating);
-    }
-
     public function updateDisplayImdbRating(int $userId, bool $displayTmdbRating) : void
     {
         $this->repository->updateDisplayImdbRating($userId, $displayTmdbRating);
+    }
+
+    public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
+    {
+        $this->repository->updateDisplayTmdbRating($userId, $displayTmdbRating);
     }
 
     public function updateEmail(int $userId, string $email) : void
@@ -419,6 +419,31 @@ class UserApi
     public function updateLocationsEnabled(int $userId, bool $locationsEnabled) : void
     {
         $this->repository->updateLocationsEnabled($userId, $locationsEnabled);
+    }
+
+    public function updateMastodonAccessToken(int $userId, ?string $mastodonAccessToken) : void
+    {
+        $this->repository->updateMastodonAccessToken($userId, $mastodonAccessToken);
+    }
+
+    public function updateMastodonPostAutomatic(int $userId, bool $mastodonPostAutomatic) : void
+    {
+        $this->repository->updateMastodonPostAutomatic($userId, $mastodonPostAutomatic);
+    }
+
+    public function updateMastodonPostEnabled(int $userId, bool $mastodonPostEnabled) : void
+    {
+        $this->repository->updateMastodonPostEnabled($userId, $mastodonPostEnabled);
+    }
+
+    public function updateMastodonPostVisibility(int $userId, ?string $mastodonPostVisibility) : void
+    {
+        $this->repository->updateMastodonPostVisibility($userId, $mastodonPostVisibility);
+    }
+
+    public function updateMastodonUsername(int $userId, ?string $mastodonUsername) : void
+    {
+        $this->repository->updateMastodonUsername($userId, $mastodonUsername);
     }
 
     public function updateName(int $userId, string $name) : void

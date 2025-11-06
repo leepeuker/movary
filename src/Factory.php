@@ -308,6 +308,8 @@ class Factory
         $twig->addGlobal('currentUserIsAdmin', $user?->isAdmin());
         $twig->addGlobal('currentUserCountry', $user?->getCountry());
         $twig->addGlobal('currentUserLocationsEnabled', $user?->hasLocationsEnabled());
+        $twig->addGlobal('currentUserMastodonEnabled', $user?->isMastodonEnabled());
+        $twig->addGlobal('currentUserMastodonPostAutomatic', $user?->isMastodonPostAutomatic());
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
