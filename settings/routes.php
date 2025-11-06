@@ -51,8 +51,8 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/jobs/schedule/letterboxd-diary-sync', [Web\JobController::class, 'scheduleLetterboxdDiaryImport'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/jobs/schedule/letterboxd-ratings-sync', [Web\JobController::class, 'scheduleLetterboxdRatingsImport'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/jobs/schedule/plex-watchlist-sync', [Web\JobController::class, 'schedulePlexWatchlistImport'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/jobs/schedule/jellyfin-export-history', [Web\JobController::class, 'scheduleJellyfinExportHistory'], [
+    $routes->add('POST', '/jobs/schedule/jellyfin-import-history', [Web\JobController::class, 'scheduleJellyfinImportHistory'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/jobs/schedule/jellyfin-export-history', [Web\JobController::class, 'scheduleJellyfinExportHistory'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserHasJellyfinToken::class,
     ]);
