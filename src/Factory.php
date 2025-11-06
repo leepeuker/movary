@@ -94,16 +94,6 @@ class Factory
         );
     }
 
-    public static function createCreateUserController(ContainerInterface $container) : CreateUserController
-    {
-        return new CreateUserController(
-            $container->get(Twig\Environment::class),
-            $container->get(Authentication::class),
-            $container->get(UserApi::class),
-            $container->get(SessionWrapper::class),
-        );
-    }
-
     public static function createCurrentHttpRequest() : Request
     {
         return Request::createFromGlobals();
