@@ -227,7 +227,7 @@ document.getElementById('plexServerUrlInput').addEventListener('input', function
 async function importPlexWatchlist() {
     const response = await fetch(
         APPLICATION_URL + '/jobs/schedule/plex-watchlist-sync',
-        {'method': 'get'}
+        {'method': 'POST'}
     ).catch(function (error) {
         addAlert('alertPlexWatchlistImportDiv', 'Watchlist import could not be scheduled', 'danger')
 
