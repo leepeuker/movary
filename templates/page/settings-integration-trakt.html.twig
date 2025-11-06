@@ -15,6 +15,8 @@
 
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
+            {{ include('component/modal-trakt-import-history.twig') }}
+            {{ include('component/modal-trakt-import-ratings.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5>Trakt.tv API Access</h5>
@@ -73,30 +75,20 @@
                     The import only adds missing data, it will not change existing data.
                 </p>
 
-                {% if traktScheduleHistorySyncSuccessful == true %}
-                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 0rem">
-                        History import scheduled
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endif %}
-
                 <div style="margin-top: 0.9rem">
+                    <div id="alertHistoryImportDiv" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem"></div>
+
                     <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_history')" style="margin-right: .3rem">Show imports</button>
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       href="{{ applicationUrl }}/jobs/schedule/trakt-history-sync">Import history</a>
+                    <button class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
+                       data-bs-toggle="modal" data-bs-target="#traktImportHistory">Import history</button>
 
                     <br>
 
-                    {% if traktScheduleRatingsSyncSuccessful == true %}
-                        <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0!important;margin-top: 1rem">
-                            Ratings import scheduled
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
+                    <div id="alertRatingsImportDiv" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem"></div>
 
-                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_ratings')" style="margin-right: .3rem;margin-top: 1rem">Show imports</button>
-                    <a class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
-                       href="{{ applicationUrl }}/jobs/schedule/trakt-ratings-sync" style="margin-top: 1rem">Import ratings</a>
+                    <button type="button" class="btn btn-outline-primary" onclick="showJobModal('trakt_import_ratings')" style="margin-right: .3rem;">Show imports</button>
+                    <button class="btn btn-warning {% if coreAccountChangesDisabled == true or traktUserName is null or traktClientId is null %}disabled{% endif %}"
+                       data-bs-toggle="modal" data-bs-target="#traktImportRatings">Import ratings</button>
                 </div>
             </div>
         </div>

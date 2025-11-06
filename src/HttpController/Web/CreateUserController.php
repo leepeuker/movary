@@ -8,11 +8,13 @@ use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
+use Movary\Service\ApplicationUrlService;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\RelativeUrl;
 use Throwable;
 use Twig\Environment;
 
@@ -25,6 +27,7 @@ class CreateUserController
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
 
@@ -43,20 +46,24 @@ class CreateUserController
         if ($email === null || $name === null || $password === null || $repeatPassword === null) {
             $this->sessionWrapper->set('missingFormData', true);
 
+            $redirectUrl = $this->applicationUrlService->createApplicationUrl(RelativeUrl::create('/create-user'));
+
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation((string)$request->getHttpReferer())],
+                [Header::createLocation($redirectUrl)],
             );
         }
 
         if ($password !== $repeatPassword) {
             $this->sessionWrapper->set('errorPasswordNotEqual', true);
 
+            $redirectUrl = $this->applicationUrlService->createApplicationUrl(RelativeUrl::create('/create-user'));
+
             return Response::create(
                 StatusCode::createSeeOther(),
                 null,
-                [Header::createLocation((string)$request->getHttpReferer())],
+                [Header::createLocation($redirectUrl)],
             );
         }
 
@@ -79,7 +86,7 @@ class CreateUserController
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation((string)$request->getHttpReferer())],
+            [Header::createLocation($this->applicationUrlService->createApplicationUrl())],
         );
     }
 

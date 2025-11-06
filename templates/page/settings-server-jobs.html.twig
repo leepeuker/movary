@@ -18,6 +18,8 @@
 
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
+            {{ include('component/modal-jobs-remove-all.html.twig') }}
+            {{ include('component/modal-jobs-remove-processed.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 1rem">Job Queue</h5>
@@ -62,11 +64,12 @@
                 </div>
 
                 {% if jobs|length == 0 %}<p>No jobs in queue</p>{% endif %}
+
+                <div id="alertJobsDiv"></div>
+
                 <div class="d-grid gap-2">
-                    <a class="btn btn-warning" type="button" href="{{ applicationUrl }}/job-queue/purge-processed"
-                       onclick="return confirm('Are you sure you want to remove all processed jobs (done + failed)?')">Remove processed jobs</a>
-                    <a class="btn btn-danger" type="button" href="{{ applicationUrl }}/job-queue/purge-all"
-                       onclick="return confirm('Are you sure you want to remove all jobs? This will not stop active job processes')">Remove all jobs</a>
+                    <button class="btn btn-warning" type="button"  data-bs-toggle="modal" data-bs-target="#jobsRemoveProcessedModal">Remove processed jobs</button>
+                    <button class="btn btn-danger" type="button"  data-bs-toggle="modal" data-bs-target="#jobsRemoveAllModal">Remove all jobs</button>
                 </div>
                 <br>
             </div>

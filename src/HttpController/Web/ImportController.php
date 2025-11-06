@@ -3,12 +3,14 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\ImportService;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\RelativeUrl;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
@@ -20,6 +22,7 @@ class ImportController
         private readonly ImportService $importService,
         private readonly LoggerInterface $logger,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly ApplicationUrlService $urlService,
     ) {
     }
 
@@ -41,10 +44,12 @@ class ImportController
             $this->sessionWrapper->set('importHistoryError', $exportType);
         }
 
+        $redirectUrl = $this->urlService->createApplicationUrl(RelativeUrl::create('/settings/account/data'));
+
         return Response::create(
             StatusCode::createSeeOther(),
             null,
-            [Header::createLocation((string)$request->getHttpReferer())],
+            [Header::createLocation($redirectUrl)],
         );
     }
 
