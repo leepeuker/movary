@@ -4,6 +4,10 @@
     Watchlist
 {% endblock %}
 
+{% block ogTitleExtra -%}
+    {{ routeUsername }}'s watchlist
+{%- endblock %}
+
 {% block scripts %}
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
     <script src="{{ applicationUrl }}/js/component/modal-advanced-search-watchlist.html.js"></script>

@@ -4,6 +4,10 @@
     History
 {% endblock %}
 
+{% block ogTitleExtra -%}
+    {{ routeUsername }}'s watch history
+{%- endblock %}
+
 {% block scripts %}
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
 {% endblock %}

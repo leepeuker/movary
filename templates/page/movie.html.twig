@@ -1,8 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
+{% block title -%}
     Movie: {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
-{% endblock %}
+{%- endblock %}
+
+{% block ogTitleExtra -%}
+    {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
+{%- endblock %}
+
+{% block ogImage -%}
+    {{ movie.posterPath }}
+{%- endblock %}
 
 {% block stylesheets %}
     <link href="{{ applicationUrl }}/css/movie.css" rel="stylesheet">
