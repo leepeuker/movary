@@ -56,10 +56,14 @@ class HistoryController
         $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
         $position = empty($requestBody['position']) === true ? 1 : (int)$requestBody['position'];
         $locationId = empty($requestBody['locationId']) === true ? null : (int)$requestBody['locationId'];
+        $postToMastodon = empty($requestBody['postToMastodon']) === true ? false : (bool)$requestBody['postToMastodon'];
 
         $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
         $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
 
+        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $newWatchDate->format('Y-m-d'));
+        }
         if ($originalWatchDate == $newWatchDate) {
             $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position);
 

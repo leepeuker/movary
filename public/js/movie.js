@@ -161,6 +161,7 @@ function editWatchDate() {
     const newPositionPlays = document.getElementById('editWatchDateModalPositionInput').value;
     const comment = document.getElementById('editWatchDateModalCommentInput').value;
     const locationId = document.getElementById('editWatchDateModalLocationInput').value;
+    const postToMastodon = document.getElementById('postToMastodon').checked;
 
     const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
 
@@ -174,7 +175,8 @@ function editWatchDate() {
             'comment': comment,
             'position': newPositionPlays,
             'dateFormat': document.getElementById('dateFormatPhp').value,
-            'locationId': locationId
+            'locationId': locationId,
+            'postToMastodon': postToMastodon,
         }),
         success: function (data, textStatus, xhr) {
             window.location.reload()

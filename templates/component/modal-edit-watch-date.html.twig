@@ -30,6 +30,17 @@
                     <select class="form-select"  id="editWatchDateModalLocationInput" aria-describedby="location"></select>
                     <a class="btn btn-outline-secondary rounded-end" href="{{ applicationUrl }}/settings/account/locations"><i class="bi bi-gear"></i></a>
                 </div>
+                <div class="{% if currentUserMastodonEnabled == false %}d-none{% endif %}" style="margin-top: 0.5rem;">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="postToMastodon"
+                        name="postToMastodon"
+                        style="margin-right:0.5rem"
+                        {% if currentUserMastodonPostAutomatic %}checked{% endif %}
+                    >
+                    <label for="postToMastodon" class="form-check-label">Post to Mastodon</label>
+                </div>
                 <div id="advancedWatchDateDetails" class="d-none">
                     <div class="input-group" style="margin-top: 1rem">
                         <i class="input-group-text">Plays</i>
