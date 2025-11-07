@@ -702,7 +702,7 @@ class SettingsController
         $mastodonAccessToken = $postParameters['mastodonAccessToken'];
 
         $mastodonPostVisibility = $postParameters['mastodonVisibility'];
-        if (!in_array($mastodonPostVisibility, ['public', 'unlisted', 'private'])) {
+        if (!in_array($mastodonPostVisibility, ['public', 'unlisted', 'private', 'direct'])) {
             $mastodonPostVisibility = 'public';
         }
 
