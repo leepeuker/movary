@@ -62,7 +62,8 @@ class HistoryController
         $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
 
         if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
-            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $newWatchDate?->format('Y-m-d') ?? "");
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId);
+            // $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $newWatchDate?->format('Y-m-d') ?? "");
         }
         if ($originalWatchDate == $newWatchDate) {
             $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position);
