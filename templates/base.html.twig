@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="canonical" href="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
 
-^    <title>{% apply trim %}{%- block title -%}{% endblock %}{% endapply %}</title>
+    <title>{% apply trim %}{% block title %}Movary{% endblock %}{% endapply %}</title>
     <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
 
     <meta property="og:title" content="{{ applicationName  ~ ': ' ~  block('title')|trim }}" />
