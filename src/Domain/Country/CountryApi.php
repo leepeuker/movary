@@ -17,8 +17,6 @@ class CountryApi
             $map[$country->getIso31661()] = $country->getName();
         }
 
-        asort($map);
-
         return $map;
     }
 }

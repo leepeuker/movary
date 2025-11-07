@@ -12,7 +12,7 @@ class CountryRepository
 
     public function fetchAll() : CountryEntityList
     {
-        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `country` ORDER BY iso_3166_1');
+        $data = $this->dbConnection->fetchAllAssociative('SELECT * FROM `country` ORDER BY english_name');
 
         return CountryEntityList::createFromArray($data);
     }
