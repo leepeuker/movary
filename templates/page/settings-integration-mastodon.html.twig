@@ -95,7 +95,8 @@
                                 {% if mastodonEnable == false %}disabled{% endif %}>
                             <option value="public" {% if mastodonVisibility == "public" %}selected{% endif %}>Public</option>
                             <option value="unlisted" {% if mastodonVisibility == "unlisted" %}selected{% endif %}>Unlisted</option>
-                            <option value="private" {% if mastodonVisibility == "private" %}selected{% endif %}>Private</option>
+                            <option value="private" {% if mastodonVisibility == "private" %}selected{% endif %}>Followers Only</option>
+                            <option value="direct" {% if mastodonVisibility == "direct" %}selected{% endif %}>Private</option>
                         </select>
                     </div>
 
