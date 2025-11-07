@@ -1,12 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    History
-{% endblock %}
-
-{% block ogTitleExtra -%}
     {{ routeUsername }}'s watch history
-{%- endblock %}
+{% endblock %}
 
 {% block scripts %}
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>

@@ -5,20 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="canonical" href="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
 
-    <title>{% block title %}{% endblock %}</title>
+^    <title>{% apply trim %}{%- block title -%}{% endblock %}{% endapply %}</title>
     <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
 
-    <meta property="og:title" content="
-        {{- applicationName -}}
-        {% if routeUsername -%}
-            : {% block ogTitleExtra %}{{ routeUsername }}{% endblock %}
-        {%- endif %}" />
+    <meta property="og:title" content="{{ applicationName  ~ ': ' ~  block('title')|trim }}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
-    <meta property="og:image" content="
-    {%- block ogImage -%}
-        {{ applicationUrl }}/images/movary-logo-512x512.png
-    {%- endblock %}" />
+    <meta property="og:image" content="{% block ogImage %}{{ applicationUrl }}/images/movary-logo-512x512.png{% endblock %}" />
     <meta property="og:description" content="Self hosted web app to track and rate your watched movies" />
 
     <link href="{{ applicationUrl }}/css/bootstrap.min.css" rel="stylesheet">

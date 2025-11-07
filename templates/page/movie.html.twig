@@ -1,10 +1,6 @@
 {% extends 'base.html.twig' %}
 
 {% block title -%}
-    Movie: {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
-{%- endblock %}
-
-{% block ogTitleExtra -%}
     {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
 {%- endblock %}
 
