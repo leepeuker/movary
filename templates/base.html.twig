@@ -8,7 +8,7 @@
     <title>{% apply trim %}{% block title %}Movary{% endblock %}{% endapply %} | {{ applicationName }}</title>
     <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
 
-    <meta property="og:title" content="{{ applicationName  ~ ': ' ~  block('title')|trim }}" />
+    <meta property="og:title" content="{{ block('title')|trim }} | {{ applicationName }}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
     <meta property="og:image" content="{% block ogImage %}{{ applicationUrl }}/images/movary-logo-512x512.png{% endblock %}" />
