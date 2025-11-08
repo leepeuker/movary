@@ -323,7 +323,7 @@ function resetLogModalLogInputs() {
 
 function addToWatchlist(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
-    const postToMastodon = document.getElementById('postToMastodon').value
+    const postToMastodon = document.getElementById('postToMastodon').checked
 
     fetch(APPLICATION_URL + '/add-movie-to-watchlist', {
         method: 'post', headers: {
