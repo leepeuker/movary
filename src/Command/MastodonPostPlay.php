@@ -3,6 +3,7 @@
 namespace Movary\Command;
 
 use Movary\Service\Mastodon\MastodonPostPlayService;
+use Movary\ValueObject\Date;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +23,8 @@ class MastodonPostPlay extends Command
 
     private const string OPTION_NAME_MOVIE_ID = 'movieId';
 
+    private const string OPTION_NAME_WATCH_DATE = 'watchDate';
+
     public function __construct(
         private readonly MastodonPostPlayService $mastodonPostPlayService,
         private readonly LoggerInterface $logger,
@@ -33,6 +36,7 @@ class MastodonPostPlay extends Command
     {
         $this->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user.');
         $this->addOption(self::OPTION_NAME_MOVIE_ID, [], InputOption::VALUE_REQUIRED, 'Id of watched movie.');
+        $this->addOption(self::OPTION_NAME_WATCH_DATE, [], InputOption::VALUE_OPTIONAL, 'Watch date in "Y-m-d" format (or use "today").');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
@@ -49,14 +53,25 @@ class MastodonPostPlay extends Command
             exit;
         }
 
+        $watchDate = (string)$input->getOption(self::OPTION_NAME_WATCH_DATE);
+        if ($watchDate === 'today') {
+            $watchDate = Date::create();
+        } elseif (empty($watchDate) === false) {
+            $watchDate = Date::createFromString($watchDate);
+        } else {
+            $watchDate = null;
+        }
+
         try {
-            $this->mastodonPostPlayService->postPlay($userId, $movieId);
+            $this->mastodonPostPlayService->postPlay($userId, $movieId, $watchDate);
         } catch (Throwable $t) {
             $this->generateOutput($output, 'ERROR: Could not post play to Mastodon.');
             $this->logger->error('Could not post play to Mastodon.', ['exception' => $t]);
 
             return Command::FAILURE;
         }
+
+        $this->generateOutput($output, 'Posted play to Mastodon.');
 
         return Command::SUCCESS;
     }

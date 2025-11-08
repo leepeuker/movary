@@ -113,7 +113,7 @@ app_jobs_process:
 	make exec_app_cmd CMD="php bin/console.php jobs:process"
 
 app_mastodon_post_play:
-	make exec_app_cmd CMD="php bin/console.php mastodon:post:play --userId=1 --movieId=1"
+	make exec_app_cmd CMD="php bin/console.php mastodon:post:play --userId=1 --movieId=1 --watchDate=today"
 
 app_mastodon_post_watchlist:
 	make exec_app_cmd CMD="php bin/console.php mastodon:post:watchlist --userId=1 --movieId=1"
