@@ -100,7 +100,7 @@
                         </select>
                     </div>
 
-                    <div style="padding-bottom: 1rem;padding-top: 0.5rem">
+                    <div class="mb-3">
                         <input
                                 {% if mastodonEnable == false %}disabled{% endif %}
                                 class="form-check-input"
@@ -117,7 +117,7 @@
                     </div>
                 </section>
 
-                <div id="alerts" style="margin-left: 5%; margin-right: 5%; margin-bottom: 0.7rem !important;">
+                <div id="alerts" style="margin-left: 5%; margin-right: 5%;">
                     {% if mastodonCredentialsUpdated == true %}
                         <div class="alert alert-success alert-dismissible" role="alert">
                             Settings updated.
@@ -126,11 +126,11 @@
                     {% endif %}
                 </div>
 
-                <button class="btn btn-outline-primary" type="button" onclick="testCredentials()" id="verifyButton">
+                <button class="btn btn-outline-primary mb-3" type="button" onclick="testCredentials()" id="verifyButton">
                     Test
                 </button>
 
-                <button class="btn btn-primary" type="submit">Save</button>
+                <button class="btn btn-primary mb-3" type="submit">Save</button>
             </form>
         </div>
     </main>
