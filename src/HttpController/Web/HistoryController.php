@@ -61,18 +61,22 @@ class HistoryController
         $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
         $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
 
-        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
-            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId);
-            // $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $newWatchDate?->format('Y-m-d') ?? "");
-        }
         if ($originalWatchDate == $newWatchDate) {
             $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position);
+
+            if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
+                $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $originalWatchDate);
+            }
 
             return Response::create(StatusCode::createNoContent());
         }
 
         $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position);
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
+
+        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $newWatchDate);
+        }
 
         return Response::create(StatusCode::createNoContent());
     }
