@@ -36,7 +36,7 @@ class MastodonPostPlay extends Command
     {
         $this->addOption(self::OPTION_NAME_USER_ID, [], InputOption::VALUE_REQUIRED, 'Id of user.');
         $this->addOption(self::OPTION_NAME_MOVIE_ID, [], InputOption::VALUE_REQUIRED, 'Id of watched movie.');
-        $this->addOption(self::OPTION_NAME_WATCH_DATE, [], InputOption::VALUE_REQUIRED, 'Watchdate of watched movie as Y-m-d string.');
+        $this->addOption(self::OPTION_NAME_WATCH_DATE, [], InputOption::VALUE_OPTIONAL, 'Watch date in "Y-m-d" format (or use "today").');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
@@ -54,12 +54,12 @@ class MastodonPostPlay extends Command
         }
 
         $watchDate = (string)$input->getOption(self::OPTION_NAME_WATCH_DATE);
-        if ($watchDate == "today") {
-            $watchDate = Date::create()->format("Y-m-d");
-        }
-        if (empty($watchDate) === true) {
-            $this->generateOutput($output, 'Missing option --watchDate');
-            exit;
+        if ($watchDate === 'today') {
+            $watchDate = Date::create();
+        } elseif (empty($watchDate) === false) {
+            $watchDate = Date::createFromString($watchDate);
+        } else {
+            $watchDate = null;
         }
 
         try {
@@ -70,6 +70,8 @@ class MastodonPostPlay extends Command
 
             return Command::FAILURE;
         }
+
+        $this->generateOutput($output, 'Posted play to Mastodon.');
 
         return Command::SUCCESS;
     }

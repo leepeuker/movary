@@ -4,7 +4,9 @@ namespace Movary\Service\Mastodon;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\SlugifyService;
@@ -14,6 +16,8 @@ use RuntimeException;
 
 class MastodonPostPlayService
 {
+    const int MASTODON_MESSAGE_MAX_LENGTH = 500;
+
     public function __construct(
         private readonly MastodonPostService $mastodonPostService,
         private readonly MovieApi $movieApi,
@@ -37,14 +41,14 @@ class MastodonPostPlayService
         }
 
         $watchDate = $job->getParameters()['watchDate'] ?? null;
-        if ($watchDate === null) {
-            throw new RuntimeException('Missing parameter: watchDate');
+        if ($watchDate !== null) {
+            $watchDate = Date::createFromString($watchDate);
         }
 
         $this->postPlay($userId, $movieId, $watchDate);
     }
 
-    public function postPlay(int $userId, int $movieId, string $watchDate) : void
+    public function postPlay(int $userId, int $movieId, ?Date $watchDate) : void
     {
         $movie = $this->movieApi->findById($movieId);
         if ($movie === null) {
@@ -56,49 +60,48 @@ class MastodonPostPlayService
             throw new RuntimeException('User does not exist with id: ' . $movieId);
         }
 
-        $watch = $this->movieHistoryApi->findHistoryEntryForMovieByUserOnDate(
-            $movieId, $userId, Date::createFromString($watchDate)
-        );
-        if ($watch === null) {
-            throw new RuntimeException(
-                'Movie id ' . $movieId . ' and user id ' . $userId . ' does not have a watch on ' . $watchDate
-            );
-        }
+        $mastodonMessageBase = 'Watched movie: ' . $movie->getTitle() . ' (' . $movie->getReleaseDate()?->format('Y') . ')';
+        $mastodonMessageRating = '';
+        $mastodonMessageComment = '';
+        $mastodonMessageMovieUrl = "\n\n" . $this->generateMovieUrl($user, $movieId, $movie);
 
         $personalRating = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
-
-        $comment = $watch->getComment();
-
-        $movieUrl = $this->applicationUrlService->createApplicationUrl(
-            RelativeUrl::create(
-                '/users/' . $user->getName() . '/movies/' . $movieId . '-' . $this->slugify->slugify($movie->getTitle())
-            )
-        );
-
-        // link only renders on mastodon if https, not for http
-        $message_start = (
-            'Watched movie: '
-            . $movie->getTitle() . ' (' . $movie->getReleaseDate()?->format('Y') . ')'
-            . (
-                $personalRating != null
-                  ? (
-                    "\nRated: "
-                    . str_repeat("★", $personalRating)
-                    . str_repeat("☆", 10 - $personalRating)
-                  ) : ""
-            )
-        );
-        $message_comment = $comment != null ? "\nComment: " . $comment : "";
-        $message_url = "\n\n" . $movieUrl;
-
-        // for mastodon, cannot send message over 500 characters
-        $length = strlen($message_start . $message_comment . $message_url);
-        if ($length >= 500) {
-            $max_message_length = 500 - strlen($message_start . $message_url) - 2;
-            $message_comment = substr($message_comment, 0, $max_message_length) . "…\n";
+        if ($personalRating !== null) {
+            $mastodonMessageRating = $this->formatUserRating($personalRating);
         }
-        $message = $message_start . $message_comment . $message_url;
 
-        $this->mastodonPostService->postMessageForUser($userId, $message);
+        $watchHistoryComment = $this->movieHistoryApi->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchDate)?->getComment();
+        if ($watchHistoryComment != null) {
+            $mastodonMessageComment = $this->formatUserComment($watchHistoryComment);
+        }
+
+        $mastodonMessageLength = strlen($mastodonMessageBase . $mastodonMessageRating . $mastodonMessageComment . $mastodonMessageMovieUrl);
+        if ($mastodonMessageLength >= self::MASTODON_MESSAGE_MAX_LENGTH) {
+            $mastodonMessageCommentMaxLength = self::MASTODON_MESSAGE_MAX_LENGTH - strlen($mastodonMessageBase . $mastodonMessageRating . $mastodonMessageMovieUrl) - 2;
+            $mastodonMessageComment = substr($mastodonMessageComment, 0, $mastodonMessageCommentMaxLength) . "…\n";
+        }
+
+        $mastodonMessage = $mastodonMessageBase . $mastodonMessageRating . $mastodonMessageComment . $mastodonMessageMovieUrl;
+
+        $this->mastodonPostService->postMessageForUser($userId, $mastodonMessage);
+    }
+
+    private function formatUserComment(string $watchHistoryComment) : string
+    {
+        return "\nComment: " . $watchHistoryComment;
+    }
+
+    private function formatUserRating(int $personalRating) : string
+    {
+        return "\nRated: " . str_repeat("★", $personalRating) . str_repeat("☆", 10 - $personalRating);
+    }
+
+    private function generateMovieUrl(UserEntity $user, int $movieId, MovieEntity $movie) : string
+    {
+        return $this->applicationUrlService->createApplicationUrl(
+            RelativeUrl::create(
+                '/users/' . $user->getName() . '/movies/' . $movieId . '-' . $this->slugify->slugify($movie->getTitle()),
+            ),
+        );
     }
 }
