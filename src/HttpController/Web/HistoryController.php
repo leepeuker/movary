@@ -32,7 +32,6 @@ class HistoryController
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
-        private readonly JobQueueApi $jobQueueApi,
     ) {
     }
 
@@ -57,16 +56,21 @@ class HistoryController
         $position = empty($requestBody['position']) === true ? 1 : (int)$requestBody['position'];
         $locationId = empty($requestBody['locationId']) === true ? null : (int)$requestBody['locationId'];
 
+        $postToMastodon = null;
+        if (isset($requestBody['postToMastodon']) === true) {
+            $postToMastodon = (bool)$requestBody['postToMastodon'];
+        }
+
         $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
         $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
 
         if ($originalWatchDate == $newWatchDate) {
-            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position);
+            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position, postToMastodon: $postToMastodon);
 
             return Response::create(StatusCode::createNoContent());
         }
 
-        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position);
+        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position, postToMastodon: $postToMastodon);
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
 
         return Response::create(StatusCode::createNoContent());
@@ -105,7 +109,11 @@ class HistoryController
         $personalRating = $requestData['personalRating'] === 0 ? null : PersonalRating::create((int)$requestData['personalRating']);
         $comment = empty($requestData['comment']) === true ? null : (string)$requestData['comment'];
         $locationId = empty($requestData['locationId']) === true ? null : (int)$requestData['locationId'];
-        $postToMastodon = empty($requestData['postToMastodon']) === true ? false : (bool)$requestData['postToMastodon'];
+
+        $postToMastodon = null;
+        if (isset($requestData['postToMastodon']) === true) {
+            $postToMastodon = (bool)$requestData['postToMastodon'];
+        }
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -114,12 +122,9 @@ class HistoryController
         }
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);
-        $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+        $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate, postToMastodon: $postToMastodon);
         $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $comment);
         $this->movieApi->updateHistoryLocation($movie->getId(), $userId, $watchDate, $locationId);
-        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
-            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movie->getId(), $watchDate);
-        }
 
         return Response::create(StatusCode::createOk());
     }
