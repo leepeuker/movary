@@ -32,6 +32,7 @@ class MovieHistoryApi
         ?int $position = null,
         ?string $comment = null,
         ?int $locationId = null,
+        ?bool $postToMastodon = null,
     ) : void {
         if ($position === null) {
             $position = $this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt);
@@ -39,11 +40,14 @@ class MovieHistoryApi
 
         $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1, $locationId);
 
-        if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === false) {
-            return;
+        $user = $this->userApi->fetchUser($userId);
+        if ($user->hasJellyfinSyncEnabled() === true) {
+            $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
         }
 
-        $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
+        if ($user->isMastodonEnabled() === true && $postToMastodon !== false && $user->isMastodonPostAutomatic() === true) {
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt);
+        }
     }
 
     public function deleteByUserAndMovieId(int $userId, int $movieId) : void
@@ -532,8 +536,15 @@ class MovieHistoryApi
         int $position,
         ?string $comment = null,
         ?int $locationId = null,
+        ?bool $postToMastodon = null,
     ) : void {
         $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId);
+
+        $user = $this->userApi->fetchUser($userId);
+
+        if ($user->isMastodonEnabled() === true && $postToMastodon !== false && $user->isMastodonPostAutomatic() === true) {
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt);
+        }
     }
 
     public function updateHistoryComment(

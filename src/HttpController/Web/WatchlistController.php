@@ -28,7 +28,6 @@ class WatchlistController
         private readonly Authentication $authenticationService,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
-        private readonly JobQueueApi $jobQueueApi,
     ) {
     }
 
@@ -43,7 +42,11 @@ class WatchlistController
         }
 
         $tmdbId = (int)$requestData['tmdbId'];
-        $postToMastodon = empty($requestData['postToMastodon']) === true ? false : (bool)$requestData['postToMastodon'];
+
+        $postToMastodon = null;
+        if (isset($requestData['postToMastodon']) === true) {
+            $postToMastodon = (bool)$requestData['postToMastodon'];
+        }
 
         $movie = $this->movieApi->findByTmdbId($tmdbId);
 
@@ -51,10 +54,7 @@ class WatchlistController
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
         }
 
-        $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId());
-        if ($this->authenticationService->getCurrentUser()->isMastodonEnabled() === true && $postToMastodon === true) {
-            $this->jobQueueApi->addMastodonPostWatchlistJob($userId, $movie->getId());
-        }
+        $this->movieWatchlistApi->addMovieToWatchlist($userId, $movie->getId(), postToMastodon: $postToMastodon);
 
         return Response::create(StatusCode::createOk());
     }
