@@ -38,8 +38,7 @@ class MovieWatchlistApi
         $user = $this->userApi->fetchUser($userId);
         
         // post based on true/false of form var $postToMastodon, or if null, use isMastodonPostAutomatic
-        if (
-            $user->isMastodonEnabled() === true
+        if ($user->isMastodonEnabled() === true
             && $postToMastodon !== false
             && ($postToMastodon === true || $user->isMastodonPostAutomatic() === true)
         ) {
