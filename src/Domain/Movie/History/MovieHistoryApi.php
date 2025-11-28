@@ -45,7 +45,7 @@ class MovieHistoryApi
             $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$movieId]);
         }
 
-        if ($user->isMastodonEnabled() === true && $postToMastodon !== false) {
+        if ($user->isMastodonEnabled() === true && $postToMastodon !== false && $user->isMastodonPostAutomatic() === true) {
             $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt);
         }
     }
@@ -542,7 +542,7 @@ class MovieHistoryApi
 
         $user = $this->userApi->fetchUser($userId);
 
-        if ($user->isMastodonEnabled() === true && $postToMastodon !== false) {
+        if ($user->isMastodonEnabled() === true && $postToMastodon !== false && $user->isMastodonPostAutomatic() === true) {
             $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt);
         }
     }
