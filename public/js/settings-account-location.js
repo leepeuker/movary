@@ -12,24 +12,24 @@ document.addEventListener('DOMContentLoaded', function () {
         setLocationsAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
         window.history.replaceState(null, '', window.location.pathname);
     }
-    let categoryCreatedName = urlParams.get('categoryCreated');
-    if (categoryCreatedName) {
-        setLocationsAlert('Location was created: ' + categoryCreatedName)
+    let locationCreatedName = urlParams.get('locationCreated');
+    if (locationCreatedName) {
+        setLocationsAlert('Location was created: ' + locationCreatedName)
         window.history.replaceState(null, '', window.location.pathname);
     }
-    let categoryDeletedName = urlParams.get('categoryDeleted');
-    if (categoryDeletedName) {
-        setLocationsAlert('Location was deleted: ' + categoryDeletedName)
+    let locationDeletedName = urlParams.get('locationDeleted');
+    if (locationDeletedName) {
+        setLocationsAlert('Location was deleted: ' + locationDeletedName)
         window.history.replaceState(null, '', window.location.pathname);
     }
-    let categoryUpdatedName = urlParams.get('categoryUpdated');
-    if (categoryUpdatedName) {
-        setLocationsAlert('Location was updated: ' + categoryUpdatedName)
+    let locationUpdatedName = urlParams.get('locationUpdated');
+    if (locationUpdatedName) {
+        setLocationsAlert('Location was updated: ' + locationUpdatedName)
         window.history.replaceState(null, '', window.location.pathname);
     }
 });
 
-async function reloadTable(featureIsEnabled = true) {
+async function reloadTable() {
     table.getElementsByTagName('tbody')[0].innerHTML = ''
 
     if (document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations') {
@@ -68,10 +68,25 @@ async function reloadTable(featureIsEnabled = true) {
 
 function setLocationsAlert(message, type = 'success') {
     const locationAlerts = document.getElementById('locationAlerts');
-    locationAlerts.classList.remove('d-none')
-    locationAlerts.innerHTML = ''
-    locationAlerts.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
-    locationAlerts.style.textAlign = 'center'
+    locationAlerts.classList.remove('d-none');
+    locationAlerts.innerHTML = '';
+    locationAlerts.style.textAlign = 'center';
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible`;
+    alertDiv.setAttribute('role', 'alert');
+
+    const textNode = document.createTextNode(message);
+    alertDiv.appendChild(textNode);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn-close';
+    closeBtn.setAttribute('data-bs-dismiss', 'alert');
+    closeBtn.setAttribute('aria-label', 'Close');
+
+    alertDiv.appendChild(closeBtn);
+    locationAlerts.appendChild(alertDiv);
 }
 
 function registerTableRowClickEvent() {
@@ -112,7 +127,7 @@ function showCreateLocationModal() {
     locationModal.show()
 }
 
-function prepareCreateLocationModal(name) {
+function prepareCreateLocationModal() {
     document.getElementById('locationModalHeaderTitle').innerHTML = 'Create Location'
 
     document.getElementById('locationModalFooterCreateButton').classList.remove('d-none')
@@ -153,9 +168,9 @@ document.getElementById('createLocationButton').addEventListener('click', async 
 
     let url = window.location.href;
     if (url.indexOf('?') > -1){
-        url += '&categoryCreated=' + categoryName
+        url += '&locationCreated=' + categoryName
     } else {
-        url += '?categoryCreated=' + categoryName
+        url += '?locationCreated=' + categoryName
     }
     window.location.href = url;
 })
@@ -201,9 +216,9 @@ document.getElementById('deleteLocationButton').addEventListener('click', async 
     let categoryName = document.getElementById('locationModalNameInput').value;
     let url = window.location.href;
     if (url.indexOf('?') > -1){
-        url += '&categoryDeleted=' + categoryName
+        url += '&locationDeleted=' + categoryName
     } else {
-        url += '?categoryDeleted=' + categoryName
+        url += '?locationDeleted=' + categoryName
     }
     window.location.href = url;
 })
@@ -234,9 +249,9 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
 
     let url = window.location.href;
     if (url.indexOf('?') > -1){
-        url += '&categoryUpdated=' + locationName
+        url += '&locationUpdated=' + locationName
     } else {
-        url += '?categoryUpdated=' + locationName
+        url += '?locationUpdated=' + locationName
     }
     window.location.href = url;
 })
@@ -254,31 +269,6 @@ async function toggleLocationFeature() {
     window.location.href = url;
 }
 
-function setLocationFeatureBtnState(featureIsEnabled) {
-    if (featureIsEnabled === true) {
-        document.getElementById('toggleLocationsFeatureBtn').classList.add('btn-primary')
-        document.getElementById('toggleLocationsFeatureBtn').classList.remove('btn-outline-danger')
-        document.getElementById('toggleLocationsFeatureBtn').textContent = 'Enable locations'
-
-        return
-    }
-
-    document.getElementById('toggleLocationsFeatureBtn').classList.add('btn-outline-danger')
-    document.getElementById('toggleLocationsFeatureBtn').classList.remove('btn-primary')
-    document.getElementById('toggleLocationsFeatureBtn').textContent = 'Disable locations'
-
-}
-
-function setLocationTableState(featureIsEnabled) {
-    if (featureIsEnabled === true) {
-        document.getElementById('createLocationBtn').disabled = false
-
-        return
-    }
-
-    document.getElementById('createLocationBtn').disabled = true
-}
-
 async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
     const response = await fetch(APPLICATION_URL + '/settings/locations/toggle-feature', {
         method: 'POST',
@@ -293,16 +283,4 @@ async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
     }
-}
-
-
-async function sendRequestFetchIsLocationsFeatureEnabled() {
-    const response = await fetch(APPLICATION_URL + '/settings/locations/toggle-feature', {method: 'GET'})
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const data = await response.json()
-
-    return data.locationsEnabled
 }
