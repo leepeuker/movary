@@ -49,6 +49,7 @@ nav:
       - Trakt TV: features/trakt.md
       - Netflix: features/netflix.md
       - Radarr: features/radarr.md
+      - Mastodon: features/mastodon.md
   - Development:
       - Setup: development/setup.md
       - Directory structure: development/file-structure.md
