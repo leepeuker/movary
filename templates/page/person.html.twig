@@ -1,10 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-    Person: {{ person.name }}
-{% endblock %}
+{% block title -%}
+    {{ person.name }}
+{%- endblock %}
 
-{% block scripts %}
+{% block ogImage -%}
+    {{ person.posterPath }}
+{%- endblock %}
+
+{% block scripts -%}
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
     <script src="{{ applicationUrl }}/js/person.js"></script>
 {% endblock %}

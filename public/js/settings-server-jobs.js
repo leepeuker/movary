@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // localStorage here is a "hack" to keep state after page refresh, it would be better to not refresh the page and load the table via AJAX
     const alertMessageJobs = localStorage.getItem('alertMessageJobs');
-    console.log(alertMessageJobs)
     if (alertMessageJobs) {
         addAlert('alertJobsDiv', alertMessageJobs, 'success');
     }
@@ -29,19 +28,26 @@ function refreshPage() {
 async function removeAllJobs() {
     const jobsRemoveAllModal = bootstrap.Modal.getInstance('#jobsRemoveAllModal');
 
-    const response = await fetch(
-        APPLICATION_URL + '/job-queue/purge-all', {
-            method: 'POST',
-            signal: AbortSignal.timeout(4000)
-        }
-    ).catch(function (error) {
-        console.error(error)
-        addAlert('alertJobsDiv', 'Could not remove all jobs', 'danger');
-    });
+    addAlert('alertJobsDiv', 'Removing all jobs...', 'info');
 
     jobsRemoveAllModal.hide()
 
-    if (!response.ok) {
+    try {
+        const response = await fetch(
+            APPLICATION_URL + '/job-queue/purge-all', {
+                method: 'POST',
+                signal: AbortSignal.timeout(10000)
+            }
+        );
+
+        if (!response.ok) {
+            console.error('Response status: ' + response.status)
+            addAlert('alertJobsDiv', 'Could not remove all jobs', 'danger');
+
+            return
+        }
+    } catch (error) {
+        console.error(error)
         addAlert('alertJobsDiv', 'Could not remove all jobs', 'danger');
 
         return
@@ -54,19 +60,26 @@ async function removeAllJobs() {
 async function removeProcessedJobs() {
     const jobsRemoveProcessedModal = bootstrap.Modal.getInstance('#jobsRemoveProcessedModal');
 
-    const response = await fetch(
-        APPLICATION_URL + '/job-queue/purge-processed', {
-            method: 'POST',
-            signal: AbortSignal.timeout(4000)
-        }
-    ).catch(function (error) {
-        console.error(error)
-        addAlert('alertJobsDiv', 'Could not remove processed jobs', 'danger');
-    });
+    addAlert('alertJobsDiv', 'Removing processed jobs...', 'info');
 
     jobsRemoveProcessedModal.hide()
 
-    if (!response.ok) {
+    try {
+        const response = await fetch(
+            APPLICATION_URL + '/job-queue/purge-processed', {
+                method: 'POST',
+                signal: AbortSignal.timeout(10000)
+            }
+        );
+
+        if (!response.ok) {
+            console.error('Response status: ' + response.status)
+            addAlert('alertJobsDiv', 'Could not remove processed jobs', 'danger');
+
+            return
+        }
+    } catch (error) {
+        console.error(error)
         addAlert('alertJobsDiv', 'Could not remove processed jobs', 'danger');
 
         return

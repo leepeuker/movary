@@ -207,8 +207,8 @@ function loadLogModalSearchResults(data) {
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
         posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
-        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : '';
-        isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : '';
+        isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : '';
+        isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : '';
         listElement.innerHTML = `
             <img src="${posterPath}" alt="Poster for ${item.title}" style="margin-right: .5rem; width: 3rem">
             <p style="margin: 0;">
@@ -323,7 +323,7 @@ function resetLogModalLogInputs() {
 
 function addToWatchlist(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
-    const postToMastodon = document.getElementById('postToMastodon').value
+    const postToMastodon = document.getElementById('postToMastodon').checked
 
     fetch(APPLICATION_URL + '/add-movie-to-watchlist', {
         method: 'post', headers: {

@@ -58,6 +58,7 @@ class MovieApi
         ?int $position = null,
         ?string $comment = null,
         ?int $locationId = null,
+        ?bool $postToMastodon = null,
     ) : void {
         $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
 
@@ -72,6 +73,7 @@ class MovieApi
                 $position,
                 $comment,
                 $locationId,
+                $postToMastodon,
             );
 
             return;
@@ -516,6 +518,7 @@ class MovieApi
         ?int $position = null,
         ?string $comment = null,
         ?int $locationId = null,
+        ?bool $postToMastodon = null,
     ) : void {
         $existingHistoryEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
 
@@ -530,6 +533,7 @@ class MovieApi
                 $position,
                 $comment,
                 $locationId,
+                $postToMastodon,
             );
 
             return;
@@ -547,6 +551,7 @@ class MovieApi
             $position ?? $existingHistoryEntry->getPosition(),
             $comment ?? $existingHistoryEntry->getComment(),
             $locationId ?? $existingHistoryEntry->getLocationId(),
+            $postToMastodon,
         );
     }
 

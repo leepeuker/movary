@@ -4,6 +4,7 @@ namespace Movary\Domain\Movie\Watchlist;
 
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\User\UserApi;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ImageUrlService;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\SortOrder;
@@ -17,11 +18,12 @@ class MovieWatchlistApi
         private readonly ImageUrlService $urlGenerator,
         private readonly UserApi $userApi,
         private readonly TmdbApi $tmdbApi,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function addMovieToWatchlist(int $userId, int $movieId, ?DateTime $addedAt = null) : void
+    public function addMovieToWatchlist(int $userId, int $movieId, ?DateTime $addedAt = null, ?bool $postToMastodon = null) : void
     {
         if ($this->repository->hasMovieInWatchlist($userId, $movieId) === true) {
             $this->logger->debug('Skip adding movie to watchlist because it already exists', ['userId' => $userId, 'movieId' => $movieId]);
@@ -32,6 +34,11 @@ class MovieWatchlistApi
         $this->logger->debug('Adding movie to watchlist', ['userId' => $userId, 'movieId' => $movieId]);
 
         $this->repository->addMovieToWatchlist($userId, $movieId, $addedAt);
+
+        $user = $this->userApi->fetchUser($userId);
+        if ($user->isMastodonEnabled() === true && $postToMastodon === true) {
+            $this->jobQueueApi->addMastodonPostWatchlistJob($userId, $movieId);
+        }
     }
 
     public function fetchAllWatchlistItems(int $userId) : array

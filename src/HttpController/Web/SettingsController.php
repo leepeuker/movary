@@ -697,12 +697,12 @@ class SettingsController
         $mastodonOnByDefault = $postParameters['mastodonOnByDefault'];
         $mastodonOnByDefault = $mastodonOnByDefault == 'on';
 
-        $mastodonUsername = $postParameters['mastodonUsername'];
+        $mastodonUsername = trim($postParameters['mastodonUsername'] ?? '');
 
-        $mastodonAccessToken = $postParameters['mastodonAccessToken'];
+        $mastodonAccessToken = trim($postParameters['mastodonAccessToken'] ?? '');
 
         $mastodonPostVisibility = $postParameters['mastodonVisibility'];
-        if (!in_array($mastodonPostVisibility, ['public', 'unlisted', 'private'])) {
+        if (!in_array($mastodonPostVisibility, ['public', 'unlisted', 'private', 'direct'])) {
             $mastodonPostVisibility = 'public';
         }
 
