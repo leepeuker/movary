@@ -36,7 +36,7 @@ class MovieWatchlistApi
         $this->repository->addMovieToWatchlist($userId, $movieId, $addedAt);
 
         $user = $this->userApi->fetchUser($userId);
-        if ($user->isMastodonEnabled() === true && $postToMastodon !== false && $user->isMastodonPostAutomatic() === true) {
+        if ($user->isMastodonEnabled() === true && $postToMastodon === true) {
             $this->jobQueueApi->addMastodonPostWatchlistJob($userId, $movieId);
         }
     }
