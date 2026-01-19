@@ -1,0 +1,78 @@
+#@name Dashboard statistics
+GET http://127.0.0.1/api/users/{{username}}/statistics/dashboard
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Last plays
+GET http://127.0.0.1/api/users/{{username}}/statistics/lastplays
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Most watched actors
+GET http://127.0.0.1/api/users/{{username}}/statistics/mostwatchedactors
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Most watched actresses
+GET http://127.0.0.1/api/users/{{username}}/statistics/mostwatchedactresses
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Most watched directors
+GET http://127.0.0.1/api/users/{{username}}/statistics/mostwatcheddirectors
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Most watched languages
+GET http://127.0.0.1/api/users/{{username}}/statistics/mostwatchedlanguages
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Most watched genres
+GET http://127.0.0.1/api/users/{{username}}/statistics/mostwatchedgenres
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Most watched production companies
+GET http://127.0.0.1/api/users/{{username}}/statistics/mostwatchedproductioncompanies
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Most watched release years
+GET http://127.0.0.1/api/users/{{username}}/statistics/mostwatchedreleaseyears
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
+
+###
+#@name Watchlist
+GET http://127.0.0.1/api/users/{{username}}/statistics/watchlist
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+X-Movary-Client: REST Unit Test
