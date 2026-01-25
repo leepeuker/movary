@@ -26,7 +26,7 @@ class PlexTvClient extends PlexClient
         ?int $limit = null,
         ?int $offset = null,
     ) : array {
-        $requestUrl = Url::createFromString('https://metadata.provider.plex.tv/')->appendRelativeUrl($relativeUrl);
+        $requestUrl = Url::createFromString('https://discover.provider.plex.tv/')->appendRelativeUrl($relativeUrl);
         $requestOptions = [
             'query' => array_merge([
                 'X-Plex-Container-Size' => (string)$limit,
