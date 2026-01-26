@@ -66,6 +66,10 @@ class PlexApi
 
             $totalItems = $responseData['MediaContainer']['totalSize'];
 
+            if ($totalItems === 0) {
+                break;
+            }
+
             foreach ($responseData['MediaContainer']['Metadata'] as $movie) {
                 $watchlistMovies[] = $movie;
             }
