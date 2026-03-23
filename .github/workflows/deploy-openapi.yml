@@ -5,6 +5,7 @@ on:
     types: [published]
     paths:
       - docs/openapi.json
+  workflow_dispatch:
 
 jobs:
 
