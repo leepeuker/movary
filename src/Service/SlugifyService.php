@@ -8,7 +8,7 @@ class SlugifyService
     {
         $slugToLower = strtolower($slugOriginal);
 
-        $slugReplaced = preg_replace('/[^a-z-]/', '-', $slugToLower);
+        $slugReplaced = preg_replace('/[^a-z0-9-]/', '-', $slugToLower);
         if (!is_string($slugReplaced)) {
             throw new \RuntimeException('Could not slugify string: ' . $slugToLower);
         }
