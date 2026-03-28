@@ -1,6 +1,6 @@
-FROM composer:latest AS composer
+FROM composer:2.9 AS composer
 
-FROM trafex/php-nginx AS base
+FROM trafex/php-nginx:3.10.0 AS base
 
 LABEL Description="Movary is a self hosted web app to track and rate your watched movies"
 LABEL Maintainer="Lee Peuker"
