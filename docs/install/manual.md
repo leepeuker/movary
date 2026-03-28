@@ -1,13 +1,13 @@
 ## System requirements
 
-- PHP 8.4 (FPM) + extensions:
-    - php84-pdo
-    - php84-pdo_mysql
-    - php84-pdo_sqlite
-    - php84-mbstring
-    - php84-sqlite3
-    - php84-simplexml
-    - php84-pecl-imagick
+- PHP 8.5 (FPM) + extensions:
+    - php85-pdo
+    - php85-pdo_mysql
+    - php85-pdo_sqlite
+    - php85-mbstring
+    - php85-sqlite3
+    - php85-simplexml
+    - php85-pecl-imagick
 - git
 - [composer](https://getcomposer.org)
 - web server (e.g. nginx)
