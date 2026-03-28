@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Movary\Api\Imdb\ImdbUrlGenerator;
 use Movary\Api\Imdb\ImdbWebScrapper;
 use Movary\ValueObject\ImdbRating;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -15,6 +16,7 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 
 #[CoversClass(\Movary\Api\Imdb\ImdbWebScrapper::class)]
+#[AllowMockObjectsWithoutExpectations]
 class ImdbWebScrapperTest extends TestCase
 {
     private Client|MockObject $httpClientMock;

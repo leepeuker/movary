@@ -8,12 +8,14 @@ use Movary\Service\ImageCacheService;
 use Movary\Service\ImageUrlService;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(\Movary\Service\ImageUrlService::class)]
+#[AllowMockObjectsWithoutExpectations]
 class ImageUrlGeneratorTest extends TestCase
 {
     private ImageCacheService|MockObject $imageCacheServiceMock;

@@ -1,6 +1,6 @@
 FROM composer:2.9 AS composer
 
-FROM trafex/php-nginx:3.10.0 AS base
+FROM trafex/php-nginx:3.11 AS base
 
 LABEL Description="Movary is a self hosted web app to track and rate your watched movies"
 LABEL Maintainer="Lee Peuker"
@@ -12,16 +12,16 @@ USER root
 
 RUN apk add --no-cache \
     bash \
-    php84-pdo \
-    php84-pdo_mysql \
-    php84-pdo_sqlite \
-    php84-mbstring \
-    php84-sqlite3 \
-    php84-simplexml \
-    php84-pecl-imagick
+    php85-pdo \
+    php85-pdo_mysql \
+    php85-pdo_sqlite \
+    php85-mbstring \
+    php85-sqlite3 \
+    php85-simplexml \
+    php85-pecl-imagick
 
 # Create standard binary for php
-RUN cp /usr/bin/php84 /usr/bin/php
+RUN cp /usr/bin/php85 /usr/bin/php
 
 # Create entrypoint script (for automatic database migrations)
 COPY ./build/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -66,7 +66,7 @@ FROM base AS development
 
 USER root
 
-RUN apk add --no-cache php84-pecl-xdebug
+RUN apk add --no-cache php85-pecl-xdebug
 
 ARG XDEBUG_INI="$PHP_INI_DIR/conf.d/xdebug.ini"
 RUN echo 'zend_extension=xdebug.so' > $XDEBUG_INI \

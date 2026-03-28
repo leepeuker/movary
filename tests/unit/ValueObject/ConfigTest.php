@@ -5,11 +5,13 @@ namespace Tests\Unit\Movary\ValueObject;
 use Movary\Util\File;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Exception\ConfigNotSetException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(\Movary\ValueObject\Config::class)]
+#[AllowMockObjectsWithoutExpectations]
 class ConfigTest extends TestCase
 {
     private File|MockObject $fileUtilMock;
