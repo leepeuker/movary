@@ -23,7 +23,7 @@ class UserController
     public function createUser(Request $request) : Response
     {
         if ($this->authenticationService->isUserAuthenticatedWithCookie() === false
-            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            || $this->authenticationService->getCurrentUser()->isAdmin() === false) {
             return Response::createForbidden();
         }
 
@@ -66,7 +66,7 @@ class UserController
     public function fetchUsers() : Response
     {
         if ($this->authenticationService->isUserAuthenticatedWithCookie() === false
-            && $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+            || $this->authenticationService->getCurrentUser()->isAdmin() === false) {
             return Response::createForbidden();
         }
 
