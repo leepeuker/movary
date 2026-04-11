@@ -36,6 +36,40 @@ When an authentication is removed from Movary, the token will be deleted only in
     Removing the authentication only deletes the token stored in Movary itself. The token still exists in Plex.
     To invalidate the access token in Plex, go to your Plex settings at: Account -> Authorized devices -> Click on the red cross for the entry "Movary"
 
+## URL Validation and SSRF Protection
+
+### Overview
+
+Movary can validate Plex server URLs to protect against Server-Side Request Forgery (SSRF) attacks.
+
+### Security Features
+
+When enabled, URL validation blocks:
+
+- **Localhost access** (localhost, 127.0.0.1, ::1)
+- **Private IP ranges** (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+- **Internal DNS names** (.internal, .local, .docker, .corp, .lan, .home, .priv)
+- **Cloud metadata endpoints** (169.254.169.254, metadata.google.internal, etc.)
+- **Suspicious ports** (only allows 80, 443, 8096, 8920)
+- **DNS rebinding attacks**
+
+### Configuration
+
+Enable SSRF protection by setting the environment variable:
+
+```bash
+PLEX_VALIDATE_URL_SAFE=1
+```
+
+!!! warning
+
+    Enabling this feature will break existing configurations that use:
+    - Localhost Plex servers
+    - Private network IP addresses
+    - Internal DNS names
+    
+    Ensure your Plex server is accessible via a public domain name before enabling.
+
 ## Watchlist import
 
 ### Description
