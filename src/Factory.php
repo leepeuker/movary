@@ -211,6 +211,35 @@ class Factory
         );
     }
 
+    public static function createJellyfinController(ContainerInterface $container, Config $config) : HttpController\Web\JellyfinController
+    {
+        return new HttpController\Web\JellyfinController(
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(Service\Jellyfin\JellyfinScrobbler::class),
+            $container->get(Service\WebhookUrlBuilder::class),
+            $container->get(LoggerInterface::class),
+            $container->get(Api\Jellyfin\JellyfinApi::class),
+            $container->get(Util\UrlValidator::class),
+            $config->getAsBool('JELLYFIN_VALIDATE_URL_SAFE', false),
+        );
+    }
+
+    public static function createPlexController(ContainerInterface $container, Config $config) : HttpController\Web\PlexController
+    {
+        return new HttpController\Web\PlexController(
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(Service\Plex\PlexScrobbler::class),
+            $container->get(Api\Plex\PlexApi::class),
+            $container->get(Service\WebhookUrlBuilder::class),
+            $container->get(LoggerInterface::class),
+            $container->get(Service\ApplicationUrlService::class),
+            $container->get(Util\UrlValidator::class),
+            $config->getAsBool('PLEX_VALIDATE_URL_SAFE', false),
+        );
+    }
+
     public static function createLineFormatter(Config $config) : LineFormatter
     {
         $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);

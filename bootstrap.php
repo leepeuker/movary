@@ -17,6 +17,8 @@ $builder->addDefinitions(
         \Movary\HttpController\Api\OpenApiController::class => DI\factory([Factory::class, 'createOpenApiController']),
         \Movary\HttpController\Web\JobController::class => DI\factory([Factory::class, 'createJobController']),
         \Movary\HttpController\Web\LandingPageController::class => DI\factory([Factory::class, 'createLandingPageController']),
+        \Movary\HttpController\Web\JellyfinController::class => DI\factory([Factory::class, 'createJellyfinController']),
+        \Movary\HttpController\Web\PlexController::class => DI\factory([Factory::class, 'createPlexController']),
         \Movary\HttpController\Web\Middleware\ServerHasRegistrationEnabled::class => DI\factory([Factory::class, 'createMiddlewareServerHasRegistrationEnabled']),
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),
         \Movary\Command\CreatePublicStorageLink::class => DI\factory([Factory::class, 'createCreatePublicStorageLink']),
