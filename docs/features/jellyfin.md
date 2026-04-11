@@ -69,9 +69,8 @@ JELLYFIN_VALIDATE_URL_SAFE=1
 
 ### Recommendations
 
-- **Enable in production environments** for enhanced security
-- **Keep disabled** for development or private instances when using localhost/internal networks
-- **Use public domain names** for Jellyfin servers when validation is enabled
+- **Enable in public environments** for enhanced security
+- **Keep disabled** for development or when using localhost/internal networks
 
 ## Sync
 

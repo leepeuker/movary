@@ -70,6 +70,11 @@ PLEX_VALIDATE_URL_SAFE=1
     
     Ensure your Plex server is accessible via a public domain name before enabling.
 
+### Recommendations
+
+- **Enable in public environments** for enhanced security
+- **Keep disabled** for development or when using localhost/internal networks
+
 ## Watchlist import
 
 ### Description
