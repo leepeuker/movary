@@ -152,7 +152,7 @@ async function verifyJellyfinServerUrl() {
 
     if (!response.ok) {
         if (response.status === 400) {
-            addAlert('alertJellyfinAuthenticationModalDiv', await response.text(), 'danger')
+            addAlert('alertJellyfinServerUrlDiv', await response.text(), 'danger')
 
             return
         }

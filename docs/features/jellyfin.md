@@ -33,6 +33,45 @@ During the authentication process a Jellyfin access token is generated and store
 This token will be used in all further Jellyfin API requests.
 When an authentication is removed from Movary, the token will be deleted in Movary and the Jellyfin server.
 
+## URL Validation and SSRF Protection
+
+### Overview
+
+Movary can validate Jellyfin server URLs to protect against Server-Side Request Forgery (SSRF) attacks.
+
+### Security Features
+
+When enabled, URL validation blocks:
+
+- **Localhost access** (localhost, 127.0.0.1, ::1)
+- **Private IP ranges** (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+- **Internal DNS names** (.internal, .local, .docker, .corp, .lan, .home, .priv)
+- **Cloud metadata endpoints** (169.254.169.254, metadata.google.internal, etc.)
+- **Suspicious ports** (only allows 80, 443, 8096, 8920)
+- **DNS rebinding attacks**
+
+### Configuration
+
+Enable SSRF protection by setting the environment variable:
+
+```bash
+JELLYFIN_VALIDATE_URL_SAFE=1
+```
+
+!!! warning
+
+    Enabling this feature will break existing configurations that use:
+    - Localhost Jellyfin servers
+    - Private network IP addresses
+    - Internal DNS names
+    
+    Ensure your Jellyfin server is accessible via a public domain name before enabling.
+
+### Recommendations
+
+- **Enable in public environments** for enhanced security
+- **Keep disabled** for development or when using localhost/internal networks
+
 ## Sync
 
 General notes:

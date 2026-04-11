@@ -4,15 +4,13 @@ namespace Movary\HttpController\Web;
 
 use Exception;
 use Movary\Api\Jellyfin\Exception\JellyfinInvalidAuthentication;
-use Movary\Api\Jellyfin\Exception\JellyfinNotFoundError;
-use Movary\Api\Jellyfin\Exception\JellyfinServerConnectionError;
-use Movary\Api\Jellyfin\Exception\JellyfinServerUrlMissing;
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Jellyfin\JellyfinScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
+use Movary\Util\UrlValidator;
 use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -28,6 +26,8 @@ class JellyfinController
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
         private readonly JellyfinApi $jellyfinApi,
+        private readonly UrlValidator $urlValidator,
+        private readonly bool $validateUrlIsSafe = false,
     ) {
     }
 
@@ -44,13 +44,8 @@ class JellyfinController
 
         try {
             $jellyfinAuthentication = $this->jellyfinApi->createJellyfinAuthentication($userId, $username, $password);
-        } catch (JellyfinServerUrlMissing) {
-            return Response::createBadRequest('Could not authenticate: Server url missing');
-        } catch (JellyfinNotFoundError) {
-            return Response::createBadRequest('Could not authenticate: Page not found');
-        } catch (JellyfinServerConnectionError) {
-            return Response::createBadRequest('Could not authenticate: Cannot connect to server');
-        } catch (JellyfinInvalidAuthentication) {
+        } catch (Exception $e) {
+            $this->logger->warning('Jellyfin could not authenticate: ' . $e->getMessage());
             return Response::createBadRequest('Could not authenticate');
         }
 
@@ -82,7 +77,7 @@ class JellyfinController
         $requestPayload = $request->getBody();
 
         $this->logger->debug('Jellyfin: Webhook triggered with payload: ' . $requestPayload);
-        $this->logger->warning('This jellyfin webhook url is deprecated and will stop to work soon, regenerate the url');
+        $this->logger->warning('Jellyfin: This webhook url is deprecated and will stop to work soon, regenerate the url');
 
         $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode($requestPayload));
 
@@ -108,7 +103,7 @@ class JellyfinController
         try {
             $this->jellyfinApi->deleteJellyfinAccessToken($jellyfinAuthentication);
         } catch (Exception) {
-            $this->logger->warning('Could not delete jellyfin remote access token for user: ' . $userId);
+            $this->logger->warning('Jellyfin: Could not delete remote access token for user: ' . $userId);
         }
 
         $this->userApi->deleteJellyfinAuthentication($userId);
@@ -120,19 +115,29 @@ class JellyfinController
 
     public function saveJellyfinServerUrl(Request $request) : Response
     {
-        $jellyfinServerUrl = Json::decode($request->getBody())['JellyfinServerUrl'];
+        $jellyfinServerUrlString = Json::decode($request->getBody())['JellyfinServerUrl'];
         $userId = $this->authenticationService->getCurrentUserId();
 
-        if (empty($jellyfinServerUrl)) {
+        if (empty($jellyfinServerUrlString)) {
             $this->userApi->updateJellyfinServerUrl($userId, null);
 
             return Response::createOk();
         }
 
         try {
-            $jellyfinServerUrl = Url::createFromString($jellyfinServerUrl);
+            $jellyfinServerUrl = Url::createFromString($jellyfinServerUrlString);
         } catch (InvalidUrl) {
+            $this->logger->info('Jellyfin: Provided server url is not a valid url: ' . $jellyfinServerUrlString);
             return Response::createBadRequest('Provided server url is not a valid url');
+        }
+
+        if ($this->validateUrlIsSafe === true) {
+            try {
+                $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl);
+            } catch (InvalidUrl $e) {
+                $this->logger->warning('Jellyfin: Could not safe server ur: ' . $e->getMessage());
+                return Response::createBadRequest('Could not safe server url');
+            }
         }
 
         $this->userApi->updateJellyfinServerUrl($userId, $jellyfinServerUrl);
@@ -152,7 +157,24 @@ class JellyfinController
 
     public function verifyJellyfinServerUrl(Request $request) : Response
     {
-        $jellyfinServerUrl = Url::createFromString(Json::decode($request->getBody())['jellyfinServerUrl']);
+        $jellyfinServerUrlString = Json::decode($request->getBody())['jellyfinServerUrl'];
+
+        try {
+            $jellyfinServerUrl = Url::createFromString($jellyfinServerUrlString);
+        } catch (InvalidUrl) {
+            $this->logger->info('Jellyfin: Provided server url is not a valid url: ' . $jellyfinServerUrlString);
+            return Response::createBadRequest('Provided server url is not a valid url');
+        }
+
+        if ($this->validateUrlIsSafe === true) {
+            try {
+                $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl);
+            } catch (InvalidUrl $e) {
+                $this->logger->warning('Jellyfin: Could not safe server ur: ' . $e->getMessage());
+                return Response::createBadRequest('Could not safe server url');
+            }
+        }
+
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->getCurrentUserId());
 
         $authenticationVerified = $jellyfinAuthentication !== null;
@@ -164,16 +186,16 @@ class JellyfinController
             } else {
                 $jellyfinServerInfo = $this->jellyfinApi->fetchJellyfinServerInfo($jellyfinServerUrl, $jellyfinAuthentication->getAccessToken());
             }
-        } catch (JellyfinNotFoundError) {
-            return Response::createBadRequest('Connection test failed: Page not found');
-        } catch (JellyfinServerConnectionError) {
-            return Response::createBadRequest('Connection test failed: Cannot connect to server');
         } catch (JellyfinInvalidAuthentication) {
             $authenticationVerified = false;
+        } catch (Exception $e) {
+            $this->logger->warning('Jellyfin: Connection test failed: ' . $e->getMessage());
+            return Response::createBadRequest('Connection test failed');
         }
 
         if ($jellyfinServerInfo === null || empty($jellyfinServerInfo['Id']) === true) {
-            return Response::createBadRequest('Connection test failed: Jellyfin response invalid');
+            $this->logger->warning('Jellyfin: Connection test failed: Jellyfin response invalid');
+            return Response::createBadRequest('Connection test failed');
         }
 
         return Response::createJson(Json::encode(['serverUrlVerified' => true, 'authenticationVerified' => $authenticationVerified]));
