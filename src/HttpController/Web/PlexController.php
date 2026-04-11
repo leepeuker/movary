@@ -10,12 +10,11 @@ use Movary\Service\ApplicationUrlService;
 use Movary\Service\Plex\PlexScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
+use Movary\Util\UrlValidator;
 use Movary\ValueObject\Exception\ConfigNotSetException;
 use Movary\ValueObject\Exception\InvalidUrl;
-use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\RelativeUrl;
 use Movary\ValueObject\Url;
 use Psr\Log\LoggerInterface;
@@ -31,6 +30,8 @@ class PlexController
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly LoggerInterface $logger,
         private readonly ApplicationUrlService $applicationUrlService,
+        private readonly UrlValidator $urlValidator,
+        private readonly bool $validateUrlIsSafe = false,
     ) {
     }
 
@@ -143,8 +144,12 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
-        } catch (InvalidUrl) {
-            return Response::createBadRequest('Url not properly formatted');
+            if ($this->validateUrlIsSafe === true) {
+                $this->urlValidator->validateUrlIsSafe($plexServerUrl);
+            }
+        } catch (InvalidUrl $e) {
+            $this->logger->warning('Plex: Could not safe server url: ' . $e->getMessage());
+            return Response::createBadRequest('Could not safe server url');
         }
 
         $this->userApi->updatePlexServerUrl($userId, $plexServerUrl);
@@ -163,8 +168,12 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
-        } catch (InvalidUrl) {
-            return Response::createBadRequest('Provided server url is not a valid url');
+            if ($this->validateUrlIsSafe === true) {
+                $this->urlValidator->validateUrlIsSafe($plexServerUrl);
+            }
+        } catch (InvalidUrl $e) {
+            $this->logger->warning('Plex: Connection test failed: ' . $e->getMessage());
+            return Response::createBadRequest('Connection test failed');
         }
 
         $userClientConfiguration = PlexUserClientConfiguration::create($plexAccessToken, $plexServerUrl);
