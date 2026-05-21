@@ -11,6 +11,7 @@ $builder->addDefinitions(
         \Movary\Api\Trakt\TraktApi::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
+        \Movary\Api\Imdb\ImdbApi::class => DI\factory([Factory::class, 'createImdbApi']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\ImageUrlService::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\Service\Export\ExportService::class => DI\factory([Factory::class, 'createExportService']),

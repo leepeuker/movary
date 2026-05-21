@@ -2,21 +2,15 @@
 
 namespace Movary\Service\Imdb;
 
-use Exception;
-use Movary\Api\Imdb\ImdbWebScrapper;
+use Movary\Api\Imdb\ImdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
-use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
 class ImdbMovieRatingSync
 {
-    private const int DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS = 1000000;
-
-    private const int SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS = 2000000;
-
     public function __construct(
-        private readonly ImdbWebScrapper $imdbWebScrapper,
+        private readonly ImdbApi $imdbApi,
         private readonly MovieApi $movieApi,
         private readonly LoggerInterface $logger,
     ) {
@@ -33,7 +27,7 @@ class ImdbMovieRatingSync
 
         $this->logger->debug('IMDb: Start movie rating update', [$this->generateMovieLogData($movie)]);
 
-        $imdbRating = $this->findRating($imdbId);
+        $imdbRating = $this->imdbApi->findRating($imdbId);
         if ($imdbRating === null) {
             $this->movieApi->updateImdbTimestamp($movieId);
 
@@ -76,25 +70,6 @@ class ImdbMovieRatingSync
 
             if ($index === array_key_last($movieIds) || ((int)$movieCountSyncThreshold !== 0 && (int)$index + 1 >= $movieCountSyncThreshold)) {
                 break;
-            }
-
-            // Hacky way to prevent imdb rate limits
-            usleep(self::DEFAULT_MIN_DELAY_BETWEEN_REQUESTS_IN_MS);
-        }
-    }
-
-    private function findRating(string $imdbId) : ?ImdbRating
-    {
-        try {
-            return $this->imdbWebScrapper->findRating($imdbId);
-        } catch (Exception) {
-            // Retry request with a little delay to circumvent onetime network issues
-            usleep(self::SLEEP_AFTER_FIRST_FAILED_REQUEST_IN_MS);
-
-            try {
-                return $this->imdbWebScrapper->findRating($imdbId);
-            } catch (Exception) {
-                return null;
             }
         }
     }

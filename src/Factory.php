@@ -8,6 +8,7 @@ use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Movary\Api\Imdb;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -20,7 +21,6 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
-use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;
@@ -280,6 +280,17 @@ class Factory
             $container->get(ServerSettings::class),
             $container->get(ApplicationUrlService::class),
             self::createDirectoryDocs(),
+        );
+    }
+
+    public static function createImdbApi(ContainerInterface $container): Imdb\ImdbApi
+    {
+        return new Imdb\ImdbApi(
+            $container->get(Imdb\ImdbClient::class),
+            $container->get(Imdb\ImdbDatasetService::class),
+            $container->get(Imdb\ImdbUrlGenerator::class),
+            $container->get(LoggerInterface::class),
+            self::createDirectoryStorageApp(),
         );
     }
 
