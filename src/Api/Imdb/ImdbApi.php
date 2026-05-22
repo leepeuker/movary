@@ -17,6 +17,7 @@ class ImdbApi
         private readonly File $fileUtil,
         private readonly string $appStorageDirectory,
     ) {
+        $this->fileUtil->createDirectory($appStorageDirectory, 0755);
     }
 
     public function findRating(string $imdbId) : ?ImdbRating

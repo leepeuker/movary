@@ -31,6 +31,8 @@ class CreatePublicStorageLink extends Command
         $link = $this->appBaseDirectory . 'public/storage';
 
         try {
+            $this->fileUtil->createDirectory($target, 0755);
+
             if ($this->fileUtil->fileExists($link) === false) {
                 $this->fileUtil->createSymlink($target, $link);
             }
