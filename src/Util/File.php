@@ -2,6 +2,7 @@
 
 namespace Movary\Util;
 
+use Movary\ValueObject\DateTime;
 use RuntimeException;
 use Throwable;
 
@@ -89,6 +90,21 @@ class File
         return file_exists($fileName) === true;
     }
 
+    public function getModificationTime(string $fileName) : ?DateTime
+    {
+        if ($this->fileExists($fileName) === false) {
+            return null;
+        }
+
+        $modificationTime = filemtime($fileName);
+
+        if ($modificationTime === false) {
+            return null;
+        }
+
+        return DateTime::createFromUnixTimestamp($modificationTime);
+    }
+
     public function readFile(string $fileName) : string
     {
         $fileContent = file_get_contents($fileName);
@@ -98,5 +114,14 @@ class File
         }
 
         return $fileContent;
+    }
+
+    public function rename(string $from, string $to) : void
+    {
+        $success = rename($from, $to);
+
+        if ($success === false) {
+            throw new RuntimeException("Could not rename file or directory: $from -> $to");
+        }
     }
 }

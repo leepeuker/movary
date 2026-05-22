@@ -8,6 +8,7 @@ use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Movary\Api\Imdb;
 use Movary\Api\Tmdb;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\Api\Trakt\Cache\User\Movie\Watched;
@@ -20,7 +21,6 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
-use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;
@@ -181,6 +181,32 @@ class Factory
         );
     }
 
+    public static function createImdbApi(ContainerInterface $container) : Imdb\ImdbApi
+    {
+        return new Imdb\ImdbApi(
+            $container->get(Imdb\ImdbClient::class),
+            $container->get(Imdb\ImdbDatasetService::class),
+            $container->get(Imdb\ImdbUrlGenerator::class),
+            $container->get(LoggerInterface::class),
+            $container->get(File::class),
+            self::createDirectoryStorageApp(),
+        );
+    }
+
+    public static function createJellyfinController(ContainerInterface $container, Config $config) : HttpController\Web\JellyfinController
+    {
+        return new HttpController\Web\JellyfinController(
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(Service\Jellyfin\JellyfinScrobbler::class),
+            $container->get(Service\WebhookUrlBuilder::class),
+            $container->get(LoggerInterface::class),
+            $container->get(Api\Jellyfin\JellyfinApi::class),
+            $container->get(Util\UrlValidator::class),
+            $config->getAsBool('JELLYFIN_VALIDATE_URL_SAFE', false),
+        );
+    }
+
     public static function createJobController(ContainerInterface $container) : JobController
     {
         return new JobController(
@@ -208,35 +234,6 @@ class Factory
             $config->getAsBool('ENABLE_REGISTRATION', false),
             $config->getAsStringNullable('DEFAULT_LOGIN_EMAIL'),
             $config->getAsStringNullable('DEFAULT_LOGIN_PASSWORD'),
-        );
-    }
-
-    public static function createJellyfinController(ContainerInterface $container, Config $config) : HttpController\Web\JellyfinController
-    {
-        return new HttpController\Web\JellyfinController(
-            $container->get(Authentication::class),
-            $container->get(UserApi::class),
-            $container->get(Service\Jellyfin\JellyfinScrobbler::class),
-            $container->get(Service\WebhookUrlBuilder::class),
-            $container->get(LoggerInterface::class),
-            $container->get(Api\Jellyfin\JellyfinApi::class),
-            $container->get(Util\UrlValidator::class),
-            $config->getAsBool('JELLYFIN_VALIDATE_URL_SAFE', false),
-        );
-    }
-
-    public static function createPlexController(ContainerInterface $container, Config $config) : HttpController\Web\PlexController
-    {
-        return new HttpController\Web\PlexController(
-            $container->get(Authentication::class),
-            $container->get(UserApi::class),
-            $container->get(Service\Plex\PlexScrobbler::class),
-            $container->get(Api\Plex\PlexApi::class),
-            $container->get(Service\WebhookUrlBuilder::class),
-            $container->get(LoggerInterface::class),
-            $container->get(Service\ApplicationUrlService::class),
-            $container->get(Util\UrlValidator::class),
-            $config->getAsBool('PLEX_VALIDATE_URL_SAFE', false),
         );
     }
 
@@ -280,6 +277,21 @@ class Factory
             $container->get(ServerSettings::class),
             $container->get(ApplicationUrlService::class),
             self::createDirectoryDocs(),
+        );
+    }
+
+    public static function createPlexController(ContainerInterface $container, Config $config) : HttpController\Web\PlexController
+    {
+        return new HttpController\Web\PlexController(
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(Service\Plex\PlexScrobbler::class),
+            $container->get(Api\Plex\PlexApi::class),
+            $container->get(Service\WebhookUrlBuilder::class),
+            $container->get(LoggerInterface::class),
+            $container->get(Service\ApplicationUrlService::class),
+            $container->get(Util\UrlValidator::class),
+            $config->getAsBool('PLEX_VALIDATE_URL_SAFE', false),
         );
     }
 
@@ -349,7 +361,7 @@ class Factory
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
         $twig->addFilter(new TwigFilter('slugify', [$container->get(SlugifyService::class), 'slugify']));
-        
+
         return $twig;
     }
 

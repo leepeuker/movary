@@ -36,6 +36,11 @@ class DateTime implements JsonSerializable
         return new self(new \DateTime($dateTimeString, new DateTimeZone($timeZone)));
     }
 
+    public static function createFromUnixTimestamp(int $timestamp) : self
+    {
+        return new self(new \DateTime('@' . $timestamp));
+    }
+
     public function __toString() : string
     {
         return $this->format(self::DEFAULT_STRING_FORMAT);
