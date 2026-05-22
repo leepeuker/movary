@@ -23,46 +23,91 @@ class ImdbDatasetService
             return null;
         }
 
-        // Skip header row
-        fgetcsv($handle, 0, "\t");
+        try {
+            $this->skipHeaderRow($handle);
 
-        // Optimized linear search - read in chunks for better performance
-        $imdbIdLength = strlen($imdbId);
-        $bufferSize = 8192; // 8KB chunks
-        
-        while (!feof($handle)) {
+            return $this->searchForRatingInChunks($handle, $imdbId);
+        } finally {
+            fclose($handle);
+        }
+    }
+
+    private function findRatingInLines(array $lines, string $imdbId, string $imdbIdPrefix, int $prefixLength) : ?ImdbRating
+    {
+        foreach ($lines as $line) {
+            if ($line === '') {
+                continue;
+            }
+
+            /** @psalm-suppress ArgumentTypeCoercion */
+            if (strncmp($line, $imdbIdPrefix, $prefixLength) !== 0) {
+                continue;
+            }
+
+            $rating = $this->parseRatingFromLine($line, $imdbId);
+            if ($rating !== null) {
+                return $rating;
+            }
+        }
+
+        return null;
+    }
+
+    private function parseRatingFromLine(string $line, string $imdbId) : ?ImdbRating
+    {
+        $row = str_getcsv($line, "\t");
+
+        if (count($row) >= 3 && $row[0] === $imdbId) {
+            return ImdbRating::create((float)$row[1], (int)$row[2]);
+        }
+
+        return null;
+    }
+
+    /** @param resource $handle */
+    private function searchForRatingInChunks($handle, string $imdbId) : ?ImdbRating
+    {
+        $imdbIdPrefix = $imdbId . "\t";
+        $prefixLength = strlen($imdbIdPrefix);
+        $bufferSize = 65536;
+        $remainder = '';
+
+        while (feof($handle) === false) {
             $chunk = fread($handle, $bufferSize);
             if ($chunk === false) {
                 break;
             }
-            
-            // Split chunk into lines
-            $lines = explode("\n", $chunk);
-            
-            // Process all lines except possibly the last incomplete one
-            $lineCount = count($lines) - 1;
-            for ($i = 0; $i < $lineCount; $i++) {
-                $line = trim($lines[$i]);
-                if ($line === '') {
-                    continue;
-                }
-                
-                // Quick check: if line doesn't start with our IMDb ID prefix, skip
-                if (strncmp($line, $imdbId, $imdbIdLength) !== 0) {
-                    continue;
-                }
-                
-                // Parse the line
-                $row = str_getcsv($line, "\t");
-                if (count($row) >= 3 && $row[0] === $imdbId) {
-                    fclose($handle);
 
-                    return ImdbRating::create((float)$row[1], (int)$row[2]);
-                }
+            [$completeLines, $remainder] = $this->splitChunkIntoCompleteLines($chunk, $remainder);
+
+            $rating = $this->findRatingInLines($completeLines, $imdbId, $imdbIdPrefix, $prefixLength);
+            if ($rating !== null) {
+                return $rating;
             }
         }
 
-        fclose($handle);
-        return null;
+        return $this->findRatingInLines([$remainder], $imdbId, $imdbIdPrefix, $prefixLength);
+    }
+
+    /** @param resource $handle */
+    private function skipHeaderRow($handle) : void
+    {
+        fgets($handle);
+    }
+
+    private function splitChunkIntoCompleteLines(string $chunk, string $remainder) : array
+    {
+        $chunk = $remainder . $chunk;
+        $lastNewlinePos = strrpos($chunk, "\n");
+
+        if ($lastNewlinePos === false) {
+            return [[], $chunk];
+        }
+
+        $newRemainder = substr($chunk, $lastNewlinePos + 1);
+        $completeChunk = substr($chunk, 0, $lastNewlinePos);
+        $lines = explode("\n", $completeChunk);
+
+        return [$lines, $newRemainder];
     }
 }

@@ -25,6 +25,17 @@ class ImdbMovieRatingSync
             return;
         }
 
+        $ratingsFileModificationTime = $this->imdbApi->getRatingsFileModificationTime();
+        $movieUpdatedAtImdb = $movie->getUpdatedAtImdb();
+
+        if ($ratingsFileModificationTime !== null && $movieUpdatedAtImdb !== null) {
+            if ($ratingsFileModificationTime->isAfter($movieUpdatedAtImdb) === false) {
+                $this->logger->debug('IMDb: Skipped movie - already synced with latest ratings file', [$this->generateMovieLogData($movie)]);
+
+                return;
+            }
+        }
+
         $this->logger->debug('IMDb: Start movie rating update', [$this->generateMovieLogData($movie)]);
 
         $imdbRating = $this->imdbApi->findRating($imdbId);

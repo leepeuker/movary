@@ -2,6 +2,8 @@
 
 namespace Movary\Util;
 
+use RuntimeException;
+
 class Gzip
 {
     public function __construct(
@@ -9,10 +11,10 @@ class Gzip
     ) {
     }
 
-    public function extract(string $sourceFile, string $destinationFile): void
+    public function extract(string $sourceFile, string $destinationFile) : void
     {
         if ($this->fileUtil->fileExists($sourceFile) === false) {
-            throw new \RuntimeException("Source file not found: {$sourceFile}");
+            throw new RuntimeException("Source file not found: {$sourceFile}");
         }
 
         $compressedData = $this->fileUtil->readFile($sourceFile);
@@ -20,7 +22,7 @@ class Gzip
         $uncompressedData = gzdecode($compressedData);
 
         if ($uncompressedData === false) {
-            throw new \RuntimeException("Failed to decompress file: $sourceFile");
+            throw new RuntimeException("Failed to decompress file: $sourceFile");
         }
 
         $this->fileUtil->createFile($destinationFile, $uncompressedData);

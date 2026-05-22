@@ -2,10 +2,12 @@
 
 namespace Movary\Api\Imdb;
 
+use Exception;
 use GuzzleHttp\Client as HttpClient;
 use Movary\Util\File;
 use Movary\Util\Gzip;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class ImdbClient
 {
@@ -21,45 +23,74 @@ class ImdbClient
     ) {
     }
 
-    public function downloadRatings(string $ratingsFile): void
+    public function downloadRatings(string $ratingsFile) : void
     {
         $compressedFile = $ratingsFile . '.gz';
+        $tempFile = $compressedFile . '.tmp';
 
-        if ($this->shouldDownload($compressedFile) === false) {
+        if ($this->shouldDownload($ratingsFile) === false) {
             return;
         }
 
-        $response = $this->httpClient->request('GET', self::URL_RATINGS);
+        try {
+            $response = $this->httpClient->request('GET', self::URL_RATINGS, [
+                'sink' => $tempFile,
+                'timeout' => 300,
+            ]);
 
-        $this->fileUtil->createFile(
-            $compressedFile,
-            $response->getBody()->getContents(),
-        );
+            if ($response->getStatusCode() !== 200) {
+                throw new RuntimeException('Failed to download IMDb ratings file: HTTP ' . $response->getStatusCode());
+            }
 
-        $this->logger->debug('IMDb: Ratings file downloaded successfully');
+            $this->fileUtil->rename($tempFile, $compressedFile);
 
-        $this->gzipUtil->extract($compressedFile, $ratingsFile);
-        $this->fileUtil->deleteFile($compressedFile);
+            $this->logger->debug('IMDb: Ratings file downloaded successfully');
 
-        $this->logger->debug('IMDb: Ratings file extracted successfully');
+            $this->gzipUtil->extract($compressedFile, $ratingsFile);
+
+            $this->logger->debug('IMDb: Ratings file extracted successfully');
+
+            $this->fileUtil->deleteFile($compressedFile);
+        } catch (Exception $e) {
+            if ($this->fileUtil->fileExists($tempFile) === true) {
+                $this->fileUtil->deleteFile($tempFile);
+            }
+
+            $this->logger->error('IMDb: Failed to download/extract ratings file', [
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
     }
 
-    private function shouldDownload(string $compressedFile): bool
+    private function shouldDownload(string $ratingsFile) : bool
     {
-        if ($this->fileUtil->fileExists($compressedFile) === false) {
+        if ($this->fileUtil->fileExists($ratingsFile) === false) {
             $this->logger->debug('IMDb: Ratings file does not exist, downloading fresh copy');
+
             return true;
         }
 
-        $fileAge = time() - filemtime($compressedFile);
+        $modificationTime = filemtime($ratingsFile);
+
+        if ($modificationTime === false) {
+            $this->logger->warning('IMDb: Cannot determine file age, downloading fresh copy');
+
+            return true;
+        }
+
+        $fileAge = time() - $modificationTime;
         $hoursOld = round($fileAge / 3600, 1);
 
         if ($fileAge > self::TWENTY_FOUR_HOURS_IN_SECONDS) {
-            $this->logger->debug('IMDb: Ratings file is older than 24 hours (' . $hoursOld . ' hours old), downloading fresh copy');
+            $this->logger->debug('IMDb: Ratings file is older than 24 hours (' . $hoursOld . ' hours), downloading fresh copy');
+
             return true;
         }
 
-        $this->logger->debug('IMDb: Ratings file is less than 24 hours old (' . $hoursOld . ' hours old), using existing file');
+        $this->logger->debug('IMDb: Ratings file is less than 24 hours old (' . $hoursOld . ' hours), using existing file');
+
         return false;
     }
 }

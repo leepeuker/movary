@@ -2,6 +2,8 @@
 
 namespace Movary\Api\Imdb;
 
+use Movary\Util\File;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
 use Psr\Log\LoggerInterface;
 
@@ -12,6 +14,7 @@ class ImdbApi
         private readonly ImdbDatasetService $imdbDatasetService,
         private readonly ImdbUrlGenerator $imdbUrlGenerator,
         private readonly LoggerInterface $logger,
+        private readonly File $fileUtil,
         private readonly string $appStorageDirectory,
     ) {
     }
@@ -33,5 +36,12 @@ class ImdbApi
         }
 
         return $imdbRating;
+    }
+
+    public function getRatingsFileModificationTime() : ?DateTime
+    {
+        $ratingsFile = $this->appStorageDirectory . 'imdb_ratings.tsv';
+
+        return $this->fileUtil->getModificationTime($ratingsFile);
     }
 }
