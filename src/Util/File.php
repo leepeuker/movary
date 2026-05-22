@@ -118,9 +118,9 @@ class File
 
     public function rename(string $from, string $to) : void
     {
-        $sucess = rename($from, $to);
+        $success = rename($from, $to);
 
-        if ($sucess === false) {
+        if ($success === false) {
             throw new RuntimeException("Could not rename file or directory: $from -> $to");
         }
     }
