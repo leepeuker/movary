@@ -51,6 +51,7 @@ class Date implements JsonSerializable
 
     public function getDifferenceInDays(Date $date) : int
     {
+        /** @var int|false $daysSince */
         $daysSince = (new \DateTime($this->date))->diff((new \DateTime($date->date)))->days;
 
         if ($daysSince === false) {

@@ -26,7 +26,7 @@
     "robmorgan/phinx": "^0.16",
     "spomky-labs/otphp": "^11.4",
     "symfony/console": "^7.1",
-    "twig/twig": "^3.24",
+    "twig/twig": "^3.26",
     "vlucas/phpdotenv": "^5.6"
   },
   "require-dev": {
