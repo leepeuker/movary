@@ -57,7 +57,7 @@ class ImdbDatasetService
     {
         $row = str_getcsv($line, "\t");
 
-        if (count($row) >= 3 && $row[0] === $imdbId) {
+        if (count($row) >= 3 && $row[0] === $imdbId && is_numeric($row[1]) && is_numeric($row[2])) {
             return ImdbRating::create((float)$row[1], (int)$row[2]);
         }
 
