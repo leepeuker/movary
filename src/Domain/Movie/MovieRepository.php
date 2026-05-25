@@ -550,7 +550,7 @@ class MovieRepository
         }
 
         $filterMovieIdsQuery = '';
-        if ($filterMovieIds !== null) {
+        if ($filterMovieIds !== null && count($filterMovieIds) > 0) {
             $filterMovieIdsQuery = ' AND movie.id IN (' . implode(',', $filterMovieIds) . ')';
         }
 
