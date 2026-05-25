@@ -1018,6 +1018,10 @@ class MovieRepository
 
     public function fetchWatchDatesForMovieIds(int $userId, array $movieIds) : array
     {
+        if (count($movieIds) === 0) {
+            return [];
+        }
+
         $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
 
         return $this->dbConnection->fetchAllAssociative(
