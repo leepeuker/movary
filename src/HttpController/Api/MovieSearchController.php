@@ -33,7 +33,12 @@ class MovieSearchController
             $requestData->getPage(),
         );
 
-        $totalResults = (int)$tmdbResponse['total_results'];
+        // total_results doesn't exist when you enter direct TMDB URLs
+        if (key_exists('total_results', $tmdbResponse)) {
+            $totalResults = (int)$tmdbResponse['total_results'];
+        } else {
+            $totalResults = count($tmdbResponse['results']);
+        }
         if ($totalResults === 0) {
             return Response::createJson(
                 Json::encode([
@@ -44,7 +49,12 @@ class MovieSearchController
             );
         }
 
-        $limit = (int)floor($totalResults / (int)$tmdbResponse['total_pages']);
+        // total_pages doesn't exist when you enter direct TMDB URLs
+        if (key_exists('total_pages', $tmdbResponse)) {
+            $limit = (int)floor($totalResults / (int)$tmdbResponse['total_pages']);
+        } else {
+            $limit = $totalResults;
+        }
 
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
             $totalResults,
