@@ -9,25 +9,27 @@ use Movary\Api\Tmdb\Dto\TmdbWatchProviderCollection;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderList;
 use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
 use Movary\ValueObject\Year;
+use Movary\Service\ServerSettings;
 
 class TmdbApi
 {
     public function __construct(
         private readonly TmdbClient $client,
         private readonly TmdbIsoLanguageCache $iso6931,
+	private readonly ServerSettings $serverSettingsService,
     ) {
     }
 
     public function fetchMovieDetails(int $movieId) : TmdbMovie
     {
-        $data = $this->client->get('/movie/' . $movieId, ['append_to_response' => 'credits']);
+        $data = $this->client->get('/movie/' . $movieId, ['append_to_response' => 'credits', 'language' => $this->serverSettingsService->getTmdbLanguage()]);
 
         return TmdbMovie::createFromArray($data);
     }
 
     public function fetchPersonDetails(int $personId) : TmdbPerson
     {
-        $data = $this->client->get('/person/' . $personId);
+        $data = $this->client->get('/person/' . $personId, ['language' => $this->serverSettingsService->getTmdbLanguage()]);
 
         return TmdbPerson::createFromArray($data);
     }
