@@ -4,9 +4,15 @@ if (selectElement !== null) {
 	selectElement.addEventListener('change', (e) => {
 		const currentUrlPath = window.location.pathname
 
-		const regex = /(?<!^)\/([a-zA-Z0-9]+)\//;
-		const currentRouteUsername = currentUrlPath.match(regex)[1];
+		const regex = /\/users\/([a-zA-Z0-9]+)/;
+		const match = currentUrlPath.match(regex);
+		
+		if (match === null) {
+			return;
+		}
+		
+		const currentRouteUsername = match[1];
 
-		window.location.href = currentUrlPath.replace(currentRouteUsername, selectElement.value)
+		window.location.href = currentUrlPath.replace(`/users/${currentRouteUsername}`, `/users/${selectElement.value}`)
 	})
 }
