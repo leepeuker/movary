@@ -98,8 +98,8 @@ class PersonController
 
         $isHiddenInTopLists = false;
         if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $userId = $this->authenticationService->getCurrentUserId();
-            $isHiddenInTopLists = $this->userApi->hasHiddenPerson($userId, $personId);
+            $currentUserId = $this->authenticationService->getCurrentUserId();
+            $isHiddenInTopLists = $this->userApi->hasHiddenPerson($currentUserId, $personId);
         }
 
         $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
