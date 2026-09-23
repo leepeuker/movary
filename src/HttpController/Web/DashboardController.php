@@ -5,7 +5,6 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
-use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Dashboard\DashboardFactory;
@@ -27,6 +26,7 @@ class DashboardController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly DashboardFactory $dashboardFactory,
         private readonly UserApi $userApi,
+        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -40,6 +40,11 @@ class DashboardController
     public function render(Request $request) : Response
     {
         $requestedUserId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
+
+        $currentUserId = null;
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
+            $currentUserId = $this->authenticationService->getCurrentUserId();
+        }
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($requestedUserId));
 
@@ -55,7 +60,7 @@ class DashboardController
                 'firstDiaryEntry' => $this->movieHistoryApi->fetchFirstHistoryWatchDate($requestedUserId),
                 'dashboardRows' => $dashboardRows,
             ],
-            $this->fetchVisibleDashboardRowData($dashboardRows, $requestedUserId, $requestedUserId),
+            $this->fetchVisibleDashboardRowData($dashboardRows, $requestedUserId, $currentUserId),
         );
 
         return Response::create(
