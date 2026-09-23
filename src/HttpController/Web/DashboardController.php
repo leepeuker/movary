@@ -27,7 +27,6 @@ class DashboardController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly DashboardFactory $dashboardFactory,
         private readonly UserApi $userApi,
-        private readonly Authentication $authenticationService,
     ) {
     }
 
@@ -41,11 +40,6 @@ class DashboardController
     public function render(Request $request) : Response
     {
         $requestedUserId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
-
-        $currentUserId = null;
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $currentUserId = $this->authenticationService->getCurrentUserId();
-        }
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($requestedUserId));
 
