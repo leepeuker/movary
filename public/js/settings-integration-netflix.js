@@ -436,7 +436,7 @@ function processNetflixData(netflixActivityItems) {
         }
 
         if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.poster_path === null) {
-            tmdb_cover.src = APPLICATION_URL + '/images/placeholder/' + btoa(item.title);
+            tmdb_cover.src = APPLICATION_URL + '/images/placeholder/' + btoa(netflixActivityItem.netflixMovieName);
             tmdb_link.innerText = 'Image not found on TMDB';
         } else {
             tmdb_cover.src = 'https://image.tmdb.org/t/p/w92' + netflixActivityItem.tmdbMatch.poster_path;
