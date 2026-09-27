@@ -21,6 +21,9 @@ class Authentication
 
     private const int MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
+    /** @var array<string, int> */
+    private array $validatedAuthTokenUserIds = [];
+
     public function __construct(
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
@@ -83,13 +86,8 @@ class Authentication
 
     public function getCurrentUserId() : int
     {
-        $userId = $this->sessionWrapper->find('userId');
-        $token = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
-
-        if ($userId === null && $token !== '') {
-            $userId = $this->repository->findUserIdByAuthToken($token);
-            $this->sessionWrapper->set('userId', $userId);
-        }
+        $token = $this->getAuthenticationCookie();
+        $userId = $token === null ? null : $this->findUserIdByValidAuthToken($token);
 
         if ($userId === null) {
             throw new RuntimeException('Could not find a current user');
@@ -100,8 +98,8 @@ class Authentication
 
     public function getToken(Request $request) : ?string
     {
-        $tokenInCookie = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
-        if ($tokenInCookie !== '') {
+        $tokenInCookie = $this->getAuthenticationCookie();
+        if ($tokenInCookie !== null) {
             return $tokenInCookie;
         }
 
@@ -115,24 +113,24 @@ class Authentication
             return null;
         }
 
-        if ($this->isValidToken($token) === false) {
-            return null;
+        $apiTokenUserId = $this->userApi->findUserIdByApiToken($token);
+        if ($apiTokenUserId !== null) {
+            return $apiTokenUserId;
         }
 
-        return $this->userApi->findByToken($token)?->getId();
+        return $this->findUserIdByValidAuthToken($token);
     }
 
     public function isUserAuthenticatedWithCookie() : bool
     {
-        $token = (string)filter_input(INPUT_COOKIE, self::AUTHENTICATION_COOKIE_NAME);
+        $token = $this->getAuthenticationCookie();
 
-        if ($token !== '' && $this->isValidAuthToken($token) === true) {
+        if ($token !== null && $this->findUserIdByValidAuthToken($token) !== null) {
             return true;
         }
 
-        if (empty($token) === false) {
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
+        if ($token !== null) {
+            $this->clearAuthenticationCookie();
         }
 
         return false;
@@ -190,38 +188,83 @@ class Authentication
             return $userAndToken;
         }
 
-        $this->setAuthenticationCookieAndNewSession($user->getId(), $token, $authTokenExpirationDate);
+        $this->setAuthenticationCookieAndNewSession($token, $authTokenExpirationDate);
 
         return $userAndToken;
     }
 
     public function logout() : void
     {
-        $token = (string)filter_input(INPUT_COOKIE, 'id');
+        $token = $this->getAuthenticationCookie();
 
-        if ($token !== '') {
+        if ($token !== null) {
             $this->deleteToken($token);
-            unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-            setcookie(self::AUTHENTICATION_COOKIE_NAME, '', -1);
+            $this->clearAuthenticationCookie();
         }
 
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
     }
 
-    public function setAuthenticationCookieAndNewSession(int $userId, string $token, DateTime $expirationDate) : void
+    public function setAuthenticationCookieAndNewSession(string $token, DateTime $expirationDate) : void
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
+        $_COOKIE[self::AUTHENTICATION_COOKIE_NAME] = $token;
         setcookie(
             self::AUTHENTICATION_COOKIE_NAME,
             $token,
-            (int)$expirationDate->format('U'),
-            '/',
-            httponly: true,
+            [
+                'expires' => (int)$expirationDate->format('U'),
+                'path' => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ],
         );
+    }
 
-        $this->sessionWrapper->set('userId', $userId);
+    private function clearAuthenticationCookie() : void
+    {
+        unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
+        setcookie(
+            self::AUTHENTICATION_COOKIE_NAME,
+            '',
+            [
+                'expires' => 1,
+                'path' => '/',
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ],
+        );
+    }
+
+    private function findUserIdByValidAuthToken(string $token) : ?int
+    {
+        if (isset($this->validatedAuthTokenUserIds[$token]) === true) {
+            return $this->validatedAuthTokenUserIds[$token];
+        }
+
+        $tokenData = $this->repository->findAuthTokenData($token);
+        if ($tokenData === null) {
+            return null;
+        }
+
+        if ($tokenData['expirationDate']->isAfter(DateTime::create()) === false) {
+            $this->repository->deleteAuthToken($token);
+
+            return null;
+        }
+
+        $this->validatedAuthTokenUserIds[$token] = $tokenData['userId'];
+
+        return $tokenData['userId'];
+    }
+
+    private function getAuthenticationCookie() : ?string
+    {
+        $token = $_COOKIE[self::AUTHENTICATION_COOKIE_NAME] ?? null;
+
+        return is_string($token) === true && $token !== '' ? $token : null;
     }
 
     private function isUserPageVisibleForUser(UserEntity $targetUser, ?int $requestUserId) : bool
@@ -246,17 +289,7 @@ class Authentication
 
     private function isValidAuthToken(string $token) : bool
     {
-        $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
-
-        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
-            if ($tokenExpirationDate !== null) {
-                $this->repository->deleteAuthToken($token);
-            }
-
-            return false;
-        }
-
-        return true;
+        return $this->findUserIdByValidAuthToken($token) !== null;
     }
 
     private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string

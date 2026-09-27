@@ -133,12 +133,13 @@ class AuthenticationController
             );
         }
 
-        $user = $this->userApi->findByToken($token);
-        if ($user === null) {
+        $userId = $this->authenticationService->getUserIdByToken($request);
+        if ($userId === null) {
             return Response::createUnauthorized();
         }
 
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true && $this->authenticationService->isValidToken($token) === false) {
+        $user = $this->userApi->findUserById($userId);
+        if ($user === null) {
             return Response::createUnauthorized();
         }
 
