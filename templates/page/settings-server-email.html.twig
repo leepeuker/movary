@@ -109,9 +109,11 @@
                     <label for="smtpPasswordInput" class="form-label">
                         <b>SMTP Password</b>
                     </label>
-                    <input type="text"
+                    <input type="password"
                            class="form-control"
-                           value="{{ smtpPassword }}"
+                           value=""
+                           placeholder="{{ smtpPasswordConfigured ? '***' : '' }}"
+                           autocomplete="new-password"
                            id="smtpPasswordInput"
                            style="text-align: center;"
                             {{ smtpPasswordSetInEnv == true ? 'disabled' }}

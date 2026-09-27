@@ -26,6 +26,14 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
 });
 
 function updateEmail() {
+    return fetch(APPLICATION_URL + '/settings/server/email', {
+        method: 'POST', headers: {
+            'Content-Type': 'application/json'
+        }, body: JSON.stringify(getEditableSmtpSettings())
+    });
+}
+
+function getEditableSmtpSettings() {
     const smtpSettings = {};
 
     if (smtpHostInput.disabled === false) {
@@ -46,15 +54,11 @@ function updateEmail() {
     if (smtpUserInput.disabled === false) {
         smtpSettings.smtpUser = smtpUserInput.value;
     }
-    if (smtpPasswordInput.disabled === false) {
+    if (smtpPasswordInput.disabled === false && smtpPasswordInput.value !== '') {
         smtpSettings.smtpPassword = smtpPasswordInput.value;
     }
 
-    return fetch(APPLICATION_URL + '/settings/server/email', {
-        method: 'POST', headers: {
-            'Content-Type': 'application/json'
-        }, body: JSON.stringify(smtpSettings)
-    });
+    return smtpSettings;
 }
 
 const testEmailModal = new bootstrap.Modal('#testEmailModal')
@@ -80,16 +84,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
     removeAlert('testEmailModalAlerts')
     loadingSpinner.classList.remove('d-none')
 
-    const response = await testEmail(
-        recipient,
-        smtpHostInput.value,
-        smtpPortInput.value,
-        smtpFromAddressInput.value,
-        smtpEncryptionInput.value,
-        smtpWithAuthenticationInput.checked,
-        smtpUserInput.value,
-        smtpPasswordInput.value
-    );
+    const response = await testEmail(recipient);
 
     loadingSpinner.classList.add('d-none')
 
@@ -109,19 +104,13 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
     }
 });
 
-function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
+function testEmail(recipient) {
     return fetch(APPLICATION_URL + '/settings/server/email-test', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({
             'recipient': recipient,
-            'smtpHost': smtpHost,
-            'smtpPort': smtpPort,
-            'smtpEncryption': smtpEncryption,
-            'smtpFromAddress': smtpFromAddress,
-            'smtpWithAuthentication': smtpWithAuthentication,
-            'smtpUser': smtpUser,
-            'smtpPassword': smtpPassword
+            ...getEditableSmtpSettings()
         })
     });
 }
