@@ -71,8 +71,6 @@ Required when email support is wanted
 | `SMTP_USER`         |       -       | Required if auth is enabled          |  yes   |
 | `SMTP_PASSWORD`     |       -       | Required if auth is enabled          |  yes   |
 
-Database-backed legacy `tsl` values are migrated to `tls`. Environment configurations cannot be migrated and must be updated manually.
-
 ### Logging
 
 | NAME                      | DEFAULT VALUE | INFO                                                                           |
