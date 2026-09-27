@@ -112,7 +112,12 @@ class ServerSettings
 
     public function getSmtpPort() : ?int
     {
-        return (int)$this->getByKey(self::SMTP_PORT);
+        $smtpPort = $this->getByKey(self::SMTP_PORT);
+        if ($smtpPort === null || $smtpPort === '') {
+            return null;
+        }
+
+        return (int)$smtpPort;
     }
 
     public function getSmtpSenderAddress() : ?string
