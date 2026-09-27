@@ -810,11 +810,19 @@ class SettingsController
         if ($smtpWithAuthentication !== null) {
             $this->serverSettings->setSmtpFromWithAuthentication($smtpWithAuthentication);
         }
-        if ($smtpUser !== null) {
-            $this->serverSettings->setSmtpUser($smtpUser);
-        }
-        if ($smtpPassword !== null) {
-            $this->serverSettings->setSmtpPassword($smtpPassword);
+
+        $smtpAuthenticationEnabled = $this->serverSettings->getSmtpWithAuthentication() === true;
+        if ($smtpWithAuthentication === false
+            && $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment() === false
+        ) {
+            $this->serverSettings->clearSmtpAuthenticationCredentials();
+        } elseif ($smtpAuthenticationEnabled === true) {
+            if ($smtpUser !== null) {
+                $this->serverSettings->setSmtpUser($smtpUser);
+            }
+            if ($smtpPassword !== null) {
+                $this->serverSettings->setSmtpPassword($smtpPassword);
+            }
         }
 
         return Response::createOk();

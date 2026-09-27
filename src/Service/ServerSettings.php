@@ -276,6 +276,17 @@ class ServerSettings
         $this->updateValue(self::SMTP_WITH_AUTH, $smtpFromWithAuthentication);
     }
 
+    public function clearSmtpAuthenticationCredentials() : void
+    {
+        if ($this->isSmtpUserSetInEnvironment() === false) {
+            $this->deleteValue(self::SMTP_USER);
+        }
+
+        if ($this->isSmtpPasswordSetInEnvironment() === false) {
+            $this->deleteValue(self::SMTP_PASSWORD);
+        }
+    }
+
     public function setSmtpHost(string $smtpHost) : void
     {
         if ($this->isSmtpHostSetInEnvironment() === true) {
@@ -358,11 +369,18 @@ class ServerSettings
         return true;
     }
 
-    private function updateValue(string $environmentKey, mixed $value) : void
+    private function deleteValue(string $environmentKey) : void
     {
         $key = $this->convertEnvironmentKeyToDatabaseKey($environmentKey);
 
         $this->dbConnection->prepare('DELETE FROM `server_setting` WHERE `key` = ?')->executeStatement([$key]);
+    }
+
+    private function updateValue(string $environmentKey, mixed $value) : void
+    {
+        $key = $this->convertEnvironmentKeyToDatabaseKey($environmentKey);
+
+        $this->deleteValue($environmentKey);
         $this->dbConnection->prepare('INSERT INTO `server_setting` (value, `key`) VALUES (?, ?)')->executeStatement([(string)$value, $key]);
     }
 }
