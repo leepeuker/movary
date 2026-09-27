@@ -59,17 +59,49 @@ Required for some third party integrations. Only necessary if the relevant third
 
 ### Email
 
-Required when email support is wanted
+Configure outgoing email either in `Settings -> Server -> Email` or with the environment variables below.
 
-| NAME                | DEFAULT VALUE | INFO                                 | Web UI |
-|:--------------------|:-------------:|:-------------------------------------|:------:|
-| `SMTP_HOST`         |       -       |                                      |  yes   |
-| `SMTP_PORT`         |       -       |                                      |  yes   |
-| `SMTP_FROM_ADDRESS` |       -       | Email address used as sender address |  yes   |
-| `SMTP_ENCRYPTION`   |       -       | `ssl` and `tls` supported            |  yes   |
-| `SMTP_WITH_AUTH`    |       -       | `0` or `1`                           |  yes   |
-| `SMTP_USER`         |       -       | Required if auth is enabled          |  yes   |
-| `SMTP_PASSWORD`     |       -       | Required if auth is enabled          |  yes   |
+Environment variables take precedence over database values. Settings provided through the environment are shown as disabled in the web UI and cannot be overwritten there. SMTP passwords are never displayed; the UI only shows `***` when a password is configured.
+
+| NAME                | DEFAULT VALUE | INFO                                                   | Web UI |
+|:--------------------|:-------------:|:-------------------------------------------------------|:------:|
+| `SMTP_HOST`         |       -       | SMTP server hostname                                   |  yes   |
+| `SMTP_PORT`         |       -       | SMTP server port, from `1` through `65535`             |  yes   |
+| `SMTP_FROM_ADDRESS` |       -       | Valid email address used as the sender                 |  yes   |
+| `SMTP_ENCRYPTION`   |       -       | Empty for none; otherwise `ssl` or `tls`               |  yes   |
+| `SMTP_WITH_AUTH`    |      `0`      | `1` enables username/password authentication           |  yes   |
+| `SMTP_USER`         |       -       | Required when authentication is enabled                |  yes   |
+| `SMTP_PASSWORD`     |       -       | Required when authentication is enabled                |  yes   |
+
+A typical authenticated SMTP configuration using explicit TLS is:
+
+```dotenv
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_FROM_ADDRESS=movary@example.com
+SMTP_ENCRYPTION=tls
+SMTP_WITH_AUTH=1
+SMTP_USER=movary@example.com
+SMTP_PASSWORD=replace-with-a-secret
+```
+
+For an SMTP relay that does not require authentication:
+
+```dotenv
+SMTP_HOST=smtp.example.com
+SMTP_PORT=25
+SMTP_FROM_ADDRESS=movary@example.com
+SMTP_ENCRYPTION=
+SMTP_WITH_AUTH=0
+```
+
+The **Test** action uses unsaved values currently entered in editable fields. Omitted values, including an unchanged password, are resolved from the stored server configuration. Environment-managed values always take precedence and are resolved on the server.
+
+Disabling authentication through the web UI removes database-managed SMTP username and password values. Environment-managed credentials are not changed.
+
+!!! Warning
+
+    Older Movary versions used the misspelled encryption value `tsl`. Database values are migrated automatically, but environment configurations cannot be migrated. Change `SMTP_ENCRYPTION=tsl` to `SMTP_ENCRYPTION=tls` manually.
 
 ### Logging
 
