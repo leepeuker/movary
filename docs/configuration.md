@@ -59,17 +59,17 @@ Required for some third party integrations. Only necessary if the relevant third
 
 ### Email
 
-Required when email support is wanted
+Required to send emails
 
-| NAME                | DEFAULT VALUE | INFO                                 | Web UI |
-|:--------------------|:-------------:|:-------------------------------------|:------:|
-| `SMTP_HOST`         |       -       |                                      |  yes   |
-| `SMTP_PORT`         |       -       |                                      |  yes   |
-| `SMTP_FROM_ADDRESS` |       -       | Email address used as sender address |  yes   |
-| `SMTP_ENCRYPTION`   |       -       | `ssl` and `tls` supported            |  yes   |
-| `SMTP_WITH_AUTH`    |       -       | `0` or `1`                           |  yes   |
-| `SMTP_USER`         |       -       | Required if auth is enabled          |  yes   |
-| `SMTP_PASSWORD`     |       -       | Required if auth is enabled          |  yes   |
+| NAME                | DEFAULT VALUE | INFO                                                   | Web UI |
+|:--------------------|:-------------:|:-------------------------------------------------------|:------:|
+| `SMTP_HOST`         |       -       | SMTP server hostname                                   |  yes   |
+| `SMTP_PORT`         |       -       | SMTP server port, from `1` through `65535`             |  yes   |
+| `SMTP_FROM_ADDRESS` |       -       | Valid email address used as the sender                 |  yes   |
+| `SMTP_ENCRYPTION`   |       -       | Empty for none; otherwise `ssl` or `tls`               |  yes   |
+| `SMTP_WITH_AUTH`    |      `0`      | `1` enables username/password authentication           |  yes   |
+| `SMTP_USER`         |       -       | Required when authentication is enabled                |  yes   |
+| `SMTP_PASSWORD`     |       -       | Required when authentication is enabled                |  yes   |
 
 ### Logging
 
