@@ -99,7 +99,7 @@
                     <input type="text"
                            class="form-control"
                            value="{{ smtpWithAuthentication ? smtpUser : '' }}"
-                           data-configured-value="{{ smtpUser }}"
+                           data-environment-value="{{ smtpUserSetInEnv ? smtpUser : '' }}"
                            data-set-in-env="{{ smtpUserSetInEnv ? 'true' : 'false' }}"
                            id="smtpUserInput"
                            style="text-align: center;"

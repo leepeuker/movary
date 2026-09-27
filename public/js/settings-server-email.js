@@ -6,20 +6,10 @@ const smtpWithAuthenticationInput = document.getElementById('smtpWithAuthenticat
 const smtpUserInput = document.getElementById('smtpUserInput');
 const smtpPasswordInput = document.getElementById('smtpPasswordInput');
 
-let smtpUserValue = smtpUserInput.dataset.configuredValue;
-let smtpPasswordValue = '';
-
 smtpWithAuthenticationInput.addEventListener('change', updateSmtpAuthenticationInputs);
 
 function updateSmtpAuthenticationInputs() {
     if (smtpWithAuthenticationInput.checked === false) {
-        if (smtpUserInput.disabled === false) {
-            smtpUserValue = smtpUserInput.value;
-        }
-        if (smtpPasswordInput.disabled === false) {
-            smtpPasswordValue = smtpPasswordInput.value;
-        }
-
         smtpUserInput.value = '';
         smtpPasswordInput.value = '';
         smtpPasswordInput.placeholder = '';
@@ -29,11 +19,30 @@ function updateSmtpAuthenticationInputs() {
         return;
     }
 
-    smtpUserInput.value = smtpUserValue;
-    smtpPasswordInput.value = smtpPasswordValue;
+    smtpUserInput.value = smtpUserInput.dataset.environmentValue;
+    smtpPasswordInput.value = '';
     smtpPasswordInput.placeholder = smtpPasswordInput.dataset.configured === 'true' ? '***' : '';
     smtpUserInput.disabled = smtpUserInput.dataset.setInEnv === 'true';
     smtpPasswordInput.disabled = smtpPasswordInput.dataset.setInEnv === 'true';
+}
+
+function updateSmtpCredentialStateAfterSave() {
+    if (smtpWithAuthenticationInput.checked === false) {
+        if (
+            smtpWithAuthenticationInput.disabled === false
+            && smtpPasswordInput.dataset.setInEnv === 'false'
+        ) {
+            smtpPasswordInput.dataset.configured = 'false';
+        }
+
+        return;
+    }
+
+    if (smtpPasswordInput.disabled === false && smtpPasswordInput.value !== '') {
+        smtpPasswordInput.dataset.configured = 'true';
+        smtpPasswordInput.value = '';
+        smtpPasswordInput.placeholder = '***';
+    }
 }
 
 document.getElementById('emailSettingsUpdateButton').addEventListener('click', async () => {
@@ -41,6 +50,7 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
 
     switch (response.status) {
         case 200:
+            updateSmtpCredentialStateAfterSave();
             addAlert('alertEmailDiv', 'Update was successful', 'success');
 
             return;
