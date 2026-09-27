@@ -41,7 +41,9 @@
                     <label for="smtpPortInput" class="form-label">
                         <b>SMTP Port</b>
                     </label>
-                    <input type="text"
+                    <input type="number"
+                           min="1"
+                           max="65535"
                            class="form-control"
                            value="{{ smtpPort }}"
                            id="smtpPortInput"
@@ -61,7 +63,7 @@
                     >
                         <option value="" {% if smtpEncryption == '' %}selected{% endif %}>None</option>
                         <option value="ssl" {% if smtpEncryption == 'ssl' %}selected{% endif %}>SSL</option>
-                        <option value="tsl" {% if smtpEncryption == 'tsl' %}selected{% endif %}>TSL</option>
+                        <option value="tls" {% if smtpEncryption == 'tls' %}selected{% endif %}>TLS</option>
 
                     </select>
                 </div>
@@ -70,7 +72,7 @@
                     <label for="smtpFromAddressInput" class="form-label">
                         <b>From Address</b>
                     </label>
-                    <input type="text"
+                    <input type="email"
                            class="form-control"
                            value="{{ smtpFromAddress }}"
                            id="smtpFromAddressInput"

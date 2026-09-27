@@ -66,10 +66,12 @@ Required when email support is wanted
 | `SMTP_HOST`         |       -       |                                      |  yes   |
 | `SMTP_PORT`         |       -       |                                      |  yes   |
 | `SMTP_FROM_ADDRESS` |       -       | Email address used as sender address |  yes   |
-| `SMTP_ENCRYPTION`   |       -       | `SSL` and `TSL` supported            |  yes   |
+| `SMTP_ENCRYPTION`   |       -       | `ssl` and `tls` supported            |  yes   |
 | `SMTP_WITH_AUTH`    |       -       | `0` or `1`                           |  yes   |
 | `SMTP_USER`         |       -       | Required if auth is enabled          |  yes   |
 | `SMTP_PASSWORD`     |       -       | Required if auth is enabled          |  yes   |
+
+Database-backed legacy `tsl` values are migrated to `tls`. Environment configurations cannot be migrated and must be updated manually.
 
 ### Logging
 

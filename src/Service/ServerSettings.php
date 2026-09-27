@@ -242,6 +242,10 @@ class ServerSettings
 
     public function setSmtpEncryption(string $smtpEncryption) : void
     {
+        if ($this->isSmtpEncryptionSetInEnvironment() === true) {
+            return;
+        }
+
         if ($smtpEncryption === '') {
             $smtpEncryption = null;
         }
@@ -251,31 +255,55 @@ class ServerSettings
 
     public function setSmtpFromAddress(string $smtpFromAddress) : void
     {
+        if ($this->isSmtpFromAddressSetInEnvironment() === true) {
+            return;
+        }
+
         $this->updateValue(self::SMTP_FROM_ADDRESS, $smtpFromAddress);
     }
 
     public function setSmtpFromWithAuthentication(bool $smtpFromWithAuthentication) : void
     {
+        if ($this->isSmtpWithAuthenticationSetInEnvironment() === true) {
+            return;
+        }
+
         $this->updateValue(self::SMTP_WITH_AUTH, $smtpFromWithAuthentication);
     }
 
     public function setSmtpHost(string $smtpHost) : void
     {
+        if ($this->isSmtpHostSetInEnvironment() === true) {
+            return;
+        }
+
         $this->updateValue(self::SMTP_HOST, $smtpHost);
     }
 
     public function setSmtpPassword(string $smtpPassword) : void
     {
+        if ($this->isSmtpPasswordSetInEnvironment() === true) {
+            return;
+        }
+
         $this->updateValue(self::SMTP_PASSWORD, $smtpPassword);
     }
 
     public function setSmtpPort(int $smtpPort) : void
     {
+        if ($this->isSmtpPortSetInEnvironment() === true) {
+            return;
+        }
+
         $this->updateValue(self::SMTP_PORT, $smtpPort);
     }
 
     public function setSmtpUser(string $smtpUser) : void
     {
+        if ($this->isSmtpUserSetInEnvironment() === true) {
+            return;
+        }
+
         $this->updateValue(self::SMTP_USER, $smtpUser);
     }
 

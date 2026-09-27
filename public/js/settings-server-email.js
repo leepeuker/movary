@@ -7,15 +7,7 @@ const smtpUserInput = document.getElementById('smtpUserInput');
 const smtpPasswordInput = document.getElementById('smtpPasswordInput');
 
 document.getElementById('emailSettingsUpdateButton').addEventListener('click', async () => {
-    const response = await updateEmail(
-        smtpHostInput.value,
-        smtpPortInput.value,
-        smtpFromAddressInput.value,
-        smtpEncryptionInput.value,
-        smtpWithAuthenticationInput.checked,
-        smtpUserInput.value,
-        smtpPasswordInput.value
-    );
+    const response = await updateEmail();
 
     switch (response.status) {
         case 200:
@@ -25,7 +17,6 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
         case 400:
             const errorMessage = await response.text();
 
-            tmdbApiKeyInput.classList.add('invalid-input');
             addAlert('alertEmailDiv', errorMessage, 'danger');
 
             return;
@@ -34,19 +25,35 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
     }
 });
 
-function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
+function updateEmail() {
+    const smtpSettings = {};
+
+    if (smtpHostInput.disabled === false) {
+        smtpSettings.smtpHost = smtpHostInput.value;
+    }
+    if (smtpPortInput.disabled === false) {
+        smtpSettings.smtpPort = smtpPortInput.value;
+    }
+    if (smtpFromAddressInput.disabled === false) {
+        smtpSettings.smtpFromAddress = smtpFromAddressInput.value;
+    }
+    if (smtpEncryptionInput.disabled === false) {
+        smtpSettings.smtpEncryption = smtpEncryptionInput.value;
+    }
+    if (smtpWithAuthenticationInput.disabled === false) {
+        smtpSettings.smtpWithAuthentication = smtpWithAuthenticationInput.checked;
+    }
+    if (smtpUserInput.disabled === false) {
+        smtpSettings.smtpUser = smtpUserInput.value;
+    }
+    if (smtpPasswordInput.disabled === false) {
+        smtpSettings.smtpPassword = smtpPasswordInput.value;
+    }
+
     return fetch(APPLICATION_URL + '/settings/server/email', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
-        }, body: JSON.stringify({
-            'smtpHost': smtpHost,
-            'smtpPort': smtpPort,
-            'smtpFromAddress': smtpFromAddress,
-            'smtpEncryption': smtpEncryption,
-            'smtpWithAuthentication': smtpWithAuthentication,
-            'smtpUser': smtpUser,
-            'smtpPassword': smtpPassword
-        })
+        }, body: JSON.stringify(smtpSettings)
     });
 }
 
@@ -79,7 +86,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
         smtpPortInput.value,
         smtpFromAddressInput.value,
         smtpEncryptionInput.value,
-        smtpWithAuthenticationInput.value,
+        smtpWithAuthenticationInput.checked,
         smtpUserInput.value,
         smtpPasswordInput.value
     );
