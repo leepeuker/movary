@@ -17,7 +17,8 @@ use Movary\Service\ApplicationUrlService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
-use Movary\Service\Email\SmtpConfig;
+use Movary\Service\Email\InvalidSmtpConfigException;
+use Movary\Service\Email\SmtpConfigFactory;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Radarr\RadarrFeedUrlGenerator;
 use Movary\Service\ServerSettings;
@@ -54,6 +55,7 @@ class SettingsController
         private readonly JobQueueApi $jobQueueApi,
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
+        private readonly SmtpConfigFactory $smtpConfigFactory,
         private readonly CountryApi $countryApi,
         private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
         private readonly ApplicationUrlService $applicationUrlService,
@@ -555,42 +557,21 @@ class SettingsController
     public function sendTestEmail(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());
+        $recipient = (string)($requestData['recipient'] ?? '');
 
-        $smtpConfig = SmtpConfig::create(
-            $this->serverSettings->isSmtpHostSetInEnvironment() || isset($requestData['smtpHost']) === false
-                ? (string)$this->serverSettings->getSmtpHost()
-                : (string)$requestData['smtpHost'],
-            $this->serverSettings->isSmtpPortSetInEnvironment() || isset($requestData['smtpPort']) === false
-                ? (int)$this->serverSettings->getSmtpPort()
-                : (int)$requestData['smtpPort'],
-            $this->serverSettings->isSmtpFromAddressSetInEnvironment()
-                || isset($requestData['smtpFromAddress']) === false
-                    ? (string)$this->serverSettings->getFromAddress()
-                    : (string)$requestData['smtpFromAddress'],
-            $this->serverSettings->isSmtpEncryptionSetInEnvironment()
-                || isset($requestData['smtpEncryption']) === false
-                    ? $this->serverSettings->getSmtpEncryption()
-                    : (string)$requestData['smtpEncryption'],
-            $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment()
-                || isset($requestData['smtpWithAuthentication']) === false
-                    ? (bool)$this->serverSettings->getSmtpWithAuthentication()
-                    : (bool)$requestData['smtpWithAuthentication'],
-            $this->serverSettings->isSmtpUserSetInEnvironment() || isset($requestData['smtpUser']) === false
-                ? $this->serverSettings->getSmtpUser()
-                : (string)$requestData['smtpUser'],
-            $this->serverSettings->isSmtpPasswordSetInEnvironment() || isset($requestData['smtpPassword']) === false
-                ? $this->serverSettings->getSmtpPassword()
-                : (string)$requestData['smtpPassword'],
-        );
+        if (filter_var($recipient, FILTER_VALIDATE_EMAIL) === false) {
+            return Response::createBadRequest('Recipient must be a valid email address.');
+        }
 
         try {
+            $smtpConfig = $this->smtpConfigFactory->create($requestData);
             $this->emailService->sendEmail(
-                $requestData['recipient'],
+                $recipient,
                 'Movary: Test Email',
                 'This is a test email sent to check the currently set email settings. It seems to work!',
                 $smtpConfig,
             );
-        } catch (CannotSendEmailException $e) {
+        } catch (InvalidSmtpConfigException|CannotSendEmailException $e) {
             return Response::createBadRequest($e->getMessage());
         }
 
@@ -786,6 +767,12 @@ class SettingsController
     public function updateServerEmail(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());
+
+        try {
+            $this->smtpConfigFactory->create($requestData);
+        } catch (InvalidSmtpConfigException $e) {
+            return Response::createBadRequest($e->getMessage());
+        }
 
         $smtpHost = isset($requestData['smtpHost']) === false ? null : $requestData['smtpHost'];
         $smtpPort = isset($requestData['smtpPort']) === false ? null : $requestData['smtpPort'];
