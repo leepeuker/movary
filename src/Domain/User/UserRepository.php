@@ -41,6 +41,26 @@ class UserRepository
         );
     }
 
+    public function replacePasswordResetToken(int $userId, string $tokenHash, DateTime $expirationDate) : void
+    {
+        $createdAt = DateTime::create();
+
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $tokenHash, $expirationDate, $createdAt) : void {
+                $connection->delete('user_password_reset_token', ['user_id' => $userId]);
+                $connection->insert(
+                    'user_password_reset_token',
+                    [
+                        'user_id' => $userId,
+                        'token_hash' => $tokenHash,
+                        'expiration_date' => (string)$expirationDate,
+                        'created_at' => (string)$createdAt,
+                    ],
+                );
+            },
+        );
+    }
+
     public function createUser(string $email, string $passwordHash, string $name, bool $isAdmin) : void
     {
         $this->dbConnection->insert(
@@ -73,6 +93,16 @@ class UserRepository
                 'token' => $token,
             ],
         );
+    }
+
+    public function deletePasswordResetToken(string $tokenHash) : void
+    {
+        $this->dbConnection->delete('user_password_reset_token', ['token_hash' => $tokenHash]);
+    }
+
+    public function deletePasswordResetTokenForUser(int $userId) : void
+    {
+        $this->dbConnection->delete('user_password_reset_token', ['user_id' => $userId]);
     }
 
     public function deleteJellyfinAuthentication(int $userId) : void
@@ -220,6 +250,27 @@ class UserRepository
         return [
             'userId' => (int)$data['user_id'],
             'expirationDate' => DateTime::createFromString($data['expiration_date']),
+        ];
+    }
+
+    /**
+     * @return array{userId: int, expirationDate: DateTime, createdAt: DateTime}|null
+     */
+    public function findPasswordResetTokenData(string $tokenHash) : ?array
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT `user_id`, `expiration_date`, `created_at` FROM `user_password_reset_token` WHERE `token_hash` = ?',
+            [$tokenHash],
+        );
+
+        if ($data === false) {
+            return null;
+        }
+
+        return [
+            'userId' => (int)$data['user_id'],
+            'expirationDate' => DateTime::createFromString($data['expiration_date']),
+            'createdAt' => DateTime::createFromString($data['created_at']),
         ];
     }
 

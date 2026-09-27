@@ -54,4 +54,68 @@ class UserRepositoryTest extends TestCase
 
         self::assertNull($this->subject->findAuthTokenData('unknown-token'));
     }
+
+    public function testFindPasswordResetTokenData() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->with(
+                'SELECT `user_id`, `expiration_date`, `created_at` FROM `user_password_reset_token` WHERE `token_hash` = ?',
+                ['token-hash'],
+            )
+            ->willReturn([
+                'user_id' => '12',
+                'expiration_date' => '2026-09-27 12:15:00',
+                'created_at' => '2026-09-27 12:00:00',
+            ]);
+
+        self::assertEquals(
+            [
+                'userId' => 12,
+                'expirationDate' => DateTime::createFromString('2026-09-27 12:15:00'),
+                'createdAt' => DateTime::createFromString('2026-09-27 12:00:00'),
+            ],
+            $this->subject->findPasswordResetTokenData('token-hash'),
+        );
+    }
+
+    public function testFindPasswordResetTokenDataReturnsNull() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->willReturn(false);
+
+        self::assertNull($this->subject->findPasswordResetTokenData('unknown-token-hash'));
+    }
+
+    public function testReplacePasswordResetToken() : void
+    {
+        $expirationDate = DateTime::createFromString('2026-09-27 12:15:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(function (callable $callback) : void {
+                $callback($this->dbConnectionMock);
+            });
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_password_reset_token', ['user_id' => 12]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('insert')
+            ->with(
+                'user_password_reset_token',
+                self::callback(
+                    static fn(array $data) => $data['user_id'] === 12
+                        && $data['token_hash'] === 'token-hash'
+                        && $data['expiration_date'] === (string)$expirationDate
+                        && is_string($data['created_at']),
+                ),
+            );
+
+        $this->subject->replacePasswordResetToken(12, 'token-hash', $expirationDate);
+    }
 }
