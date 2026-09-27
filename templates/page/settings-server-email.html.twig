@@ -41,7 +41,9 @@
                     <label for="smtpPortInput" class="form-label">
                         <b>SMTP Port</b>
                     </label>
-                    <input type="text"
+                    <input type="number"
+                           min="1"
+                           max="65535"
                            class="form-control"
                            value="{{ smtpPort }}"
                            id="smtpPortInput"
@@ -61,7 +63,7 @@
                     >
                         <option value="" {% if smtpEncryption == '' %}selected{% endif %}>None</option>
                         <option value="ssl" {% if smtpEncryption == 'ssl' %}selected{% endif %}>SSL</option>
-                        <option value="tsl" {% if smtpEncryption == 'tsl' %}selected{% endif %}>TSL</option>
+                        <option value="tls" {% if smtpEncryption == 'tls' %}selected{% endif %}>TLS</option>
 
                     </select>
                 </div>
@@ -70,7 +72,7 @@
                     <label for="smtpFromAddressInput" class="form-label">
                         <b>From Address</b>
                     </label>
-                    <input type="text"
+                    <input type="email"
                            class="form-control"
                            value="{{ smtpFromAddress }}"
                            id="smtpFromAddressInput"
@@ -87,7 +89,7 @@
                            {% if smtpWithAuthentication == true %}checked{% endif %}
                             {{ smtpWithAuthenticationSetInEnv == true ? 'disabled' }}
                            style="margin-right: 0.2rem">
-                    <label class="form-check-label" for="Input">Enable SMTP Authentication</label>
+                    <label class="form-check-label" for="smtpWithAuthenticationInput">Enable SMTP Authentication</label>
                 </div>
 
                 <div class="mb-3">
@@ -96,10 +98,12 @@
                     </label>
                     <input type="text"
                            class="form-control"
-                           value="{{ smtpUser }}"
+                           value="{{ smtpWithAuthentication ? smtpUser : '' }}"
+                           data-environment-value="{{ smtpUserSetInEnv ? smtpUser : '' }}"
+                           data-set-in-env="{{ smtpUserSetInEnv ? 'true' : 'false' }}"
                            id="smtpUserInput"
                            style="text-align: center;"
-                            {{ smtpUserSetInEnv == true ? 'disabled' }}
+                            {{ smtpUserSetInEnv == true or smtpWithAuthentication == false ? 'disabled' }}
                     >
                 </div>
 
@@ -107,12 +111,16 @@
                     <label for="smtpPasswordInput" class="form-label">
                         <b>SMTP Password</b>
                     </label>
-                    <input type="text"
+                    <input type="password"
                            class="form-control"
-                           value="{{ smtpPassword }}"
+                           value=""
+                           placeholder="{{ smtpWithAuthentication and smtpPasswordConfigured ? '***' : '' }}"
+                           autocomplete="new-password"
+                           data-configured="{{ smtpPasswordConfigured ? 'true' : 'false' }}"
+                           data-set-in-env="{{ smtpPasswordSetInEnv ? 'true' : 'false' }}"
                            id="smtpPasswordInput"
                            style="text-align: center;"
-                            {{ smtpPasswordSetInEnv == true ? 'disabled' }}
+                            {{ smtpPasswordSetInEnv == true or smtpWithAuthentication == false ? 'disabled' }}
                     >
                 </div>
 

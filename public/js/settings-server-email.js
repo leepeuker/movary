@@ -6,26 +6,57 @@ const smtpWithAuthenticationInput = document.getElementById('smtpWithAuthenticat
 const smtpUserInput = document.getElementById('smtpUserInput');
 const smtpPasswordInput = document.getElementById('smtpPasswordInput');
 
+smtpWithAuthenticationInput.addEventListener('change', updateSmtpAuthenticationInputs);
+
+function updateSmtpAuthenticationInputs() {
+    if (smtpWithAuthenticationInput.checked === false) {
+        smtpUserInput.value = '';
+        smtpPasswordInput.value = '';
+        smtpPasswordInput.placeholder = '';
+        smtpUserInput.disabled = true;
+        smtpPasswordInput.disabled = true;
+
+        return;
+    }
+
+    smtpUserInput.value = smtpUserInput.dataset.environmentValue;
+    smtpPasswordInput.value = '';
+    smtpPasswordInput.placeholder = smtpPasswordInput.dataset.configured === 'true' ? '***' : '';
+    smtpUserInput.disabled = smtpUserInput.dataset.setInEnv === 'true';
+    smtpPasswordInput.disabled = smtpPasswordInput.dataset.setInEnv === 'true';
+}
+
+function updateSmtpCredentialStateAfterSave() {
+    if (smtpWithAuthenticationInput.checked === false) {
+        if (
+            smtpWithAuthenticationInput.disabled === false
+            && smtpPasswordInput.dataset.setInEnv === 'false'
+        ) {
+            smtpPasswordInput.dataset.configured = 'false';
+        }
+
+        return;
+    }
+
+    if (smtpPasswordInput.disabled === false && smtpPasswordInput.value !== '') {
+        smtpPasswordInput.dataset.configured = 'true';
+        smtpPasswordInput.value = '';
+        smtpPasswordInput.placeholder = '***';
+    }
+}
+
 document.getElementById('emailSettingsUpdateButton').addEventListener('click', async () => {
-    const response = await updateEmail(
-        smtpHostInput.value,
-        smtpPortInput.value,
-        smtpFromAddressInput.value,
-        smtpEncryptionInput.value,
-        smtpWithAuthenticationInput.checked,
-        smtpUserInput.value,
-        smtpPasswordInput.value
-    );
+    const response = await updateEmail();
 
     switch (response.status) {
         case 200:
+            updateSmtpCredentialStateAfterSave();
             addAlert('alertEmailDiv', 'Update was successful', 'success');
 
             return;
         case 400:
             const errorMessage = await response.text();
 
-            tmdbApiKeyInput.classList.add('invalid-input');
             addAlert('alertEmailDiv', errorMessage, 'danger');
 
             return;
@@ -34,20 +65,40 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
     }
 });
 
-function updateEmail(smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
+function updateEmail() {
     return fetch(APPLICATION_URL + '/settings/server/email', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
-        }, body: JSON.stringify({
-            'smtpHost': smtpHost,
-            'smtpPort': smtpPort,
-            'smtpFromAddress': smtpFromAddress,
-            'smtpEncryption': smtpEncryption,
-            'smtpWithAuthentication': smtpWithAuthentication,
-            'smtpUser': smtpUser,
-            'smtpPassword': smtpPassword
-        })
+        }, body: JSON.stringify(getEditableSmtpSettings())
     });
+}
+
+function getEditableSmtpSettings() {
+    const smtpSettings = {};
+
+    if (smtpHostInput.disabled === false) {
+        smtpSettings.smtpHost = smtpHostInput.value;
+    }
+    if (smtpPortInput.disabled === false) {
+        smtpSettings.smtpPort = smtpPortInput.value;
+    }
+    if (smtpFromAddressInput.disabled === false) {
+        smtpSettings.smtpFromAddress = smtpFromAddressInput.value;
+    }
+    if (smtpEncryptionInput.disabled === false) {
+        smtpSettings.smtpEncryption = smtpEncryptionInput.value;
+    }
+    if (smtpWithAuthenticationInput.disabled === false) {
+        smtpSettings.smtpWithAuthentication = smtpWithAuthenticationInput.checked;
+    }
+    if (smtpUserInput.disabled === false) {
+        smtpSettings.smtpUser = smtpUserInput.value;
+    }
+    if (smtpPasswordInput.disabled === false && smtpPasswordInput.value !== '') {
+        smtpSettings.smtpPassword = smtpPasswordInput.value;
+    }
+
+    return smtpSettings;
 }
 
 const testEmailModal = new bootstrap.Modal('#testEmailModal')
@@ -73,16 +124,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
     removeAlert('testEmailModalAlerts')
     loadingSpinner.classList.remove('d-none')
 
-    const response = await testEmail(
-        recipient,
-        smtpHostInput.value,
-        smtpPortInput.value,
-        smtpFromAddressInput.value,
-        smtpEncryptionInput.value,
-        smtpWithAuthenticationInput.value,
-        smtpUserInput.value,
-        smtpPasswordInput.value
-    );
+    const response = await testEmail(recipient);
 
     loadingSpinner.classList.add('d-none')
 
@@ -102,19 +144,13 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
     }
 });
 
-function testEmail(recipient, smtpHost, smtpPort, smtpFromAddress, smtpEncryption, smtpWithAuthentication, smtpUser, smtpPassword) {
+function testEmail(recipient) {
     return fetch(APPLICATION_URL + '/settings/server/email-test', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({
             'recipient': recipient,
-            'smtpHost': smtpHost,
-            'smtpPort': smtpPort,
-            'smtpEncryption': smtpEncryption,
-            'smtpFromAddress': smtpFromAddress,
-            'smtpWithAuthentication': smtpWithAuthentication,
-            'smtpUser': smtpUser,
-            'smtpPassword': smtpPassword
+            ...getEditableSmtpSettings()
         })
     });
 }

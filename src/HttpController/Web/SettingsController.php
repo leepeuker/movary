@@ -468,7 +468,7 @@ class SettingsController
                 'smtpWithAuthenticationSetInEnv' => $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment(),
                 'smtpUser' => $this->serverSettings->getSmtpUser(),
                 'smtpUserSetInEnv' => $this->serverSettings->isSmtpUserSetInEnvironment(),
-                'smtpPassword' => $this->serverSettings->getSmtpPassword(),
+                'smtpPasswordConfigured' => strlen((string)$this->serverSettings->getSmtpPassword()) > 0,
                 'smtpPasswordSetInEnv' => $this->serverSettings->isSmtpPasswordSetInEnvironment(),
             ]),
         );
@@ -557,13 +557,30 @@ class SettingsController
         $requestData = Json::decode($request->getBody());
 
         $smtpConfig = SmtpConfig::create(
-            (string)$requestData['smtpHost'],
-            (int)$requestData['smtpPort'],
-            (string)$requestData['smtpFromAddress'],
-            (string)$requestData['smtpEncryption'],
-            (bool)$requestData['smtpWithAuthentication'],
-            isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'],
-            isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'],
+            $this->serverSettings->isSmtpHostSetInEnvironment() || isset($requestData['smtpHost']) === false
+                ? (string)$this->serverSettings->getSmtpHost()
+                : (string)$requestData['smtpHost'],
+            $this->serverSettings->isSmtpPortSetInEnvironment() || isset($requestData['smtpPort']) === false
+                ? (int)$this->serverSettings->getSmtpPort()
+                : (int)$requestData['smtpPort'],
+            $this->serverSettings->isSmtpFromAddressSetInEnvironment()
+                || isset($requestData['smtpFromAddress']) === false
+                    ? (string)$this->serverSettings->getFromAddress()
+                    : (string)$requestData['smtpFromAddress'],
+            $this->serverSettings->isSmtpEncryptionSetInEnvironment()
+                || isset($requestData['smtpEncryption']) === false
+                    ? $this->serverSettings->getSmtpEncryption()
+                    : (string)$requestData['smtpEncryption'],
+            $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment()
+                || isset($requestData['smtpWithAuthentication']) === false
+                    ? (bool)$this->serverSettings->getSmtpWithAuthentication()
+                    : (bool)$requestData['smtpWithAuthentication'],
+            $this->serverSettings->isSmtpUserSetInEnvironment() || isset($requestData['smtpUser']) === false
+                ? $this->serverSettings->getSmtpUser()
+                : (string)$requestData['smtpUser'],
+            $this->serverSettings->isSmtpPasswordSetInEnvironment() || isset($requestData['smtpPassword']) === false
+                ? $this->serverSettings->getSmtpPassword()
+                : (string)$requestData['smtpPassword'],
         );
 
         try {
@@ -793,11 +810,19 @@ class SettingsController
         if ($smtpWithAuthentication !== null) {
             $this->serverSettings->setSmtpFromWithAuthentication($smtpWithAuthentication);
         }
-        if ($smtpUser !== null) {
-            $this->serverSettings->setSmtpUser($smtpUser);
-        }
-        if ($smtpPassword !== null) {
-            $this->serverSettings->setSmtpPassword($smtpPassword);
+
+        $smtpAuthenticationEnabled = $this->serverSettings->getSmtpWithAuthentication() === true;
+        if ($smtpWithAuthentication === false
+            && $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment() === false
+        ) {
+            $this->serverSettings->clearSmtpAuthenticationCredentials();
+        } elseif ($smtpAuthenticationEnabled === true) {
+            if ($smtpUser !== null) {
+                $this->serverSettings->setSmtpUser($smtpUser);
+            }
+            if ($smtpPassword !== null) {
+                $this->serverSettings->setSmtpPassword($smtpPassword);
+            }
         }
 
         return Response::createOk();
