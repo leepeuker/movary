@@ -203,6 +203,26 @@ class UserRepository
         return DateTime::createFromString($expirationDate);
     }
 
+    /**
+     * @return array{userId: int, expirationDate: DateTime}|null
+     */
+    public function findAuthTokenData(string $token) : ?array
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT `user_id`, `expiration_date` FROM `user_auth_token` WHERE `token` = ?',
+            [$token],
+        );
+
+        if ($data === false) {
+            return null;
+        }
+
+        return [
+            'userId' => (int)$data['user_id'],
+            'expirationDate' => DateTime::createFromString($data['expiration_date']),
+        ];
+    }
+
     public function findJellyfinAuthenticationData(int $userId) : ?array
     {
         $jellyfinAuthenticationData = $this->dbConnection->fetchAllAssociative(

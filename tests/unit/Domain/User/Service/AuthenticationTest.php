@@ -26,16 +26,19 @@ class AuthenticationTest extends TestCase
 
     private MockObject|UserRepository $userRepositoryMock;
 
+    private MockObject|SessionWrapper $sessionWrapperMock;
+
     protected function setUp() : void
     {
         unset($_COOKIE['id']);
 
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
         $this->userApiMock = $this->createMock(UserApi::class);
+        $this->sessionWrapperMock = $this->createMock(SessionWrapper::class);
         $this->subject = new Authentication(
             $this->userRepositoryMock,
             $this->userApiMock,
-            $this->createMock(SessionWrapper::class),
+            $this->sessionWrapperMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
         );
     }
@@ -51,14 +54,12 @@ class AuthenticationTest extends TestCase
 
         $this->userRepositoryMock
             ->expects(self::once())
-            ->method('findAuthTokenExpirationDate')
+            ->method('findAuthTokenData')
             ->with(self::TOKEN)
-            ->willReturn(DateTime::createFromString('+1 hour'));
-        $this->userRepositoryMock
-            ->expects(self::once())
-            ->method('findUserIdByAuthToken')
-            ->with(self::TOKEN)
-            ->willReturn(12);
+            ->willReturn([
+                'userId' => 12,
+                'expirationDate' => DateTime::createFromString('+1 hour'),
+            ]);
 
         self::assertTrue($this->subject->isUserAuthenticatedWithCookie());
         self::assertSame(12, $this->subject->getCurrentUserId());
@@ -74,7 +75,7 @@ class AuthenticationTest extends TestCase
             ->method('findUserIdByApiToken')
             ->with(self::TOKEN)
             ->willReturn(12);
-        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenExpirationDate');
+        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
 
         self::assertSame(12, $this->subject->getUserIdByToken($request));
     }
@@ -91,15 +92,30 @@ class AuthenticationTest extends TestCase
             ->willReturn(null);
         $this->userRepositoryMock
             ->expects(self::once())
-            ->method('findAuthTokenExpirationDate')
+            ->method('findAuthTokenData')
             ->with(self::TOKEN)
-            ->willReturn(DateTime::createFromString('-1 hour'));
+            ->willReturn([
+                'userId' => 12,
+                'expirationDate' => DateTime::createFromString('-1 hour'),
+            ]);
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('deleteAuthToken')
             ->with(self::TOKEN);
-        $this->userRepositoryMock->expects(self::never())->method('findUserIdByAuthToken');
 
         self::assertNull($this->subject->getUserIdByToken($request));
+    }
+
+    public function testSetAuthenticationCookieMakesTokenAvailableInCurrentRequest() : void
+    {
+        $this->sessionWrapperMock->expects(self::once())->method('destroy');
+        $this->sessionWrapperMock->expects(self::once())->method('start');
+
+        $this->subject->setAuthenticationCookieAndNewSession(
+            self::TOKEN,
+            DateTime::createFromString('+1 hour'),
+        );
+
+        self::assertSame(self::TOKEN, $_COOKIE['id']);
     }
 }

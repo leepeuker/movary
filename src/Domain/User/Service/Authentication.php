@@ -210,6 +210,7 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
+        $_COOKIE[self::AUTHENTICATION_COOKIE_NAME] = $token;
         setcookie(
             self::AUTHENTICATION_COOKIE_NAME,
             $token,
@@ -243,16 +244,20 @@ class Authentication
             return $this->validatedAuthTokenUserIds[$token];
         }
 
-        if ($this->isValidAuthToken($token) === false) {
+        $tokenData = $this->repository->findAuthTokenData($token);
+        if ($tokenData === null) {
             return null;
         }
 
-        $userId = $this->repository->findUserIdByAuthToken($token);
-        if ($userId !== null) {
-            $this->validatedAuthTokenUserIds[$token] = $userId;
+        if ($tokenData['expirationDate']->isAfter(DateTime::create()) === false) {
+            $this->repository->deleteAuthToken($token);
+
+            return null;
         }
 
-        return $userId;
+        $this->validatedAuthTokenUserIds[$token] = $tokenData['userId'];
+
+        return $tokenData['userId'];
     }
 
     private function getAuthenticationCookie() : ?string
@@ -284,17 +289,7 @@ class Authentication
 
     private function isValidAuthToken(string $token) : bool
     {
-        $tokenExpirationDate = $this->repository->findAuthTokenExpirationDate($token);
-
-        if ($tokenExpirationDate === null || $tokenExpirationDate->isAfter(DateTime::create()) === false) {
-            if ($tokenExpirationDate !== null) {
-                $this->repository->deleteAuthToken($token);
-            }
-
-            return false;
-        }
-
-        return true;
+        return $this->findUserIdByValidAuthToken($token) !== null;
     }
 
     private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string
