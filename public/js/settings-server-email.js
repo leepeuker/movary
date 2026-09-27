@@ -6,6 +6,36 @@ const smtpWithAuthenticationInput = document.getElementById('smtpWithAuthenticat
 const smtpUserInput = document.getElementById('smtpUserInput');
 const smtpPasswordInput = document.getElementById('smtpPasswordInput');
 
+let smtpUserValue = smtpUserInput.dataset.configuredValue;
+let smtpPasswordValue = '';
+
+smtpWithAuthenticationInput.addEventListener('change', updateSmtpAuthenticationInputs);
+
+function updateSmtpAuthenticationInputs() {
+    if (smtpWithAuthenticationInput.checked === false) {
+        if (smtpUserInput.disabled === false) {
+            smtpUserValue = smtpUserInput.value;
+        }
+        if (smtpPasswordInput.disabled === false) {
+            smtpPasswordValue = smtpPasswordInput.value;
+        }
+
+        smtpUserInput.value = '';
+        smtpPasswordInput.value = '';
+        smtpPasswordInput.placeholder = '';
+        smtpUserInput.disabled = true;
+        smtpPasswordInput.disabled = true;
+
+        return;
+    }
+
+    smtpUserInput.value = smtpUserValue;
+    smtpPasswordInput.value = smtpPasswordValue;
+    smtpPasswordInput.placeholder = smtpPasswordInput.dataset.configured === 'true' ? '***' : '';
+    smtpUserInput.disabled = smtpUserInput.dataset.setInEnv === 'true';
+    smtpPasswordInput.disabled = smtpPasswordInput.dataset.setInEnv === 'true';
+}
+
 document.getElementById('emailSettingsUpdateButton').addEventListener('click', async () => {
     const response = await updateEmail();
 
