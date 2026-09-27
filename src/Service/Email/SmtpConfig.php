@@ -24,6 +24,29 @@ class SmtpConfig
         ?string $user,
         ?string $password,
     ) : self {
+        $host = trim($host);
+        $fromAddress = trim($fromAddress);
+        $encryption = $encryption === '' ? null : $encryption;
+
+        if ($host === '') {
+            throw new InvalidSmtpConfigException('SMTP host must be set.');
+        }
+        if ($port < 1 || $port > 65535) {
+            throw new InvalidSmtpConfigException('SMTP port must be between 1 and 65535.');
+        }
+        if (filter_var($fromAddress, FILTER_VALIDATE_EMAIL) === false) {
+            throw new InvalidSmtpConfigException('SMTP from address must be a valid email address.');
+        }
+        if (in_array($encryption, [null, 'ssl', 'tls'], true) === false) {
+            throw new InvalidSmtpConfigException('SMTP encryption must be ssl, tls, or empty.');
+        }
+        if ($withAuthentication === true && trim((string)$user) === '') {
+            throw new InvalidSmtpConfigException('SMTP user must be set when authentication is enabled.');
+        }
+        if ($withAuthentication === true && (string)$password === '') {
+            throw new InvalidSmtpConfigException('SMTP password must be set when authentication is enabled.');
+        }
+
         return new self($host, $port, $fromAddress, $encryption, $withAuthentication, $user, $password);
     }
 
