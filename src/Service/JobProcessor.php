@@ -8,6 +8,7 @@ use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
 use Movary\Service\Mastodon\MastodonPostPlayService;
 use Movary\Service\Mastodon\MastodonPostWatchlistService;
+use Movary\Service\Email\PasswordResetEmailJobProcessor;
 use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\Service\Trakt\ImportWatchedMovies;
@@ -27,6 +28,7 @@ class JobProcessor
         private readonly JellyfinMoviesImporter $jellyfinImporter,
         private readonly MastodonPostPlayService $mastodonPostPlayService,
         private readonly MastodonPostWatchlistService $mastodonPostWatchlistService,
+        private readonly PasswordResetEmailJobProcessor $passwordResetEmailJobProcessor,
     ) {
     }
 
@@ -45,6 +47,7 @@ class JobProcessor
             $job->getType()->isOfTypeJellyfinImportMovies() => $this->jellyfinImporter->executeJob($job),
             $job->getType()->isOfTypeMastodonPostPlay() => $this->mastodonPostPlayService->executeJob($job),
             $job->getType()->isOfTypeMastodonPostWatchlist() => $this->mastodonPostWatchlistService->executeJob($job),
+            $job->getType()->isOfTypePasswordResetEmail() => $this->passwordResetEmailJobProcessor->executeJob($job),
 
             default => throw new RuntimeException('Job type not supported: ' . $job->getType()),
         };

@@ -59,6 +59,16 @@ class JobQueueApi
         $this->repository->addJob(JobType::createMastodonPostWatchlist(), JobStatus::createWaiting(), $userId, ['movieId' => $movieId]);
     }
 
+    public function addPasswordResetEmailJob(int $userId, bool $ignoreCooldown = false) : void
+    {
+        $this->repository->addJob(
+            JobType::createPasswordResetEmail(),
+            JobStatus::createWaiting(),
+            $userId,
+            ['ignoreCooldown' => $ignoreCooldown],
+        );
+    }
+
     public function addPlexImportWatchlistJob(int $userId, ?JobStatus $jobStatus = null) : int
     {
         return $this->repository->addJob(JobType::createPlexImportWatchlist(), $jobStatus ?? JobStatus::createWaiting(), $userId);

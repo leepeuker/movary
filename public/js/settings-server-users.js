@@ -279,11 +279,11 @@ async function sendPasswordReset(userId, userName) {
 
     if (response.ok === false) {
         const message = await response.text()
-        setUserModalAlertServerError(message || 'Could not send password reset email.')
+        setUserModalAlertServerError(message || 'Could not schedule password reset email.')
         return
     }
 
-    setUserManagementAlert('Password reset email was sent to ' + userName)
+    setUserManagementAlert('Password reset email was scheduled for ' + userName)
     reloadPasswordResetTable()
     userModal.hide()
 }

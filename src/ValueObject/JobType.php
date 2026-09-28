@@ -7,6 +7,8 @@ use RuntimeException;
 
 class JobType implements JsonSerializable
 {
+    private const string TYPE_PASSWORD_RESET_EMAIL = 'password_reset_email';
+
     private const string TYPE_MASTODON_POST_PLAY = 'mastodon_post_play';
 
     private const string TYPE_MASTODON_POST_WATCHLIST = 'mastodon_post_watchlist';
@@ -47,6 +49,7 @@ class JobType implements JsonSerializable
                 self::TYPE_PLEX_IMPORT_WATCHLIST,
                 self::TYPE_JELLYFIN_EXPORT_HISTORY,
                 self::TYPE_JELLYFIN_IMPORT_HISTORY,
+                self::TYPE_PASSWORD_RESET_EMAIL,
                 self::TYPE_MASTODON_POST_PLAY,
                 self::TYPE_MASTODON_POST_WATCHLIST,
             ]) === false) {
@@ -92,6 +95,11 @@ class JobType implements JsonSerializable
     public static function createMastodonPostWatchlist() : self
     {
         return new self(self::TYPE_MASTODON_POST_WATCHLIST);
+    }
+
+    public static function createPasswordResetEmail() : self
+    {
+        return new self(self::TYPE_PASSWORD_RESET_EMAIL);
     }
 
     public static function createPlexImportWatchlist() : self
@@ -162,6 +170,11 @@ class JobType implements JsonSerializable
     public function isOfTypeMastodonPostWatchlist() : bool
     {
         return $this->type === self::TYPE_MASTODON_POST_WATCHLIST;
+    }
+
+    public function isOfTypePasswordResetEmail() : bool
+    {
+        return $this->type === self::TYPE_PASSWORD_RESET_EMAIL;
     }
 
     public function isOfTypePlexImportWatchlist() : bool

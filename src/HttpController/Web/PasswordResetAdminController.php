@@ -32,7 +32,7 @@ class PasswordResetAdminController
         }
 
         if ($this->requestService->requestForUser($user) === false) {
-            return Response::createBadRequest('Could not send password reset email.');
+            return Response::createBadRequest('Could not schedule password reset email.');
         }
 
         return Response::createOk();

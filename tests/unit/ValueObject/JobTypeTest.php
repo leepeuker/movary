@@ -79,4 +79,11 @@ class JobTypeTest extends TestCase
         self::assertSame('trakt_import_ratings', (string)$subject);
         self::assertTrue($subject->isOfTypeTraktImportRatings());
     }
+    public function testCreatePasswordResetEmail() : void
+    {
+        $subject = JobType::createPasswordResetEmail();
+
+        self::assertSame('password_reset_email', (string)$subject);
+        self::assertTrue($subject->isOfTypePasswordResetEmail());
+    }
 }
