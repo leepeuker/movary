@@ -2,21 +2,11 @@
 
 namespace Movary\Service\Email;
 
-use Movary\Service\ServerSettings;
-use Twig\Environment;
-
-class PasswordResetEmailRenderer
+class PasswordResetEmailRenderer extends AbstractEmailRenderer
 {
-    public function __construct(
-        private readonly Environment $twig,
-        private readonly ServerSettings $serverSettings,
-    ) {
-    }
-
     public function render(string $resetUrl, int $expirationTimeInMinutes) : string
     {
-        return $this->twig->render('email/password-reset.html.twig', [
-            'applicationName' => $this->serverSettings->getApplicationName() ?? 'Movary',
+        return $this->renderTemplate('password-reset', [
             'resetUrl' => $resetUrl,
             'expirationTimeInMinutes' => $expirationTimeInMinutes,
         ]);

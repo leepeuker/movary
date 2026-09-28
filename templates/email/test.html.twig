@@ -1,0 +1,12 @@
+{% extends 'email/base.html.twig' %}
+
+{% block title %}Test email from {{ applicationName|e('html') }}{% endblock %}
+
+{% block content %}
+    <p style="margin: 0 0 16px; line-height: 1.5;">
+        This test email confirms that your current email settings are working.
+    </p>
+    <p style="margin: 0; line-height: 1.5;">
+        No further action is required.
+    </p>
+{% endblock %}

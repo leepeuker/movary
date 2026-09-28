@@ -21,6 +21,7 @@ use Movary\Service\Email\EmailService;
 use Movary\Service\Email\EmailSupport;
 use Movary\Service\Email\InvalidSmtpConfigException;
 use Movary\Service\Email\SmtpConfigFactory;
+use Movary\Service\Email\TestEmailRenderer;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\Radarr\RadarrFeedUrlGenerator;
 use Movary\Service\ServerSettings;
@@ -57,6 +58,7 @@ class SettingsController
         private readonly JobQueueApi $jobQueueApi,
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
+        private readonly TestEmailRenderer $testEmailRenderer,
         private readonly SmtpConfigFactory $smtpConfigFactory,
         private readonly EmailSupport $emailSupport,
         private readonly PasswordResetTokenService $passwordResetTokenService,
@@ -581,7 +583,7 @@ class SettingsController
             $this->emailService->sendEmail(
                 $recipient,
                 'Movary: Test Email',
-                'This is a test email sent to check the currently set email settings. It seems to work!',
+                $this->testEmailRenderer->render(),
                 $smtpConfig,
             );
         } catch (InvalidSmtpConfigException|CannotSendEmailException $e) {
