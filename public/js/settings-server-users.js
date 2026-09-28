@@ -245,6 +245,18 @@ async function reloadTable() {
         row.innerHTML += '<td>' + user.name + '</td>';
         row.innerHTML += '<td>' + user.email + '</td>';
         row.innerHTML += '<td>' + user.isAdmin + '</td>';
+
+        const actionCell = document.createElement('td')
+        const resetButton = document.createElement('button')
+        resetButton.type = 'button'
+        resetButton.className = 'btn btn-sm btn-secondary'
+        resetButton.textContent = 'Send reset email'
+        resetButton.addEventListener('click', (event) => {
+            event.stopPropagation()
+            sendPasswordReset(user.id, user.name)
+        })
+        actionCell.appendChild(resetButton)
+        row.appendChild(actionCell)
         row.style.cursor = 'pointer'
 
         table.getElementsByTagName('tbody')[0].appendChild(row);
@@ -253,9 +265,7 @@ async function reloadTable() {
     registerTableRowClickEvent()
 }
 
-document.getElementById('sendPasswordResetButton').addEventListener('click', async () => {
-    const userId = document.getElementById('userModalIdInput').value
-    const userName = document.getElementById('userModalNameInput').value
+async function sendPasswordReset(userId, userName) {
     if (confirm('Send a new password reset email to ' + userName + '?') === false) {
         return
     }
@@ -266,14 +276,13 @@ document.getElementById('sendPasswordResetButton').addEventListener('click', asy
 
     if (response.ok === false) {
         const message = await response.text()
-        setUserModalAlertServerError(message || 'Could not send password reset email.')
+        setUserManagementAlert(message || 'Could not send password reset email.', 'danger')
         return
     }
 
     setUserManagementAlert('Password reset email was sent to ' + userName)
     reloadPasswordResetTable()
-    userModal.hide()
-})
+}
 
 function appendTextCell(row, value) {
     const cell = document.createElement('td')
