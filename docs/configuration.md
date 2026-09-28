@@ -59,10 +59,11 @@ Required for some third party integrations. Only necessary if the relevant third
 
 ### Email
 
-Required to send emails
+Outgoing email features are disabled by default. Set `EMAIL_ENABLED=1` or enable them in the Web UI after configuring SMTP.
 
 | NAME                | DEFAULT VALUE | INFO                                                   | Web UI |
 |:--------------------|:-------------:|:-------------------------------------------------------|:------:|
+| `EMAIL_ENABLED`     |      `0`      | `1` enables outgoing email features                     |  yes   |
 | `SMTP_HOST`         |       -       | SMTP server hostname                                   |  yes   |
 | `SMTP_PORT`         |       -       | SMTP server port, from `1` through `65535`             |  yes   |
 | `SMTP_FROM_ADDRESS` |       -       | Valid email address used as the sender                 |  yes   |

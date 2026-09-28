@@ -5,7 +5,9 @@ const rows = table.getElementsByTagName('tr');
 const passwordResetsTable = document.getElementById('passwordResetsTable');
 
 reloadTable()
-reloadPasswordResetTable()
+if (passwordResetsTable !== null) {
+    reloadPasswordResetTable()
+}
 
 function registerTableRowClickEvent() {
     for (let i = 0; i < rows.length; i++) {
@@ -246,17 +248,19 @@ async function reloadTable() {
         row.innerHTML += '<td>' + user.email + '</td>';
         row.innerHTML += '<td>' + user.isAdmin + '</td>';
 
-        const actionCell = document.createElement('td')
-        const resetButton = document.createElement('button')
-        resetButton.type = 'button'
-        resetButton.className = 'btn btn-sm btn-secondary'
-        resetButton.textContent = 'Send reset email'
-        resetButton.addEventListener('click', (event) => {
-            event.stopPropagation()
-            sendPasswordReset(user.id, user.name)
-        })
-        actionCell.appendChild(resetButton)
-        row.appendChild(actionCell)
+        if (passwordResetsTable !== null) {
+            const actionCell = document.createElement('td')
+            const resetButton = document.createElement('button')
+            resetButton.type = 'button'
+            resetButton.className = 'btn btn-sm btn-secondary'
+            resetButton.textContent = 'Send reset email'
+            resetButton.addEventListener('click', (event) => {
+                event.stopPropagation()
+                sendPasswordReset(user.id, user.name)
+            })
+            actionCell.appendChild(resetButton)
+            row.appendChild(actionCell)
+        }
         row.style.cursor = 'pointer'
 
         table.getElementsByTagName('tbody')[0].appendChild(row);

@@ -51,7 +51,9 @@
                     <input type="hidden" value="{{ redirect }}" name="redirect" />
                 {% endif %}
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">Sign in</button>
-                <a class="d-block mb-3" href="{{ applicationUrl }}/forgot-password">Forgot password?</a>
+                {% if passwordResetAvailable == true %}
+                    <a class="d-block mb-3" href="{{ applicationUrl }}/forgot-password">Forgot password?</a>
+                {% endif %}
                 {% if registrationEnabled == true %}
                     <a href="{{ applicationUrl }}/create-user">Create new user</a>
                 {% endif %}

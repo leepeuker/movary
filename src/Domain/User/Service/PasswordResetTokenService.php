@@ -56,6 +56,11 @@ class PasswordResetTokenService
         );
     }
 
+    public function deleteAllTokens() : void
+    {
+        $this->repository->deleteAllPasswordResetTokens();
+    }
+
     public function deleteToken(string $token) : void
     {
         $this->repository->deletePasswordResetToken($this->hashToken($token));

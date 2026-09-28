@@ -275,6 +275,16 @@ class UserRepositoryTest extends TestCase
         self::assertNull($this->subject->findPasswordResetTokenData('unknown-token-hash'));
     }
 
+    public function testDeleteAllPasswordResetTokens() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with('DELETE FROM `user_password_reset_token`');
+
+        $this->subject->deleteAllPasswordResetTokens();
+    }
+
     public function testReplacePasswordResetToken() : void
     {
         $expirationDate = DateTime::createFromString('2026-09-27 12:15:00');

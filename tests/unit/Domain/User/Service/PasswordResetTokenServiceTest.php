@@ -182,6 +182,15 @@ class PasswordResetTokenServiceTest extends TestCase
         self::assertSame($pendingTokens, $this->subject->fetchPendingTokens());
     }
 
+    public function testDeleteAllTokens() : void
+    {
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('deleteAllPasswordResetTokens');
+
+        $this->subject->deleteAllTokens();
+    }
+
     public function testDeleteTokenHashesToken() : void
     {
         $this->repositoryMock

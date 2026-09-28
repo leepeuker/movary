@@ -145,6 +145,11 @@ class UserRepository
         );
     }
 
+    public function deleteAllPasswordResetTokens() : void
+    {
+        $this->dbConnection->executeStatement('DELETE FROM `user_password_reset_token`');
+    }
+
     public function deletePasswordResetToken(string $tokenHash) : void
     {
         $this->dbConnection->delete('user_password_reset_token', ['token_hash' => $tokenHash]);

@@ -5,6 +5,7 @@ namespace Movary\Domain\User\Service;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\Email\EmailSupport;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\ValueObject\RelativeUrl;
@@ -16,6 +17,7 @@ class PasswordResetRequestService
 {
     public function __construct(
         private readonly UserApi $userApi,
+        private readonly EmailSupport $emailSupport,
         private readonly PasswordResetTokenService $tokenService,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly SmtpConfigFactory $smtpConfigFactory,
@@ -37,6 +39,12 @@ class PasswordResetRequestService
     private function send(string $email, ?UserEntity $user = null, bool $ignoreCooldown = false) : bool
     {
         $token = null;
+
+        if ($this->emailSupport->isEnabled() === false) {
+            $this->logger->info('Password reset email not sent because email support is disabled.');
+
+            return false;
+        }
 
         try {
             if ($this->applicationUrlService->hasApplicationUrl() === false) {

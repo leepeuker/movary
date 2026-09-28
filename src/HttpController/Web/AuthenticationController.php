@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\SessionService;
+use Movary\Service\Email\EmailSupport;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -13,6 +14,7 @@ class AuthenticationController
 {
     public function __construct(
         private readonly Environment $twig,
+        private readonly EmailSupport $emailSupport,
         private readonly SessionWrapper $sessionWrapper,
     ) {
     }
@@ -29,6 +31,7 @@ class AuthenticationController
                 'failedLogin' => $failedLogin,
                 'redirect' => $redirect,
                 'passwordResetSuccessful' => $request->getGetParameters()['password-reset'] ?? null,
+                'passwordResetAvailable' => $this->emailSupport->isPasswordResetAvailable(),
             ],
         );
 

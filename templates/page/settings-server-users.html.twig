@@ -22,7 +22,9 @@
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 1rem;">User Management</h5>
 
-                <p class="text-muted">List of all users. Click on table row to edit/delete users.</p>
+                <p class="text-muted">
+                    Click a user row to edit/delete users{% if passwordResetAvailable == true %}, or use the action to send a password reset email{% endif %}.
+                </p>
 
                 <div id="userManagementAlerts"></div>
 
@@ -34,6 +36,9 @@
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Admin</th>
+                            {% if passwordResetAvailable == true %}
+                                <th scope="col">Action</th>
+                            {% endif %}
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -46,33 +51,35 @@
                 <button type="button" class="btn btn-primary float-end" style="width: 100%;" onclick="showCreateUserModal()">Create User</button>
             </div>
 
-            <hr style="margin-top: 3rem">
+            {% if passwordResetAvailable == true %}
+                <hr style="margin-top: 3rem">
 
-            <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5 style="margin-bottom: 1rem;">Password Resets</h5>
+                <div style="padding-bottom: 1rem;padding-top: 1rem">
+                    <h5 style="margin-bottom: 1rem;">Password Resets</h5>
 
-                <p class="text-muted">Active password reset requests. Reset links and token hashes are never displayed.</p>
+                    <p class="text-muted">Active password reset requests. Reset links and token hashes are never displayed.</p>
 
-                <div id="passwordResetManagementAlerts"></div>
+                    <div id="passwordResetManagementAlerts"></div>
 
-                <div class="table-responsive">
-                    <table class="table" id="passwordResetsTable">
-                        <thead>
-                        <tr>
-                            <th scope="col">User</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Created</th>
-                            <th scope="col">Expires</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table" id="passwordResetsTable">
+                            <thead>
+                            <tr>
+                                <th scope="col">User</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Expires</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="spinner-border d-none" role="status" id="passwordResetTableLoadingSpinner">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
-                <div class="spinner-border d-none" role="status" id="passwordResetTableLoadingSpinner">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            {% endif %}
         </div>
 
         {{ include('component/modal-user.html.twig') }}

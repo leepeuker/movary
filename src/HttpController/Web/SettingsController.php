@@ -10,6 +10,7 @@ use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
@@ -17,6 +18,7 @@ use Movary\Service\ApplicationUrlService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
+use Movary\Service\Email\EmailSupport;
 use Movary\Service\Email\InvalidSmtpConfigException;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\Service\Letterboxd\LetterboxdExporter;
@@ -56,6 +58,8 @@ class SettingsController
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
         private readonly SmtpConfigFactory $smtpConfigFactory,
+        private readonly EmailSupport $emailSupport,
+        private readonly PasswordResetTokenService $passwordResetTokenService,
         private readonly CountryApi $countryApi,
         private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
         private readonly ApplicationUrlService $applicationUrlService,
@@ -458,6 +462,9 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-server-email.html.twig', [
+                'emailEnabled' => $this->emailSupport->isEnabled(),
+                'emailEnabledSetInEnv' => $this->serverSettings->isEmailEnabledSetInEnvironment(),
+                'smtpConfigured' => $this->emailSupport->isSmtpConfigured(),
                 'smtpHost' => $this->serverSettings->getSmtpHost(),
                 'smtpHostSetInEnv' => $this->serverSettings->isSmtpHostSetInEnvironment(),
                 'smtpPort' => $this->serverSettings->getSmtpPort(),
@@ -514,7 +521,9 @@ class SettingsController
     {
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-server-users.html.twig'),
+            $this->twig->render('page/settings-server-users.html.twig', [
+                'passwordResetAvailable' => $this->emailSupport->isPasswordResetAvailable(),
+            ]),
         );
     }
 
@@ -557,6 +566,9 @@ class SettingsController
     public function sendTestEmail(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());
+        if ($this->resolveEmailEnabled($requestData) === false) {
+            return Response::createBadRequest('Email support is disabled.');
+        }
         $recipient = (string)($requestData['recipient'] ?? '');
 
         if (filter_var($recipient, FILTER_VALIDATE_EMAIL) === false) {
@@ -767,6 +779,14 @@ class SettingsController
     public function updateServerEmail(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());
+        $emailEnabled = $this->resolveEmailEnabled($requestData);
+
+        if ($emailEnabled === false) {
+            $this->serverSettings->setEmailEnabled(false);
+            $this->passwordResetTokenService->deleteAllTokens();
+
+            return Response::createOk();
+        }
 
         try {
             $this->smtpConfigFactory->create($requestData);
@@ -811,6 +831,8 @@ class SettingsController
                 $this->serverSettings->setSmtpPassword($smtpPassword);
             }
         }
+
+        $this->serverSettings->setEmailEnabled(true);
 
         return Response::createOk();
     }
@@ -869,5 +891,17 @@ class SettingsController
             null,
             [Header::createLocation($redirectUrl)],
         );
+    }
+
+    /** @param array<string, mixed> $requestData */
+    private function resolveEmailEnabled(array $requestData) : bool
+    {
+        if ($this->serverSettings->isEmailEnabledSetInEnvironment() === true) {
+            return $this->serverSettings->isEmailEnabled();
+        }
+
+        return array_key_exists('emailEnabled', $requestData)
+            ? (bool)$requestData['emailEnabled']
+            : $this->serverSettings->isEmailEnabled();
     }
 }

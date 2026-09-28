@@ -19,10 +19,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
-    $routes->add('GET', '/forgot-password', [Web\PasswordResetController::class, 'renderRequestPage']);
-    $routes->add('POST', '/forgot-password', [Web\PasswordResetController::class, 'requestReset']);
-    $routes->add('GET', '/reset-password', [Web\PasswordResetController::class, 'renderResetPage']);
-    $routes->add('POST', '/reset-password', [Web\PasswordResetController::class, 'resetPassword']);
+    $routes->add('GET', '/forgot-password', [Web\PasswordResetController::class, 'renderRequestPage'], [
+        Web\Middleware\PasswordResetIsAvailable::class,
+    ]);
+    $routes->add('POST', '/forgot-password', [Web\PasswordResetController::class, 'requestReset'], [
+        Web\Middleware\PasswordResetIsAvailable::class,
+    ]);
+    $routes->add('GET', '/reset-password', [Web\PasswordResetController::class, 'renderResetPage'], [
+        Web\Middleware\PasswordResetIsAvailable::class,
+    ]);
+    $routes->add('POST', '/reset-password', [Web\PasswordResetController::class, 'resetPassword'], [
+        Web\Middleware\PasswordResetIsAvailable::class,
+    ]);
     $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
         Web\Middleware\UserIsUnauthenticated::class,
         Web\Middleware\ServerHasUsers::class,
@@ -177,15 +185,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ]);
     $routes->add('GET', '/settings/password-resets', [Web\PasswordResetAdminController::class, 'fetchPendingResets'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\PasswordResetIsAvailable::class,
     ]);
     $routes->add('POST', '/settings/users/{userId:\d+}/password-reset', [Web\PasswordResetAdminController::class, 'createReset'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\PasswordResetIsAvailable::class,
     ]);
     $routes->add('DELETE', '/settings/users/{userId:\d+}/password-reset', [Web\PasswordResetAdminController::class, 'revokeReset'], [
         Web\Middleware\UserIsAuthenticated::class,
-        Web\Middleware\UserIsAdmin::class
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\PasswordResetIsAvailable::class,
     ]);
 
     $routes->add('GET', '/settings/locations', [Web\LocationController::class, 'fetchLocations'], [Web\Middleware\UserIsAuthenticated::class]);
