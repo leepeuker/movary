@@ -10,6 +10,7 @@ use Movary\Service\ApplicationUrlService;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\EmailSupport;
+use Movary\Service\Email\PasswordResetEmailRenderer;
 use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\ValueObject\RelativeUrl;
@@ -31,6 +32,8 @@ class PasswordResetRequestServiceTest extends TestCase
 
     private EmailSupport|MockObject $emailSupportMock;
 
+    private PasswordResetEmailRenderer|MockObject $passwordResetEmailRendererMock;
+
     private LoggerInterface|MockObject $loggerMock;
 
     private SmtpConfigFactory|MockObject $smtpConfigFactoryMock;
@@ -47,6 +50,13 @@ class PasswordResetRequestServiceTest extends TestCase
         $this->tokenServiceMock = $this->createMock(PasswordResetTokenService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->smtpConfigFactoryMock = $this->createMock(SmtpConfigFactory::class);
+        $this->passwordResetEmailRendererMock = $this->createMock(PasswordResetEmailRenderer::class);
+        $this->passwordResetEmailRendererMock
+            ->method('render')
+            ->willReturnCallback(
+                static fn(string $resetUrl, int $expirationTime) => '<a href="' . $resetUrl . '">'
+                    . $expirationTime . ' minutes</a>',
+            );
         $this->emailSupportMock = $this->createMock(EmailSupport::class);
         $this->emailSupportMock
             ->method('isEnabled')
@@ -56,6 +66,7 @@ class PasswordResetRequestServiceTest extends TestCase
         $this->subject = new PasswordResetRequestService(
             $this->userApiMock,
             $this->emailSupportMock,
+            $this->passwordResetEmailRendererMock,
             $this->tokenServiceMock,
             $this->applicationUrlServiceMock,
             $this->smtpConfigFactoryMock,
