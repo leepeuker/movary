@@ -1,4 +1,4 @@
-FROM composer:2.9 AS composer
+FROM composer:2.10.3 AS composer
 
 FROM trafex/php-nginx:3.11 AS base
 
