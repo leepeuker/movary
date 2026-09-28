@@ -188,6 +188,11 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAdmin::class,
         Web\Middleware\PasswordResetIsAvailable::class,
     ]);
+    $routes->add('DELETE', '/settings/password-resets', [Web\PasswordResetAdminController::class, 'revokeAllResets'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\PasswordResetIsAvailable::class,
+    ]);
     $routes->add('POST', '/settings/users/{userId:\d+}/password-reset', [Web\PasswordResetAdminController::class, 'createReset'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,

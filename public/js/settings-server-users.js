@@ -4,6 +4,7 @@ const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');
 const passwordResetsTable = document.getElementById('passwordResetsTable');
 const passwordResetUserButton = document.getElementById('passwordResetUserButton');
+const revokeAllPasswordResetsButton = document.getElementById('revokeAllPasswordResetsButton');
 
 reloadTable()
 if (passwordResetsTable !== null) {
@@ -16,6 +17,9 @@ if (passwordResetUserButton !== null) {
             document.getElementById('userModalNameInput').value,
         )
     })
+}
+if (revokeAllPasswordResetsButton !== null) {
+    revokeAllPasswordResetsButton.addEventListener('click', revokeAllPasswordResets)
 }
 
 function registerTableRowClickEvent() {
@@ -257,7 +261,7 @@ async function reloadTable() {
         row.innerHTML = '<td>' + user.id + '</td>';
         row.innerHTML += '<td>' + user.name + '</td>';
         row.innerHTML += '<td>' + user.email + '</td>';
-        row.innerHTML += '<td><span class="badge rounded-pill text-bg-' + (isAdmin ? 'danger' : 'secondary') + '">' + (isAdmin ? 'Admin' : 'User') + '</span></td>';
+        row.innerHTML += '<td><span class="badge rounded-pill text-bg-' + (isAdmin ? 'light' : 'dark') + '">' + (isAdmin ? 'Admin' : 'User') + '</span></td>';
 
         row.style.cursor = 'pointer'
 
@@ -309,6 +313,7 @@ async function reloadPasswordResetTable() {
     const spinner = document.getElementById('passwordResetTableLoadingSpinner')
     tableBody.replaceChildren()
     spinner.classList.remove('d-none')
+    revokeAllPasswordResetsButton.disabled = true
 
     const response = await fetch(APPLICATION_URL + '/settings/password-resets')
     spinner.classList.add('d-none')
@@ -319,6 +324,7 @@ async function reloadPasswordResetTable() {
     }
 
     const resets = await response.json()
+    revokeAllPasswordResetsButton.disabled = resets.length === 0
     if (resets.length === 0) {
         const row = document.createElement('tr')
         const cell = document.createElement('td')
@@ -347,6 +353,27 @@ async function reloadPasswordResetTable() {
         row.appendChild(actionCell)
         tableBody.appendChild(row)
     })
+}
+
+async function revokeAllPasswordResets() {
+    if (confirm('Revoke all active password reset links?') === false) {
+        return
+    }
+
+    revokeAllPasswordResetsButton.disabled = true
+
+    const response = await fetch(APPLICATION_URL + '/settings/password-resets', {
+        method: 'DELETE'
+    })
+
+    if (response.ok === false) {
+        setPasswordResetManagementAlert('Could not revoke all password reset links.', 'danger')
+        revokeAllPasswordResetsButton.disabled = false
+        return
+    }
+
+    setPasswordResetManagementAlert('All password reset links were revoked.')
+    reloadPasswordResetTable()
 }
 
 async function revokePasswordReset(userId, userName) {

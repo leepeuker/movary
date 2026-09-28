@@ -114,6 +114,15 @@ class PasswordResetAdminControllerTest extends TestCase
         self::assertSame('Could not send password reset email.', $response->getBody());
     }
 
+    public function testRevokeAllResetsDeletesAllTokens() : void
+    {
+        $this->tokenServiceMock
+            ->expects(self::once())
+            ->method('deleteAllTokens');
+
+        self::assertSame(204, $this->subject->revokeAllResets()->getStatusCode()->getCode());
+    }
+
     public function testRevokeResetDeletesUserToken() : void
     {
         $this->userApiMock->method('findUserById')->willReturn($this->createUser(false));
