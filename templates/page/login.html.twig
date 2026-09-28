@@ -38,6 +38,12 @@
 
                 <div id="loginErrors"></div>
 
+                {% if passwordResetSuccessful == 'success' %}
+                    <div class="alert alert-success" role="alert">
+                        Your password was reset. You can now sign in with the new password.
+                    </div>
+                {% endif %}
+
                 {% if redirect != false %}
                     <div class="alert alert-danger" role="alert" id="forbiddenPageAlert">
                         Sign in to access page
@@ -45,6 +51,7 @@
                     <input type="hidden" value="{{ redirect }}" name="redirect" />
                 {% endif %}
                 <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">Sign in</button>
+                <a class="d-block mb-3" href="{{ applicationUrl }}/forgot-password">Forgot password?</a>
                 {% if registrationEnabled == true %}
                     <a href="{{ applicationUrl }}/create-user">Create new user</a>
                 {% endif %}

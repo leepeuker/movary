@@ -55,6 +55,130 @@ class UserRepositoryTest extends TestCase
         self::assertNull($this->subject->findAuthTokenData('unknown-token'));
     }
 
+    public function testResetPasswordWithTokenConsumesTokenAndRevokesAccess() : void
+    {
+        $currentDate = DateTime::createFromString('2026-09-28 12:00:00');
+        $deleteCalls = [];
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->with(
+                'SELECT reset_token.`user_id`, reset_token.`expiration_date`, u.`core_account_changes_disabled` '
+                . 'FROM `user_password_reset_token` reset_token '
+                . 'JOIN `user` u ON u.`id` = reset_token.`user_id` '
+                . 'WHERE reset_token.`token_hash` = ?',
+                ['token-hash'],
+            )
+            ->willReturn([
+                'user_id' => '12',
+                'expiration_date' => '2026-09-28 12:15:00',
+                'core_account_changes_disabled' => '0',
+            ]);
+        $this->dbConnectionMock
+            ->expects(self::exactly(4))
+            ->method('delete')
+            ->willReturnCallback(static function (string $table, array $criteria) use (&$deleteCalls) : int {
+                $deleteCalls[] = [$table, $criteria];
+
+                return 1;
+            });
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with('user', ['password' => 'password-hash'], ['id' => 12]);
+
+        self::assertTrue($this->subject->resetPasswordWithToken('token-hash', 'password-hash', $currentDate));
+        self::assertSame(
+            [
+                ['user_password_reset_token', ['token_hash' => 'token-hash']],
+                ['user_password_reset_token', ['user_id' => 12]],
+                ['user_auth_token', ['user_id' => 12]],
+                ['user_api_token', ['user_id' => 12]],
+            ],
+            $deleteCalls,
+        );
+    }
+
+    public function testResetPasswordWithTokenRejectsAlreadyConsumedToken() : void
+    {
+        $this->dbConnectionMock
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->method('fetchAssociative')
+            ->willReturn([
+                'user_id' => '12',
+                'expiration_date' => '2026-09-28 12:15:00',
+                'core_account_changes_disabled' => '0',
+            ]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_password_reset_token', ['token_hash' => 'token-hash'])
+            ->willReturn(0);
+        $this->dbConnectionMock->expects(self::never())->method('update');
+
+        self::assertFalse($this->subject->resetPasswordWithToken(
+            'token-hash',
+            'password-hash',
+            DateTime::createFromString('2026-09-28 12:00:00'),
+        ));
+    }
+
+    public function testResetPasswordWithTokenRejectsTokenThatExpiredBeforeSubmission() : void
+    {
+        $this->dbConnectionMock
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->method('fetchAssociative')
+            ->willReturn([
+                'user_id' => '12',
+                'expiration_date' => '2026-09-28 11:59:59',
+                'core_account_changes_disabled' => '0',
+            ]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_password_reset_token', ['token_hash' => 'token-hash']);
+        $this->dbConnectionMock->expects(self::never())->method('update');
+
+        self::assertFalse($this->subject->resetPasswordWithToken(
+            'token-hash',
+            'password-hash',
+            DateTime::createFromString('2026-09-28 12:00:00'),
+        ));
+    }
+
+    public function testResetPasswordWithTokenRejectsProtectedAccount() : void
+    {
+        $this->dbConnectionMock
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->method('fetchAssociative')
+            ->willReturn([
+                'user_id' => '12',
+                'expiration_date' => '2026-09-28 12:15:00',
+                'core_account_changes_disabled' => '1',
+            ]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_password_reset_token', ['token_hash' => 'token-hash']);
+        $this->dbConnectionMock->expects(self::never())->method('update');
+
+        self::assertFalse($this->subject->resetPasswordWithToken(
+            'token-hash',
+            'password-hash',
+            DateTime::createFromString('2026-09-28 12:00:00'),
+        ));
+    }
+
     public function testFindPasswordResetTokenCreationDate() : void
     {
         $this->dbConnectionMock

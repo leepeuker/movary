@@ -13,8 +13,10 @@ class PasswordResetTokenService
 
     private const int TOKEN_LENGTH_IN_BYTES = 32;
 
-    public function __construct(private readonly UserRepository $repository)
-    {
+    public function __construct(
+        private readonly UserRepository $repository,
+        private readonly Validator $validator,
+    ) {
     }
 
     public function createTokenIfAllowed(int $userId) : ?string
@@ -41,6 +43,17 @@ class PasswordResetTokenService
         );
 
         return $token;
+    }
+
+    public function resetPassword(string $token, string $newPassword) : bool
+    {
+        $this->validator->ensurePasswordIsValid($newPassword);
+
+        return $this->repository->resetPasswordWithToken(
+            $this->hashToken($token),
+            password_hash($newPassword, PASSWORD_DEFAULT),
+            DateTime::create(),
+        );
     }
 
     public function deleteToken(string $token) : void

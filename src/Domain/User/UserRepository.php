@@ -61,6 +61,56 @@ class UserRepository
         );
     }
 
+    public function resetPasswordWithToken(
+        string $tokenHash,
+        string $passwordHash,
+        DateTime $currentDate,
+    ) : bool {
+        return $this->dbConnection->transactional(
+            static function (Connection $connection) use ($tokenHash, $passwordHash, $currentDate) : bool {
+                $tokenData = $connection->fetchAssociative(
+                    'SELECT reset_token.`user_id`, reset_token.`expiration_date`, u.`core_account_changes_disabled` '
+                    . 'FROM `user_password_reset_token` reset_token '
+                    . 'JOIN `user` u ON u.`id` = reset_token.`user_id` '
+                    . 'WHERE reset_token.`token_hash` = ?',
+                    [$tokenHash],
+                );
+
+                if ($tokenData === false) {
+                    return false;
+                }
+
+                if ((bool)$tokenData['core_account_changes_disabled'] === true) {
+                    $connection->delete('user_password_reset_token', ['token_hash' => $tokenHash]);
+
+                    return false;
+                }
+
+                if (DateTime::createFromString($tokenData['expiration_date'])->isAfter($currentDate) === false) {
+                    $connection->delete('user_password_reset_token', ['token_hash' => $tokenHash]);
+
+                    return false;
+                }
+
+                $userId = (int)$tokenData['user_id'];
+                $deletedTokenCount = $connection->delete(
+                    'user_password_reset_token',
+                    ['token_hash' => $tokenHash],
+                );
+                if ($deletedTokenCount !== 1) {
+                    return false;
+                }
+
+                $connection->update('user', ['password' => $passwordHash], ['id' => $userId]);
+                $connection->delete('user_password_reset_token', ['user_id' => $userId]);
+                $connection->delete('user_auth_token', ['user_id' => $userId]);
+                $connection->delete('user_api_token', ['user_id' => $userId]);
+
+                return true;
+            },
+        );
+    }
+
     public function createUser(string $email, string $passwordHash, string $name, bool $isAdmin) : void
     {
         $this->dbConnection->insert(
