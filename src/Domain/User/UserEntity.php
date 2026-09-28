@@ -10,6 +10,7 @@ class UserEntity
     private function __construct(
         private readonly int $id,
         private readonly string $name,
+        private readonly string $email,
         private readonly string $passwordHash,
         private readonly bool $isAdmin,
         private readonly ?string $dashboardVisibleRows,
@@ -52,6 +53,7 @@ class UserEntity
         return new self(
             (int)$data['id'],
             $data['name'],
+            $data['email'],
             $data['password'],
             (bool)$data['is_admin'],
             $data['dashboard_visible_rows'],
@@ -127,6 +129,11 @@ class UserEntity
     public function getDisplayTmdbRating() : bool
     {
         return $this->displayTmdbRating;
+    }
+
+    public function getEmail() : string
+    {
+        return $this->email;
     }
 
     public function getEmbyWebhookId() : ?string

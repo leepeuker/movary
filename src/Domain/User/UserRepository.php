@@ -179,6 +179,32 @@ class UserRepository
         return $this->dbConnection->fetchAllAssociative('SELECT id, name, email, is_admin as isAdmin FROM `user` ORDER BY id');
     }
 
+    /**
+     * @return array<array{userId: int, name: string, email: string, expirationDate: DateTime, createdAt: DateTime}>
+     */
+    public function fetchPendingPasswordResetTokens(DateTime $currentDate) : array
+    {
+        $rows = $this->dbConnection->fetchAllAssociative(
+            'SELECT reset_token.`user_id`, u.`name`, u.`email`, reset_token.`expiration_date`, reset_token.`created_at` '
+            . 'FROM `user_password_reset_token` reset_token '
+            . 'JOIN `user` u ON u.`id` = reset_token.`user_id` '
+            . 'WHERE reset_token.`expiration_date` > ? '
+            . 'ORDER BY reset_token.`created_at` DESC',
+            [(string)$currentDate],
+        );
+
+        return array_map(
+            static fn(array $row) : array => [
+                'userId' => (int)$row['user_id'],
+                'name' => $row['name'],
+                'email' => $row['email'],
+                'expirationDate' => DateTime::createFromString($row['expiration_date']),
+                'createdAt' => DateTime::createFromString($row['created_at']),
+            ],
+            $rows,
+        );
+    }
+
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
