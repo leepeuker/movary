@@ -55,6 +55,33 @@ class UserRepositoryTest extends TestCase
         self::assertNull($this->subject->findAuthTokenData('unknown-token'));
     }
 
+    public function testFindPasswordResetTokenCreationDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT `created_at` FROM `user_password_reset_token` WHERE `user_id` = ?',
+                [12],
+            )
+            ->willReturn('2026-09-27 12:00:00');
+
+        self::assertEquals(
+            DateTime::createFromString('2026-09-27 12:00:00'),
+            $this->subject->findPasswordResetTokenCreationDate(12),
+        );
+    }
+
+    public function testFindPasswordResetTokenCreationDateReturnsNull() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->willReturn(false);
+
+        self::assertNull($this->subject->findPasswordResetTokenCreationDate(12));
+    }
+
     public function testFindPasswordResetTokenData() : void
     {
         $this->dbConnectionMock

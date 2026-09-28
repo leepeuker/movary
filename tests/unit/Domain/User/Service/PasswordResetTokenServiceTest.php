@@ -26,6 +26,50 @@ class PasswordResetTokenServiceTest extends TestCase
         $this->subject = new PasswordResetTokenService($this->repositoryMock);
     }
 
+    public function testCreateTokenIfAllowedCreatesTokenWithoutExistingToken() : void
+    {
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('findPasswordResetTokenCreationDate')
+            ->with(12)
+            ->willReturn(null);
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('replacePasswordResetToken');
+
+        $token = $this->subject->createTokenIfAllowed(12);
+        self::assertNotNull($token);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $token);
+    }
+
+    public function testCreateTokenIfAllowedCreatesTokenAfterCooldown() : void
+    {
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('findPasswordResetTokenCreationDate')
+            ->with(12)
+            ->willReturn(DateTime::createFromString('-61 seconds'));
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('replacePasswordResetToken');
+
+        $token = $this->subject->createTokenIfAllowed(12);
+        self::assertNotNull($token);
+        self::assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $token);
+    }
+
+    public function testCreateTokenIfAllowedReturnsNullDuringCooldown() : void
+    {
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('findPasswordResetTokenCreationDate')
+            ->with(12)
+            ->willReturn(DateTime::createFromString('-30 seconds'));
+        $this->repositoryMock->expects(self::never())->method('replacePasswordResetToken');
+
+        self::assertNull($this->subject->createTokenIfAllowed(12));
+    }
+
     public function testCreateTokenStoresHashAndReturnsRawToken() : void
     {
         $storedTokenHash = null;
