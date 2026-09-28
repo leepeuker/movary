@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 #[CoversClass(TestEmailRenderer::class)]
@@ -21,9 +20,9 @@ class TestEmailRendererTest extends TestCase
 
     protected function setUp() : void
     {
-        $twig = new Environment(new FilesystemLoader(dirname(__DIR__, 4) . '/templates'));
+        $loader = new FilesystemLoader(dirname(__DIR__, 4) . '/templates');
         $this->serverSettingsMock = $this->createMock(ServerSettings::class);
-        $this->subject = new TestEmailRenderer($twig, $this->serverSettingsMock);
+        $this->subject = new TestEmailRenderer($loader, $this->serverSettingsMock);
     }
 
     public function testRenderCreatesEscapedTestEmail() : void
