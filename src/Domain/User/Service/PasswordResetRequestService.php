@@ -39,12 +39,14 @@ class PasswordResetRequestService
 
             $user = $this->userApi->findUserByEmail($email);
             if ($user === null || $user->hasCoreAccountChangesDisabled() === true) {
+                $this->logger->debug('Password reset email not send because email does not exist.', ['email' => $email]);
                 return;
             }
 
             $smtpConfig = $this->smtpConfigFactory->create();
             $token = $this->tokenService->createTokenIfAllowed($user->getId());
             if ($token === null) {
+                $this->logger->info('Password reset email not send because token was could not be created.', ['userId' => $user->getId()]);
                 return;
             }
 

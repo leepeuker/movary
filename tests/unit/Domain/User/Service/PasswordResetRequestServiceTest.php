@@ -72,6 +72,13 @@ class PasswordResetRequestServiceTest extends TestCase
             ->willReturn(null);
         $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Password reset email not send because email does not exist.',
+                ['email' => 'unknown@example.com'],
+            );
         $this->subject->request(' unknown@example.com ');
     }
 
@@ -82,6 +89,13 @@ class PasswordResetRequestServiceTest extends TestCase
         $this->userApiMock->method('findUserByEmail')->willReturn($user);
         $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Password reset email not send because email does not exist.',
+                ['email' => 'user@example.com'],
+            );
         $this->subject->request('user@example.com');
     }
 
@@ -135,6 +149,13 @@ class PasswordResetRequestServiceTest extends TestCase
         $this->tokenServiceMock->method('createTokenIfAllowed')->willReturn(null);
         $this->emailServiceMock->expects(self::never())->method('sendEmail');
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('info')
+            ->with(
+                'Password reset email not send because token was could not be created.',
+                ['userId' => 12],
+            );
         $this->subject->request('user@example.com');
     }
 
