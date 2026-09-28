@@ -69,16 +69,26 @@ function submitCredentialsOnEnter(event) {
 }
 
 function getSafeRedirect(redirectGetParameter, baseUrl) {
+    const fallbackRedirect = baseUrl + '/';
+
     if (!redirectGetParameter) {
-        return baseUrl + '/';
+        return fallbackRedirect;
     }
 
     try {
-        const parsed = new URL(redirectGetParameter, baseUrl);
-        const path = parsed.pathname + parsed.search + parsed.hash;
+        const applicationUrl = new URL(baseUrl || '/', window.location.origin);
+        const parsedRedirect = new URL(redirectGetParameter, applicationUrl);
+        const applicationPath = applicationUrl.pathname.replace(/\/$/, '');
+        const redirectIsWithinApplicationPath = applicationPath === ''
+            || parsedRedirect.pathname === applicationPath
+            || parsedRedirect.pathname.startsWith(applicationPath + '/');
 
-        return baseUrl + path;
+        if (parsedRedirect.origin !== applicationUrl.origin || !redirectIsWithinApplicationPath) {
+            return fallbackRedirect;
+        }
+
+        return parsedRedirect.href;
     } catch {
-        return baseUrl + '/';
+        return fallbackRedirect;
     }
 }
