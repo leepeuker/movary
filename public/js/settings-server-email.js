@@ -1,5 +1,6 @@
 const emailSupportEnabledInput = document.getElementById('emailSupportEnabledInput');
 const smtpSettingsFieldset = document.getElementById('smtpSettingsFieldset');
+const emailSettingsTestButton = document.getElementById('emailSettingsTestButton');
 const smtpHostInput = document.getElementById('smtpHostInput');
 const smtpPortInput = document.getElementById('smtpPortInput');
 const smtpEncryptionInput = document.getElementById('smtpEncryptionInput');
@@ -13,6 +14,7 @@ smtpWithAuthenticationInput.addEventListener('change', updateSmtpAuthenticationI
 
 function updateEmailSupportInputs() {
     smtpSettingsFieldset.disabled = emailSupportEnabledInput.checked === false;
+    emailSettingsTestButton.disabled = emailSupportEnabledInput.checked === false;
 }
 
 function updateSmtpAuthenticationInputs() {
@@ -117,7 +119,7 @@ function getEditableSmtpSettings() {
 
 const testEmailModal = new bootstrap.Modal('#testEmailModal')
 
-document.getElementById('emailSettingsTestButton').addEventListener('click', async () => {
+emailSettingsTestButton.addEventListener('click', async () => {
     testEmailModal.show()
 });
 

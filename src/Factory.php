@@ -21,8 +21,8 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
+use Movary\HttpController\Web\AuthenticationController;
 use Movary\HttpController\Web\JobController;
-use Movary\HttpController\Web\LandingPageController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
@@ -227,10 +227,11 @@ class Factory
         );
     }
 
-    public static function createLandingPageController(ContainerInterface $container, Config $config) : LandingPageController
+    public static function createAuthenticationController(ContainerInterface $container, Config $config) : AuthenticationController
     {
-        return new LandingPageController(
+        return new AuthenticationController(
             $container->get(Twig\Environment::class),
+            $container->get(Service\Email\EmailSupport::class),
             $config->getAsBool('ENABLE_REGISTRATION', false),
             $config->getAsStringNullable('DEFAULT_LOGIN_EMAIL'),
             $config->getAsStringNullable('DEFAULT_LOGIN_PASSWORD'),

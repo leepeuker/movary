@@ -465,6 +465,7 @@ class SettingsController
                 'emailEnabled' => $this->emailSupport->isEnabled(),
                 'emailEnabledSetInEnv' => $this->serverSettings->isEmailEnabledSetInEnvironment(),
                 'smtpConfigured' => $this->emailSupport->isSmtpConfigured(),
+                'hasApplicationUrl' => $this->applicationUrlService->hasApplicationUrl(),
                 'smtpHost' => $this->serverSettings->getSmtpHost(),
                 'smtpHostSetInEnv' => $this->serverSettings->isSmtpHostSetInEnvironment(),
                 'smtpPort' => $this->serverSettings->getSmtpPort(),
