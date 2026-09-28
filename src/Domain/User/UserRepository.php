@@ -253,6 +253,16 @@ class UserRepository
         ];
     }
 
+    public function findPasswordResetTokenCreationDate(int $userId) : ?DateTime
+    {
+        $createdAt = $this->dbConnection->fetchOne(
+            'SELECT `created_at` FROM `user_password_reset_token` WHERE `user_id` = ?',
+            [$userId],
+        );
+
+        return $createdAt === false ? null : DateTime::createFromString($createdAt);
+    }
+
     /**
      * @return array{userId: int, expirationDate: DateTime, createdAt: DateTime}|null
      */

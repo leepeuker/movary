@@ -9,10 +9,24 @@ class PasswordResetTokenService
 {
     private const int EXPIRATION_TIME_IN_MINUTES = 15;
 
+    private const int CREATION_COOLDOWN_IN_SECONDS = 60;
+
     private const int TOKEN_LENGTH_IN_BYTES = 32;
 
     public function __construct(private readonly UserRepository $repository)
     {
+    }
+
+    public function createTokenIfAllowed(int $userId) : ?string
+    {
+        $lastCreationDate = $this->repository->findPasswordResetTokenCreationDate($userId);
+        $cooldownThreshold = DateTime::create()->subSeconds(self::CREATION_COOLDOWN_IN_SECONDS);
+
+        if ($lastCreationDate?->isAfter($cooldownThreshold) === true) {
+            return null;
+        }
+
+        return $this->createToken($userId);
     }
 
     public function createToken(int $userId) : string

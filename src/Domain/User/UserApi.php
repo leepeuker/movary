@@ -217,6 +217,11 @@ class UserApi
         return $this->repository->findTraktUserName($userId);
     }
 
+    public function findUserByEmail(string $email) : ?UserEntity
+    {
+        return $this->repository->findUserByEmail($email);
+    }
+
     public function findUserById(int $userId) : ?UserEntity
     {
         return $this->repository->findUserById($userId);
