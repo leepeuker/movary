@@ -24,9 +24,15 @@
 
                 <p class="text-muted">Configuration set via environment variables cannot be changed and will be readonly.</p>
 
+                <p class="text-muted">
+                    Password reset emails require email support to be enabled and an
+                    <a href="{{ applicationUrl }}/settings/server/general">Application URL</a> to be configured.
+                    The Application URL is used to generate the reset link included in each email.
+                </p>
+
                 {% if hasApplicationUrl == false %}
                     <div class="alert alert-warning" role="alert">
-                        An <a href="{{ applicationUrl }}/settings/server/general" class="alert-link">Application URL</a> is required to enable password resets.
+                        Application URL is not configured. Password reset emails will remain unavailable until it is set.
                     </div>
                 {% endif %}
 
