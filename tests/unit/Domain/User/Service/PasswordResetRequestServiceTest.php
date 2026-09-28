@@ -56,6 +56,7 @@ class PasswordResetRequestServiceTest extends TestCase
 
     public function testRequestIgnoresInvalidEmail() : void
     {
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
         $this->userApiMock->expects(self::never())->method('findUserByEmail');
 
         $this->subject->request('not-an-email');
@@ -63,6 +64,7 @@ class PasswordResetRequestServiceTest extends TestCase
 
     public function testRequestIgnoresUnknownEmail() : void
     {
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
         $this->userApiMock
             ->expects(self::once())
             ->method('findUserByEmail')
@@ -70,15 +72,30 @@ class PasswordResetRequestServiceTest extends TestCase
             ->willReturn(null);
         $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Password reset email not send because email does not exist.',
+                ['email' => 'unknown@example.com'],
+            );
         $this->subject->request(' unknown@example.com ');
     }
 
     public function testRequestIgnoresProtectedUser() : void
     {
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
         $user = $this->createUser(true);
         $this->userApiMock->method('findUserByEmail')->willReturn($user);
         $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Password reset email not send because email does not exist.',
+                ['email' => 'user@example.com'],
+            );
         $this->subject->request('user@example.com');
     }
 
@@ -116,6 +133,10 @@ class PasswordResetRequestServiceTest extends TestCase
                 $smtpConfig,
             );
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('info')
+            ->with('Password reset email sent.', ['userId' => 12]);
         $this->subject->request('user@example.com');
     }
 
@@ -128,13 +149,19 @@ class PasswordResetRequestServiceTest extends TestCase
         $this->tokenServiceMock->method('createTokenIfAllowed')->willReturn(null);
         $this->emailServiceMock->expects(self::never())->method('sendEmail');
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('info')
+            ->with(
+                'Password reset email not send because token was could not be created.',
+                ['userId' => 12],
+            );
         $this->subject->request('user@example.com');
     }
 
     public function testRequestLogsMissingApplicationUrlWithoutCreatingToken() : void
     {
-        $user = $this->createUser(false);
-        $this->userApiMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->expects(self::never())->method('findUserByEmail');
         $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(false);
         $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
         $this->loggerMock
@@ -167,6 +194,7 @@ class PasswordResetRequestServiceTest extends TestCase
             ->method('error')
             ->with('Could not process password reset request.', self::arrayHasKey('exception'));
 
+        $this->loggerMock->expects(self::never())->method('info');
         $this->subject->request('user@example.com');
     }
 

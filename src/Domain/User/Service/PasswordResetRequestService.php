@@ -25,26 +25,28 @@ class PasswordResetRequestService
 
     public function request(string $email) : void
     {
-        $email = trim($email);
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            return;
-        }
-
         $token = null;
 
         try {
-            $user = $this->userApi->findUserByEmail($email);
-            if ($user === null || $user->hasCoreAccountChangesDisabled() === true) {
+            if ($this->applicationUrlService->hasApplicationUrl() === false) {
+                throw new RuntimeException('APPLICATION_URL must be configured to send password reset emails.');
+            }
+
+            $email = trim($email);
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
                 return;
             }
 
-            if ($this->applicationUrlService->hasApplicationUrl() === false) {
-                throw new RuntimeException('APPLICATION_URL must be configured to send password reset emails.');
+            $user = $this->userApi->findUserByEmail($email);
+            if ($user === null || $user->hasCoreAccountChangesDisabled() === true) {
+                $this->logger->debug('Password reset email not send because email does not exist.', ['email' => $email]);
+                return;
             }
 
             $smtpConfig = $this->smtpConfigFactory->create();
             $token = $this->tokenService->createTokenIfAllowed($user->getId());
             if ($token === null) {
+                $this->logger->info('Password reset email not send because token was could not be created.', ['userId' => $user->getId()]);
                 return;
             }
 
@@ -57,6 +59,7 @@ class PasswordResetRequestService
                 . '<p>If you did not request this, you can ignore this email.</p>';
 
             $this->emailService->sendEmail($email, 'Reset your Movary password', $message, $smtpConfig);
+            $this->logger->info('Password reset email sent.', ['userId' => $user->getId()]);
         } catch (Throwable $exception) {
             if ($token !== null) {
                 try {

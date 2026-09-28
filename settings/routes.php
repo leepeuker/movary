@@ -19,6 +19,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/', [Web\LandingPageController::class, 'render'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
+    $routes->add('GET', '/forgot-password', [Web\PasswordResetController::class, 'renderRequestPage']);
+    $routes->add('POST', '/forgot-password', [Web\PasswordResetController::class, 'requestReset']);
+    $routes->add('GET', '/reset-password', [Web\PasswordResetController::class, 'renderResetPage']);
+    $routes->add('POST', '/reset-password', [Web\PasswordResetController::class, 'resetPassword']);
     $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
         Web\Middleware\UserIsUnauthenticated::class,
         Web\Middleware\ServerHasUsers::class,

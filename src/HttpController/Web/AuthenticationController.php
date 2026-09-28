@@ -27,7 +27,8 @@ class AuthenticationController
             'page/login.html.twig',
             [
                 'failedLogin' => $failedLogin,
-                'redirect' => $redirect
+                'redirect' => $redirect,
+                'passwordResetSuccessful' => $request->getGetParameters()['password-reset'] ?? null,
             ],
         );
 
