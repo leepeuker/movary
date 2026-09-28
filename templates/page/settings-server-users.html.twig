@@ -22,7 +22,7 @@
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 1rem;">User Management</h5>
 
-                <p class="text-muted">List of all users. Click on table row to edit/delete users.</p>
+                <p class="text-muted">Click a user row to edit or delete the user, or use the action to send a password reset email.</p>
 
                 <div id="userManagementAlerts"></div>
 
@@ -34,6 +34,7 @@
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Admin</th>
+                            <th scope="col">Action</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -42,6 +43,7 @@
                 <div class="spinner-border d-none" role="status" id="userTableLoadingSpinner">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+                <button type="button" class="btn btn-primary w-100 mt-3" onclick="showCreateUserModal()">Create User</button>
             </div>
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 1rem;">Password Resets</h5>
@@ -70,7 +72,6 @@
             </div>
 
         </div>
-        <button type="button" class="btn btn-primary float-end" style="width: 100%" onclick="showCreateUserModal()">Create User</button>
 
         {{ include('component/modal-user.html.twig') }}
     </main>
