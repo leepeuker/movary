@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ applicationName|e('html') }}{% endblock %}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; color: #212529; font-family: Arial, sans-serif;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f4f4; padding: 32px 16px;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 6px; padding: 32px;">
+                <tr>
+                    <td>
+                        <h1 style="margin: 0 0 24px; font-size: 24px;">{{ block('title') }}</h1>
+                        {% block content %}{% endblock %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
