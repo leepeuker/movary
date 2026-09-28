@@ -116,6 +116,10 @@ class PasswordResetRequestServiceTest extends TestCase
                 $smtpConfig,
             );
 
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('info')
+            ->with('Password reset email sent.', ['userId' => 12]);
         $this->subject->request('user@example.com');
     }
 
@@ -167,6 +171,7 @@ class PasswordResetRequestServiceTest extends TestCase
             ->method('error')
             ->with('Could not process password reset request.', self::arrayHasKey('exception'));
 
+        $this->loggerMock->expects(self::never())->method('info');
         $this->subject->request('user@example.com');
     }
 

@@ -57,6 +57,7 @@ class PasswordResetRequestService
                 . '<p>If you did not request this, you can ignore this email.</p>';
 
             $this->emailService->sendEmail($email, 'Reset your Movary password', $message, $smtpConfig);
+            $this->logger->info('Password reset email sent.', ['userId' => $user->getId()]);
         } catch (Throwable $exception) {
             if ($token !== null) {
                 try {
