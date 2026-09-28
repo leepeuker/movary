@@ -26,6 +26,8 @@ class ServerSettings
 
     private const string APPLICATION_VERSION = 'APPLICATION_VERSION';
 
+    private const string EMAIL_ENABLED = 'EMAIL_ENABLED';
+
     private const string SMTP_HOST = 'SMTP_HOST';
 
     private const string SMTP_SENDER_ADDRESS = 'SMTP_SENDER_ADDRESS';
@@ -68,6 +70,11 @@ class ServerSettings
     public function getApplicationVersion() : string
     {
         return $this->getByKey(self::APPLICATION_VERSION) ?? 'unknown';
+    }
+
+    public function isEmailEnabled() : bool
+    {
+        return $this->getByKey(self::EMAIL_ENABLED) === '1';
     }
 
     public function getFromAddress() : ?string
@@ -160,6 +167,11 @@ class ServerSettings
         return $this->isSetInEnvironment(self::APPLICATION_URL);
     }
 
+    public function isEmailEnabledSetInEnvironment() : bool
+    {
+        return $this->isSetInEnvironment(self::EMAIL_ENABLED);
+    }
+
     public function isSmtpEncryptionSetInEnvironment() : bool
     {
         return $this->isSetInEnvironment(self::SMTP_ENCRYPTION);
@@ -243,6 +255,15 @@ class ServerSettings
     public function setApplicationUrl(string $applicationUrl) : void
     {
         $this->updateValue(self::APPLICATION_URL, $applicationUrl);
+    }
+
+    public function setEmailEnabled(bool $emailEnabled) : void
+    {
+        if ($this->isEmailEnabledSetInEnvironment() === true) {
+            return;
+        }
+
+        $this->updateValue(self::EMAIL_ENABLED, $emailEnabled);
     }
 
     public function setSmtpEncryption(string $smtpEncryption) : void

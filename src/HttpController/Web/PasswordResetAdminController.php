@@ -43,6 +43,13 @@ class PasswordResetAdminController
         return Response::createJson(Json::encode($this->tokenService->fetchPendingTokens()));
     }
 
+    public function revokeAllResets() : Response
+    {
+        $this->tokenService->deleteAllTokens();
+
+        return Response::createNoContent();
+    }
+
     public function revokeReset(Request $request) : Response
     {
         $userId = (int)$request->getRouteParameters()['userId'];

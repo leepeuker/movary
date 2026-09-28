@@ -9,6 +9,7 @@ use Movary\Domain\User\UserEntity;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
+use Movary\Service\Email\EmailSupport;
 use Movary\Service\Email\SmtpConfig;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\ValueObject\RelativeUrl;
@@ -26,6 +27,10 @@ class PasswordResetRequestServiceTest extends TestCase
 
     private EmailService|MockObject $emailServiceMock;
 
+    private bool $emailSupportEnabled = true;
+
+    private EmailSupport|MockObject $emailSupportMock;
+
     private LoggerInterface|MockObject $loggerMock;
 
     private SmtpConfigFactory|MockObject $smtpConfigFactoryMock;
@@ -42,10 +47,15 @@ class PasswordResetRequestServiceTest extends TestCase
         $this->tokenServiceMock = $this->createMock(PasswordResetTokenService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->smtpConfigFactoryMock = $this->createMock(SmtpConfigFactory::class);
+        $this->emailSupportMock = $this->createMock(EmailSupport::class);
+        $this->emailSupportMock
+            ->method('isEnabled')
+            ->willReturnCallback(fn() : bool => $this->emailSupportEnabled);
         $this->emailServiceMock = $this->createMock(EmailService::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->subject = new PasswordResetRequestService(
             $this->userApiMock,
+            $this->emailSupportMock,
             $this->tokenServiceMock,
             $this->applicationUrlServiceMock,
             $this->smtpConfigFactoryMock,
@@ -248,6 +258,21 @@ class PasswordResetRequestServiceTest extends TestCase
             ->with('Could not process password reset request.', self::arrayHasKey('exception'));
 
         $this->loggerMock->expects(self::never())->method('info');
+        $this->subject->request('user@example.com');
+    }
+
+    public function testRequestDoesNotSendEmailWhenEmailSupportIsDisabled() : void
+    {
+        $this->emailSupportEnabled = false;
+        $this->applicationUrlServiceMock->expects(self::never())->method('hasApplicationUrl');
+        $this->userApiMock->expects(self::never())->method('findUserByEmail');
+        $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
+        $this->emailServiceMock->expects(self::never())->method('sendEmail');
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('info')
+            ->with('Password reset email not sent because email support is disabled.');
+
         $this->subject->request('user@example.com');
     }
 
