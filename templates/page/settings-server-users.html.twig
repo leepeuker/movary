@@ -76,9 +76,11 @@
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <div class="d-grid mt-3">
-                        <button type="button" class="btn btn-danger" id="revokeAllPasswordResetsButton" disabled>Revoke all reset links</button>
+                        <button type="button" class="btn btn-danger" id="revokeAllPasswordResetsButton" data-bs-toggle="modal" data-bs-target="#passwordResetsRevokeAllModal" disabled>Revoke all reset links</button>
                     </div>
                 </div>
+
+                {{ include('component/modal-password-resets-revoke-all.html.twig') }}
             {% endif %}
         </div>
 

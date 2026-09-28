@@ -18,9 +18,6 @@ if (passwordResetUserButton !== null) {
         )
     })
 }
-if (revokeAllPasswordResetsButton !== null) {
-    revokeAllPasswordResetsButton.addEventListener('click', revokeAllPasswordResets)
-}
 
 function registerTableRowClickEvent() {
     for (let i = 0; i < rows.length; i++) {
@@ -302,9 +299,17 @@ function setPasswordResetManagementAlert(message, type = 'success') {
     alerts.replaceChildren()
 
     const alert = document.createElement('div')
-    alert.className = 'alert alert-' + type
+    alert.className = 'alert alert-' + type + ' alert-dismissible'
     alert.setAttribute('role', 'alert')
     alert.textContent = message
+
+    const closeButton = document.createElement('button')
+    closeButton.type = 'button'
+    closeButton.className = 'btn-close'
+    closeButton.dataset.bsDismiss = 'alert'
+    closeButton.setAttribute('aria-label', 'Close')
+    alert.appendChild(closeButton)
+
     alerts.appendChild(alert)
 }
 
@@ -356,11 +361,10 @@ async function reloadPasswordResetTable() {
 }
 
 async function revokeAllPasswordResets() {
-    if (confirm('Revoke all active password reset links?') === false) {
-        return
-    }
+    const modal = bootstrap.Modal.getInstance('#passwordResetsRevokeAllModal')
 
     revokeAllPasswordResetsButton.disabled = true
+    modal.hide()
 
     const response = await fetch(APPLICATION_URL + '/settings/password-resets', {
         method: 'DELETE'
