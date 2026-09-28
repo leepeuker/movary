@@ -56,6 +56,7 @@ class PasswordResetRequestServiceTest extends TestCase
 
     public function testRequestIgnoresInvalidEmail() : void
     {
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
         $this->userApiMock->expects(self::never())->method('findUserByEmail');
 
         $this->subject->request('not-an-email');
@@ -63,6 +64,7 @@ class PasswordResetRequestServiceTest extends TestCase
 
     public function testRequestIgnoresUnknownEmail() : void
     {
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
         $this->userApiMock
             ->expects(self::once())
             ->method('findUserByEmail')
@@ -75,6 +77,7 @@ class PasswordResetRequestServiceTest extends TestCase
 
     public function testRequestIgnoresProtectedUser() : void
     {
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
         $user = $this->createUser(true);
         $this->userApiMock->method('findUserByEmail')->willReturn($user);
         $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
@@ -137,8 +140,7 @@ class PasswordResetRequestServiceTest extends TestCase
 
     public function testRequestLogsMissingApplicationUrlWithoutCreatingToken() : void
     {
-        $user = $this->createUser(false);
-        $this->userApiMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->expects(self::never())->method('findUserByEmail');
         $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(false);
         $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
         $this->loggerMock

@@ -25,21 +25,21 @@ class PasswordResetRequestService
 
     public function request(string $email) : void
     {
-        $email = trim($email);
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            return;
-        }
-
         $token = null;
 
         try {
-            $user = $this->userApi->findUserByEmail($email);
-            if ($user === null || $user->hasCoreAccountChangesDisabled() === true) {
+            if ($this->applicationUrlService->hasApplicationUrl() === false) {
+                throw new RuntimeException('APPLICATION_URL must be configured to send password reset emails.');
+            }
+
+            $email = trim($email);
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
                 return;
             }
 
-            if ($this->applicationUrlService->hasApplicationUrl() === false) {
-                throw new RuntimeException('APPLICATION_URL must be configured to send password reset emails.');
+            $user = $this->userApi->findUserByEmail($email);
+            if ($user === null || $user->hasCoreAccountChangesDisabled() === true) {
+                return;
             }
 
             $smtpConfig = $this->smtpConfigFactory->create();
