@@ -38,7 +38,9 @@ class Response
     {
         $query = urlencode($redirectTarget);
 
-        return new self(StatusCode::createForbidden(), null, [Header::createLocation($baseUrl . '/login?redirect=' . $query)]);
+        $loginUrl = rtrim($baseUrl, '/') . '/login?redirect=' . $query;
+
+        return new self(StatusCode::createForbidden(), null, [Header::createLocation($loginUrl)]);
     }
 
     public static function createJson(string $body, ?StatusCode $statusCode = null) : self

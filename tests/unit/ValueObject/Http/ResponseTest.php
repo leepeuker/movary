@@ -35,6 +35,30 @@ class ResponseTest extends TestCase
         );
     }
 
+    public function testCreateForbiddenRedirectWithoutApplicationUrl() : void
+    {
+        self::assertEquals(
+            Response::create(
+                StatusCode::createForbidden(),
+                null,
+                [Header::createLocation('/login?redirect=%2Fusers%2Falice')],
+            ),
+            Response::createForbiddenRedirect('/users/alice', '/'),
+        );
+    }
+
+    public function testCreateForbiddenRedirectWithApplicationUrl() : void
+    {
+        self::assertEquals(
+            Response::create(
+                StatusCode::createForbidden(),
+                null,
+                [Header::createLocation('https://example.com/movary/login?redirect=%2Fusers%2Falice')],
+            ),
+            Response::createForbiddenRedirect('/users/alice', 'https://example.com/movary'),
+        );
+    }
+
     public function testCreateJson() : void
     {
         self::assertEquals(
