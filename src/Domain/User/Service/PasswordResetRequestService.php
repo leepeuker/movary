@@ -4,12 +4,9 @@ namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
+use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ApplicationUrlService;
-use Movary\Service\Email\EmailService;
 use Movary\Service\Email\EmailSupport;
-use Movary\Service\Email\PasswordResetEmailRenderer;
-use Movary\Service\Email\SmtpConfigFactory;
-use Movary\ValueObject\RelativeUrl;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
@@ -19,31 +16,26 @@ class PasswordResetRequestService
     public function __construct(
         private readonly UserApi $userApi,
         private readonly EmailSupport $emailSupport,
-        private readonly PasswordResetEmailRenderer $passwordResetEmailRenderer,
-        private readonly PasswordResetTokenService $tokenService,
         private readonly ApplicationUrlService $applicationUrlService,
-        private readonly SmtpConfigFactory $smtpConfigFactory,
-        private readonly EmailService $emailService,
+        private readonly JobQueueApi $jobQueueApi,
         private readonly LoggerInterface $logger,
     ) {
     }
 
     public function request(string $email) : bool
     {
-        return $this->send($email);
+        return $this->schedule($email);
     }
 
     public function requestForUser(UserEntity $user) : bool
     {
-        return $this->send($user->getEmail(), $user, true);
+        return $this->schedule($user->getEmail(), $user, true);
     }
 
-    private function send(string $email, ?UserEntity $user = null, bool $ignoreCooldown = false) : bool
+    private function schedule(string $email, ?UserEntity $user = null, bool $ignoreCooldown = false) : bool
     {
-        $token = null;
-
         if ($this->emailSupport->isEnabled() === false) {
-            $this->logger->info('Password reset email not sent because email support is disabled.');
+            $this->logger->info('Password reset email not scheduled because email support is disabled.');
 
             return false;
         }
@@ -60,44 +52,17 @@ class PasswordResetRequestService
 
             $user ??= $this->userApi->findUserByEmail($email);
             if ($user === null || $user->hasCoreAccountChangesDisabled() === true) {
-                $this->logger->debug('Password reset email not send because email does not exist.', ['email' => $email]);
+                $this->logger->debug('Password reset email not scheduled because email does not exist.', ['email' => $email]);
+
                 return false;
             }
 
-            $smtpConfig = $this->smtpConfigFactory->create();
-            $token = $ignoreCooldown === true
-                ? $this->tokenService->createToken($user->getId())
-                : $this->tokenService->createTokenIfAllowed($user->getId());
-            if ($token === null) {
-                $this->logger->info('Password reset email not send because token was could not be created.', ['userId' => $user->getId()]);
-                return false;
-            }
-
-            $resetUrl = $this->applicationUrlService->createApplicationUrl(
-                RelativeUrl::create('/reset-password?token=' . rawurlencode($token)),
-            );
-            $message = $this->passwordResetEmailRenderer->render(
-                $resetUrl,
-                PasswordResetTokenService::EXPIRATION_TIME_IN_MINUTES,
-            );
-
-            $this->emailService->sendEmail($email, 'Reset your Movary password', $message, $smtpConfig);
-            $this->logger->info('Password reset email sent.', ['userId' => $user->getId()]);
+            $this->jobQueueApi->addPasswordResetEmailJob($user->getId(), $ignoreCooldown);
+            $this->logger->info('Password reset email job scheduled.', ['userId' => $user->getId()]);
 
             return true;
         } catch (Throwable $exception) {
-            if ($token !== null) {
-                try {
-                    $this->tokenService->deleteToken($token);
-                } catch (Throwable $cleanupException) {
-                    $this->logger->error(
-                        'Could not remove password reset token after a failed request.',
-                        ['exception' => $cleanupException],
-                    );
-                }
-            }
-
-            $this->logger->error('Could not process password reset request.', ['exception' => $exception]);
+            $this->logger->error('Could not schedule password reset email.', ['exception' => $exception]);
 
             return false;
         }

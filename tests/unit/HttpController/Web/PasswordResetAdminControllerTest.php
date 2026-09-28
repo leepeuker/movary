@@ -102,7 +102,7 @@ class PasswordResetAdminControllerTest extends TestCase
         self::assertSame('Password resets are disabled for this user.', $response->getBody());
     }
 
-    public function testCreateResetReportsDeliveryFailure() : void
+    public function testCreateResetReportsSchedulingFailure() : void
     {
         $user = $this->createUser(false);
         $this->userApiMock->method('findUserById')->willReturn($user);
@@ -111,7 +111,7 @@ class PasswordResetAdminControllerTest extends TestCase
         $response = $this->subject->createReset($this->createRequest(12));
 
         self::assertEquals(StatusCode::createBadRequest(), $response->getStatusCode());
-        self::assertSame('Could not send password reset email.', $response->getBody());
+        self::assertSame('Could not schedule password reset email.', $response->getBody());
     }
 
     public function testRevokeAllResetsDeletesAllTokens() : void
