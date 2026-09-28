@@ -164,6 +164,24 @@ class PasswordResetTokenServiceTest extends TestCase
         self::assertNull($this->subject->findUserIdByToken(self::TOKEN));
     }
 
+    public function testFetchPendingTokens() : void
+    {
+        $pendingTokens = [[
+            'userId' => 12,
+            'name' => 'Alice',
+            'email' => 'alice@example.com',
+            'expirationDate' => DateTime::createFromString('+15 minutes'),
+            'createdAt' => DateTime::create(),
+        ]];
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('fetchPendingPasswordResetTokens')
+            ->with(self::isInstanceOf(DateTime::class))
+            ->willReturn($pendingTokens);
+
+        self::assertSame($pendingTokens, $this->subject->fetchPendingTokens());
+    }
+
     public function testDeleteTokenHashesToken() : void
     {
         $this->repositoryMock

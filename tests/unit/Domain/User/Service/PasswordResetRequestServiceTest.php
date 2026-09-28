@@ -140,6 +140,59 @@ class PasswordResetRequestServiceTest extends TestCase
         $this->subject->request('user@example.com');
     }
 
+    public function testRequestForUserReplacesExistingTokenAndSendsEmail() : void
+    {
+        $user = $this->createUser(false);
+        $smtpConfig = $this->createMock(SmtpConfig::class);
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
+        $this->smtpConfigFactoryMock->method('create')->willReturn($smtpConfig);
+        $this->userApiMock->expects(self::never())->method('findUserByEmail');
+        $this->tokenServiceMock->expects(self::never())->method('createTokenIfAllowed');
+        $this->tokenServiceMock
+            ->expects(self::once())
+            ->method('createToken')
+            ->with(12)
+            ->willReturn('replacement-token');
+        $this->applicationUrlServiceMock
+            ->method('createApplicationUrl')
+            ->willReturn('https://movary.example/reset-password?token=replacement-token');
+        $this->emailServiceMock
+            ->expects(self::once())
+            ->method('sendEmail')
+            ->with(
+                'user@example.com',
+                'Reset your Movary password',
+                self::stringContains('replacement-token'),
+                $smtpConfig,
+            );
+
+        self::assertTrue($this->subject->requestForUser($user));
+    }
+
+    public function testRequestForUserDeletesReplacementTokenWhenEmailSendingFails() : void
+    {
+        $user = $this->createUser(false);
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
+        $this->applicationUrlServiceMock
+            ->method('createApplicationUrl')
+            ->willReturn('https://movary.example/reset-password?token=replacement-token');
+        $this->smtpConfigFactoryMock->method('create')->willReturn($this->createMock(SmtpConfig::class));
+        $this->tokenServiceMock->method('createToken')->willReturn('replacement-token');
+        $this->emailServiceMock
+            ->method('sendEmail')
+            ->willThrowException(new CannotSendEmailException('SMTP failed.'));
+        $this->tokenServiceMock
+            ->expects(self::once())
+            ->method('deleteToken')
+            ->with('replacement-token');
+        $this->loggerMock
+            ->expects(self::once())
+            ->method('error')
+            ->with('Could not process password reset request.', self::arrayHasKey('exception'));
+
+        self::assertFalse($this->subject->requestForUser($user));
+    }
+
     public function testRequestDoesNotSendEmailDuringCooldown() : void
     {
         $user = $this->createUser(false);
@@ -202,6 +255,7 @@ class PasswordResetRequestServiceTest extends TestCase
     {
         $user = $this->createMock(UserEntity::class);
         $user->method('getId')->willReturn(12);
+        $user->method('getEmail')->willReturn('user@example.com');
         $user->method('hasCoreAccountChangesDisabled')->willReturn($accountChangesDisabled);
 
         return $user;

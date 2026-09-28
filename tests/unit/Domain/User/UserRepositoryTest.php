@@ -179,6 +179,40 @@ class UserRepositoryTest extends TestCase
         ));
     }
 
+    public function testFetchPendingPasswordResetTokensReturnsSafeMetadata() : void
+    {
+        $currentDate = DateTime::createFromString('2026-09-28 12:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                'SELECT reset_token.`user_id`, u.`name`, u.`email`, reset_token.`expiration_date`, reset_token.`created_at` '
+                . 'FROM `user_password_reset_token` reset_token '
+                . 'JOIN `user` u ON u.`id` = reset_token.`user_id` '
+                . 'WHERE reset_token.`expiration_date` > ? '
+                . 'ORDER BY reset_token.`created_at` DESC',
+                ['2026-09-28 12:00:00'],
+            )
+            ->willReturn([[
+                'user_id' => '12',
+                'name' => 'Alice',
+                'email' => 'alice@example.com',
+                'expiration_date' => '2026-09-28 12:15:00',
+                'created_at' => '2026-09-28 12:00:00',
+            ]]);
+
+        self::assertEquals(
+            [[
+                'userId' => 12,
+                'name' => 'Alice',
+                'email' => 'alice@example.com',
+                'expirationDate' => DateTime::createFromString('2026-09-28 12:15:00'),
+                'createdAt' => DateTime::createFromString('2026-09-28 12:00:00'),
+            ]],
+            $this->subject->fetchPendingPasswordResetTokens($currentDate),
+        );
+    }
+
     public function testFindPasswordResetTokenCreationDate() : void
     {
         $this->dbConnectionMock

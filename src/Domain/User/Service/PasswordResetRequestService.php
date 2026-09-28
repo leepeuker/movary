@@ -3,6 +3,7 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\SmtpConfigFactory;
@@ -23,7 +24,17 @@ class PasswordResetRequestService
     ) {
     }
 
-    public function request(string $email) : void
+    public function request(string $email) : bool
+    {
+        return $this->send($email);
+    }
+
+    public function requestForUser(UserEntity $user) : bool
+    {
+        return $this->send($user->getEmail(), $user, true);
+    }
+
+    private function send(string $email, ?UserEntity $user = null, bool $ignoreCooldown = false) : bool
     {
         $token = null;
 
@@ -34,20 +45,22 @@ class PasswordResetRequestService
 
             $email = trim($email);
             if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-                return;
+                return false;
             }
 
-            $user = $this->userApi->findUserByEmail($email);
+            $user ??= $this->userApi->findUserByEmail($email);
             if ($user === null || $user->hasCoreAccountChangesDisabled() === true) {
                 $this->logger->debug('Password reset email not send because email does not exist.', ['email' => $email]);
-                return;
+                return false;
             }
 
             $smtpConfig = $this->smtpConfigFactory->create();
-            $token = $this->tokenService->createTokenIfAllowed($user->getId());
+            $token = $ignoreCooldown === true
+                ? $this->tokenService->createToken($user->getId())
+                : $this->tokenService->createTokenIfAllowed($user->getId());
             if ($token === null) {
                 $this->logger->info('Password reset email not send because token was could not be created.', ['userId' => $user->getId()]);
-                return;
+                return false;
             }
 
             $resetUrl = $this->applicationUrlService->createApplicationUrl(
@@ -60,6 +73,8 @@ class PasswordResetRequestService
 
             $this->emailService->sendEmail($email, 'Reset your Movary password', $message, $smtpConfig);
             $this->logger->info('Password reset email sent.', ['userId' => $user->getId()]);
+
+            return true;
         } catch (Throwable $exception) {
             if ($token !== null) {
                 try {
@@ -73,6 +88,8 @@ class PasswordResetRequestService
             }
 
             $this->logger->error('Could not process password reset request.', ['exception' => $exception]);
+
+            return false;
         }
     }
 }

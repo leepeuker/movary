@@ -84,6 +84,14 @@ class PasswordResetTokenService
         return $tokenData['userId'];
     }
 
+    /**
+     * @return array<array{userId: int, name: string, email: string, expirationDate: DateTime, createdAt: DateTime}>
+     */
+    public function fetchPendingTokens() : array
+    {
+        return $this->repository->fetchPendingPasswordResetTokens(DateTime::create());
+    }
+
     private function hashToken(string $token) : string
     {
         return hash('sha256', $token);
