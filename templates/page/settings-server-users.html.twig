@@ -42,7 +42,12 @@
                 <div class="spinner-border d-none" role="status" id="userTableLoadingSpinner">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+
+                <button type="button" class="btn btn-primary float-end" style="width: 100%;" onclick="showCreateUserModal()">Create User</button>
             </div>
+
+            <hr style="margin-top: 3rem">
+
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 1rem;">Password Resets</h5>
 
@@ -68,9 +73,7 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-
         </div>
-        <button type="button" class="btn btn-primary float-end" style="width: 100%" onclick="showCreateUserModal()">Create User</button>
 
         {{ include('component/modal-user.html.twig') }}
     </main>
