@@ -7,7 +7,7 @@ use Movary\ValueObject\DateTime;
 
 class PasswordResetTokenService
 {
-    private const int EXPIRATION_TIME_IN_MINUTES = 15;
+    public const int EXPIRATION_TIME_IN_MINUTES = 15;
 
     private const int CREATION_COOLDOWN_IN_SECONDS = 60;
 

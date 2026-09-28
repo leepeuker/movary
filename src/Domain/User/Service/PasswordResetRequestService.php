@@ -5,8 +5,9 @@ namespace Movary\Domain\User\Service;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Service\ApplicationUrlService;
-use Movary\Service\Email\EmailSupport;
 use Movary\Service\Email\EmailService;
+use Movary\Service\Email\EmailSupport;
+use Movary\Service\Email\PasswordResetEmailRenderer;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\ValueObject\RelativeUrl;
 use Psr\Log\LoggerInterface;
@@ -18,6 +19,7 @@ class PasswordResetRequestService
     public function __construct(
         private readonly UserApi $userApi,
         private readonly EmailSupport $emailSupport,
+        private readonly PasswordResetEmailRenderer $passwordResetEmailRenderer,
         private readonly PasswordResetTokenService $tokenService,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly SmtpConfigFactory $smtpConfigFactory,
@@ -74,10 +76,10 @@ class PasswordResetRequestService
             $resetUrl = $this->applicationUrlService->createApplicationUrl(
                 RelativeUrl::create('/reset-password?token=' . rawurlencode($token)),
             );
-            $escapedResetUrl = htmlspecialchars($resetUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $message = '<p>A password reset was requested for your Movary account.</p>'
-                . '<p><a href="' . $escapedResetUrl . '">Reset password</a></p>'
-                . '<p>If you did not request this, you can ignore this email.</p>';
+            $message = $this->passwordResetEmailRenderer->render(
+                $resetUrl,
+                PasswordResetTokenService::EXPIRATION_TIME_IN_MINUTES,
+            );
 
             $this->emailService->sendEmail($email, 'Reset your Movary password', $message, $smtpConfig);
             $this->logger->info('Password reset email sent.', ['userId' => $user->getId()]);
