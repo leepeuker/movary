@@ -23,7 +23,7 @@
                 <h5 style="margin-bottom: 1rem;">User Management</h5>
 
                 <p class="text-muted">
-                    Click a user row to edit/delete users{% if passwordResetAvailable == true %}, or use the action to send a password reset email{% endif %}.
+                    Click a user row to edit or delete the user{% if passwordResetAvailable == true %}, or send a password reset email{% endif %}.
                 </p>
 
                 <div id="userManagementAlerts"></div>
@@ -35,10 +35,7 @@
                             <th scope="col">Id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
-                            <th scope="col">Admin</th>
-                            {% if passwordResetAvailable == true %}
-                                <th scope="col">Action</th>
-                            {% endif %}
+                            <th scope="col">Role</th>
                         </tr>
                         </thead>
                         <tbody></tbody>

@@ -3,10 +3,19 @@ const userModal = new bootstrap.Modal('#userModal', {keyboard: false})
 const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');
 const passwordResetsTable = document.getElementById('passwordResetsTable');
+const passwordResetUserButton = document.getElementById('passwordResetUserButton');
 
 reloadTable()
 if (passwordResetsTable !== null) {
     reloadPasswordResetTable()
+}
+if (passwordResetUserButton !== null) {
+    passwordResetUserButton.addEventListener('click', () => {
+        sendPasswordReset(
+            document.getElementById('userModalIdInput').value,
+            document.getElementById('userModalNameInput').value,
+        )
+    })
 }
 
 function registerTableRowClickEvent() {
@@ -18,7 +27,7 @@ function registerTableRowClickEvent() {
                 this.cells[0].innerHTML,
                 this.cells[1].innerHTML,
                 this.cells[2].innerHTML,
-                this.cells[3].innerHTML === '1'
+                this.dataset.isAdmin === 'true'
             )
 
             userModal.show()
@@ -243,24 +252,13 @@ async function reloadTable() {
 
     users.forEach((user) => {
         let row = document.createElement('tr');
+        const isAdmin = user.isAdmin === true || user.isAdmin === 1 || user.isAdmin === '1'
+        row.dataset.isAdmin = isAdmin ? 'true' : 'false'
         row.innerHTML = '<td>' + user.id + '</td>';
         row.innerHTML += '<td>' + user.name + '</td>';
         row.innerHTML += '<td>' + user.email + '</td>';
-        row.innerHTML += '<td>' + user.isAdmin + '</td>';
+        row.innerHTML += '<td><span class="badge rounded-pill text-bg-' + (isAdmin ? 'danger' : 'secondary') + '">' + (isAdmin ? 'Admin' : 'User') + '</span></td>';
 
-        if (passwordResetsTable !== null) {
-            const actionCell = document.createElement('td')
-            const resetButton = document.createElement('button')
-            resetButton.type = 'button'
-            resetButton.className = 'btn btn-sm btn-secondary'
-            resetButton.textContent = 'Send reset email'
-            resetButton.addEventListener('click', (event) => {
-                event.stopPropagation()
-                sendPasswordReset(user.id, user.name)
-            })
-            actionCell.appendChild(resetButton)
-            row.appendChild(actionCell)
-        }
         row.style.cursor = 'pointer'
 
         table.getElementsByTagName('tbody')[0].appendChild(row);
@@ -280,12 +278,13 @@ async function sendPasswordReset(userId, userName) {
 
     if (response.ok === false) {
         const message = await response.text()
-        setUserManagementAlert(message || 'Could not send password reset email.', 'danger')
+        setUserModalAlertServerError(message || 'Could not send password reset email.')
         return
     }
 
     setUserManagementAlert('Password reset email was sent to ' + userName)
     reloadPasswordResetTable()
+    userModal.hide()
 }
 
 function appendTextCell(row, value) {
