@@ -13,6 +13,10 @@ their [docs](https://github.com/TrafeX/docker-php-nginx) for more configuration 
 
     Missing database migrations can cause criticatal errors!
 
+    Back up the database before upgrading across the Doctrine migration
+    cutover. Movary validates a legacy database before recording the new
+    baseline and stops without marking a mismatching schema current.
+
 !!! info
     
     The docker images automatically runs the missing database migrations on start up. 

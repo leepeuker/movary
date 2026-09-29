@@ -31,6 +31,7 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\DatabaseMigration\CanonicalSchemaProvider;
+use Movary\Service\DatabaseMigration\MigrationCoordinator;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
@@ -109,6 +110,15 @@ class Factory
         return new Command\DatabaseMigrationMigrate(
             $container->get(PhinxApplication::class),
             self::createDirectoryAppRoot() . 'settings/phinx.php',
+            $container->get(MigrationCoordinator::class),
+        );
+    }
+
+    public static function createDatabaseMigrationGenerateCommand(
+        ContainerInterface $container,
+    ) : Command\DatabaseMigrationGenerate {
+        return new Command\DatabaseMigrationGenerate(
+            $container->get(DependencyFactory::class),
         );
     }
 
@@ -117,6 +127,8 @@ class Factory
         return new Command\DatabaseMigrationRollback(
             $container->get(PhinxApplication::class),
             self::createDirectoryAppRoot() . 'settings/phinx.php',
+            $container->get(Service\DatabaseMigration\MigrationStateDetector::class),
+            $container->get(DependencyFactory::class),
         );
     }
 
@@ -125,6 +137,8 @@ class Factory
         return new Command\DatabaseMigrationStatus(
             $container->get(PhinxApplication::class),
             self::createDirectoryAppRoot() . 'settings/phinx.php',
+            $container->get(Service\DatabaseMigration\MigrationStateDetector::class),
+            $container->get(DependencyFactory::class),
         );
     }
 

@@ -20,6 +20,7 @@ final class Version20260928000000 extends AbstractMigration
         return false;
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
         $targetSchema = (new CanonicalSchemaProvider())->createSchema();
@@ -50,6 +51,7 @@ final class Version20260928000000 extends AbstractMigration
         }
     }
 
+    // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function down(Schema $schema) : void
     {
         $this->throwIrreversibleMigrationException(

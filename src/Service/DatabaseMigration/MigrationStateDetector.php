@@ -33,8 +33,6 @@ class MigrationStateDetector
             }
 
             $tableNames = array_values(array_diff($tableNames, [self::DOCTRINE_METADATA_TABLE]));
-
-            return $tableNames === [] ? MigrationState::EMPTY : MigrationState::UNEXPECTED;
         }
 
         if (in_array(self::PHINX_METADATA_TABLE, $tableNames, true) === true) {

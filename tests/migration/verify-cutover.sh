@@ -43,6 +43,34 @@ run_mysql_migrations() {
         vendor/bin/phinx migrate --configuration settings/phinx.php "$@"
 }
 
+run_sqlite_app_command() {
+    local database_file=$1
+    shift
+
+    docker run --rm --entrypoint php \
+        --env DATABASE_MODE=sqlite \
+        --env "DATABASE_SQLITE=../audit/$database_file" \
+        --volume "$audit_directory:/audit" \
+        "$image_name" \
+        bin/console.php "$@" --no-interaction
+}
+
+run_mysql_app_command() {
+    local database_name=$1
+    shift
+
+    docker run --rm --entrypoint php \
+        --network "$network_name" \
+        --env DATABASE_MODE=mysql \
+        --env DATABASE_MYSQL_HOST="$mysql_container" \
+        --env DATABASE_MYSQL_NAME="$database_name" \
+        --env DATABASE_MYSQL_USER=movary \
+        --env DATABASE_MYSQL_PASSWORD=movary \
+        --env DATABASE_MYSQL_PORT=3306 \
+        "$image_name" \
+        bin/console.php "$@" --no-interaction
+}
+
 query_sqlite() {
     local database_file=$1
     local query=$2
@@ -128,6 +156,28 @@ assert_equal 1x "$(query_sqlite noncanonical.sqlite 'SELECT user_id FROM locatio
 assert_equal 0 "$(query_sqlite noncanonical.sqlite 'SELECT COUNT(*) FROM phinxlog WHERE version = 20260927220000')" \
     'SQLite recorded a rejected normalization migration'
 
+run_sqlite_app_command null-genre.sqlite database:migration:migrate
+assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
+    "$(query_sqlite null-genre.sqlite 'SELECT version FROM doctrine_migration_versions')" \
+    'SQLite legacy database did not record the Doctrine baseline'
+run_sqlite_app_command null-genre.sqlite database:migration:migrate
+run_sqlite_app_command null-genre.sqlite database:migration:status >/dev/null
+if run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null 2>&1; then
+    echo 'SQLite rolled back the irreversible Doctrine baseline' >&2
+    exit 1
+fi
+assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
+    "$(query_sqlite null-genre.sqlite 'SELECT version FROM doctrine_migration_versions')" \
+    'SQLite removed the Doctrine baseline after rejected rollback'
+
+run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
+assert_equal 27 "$(query_sqlite doctrine-fresh.sqlite \
+    "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
+    'Fresh SQLite Doctrine database has an unexpected table count'
+assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
+    "$(query_sqlite doctrine-fresh.sqlite 'SELECT version FROM doctrine_migration_versions')" \
+    'Fresh SQLite database did not execute the Doctrine baseline'
+
 docker network create "$network_name" >/dev/null
 docker run --detach --rm \
     --name "$mysql_container" \
@@ -154,7 +204,7 @@ mysql_query() {
     local database_name=$1
     local query=$2
 
-    docker exec "$mysql_container" mysql --batch --skip-column-names \
+    docker exec "$mysql_container" mysql --batch --raw --skip-column-names \
         --user=root --password=movary-root "$database_name" --execute="$query"
 }
 
@@ -181,6 +231,30 @@ assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movi
     'MySQL rating cache does not isolate identical Trakt IDs by user'
 assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movie_watched WHERE trakt_id = 123')" \
     'MySQL watched cache does not isolate identical Trakt IDs by user'
+
+run_mysql_app_command movary database:migration:migrate
+assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
+    "$(mysql_query movary 'SELECT version FROM doctrine_migration_versions')" \
+    'MySQL legacy database did not record the Doctrine baseline'
+run_mysql_app_command movary database:migration:migrate
+run_mysql_app_command movary database:migration:status >/dev/null
+if run_mysql_app_command movary database:migration:rollback >/dev/null 2>&1; then
+    echo 'MySQL rolled back the irreversible Doctrine baseline' >&2
+    exit 1
+fi
+assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
+    "$(mysql_query movary 'SELECT version FROM doctrine_migration_versions')" \
+    'MySQL removed the Doctrine baseline after rejected rollback'
+
+docker exec "$mysql_container" mysql --user=root --password=movary-root \
+    --execute="CREATE DATABASE doctrine_fresh; GRANT ALL PRIVILEGES ON doctrine_fresh.* TO 'movary'@'%';"
+run_mysql_app_command doctrine_fresh database:migration:migrate
+assert_equal 27 "$(mysql_query doctrine_fresh \
+    "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'doctrine_fresh'")" \
+    'Fresh MySQL Doctrine database has an unexpected table count'
+assert_equal 2 "$(mysql_query doctrine_fresh \
+    "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = 'doctrine_fresh' AND CONSTRAINT_TYPE = 'CHECK'")" \
+    'Fresh MySQL Doctrine database does not have both value-domain checks'
 
 docker exec "$mysql_container" mysql --user=root --password=movary-root movary_drift \
     --execute='ALTER TABLE movie_cast DROP FOREIGN KEY movie_cast_ibfk_1'

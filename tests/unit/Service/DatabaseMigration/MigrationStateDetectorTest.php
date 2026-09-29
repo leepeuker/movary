@@ -83,12 +83,24 @@ class MigrationStateDetectorTest extends TestCase
         self::assertSame(MigrationState::EMPTY, $this->detector->detect());
     }
 
-    public function testRejectsInterruptedDoctrineInitialization() : void
+    public function testRecoversInterruptedDoctrineInitializationAsIncompleteLegacyDatabase() : void
     {
         $this->createPhinxMetadataTable();
         $this->createDoctrineMetadataTable();
 
-        self::assertSame(MigrationState::UNEXPECTED, $this->detector->detect());
+        self::assertSame(MigrationState::LEGACY_INCOMPLETE, $this->detector->detect());
+    }
+
+    public function testRecoversInterruptedDoctrineInitializationAtCutoverBoundary() : void
+    {
+        $this->createPhinxMetadataTable();
+        $this->dbConnection->insert(
+            'phinxlog',
+            ['version' => MigrationStateDetector::LEGACY_CUTOVER_VERSION],
+        );
+        $this->createDoctrineMetadataTable();
+
+        self::assertSame(MigrationState::LEGACY_READY, $this->detector->detect());
     }
 
     public function testRejectsDatabaseWithoutMigrationMetadata() : void
