@@ -67,8 +67,9 @@ assert_equal() {
 
 run_sqlite_migrations before.sqlite --target 20260927143000
 cp "$audit_directory/before.sqlite" "$audit_directory/null-genre.sqlite"
+cp "$audit_directory/before.sqlite" "$audit_directory/repairable.sqlite"
 cp "$audit_directory/before.sqlite" "$audit_directory/noncanonical.sqlite"
-chmod 0666 "$audit_directory/null-genre.sqlite" "$audit_directory/noncanonical.sqlite"
+chmod 0666 "$audit_directory/null-genre.sqlite" "$audit_directory/repairable.sqlite" "$audit_directory/noncanonical.sqlite"
 
 query_sqlite null-genre.sqlite \
     "INSERT INTO genre (id, name, tmdb_id, created_at) VALUES (1, 'a', NULL, '2026-01-01'), (2, 'b', NULL, '2026-01-01')"
@@ -90,15 +91,39 @@ assert_equal 2 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM cache_tra
 assert_equal 2 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM cache_trakt_user_movie_watched WHERE trakt_id = 123')" \
     'SQLite watched cache does not isolate identical Trakt IDs by user'
 
+query_sqlite repairable.sqlite \
+    "INSERT INTO user (id, email, name, password, created_at) VALUES (1, 'a@example.test', 'a', 'x', '2026-01-01')"
+query_sqlite repairable.sqlite \
+    "INSERT INTO location (id, user_id, name, created_at) VALUES (1, '01', 'leading zero', '2026-01-01')"
+query_sqlite repairable.sqlite \
+    "INSERT INTO cache_tmdb_languages (iso_639_1, english_name) VALUES (NULL, 'invalid')"
+query_sqlite repairable.sqlite \
+    "INSERT INTO cache_trakt_user_movie_rating (trakt_id, user_id, rated_at) VALUES (10, NULL, '2026-01-01')"
+query_sqlite repairable.sqlite \
+    "INSERT INTO cache_trakt_user_movie_watched (trakt_id, user_id, last_updated_at) VALUES (10, NULL, '2026-01-01')"
+query_sqlite repairable.sqlite \
+    "INSERT INTO person (id, name, gender, tmdb_id, created_at) VALUES (1, 'invalid gender', 9, 1, '2026-01-01')"
+run_sqlite_migrations repairable.sqlite
+assert_equal integer:1 "$(query_sqlite repairable.sqlite "SELECT TYPEOF(user_id) || ':' || user_id FROM location WHERE id = 1")" \
+    'SQLite did not normalize a digit-only user ID'
+assert_equal 0 "$(query_sqlite repairable.sqlite 'SELECT COUNT(*) FROM cache_tmdb_languages')" \
+    'SQLite did not remove an unusable TMDB language cache row'
+assert_equal 0 "$(query_sqlite repairable.sqlite 'SELECT COUNT(*) FROM cache_trakt_user_movie_rating')" \
+    'SQLite did not remove an unusable Trakt rating cache row'
+assert_equal 0 "$(query_sqlite repairable.sqlite 'SELECT COUNT(*) FROM cache_trakt_user_movie_watched')" \
+    'SQLite did not remove an unusable Trakt watched cache row'
+assert_equal 0 "$(query_sqlite repairable.sqlite 'SELECT gender FROM person WHERE id = 1')" \
+    'SQLite did not normalize unsupported person gender metadata'
+
 query_sqlite noncanonical.sqlite \
     "INSERT INTO user (id, email, name, password, created_at) VALUES (1, 'a@example.test', 'a', 'x', '2026-01-01')"
 query_sqlite noncanonical.sqlite \
-    "INSERT INTO location (id, user_id, name, created_at) VALUES (1, '01', 'bad', '2026-01-01')"
+    "INSERT INTO location (id, user_id, name, created_at) VALUES (1, '1x', 'bad', '2026-01-01')"
 if run_sqlite_migrations noncanonical.sqlite; then
     echo 'SQLite accepted a non-canonical foreign-key value' >&2
     exit 1
 fi
-assert_equal 01 "$(query_sqlite noncanonical.sqlite 'SELECT user_id FROM location')" \
+assert_equal 1x "$(query_sqlite noncanonical.sqlite 'SELECT user_id FROM location')" \
     'SQLite changed a rejected foreign-key value'
 assert_equal 0 "$(query_sqlite noncanonical.sqlite 'SELECT COUNT(*) FROM phinxlog WHERE version = 20260927220000')" \
     'SQLite recorded a rejected normalization migration'
@@ -125,13 +150,6 @@ for attempt in {1..30}; do
 done
 
 run_mysql_migrations movary --target 20260927143000
-docker exec "$mysql_container" mysqldump --no-tablespaces --user=movary --password=movary movary >"$audit_directory/mysql-before.sql"
-docker exec "$mysql_container" mysql --user=root --password=movary-root \
-    --execute="CREATE DATABASE movary_drift; GRANT ALL PRIVILEGES ON movary_drift.* TO 'movary'@'%';"
-docker exec --interactive "$mysql_container" mysql --user=movary --password=movary movary_drift \
-    <"$audit_directory/mysql-before.sql"
-
-run_mysql_migrations movary
 mysql_query() {
     local database_name=$1
     local query=$2
@@ -140,6 +158,18 @@ mysql_query() {
         --user=root --password=movary-root "$database_name" --execute="$query"
 }
 
+mysql_query movary "SET SESSION sql_mode = ''; INSERT INTO person (name, gender, tmdb_id, created_at) VALUES ('gender 0', '0', 990, '2026-01-01'), ('gender 1', '1', 991, '2026-01-01'), ('gender 2', '2', 992, '2026-01-01'), ('gender 3', '3', 993, '2026-01-01'), ('invalid gender', 'invalid', 999, '2026-01-01')"
+docker exec "$mysql_container" mysqldump --no-tablespaces --user=movary --password=movary movary >"$audit_directory/mysql-before.sql"
+docker exec "$mysql_container" mysql --user=root --password=movary-root \
+    --execute="CREATE DATABASE movary_drift; GRANT ALL PRIVILEGES ON movary_drift.* TO 'movary'@'%';"
+docker exec --interactive "$mysql_container" mysql --user=movary --password=movary movary_drift \
+    <"$audit_directory/mysql-before.sql"
+
+run_mysql_migrations movary
+assert_equal 0,1,2,3 "$(mysql_query movary 'SELECT GROUP_CONCAT(gender ORDER BY tmdb_id) FROM person WHERE tmdb_id BETWEEN 990 AND 993')" \
+    'MySQL changed valid person gender values while removing the enum'
+assert_equal 0 "$(mysql_query movary "SELECT gender FROM person WHERE tmdb_id = 999")" \
+    'MySQL did not normalize unsupported person gender metadata'
 assert_equal user_id,trakt_id "$(mysql_query movary "SELECT GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary' AND TABLE_NAME = 'cache_trakt_user_movie_rating' AND INDEX_NAME = 'PRIMARY'")" \
     'MySQL rating cache does not have the expected composite primary key'
 assert_equal user_id,trakt_id "$(mysql_query movary "SELECT GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary' AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'PRIMARY'")" \

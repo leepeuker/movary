@@ -13,10 +13,6 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
     {
         $this->assertExpectedSchema();
         $this->assertNoRows(
-            "SELECT id FROM person WHERE gender NOT IN ('0', '1', '2', '3') LIMIT 1",
-            'Cannot normalize person.gender: an unsupported value exists.',
-        );
-        $this->assertNoRows(
             "SELECT id FROM user WHERE mastodon_post_visibility NOT IN ('public', 'private', 'unlisted', 'direct') LIMIT 1",
             'Cannot normalize user.mastodon_post_visibility: an unsupported value exists.',
         );
@@ -24,6 +20,12 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
             'SELECT id FROM user_auth_token WHERE CHAR_LENGTH(token) > 32 LIMIT 1',
             'Cannot normalize user_auth_token.token: a token longer than 32 characters exists.',
         );
+        $this->execute("UPDATE person SET gender = '0' WHERE gender = '' OR gender NOT IN ('0', '1', '2', '3')");
+        $this->assertNoRows(
+            "SELECT id FROM person WHERE gender = '' OR gender NOT IN ('0', '1', '2', '3') LIMIT 1",
+            'Cannot normalize person.gender: an unsupported value exists.',
+        );
+        $this->execute('ALTER TABLE person MODIFY gender VARCHAR(1) NOT NULL');
 
         $this->execute(
             <<<SQL

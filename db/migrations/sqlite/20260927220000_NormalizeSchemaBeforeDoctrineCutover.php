@@ -16,8 +16,9 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
 
     public function up() : void
     {
-        $this->assertForeignKeysValid('before normalization');
         $this->runPreflightChecks();
+        $this->repairSafeConflicts();
+        $this->assertForeignKeysValid('before normalization');
         $this->backfillUserFlags();
         $this->normalizeCacheTables();
         $this->normalizePersonTable();
@@ -32,18 +33,6 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
     private function runPreflightChecks() : void
     {
         $checks = [
-            [
-                'SELECT iso_639_1 FROM cache_tmdb_languages WHERE iso_639_1 IS NULL LIMIT 1',
-                'cache_tmdb_languages.iso_639_1 contains null.',
-            ],
-            [
-                'SELECT trakt_id FROM cache_trakt_user_movie_rating WHERE user_id IS NULL LIMIT 1',
-                'cache_trakt_user_movie_rating.user_id contains null.',
-            ],
-            [
-                'SELECT trakt_id FROM cache_trakt_user_movie_watched WHERE user_id IS NULL LIMIT 1',
-                'cache_trakt_user_movie_watched.user_id contains null.',
-            ],
             [
                 'SELECT tmdb_id FROM genre WHERE tmdb_id IS NOT NULL GROUP BY tmdb_id HAVING COUNT(*) > 1 LIMIT 1',
                 'genre.tmdb_id contains duplicate values.',
@@ -65,10 +54,6 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 'user_auth_token.token contains duplicate values.',
             ],
             [
-                'SELECT id FROM person WHERE gender NOT IN (0, 1, 2, 3) LIMIT 1',
-                'person.gender contains an unsupported value.',
-            ],
-            [
                 "SELECT id FROM user WHERE mastodon_post_visibility NOT IN ('public', 'private', 'unlisted', 'direct') LIMIT 1",
                 'user.mastodon_post_visibility contains an unsupported value.',
             ],
@@ -77,11 +62,11 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 'user_auth_token.token contains a token longer than 32 characters.',
             ],
             [
-                'SELECT id FROM location WHERE user_id IS NULL OR CAST(user_id AS INTEGER) < 1 OR user_id <> CAST(CAST(user_id AS INTEGER) AS TEXT) LIMIT 1',
+                "SELECT id FROM location WHERE user_id IS NULL OR user_id = '' OR user_id GLOB '*[^0-9]*' OR CAST(user_id AS INTEGER) < 1 LIMIT 1",
                 'location.user_id contains a value that cannot be normalized to an integer user ID.',
             ],
             [
-                'SELECT movie_id FROM movie_production_countries WHERE CAST(movie_id AS INTEGER) < 1 OR movie_id <> CAST(CAST(movie_id AS INTEGER) AS TEXT) LIMIT 1',
+                "SELECT movie_id FROM movie_production_countries WHERE movie_id = '' OR movie_id GLOB '*[^0-9]*' OR CAST(movie_id AS INTEGER) < 1 LIMIT 1",
                 'movie_production_countries.movie_id contains a value that cannot be normalized to an integer movie ID.',
             ],
         ];
@@ -92,6 +77,20 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
             }
         }
 
+    }
+
+    private function repairSafeConflicts() : void
+    {
+        $this->execute(
+            <<<SQL
+            DELETE FROM cache_tmdb_languages WHERE iso_639_1 IS NULL;
+            DELETE FROM cache_trakt_user_movie_rating
+                WHERE user_id IS NULL OR user_id NOT IN (SELECT id FROM user);
+            DELETE FROM cache_trakt_user_movie_watched
+                WHERE user_id IS NULL OR user_id NOT IN (SELECT id FROM user);
+            UPDATE person SET gender = 0 WHERE gender NOT IN (0, 1, 2, 3);
+            SQL,
+        );
     }
 
     private function assertForeignKeysValid(string $phase) : void
