@@ -4,13 +4,17 @@ namespace Movary\Service\Email;
 
 use Movary\Service\ServerSettings;
 use Twig\Environment;
+use Twig\Loader\LoaderInterface;
 
 abstract class AbstractEmailRenderer
 {
+    private readonly Environment $twig;
+
     public function __construct(
-        private readonly Environment $twig,
+        LoaderInterface $loader,
         private readonly ServerSettings $serverSettings,
     ) {
+        $this->twig = new Environment($loader);
     }
 
     /** @param array<string, mixed> $context */
