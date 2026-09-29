@@ -3,6 +3,10 @@
 namespace Movary;
 
 use Doctrine\DBAL;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Provider\SchemaProvider;
 use Dotenv\Dotenv;
 use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
@@ -26,6 +30,7 @@ use Movary\HttpController\Web\JobController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\DatabaseMigration\CanonicalSchemaProvider;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
@@ -152,6 +157,32 @@ class Factory
         }
 
         return $connection;
+    }
+
+    public static function createDoctrineMigrationDependencyFactory(
+        ContainerInterface $container,
+    ) : DependencyFactory {
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ConfigurationArray([
+                'migrations_paths' => [
+                    'Movary\\DatabaseMigration' => self::createDirectoryAppRoot() . 'db/migrations/doctrine',
+                ],
+                'table_storage' => [
+                    'table_name' => 'doctrine_migration_versions',
+                ],
+                'all_or_nothing' => false,
+                'transactional' => false,
+                'check_database_platform' => true,
+            ]),
+            new ExistingConnection($container->get(DBAL\Connection::class)),
+            $container->get(LoggerInterface::class),
+        );
+        $dependencyFactory->setService(
+            SchemaProvider::class,
+            $container->get(CanonicalSchemaProvider::class),
+        );
+
+        return $dependencyFactory;
     }
 
     public static function createExportService(ContainerInterface $container) : ExportService

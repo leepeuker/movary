@@ -14,6 +14,7 @@
     "ext-pdo": "*",
     "ext-zlib": "*",
     "doctrine/dbal": "^3.10",
+    "doctrine/migrations": "^3.9",
     "guzzlehttp/guzzle": "^7.15",
     "league/csv": "^9.28",
     "maennchen/zipstream-php": "^3.2",
