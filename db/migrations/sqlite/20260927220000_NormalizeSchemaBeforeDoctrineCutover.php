@@ -161,7 +161,7 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 user_id INTEGER NOT NULL,
                 rating INTEGER DEFAULT NULL,
                 rated_at TEXT NOT NULL,
-                PRIMARY KEY (trakt_id),
+                PRIMARY KEY (user_id, trakt_id),
                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
             );
             INSERT INTO cache_trakt_user_movie_rating_normalized SELECT * FROM cache_trakt_user_movie_rating;
@@ -172,7 +172,7 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 trakt_id INTEGER NOT NULL,
                 user_id INTEGER NOT NULL,
                 last_updated_at TEXT NOT NULL,
-                PRIMARY KEY (trakt_id),
+                PRIMARY KEY (user_id, trakt_id),
                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
             );
             INSERT INTO cache_trakt_user_movie_watched_normalized SELECT * FROM cache_trakt_user_movie_watched;
@@ -402,10 +402,6 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
     {
         $this->execute(
             <<<SQL
-            CREATE INDEX index_cache_trakt_user_movie_rating_user_id
-                ON cache_trakt_user_movie_rating(user_id);
-            CREATE INDEX index_cache_trakt_user_movie_watched_user_id
-                ON cache_trakt_user_movie_watched(user_id);
             CREATE INDEX index_job_queue_user_id ON job_queue(user_id);
             CREATE INDEX index_location_user_id ON location(user_id);
             CREATE INDEX index_movie_cast_person_id ON movie_cast(person_id);

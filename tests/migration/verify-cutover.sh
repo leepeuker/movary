@@ -75,6 +75,20 @@ query_sqlite null-genre.sqlite \
 run_sqlite_migrations null-genre.sqlite
 assert_equal 2 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM genre WHERE tmdb_id IS NULL')" \
     'SQLite nullable genre IDs were not preserved'
+assert_equal user_id,trakt_id "$(query_sqlite null-genre.sqlite "SELECT GROUP_CONCAT(name, ',') FROM (SELECT name FROM pragma_table_info('cache_trakt_user_movie_rating') WHERE pk > 0 ORDER BY pk)")" \
+    'SQLite rating cache does not have the expected composite primary key'
+assert_equal user_id,trakt_id "$(query_sqlite null-genre.sqlite "SELECT GROUP_CONCAT(name, ',') FROM (SELECT name FROM pragma_table_info('cache_trakt_user_movie_watched') WHERE pk > 0 ORDER BY pk)")" \
+    'SQLite watched cache does not have the expected composite primary key'
+query_sqlite null-genre.sqlite \
+    "INSERT INTO user (id, email, name, password, created_at) VALUES (1, 'first@example.test', 'first', 'x', '2026-01-01'), (2, 'second@example.test', 'second', 'x', '2026-01-01')"
+query_sqlite null-genre.sqlite \
+    "INSERT INTO cache_trakt_user_movie_rating (trakt_id, user_id, rating, rated_at) VALUES (123, 1, 8, '2026-01-01'), (123, 2, 9, '2026-01-01')"
+query_sqlite null-genre.sqlite \
+    "INSERT INTO cache_trakt_user_movie_watched (trakt_id, user_id, last_updated_at) VALUES (123, 1, '2026-01-01'), (123, 2, '2026-01-01')"
+assert_equal 2 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM cache_trakt_user_movie_rating WHERE trakt_id = 123')" \
+    'SQLite rating cache does not isolate identical Trakt IDs by user'
+assert_equal 2 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM cache_trakt_user_movie_watched WHERE trakt_id = 123')" \
+    'SQLite watched cache does not isolate identical Trakt IDs by user'
 
 query_sqlite noncanonical.sqlite \
     "INSERT INTO user (id, email, name, password, created_at) VALUES (1, 'a@example.test', 'a', 'x', '2026-01-01')"
@@ -118,6 +132,26 @@ docker exec --interactive "$mysql_container" mysql --user=movary --password=mova
     <"$audit_directory/mysql-before.sql"
 
 run_mysql_migrations movary
+mysql_query() {
+    local database_name=$1
+    local query=$2
+
+    docker exec "$mysql_container" mysql --batch --skip-column-names \
+        --user=root --password=movary-root "$database_name" --execute="$query"
+}
+
+assert_equal user_id,trakt_id "$(mysql_query movary "SELECT GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary' AND TABLE_NAME = 'cache_trakt_user_movie_rating' AND INDEX_NAME = 'PRIMARY'")" \
+    'MySQL rating cache does not have the expected composite primary key'
+assert_equal user_id,trakt_id "$(mysql_query movary "SELECT GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary' AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'PRIMARY'")" \
+    'MySQL watched cache does not have the expected composite primary key'
+mysql_query movary "INSERT INTO user (id, email, name, password, created_at) VALUES (101, 'first@example.test', 'first', 'x', '2026-01-01'), (102, 'second@example.test', 'second', 'x', '2026-01-01')"
+mysql_query movary "INSERT INTO cache_trakt_user_movie_rating (trakt_id, user_id, rating, rated_at) VALUES (123, 101, 8, '2026-01-01'), (123, 102, 9, '2026-01-01')"
+mysql_query movary "INSERT INTO cache_trakt_user_movie_watched (trakt_id, user_id, last_updated_at) VALUES (123, 101, '2026-01-01'), (123, 102, '2026-01-01')"
+assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movie_rating WHERE trakt_id = 123')" \
+    'MySQL rating cache does not isolate identical Trakt IDs by user'
+assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movie_watched WHERE trakt_id = 123')" \
+    'MySQL watched cache does not isolate identical Trakt IDs by user'
+
 docker exec "$mysql_container" mysql --user=root --password=movary-root movary_drift \
     --execute='ALTER TABLE movie_cast DROP FOREIGN KEY movie_cast_ibfk_1'
 if run_mysql_migrations movary_drift; then
@@ -125,14 +159,9 @@ if run_mysql_migrations movary_drift; then
     exit 1
 fi
 
-mysql_query() {
-    docker exec "$mysql_container" mysql --batch --skip-column-names \
-        --user=root --password=movary-root movary_drift --execute="$1"
-}
-
-assert_equal 0 "$(mysql_query 'SELECT COUNT(*) FROM phinxlog WHERE version = 20260927220000')" \
+assert_equal 0 "$(mysql_query movary_drift 'SELECT COUNT(*) FROM phinxlog WHERE version = 20260927220000')" \
     'MySQL recorded a rejected normalization migration'
-assert_equal uniqueTraktId "$(mysql_query "SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary_drift' AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'uniqueTraktId'")" \
+assert_equal uniqueTraktId "$(mysql_query movary_drift "SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary_drift' AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'uniqueTraktId'")" \
     'MySQL changed the legacy watched-cache index before rejecting drift'
-assert_equal "NO ACTION" "$(mysql_query "SELECT DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'movary_drift' AND TABLE_NAME = 'job_queue' AND CONSTRAINT_NAME = 'job_queue_ibfk_1'")" \
+assert_equal "NO ACTION" "$(mysql_query movary_drift "SELECT DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'movary_drift' AND TABLE_NAME = 'job_queue' AND CONSTRAINT_NAME = 'job_queue_ibfk_1'")" \
     'MySQL changed the job-queue foreign key before rejecting drift'

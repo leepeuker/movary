@@ -29,7 +29,11 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
             <<<SQL
             ALTER TABLE cache_trakt_user_movie_watched
                 DROP INDEX uniqueTraktId,
-                ADD PRIMARY KEY (trakt_id);
+                ADD PRIMARY KEY (user_id, trakt_id);
+
+            ALTER TABLE cache_trakt_user_movie_rating
+                DROP PRIMARY KEY,
+                ADD PRIMARY KEY (user_id, trakt_id);
 
             ALTER TABLE job_queue
                 DROP FOREIGN KEY job_queue_ibfk_1;
@@ -100,6 +104,16 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'PRIMARY'",
                 0,
                 'cache_trakt_user_movie_watched already has a primary key',
+            ],
+            [
+                "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'cache_trakt_user_movie_rating' AND INDEX_NAME = 'PRIMARY' AND COLUMN_NAME = 'trakt_id' AND SEQ_IN_INDEX = 1",
+                1,
+                'cache_trakt_user_movie_rating does not have the expected trakt_id primary key',
+            ],
+            [
+                "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'cache_trakt_user_movie_rating' AND INDEX_NAME = 'PRIMARY'",
+                1,
+                'cache_trakt_user_movie_rating has an unexpected composite primary key',
             ],
             [
                 "SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_NAME IN ('job_queue_ibfk_1', 'movie_cast_ibfk_1', 'movie_crew_ibfk_1', 'movie_genre_ibfk_1', 'user_jellyfin_cache_ibfk_1')",
