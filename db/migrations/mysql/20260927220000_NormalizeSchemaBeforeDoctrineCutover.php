@@ -11,6 +11,7 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
 
     public function up() : void
     {
+        $this->assertExpectedSchema();
         $this->assertNoRows(
             "SELECT id FROM person WHERE gender NOT IN ('0', '1', '2', '3') LIMIT 1",
             'Cannot normalize person.gender: an unsupported value exists.',
@@ -85,6 +86,42 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 MODIFY token CHAR(32) NOT NULL;
             SQL,
         );
+    }
+
+    private function assertExpectedSchema() : void
+    {
+        $checks = [
+            [
+                "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'uniqueTraktId' AND COLUMN_NAME = 'trakt_id' AND NON_UNIQUE = 0",
+                1,
+                'the expected uniqueTraktId index is missing',
+            ],
+            [
+                "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'PRIMARY'",
+                0,
+                'cache_trakt_user_movie_watched already has a primary key',
+            ],
+            [
+                "SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_NAME IN ('job_queue_ibfk_1', 'movie_cast_ibfk_1', 'movie_crew_ibfk_1', 'movie_genre_ibfk_1', 'user_jellyfin_cache_ibfk_1')",
+                5,
+                'one or more expected foreign keys are missing',
+            ],
+            [
+                "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_NAME IN ('chk_person_gender', 'chk_user_mastodon_post_visibility')",
+                0,
+                'one or more target check constraints already exist',
+            ],
+        ];
+
+        foreach ($checks as [$query, $expectedCount, $message]) {
+            $row = $this->fetchRow($query);
+            $actualCount = $row === false ? 0 : (int)reset($row);
+            if ($actualCount !== $expectedCount) {
+                throw new RuntimeException(
+                    'Cannot normalize the MySQL schema: ' . $message . '. Restore the database backup before retrying.',
+                );
+            }
+        }
     }
 
     private function assertNoRows(string $query, string $message) : void

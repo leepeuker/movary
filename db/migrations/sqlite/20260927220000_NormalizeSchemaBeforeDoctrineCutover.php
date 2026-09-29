@@ -16,8 +16,9 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
 
     public function up() : void
     {
-        $this->backfillUserFlags();
+        $this->assertForeignKeysValid('before normalization');
         $this->runPreflightChecks();
+        $this->backfillUserFlags();
         $this->normalizeCacheTables();
         $this->normalizePersonTable();
         $this->normalizeUserTable();
@@ -25,9 +26,7 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
         $this->normalizeAuthenticationTable();
         $this->addIndexes();
 
-        if ($this->fetchAll('PRAGMA foreign_key_check') !== []) {
-            throw new RuntimeException('Cannot normalize the SQLite schema: foreign-key violations exist.');
-        }
+        $this->assertForeignKeysValid('after normalization');
     }
 
     private function runPreflightChecks() : void
@@ -46,7 +45,7 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 'cache_trakt_user_movie_watched.user_id contains null.',
             ],
             [
-                'SELECT tmdb_id FROM genre GROUP BY tmdb_id HAVING COUNT(*) > 1 LIMIT 1',
+                'SELECT tmdb_id FROM genre WHERE tmdb_id IS NOT NULL GROUP BY tmdb_id HAVING COUNT(*) > 1 LIMIT 1',
                 'genre.tmdb_id contains duplicate values.',
             ],
             [
@@ -78,11 +77,11 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
                 'user_auth_token.token contains a token longer than 32 characters.',
             ],
             [
-                'SELECT id FROM location WHERE user_id IS NULL OR CAST(user_id AS INTEGER) < 1 LIMIT 1',
+                'SELECT id FROM location WHERE user_id IS NULL OR CAST(user_id AS INTEGER) < 1 OR user_id <> CAST(CAST(user_id AS INTEGER) AS TEXT) LIMIT 1',
                 'location.user_id contains a value that cannot be normalized to an integer user ID.',
             ],
             [
-                'SELECT movie_id FROM movie_production_countries WHERE CAST(movie_id AS INTEGER) < 1 LIMIT 1',
+                'SELECT movie_id FROM movie_production_countries WHERE CAST(movie_id AS INTEGER) < 1 OR movie_id <> CAST(CAST(movie_id AS INTEGER) AS TEXT) LIMIT 1',
                 'movie_production_countries.movie_id contains a value that cannot be normalized to an integer movie ID.',
             ],
         ];
@@ -93,6 +92,23 @@ final class NormalizeSchemaBeforeDoctrineCutover extends AbstractMigration
             }
         }
 
+    }
+
+    private function assertForeignKeysValid(string $phase) : void
+    {
+        $violation = $this->fetchRow('PRAGMA foreign_key_check');
+        if ($violation === false) {
+            return;
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'Cannot normalize the SQLite schema: foreign-key violation %s in table %s at row %s.',
+                $phase,
+                $violation['table'],
+                $violation['rowid'] ?? 'unknown',
+            ),
+        );
     }
 
     private function backfillUserFlags() : void
