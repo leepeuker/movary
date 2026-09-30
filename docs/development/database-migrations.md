@@ -33,11 +33,12 @@ Movary release can reach the cutover boundary. Do not add new Phinx migrations.
 
 During an upgrade, `database:migration:migrate`:
 
-1. finishes missing legacy Phinx migrations;
+1. finishes remaining legacy Phinx migrations;
 2. validates tables, columns, keys, indexes, foreign keys, defaults, and value
    constraints against the canonical schema;
 3. records the Doctrine baseline without recreating validated legacy tables;
 4. runs pending Doctrine migrations.
 
-An empty database executes the Doctrine baseline directly. A schema with
-unknown drift fails before Doctrine metadata is written.
+An empty database executes the Doctrine baseline directly. A legacy history
+with gaps or unknown versions, or a schema with unknown drift, fails before
+Doctrine metadata is written.

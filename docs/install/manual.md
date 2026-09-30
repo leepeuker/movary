@@ -37,6 +37,11 @@ cp .env.example .env
 php bin/console.php storage:link
 ```
 
+!!! warning
+
+    Before updating across the Phinx-to-Doctrine migration cutover, back up the
+    database and verify that the backup can be restored.
+
 5. Run the database migrations
 ```
 php bin/console.php database:migration:migrate

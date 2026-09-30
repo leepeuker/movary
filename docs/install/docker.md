@@ -7,6 +7,9 @@ their [docs](https://github.com/TrafeX/docker-php-nginx) for more configuration 
 
 !!! warning
 
+    Before updating across the Phinx-to-Doctrine migration cutover, back up the
+    database and verify that the backup can be restored.
+
     After the **initial installation** and every update containing database changes the database migrations must be executed:
 
     `php bin/console.php database:migration:migrate`
