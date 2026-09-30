@@ -9,7 +9,6 @@ use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
 use Doctrine\Migrations\DependencyFactory;
 use Movary\DatabaseMigration\Version20260928000000;
-use Movary\Service\DatabaseMigration\CanonicalSchemaProvider;
 use Movary\Service\DatabaseMigration\CutoverSchemaValidator;
 use Movary\Service\DatabaseMigration\MigrationCoordinator;
 use Movary\Service\DatabaseMigration\MigrationState;
@@ -98,7 +97,6 @@ class MigrationCoordinatorTest extends TestCase
 
     private function createCoordinator(Connection $connection) : MigrationCoordinator
     {
-        $schemaProvider = new CanonicalSchemaProvider();
         $dependencyFactory = DependencyFactory::fromConnection(
             new ConfigurationArray([
                 'migrations_paths' => [
@@ -113,7 +111,7 @@ class MigrationCoordinatorTest extends TestCase
 
         return new MigrationCoordinator(
             new MigrationStateDetector($connection),
-            new CutoverSchemaValidator($connection, $schemaProvider),
+            new CutoverSchemaValidator($connection),
             $dependencyFactory,
         );
     }

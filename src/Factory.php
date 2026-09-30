@@ -6,7 +6,6 @@ use Doctrine\DBAL;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Provider\SchemaProvider;
 use Dotenv\Dotenv;
 use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
@@ -30,7 +29,6 @@ use Movary\HttpController\Web\JobController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
-use Movary\Service\DatabaseMigration\CanonicalSchemaProvider;
 use Movary\Service\DatabaseMigration\MigrationCoordinator;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
@@ -191,11 +189,6 @@ class Factory
             new ExistingConnection($container->get(DBAL\Connection::class)),
             $container->get(LoggerInterface::class),
         );
-        $dependencyFactory->setService(
-            SchemaProvider::class,
-            $container->get(CanonicalSchemaProvider::class),
-        );
-
         return $dependencyFactory;
     }
 

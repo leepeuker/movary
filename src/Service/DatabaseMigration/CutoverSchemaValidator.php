@@ -8,6 +8,7 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
+use Movary\DatabaseMigration\Version20260928000000;
 
 final class CutoverSchemaValidator
 {
@@ -16,10 +17,8 @@ final class CutoverSchemaValidator
         'phinxlog',
     ];
 
-    public function __construct(
-        private readonly Connection $dbConnection,
-        private readonly CanonicalSchemaProvider $schemaProvider,
-    ) {
+    public function __construct(private readonly Connection $dbConnection)
+    {
     }
 
     /**
@@ -45,7 +44,7 @@ final class CutoverSchemaValidator
         $applicationTableNames = array_values(array_diff($actualTableNames, self::METADATA_TABLES));
         sort($applicationTableNames);
 
-        $expectedSchema = $this->schemaProvider->createSchema();
+        $expectedSchema = Version20260928000000::createCutoverSchema();
         $expectedTableNames = array_map(
             static fn (Table $table) : string => strtolower($table->getName()),
             $expectedSchema->getTables(),

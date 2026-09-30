@@ -54,6 +54,7 @@
   },
   "autoload": {
     "psr-4": {
+      "Movary\\DatabaseMigration\\": "db/migrations/doctrine/",
       "Movary\\": "src/"
     }
   },

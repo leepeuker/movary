@@ -6,7 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use Movary\DatabaseMigration\Version20260928000000;
-use Movary\Service\DatabaseMigration\CanonicalSchemaProvider;
 use Movary\Service\DatabaseMigration\CutoverSchemaValidator;
 use Movary\Service\DatabaseMigration\SchemaMismatch;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -27,7 +26,7 @@ class CutoverSchemaValidatorTest extends TestCase
         $connection = $this->createMigratedConnection();
 
         try {
-            $validator = new CutoverSchemaValidator($connection, new CanonicalSchemaProvider());
+            $validator = new CutoverSchemaValidator($connection);
 
             self::assertSame([], $validator->findDifferences());
             $validator->validate();
@@ -42,7 +41,7 @@ class CutoverSchemaValidatorTest extends TestCase
         $connection->executeStatement('CREATE TABLE unknown_table (id INTEGER)');
 
         try {
-            $validator = new CutoverSchemaValidator($connection, new CanonicalSchemaProvider());
+            $validator = new CutoverSchemaValidator($connection);
 
             $this->expectException(SchemaMismatch::class);
             $this->expectExceptionMessage('Unexpected table: unknown_table');
@@ -59,7 +58,7 @@ class CutoverSchemaValidatorTest extends TestCase
         $connection->executeStatement('DROP INDEX index_job_status');
 
         try {
-            $validator = new CutoverSchemaValidator($connection, new CanonicalSchemaProvider());
+            $validator = new CutoverSchemaValidator($connection);
 
             $this->expectException(SchemaMismatch::class);
             $this->expectExceptionMessage('Missing index: job_queue(job_status)');
