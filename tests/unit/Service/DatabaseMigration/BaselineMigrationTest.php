@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Movary\DatabaseMigration\Version20260928000000;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -70,6 +71,24 @@ class BaselineMigrationTest extends TestCase
             'user_person_settings',
             'watchlist',
         ], $tableNames);
+    }
+
+    public function testAppliesConfiguredDefaultTableOptions() : void
+    {
+        $schemaConfig = new SchemaConfig();
+        $schemaConfig->setDefaultTableOptions([
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'engine' => 'InnoDB',
+        ]);
+
+        $schema = Version20260928000000::createCutoverSchema($schemaConfig);
+
+        foreach ($schema->getTables() as $table) {
+            self::assertSame('utf8mb4', $table->getOption('charset'));
+            self::assertSame('utf8mb4_unicode_ci', $table->getOption('collation'));
+            self::assertSame('InnoDB', $table->getOption('engine'));
+        }
     }
 
     public function testDefinesCutoverKeysAndDefaults() : void

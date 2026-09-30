@@ -65,6 +65,8 @@ class Factory
 
     private const string DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
 
+    private const string DEFAULT_DATABASE_MYSQL_COLLATION = 'utf8mb4_unicode_ci';
+
     private const int DEFAULT_DATABASE_MYSQL_PORT = 3306;
 
     private const string DEFAULT_LOG_LEVEL = LogLevel::WARNING;
@@ -157,6 +159,11 @@ class Factory
                 'user' => $config->getAsString('DATABASE_MYSQL_USER'),
                 'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
                 'charset' => self::getDatabaseMysqlCharset($config),
+                'defaultTableOptions' => [
+                    'charset' => self::getDatabaseMysqlCharset($config),
+                    'collation' => self::getDatabaseMysqlCollation($config),
+                    'engine' => 'InnoDB',
+                ],
             ],
             default => throw new RuntimeException('Not supported database mode: ' . $databaseMode)
         };
@@ -507,6 +514,11 @@ class Factory
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
         return $streamHandler;
+    }
+
+    private static function getDatabaseMysqlCollation(Config $config) : string
+    {
+        return $config->getAsString('DATABASE_MYSQL_COLLATION', self::DEFAULT_DATABASE_MYSQL_COLLATION);
     }
 
     private static function getLogLevel(Config $config) : string

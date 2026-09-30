@@ -5,6 +5,7 @@ namespace Movary\DatabaseMigration;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
@@ -24,7 +25,9 @@ final class Version20260928000000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
-        $targetSchema = self::createCutoverSchema();
+        $targetSchema = self::createCutoverSchema(
+            $this->connection->createSchemaManager()->createSchemaConfig(),
+        );
 
         if ($this->platform instanceof SqlitePlatform) {
             $targetSchema->getTable('person')->getColumn('gender')->setColumnDefinition(
@@ -60,9 +63,9 @@ final class Version20260928000000 extends AbstractMigration
         );
     }
 
-    public static function createCutoverSchema() : Schema
+    public static function createCutoverSchema(?SchemaConfig $schemaConfig = null) : Schema
     {
-        $schema = new Schema();
+        $schema = new Schema([], [], $schemaConfig);
 
         self::createUserTable($schema);
         self::createMovieTable($schema);
