@@ -192,6 +192,32 @@ class Factory
         return $dependencyFactory;
     }
 
+    public static function createMigrationStateDetector(
+        ContainerInterface $container,
+        Config $config,
+    ) : Service\DatabaseMigration\MigrationStateDetector {
+        $migrationFiles = glob(
+            self::createDirectoryAppRoot() . 'db/migrations/' . self::getDatabaseMode($config) . '/*.php',
+        );
+        if ($migrationFiles === false || $migrationFiles === []) {
+            throw new RuntimeException('Could not find the legacy database migration history.');
+        }
+
+        $versions = [];
+        foreach ($migrationFiles as $migrationFile) {
+            if (preg_match('/^(\d{14})_/', basename($migrationFile), $matches) !== 1) {
+                throw new RuntimeException('Invalid legacy database migration filename: ' . $migrationFile);
+            }
+            $versions[] = (int)$matches[1];
+        }
+        sort($versions);
+
+        return new Service\DatabaseMigration\MigrationStateDetector(
+            $container->get(DBAL\Connection::class),
+            $versions,
+        );
+    }
+
     public static function createExportService(ContainerInterface $container) : ExportService
     {
         return new ExportService(

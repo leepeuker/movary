@@ -156,6 +156,16 @@ assert_equal 1x "$(query_sqlite noncanonical.sqlite 'SELECT user_id FROM locatio
 assert_equal 0 "$(query_sqlite noncanonical.sqlite 'SELECT COUNT(*) FROM phinxlog WHERE version = 20260927220000')" \
     'SQLite recorded a rejected normalization migration'
 
+cp "$audit_directory/null-genre.sqlite" "$audit_directory/missing-history.sqlite"
+chmod 0666 "$audit_directory/missing-history.sqlite"
+query_sqlite missing-history.sqlite "DELETE FROM phinxlog WHERE version = 20260927143000"
+if run_sqlite_app_command missing-history.sqlite database:migration:migrate; then
+    echo 'SQLite accepted a legacy history with a missing migration' >&2
+    exit 1
+fi
+assert_equal 0 "$(query_sqlite missing-history.sqlite "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'doctrine_migration_versions'")" \
+    'SQLite initialized Doctrine metadata for an incomplete legacy history'
+
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
     "$(query_sqlite null-genre.sqlite 'SELECT version FROM doctrine_migration_versions')" \
@@ -222,6 +232,27 @@ assert_equal 0 "$(mysql_query movary "SELECT gender FROM person WHERE tmdb_id = 
     'MySQL did not normalize unsupported person gender metadata'
 assert_equal user_id,trakt_id "$(mysql_query movary "SELECT GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary' AND TABLE_NAME = 'cache_trakt_user_movie_rating' AND INDEX_NAME = 'PRIMARY'")" \
     'MySQL rating cache does not have the expected composite primary key'
+docker exec "$mysql_container" mysqldump --no-tablespaces --user=movary --password=movary movary >"$audit_directory/mysql-normalized.sql"
+docker exec "$mysql_container" mysql --user=root --password=movary-root \
+    --execute="CREATE DATABASE movary_column_drift; CREATE DATABASE movary_constraint_drift; GRANT ALL PRIVILEGES ON movary_column_drift.* TO 'movary'@'%'; GRANT ALL PRIVILEGES ON movary_constraint_drift.* TO 'movary'@'%';"
+docker exec --interactive "$mysql_container" mysql --user=movary --password=movary movary_column_drift \
+    <"$audit_directory/mysql-normalized.sql"
+docker exec --interactive "$mysql_container" mysql --user=movary --password=movary movary_constraint_drift \
+    <"$audit_directory/mysql-normalized.sql"
+mysql_query movary_column_drift "ALTER TABLE job_queue MODIFY id INT UNSIGNED NOT NULL; ALTER TABLE user_auth_token MODIFY token CHAR(16) NOT NULL"
+if column_drift_output=$(run_mysql_app_command movary_column_drift database:migration:migrate 2>&1); then
+    echo 'MySQL accepted incompatible column definitions' >&2
+    exit 1
+fi
+grep -q 'Auto-increment mismatch: job_queue.id' <<<"$column_drift_output"
+grep -q 'Length mismatch: user_auth_token.token' <<<"$column_drift_output"
+mysql_query movary_constraint_drift "ALTER TABLE user DROP CHECK chk_user_mastodon_post_visibility, ADD CONSTRAINT chk_user_mastodon_post_visibility CHECK (mastodon_post_visibility IN ('public'))"
+if constraint_drift_output=$(run_mysql_app_command movary_constraint_drift database:migration:migrate 2>&1); then
+    echo 'MySQL accepted an incompatible check constraint' >&2
+    exit 1
+fi
+grep -q 'Missing or invalid check constraint: chk_user_mastodon_post_visibility' <<<"$constraint_drift_output"
+
 assert_equal user_id,trakt_id "$(mysql_query movary "SELECT GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'movary' AND TABLE_NAME = 'cache_trakt_user_movie_watched' AND INDEX_NAME = 'PRIMARY'")" \
     'MySQL watched cache does not have the expected composite primary key'
 mysql_query movary "INSERT INTO user (id, email, name, password, created_at) VALUES (101, 'first@example.test', 'first', 'x', '2026-01-01'), (102, 'second@example.test', 'second', 'x', '2026-01-01')"

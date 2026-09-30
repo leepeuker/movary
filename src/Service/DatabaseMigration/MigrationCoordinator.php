@@ -11,8 +11,6 @@ use Symfony\Component\Console\Output\NullOutput;
 
 final class MigrationCoordinator
 {
-    public const string BASELINE_VERSION = 'Movary\\DatabaseMigration\\Version20260928000000';
-
     public function __construct(
         private readonly MigrationStateDetector $stateDetector,
         private readonly CutoverSchemaValidator $schemaValidator,
@@ -46,7 +44,7 @@ final class MigrationCoordinator
         $metadataStorage->ensureInitialized();
 
         $input = new ArrayInput([
-            'version' => self::BASELINE_VERSION,
+            'version' => MigrationStateDetector::DOCTRINE_BASELINE_VERSION,
             '--add' => true,
         ]);
         $input->setInteractive(false);

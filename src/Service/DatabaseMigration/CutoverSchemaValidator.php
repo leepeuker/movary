@@ -150,6 +150,25 @@ final class CutoverSchemaValidator
             $differences[] = "Unsigned mismatch: $tableName.$columnName";
         }
 
+        if ($this->dbConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
+            if ($expected->getAutoincrement() !== $actual->getAutoincrement()) {
+                $differences[] = "Auto-increment mismatch: $tableName.$columnName";
+            }
+            $expectedType = $expected->getType()->getName();
+            if ($expectedType === 'string'
+                && ($expected->getLength() !== $actual->getLength()
+                    || $expected->getFixed() !== $actual->getFixed())
+            ) {
+                $differences[] = "Length mismatch: $tableName.$columnName";
+            }
+            if (in_array($expectedType, ['decimal', 'float'], true)
+                && ($expected->getPrecision() !== $actual->getPrecision()
+                    || $expected->getScale() !== $actual->getScale())
+            ) {
+                $differences[] = "Precision mismatch: $tableName.$columnName";
+            }
+        }
+
         return $differences;
     }
 
@@ -168,9 +187,7 @@ final class CutoverSchemaValidator
         } else {
             $groups = [
                 ['boolean', 'smallint', 'integer'],
-                ['string', 'text'],
                 ['datetime', 'datetimetz'],
-                ['decimal', 'float'],
                 ['date'],
             ];
         }
@@ -368,24 +385,59 @@ final class CutoverSchemaValidator
      */
     private function checkMysqlValueDomainConstraints() : array
     {
-        $constraintNames = $this->dbConnection->fetchFirstColumn(
+        $rows = $this->dbConnection->fetchAllAssociative(
             <<<'SQL'
-            SELECT CONSTRAINT_NAME
-            FROM information_schema.TABLE_CONSTRAINTS
-            WHERE TABLE_SCHEMA = DATABASE()
-              AND CONSTRAINT_TYPE = 'CHECK'
+            SELECT
+                tc.CONSTRAINT_NAME AS constraint_name,
+                tc.TABLE_NAME AS table_name,
+                cc.CHECK_CLAUSE AS check_clause
+            FROM information_schema.TABLE_CONSTRAINTS tc
+            INNER JOIN information_schema.CHECK_CONSTRAINTS cc
+                ON cc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA
+                AND cc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+            WHERE tc.TABLE_SCHEMA = DATABASE()
+              AND tc.CONSTRAINT_TYPE = 'CHECK'
             SQL,
         );
-        $constraintNames = array_map('strtolower', $constraintNames);
+        $constraints = [];
+        foreach ($rows as $row) {
+            $constraints[strtolower((string)$row['constraint_name'])] = [
+                'table' => strtolower((string)$row['table_name']),
+                'clause' => (string)$row['check_clause'],
+            ];
+        }
+
+        $expectedConstraints = [
+            'chk_person_gender' => [
+                'table' => 'person',
+                'clause' => 'genderin0,1,2,3',
+            ],
+            'chk_user_mastodon_post_visibility' => [
+                'table' => 'user',
+                'clause' => "mastodon_post_visibilityin'public','private','unlisted','direct'",
+            ],
+        ];
         $differences = [];
 
-        foreach (['chk_person_gender', 'chk_user_mastodon_post_visibility'] as $constraintName) {
-            if (in_array($constraintName, $constraintNames, true) === false) {
-                $differences[] = "Missing check constraint: $constraintName";
+        foreach ($expectedConstraints as $constraintName => $expected) {
+            $actual = $constraints[$constraintName] ?? null;
+            if ($actual === null
+                || $actual['table'] !== $expected['table']
+                || $this->normalizeMysqlCheckClause($actual['clause']) !== $expected['clause']
+            ) {
+                $differences[] = "Missing or invalid check constraint: $constraintName";
             }
         }
 
         return $differences;
+    }
+
+    private function normalizeMysqlCheckClause(string $clause) : string
+    {
+        $clause = str_replace("\\", '', $clause);
+        $clause = preg_replace("/_[a-z0-9]+(?=')/i", '', $clause) ?? $clause;
+
+        return strtolower(str_replace(["`", "(", ")", " ", "\t", "\n", "\r"], '', $clause));
     }
 
     /**

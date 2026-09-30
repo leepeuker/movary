@@ -33,7 +33,10 @@ class MigrationCoordinatorTest extends TestCase
             $state = $this->createCoordinator($connection)->migrate();
 
             self::assertSame(MigrationState::EMPTY, $state);
-            self::assertSame(MigrationState::DOCTRINE, (new MigrationStateDetector($connection))->detect());
+            self::assertSame(
+                MigrationState::DOCTRINE,
+                (new MigrationStateDetector($connection, $this->expectedLegacyVersions()))->detect(),
+            );
             self::assertCount(27, $connection->createSchemaManager()->listTableNames());
         } finally {
             $connection->close();
@@ -45,10 +48,9 @@ class MigrationCoordinatorTest extends TestCase
         $connection = $this->createConnection();
         $this->executeBaseline($connection);
         $connection->executeStatement('CREATE TABLE phinxlog (version BIGINT NOT NULL PRIMARY KEY)');
-        $connection->insert(
-            'phinxlog',
-            ['version' => MigrationStateDetector::LEGACY_CUTOVER_VERSION],
-        );
+        foreach ($this->expectedLegacyVersions() as $version) {
+            $connection->insert('phinxlog', ['version' => $version]);
+        }
         $connection->insert('server_setting', ['key' => 'test', 'value' => 'preserved']);
 
         try {
@@ -56,7 +58,7 @@ class MigrationCoordinatorTest extends TestCase
 
             self::assertSame(MigrationState::LEGACY_READY, $state);
             self::assertSame(
-                MigrationCoordinator::BASELINE_VERSION,
+                MigrationStateDetector::DOCTRINE_BASELINE_VERSION,
                 $connection->fetchOne('SELECT version FROM doctrine_migration_versions'),
             );
             self::assertSame(
@@ -110,7 +112,7 @@ class MigrationCoordinatorTest extends TestCase
         );
 
         return new MigrationCoordinator(
-            new MigrationStateDetector($connection),
+            new MigrationStateDetector($connection, $this->expectedLegacyVersions()),
             new CutoverSchemaValidator($connection),
             $dependencyFactory,
         );
@@ -124,5 +126,16 @@ class MigrationCoordinatorTest extends TestCase
         foreach ($migration->getSql() as $query) {
             $connection->executeStatement($query->getStatement());
         }
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function expectedLegacyVersions() : array
+    {
+        return [
+            20260927143000,
+            MigrationStateDetector::LEGACY_CUTOVER_VERSION,
+        ];
     }
 }
