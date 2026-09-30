@@ -42,10 +42,6 @@ php bin/console.php storage:link
 php bin/console.php database:migration:migrate
 ```
 
-Back up an existing database before upgrading across the Doctrine migration
-cutover. The command completes supported legacy migrations automatically and
-validates the resulting schema before recording the Doctrine baseline.
-
 !!! Info
 
     Make sure that the permissions on the `storage` directory are correct and set to writable for the php (fpm) user
