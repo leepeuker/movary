@@ -20,6 +20,8 @@ use Psr\Log\NullLogger;
 #[CoversClass(MigrationCoordinator::class)]
 class MigrationCoordinatorTest extends TestCase
 {
+    private const int TEST_FINAL_LEGACY_VERSION = 20260927220000;
+
     public static function setUpBeforeClass() : void
     {
         require_once dirname(__DIR__, 4) . '/db/migrations/doctrine/Version20260928000000.php';
@@ -135,7 +137,7 @@ class MigrationCoordinatorTest extends TestCase
     {
         return [
             20260927143000,
-            MigrationStateDetector::LEGACY_CUTOVER_VERSION,
+            self::TEST_FINAL_LEGACY_VERSION,
         ];
     }
 }

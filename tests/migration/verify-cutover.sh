@@ -226,6 +226,8 @@ docker exec --interactive "$mysql_container" mysql --user=movary --password=mova
     <"$audit_directory/mysql-before.sql"
 
 run_mysql_migrations movary
+assert_equal '2026-01-01 00:00:00' "$(mysql_query movary 'SELECT created_at FROM person WHERE tmdb_id = 990')" \
+    'MySQL changed a stored UTC timestamp while converting it to DATETIME'
 assert_equal 0,1,2,3 "$(mysql_query movary 'SELECT GROUP_CONCAT(gender ORDER BY tmdb_id) FROM person WHERE tmdb_id BETWEEN 990 AND 993')" \
     'MySQL changed valid person gender values while removing the enum'
 assert_equal 0 "$(mysql_query movary "SELECT gender FROM person WHERE tmdb_id = 999")" \
@@ -286,6 +288,98 @@ assert_equal 27 "$(mysql_query doctrine_fresh \
 assert_equal 2 "$(mysql_query doctrine_fresh \
     "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = 'doctrine_fresh' AND CONSTRAINT_TYPE = 'CHECK'")" \
     'Fresh MySQL Doctrine database does not have both value-domain checks'
+
+table_signature_query="SELECT CONCAT_WS('|', TABLE_NAME, ENGINE, TABLE_COLLATION)
+    FROM information_schema.TABLES
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME NOT IN ('phinxlog', 'doctrine_migration_versions')
+    ORDER BY TABLE_NAME"
+assert_equal "$(mysql_query movary "$table_signature_query")" \
+    "$(mysql_query doctrine_fresh "$table_signature_query")" \
+    'Fresh and converted MySQL table options differ'
+
+column_signature_query="SELECT CONCAT_WS(
+        '|',
+        TABLE_NAME,
+        COLUMN_NAME,
+        COLUMN_TYPE,
+        IS_NULLABLE,
+        COALESCE(COLUMN_DEFAULT, '<NULL>'),
+        EXTRA,
+        COALESCE(CHARACTER_SET_NAME, ''),
+        COALESCE(COLLATION_NAME, '')
+    )
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME NOT IN ('phinxlog', 'doctrine_migration_versions')
+    ORDER BY TABLE_NAME, COLUMN_NAME"
+assert_equal "$(mysql_query movary "$column_signature_query")" \
+    "$(mysql_query doctrine_fresh "$column_signature_query")" \
+    'Fresh and converted MySQL column definitions differ'
+
+index_signature_query="SELECT CONCAT_WS(
+        '|',
+        TABLE_NAME,
+        INDEX_NAME,
+        NON_UNIQUE,
+        GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX)
+    )
+    FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME NOT IN ('phinxlog', 'doctrine_migration_versions')
+    GROUP BY TABLE_NAME, INDEX_NAME, NON_UNIQUE
+    ORDER BY TABLE_NAME, INDEX_NAME"
+assert_equal "$(mysql_query movary "$index_signature_query")" \
+    "$(mysql_query doctrine_fresh "$index_signature_query")" \
+    'Fresh and converted MySQL indexes differ'
+
+foreign_key_signature_query="SELECT CONCAT_WS(
+        '|',
+        k.TABLE_NAME,
+        k.CONSTRAINT_NAME,
+        GROUP_CONCAT(k.COLUMN_NAME ORDER BY k.ORDINAL_POSITION),
+        k.REFERENCED_TABLE_NAME,
+        GROUP_CONCAT(k.REFERENCED_COLUMN_NAME ORDER BY k.ORDINAL_POSITION),
+        r.UPDATE_RULE,
+        r.DELETE_RULE
+    )
+    FROM information_schema.KEY_COLUMN_USAGE k
+    INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS r
+        ON r.CONSTRAINT_SCHEMA = k.CONSTRAINT_SCHEMA
+        AND r.TABLE_NAME = k.TABLE_NAME
+        AND r.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+    WHERE k.TABLE_SCHEMA = DATABASE()
+      AND k.REFERENCED_TABLE_NAME IS NOT NULL
+    GROUP BY
+        k.TABLE_NAME,
+        k.CONSTRAINT_NAME,
+        k.REFERENCED_TABLE_NAME,
+        r.UPDATE_RULE,
+        r.DELETE_RULE
+    ORDER BY k.TABLE_NAME, k.CONSTRAINT_NAME"
+assert_equal "$(mysql_query movary "$foreign_key_signature_query")" \
+    "$(mysql_query doctrine_fresh "$foreign_key_signature_query")" \
+    'Fresh and converted MySQL foreign keys differ'
+
+check_signature_query="SELECT CONCAT_WS('|', tc.TABLE_NAME, tc.CONSTRAINT_NAME, cc.CHECK_CLAUSE)
+    FROM information_schema.TABLE_CONSTRAINTS tc
+    INNER JOIN information_schema.CHECK_CONSTRAINTS cc
+        ON cc.CONSTRAINT_SCHEMA = tc.CONSTRAINT_SCHEMA
+        AND cc.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+    WHERE tc.TABLE_SCHEMA = DATABASE()
+      AND tc.CONSTRAINT_TYPE = 'CHECK'
+    ORDER BY tc.TABLE_NAME, tc.CONSTRAINT_NAME"
+assert_equal "$(mysql_query movary "$check_signature_query")" \
+    "$(mysql_query doctrine_fresh "$check_signature_query")" \
+    'Fresh and converted MySQL check constraints differ'
+
+assert_equal 'double|3|1' "$(mysql_query doctrine_fresh \
+    "SELECT CONCAT_WS('|', DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE)
+     FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'movie'
+       AND COLUMN_NAME = 'imdb_rating_average'")" \
+    'Fresh MySQL Doctrine database does not preserve IMDb rating precision'
 
 docker exec "$mysql_container" mysql --user=root --password=movary-root movary_drift \
     --execute='ALTER TABLE movie_cast DROP FOREIGN KEY movie_cast_ibfk_1'

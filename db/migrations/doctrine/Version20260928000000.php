@@ -29,6 +29,10 @@ final class Version20260928000000 extends AbstractMigration
             $this->connection->createSchemaManager()->createSchemaConfig(),
         );
 
+        if ($this->platform instanceof MySQLPlatform) {
+            self::applyMysqlPhysicalSchema($targetSchema);
+        }
+
         if ($this->platform instanceof SqlitePlatform) {
             $targetSchema->getTable('person')->getColumn('gender')->setColumnDefinition(
                 'SMALLINT NOT NULL CHECK (gender IN (0, 1, 2, 3))',
@@ -181,16 +185,16 @@ final class Version20260928000000 extends AbstractMigration
         $table->addColumn('gender', Types::SMALLINT, ['unsigned' => true]);
         $table->addColumn('known_for_department', Types::STRING, ['length' => 256, 'notnull' => false]);
         $table->addColumn('poster_path', Types::STRING, ['length' => 255, 'notnull' => false]);
-        self::addText($table, 'biography', false);
         $table->addColumn('birth_date', Types::DATE_MUTABLE, ['notnull' => false]);
+        self::addText($table, 'biography', false);
         $table->addColumn('place_of_birth', Types::STRING, ['length' => 255, 'notnull' => false]);
         $table->addColumn('death_date', Types::DATE_MUTABLE, ['notnull' => false]);
         $table->addColumn('tmdb_id', Types::INTEGER, ['notnull' => false, 'unsigned' => true]);
         $table->addColumn('imdb_id', Types::STRING, ['length' => 10, 'notnull' => false]);
         $table->addColumn('tmdb_poster_path', Types::STRING, ['length' => 255, 'notnull' => false]);
+        $table->addColumn('updated_at_tmdb', Types::DATETIME_MUTABLE, ['notnull' => false]);
         $table->addColumn('created_at', Types::DATETIME_MUTABLE);
         $table->addColumn('updated_at', Types::DATETIME_MUTABLE, ['notnull' => false]);
-        $table->addColumn('updated_at_tmdb', Types::DATETIME_MUTABLE, ['notnull' => false]);
         $table->addUniqueIndex(['tmdb_id'], 'unique_person_tmdb_id');
     }
 
@@ -215,7 +219,8 @@ final class Version20260928000000 extends AbstractMigration
         $country = $schema->createTable('country');
         $country->addColumn('iso_3166_1', Types::STRING, ['length' => 2, 'fixed' => true]);
         $country->addColumn('english_name', Types::STRING, ['length' => 255]);
-        self::addTimestamps($country);
+        $country->addColumn('updated_at', Types::DATETIME_MUTABLE, ['notnull' => false]);
+        $country->addColumn('created_at', Types::DATETIME_MUTABLE);
         $country->setPrimaryKey(['iso_3166_1']);
     }
 
@@ -228,8 +233,8 @@ final class Version20260928000000 extends AbstractMigration
         $cast->addColumn('position', Types::SMALLINT, ['notnull' => false, 'unsigned' => true]);
         $cast->addUniqueIndex(['movie_id', 'position'], 'unique_movie_cast_position');
         $cast->addIndex(['person_id'], 'index_movie_cast_person_id');
-        self::addCascadeForeignKey($cast, ['person_id'], 'person', ['id']);
-        self::addCascadeForeignKey($cast, ['movie_id'], 'movie', ['id']);
+        self::addCascadeForeignKey($cast, ['person_id'], 'person', ['id'], 'movie_cast_ibfk_1');
+        self::addCascadeForeignKey($cast, ['movie_id'], 'movie', ['id'], 'movie_cast_ibfk_2');
 
         $crew = $schema->createTable('movie_crew');
         self::addUnsignedInteger($crew, 'person_id');
@@ -239,8 +244,8 @@ final class Version20260928000000 extends AbstractMigration
         $crew->addColumn('position', Types::SMALLINT, ['notnull' => false, 'unsigned' => true]);
         $crew->addUniqueIndex(['movie_id', 'position'], 'unique_movie_crew_position');
         $crew->addIndex(['person_id'], 'index_movie_crew_person_id');
-        self::addCascadeForeignKey($crew, ['person_id'], 'person', ['id']);
-        self::addCascadeForeignKey($crew, ['movie_id'], 'movie', ['id']);
+        self::addCascadeForeignKey($crew, ['person_id'], 'person', ['id'], 'movie_crew_ibfk_1');
+        self::addCascadeForeignKey($crew, ['movie_id'], 'movie', ['id'], 'movie_crew_ibfk_2');
 
         $movieGenre = $schema->createTable('movie_genre');
         self::addUnsignedInteger($movieGenre, 'genre_id');
@@ -249,8 +254,8 @@ final class Version20260928000000 extends AbstractMigration
         $movieGenre->addUniqueIndex(['genre_id', 'movie_id'], 'unique_movie_genre');
         $movieGenre->addUniqueIndex(['movie_id', 'position'], 'unique_movie_genre_position');
         $movieGenre->addIndex(['genre_id'], 'index_movie_genre_genre_id');
-        self::addCascadeForeignKey($movieGenre, ['genre_id'], 'genre', ['id']);
-        self::addCascadeForeignKey($movieGenre, ['movie_id'], 'movie', ['id']);
+        self::addCascadeForeignKey($movieGenre, ['genre_id'], 'genre', ['id'], 'movie_genre_ibfk_1');
+        self::addCascadeForeignKey($movieGenre, ['movie_id'], 'movie', ['id'], 'movie_genre_ibfk_2');
 
         $productionCompany = $schema->createTable('movie_production_company');
         self::addUnsignedInteger($productionCompany, 'company_id');
@@ -259,8 +264,8 @@ final class Version20260928000000 extends AbstractMigration
         $productionCompany->addUniqueIndex(['company_id', 'movie_id'], 'unique_movie_production_company');
         $productionCompany->addUniqueIndex(['movie_id', 'position'], 'unique_movie_production_company_position');
         $productionCompany->addIndex(['company_id'], 'index_movie_production_company_company_id');
-        self::addCascadeForeignKey($productionCompany, ['company_id'], 'company', ['id']);
-        self::addCascadeForeignKey($productionCompany, ['movie_id'], 'movie', ['id']);
+        self::addCascadeForeignKey($productionCompany, ['company_id'], 'company', ['id'], 'movie_production_company_ibfk_1');
+        self::addCascadeForeignKey($productionCompany, ['movie_id'], 'movie', ['id'], 'movie_production_company_ibfk_2');
 
         $productionCountry = $schema->createTable('movie_production_countries');
         self::addUnsignedInteger($productionCountry, 'movie_id');
@@ -269,8 +274,8 @@ final class Version20260928000000 extends AbstractMigration
         $productionCountry->addColumn('created_at', Types::DATETIME_MUTABLE);
         $productionCountry->setPrimaryKey(['movie_id', 'iso_3166_1']);
         $productionCountry->addIndex(['iso_3166_1'], 'index_movie_production_countries_iso_3166_1');
-        self::addCascadeForeignKey($productionCountry, ['movie_id'], 'movie', ['id']);
-        self::addCascadeForeignKey($productionCountry, ['iso_3166_1'], 'country', ['iso_3166_1']);
+        self::addCascadeForeignKey($productionCountry, ['movie_id'], 'movie', ['id'], 'movie_production_countries_ibfk_1');
+        self::addCascadeForeignKey($productionCountry, ['iso_3166_1'], 'country', ['iso_3166_1'], 'movie_production_countries_ibfk_2');
     }
 
     private static function createUserDataTables(Schema $schema) : void
@@ -279,11 +284,12 @@ final class Version20260928000000 extends AbstractMigration
         self::addUnsignedInteger($rating, 'movie_id');
         self::addUnsignedInteger($rating, 'user_id');
         $rating->addColumn('rating', Types::SMALLINT);
-        self::addTimestamps($rating);
+        $rating->addColumn('updated_at', Types::DATETIME_MUTABLE, ['notnull' => false]);
+        $rating->addColumn('created_at', Types::DATETIME_MUTABLE);
         $rating->setPrimaryKey(['movie_id', 'user_id']);
         $rating->addIndex(['user_id'], 'index_movie_user_rating_user_id');
-        self::addCascadeForeignKey($rating, ['movie_id'], 'movie', ['id']);
-        self::addCascadeForeignKey($rating, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($rating, ['movie_id'], 'movie', ['id'], 'movie_user_rating_ibfk_1');
+        self::addCascadeForeignKey($rating, ['user_id'], 'user', ['id'], 'movie_user_rating_ibfk_2');
 
         $watchDates = $schema->createTable('movie_user_watch_dates');
         self::addUnsignedInteger($watchDates, 'movie_id');
@@ -296,9 +302,9 @@ final class Version20260928000000 extends AbstractMigration
         $watchDates->addUniqueIndex(['movie_id', 'user_id', 'watched_at'], 'unique_movie_user_watch_date');
         $watchDates->addIndex(['user_id'], 'index_movie_user_watch_dates_user_id');
         $watchDates->addIndex(['location_id'], 'index_movie_user_watch_dates_location_id');
-        self::addForeignKey($watchDates, ['movie_id'], 'movie', ['id']);
-        self::addCascadeForeignKey($watchDates, ['user_id'], 'user', ['id']);
-        self::addCascadeForeignKey($watchDates, ['location_id'], 'location', ['id']);
+        self::addForeignKey($watchDates, ['movie_id'], 'movie', ['id'], 'movie_user_watch_dates_ibfk_1');
+        self::addCascadeForeignKey($watchDates, ['user_id'], 'user', ['id'], 'movie_history_fk_user_id');
+        self::addCascadeForeignKey($watchDates, ['location_id'], 'location', ['id'], 'fk_movie_user_watch_dates_location_id');
 
         $watchlist = $schema->createTable('watchlist');
         self::addUnsignedInteger($watchlist, 'movie_id', false);
@@ -306,8 +312,8 @@ final class Version20260928000000 extends AbstractMigration
         $watchlist->addColumn('added_at', Types::DATETIME_MUTABLE);
         $watchlist->addUniqueIndex(['movie_id', 'user_id'], 'unique_watchlist_movie_user');
         $watchlist->addIndex(['user_id'], 'index_watchlist_user_id');
-        self::addCascadeForeignKey($watchlist, ['movie_id'], 'movie', ['id']);
-        self::addCascadeForeignKey($watchlist, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($watchlist, ['movie_id'], 'movie', ['id'], 'watchlist_ibfk_1');
+        self::addCascadeForeignKey($watchlist, ['user_id'], 'user', ['id'], 'watchlist_ibfk_2');
 
         $location = $schema->createTable('location');
         self::addAutoIncrementId($location);
@@ -316,7 +322,7 @@ final class Version20260928000000 extends AbstractMigration
         $location->addColumn('is_cinema', Types::BOOLEAN, ['default' => false, 'notnull' => false]);
         self::addTimestamps($location);
         $location->addIndex(['user_id'], 'index_location_user_id');
-        self::addCascadeForeignKey($location, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($location, ['user_id'], 'user', ['id'], 'location_ibfk_1');
 
         $personSettings = $schema->createTable('user_person_settings');
         self::addUnsignedInteger($personSettings, 'user_id');
@@ -328,8 +334,8 @@ final class Version20260928000000 extends AbstractMigration
         $personSettings->addColumn('updated_at', Types::DATETIME_MUTABLE);
         $personSettings->setPrimaryKey(['user_id', 'person_id']);
         $personSettings->addIndex(['person_id'], 'index_user_person_settings_person_id');
-        self::addCascadeForeignKey($personSettings, ['user_id'], 'user', ['id']);
-        self::addCascadeForeignKey($personSettings, ['person_id'], 'person', ['id']);
+        self::addCascadeForeignKey($personSettings, ['user_id'], 'user', ['id'], 'user_person_settings_ibfk_1');
+        self::addCascadeForeignKey($personSettings, ['person_id'], 'person', ['id'], 'user_person_settings_ibfk_2');
     }
 
     private static function createCacheTables(Schema $schema) : void
@@ -350,14 +356,14 @@ final class Version20260928000000 extends AbstractMigration
         $rating->addColumn('rating', Types::SMALLINT, ['notnull' => false, 'unsigned' => true]);
         $rating->addColumn('rated_at', Types::DATETIME_MUTABLE);
         $rating->setPrimaryKey(['user_id', 'trakt_id']);
-        self::addCascadeForeignKey($rating, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($rating, ['user_id'], 'user', ['id'], 'cache_trakt_user_movie_rating_fk_user_id');
 
         $watched = $schema->createTable('cache_trakt_user_movie_watched');
         self::addUnsignedInteger($watched, 'trakt_id');
         self::addUnsignedInteger($watched, 'user_id');
         $watched->addColumn('last_updated_at', Types::DATETIME_MUTABLE);
         $watched->setPrimaryKey(['user_id', 'trakt_id']);
-        self::addCascadeForeignKey($watched, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($watched, ['user_id'], 'user', ['id'], 'cache_trakt_user_movie_watched_fk_user_id');
 
         $jellyfin = $schema->createTable('user_jellyfin_cache');
         self::addUnsignedInteger($jellyfin, 'movary_user_id');
@@ -368,7 +374,7 @@ final class Version20260928000000 extends AbstractMigration
         $jellyfin->addColumn('updated_at', Types::DATETIME_MUTABLE, ['notnull' => false]);
         $jellyfin->addColumn('created_at', Types::DATETIME_MUTABLE);
         $jellyfin->setPrimaryKey(['movary_user_id', 'jellyfin_item_id']);
-        self::addCascadeForeignKey($jellyfin, ['movary_user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($jellyfin, ['movary_user_id'], 'user', ['id'], 'user_jellyfin_cache_ibfk_1');
     }
 
     private static function createInfrastructureTables(Schema $schema) : void
@@ -379,11 +385,18 @@ final class Version20260928000000 extends AbstractMigration
         $jobQueue->addColumn('job_status', Types::STRING, ['length' => 32]);
         self::addUnsignedInteger($jobQueue, 'user_id', false);
         self::addText($jobQueue, 'parameters', false);
-        self::addTimestamps($jobQueue);
+        $jobQueue->addColumn('updated_at', Types::DATETIME_MUTABLE, ['notnull' => false]);
+        $jobQueue->addColumn('created_at', Types::DATETIME_MUTABLE);
         $jobQueue->addIndex(['job_status'], 'index_job_status');
         $jobQueue->addIndex(['job_type'], 'index_job_type');
         $jobQueue->addIndex(['user_id'], 'index_job_queue_user_id');
-        $jobQueue->addForeignKeyConstraint('user', ['user_id'], ['id'], ['onDelete' => 'SET NULL']);
+        $jobQueue->addForeignKeyConstraint(
+            'user',
+            ['user_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL'],
+            'job_queue_ibfk_1',
+        );
 
         $serverSetting = $schema->createTable('server_setting');
         $serverSetting->addColumn('key', Types::STRING, ['length' => 255]);
@@ -396,7 +409,7 @@ final class Version20260928000000 extends AbstractMigration
         $apiToken->addColumn('created_at', Types::DATETIME_MUTABLE);
         $apiToken->setPrimaryKey(['token']);
         $apiToken->addUniqueIndex(['user_id'], 'unique_user_api_token_user_id');
-        self::addCascadeForeignKey($apiToken, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($apiToken, ['user_id'], 'user', ['id'], 'user_api_token_ibfk_1');
 
         $authToken = $schema->createTable('user_auth_token');
         self::addAutoIncrementId($authToken);
@@ -408,7 +421,7 @@ final class Version20260928000000 extends AbstractMigration
         self::addText($authToken, 'user_agent');
         $authToken->addUniqueIndex(['token'], 'unique_user_auth_token_token');
         $authToken->addIndex(['user_id'], 'index_user_auth_token_user_id');
-        self::addCascadeForeignKey($authToken, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($authToken, ['user_id'], 'user', ['id'], 'user_auth_token_fk_user_id');
 
         $resetToken = $schema->createTable('user_password_reset_token');
         self::addUnsignedInteger($resetToken, 'user_id');
@@ -417,7 +430,78 @@ final class Version20260928000000 extends AbstractMigration
         $resetToken->addColumn('created_at', Types::DATETIME_MUTABLE);
         $resetToken->setPrimaryKey(['user_id']);
         $resetToken->addUniqueIndex(['token_hash'], 'unique_user_password_reset_token_hash');
-        self::addCascadeForeignKey($resetToken, ['user_id'], 'user', ['id']);
+        self::addCascadeForeignKey($resetToken, ['user_id'], 'user', ['id'], 'user_password_reset_token_ibfk_1');
+    }
+
+    private static function applyMysqlPhysicalSchema(Schema $schema) : void
+    {
+        $schema->getTable('movie')->getColumn('imdb_rating_average')->setColumnDefinition(
+            'DOUBLE(3,1) DEFAULT NULL',
+        );
+
+        $indexNames = [
+            'company' => ['unique_company_tmdb_id' => 'tmdb_id'],
+            'genre' => [
+                'unique_genre_name' => 'name',
+                'unique_genre_tmdb_id' => 'tmdb_id',
+            ],
+            'job_queue' => ['index_job_queue_user_id' => 'job_queue_ibfk_1'],
+            'location' => ['index_location_user_id' => 'user_id'],
+            'movie' => [
+                'unique_movie_imdb_id' => 'imdb_id',
+                'unique_movie_tmdb_id' => 'tmdb_id',
+                'unique_movie_trakt_id' => 'trakt_id',
+            ],
+            'movie_cast' => [
+                'index_movie_cast_person_id' => 'movie_cast_ibfk_1',
+                'unique_movie_cast_position' => 'movie_id',
+            ],
+            'movie_crew' => [
+                'index_movie_crew_person_id' => 'movie_crew_ibfk_1',
+                'unique_movie_crew_position' => 'movie_id',
+            ],
+            'movie_genre' => [
+                'unique_movie_genre' => 'genre_id',
+                'unique_movie_genre_position' => 'movie_id',
+            ],
+            'movie_production_company' => [
+                'unique_movie_production_company' => 'company_id',
+                'unique_movie_production_company_position' => 'movie_id',
+            ],
+            'movie_production_countries' => [
+                'index_movie_production_countries_iso_3166_1' => 'iso_3166_1',
+            ],
+            'movie_user_rating' => ['index_movie_user_rating_user_id' => 'user_id'],
+            'movie_user_watch_dates' => [
+                'index_movie_user_watch_dates_location_id' => 'fk_movie_user_watch_dates_location_id',
+                'index_movie_user_watch_dates_user_id' => 'movie_history_fk_user_id',
+                'unique_movie_user_watch_date' => 'unique_watched_dates',
+            ],
+            'person' => ['unique_person_tmdb_id' => 'tmdb_id'],
+            'server_setting' => ['unique_server_setting_key' => 'key'],
+            'user' => [
+                'unique_user_email' => 'email',
+                'unique_user_name' => 'name',
+            ],
+            'user_api_token' => ['unique_user_api_token_user_id' => 'user_id'],
+            'user_auth_token' => [
+                'index_user_auth_token_user_id' => 'user_auth_token_fk_user_id',
+                'unique_user_auth_token_token' => 'token',
+            ],
+            'user_password_reset_token' => ['unique_user_password_reset_token_hash' => 'token_hash'],
+            'user_person_settings' => ['index_user_person_settings_person_id' => 'person_id'],
+            'watchlist' => [
+                'index_watchlist_user_id' => 'user_id',
+                'unique_watchlist_movie_user' => 'movie_id',
+            ],
+        ];
+
+        foreach ($indexNames as $tableName => $renames) {
+            $table = $schema->getTable($tableName);
+            foreach ($renames as $currentName => $mainName) {
+                $table->renameIndex($currentName, $mainName);
+            }
+        }
     }
 
     private static function addAutoIncrementId(Table $table) : void
@@ -451,8 +535,9 @@ final class Version20260928000000 extends AbstractMigration
         array $localColumns,
         string $foreignTable,
         array $foreignColumns,
+        string $name,
     ) : void {
-        self::addForeignKey($table, $localColumns, $foreignTable, $foreignColumns, 'CASCADE');
+        self::addForeignKey($table, $localColumns, $foreignTable, $foreignColumns, $name, 'CASCADE');
     }
 
     /**
@@ -464,10 +549,11 @@ final class Version20260928000000 extends AbstractMigration
         array $localColumns,
         string $foreignTable,
         array $foreignColumns,
+        string $name,
         ?string $onDelete = null,
     ) : void {
         $options = $onDelete === null ? [] : ['onDelete' => $onDelete];
-        $table->addForeignKeyConstraint($foreignTable, $localColumns, $foreignColumns, $options);
+        $table->addForeignKeyConstraint($foreignTable, $localColumns, $foreignColumns, $options, $name);
 
         $exactIndexName = null;
         $coveredByAnotherIndex = false;

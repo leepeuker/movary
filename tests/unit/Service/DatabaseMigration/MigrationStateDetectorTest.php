@@ -12,9 +12,11 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MigrationStateDetector::class)]
 class MigrationStateDetectorTest extends TestCase
 {
+    private const int TEST_FINAL_LEGACY_VERSION = 20260927220000;
+
     private const array EXPECTED_LEGACY_VERSIONS = [
         20260927143000,
-        MigrationStateDetector::LEGACY_CUTOVER_VERSION,
+        self::TEST_FINAL_LEGACY_VERSION,
     ];
 
     private Connection $dbConnection;
@@ -64,7 +66,7 @@ class MigrationStateDetectorTest extends TestCase
         $this->createPhinxMetadataTable();
         $this->dbConnection->insert(
             'phinxlog',
-            ['version' => MigrationStateDetector::LEGACY_CUTOVER_VERSION + 1],
+            ['version' => self::TEST_FINAL_LEGACY_VERSION + 1],
         );
 
         self::assertSame(MigrationState::UNEXPECTED, $this->detector->detect());
@@ -75,7 +77,7 @@ class MigrationStateDetectorTest extends TestCase
         $this->createPhinxMetadataTable();
         $this->dbConnection->insert(
             'phinxlog',
-            ['version' => MigrationStateDetector::LEGACY_CUTOVER_VERSION],
+            ['version' => self::TEST_FINAL_LEGACY_VERSION],
         );
 
         self::assertSame(MigrationState::UNEXPECTED, $this->detector->detect());

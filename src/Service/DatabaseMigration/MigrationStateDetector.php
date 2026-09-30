@@ -8,8 +8,6 @@ class MigrationStateDetector
 {
     public const string DOCTRINE_BASELINE_VERSION = 'Movary\\DatabaseMigration\\Version20260928000000';
 
-    public const int LEGACY_CUTOVER_VERSION = 20260927220000;
-
     private const string DOCTRINE_METADATA_TABLE = 'doctrine_migration_versions';
 
     private const string PHINX_METADATA_TABLE = 'phinxlog';
