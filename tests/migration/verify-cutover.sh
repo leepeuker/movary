@@ -94,10 +94,48 @@ assert_equal() {
 }
 
 run_sqlite_migrations before.sqlite --target 20260927143000
+cp "$audit_directory/before.sqlite" "$audit_directory/release-0.73.1.sqlite"
 cp "$audit_directory/before.sqlite" "$audit_directory/null-genre.sqlite"
 cp "$audit_directory/before.sqlite" "$audit_directory/repairable.sqlite"
 cp "$audit_directory/before.sqlite" "$audit_directory/noncanonical.sqlite"
-chmod 0666 "$audit_directory/null-genre.sqlite" "$audit_directory/repairable.sqlite" "$audit_directory/noncanonical.sqlite"
+chmod 0666 "$audit_directory/release-0.73.1.sqlite" "$audit_directory/null-genre.sqlite" \
+    "$audit_directory/repairable.sqlite" "$audit_directory/noncanonical.sqlite"
+
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO user (id, email, name, password, jellyfin_access_token, created_at) VALUES (1, 'release@example.test', 'release-user', 'x', 'jellyfin-token', '2026-01-01')"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO movie (id, title, tmdb_id, created_at) VALUES (1, 'release-movie', 1001, '2026-01-01')"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO location (id, user_id, name, created_at) VALUES (1, 1, 'release-location', '2026-01-01')"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO movie_user_rating (movie_id, user_id, rating, created_at) VALUES (1, 1, 8, '2026-01-01')"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, comment, location_id) VALUES (1, 1, '2026-01-01', 'release-watch', 1)"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO watchlist (movie_id, user_id, added_at) VALUES (1, 1, '2026-01-01')"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO user_api_token (user_id, token, created_at) VALUES (1, '12345678-1234-1234-1234-123456789012', '2026-01-01')"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO user_auth_token (id, user_id, token, device_name, user_agent, expiration_date, created_at) VALUES (1, 1, '12345678901234567890123456789012', 'release-device', 'release-agent', '2027-01-01', '2026-01-01')"
+query_sqlite release-0.73.1.sqlite \
+    "INSERT INTO server_setting (key, value) VALUES ('release-setting', 'preserved')"
+
+run_sqlite_app_command release-0.73.1.sqlite database:migration:migrate
+assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
+    "$(query_sqlite release-0.73.1.sqlite 'SELECT version FROM doctrine_migration_versions')" \
+    'SQLite 0.73.1 fixture did not reach the Doctrine baseline'
+assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite \
+    "SELECT name || '|' || jellyfin_access_token FROM user WHERE id = 1")" \
+    'SQLite 0.73.1 fixture did not preserve the user and integration data'
+assert_equal '8|release-watch|release-location' "$(query_sqlite release-0.73.1.sqlite \
+    "SELECT r.rating || '|' || w.comment || '|' || l.name FROM movie_user_rating r INNER JOIN movie_user_watch_dates w ON w.movie_id = r.movie_id AND w.user_id = r.user_id INNER JOIN location l ON l.id = w.location_id WHERE r.movie_id = 1 AND r.user_id = 1")" \
+    'SQLite 0.73.1 fixture did not preserve rating and watch data'
+assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
+    "SELECT COUNT(*) FROM user_api_token a INNER JOIN user_auth_token u ON u.user_id = a.user_id INNER JOIN watchlist w ON w.user_id = a.user_id WHERE a.user_id = 1")" \
+    'SQLite 0.73.1 fixture did not preserve tokens and watchlist data'
+assert_equal preserved "$(query_sqlite release-0.73.1.sqlite \
+    "SELECT value FROM server_setting WHERE key = 'release-setting'")" \
+    'SQLite 0.73.1 fixture did not preserve server settings'
 
 query_sqlite null-genre.sqlite \
     "INSERT INTO genre (id, name, tmdb_id, created_at) VALUES (1, 'a', NULL, '2026-01-01'), (2, 'b', NULL, '2026-01-01')"
@@ -241,9 +279,38 @@ mysql_query() {
 mysql_query movary "SET SESSION sql_mode = ''; INSERT INTO person (name, gender, tmdb_id, created_at) VALUES ('gender 0', '0', 990, '2026-01-01'), ('gender 1', '1', 991, '2026-01-01'), ('gender 2', '2', 992, '2026-01-01'), ('gender 3', '3', 993, '2026-01-01'), ('invalid gender', 'invalid', 999, '2026-01-01')"
 docker exec "$mysql_container" mysqldump --no-tablespaces --user=movary --password=movary movary >"$audit_directory/mysql-before.sql"
 docker exec "$mysql_container" mysql --user=root --password=movary-root \
-    --execute="CREATE DATABASE movary_drift; GRANT ALL PRIVILEGES ON movary_drift.* TO 'movary'@'%';"
+    --execute="CREATE DATABASE movary_release; CREATE DATABASE movary_drift; GRANT ALL PRIVILEGES ON movary_release.* TO 'movary'@'%'; GRANT ALL PRIVILEGES ON movary_drift.* TO 'movary'@'%';"
+docker exec --interactive "$mysql_container" mysql --user=movary --password=movary movary_release \
+    <"$audit_directory/mysql-before.sql"
 docker exec --interactive "$mysql_container" mysql --user=movary --password=movary movary_drift \
     <"$audit_directory/mysql-before.sql"
+
+mysql_query movary_release "INSERT INTO user (id, email, name, password, jellyfin_access_token, created_at) VALUES (1, 'release@example.test', 'release-user', 'x', 'jellyfin-token', '2026-01-01')"
+mysql_query movary_release "INSERT INTO movie (id, title, tmdb_id, created_at) VALUES (1, 'release-movie', 1001, '2026-01-01')"
+mysql_query movary_release "INSERT INTO location (id, user_id, name, created_at) VALUES (1, 1, 'release-location', '2026-01-01')"
+mysql_query movary_release "INSERT INTO movie_user_rating (movie_id, user_id, rating, created_at) VALUES (1, 1, 8, '2026-01-01')"
+mysql_query movary_release "INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, comment, location_id) VALUES (1, 1, '2026-01-01', 'release-watch', 1)"
+mysql_query movary_release "INSERT INTO watchlist (movie_id, user_id, added_at) VALUES (1, 1, '2026-01-01')"
+mysql_query movary_release "INSERT INTO user_api_token (user_id, token, created_at) VALUES (1, '12345678-1234-1234-1234-123456789012', '2026-01-01')"
+mysql_query movary_release "INSERT INTO user_auth_token (id, user_id, token, device_name, user_agent, expiration_date, created_at) VALUES (1, 1, '12345678901234567890123456789012', 'release-device', 'release-agent', '2027-01-01', '2026-01-01')"
+mysql_query movary_release "INSERT INTO server_setting (\`key\`, value) VALUES ('release-setting', 'preserved')"
+
+run_mysql_app_command movary_release database:migration:migrate
+assert_equal 'Movary\DatabaseMigration\Version20260928000000' \
+    "$(mysql_query movary_release 'SELECT version FROM doctrine_migration_versions')" \
+    'MySQL 0.73.1 fixture did not reach the Doctrine baseline'
+assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
+    "SELECT CONCAT_WS('|', name, jellyfin_access_token) FROM user WHERE id = 1")" \
+    'MySQL 0.73.1 fixture did not preserve the user and integration data'
+assert_equal '8|release-watch|release-location' "$(mysql_query movary_release \
+    "SELECT CONCAT_WS('|', r.rating, w.comment, l.name) FROM movie_user_rating r INNER JOIN movie_user_watch_dates w ON w.movie_id = r.movie_id AND w.user_id = r.user_id INNER JOIN location l ON l.id = w.location_id WHERE r.movie_id = 1 AND r.user_id = 1")" \
+    'MySQL 0.73.1 fixture did not preserve rating and watch data'
+assert_equal 1 "$(mysql_query movary_release \
+    "SELECT COUNT(*) FROM user_api_token a INNER JOIN user_auth_token u ON u.user_id = a.user_id INNER JOIN watchlist w ON w.user_id = a.user_id WHERE a.user_id = 1")" \
+    'MySQL 0.73.1 fixture did not preserve tokens and watchlist data'
+assert_equal preserved "$(mysql_query movary_release \
+    "SELECT value FROM server_setting WHERE \`key\` = 'release-setting'")" \
+    'MySQL 0.73.1 fixture did not preserve server settings'
 
 run_mysql_migrations movary
 assert_equal '2026-01-01 00:00:00' "$(mysql_query movary 'SELECT created_at FROM person WHERE tmdb_id = 990')" \

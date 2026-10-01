@@ -28,8 +28,10 @@ would delete the complete application schema.
 
 ## Legacy bridge
 
-The old Phinx migrations remain temporarily so installations from an older
-Movary release can reach the cutover boundary. Do not add new Phinx migrations.
+Movary `0.74.0` is the first release using Doctrine Migrations. The old Phinx
+migration histories remain available for several releases so installations on
+older releases can catch up through the normal upgrade process. Do not add new
+Phinx migrations.
 
 The frozen legacy histories end at different backend-specific versions:
 
