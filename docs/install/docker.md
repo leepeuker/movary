@@ -6,10 +6,6 @@ The official docker image extends the `TrafeX/docker-php-nginx` image, checkout
 their [docs](https://github.com/TrafeX/docker-php-nginx) for more configuration information.
 
 !!! warning
-
-    Before updating across the Phinx-to-Doctrine migration cutover, back up the
-    database and verify that the backup can be restored.
-
     After the **initial installation** and every update containing database changes the database migrations must be executed:
 
     `php bin/console.php database:migration:migrate`

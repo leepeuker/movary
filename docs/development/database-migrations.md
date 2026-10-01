@@ -31,6 +31,15 @@ would delete the complete application schema.
 The old Phinx migrations remain temporarily so installations from an older
 Movary release can reach the cutover boundary. Do not add new Phinx migrations.
 
+The frozen legacy histories end at different backend-specific versions:
+
+- MySQL: `20260927233000`
+- SQLite: `20260927221000`
+
+These version numbers are part of the bridge preflight. The migration command
+accepts only an exact prefix of the checked-in history and does not guess how to
+handle missing or unknown Phinx versions.
+
 During an upgrade, `database:migration:migrate`:
 
 1. finishes remaining legacy Phinx migrations;
