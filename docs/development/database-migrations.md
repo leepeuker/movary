@@ -53,3 +53,28 @@ During an upgrade, `database:migration:migrate`:
 An empty database executes the Doctrine baseline directly. A legacy history
 with gaps or unknown versions, or a schema with unknown drift, fails before
 Doctrine metadata is written.
+
+## Removing the legacy bridge
+
+Phinx is scheduled for removal in Movary `1.0.0`. Installations that have not
+reached the Doctrine baseline must upgrade to the final `0.x` release and run
+its migrations before upgrading to `1.0.0`. Keep the complete frozen Phinx
+histories and the bridge code in every release until then.
+
+For the `1.0.0` removal:
+
+1. retain a lightweight check for `phinxlog` without the Doctrine baseline and
+   fail with an actionable message directing the user through the final `0.x`
+   release;
+2. remove the Phinx application wiring, configuration, dependency, and legacy
+   MySQL and SQLite migration directories;
+3. simplify the public migration commands and migration state handling to use
+   Doctrine only;
+4. add a Doctrine migration that removes the obsolete `phinxlog` table from
+   databases that have already crossed the baseline;
+5. replace the bridge-specific tests with coverage for a final `0.x` upgrade,
+   a fresh `1.0.0` installation, an existing Doctrine-managed installation,
+   and rejection of a database that skipped the bridge release;
+6. update the installation and release documentation with the mandatory
+   pre-`1.0.0` upgrade step and run the complete test suite on both MySQL and
+   SQLite.
