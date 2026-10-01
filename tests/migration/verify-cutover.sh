@@ -101,9 +101,29 @@ chmod 0666 "$audit_directory/null-genre.sqlite" "$audit_directory/repairable.sql
 
 query_sqlite null-genre.sqlite \
     "INSERT INTO genre (id, name, tmdb_id, created_at) VALUES (1, 'a', NULL, '2026-01-01'), (2, 'b', NULL, '2026-01-01')"
+query_sqlite null-genre.sqlite \
+    "INSERT INTO company (id, name, created_at) VALUES (1, 'company', '2026-01-01')"
+query_sqlite null-genre.sqlite \
+    "INSERT INTO movie (id, title, tmdb_id, created_at) VALUES (1, 'movie', 1, '2026-01-01')"
+query_sqlite null-genre.sqlite \
+    "INSERT INTO movie_genre (genre_id, movie_id, position) VALUES (1, 1, 1)"
+query_sqlite null-genre.sqlite \
+    "INSERT INTO movie_production_company (company_id, movie_id, position) VALUES (1, 1, 1)"
 run_sqlite_migrations null-genre.sqlite
 assert_equal 2 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM genre WHERE tmdb_id IS NULL')" \
     'SQLite nullable genre IDs were not preserved'
+assert_equal 1 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM movie_genre WHERE genre_id = 1 AND movie_id = 1 AND position = 1')" \
+    'SQLite movie genre relations were not preserved'
+assert_equal 1 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM movie_production_company WHERE company_id = 1 AND movie_id = 1 AND position = 1')" \
+    'SQLite movie production company relations were not preserved'
+assert_equal genre_id,movie_id "$(query_sqlite null-genre.sqlite "SELECT GROUP_CONCAT(name, ',') FROM pragma_index_info('unique_movie_genre')")" \
+    'SQLite movie genre key does not match the Doctrine starting schema'
+assert_equal company_id,movie_id "$(query_sqlite null-genre.sqlite "SELECT GROUP_CONCAT(name, ',') FROM pragma_index_info('unique_movie_production_company')")" \
+    'SQLite movie production company key does not match the Doctrine starting schema'
+assert_equal 0 "$(query_sqlite null-genre.sqlite "SELECT COUNT(*) FROM pragma_index_list('movie_genre') WHERE name = 'index_movie_genre_genre_id'")" \
+    'SQLite retained a redundant movie genre index'
+assert_equal 0 "$(query_sqlite null-genre.sqlite "SELECT COUNT(*) FROM pragma_index_list('movie_production_company') WHERE name = 'index_movie_production_company_company_id'")" \
+    'SQLite retained a redundant movie production company index'
 assert_equal user_id,trakt_id "$(query_sqlite null-genre.sqlite "SELECT GROUP_CONCAT(name, ',') FROM (SELECT name FROM pragma_table_info('cache_trakt_user_movie_rating') WHERE pk > 0 ORDER BY pk)")" \
     'SQLite rating cache does not have the expected composite primary key'
 assert_equal user_id,trakt_id "$(query_sqlite null-genre.sqlite "SELECT GROUP_CONCAT(name, ',') FROM (SELECT name FROM pragma_table_info('cache_trakt_user_movie_watched') WHERE pk > 0 ORDER BY pk)")" \
