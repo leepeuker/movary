@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MigrationStateDetector::class)]
 class MigrationStateDetectorTest extends TestCase
 {
-    private const int TEST_FINAL_LEGACY_VERSION = 20260927220000;
+    private const int TEST_FINAL_LEGACY_VERSION = 20260927221000;
 
     private const array EXPECTED_LEGACY_VERSIONS = [
         20260927143000,

@@ -34,13 +34,7 @@ final class Version20260928000000 extends AbstractMigration
         }
 
         if ($this->platform instanceof SqlitePlatform) {
-            $targetSchema->getTable('person')->getColumn('gender')->setColumnDefinition(
-                'SMALLINT NOT NULL CHECK (gender IN (0, 1, 2, 3))',
-            );
-            $targetSchema->getTable('user')->getColumn('mastodon_post_visibility')->setColumnDefinition(
-                "VARCHAR(16) NOT NULL DEFAULT 'public' "
-                . "CHECK (mastodon_post_visibility IN ('public', 'private', 'unlisted', 'direct'))",
-            );
+            self::applySqlitePhysicalSchema($targetSchema);
         }
 
         foreach ($targetSchema->toSql($this->platform) as $sql) {
@@ -502,6 +496,52 @@ final class Version20260928000000 extends AbstractMigration
                 $table->renameIndex($currentName, $mainName);
             }
         }
+    }
+
+    private static function applySqlitePhysicalSchema(Schema $schema) : void
+    {
+        $dateColumns = [
+            'cache_trakt_user_movie_rating' => ['rated_at'],
+            'cache_trakt_user_movie_watched' => ['last_updated_at'],
+            'company' => ['created_at', 'updated_at'],
+            'country' => ['created_at', 'updated_at'],
+            'genre' => ['created_at', 'updated_at'],
+            'job_queue' => ['created_at', 'updated_at'],
+            'location' => ['created_at', 'updated_at'],
+            'movie' => ['created_at', 'release_date', 'updated_at', 'updated_at_imdb', 'updated_at_tmdb'],
+            'movie_production_countries' => ['created_at'],
+            'movie_user_rating' => ['created_at', 'updated_at'],
+            'movie_user_watch_dates' => ['watched_at'],
+            'person' => ['birth_date', 'created_at', 'death_date', 'updated_at', 'updated_at_tmdb'],
+            'user' => ['created_at'],
+            'user_api_token' => ['created_at'],
+            'user_auth_token' => ['created_at', 'expiration_date'],
+            'user_jellyfin_cache' => ['created_at', 'last_watch_date', 'updated_at'],
+            'user_password_reset_token' => ['created_at', 'expiration_date'],
+            'user_person_settings' => ['updated_at'],
+            'watchlist' => ['added_at'],
+        ];
+
+        foreach ($dateColumns as $tableName => $columnNames) {
+            $table = $schema->getTable($tableName);
+            foreach ($columnNames as $columnName) {
+                $column = $table->getColumn($columnName);
+                $definition = 'TEXT';
+                $definition .= $column->getNotnull() ? ' NOT NULL' : ' DEFAULT NULL';
+                $column->setColumnDefinition($definition);
+            }
+        }
+
+        $schema->getTable('movie')->getColumn('tmdb_vote_average')->setColumnDefinition(
+            'REAL DEFAULT NULL',
+        );
+        $schema->getTable('person')->getColumn('gender')->setColumnDefinition(
+            'SMALLINT NOT NULL CHECK (gender IN (0, 1, 2, 3))',
+        );
+        $schema->getTable('user')->getColumn('mastodon_post_visibility')->setColumnDefinition(
+            "VARCHAR(16) NOT NULL DEFAULT 'public' "
+            . "CHECK (mastodon_post_visibility IN ('public', 'private', 'unlisted', 'direct'))",
+        );
     }
 
     private static function addAutoIncrementId(Table $table) : void

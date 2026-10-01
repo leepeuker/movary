@@ -20,7 +20,7 @@ use Psr\Log\NullLogger;
 #[CoversClass(MigrationCoordinator::class)]
 class MigrationCoordinatorTest extends TestCase
 {
-    private const int TEST_FINAL_LEGACY_VERSION = 20260927220000;
+    private const int TEST_FINAL_LEGACY_VERSION = 20260927221000;
 
     public static function setUpBeforeClass() : void
     {

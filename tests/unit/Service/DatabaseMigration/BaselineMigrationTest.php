@@ -114,6 +114,44 @@ class BaselineMigrationTest extends TestCase
         self::assertFalse($schema->getTable('person')->getColumn('tmdb_id')->getNotnull());
     }
 
+    public function testUsesLegacySqliteAffinitiesForDatesAndVoteAverage() : void
+    {
+        $connection = $this->createMigratedConnection();
+        $dateColumns = [
+            'cache_trakt_user_movie_rating' => ['rated_at'],
+            'cache_trakt_user_movie_watched' => ['last_updated_at'],
+            'company' => ['created_at', 'updated_at'],
+            'country' => ['created_at', 'updated_at'],
+            'genre' => ['created_at', 'updated_at'],
+            'job_queue' => ['created_at', 'updated_at'],
+            'location' => ['created_at', 'updated_at'],
+            'movie' => ['created_at', 'release_date', 'updated_at', 'updated_at_imdb', 'updated_at_tmdb'],
+            'movie_production_countries' => ['created_at'],
+            'movie_user_rating' => ['created_at', 'updated_at'],
+            'movie_user_watch_dates' => ['watched_at'],
+            'person' => ['birth_date', 'created_at', 'death_date', 'updated_at', 'updated_at_tmdb'],
+            'user' => ['created_at'],
+            'user_api_token' => ['created_at'],
+            'user_auth_token' => ['created_at', 'expiration_date'],
+            'user_jellyfin_cache' => ['created_at', 'last_watch_date', 'updated_at'],
+            'user_password_reset_token' => ['created_at', 'expiration_date'],
+            'user_person_settings' => ['updated_at'],
+            'watchlist' => ['added_at'],
+        ];
+
+        try {
+            foreach ($dateColumns as $tableName => $columnNames) {
+                foreach ($columnNames as $columnName) {
+                    self::assertSame('TEXT', $this->sqliteColumnType($connection, $tableName, $columnName));
+                }
+            }
+
+            self::assertSame('REAL', $this->sqliteColumnType($connection, 'movie', 'tmdb_vote_average'));
+        } finally {
+            $connection->close();
+        }
+    }
+
     public function testRejectsUnsupportedPersonGenderOnSqlite() : void
     {
         $connection = $this->createMigratedConnection();
@@ -182,5 +220,17 @@ class BaselineMigrationTest extends TestCase
         }
 
         return $connection;
+    }
+
+    private function sqliteColumnType(Connection $connection, string $tableName, string $columnName) : string
+    {
+        $type = $connection->fetchOne(
+            'SELECT type FROM pragma_table_info(?) WHERE name = ?',
+            [$tableName, $columnName],
+        );
+
+        self::assertIsString($type);
+
+        return $type;
     }
 }
