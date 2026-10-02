@@ -18,6 +18,7 @@ RUN apk add --no-cache \
     php85-mbstring \
     php85-sqlite3 \
     php85-simplexml \
+    php85-zip \
     php85-pecl-imagick
 
 # Create standard binary for php

@@ -67,6 +67,18 @@ class ResponseTest extends TestCase
         );
     }
 
+    public function testCreateZipDownload() : void
+    {
+        $subject = Response::createZipDownload('zip content', 'export.zip');
+
+        self::assertEquals(
+            [Header::createContentTypeZip(), Header::createAttachment('export.zip')],
+            $subject->getHeaders(),
+        );
+        self::assertSame(StatusCode::createOk()->getCode(), $subject->getStatusCode()->getCode());
+        self::assertSame('zip content', $subject->getBody());
+    }
+
     public function testCreateNotFound() : void
     {
         self::assertEquals(

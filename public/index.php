@@ -55,6 +55,7 @@ try {
     if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
+
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 

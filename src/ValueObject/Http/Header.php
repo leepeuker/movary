@@ -2,6 +2,8 @@
 
 namespace Movary\ValueObject\Http;
 
+use InvalidArgumentException;
+
 class Header
 {
     private function __construct(
@@ -20,6 +22,11 @@ class Header
         return new self('Content-Type', 'application/json');
     }
 
+    public static function createContentTypeZip() : self
+    {
+        return new self('Content-Type', 'application/zip');
+    }
+
     public static function createContentTypeSVG() : self
     {
         return new self('Content-Type', 'image/svg+xml');
@@ -28,6 +35,15 @@ class Header
     public static function createLocation(string $value) : self
     {
         return new self('Location', $value);
+    }
+
+    public static function createAttachment(string $filename) : self
+    {
+        if (preg_match('/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/D', $filename) !== 1) {
+            throw new InvalidArgumentException('Invalid attachment filename.');
+        }
+
+        return new self('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
     public static function createCache(int $maxAgeInSeconds) : self

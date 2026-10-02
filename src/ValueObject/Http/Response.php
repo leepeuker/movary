@@ -48,6 +48,18 @@ class Response
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
 
+    public static function createZipDownload(string $body, string $downloadName) : self
+    {
+        return new self(
+            StatusCode::createOk(),
+            body: $body,
+            headers: [
+                Header::createContentTypeZip(),
+                Header::createAttachment($downloadName),
+            ],
+        );
+    }
+
     public static function createSVG(string $body, ?StatusCode $statusCode = null, int $cacheDurationInSeconds = 0) : self
     {
         return new self(
