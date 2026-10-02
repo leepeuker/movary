@@ -42,6 +42,7 @@ Required to run the application
 | `DATABASE_MYSQL_USER`             |            -            | Required when mode is `mysql`                          |
 | `DATABASE_MYSQL_PASSWORD`         |            -            | Required when mode is `mysql`                          |
 | `DATABASE_MYSQL_CHARSET`          |        `utf8mb4`        |                                                        |
+| `DATABASE_MYSQL_COLLATION`        |  `utf8mb4_unicode_ci`   |                                                        |
 | `DATABASE_DISABLE_AUTO_MIGRATION` |           `0`           | On default docker runs migrations on container startup |
 
 ### Third party integrations

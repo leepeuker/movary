@@ -2,6 +2,10 @@
 
 namespace Movary\Command;
 
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
+use Movary\Service\DatabaseMigration\MigrationState;
+use Movary\Service\DatabaseMigration\MigrationStateDetector;
 use Phinx\Console\PhinxApplication;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -19,6 +23,8 @@ class DatabaseMigrationRollback extends Command
     public function __construct(
         private readonly PhinxApplication $phinxApplication,
         private readonly string $phinxConfigurationFile,
+        private readonly MigrationStateDetector $migrationStateDetector,
+        private readonly DependencyFactory $dependencyFactory,
     ) {
         parent::__construct();
     }
@@ -26,6 +32,39 @@ class DatabaseMigrationRollback extends Command
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
+        $migrationState = $this->migrationStateDetector->detect();
+
+        if ($migrationState === MigrationState::EMPTY) {
+            $output->writeln('<error>There are no migrations to roll back.</error>');
+
+            return self::FAILURE;
+        }
+        if ($migrationState === MigrationState::DOCTRINE) {
+            $metadataStorage = $this->dependencyFactory->getMetadataStorage();
+            $metadataStorage->ensureInitialized();
+            $executedMigrations = $metadataStorage->getExecutedMigrations();
+
+            if (count($executedMigrations) === 0) {
+                $output->writeln('<error>There are no migrations to roll back.</error>');
+
+                return self::FAILURE;
+            }
+
+            $arguments = [
+                'versions' => [(string)$executedMigrations->getLast()->getVersion()],
+                '--down' => true,
+            ];
+            $doctrineInput = new ArrayInput($arguments);
+            $doctrineInput->setInteractive(false);
+
+            return (new ExecuteCommand($this->dependencyFactory))->run($doctrineInput, $output);
+        }
+        if ($migrationState === MigrationState::UNEXPECTED) {
+            $output->writeln('<error>The database migration state is not recognized.</error>');
+
+            return self::FAILURE;
+        }
+
         $command = $this->phinxApplication->find('rollback');
 
         $arguments = [

@@ -24,12 +24,21 @@ $builder->addDefinitions(
         \Movary\ValueObject\Http\Request::class => DI\factory([Factory::class, 'createCurrentHttpRequest']),
         \Movary\Command\CreatePublicStorageLink::class => DI\factory([Factory::class, 'createCreatePublicStorageLink']),
         \Movary\Command\DatabaseMigrationStatus::class => DI\factory([Factory::class, 'createDatabaseMigrationStatusCommand']),
+        \Movary\Command\DatabaseMigrationGenerate::class => DI\factory(
+            [Factory::class, 'createDatabaseMigrationGenerateCommand'],
+        ),
         \Movary\Command\DatabaseMigrationMigrate::class => DI\factory([Factory::class, 'createDatabaseMigrationMigrateCommand']),
         \Movary\Command\DatabaseMigrationRollback::class => DI\factory([Factory::class, 'createDatabaseMigrationRollbackCommand']),
+        \Movary\Service\DatabaseMigration\MigrationStateDetector::class => DI\factory(
+            [Factory::class, 'createMigrationStateDetector'],
+        ),
         \Movary\Command\ProcessJobs::class => DI\factory([Factory::class, 'createProcessJobCommand']),
         \Psr\Http\Client\ClientInterface::class => DI\factory([Factory::class, 'createHttpClient']),
         \Psr\Log\LoggerInterface::class => DI\factory([Factory::class, 'createLogger']),
         \Doctrine\DBAL\Connection::class => DI\factory([Factory::class, 'createDbConnection']),
+        \Doctrine\Migrations\DependencyFactory::class => DI\factory(
+            [Factory::class, 'createDoctrineMigrationDependencyFactory'],
+        ),
         \Twig\Loader\LoaderInterface::class => DI\factory([Factory::class, 'createTwigFilesystemLoader']),
         \Twig\Environment::class => DI\factory([Factory::class, 'createTwigEnvironment']),
         \Monolog\Formatter\LineFormatter::class => DI\factory([Factory::class, 'createLineFormatter']),

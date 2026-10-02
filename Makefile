@@ -79,7 +79,7 @@ db_mysql_export:
 	chown $(USER_ID):$(USER_ID) storage/dump.sql
 
 db_migration_create:
-	make exec_app_cmd CMD="vendor/bin/phinx create Migration -c ./settings/phinx.php"
+	make exec_app_cmd CMD="php bin/console.php database:migration:generate"
 
 # App commands
 ##############

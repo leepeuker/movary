@@ -3,6 +3,9 @@
 namespace Movary;
 
 use Doctrine\DBAL;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
+use Doctrine\Migrations\DependencyFactory;
 use Dotenv\Dotenv;
 use GuzzleHttp;
 use Monolog\Formatter\LineFormatter;
@@ -26,6 +29,7 @@ use Movary\HttpController\Web\JobController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\DatabaseMigration\MigrationCoordinator;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
@@ -60,6 +64,8 @@ class Factory
     private const int DEFAULT_MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING = 15;
 
     private const string DEFAULT_DATABASE_MYSQL_CHARSET = 'utf8mb4';
+
+    private const string DEFAULT_DATABASE_MYSQL_COLLATION = 'utf8mb4_unicode_ci';
 
     private const int DEFAULT_DATABASE_MYSQL_PORT = 3306;
 
@@ -104,6 +110,15 @@ class Factory
         return new Command\DatabaseMigrationMigrate(
             $container->get(PhinxApplication::class),
             self::createDirectoryAppRoot() . 'settings/phinx.php',
+            $container->get(MigrationCoordinator::class),
+        );
+    }
+
+    public static function createDatabaseMigrationGenerateCommand(
+        ContainerInterface $container,
+    ) : Command\DatabaseMigrationGenerate {
+        return new Command\DatabaseMigrationGenerate(
+            $container->get(DependencyFactory::class),
         );
     }
 
@@ -112,6 +127,8 @@ class Factory
         return new Command\DatabaseMigrationRollback(
             $container->get(PhinxApplication::class),
             self::createDirectoryAppRoot() . 'settings/phinx.php',
+            $container->get(Service\DatabaseMigration\MigrationStateDetector::class),
+            $container->get(DependencyFactory::class),
         );
     }
 
@@ -120,6 +137,8 @@ class Factory
         return new Command\DatabaseMigrationStatus(
             $container->get(PhinxApplication::class),
             self::createDirectoryAppRoot() . 'settings/phinx.php',
+            $container->get(Service\DatabaseMigration\MigrationStateDetector::class),
+            $container->get(DependencyFactory::class),
         );
     }
 
@@ -140,6 +159,11 @@ class Factory
                 'user' => $config->getAsString('DATABASE_MYSQL_USER'),
                 'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
                 'charset' => self::getDatabaseMysqlCharset($config),
+                'defaultTableOptions' => [
+                    'charset' => self::getDatabaseMysqlCharset($config),
+                    'collation' => self::getDatabaseMysqlCollation($config),
+                    'engine' => 'InnoDB',
+                ],
             ],
             default => throw new RuntimeException('Not supported database mode: ' . $databaseMode)
         };
@@ -152,6 +176,53 @@ class Factory
         }
 
         return $connection;
+    }
+
+    public static function createDoctrineMigrationDependencyFactory(
+        ContainerInterface $container,
+    ) : DependencyFactory {
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ConfigurationArray([
+                'migrations_paths' => [
+                    'Movary\\DatabaseMigration' => self::createDirectoryAppRoot() . 'db/migrations/doctrine',
+                ],
+                'table_storage' => [
+                    'table_name' => 'doctrine_migration_versions',
+                ],
+                'all_or_nothing' => false,
+                'transactional' => false,
+                'check_database_platform' => true,
+            ]),
+            new ExistingConnection($container->get(DBAL\Connection::class)),
+            $container->get(LoggerInterface::class),
+        );
+        return $dependencyFactory;
+    }
+
+    public static function createMigrationStateDetector(
+        ContainerInterface $container,
+        Config $config,
+    ) : Service\DatabaseMigration\MigrationStateDetector {
+        $migrationFiles = glob(
+            self::createDirectoryAppRoot() . 'db/migrations/' . self::getDatabaseMode($config) . '/*.php',
+        );
+        if ($migrationFiles === false || $migrationFiles === []) {
+            throw new RuntimeException('Could not find the legacy database migration history.');
+        }
+
+        $versions = [];
+        foreach ($migrationFiles as $migrationFile) {
+            if (preg_match('/^(\d{14})_/', basename($migrationFile), $matches) !== 1) {
+                throw new RuntimeException('Invalid legacy database migration filename: ' . $migrationFile);
+            }
+            $versions[] = (int)$matches[1];
+        }
+        sort($versions);
+
+        return new Service\DatabaseMigration\MigrationStateDetector(
+            $container->get(DBAL\Connection::class),
+            $versions,
+        );
     }
 
     public static function createExportService(ContainerInterface $container) : ExportService
@@ -443,6 +514,11 @@ class Factory
         $streamHandler->setFormatter($container->get(LineFormatter::class));
 
         return $streamHandler;
+    }
+
+    private static function getDatabaseMysqlCollation(Config $config) : string
+    {
+        return $config->getAsString('DATABASE_MYSQL_COLLATION', self::DEFAULT_DATABASE_MYSQL_COLLATION);
     }
 
     private static function getLogLevel(Config $config) : string

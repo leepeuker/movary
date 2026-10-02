@@ -15,5 +15,6 @@ jobs:
 
       - name: Run all test tools/suites
         run: docker run --rm movary composer test
+
       - name: Verify migration cutover
         run: bash tests/migration/verify-cutover.sh movary
