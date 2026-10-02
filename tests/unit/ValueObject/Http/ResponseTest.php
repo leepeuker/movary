@@ -69,16 +69,14 @@ class ResponseTest extends TestCase
 
     public function testCreateZipDownload() : void
     {
-        $subject = Response::createZipDownload('/tmp/export.zip', 'export.zip');
+        $subject = Response::createZipDownload('zip content', 'export.zip');
 
-        self::assertSame('/tmp/export.zip', $subject->getFilePath());
-        self::assertTrue($subject->shouldDeleteFileAfterSend());
         self::assertEquals(
             [Header::createContentTypeZip(), Header::createAttachment('export.zip')],
             $subject->getHeaders(),
         );
         self::assertSame(StatusCode::createOk()->getCode(), $subject->getStatusCode()->getCode());
-        self::assertNull($subject->getBody());
+        self::assertSame('zip content', $subject->getBody());
     }
 
     public function testCreateNotFound() : void
@@ -112,7 +110,5 @@ class ResponseTest extends TestCase
         self::assertSame($subject->getBody(), 'foobar');
         self::assertEquals($subject->getStatusCode(), StatusCode::createOk());
         self::assertEquals($subject->getHeaders(), [Header::createContentTypeJson()]);
-        self::assertNull($subject->getFilePath());
-        self::assertFalse($subject->shouldDeleteFileAfterSend());
     }
 }

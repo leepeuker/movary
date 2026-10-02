@@ -15,7 +15,7 @@ use ZipArchive;
 #[CoversClass(LetterboxdExporter::class)]
 class LetterboxdExporterTest extends TestCase
 {
-    public function testGenerateZipFileCreatesSplitCsvFilesAndRemovesTemporaryCsvFiles() : void
+    public function testGenerateZipCreatesSplitCsvFilesAndRemovesTemporaryFiles() : void
     {
         $rows = [];
         for ($index = 0; $index < 1001; $index++) {
@@ -40,10 +40,12 @@ class LetterboxdExporterTest extends TestCase
         $subject = $this->createExporter($rows, $fileUtil);
 
         try {
-            self::assertSame($zipFilePath, $subject->generateZipFile(42));
+            $zipContent = $subject->generateZip(42);
+            self::assertFileDoesNotExist($zipFilePath);
             self::assertFileDoesNotExist($firstCsvFilePath);
             self::assertFileDoesNotExist($secondCsvFilePath);
 
+            file_put_contents($zipFilePath, $zipContent);
             $zip = new ZipArchive();
             self::assertTrue($zip->open($zipFilePath));
             self::assertSame(2, $zip->numFiles);
@@ -64,12 +66,14 @@ class LetterboxdExporterTest extends TestCase
         }
     }
 
-    public function testGenerateZipFileCreatesHeaderForEmptyHistory() : void
+    public function testGenerateZipCreatesHeaderForEmptyHistory() : void
     {
         $subject = $this->createExporter([]);
-        $zipFilePath = $subject->generateZipFile(42);
+        $zipContent = $subject->generateZip(42);
+        $zipFilePath = $this->createTemporaryFile();
 
         try {
+            file_put_contents($zipFilePath, $zipContent);
             $zip = new ZipArchive();
             self::assertTrue($zip->open($zipFilePath));
             self::assertSame(1, $zip->numFiles);
@@ -85,7 +89,7 @@ class LetterboxdExporterTest extends TestCase
         }
     }
 
-    public function testGenerateZipFileRemovesTemporaryFilesWhenCsvGenerationFails() : void
+    public function testGenerateZipRemovesTemporaryFilesWhenCsvGenerationFails() : void
     {
         $zipFilePath = $this->createTemporaryFile();
         $csvFilePath = $this->createTemporaryFile();
@@ -103,7 +107,7 @@ class LetterboxdExporterTest extends TestCase
         $subject = new LetterboxdExporter($connection, $fileUtil);
 
         try {
-            $subject->generateZipFile(42);
+            $subject->generateZip(42);
             self::fail('Expected export generation to fail.');
         } catch (RuntimeException $error) {
             self::assertSame('Database read failed.', $error->getMessage());

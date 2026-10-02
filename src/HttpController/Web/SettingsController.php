@@ -109,7 +109,7 @@ class SettingsController
         $userId = $this->authenticationService->getCurrentUserId();
 
         return Response::createZipDownload(
-            $this->letterboxdExporter->generateZipFile($userId),
+            $this->letterboxdExporter->generateZip($userId),
             'export-for-letterboxd.zip',
         );
     }

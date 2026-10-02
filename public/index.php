@@ -3,24 +3,12 @@
 /** @var DI\Container $container */
 
 use Movary\HttpController\Web\ErrorController;
-use Movary\Service\Router\ResponseBodyEmitter;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Psr\Log\LoggerInterface;
 
 $container = require(__DIR__ . '/../bootstrap.php');
 $httpRequest = $container->get(Request::class);
-$emitResponse = static function (Response $response) use ($container) : void {
-    $container->get(ResponseBodyEmitter::class)->emit(
-        $response,
-        static function () use ($response) : void {
-            header((string)$response->getStatusCode());
-            foreach ($response->getHeaders() as $header) {
-                header((string)$header);
-            }
-        },
-    );
-};
 
 try {
     $dispatcher = FastRoute\simpleDispatcher(
@@ -68,14 +56,19 @@ try {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
 
-    $emitResponse($response);
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
-    if (headers_sent() === false && str_starts_with($uri, '/api') === false) {
+    if (str_starts_with($uri, '/api') === false) {
         $response = $container->get(ErrorController::class)->renderInternalServerError();
-        $emitResponse($response);
     }
 }
+
+header((string)$response->getStatusCode());
+foreach ($response->getHeaders() as $header) {
+    header((string)$header);
+}
+
+echo $response->getBody();
 
 exit(0);

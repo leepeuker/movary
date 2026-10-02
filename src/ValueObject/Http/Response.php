@@ -11,8 +11,6 @@ class Response
         private readonly StatusCode $statusCode,
         private readonly ?string $body = null,
         private readonly ?array $headers = [],
-        private readonly ?string $filePath = null,
-        private readonly bool $deleteFileAfterSend = false,
     ) {
     }
 
@@ -50,16 +48,15 @@ class Response
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
 
-    public static function createZipDownload(string $filePath, string $downloadName) : self
+    public static function createZipDownload(string $body, string $downloadName) : self
     {
         return new self(
             StatusCode::createOk(),
+            body: $body,
             headers: [
                 Header::createContentTypeZip(),
                 Header::createAttachment($downloadName),
             ],
-            filePath: $filePath,
-            deleteFileAfterSend: true,
         );
     }
 
@@ -123,16 +120,6 @@ class Response
     public function getHeaders() : array
     {
         return (array)$this->headers;
-    }
-
-    public function getFilePath() : ?string
-    {
-        return $this->filePath;
-    }
-
-    public function shouldDeleteFileAfterSend() : bool
-    {
-        return $this->deleteFileAfterSend;
     }
 
     public function getStatusCode() : StatusCode

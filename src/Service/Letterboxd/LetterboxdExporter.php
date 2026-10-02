@@ -17,13 +17,15 @@ class LetterboxdExporter
 
     private const int LIMIT_CSV_FILE_RECORDS = 1000;
 
+    private const int MAX_ZIP_FILE_SIZE_IN_BYTES = 32 * 1024 * 1024;
+
     public function __construct(
         private readonly Connection $dbConnection,
         private readonly File $fileUtil,
     ) {
     }
 
-    public function generateZipFile(int $userId) : string
+    public function generateZip(int $userId) : string
     {
         $zipFilePath = $this->fileUtil->createTmpFile();
         $csvFilePaths = [];
@@ -50,25 +52,25 @@ class LetterboxdExporter
             if ($closeResult === false) {
                 throw new RuntimeException('Could not finish Letterboxd export ZIP.');
             }
+
+            return $this->readZipContent($zipFilePath);
         } catch (Throwable $error) {
             if ($zipIsOpen === true) {
                 $zip->close();
             }
 
+            throw $error;
+        } finally {
             if (is_file($zipFilePath) === true) {
                 unlink($zipFilePath);
             }
 
-            throw $error;
-        } finally {
             foreach ($csvFilePaths as $csvFilePath) {
                 if (is_file($csvFilePath) === true) {
                     unlink($csvFilePath);
                 }
             }
         }
-
-        return $zipFilePath;
     }
 
     public function generateCsvFiles(int $userId) : Traversable
@@ -128,5 +130,23 @@ class LetterboxdExporter
         $csv->setDelimiter(',');
 
         return $csv;
+    }
+
+    private function readZipContent(string $zipFilePath) : string
+    {
+        $zipFileSize = filesize($zipFilePath);
+        if ($zipFileSize === false) {
+            throw new RuntimeException('Could not determine Letterboxd export ZIP size.');
+        }
+        if ($zipFileSize > self::MAX_ZIP_FILE_SIZE_IN_BYTES) {
+            throw new RuntimeException('Letterboxd export ZIP exceeds the maximum size of 32 MB.');
+        }
+
+        $zipContent = file_get_contents($zipFilePath);
+        if ($zipContent === false) {
+            throw new RuntimeException('Could not read Letterboxd export ZIP.');
+        }
+
+        return $zipContent;
     }
 }
