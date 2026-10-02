@@ -10,6 +10,17 @@ use Psr\Log\LoggerInterface;
 
 $container = require(__DIR__ . '/../bootstrap.php');
 $httpRequest = $container->get(Request::class);
+$emitResponse = static function (Response $response) use ($container) : void {
+    $container->get(ResponseBodyEmitter::class)->emit(
+        $response,
+        static function () use ($response) : void {
+            header((string)$response->getStatusCode());
+            foreach ($response->getHeaders() as $header) {
+                header((string)$header);
+            }
+        },
+    );
+};
 
 try {
     $dispatcher = FastRoute\simpleDispatcher(
@@ -56,19 +67,15 @@ try {
     if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
+
+    $emitResponse($response);
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
-    if (str_starts_with($uri, '/api') === false) {
+    if (headers_sent() === false && str_starts_with($uri, '/api') === false) {
         $response = $container->get(ErrorController::class)->renderInternalServerError();
+        $emitResponse($response);
     }
 }
-
-header((string)$response->getStatusCode());
-foreach ($response->getHeaders() as $header) {
-    header((string)$header);
-}
-
-$container->get(ResponseBodyEmitter::class)->emit($response);
 
 exit(0);

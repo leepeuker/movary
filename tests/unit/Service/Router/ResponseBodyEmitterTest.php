@@ -14,11 +14,18 @@ class ResponseBodyEmitterTest extends TestCase
     public function testEmitsStringBody() : void
     {
         $subject = new ResponseBodyEmitter();
+        $beforeBodyCalled = false;
 
         ob_start();
-        $subject->emit(Response::createCsv('content'));
+        $subject->emit(
+            Response::createCsv('content'),
+            static function () use (&$beforeBodyCalled) : void {
+                $beforeBodyCalled = true;
+            },
+        );
         $output = ob_get_clean();
 
+        self::assertTrue($beforeBodyCalled);
         self::assertSame('content', $output);
     }
 
@@ -26,11 +33,18 @@ class ResponseBodyEmitterTest extends TestCase
     {
         $filePath = $this->createTemporaryFile('zip content');
         $subject = new ResponseBodyEmitter();
+        $beforeBodyCalled = false;
 
         ob_start();
-        $subject->emit(Response::createZipDownload($filePath, 'export.zip'));
+        $subject->emit(
+            Response::createZipDownload($filePath, 'export.zip'),
+            static function () use (&$beforeBodyCalled) : void {
+                $beforeBodyCalled = true;
+            },
+        );
         $output = ob_get_clean();
 
+        self::assertTrue($beforeBodyCalled);
         self::assertSame('zip content', $output);
         self::assertFileDoesNotExist($filePath);
     }
@@ -39,11 +53,21 @@ class ResponseBodyEmitterTest extends TestCase
     {
         $subject = new ResponseBodyEmitter();
         $filePath = sys_get_temp_dir() . '/movary-missing-response-file-' . bin2hex(random_bytes(8));
+        $beforeBodyCalled = false;
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not read response file: ' . $filePath);
+        try {
+            $subject->emit(
+                Response::createZipDownload($filePath, 'export.zip'),
+                static function () use (&$beforeBodyCalled) : void {
+                    $beforeBodyCalled = true;
+                },
+            );
+            self::fail('Expected response emission to fail.');
+        } catch (RuntimeException $error) {
+            self::assertSame('Could not read response file: ' . $filePath, $error->getMessage());
+        }
 
-        $subject->emit(Response::createZipDownload($filePath, 'export.zip'));
+        self::assertFalse($beforeBodyCalled);
     }
 
     private function createTemporaryFile(string $content) : string

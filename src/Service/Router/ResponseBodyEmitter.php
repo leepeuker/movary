@@ -2,15 +2,17 @@
 
 namespace Movary\Service\Router;
 
+use Closure;
 use Movary\ValueObject\Http\Response;
 use RuntimeException;
 
 class ResponseBodyEmitter
 {
-    public function emit(Response $response) : void
+    public function emit(Response $response, ?Closure $beforeBody = null) : void
     {
         $filePath = $response->getFilePath();
         if ($filePath === null) {
+            $beforeBody?->__invoke();
             echo $response->getBody();
 
             return;
@@ -28,6 +30,7 @@ class ResponseBodyEmitter
                 throw new RuntimeException('Could not open response file: ' . $filePath);
             }
 
+            $beforeBody?->__invoke();
             fpassthru($fileHandle);
         } finally {
             if (is_resource($fileHandle)) {

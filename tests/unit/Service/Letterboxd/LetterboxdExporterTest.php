@@ -54,7 +54,7 @@ class LetterboxdExporterTest extends TestCase
             self::assertIsString($secondCsv);
             self::assertStringStartsWith('WatchedDate,Title,Year,tmdbID,Rating10', $firstCsv);
             self::assertStringContainsString('Movie 999', $firstCsv);
-            self::assertStringStartsWith('2026-01-01,"Movie 1000",,1001,', $secondCsv);
+            self::assertStringStartsWith('WatchedDate,Title,Year,tmdbID,Rating10', $secondCsv);
             self::assertStringContainsString('Movie 1000', $secondCsv);
             $zip->close();
         } finally {

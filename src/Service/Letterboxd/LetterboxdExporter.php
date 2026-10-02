@@ -13,6 +13,8 @@ use ZipArchive;
 
 class LetterboxdExporter
 {
+    private const array CSV_HEADER = ['WatchedDate', 'Title', 'Year', 'tmdbID', 'Rating10'];
+
     private const int LIMIT_CSV_FILE_RECORDS = 1000;
 
     public function __construct(
@@ -86,7 +88,7 @@ class LetterboxdExporter
             $csv = $this->createCsvWriter($csvFilePath);
 
             // csv format documentation here https://letterboxd.com/about/importing-data/
-            $csv->insertOne(['WatchedDate', 'Title', 'Year', 'tmdbID', 'Rating10']);
+            $csv->insertOne(self::CSV_HEADER);
 
             $csvLineCounter = 0;
             foreach ($stmt->iterateAssociative() as $row) {
@@ -95,6 +97,7 @@ class LetterboxdExporter
 
                     $csvFilePath = $this->fileUtil->createTmpFile();
                     $csv = $this->createCsvWriter($csvFilePath);
+                    $csv->insertOne(self::CSV_HEADER);
 
                     $csvLineCounter = 0;
                 }
