@@ -37,7 +37,6 @@ use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 use Twig\Environment;
-use ZipStream;
 
 class SettingsController
 {
@@ -109,20 +108,10 @@ class SettingsController
     {
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $zip = new ZipStream\ZipStream(
-            outputName: 'export-for-letterboxd.zip',
-            sendHttpHeaders: true,
+        return Response::createZipDownload(
+            $this->letterboxdExporter->generateZipFile($userId),
+            'export-for-letterboxd.zip',
         );
-
-        foreach ($this->letterboxdExporter->generateCsvFiles($userId) as $index => $csvFile) {
-            $zip->addFileFromPath('export-' . $index . '.csv', $csvFile);
-
-            unlink($csvFile);
-        }
-
-        $zip->finish();
-
-        return Response::createOk();
     }
 
     public function getApiToken() : Response

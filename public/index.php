@@ -3,6 +3,7 @@
 /** @var DI\Container $container */
 
 use Movary\HttpController\Web\ErrorController;
+use Movary\Service\Router\ResponseBodyEmitter;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Psr\Log\LoggerInterface;
@@ -68,6 +69,6 @@ foreach ($response->getHeaders() as $header) {
     header((string)$header);
 }
 
-echo $response->getBody();
+$container->get(ResponseBodyEmitter::class)->emit($response);
 
 exit(0);

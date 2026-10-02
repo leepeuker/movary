@@ -11,6 +11,8 @@ class Response
         private readonly StatusCode $statusCode,
         private readonly ?string $body = null,
         private readonly ?array $headers = [],
+        private readonly ?string $filePath = null,
+        private readonly bool $deleteFileAfterSend = false,
     ) {
     }
 
@@ -46,6 +48,19 @@ class Response
     public static function createJson(string $body, ?StatusCode $statusCode = null) : self
     {
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
+    }
+
+    public static function createZipDownload(string $filePath, string $downloadName) : self
+    {
+        return new self(
+            StatusCode::createOk(),
+            headers: [
+                Header::createContentTypeZip(),
+                Header::createAttachment($downloadName),
+            ],
+            filePath: $filePath,
+            deleteFileAfterSend: true,
+        );
     }
 
     public static function createSVG(string $body, ?StatusCode $statusCode = null, int $cacheDurationInSeconds = 0) : self
@@ -108,6 +123,16 @@ class Response
     public function getHeaders() : array
     {
         return (array)$this->headers;
+    }
+
+    public function getFilePath() : ?string
+    {
+        return $this->filePath;
+    }
+
+    public function shouldDeleteFileAfterSend() : bool
+    {
+        return $this->deleteFileAfterSend;
     }
 
     public function getStatusCode() : StatusCode
