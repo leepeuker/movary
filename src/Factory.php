@@ -145,16 +145,15 @@ class Factory
     public static function createDbConnection(Config $config) : DBAL\Connection
     {
         $databaseMode = self::getDatabaseMode($config);
+        $databaseMysqlSocket = self::getDatabaseMysqlSocket($config);
 
-        $config = match ($databaseMode) {
+        $connectionConfig = match ($databaseMode) {
             'sqlite' => [
                 'driver' => 'sqlite3',
                 'path' => self::createDirectoryAppRoot() . $config->getAsString('DATABASE_SQLITE', self::DEFAULT_DATABASE_SQLITE),
             ],
             'mysql' => [
                 'driver' => 'pdo_mysql',
-                'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
-                'port' => self::getDatabaseMysqlPort($config),
                 'dbname' => $config->getAsString('DATABASE_MYSQL_NAME'),
                 'user' => $config->getAsString('DATABASE_MYSQL_USER'),
                 'password' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
@@ -168,7 +167,16 @@ class Factory
             default => throw new RuntimeException('Not supported database mode: ' . $databaseMode)
         };
 
-        $connection = DBAL\DriverManager::getConnection($config);
+        if ($databaseMode === 'mysql') {
+            if ($databaseMysqlSocket === null) {
+                $connectionConfig['host'] = $config->getAsString('DATABASE_MYSQL_HOST');
+                $connectionConfig['port'] = self::getDatabaseMysqlPort($config);
+            } else {
+                $connectionConfig['unix_socket'] = $databaseMysqlSocket;
+            }
+        }
+
+        $connection = DBAL\DriverManager::getConnection($connectionConfig);
 
         if ($databaseMode === 'sqlite') {
             $connection->executeQuery('PRAGMA busy_timeout = 3000');
@@ -465,6 +473,13 @@ class Factory
     public static function getDatabaseMysqlPort(Config $config) : int
     {
         return $config->getAsInt('DATABASE_MYSQL_PORT', self::DEFAULT_DATABASE_MYSQL_PORT);
+    }
+
+    public static function getDatabaseMysqlSocket(Config $config) : ?string
+    {
+        $socket = $config->getAsStringNullable('DATABASE_MYSQL_SOCKET');
+
+        return $socket === '' ? null : $socket;
     }
 
     public static function getDatabaseSqlite(Config $config) : string
