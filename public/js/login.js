@@ -43,6 +43,15 @@ async function submitCredentials() {
         }
     }
 
+    if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        const message = retryAfter
+            ? 'Too many login attempts. Please try again in ' + retryAfter + ' seconds.'
+            : 'Too many login attempts. Please try again later.';
+        addAlert('loginErrors', message, 'danger', false);
+        return;
+    }
+
     addAlert('loginErrors', 'Unexpected server error', 'danger', false);
 }
 

@@ -1310,6 +1310,9 @@
           },
           "401": {
             "$ref": "#/components/responses/401"
+          },
+          "429": {
+            "description": "Returned when too many login attempts were made. The Retry-After header contains the wait time in seconds."
           }
         }
       },
