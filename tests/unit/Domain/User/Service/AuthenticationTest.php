@@ -6,6 +6,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
+use Movary\Service\ServerSettings;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -28,6 +29,10 @@ class AuthenticationTest extends TestCase
 
     private MockObject|SessionWrapper $sessionWrapperMock;
 
+    private MockObject|ServerSettings $serverSettingsMock;
+
+    private MockObject|Request $requestMock;
+
     protected function setUp() : void
     {
         unset($_COOKIE['id']);
@@ -35,11 +40,15 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
         $this->userApiMock = $this->createMock(UserApi::class);
         $this->sessionWrapperMock = $this->createMock(SessionWrapper::class);
+        $this->serverSettingsMock = $this->createMock(ServerSettings::class);
+        $this->requestMock = $this->createMock(Request::class);
         $this->subject = new Authentication(
             $this->userRepositoryMock,
             $this->userApiMock,
             $this->sessionWrapperMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
+            $this->serverSettingsMock,
+            $this->requestMock,
         );
     }
 
@@ -117,5 +126,33 @@ class AuthenticationTest extends TestCase
         );
 
         self::assertSame(self::TOKEN, $_COOKIE['id']);
+    }
+
+    public function testAuthenticationCookieIsSecureForHttpsRequests() : void
+    {
+        $this->requestMock->expects(self::once())->method('isHttps')->willReturn(true);
+        $this->serverSettingsMock->expects(self::never())->method('getApplicationUrl');
+
+        self::assertTrue($this->subject->isAuthenticationCookieSecure());
+    }
+
+    public function testAuthenticationCookieIsSecureForHttpsApplicationUrl() : void
+    {
+        $this->serverSettingsMock
+            ->expects(self::once())
+            ->method('getApplicationUrl')
+            ->willReturn('https://movary.example.com');
+
+        self::assertTrue($this->subject->isAuthenticationCookieSecure());
+    }
+
+    public function testAuthenticationCookieIsNotSecureForHttpApplicationUrl() : void
+    {
+        $this->serverSettingsMock
+            ->expects(self::once())
+            ->method('getApplicationUrl')
+            ->willReturn('http://movary.example.com');
+
+        self::assertFalse($this->subject->isAuthenticationCookieSecure());
     }
 }

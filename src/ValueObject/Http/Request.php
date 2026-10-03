@@ -18,6 +18,7 @@ class Request
         private readonly string $userAgent,
         private readonly ?string $httpHost,
         private readonly ?string $httpReferer,
+        private readonly bool $isHttps,
     ) {
     }
 
@@ -47,6 +48,7 @@ class Request
             $userAgent,
             $httpHost,
             $httpReferer,
+            self::detectHttps(),
         );
     }
 
@@ -109,6 +111,11 @@ class Request
         return self::getServerSetting('HTTP_USER_AGENT') ?? '';
     }
 
+    private static function detectHttps() : bool
+    {
+        return in_array(self::getServerSetting('HTTPS'), ['on', '1'], true);
+    }
+
     private static function getServerSetting(string $key) : ?string
     {
         return empty($_SERVER[$key]) === false ? (string)$_SERVER[$key] : null;
@@ -147,6 +154,11 @@ class Request
     public function getHttpReferer() : ?string
     {
         return $this->httpReferer;
+    }
+
+    public function isHttps() : bool
+    {
+        return $this->isHttps;
     }
 
     public function getPath() : string

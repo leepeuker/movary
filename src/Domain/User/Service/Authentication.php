@@ -10,6 +10,7 @@ use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\HttpController\Web\CreateUserController;
+use Movary\Service\ServerSettings;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -29,6 +30,8 @@ class Authentication
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
+        private readonly ServerSettings $serverSettings,
+        private readonly Request $request,
     ) {
     }
 
@@ -219,6 +222,7 @@ class Authentication
                 'path' => '/',
                 'httponly' => true,
                 'samesite' => 'Lax',
+                'secure' => $this->isAuthenticationCookieSecure(),
             ],
         );
     }
@@ -234,8 +238,18 @@ class Authentication
                 'path' => '/',
                 'httponly' => true,
                 'samesite' => 'Lax',
+                'secure' => $this->isAuthenticationCookieSecure(),
             ],
         );
+    }
+
+    public function isAuthenticationCookieSecure() : bool
+    {
+        if ($this->request->isHttps() === true) {
+            return true;
+        }
+
+        return str_starts_with(strtolower($this->serverSettings->getApplicationUrl() ?? ''), 'https://');
     }
 
     private function findUserIdByValidAuthToken(string $token) : ?int

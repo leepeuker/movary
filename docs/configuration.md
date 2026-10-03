@@ -28,6 +28,8 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `DEFAULT_LOGIN_PASSWORD`                    |       -       | Password to always autofill on login page                               |        |
 | `TOTP_ISSUER`                               |   `Movary`    | The issuer used when setting up two factor authentication               |        |
 
+When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication cookies as secure.
+
 ### Database
 
 Required to run the application
