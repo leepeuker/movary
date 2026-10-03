@@ -16,14 +16,20 @@ if ($databaseMode === 'sqlite') {
 } elseif (\Movary\Factory::getDatabaseMode($config) === 'mysql') {
     $databaseConfig = [
         'adapter' => 'mysql',
-        'host' => $config->getAsString('DATABASE_MYSQL_HOST'),
-        'port' => \Movary\Factory::getDatabaseMysqlPort($config),
         'name' => $config->getAsString('DATABASE_MYSQL_NAME'),
         'user' => $config->getAsString('DATABASE_MYSQL_USER'),
         'pass' => $config->getAsString('DATABASE_MYSQL_PASSWORD'),
         'charset' => \Movary\Factory::getDatabaseMysqlCharset($config),
         'collation' => 'utf8_unicode_ci',
     ];
+
+    $databaseMysqlSocket = \Movary\Factory::getDatabaseMysqlSocket($config);
+    if ($databaseMysqlSocket === null) {
+        $databaseConfig['host'] = $config->getAsString('DATABASE_MYSQL_HOST');
+        $databaseConfig['port'] = \Movary\Factory::getDatabaseMysqlPort($config);
+    } else {
+        $databaseConfig['unix_socket'] = $databaseMysqlSocket;
+    }
 } else {
     throw new \RuntimeException('Not supported database mode: ' . $databaseMode);
 }

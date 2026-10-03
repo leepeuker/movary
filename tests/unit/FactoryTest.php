@@ -12,6 +12,51 @@ use PHPUnit\Framework\TestCase;
 class FactoryTest extends TestCase
 {
     /** @psalm-suppress InternalMethod */
+    public function testConfiguresMysqlTcpConnectionByDefault() : void
+    {
+        $config = new Config($this->createStub(File::class), [
+            'DATABASE_MODE' => 'mysql',
+            'DATABASE_MYSQL_HOST' => 'database',
+            'DATABASE_MYSQL_PORT' => 3307,
+            'DATABASE_MYSQL_NAME' => 'movary',
+            'DATABASE_MYSQL_USER' => 'movary',
+            'DATABASE_MYSQL_PASSWORD' => 'secret',
+        ]);
+
+        $connection = Factory::createDbConnection($config);
+
+        try {
+            self::assertSame('database', $connection->getParams()['host']);
+            self::assertSame(3307, $connection->getParams()['port']);
+            self::assertArrayNotHasKey('unix_socket', $connection->getParams());
+        } finally {
+            $connection->close();
+        }
+    }
+
+    /** @psalm-suppress InternalMethod */
+    public function testConfiguresMysqlUnixSocketConnection() : void
+    {
+        $config = new Config($this->createStub(File::class), [
+            'DATABASE_MODE' => 'mysql',
+            'DATABASE_MYSQL_SOCKET' => '/run/mysqld/mysqld.sock',
+            'DATABASE_MYSQL_NAME' => 'movary',
+            'DATABASE_MYSQL_USER' => 'movary',
+            'DATABASE_MYSQL_PASSWORD' => 'secret',
+        ]);
+
+        $connection = Factory::createDbConnection($config);
+
+        try {
+            self::assertSame('/run/mysqld/mysqld.sock', $connection->getParams()['unix_socket']);
+            self::assertArrayNotHasKey('host', $connection->getParams());
+            self::assertArrayNotHasKey('port', $connection->getParams());
+        } finally {
+            $connection->close();
+        }
+    }
+
+    /** @psalm-suppress InternalMethod */
     public function testConfiguresCanonicalMysqlTableDefaults() : void
     {
         $config = new Config($this->createStub(File::class), [
