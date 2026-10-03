@@ -64,7 +64,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('findAuthTokenData')
-            ->with(self::TOKEN)
+            ->with(hash('sha256', self::TOKEN))
             ->willReturn([
                 'userId' => 12,
                 'expirationDate' => DateTime::createFromString('+1 hour'),
@@ -102,7 +102,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('findAuthTokenData')
-            ->with(self::TOKEN)
+            ->with(hash('sha256', self::TOKEN))
             ->willReturn([
                 'userId' => 12,
                 'expirationDate' => DateTime::createFromString('-1 hour'),
@@ -110,7 +110,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('deleteAuthToken')
-            ->with(self::TOKEN);
+            ->with(hash('sha256', self::TOKEN));
 
         self::assertNull($this->subject->getUserIdByToken($request));
     }
@@ -126,6 +126,36 @@ class AuthenticationTest extends TestCase
         );
 
         self::assertSame(self::TOKEN, $_COOKIE['id']);
+    }
+
+    public function testLoginStoresHashedAuthenticationToken() : void
+    {
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $storedToken = null;
+        $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->with(12, 'password')->willReturn(true);
+        $this->userApiMock->method('findTotpUri')->with(12)->willReturn(null);
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('createAuthToken')
+            ->willReturnCallback(static function (
+                int $userId,
+                string $tokenHash,
+                string $deviceName,
+                string $userAgent,
+                DateTime $expirationDate,
+            ) use (&$storedToken) : void {
+                self::assertSame(12, $userId);
+                self::assertSame('api-client', $deviceName);
+                self::assertSame('agent', $userAgent);
+                self::assertInstanceOf(DateTime::class, $expirationDate);
+                $storedToken = $tokenHash;
+            });
+
+        $result = $this->subject->login('user@example.com', 'password', false, 'api-client', 'agent');
+
+        self::assertSame(hash('sha256', $result['token']), $storedToken);
     }
 
     public function testAuthenticationCookieIsSecureForHttpsRequests() : void

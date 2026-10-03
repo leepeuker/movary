@@ -48,7 +48,7 @@ class Authentication
 
     public function deleteToken(string $token) : void
     {
-        $this->repository->deleteAuthToken($token);
+        $this->repository->deleteAuthToken($this->hashToken($token));
     }
 
     public function findUserAndVerifyAuthentication(
@@ -258,13 +258,14 @@ class Authentication
             return $this->validatedAuthTokenUserIds[$token];
         }
 
-        $tokenData = $this->repository->findAuthTokenData($token);
+        $tokenHash = $this->hashToken($token);
+        $tokenData = $this->repository->findAuthTokenData($tokenHash);
         if ($tokenData === null) {
             return null;
         }
 
         if ($tokenData['expirationDate']->isAfter(DateTime::create()) === false) {
-            $this->repository->deleteAuthToken($token);
+            $this->repository->deleteAuthToken($tokenHash);
 
             return null;
         }
@@ -310,8 +311,13 @@ class Authentication
     {
         $token = bin2hex(random_bytes(16));
 
-        $this->repository->createAuthToken($userId, $token, $deviceName, $userAgent, $expirationDate);
+        $this->repository->createAuthToken($userId, $this->hashToken($token), $deviceName, $userAgent, $expirationDate);
 
         return $token;
+    }
+
+    private function hashToken(string $token) : string
+    {
+        return hash('sha256', $token);
     }
 }
