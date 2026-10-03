@@ -478,7 +478,7 @@ class UserApi
 
         $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
 
-        $this->repository->updatePassword($userId, $passwordHash);
+        $this->repository->updatePasswordAndRevokeAuthTokens($userId, $passwordHash);
     }
 
     public function updatePlexAccessToken(int $userId, ?string $plexAccessToken) : void

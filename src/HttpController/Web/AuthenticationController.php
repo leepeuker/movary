@@ -27,6 +27,7 @@ class AuthenticationController
             'page/login.html.twig',
             [
                 'redirect' => $redirect,
+                'passwordChangeSuccessful' => $request->getGetParameters()['password-change'] ?? null,
                 'passwordResetSuccessful' => $request->getGetParameters()['password-reset'] ?? null,
                 'passwordResetAvailable' => $this->emailSupport->isPasswordResetAvailable(),
                 'registrationEnabled' => $this->registrationEnabled,

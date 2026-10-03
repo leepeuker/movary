@@ -32,11 +32,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
 
     switch (response.status) {
         case 200:
-            addAlert('alertChangePasswordDiv', 'Password was updated', 'success')
-            currentPassword.value = ''
-            newPassword.value = ''
-            newPasswordRepeat.value = ''
-
+            window.location.assign(APPLICATION_URL + '/login?password-change=success')
             return
         case 400:
             const errorMessage = await response.text();

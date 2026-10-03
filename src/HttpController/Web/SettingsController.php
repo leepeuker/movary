@@ -750,6 +750,7 @@ class SettingsController
         }
 
         $this->userApi->updatePassword($userId, $newPassword);
+        $this->authenticationService->logout();
 
         return Response::create(StatusCode::createOk());
     }
