@@ -38,7 +38,7 @@ class PlayedController
                     $userId,
                     $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
                     $watchDate['plays'] ?? 1,
-                    $watchDate['comment'] ?? null,
+                    comment: $watchDate['comment'] ?? null,
                 );
             }
         }
@@ -138,7 +138,7 @@ class PlayedController
                     $userId,
                     $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
                     $watchDate['plays'],
-                    $watchDate['comment'],
+                    comment: $watchDate['comment'],
                 );
             }
         }

@@ -61,17 +61,27 @@ class HistoryController
             $postToMastodon = (bool)$requestBody['postToMastodon'];
         }
 
-        $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
-        $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
-
         if ($originalWatchDate == $newWatchDate) {
+            $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
+            $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
             $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position, postToMastodon: $postToMastodon);
 
             return Response::create(StatusCode::createNoContent());
         }
 
-        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position, postToMastodon: $postToMastodon);
+        $this->movieApi->addPlaysForMovieOnDate(
+            $movieId,
+            $userId,
+            $newWatchDate,
+            $plays,
+            $position,
+            comment: $comment,
+            locationId: $locationId,
+            postToMastodon: $postToMastodon,
+        );
         $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
+        $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
+        $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
 
         return Response::create(StatusCode::createNoContent());
     }
