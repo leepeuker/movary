@@ -82,6 +82,17 @@ query_sqlite() {
         "$database_file" "$query"
 }
 
+query_sqlite_with_foreign_keys() {
+    local database_file=$1
+    local query=$2
+
+    docker run --rm --entrypoint php \
+        --volume "$audit_directory:/audit" \
+        "$image_name" \
+        -r '$database = new SQLite3("/audit/" . $argv[1]); $database->exec("PRAGMA foreign_keys = ON"); $result = $database->querySingle($argv[2]); if ($result === false) { exit(1); } echo $result;' \
+        "$database_file" "$query"
+}
+
 assert_equal() {
     local expected=$1
     local actual=$2
@@ -121,7 +132,7 @@ query_sqlite release-0.73.1.sqlite \
     "INSERT INTO server_setting (key, value) VALUES ('release-setting', 'preserved')"
 
 run_sqlite_app_command release-0.73.1.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
     "$(query_sqlite release-0.73.1.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite \
@@ -136,6 +147,13 @@ assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
 assert_equal preserved "$(query_sqlite release-0.73.1.sqlite \
     "SELECT value FROM server_setting WHERE key = 'release-setting'")" \
     'SQLite 0.73.1 fixture did not preserve server settings'
+query_sqlite_with_foreign_keys release-0.73.1.sqlite 'DELETE FROM location WHERE id = 1'
+assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
+    "SELECT COUNT(*) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1 AND comment = 'release-watch'")" \
+    'SQLite deleted watch history together with its location'
+assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
+    'SELECT location_id IS NULL FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1')" \
+    'SQLite did not clear the deleted location from watch history'
 
 query_sqlite null-genre.sqlite \
     "INSERT INTO genre (id, name, tmdb_id, created_at) VALUES (1, 'a', NULL, '2026-01-01'), (2, 'b', NULL, '2026-01-01')"
@@ -225,24 +243,29 @@ assert_equal 0 "$(query_sqlite missing-history.sqlite "SELECT COUNT(*) FROM sqli
     'SQLite initialized Doctrine metadata for an incomplete legacy history'
 
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite legacy database did not record the latest Doctrine migration'
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 run_sqlite_app_command null-genre.sqlite database:migration:status >/dev/null
+run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null
+assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+    "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'SQLite did not roll back the location foreign-key migration'
 if run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null 2>&1; then
-    echo 'SQLite rolled back the irreversible Doctrine baseline' >&2
+    echo 'SQLite rolled back the irreversible authentication-token migration' >&2
     exit 1
 fi
 assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'SQLite removed the latest Doctrine migration after rejected rollback'
+    'SQLite removed the authentication-token migration after rejected rollback'
+run_sqlite_app_command null-genre.sqlite database:migration:migrate
 
 run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
 assert_equal 27 "$(query_sqlite doctrine-fresh.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
     'Fresh SQLite Doctrine database has an unexpected table count'
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
     "$(query_sqlite doctrine-fresh.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'Fresh SQLite database did not execute the latest Doctrine migration'
 
@@ -296,7 +319,7 @@ mysql_query movary_release "INSERT INTO user_auth_token (id, user_id, token, dev
 mysql_query movary_release "INSERT INTO server_setting (\`key\`, value) VALUES ('release-setting', 'preserved')"
 
 run_mysql_app_command movary_release database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
     "$(mysql_query movary_release 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
@@ -311,6 +334,13 @@ assert_equal 1 "$(mysql_query movary_release \
 assert_equal preserved "$(mysql_query movary_release \
     "SELECT value FROM server_setting WHERE \`key\` = 'release-setting'")" \
     'MySQL 0.73.1 fixture did not preserve server settings'
+mysql_query movary_release 'DELETE FROM location WHERE id = 1'
+assert_equal 1 "$(mysql_query movary_release \
+    "SELECT COUNT(*) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1 AND comment = 'release-watch'")" \
+    'MySQL deleted watch history together with its location'
+assert_equal 1 "$(mysql_query movary_release \
+    'SELECT location_id IS NULL FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1')" \
+    'MySQL did not clear the deleted location from watch history'
 
 run_mysql_migrations movary
 assert_equal '2026-01-01 00:00:00' "$(mysql_query movary 'SELECT created_at FROM person WHERE tmdb_id = 990')" \
@@ -353,18 +383,23 @@ assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movi
     'MySQL watched cache does not isolate identical Trakt IDs by user'
 
 run_mysql_app_command movary database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL legacy database did not record the latest Doctrine migration'
 run_mysql_app_command movary database:migration:migrate
 run_mysql_app_command movary database:migration:status >/dev/null
+run_mysql_app_command movary database:migration:rollback >/dev/null
+assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+    "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'MySQL did not roll back the location foreign-key migration'
 if run_mysql_app_command movary database:migration:rollback >/dev/null 2>&1; then
-    echo 'MySQL rolled back the irreversible Doctrine baseline' >&2
+    echo 'MySQL rolled back the irreversible authentication-token migration' >&2
     exit 1
 fi
 assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'MySQL removed the latest Doctrine migration after rejected rollback'
+    'MySQL removed the authentication-token migration after rejected rollback'
+run_mysql_app_command movary database:migration:migrate
 
 docker exec "$mysql_container" mysql --user=root --password=movary-root \
     --execute="CREATE DATABASE doctrine_fresh; GRANT ALL PRIVILEGES ON doctrine_fresh.* TO 'movary'@'%';"
