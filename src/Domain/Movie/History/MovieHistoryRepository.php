@@ -68,13 +68,22 @@ class MovieHistoryRepository
 
     public function fetchHighestPositionForWatchDate(int $movieIdToIgnore, int $userId, ?Date $watchedAt) : ?int
     {
+        if ($watchedAt === null) {
+            return $this->dbConnection->fetchFirstColumn(
+                'SELECT MAX(position)
+                FROM movie_user_watch_dates
+                WHERE movie_id != ? AND watched_at IS NULL AND user_id = ?',
+                [$movieIdToIgnore, $userId],
+            )[0];
+        }
+
         return $this->dbConnection->fetchFirstColumn(
             'SELECT MAX(position)
             FROM movie_user_watch_dates
             WHERE movie_id != ? AND watched_at = ? AND user_id = ?',
             [
                 $movieIdToIgnore,
-                $watchedAt === null ? null : (string)$watchedAt,
+                (string)$watchedAt,
                 $userId
             ],
         )[0];
