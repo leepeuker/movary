@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
@@ -26,6 +27,7 @@ class HistoryController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
+        private readonly MovieHistoryEditor $movieHistoryEditor,
         private readonly MovieApi $movieApi,
         private readonly UserApi $userApi,
         private readonly SyncMovie $tmdbMovieSyncService,
@@ -61,17 +63,17 @@ class HistoryController
             $postToMastodon = (bool)$requestBody['postToMastodon'];
         }
 
-        $this->movieApi->updateHistoryComment($movieId, $userId, $newWatchDate, $comment);
-        $this->movieApi->updateHistoryLocation($movieId, $userId, $newWatchDate, $locationId);
-
-        if ($originalWatchDate == $newWatchDate) {
-            $this->movieApi->replaceHistoryForMovieByDate($movieId, $userId, $newWatchDate, $plays, $position, postToMastodon: $postToMastodon);
-
-            return Response::create(StatusCode::createNoContent());
-        }
-
-        $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, $plays, $position, postToMastodon: $postToMastodon);
-        $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $originalWatchDate);
+        $this->movieHistoryEditor->update(
+            $movieId,
+            $userId,
+            $originalWatchDate,
+            $newWatchDate,
+            $plays,
+            $position,
+            $comment,
+            $locationId,
+            $postToMastodon,
+        );
 
         return Response::create(StatusCode::createNoContent());
     }
