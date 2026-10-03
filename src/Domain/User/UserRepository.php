@@ -41,6 +41,57 @@ class UserRepository
         );
     }
 
+    public function createLoginAttempt(string $scope, string $subjectHash, DateTime $createdAt) : void
+    {
+        $this->dbConnection->insert(
+            'user_login_attempt',
+            [
+                'scope' => $scope,
+                'subject_hash' => $subjectHash,
+                'created_at' => (string)$createdAt,
+            ],
+        );
+    }
+
+    public function deleteLoginAttemptsBefore(DateTime $date) : void
+    {
+        $this->dbConnection->executeStatement(
+            'DELETE FROM `user_login_attempt` WHERE `created_at` < ?',
+            [(string)$date],
+        );
+    }
+
+    public function deleteLoginAttemptsForSubject(string $scope, string $subjectHash) : void
+    {
+        $this->dbConnection->delete(
+            'user_login_attempt',
+            [
+                'scope' => $scope,
+                'subject_hash' => $subjectHash,
+            ],
+        );
+    }
+
+    public function findLoginAttemptThresholdDate(
+        string $scope,
+        string $subjectHash,
+        int $attemptLimit,
+        DateTime $windowStart,
+    ) : ?DateTime {
+        $createdAt = $this->dbConnection->fetchOne(
+            'SELECT `created_at` FROM `user_login_attempt` '
+            . 'WHERE `scope` = ? AND `subject_hash` = ? AND `created_at` >= ? '
+            . 'ORDER BY `created_at` DESC LIMIT ' . ($attemptLimit - 1) . ', 1',
+            [$scope, $subjectHash, (string)$windowStart],
+        );
+
+        if ($createdAt === false) {
+            return null;
+        }
+
+        return DateTime::createFromString($createdAt);
+    }
+
     public function replacePasswordResetToken(int $userId, string $tokenHash, DateTime $expirationDate) : void
     {
         $createdAt = DateTime::create();

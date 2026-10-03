@@ -40,6 +40,11 @@ class HeaderTest extends TestCase
         Header::createAttachment("export.zip\r\nX-Injected: true");
     }
 
+    public function testCreateRetryAfter() : void
+    {
+        self::assertSame('Retry-After: 60', (string)Header::createRetryAfter(60));
+    }
+
     public function testCreateLocation() : void
     {
         self::assertSame('Location: foobar', (string)Header::createLocation('foobar'));

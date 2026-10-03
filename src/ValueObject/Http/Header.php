@@ -37,6 +37,11 @@ class Header
         return new self('Location', $value);
     }
 
+    public static function createRetryAfter(int $seconds) : self
+    {
+        return new self('Retry-After', (string)$seconds);
+    }
+
     public static function createAttachment(string $filename) : self
     {
         if (preg_match('/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/D', $filename) !== 1) {

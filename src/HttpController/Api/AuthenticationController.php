@@ -4,6 +4,7 @@ namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
+use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
@@ -11,6 +12,7 @@ use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 
 class AuthenticationController
 {
@@ -57,6 +59,15 @@ class AuthenticationController
                 $requestClient,
                 $request->getUserAgent(),
                 $totpCode,
+            );
+        } catch (LoginAttemptLimitReached $exception) {
+            return Response::create(
+                StatusCode::createTooManyRequests(),
+                Json::encode([
+                    'error' => 'InvalidCredentials',
+                    'message' => 'Invalid credentials'
+                ]),
+                [Header::createContentTypeJson(), Header::createRetryAfter($exception->getRetryAfterSeconds())],
             );
         } catch (MissingTotpCode) {
             return Response::createBadRequest(

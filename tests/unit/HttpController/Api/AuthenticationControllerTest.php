@@ -3,6 +3,7 @@
 namespace Tests\Unit\Movary\HttpController\Api;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Api\AuthenticationController;
@@ -60,5 +61,27 @@ class AuthenticationControllerTest extends TestCase
 
         self::assertEquals(StatusCode::createOk(), $response->getStatusCode());
         self::assertSame('{"user":{"id":12,"name":"example","isAdmin":false}}', $response->getBody());
+    }
+
+    public function testCreateTokenReturnsRetryAfterWhenLoginIsRateLimited() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getBody')->willReturn('{"email":"user@example.com","password":"password"}');
+        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'client']);
+        $request->method('getUserAgent')->willReturn('agent');
+        $this->authenticationMock
+            ->expects(self::once())
+            ->method('login')
+            ->with('user@example.com', 'password', false, 'client', 'agent', null)
+            ->willThrowException(new LoginAttemptLimitReached(60));
+
+        $response = $this->subject->createToken($request);
+
+        self::assertEquals(StatusCode::createTooManyRequests(), $response->getStatusCode());
+        self::assertSame('{"error":"InvalidCredentials","message":"Invalid credentials"}', $response->getBody());
+        self::assertSame(
+            ['Content-Type: application/json', 'Retry-After: 60'],
+            array_map(static fn($header) => (string)$header, $response->getHeaders()),
+        );
     }
 }

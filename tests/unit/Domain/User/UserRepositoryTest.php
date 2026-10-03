@@ -22,6 +22,48 @@ class UserRepositoryTest extends TestCase
         $this->subject = new UserRepository($this->dbConnectionMock);
     }
 
+    public function testCreateLoginAttempt() : void
+    {
+        $createdAt = DateTime::createFromString('2026-10-03 12:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('insert')
+            ->with(
+                'user_login_attempt',
+                [
+                    'scope' => 'account',
+                    'subject_hash' => 'hash',
+                    'created_at' => '2026-10-03 12:00:00',
+                ],
+            );
+
+        $this->subject->createLoginAttempt('account', 'hash', $createdAt);
+    }
+
+    public function testFindLoginAttemptThresholdDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT `created_at` FROM `user_login_attempt` '
+                . 'WHERE `scope` = ? AND `subject_hash` = ? AND `created_at` >= ? '
+                . 'ORDER BY `created_at` DESC LIMIT 4, 1',
+                ['account', 'hash', '2026-10-03 12:00:00'],
+            )
+            ->willReturn('2026-10-03 12:01:00');
+
+        self::assertEquals(
+            DateTime::createFromString('2026-10-03 12:01:00'),
+            $this->subject->findLoginAttemptThresholdDate(
+                'account',
+                'hash',
+                5,
+                DateTime::createFromString('2026-10-03 12:00:00'),
+            ),
+        );
+    }
+
     public function testFindAuthTokenData() : void
     {
         $this->dbConnectionMock

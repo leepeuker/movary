@@ -262,7 +262,7 @@ assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 
 run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
-assert_equal 27 "$(query_sqlite doctrine-fresh.sqlite \
+assert_equal 28 "$(query_sqlite doctrine-fresh.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
     'Fresh SQLite Doctrine database has an unexpected table count'
 assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
@@ -404,7 +404,7 @@ run_mysql_app_command movary database:migration:migrate
 docker exec "$mysql_container" mysql --user=root --password=movary-root \
     --execute="CREATE DATABASE doctrine_fresh; GRANT ALL PRIVILEGES ON doctrine_fresh.* TO 'movary'@'%';"
 run_mysql_app_command doctrine_fresh database:migration:migrate
-assert_equal 27 "$(mysql_query doctrine_fresh \
+assert_equal 28 "$(mysql_query doctrine_fresh \
     "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'doctrine_fresh'")" \
     'Fresh MySQL Doctrine database has an unexpected table count'
 assert_equal 2 "$(mysql_query doctrine_fresh \
