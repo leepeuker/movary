@@ -38,9 +38,9 @@
 
                 <div id="loginErrors"></div>
 
-                {% if passwordResetSuccessful == 'success' %}
+                {% if passwordChanged == true %}
                     <div class="alert alert-success" role="alert">
-                        Your password was changed.
+                        Your password was changed. Please sign in again.
                     </div>
                 {% endif %}
 

@@ -31,6 +31,7 @@ class AuthenticationControllerTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->method('getGetParameters')->willReturn([
             'redirect' => '/users/alice',
+            'password-change' => 'success',
             'password-reset' => 'success',
         ]);
         $this->emailSupportMock->method('isPasswordResetAvailable')->willReturn(true);
@@ -39,7 +40,7 @@ class AuthenticationControllerTest extends TestCase
             ->method('render')
             ->with('page/login.html.twig', [
                 'redirect' => '/users/alice',
-                'passwordResetSuccessful' => 'success',
+                'passwordChanged' => true,
                 'passwordResetAvailable' => true,
                 'registrationEnabled' => true,
                 'defaultEmail' => 'alice@example.com',
@@ -71,7 +72,7 @@ class AuthenticationControllerTest extends TestCase
             ->method('render')
             ->with('page/login.html.twig', [
                 'redirect' => false,
-                'passwordResetSuccessful' => null,
+                'passwordChanged' => false,
                 'passwordResetAvailable' => false,
                 'registrationEnabled' => false,
                 'defaultEmail' => null,

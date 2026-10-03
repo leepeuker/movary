@@ -1012,16 +1012,21 @@ class UserRepository
         );
     }
 
-    public function updatePassword(int $userId, string $passwordHash) : void
+    public function updatePasswordAndRevokeAuthTokens(int $userId, string $passwordHash) : void
     {
-        $this->dbConnection->update(
-            'user',
-            [
-                'password' => $passwordHash,
-            ],
-            [
-                'id' => $userId,
-            ],
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $passwordHash) : void {
+                $connection->update(
+                    'user',
+                    [
+                        'password' => $passwordHash,
+                    ],
+                    [
+                        'id' => $userId,
+                    ],
+                );
+                $connection->delete('user_auth_token', ['user_id' => $userId]);
+            },
         );
     }
 

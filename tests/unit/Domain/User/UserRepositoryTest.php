@@ -55,6 +55,24 @@ class UserRepositoryTest extends TestCase
         self::assertNull($this->subject->findAuthTokenData('unknown-token'));
     }
 
+    public function testUpdatePasswordAndRevokeAuthTokens() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with('user', ['password' => 'password-hash'], ['id' => 12]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_auth_token', ['user_id' => 12]);
+
+        $this->subject->updatePasswordAndRevokeAuthTokens(12, 'password-hash');
+    }
+
     public function testResetPasswordWithTokenConsumesTokenAndRevokesAccess() : void
     {
         $currentDate = DateTime::createFromString('2026-09-28 12:00:00');
