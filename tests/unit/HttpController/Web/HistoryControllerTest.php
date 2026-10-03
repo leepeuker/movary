@@ -3,6 +3,7 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
@@ -28,6 +29,8 @@ class HistoryControllerTest extends TestCase
 {
     private Authentication&MockObject $authenticationMock;
 
+    private MovieHistoryEditor&MockObject $movieHistoryEditorMock;
+
     private MovieApi&MockObject $movieApiMock;
 
     private HistoryController $subject;
@@ -37,6 +40,7 @@ class HistoryControllerTest extends TestCase
     protected function setUp() : void
     {
         $this->authenticationMock = $this->createMock(Authentication::class);
+        $this->movieHistoryEditorMock = $this->createMock(MovieHistoryEditor::class);
         $this->movieApiMock = $this->createMock(MovieApi::class);
         $this->userApiMock = $this->createMock(UserApi::class);
 
@@ -49,6 +53,7 @@ class HistoryControllerTest extends TestCase
         $this->subject = new HistoryController(
             $this->createMock(Environment::class),
             $this->createMock(MovieHistoryApi::class),
+            $this->movieHistoryEditorMock,
             $this->movieApiMock,
             $this->userApiMock,
             $this->createMock(SyncMovie::class),
@@ -67,45 +72,19 @@ class HistoryControllerTest extends TestCase
     }
 
     #[DataProvider('provideHistoryMetadata')]
-    public function testChangingWatchDateMovesMetadataAfterCreatingDestination(
+    public function testChangingWatchDateMapsEditRequest(
         string $requestComment,
         int|string $requestLocationId,
         ?string $expectedComment,
         ?int $expectedLocationId,
     ) : void {
-        $calls = [];
         $originalDate = Date::createFromString('2026-09-01');
         $newDate = Date::createFromString('2026-09-02');
 
-        $this->movieApiMock
+        $this->movieHistoryEditorMock
             ->expects(self::once())
-            ->method('addPlaysForMovieOnDate')
-            ->with(34, 12, $newDate, 2, 3, $expectedComment, $expectedLocationId, true)
-            ->willReturnCallback(static function () use (&$calls) : void {
-                $calls[] = 'add';
-            });
-        $this->movieApiMock
-            ->expects(self::once())
-            ->method('deleteHistoryByIdAndDate')
-            ->with(34, 12, $originalDate)
-            ->willReturnCallback(static function () use (&$calls) : void {
-                $calls[] = 'delete';
-            });
-        $this->movieApiMock
-            ->expects(self::once())
-            ->method('updateHistoryComment')
-            ->with(34, 12, $newDate, $expectedComment)
-            ->willReturnCallback(static function () use (&$calls) : void {
-                $calls[] = 'comment';
-            });
-        $this->movieApiMock
-            ->expects(self::once())
-            ->method('updateHistoryLocation')
-            ->with(34, 12, $newDate, $expectedLocationId)
-            ->willReturnCallback(static function () use (&$calls) : void {
-                $calls[] = 'location';
-            });
-        $this->movieApiMock->expects(self::never())->method('replaceHistoryForMovieByDate');
+            ->method('update')
+            ->with(34, 12, $originalDate, $newDate, 2, 3, $expectedComment, $expectedLocationId, true);
 
         $response = $this->subject->createHistoryEntry($this->createRequest([
             'newWatchDate' => '2026-09-02',
@@ -119,7 +98,6 @@ class HistoryControllerTest extends TestCase
         ]));
 
         self::assertEquals(StatusCode::createNoContent(), $response->getStatusCode());
-        self::assertSame(['add', 'delete', 'comment', 'location'], $calls);
     }
 
     private function createRequest(array $body) : Request&MockObject
