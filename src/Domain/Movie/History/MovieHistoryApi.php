@@ -35,10 +35,10 @@ class MovieHistoryApi
         ?bool $postToMastodon = null,
     ) : void {
         if ($position === null) {
-            $position = $this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt);
+            $position = (int)$this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt) + 1;
         }
 
-        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, (int)$position + 1, $locationId);
+        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, $position, $locationId);
 
         $user = $this->userApi->fetchUser($userId);
         if ($user->hasJellyfinSyncEnabled() === true) {
