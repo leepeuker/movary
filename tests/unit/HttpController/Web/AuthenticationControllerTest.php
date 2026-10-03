@@ -40,8 +40,7 @@ class AuthenticationControllerTest extends TestCase
             ->method('render')
             ->with('page/login.html.twig', [
                 'redirect' => '/users/alice',
-                'passwordChangeSuccessful' => 'success',
-                'passwordResetSuccessful' => 'success',
+                'passwordChanged' => true,
                 'passwordResetAvailable' => true,
                 'registrationEnabled' => true,
                 'defaultEmail' => 'alice@example.com',
@@ -73,8 +72,7 @@ class AuthenticationControllerTest extends TestCase
             ->method('render')
             ->with('page/login.html.twig', [
                 'redirect' => false,
-                'passwordChangeSuccessful' => null,
-                'passwordResetSuccessful' => null,
+                'passwordChanged' => false,
                 'passwordResetAvailable' => false,
                 'registrationEnabled' => false,
                 'defaultEmail' => null,
