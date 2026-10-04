@@ -23,6 +23,11 @@
     cursor: pointer;
 }
 
+.list-group > .inactiveItemButton:nth-last-child(2) {
+    border-bottom-right-radius: inherit;
+    border-bottom-left-radius: inherit;
+}
+
 .activeItem {
     cursor: default;
     border-left: none;!important;
