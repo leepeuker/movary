@@ -46,6 +46,10 @@ class ServerSettings
 
     private const string TMDB_API_KEY = 'TMDB_API_KEY';
 
+    private const string LOGIN_ATTEMPT_LIMIT = 'LOGIN_ATTEMPT_LIMIT';
+
+    private const string LOGIN_ATTEMPT_WINDOW_IN_SECONDS = 'LOGIN_ATTEMPT_WINDOW_IN_SECONDS';
+
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
@@ -90,6 +94,16 @@ class ServerSettings
     public function getJellyfinDeviceId() : ?string
     {
         return $this->getByKey(self::JELLYFIN_DEVICE_ID);
+    }
+
+    public function getLoginAttemptLimit() : int
+    {
+        return $this->getPositiveIntegerByKey(self::LOGIN_ATTEMPT_LIMIT, 5);
+    }
+
+    public function getLoginAttemptWindowInSeconds() : int
+    {
+        return $this->getPositiveIntegerByKey(self::LOGIN_ATTEMPT_WINDOW_IN_SECONDS, 900);
     }
 
     public function getPlexAppName() : string
@@ -377,6 +391,13 @@ class ServerSettings
         }
 
         return (string)$value === '' ? null : (string)$value;
+    }
+
+    private function getPositiveIntegerByKey(string $key, int $default) : int
+    {
+        $value = (int)($this->getByKey($key) ?? $default);
+
+        return $value > 0 ? $value : $default;
     }
 
     private function isSetInEnvironment(string $key) : bool

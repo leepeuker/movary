@@ -43,4 +43,9 @@ class StatusCodeTest extends TestCase
     {
         self::assertSame('HTTP/1.1 303 See Other', (string)StatusCode::createSeeOther());
     }
+
+    public function testCreateTooManyRequests() : void
+    {
+        self::assertSame('HTTP/1.1 429 Too Many Requests', (string)StatusCode::createTooManyRequests());
+    }
 }

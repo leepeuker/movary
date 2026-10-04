@@ -3,6 +3,8 @@
 namespace Tests\Unit\Movary\Domain\User\Service;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\LoginAttemptLimiter;
+use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
@@ -33,6 +35,8 @@ class AuthenticationTest extends TestCase
 
     private MockObject|Request $requestMock;
 
+    private MockObject|LoginAttemptLimiter $loginAttemptLimiterMock;
+
     protected function setUp() : void
     {
         unset($_COOKIE['id']);
@@ -42,11 +46,13 @@ class AuthenticationTest extends TestCase
         $this->sessionWrapperMock = $this->createMock(SessionWrapper::class);
         $this->serverSettingsMock = $this->createMock(ServerSettings::class);
         $this->requestMock = $this->createMock(Request::class);
+        $this->loginAttemptLimiterMock = $this->createMock(LoginAttemptLimiter::class);
         $this->subject = new Authentication(
             $this->userRepositoryMock,
             $this->userApiMock,
             $this->sessionWrapperMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
+            $this->loginAttemptLimiterMock,
             $this->serverSettingsMock,
             $this->requestMock,
         );
@@ -156,6 +162,61 @@ class AuthenticationTest extends TestCase
         $result = $this->subject->login('user@example.com', 'password', false, 'api-client', 'agent');
 
         self::assertSame(hash('sha256', $result['token']), $storedToken);
+    }
+
+    public function testFailedPasswordIsRecordedForRateLimiting() : void
+    {
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $this->userRepositoryMock->method('findUserByEmail')->with('user@example.com')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->with(12, 'wrong-password')->willReturn(false);
+        $this->loginAttemptLimiterMock
+            ->expects(self::once())
+            ->method('reserveAttempt')
+            ->with('user@example.com')
+            ->willReturn(1);
+        $this->loginAttemptLimiterMock
+            ->expects(self::never())
+            ->method('releaseAttempt');
+
+        $this->expectException(InvalidPassword::class);
+
+        $this->subject->findUserAndVerifyAuthentication('user@example.com', 'wrong-password');
+    }
+
+    public function testSuccessfulLoginResetsAccountRateLimit() : void
+    {
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $this->userRepositoryMock->method('findUserByEmail')->with('user@example.com')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->with(12, 'password')->willReturn(true);
+        $this->userApiMock->method('findTotpUri')->with(12)->willReturn(null);
+        $this->loginAttemptLimiterMock
+            ->expects(self::once())
+            ->method('reserveAttempt')
+            ->with('user@example.com')
+            ->willReturn(1);
+        $this->loginAttemptLimiterMock
+            ->expects(self::once())
+            ->method('resetAccountAttempts')
+            ->with('user@example.com');
+
+        self::assertSame($user, $this->subject->findUserAndVerifyAuthentication('user@example.com', 'password'));
+    }
+
+    public function testMissingTotpCodeReleasesRateLimitReservation() : void
+    {
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $this->userRepositoryMock->method('findUserByEmail')->with('user@example.com')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->with(12, 'password')->willReturn(true);
+        $this->userApiMock->method('findTotpUri')->with(12)->willReturn('otpauth://totp/example');
+        $this->loginAttemptLimiterMock->expects(self::once())->method('reserveAttempt')->willReturn(1);
+        $this->loginAttemptLimiterMock->expects(self::once())->method('releaseAttempt')->with(1);
+
+        $this->expectException(\Movary\Domain\User\Exception\MissingTotpCode::class);
+
+        $this->subject->findUserAndVerifyAuthentication('user@example.com', 'password');
     }
 
     public function testAuthenticationCookieIsSecureForHttpsRequests() : void

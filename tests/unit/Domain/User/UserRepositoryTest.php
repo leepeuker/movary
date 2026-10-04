@@ -22,6 +22,81 @@ class UserRepositoryTest extends TestCase
         $this->subject = new UserRepository($this->dbConnectionMock);
     }
 
+    public function testCreateLoginAttempt() : void
+    {
+        $createdAt = DateTime::createFromString('2026-10-03 12:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('insert')
+            ->with(
+                'user_login_attempt',
+                [
+                    'subject_hash' => 'hash',
+                    'created_at' => '2026-10-03 12:00:00',
+                ],
+            );
+        $this->dbConnectionMock->expects(self::once())->method('lastInsertId')->willReturn('12');
+
+        self::assertSame(12, $this->subject->createLoginAttempt('hash', $createdAt));
+    }
+
+    public function testFindLoginAttemptAboveLimitDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT `created_at` FROM `user_login_attempt` '
+                . 'WHERE `subject_hash` = ? AND `created_at` >= ? '
+                . 'ORDER BY `created_at` DESC LIMIT 5, 1',
+                ['hash', '2026-10-03 12:00:00'],
+            )
+            ->willReturn('2026-10-03 12:01:00');
+
+        self::assertEquals(
+            DateTime::createFromString('2026-10-03 12:01:00'),
+            $this->subject->findLoginAttemptAboveLimitDate(
+                'hash',
+                5,
+                DateTime::createFromString('2026-10-03 12:00:00'),
+            ),
+        );
+    }
+
+    public function testFindLoginAttempts() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with('SELECT `id`, `subject_hash`, `created_at` FROM `user_login_attempt` ORDER BY `created_at` DESC')
+            ->willReturn([
+                [
+                    'id' => '12',
+                    'subject_hash' => 'hash',
+                    'created_at' => '2026-10-03 12:00:00',
+                ],
+            ]);
+
+        self::assertEquals(
+            [[
+                'id' => 12,
+                'subjectHash' => 'hash',
+                'createdAt' => DateTime::createFromString('2026-10-03 12:00:00'),
+            ]],
+            $this->subject->findLoginAttempts(),
+        );
+    }
+
+    public function testDeleteAllLoginAttempts() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with('DELETE FROM `user_login_attempt`');
+
+        $this->subject->deleteAllLoginAttempts();
+    }
+
     public function testFindAuthTokenData() : void
     {
         $this->dbConnectionMock

@@ -30,6 +30,7 @@ class Authentication
         private readonly UserApi $userApi,
         private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
+        private readonly LoginAttemptLimiter $loginAttemptLimiter,
         private readonly ServerSettings $serverSettings,
         private readonly Request $request,
     ) {
@@ -56,6 +57,8 @@ class Authentication
         string $password,
         ?int $userTotpCode = null,
     ) : UserEntity {
+        $attemptId = $this->loginAttemptLimiter->reserveAttempt($email);
+
         $user = $this->repository->findUserByEmail($email);
 
         if ($user === null) {
@@ -68,16 +71,22 @@ class Authentication
 
         $totpUri = $this->userApi->findTotpUri($user->getId());
         if ($totpUri === null) {
+            $this->loginAttemptLimiter->resetAccountAttempts($email);
+
             return $user;
         }
 
         if ($userTotpCode === null) {
+            $this->loginAttemptLimiter->releaseAttempt($attemptId);
+
             throw MissingTotpCode::create();
         }
 
         if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
             throw InvalidTotpCode::create();
         }
+
+        $this->loginAttemptLimiter->resetAccountAttempts($email);
 
         return $user;
     }

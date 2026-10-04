@@ -41,6 +41,80 @@ class UserRepository
         );
     }
 
+    public function createLoginAttempt(string $subjectHash, DateTime $createdAt) : int
+    {
+        $this->dbConnection->insert(
+            'user_login_attempt',
+            [
+                'subject_hash' => $subjectHash,
+                'created_at' => (string)$createdAt,
+            ],
+        );
+
+        return (int)$this->dbConnection->lastInsertId();
+    }
+
+    public function deleteLoginAttemptsBefore(DateTime $date) : void
+    {
+        $this->dbConnection->executeStatement(
+            'DELETE FROM `user_login_attempt` WHERE `created_at` < ?',
+            [(string)$date],
+        );
+    }
+
+    public function deleteLoginAttempt(int $id) : void
+    {
+        $this->dbConnection->delete('user_login_attempt', ['id' => $id]);
+    }
+
+    public function deleteLoginAttemptsForSubject(string $subjectHash) : void
+    {
+        $this->dbConnection->delete('user_login_attempt', ['subject_hash' => $subjectHash]);
+    }
+
+    public function findLoginAttemptAboveLimitDate(
+        string $subjectHash,
+        int $attemptLimit,
+        DateTime $windowStart,
+    ) : ?DateTime {
+        $createdAt = $this->dbConnection->fetchOne(
+            'SELECT `created_at` FROM `user_login_attempt` '
+            . 'WHERE `subject_hash` = ? AND `created_at` >= ? '
+            . 'ORDER BY `created_at` DESC LIMIT ' . $attemptLimit . ', 1',
+            [$subjectHash, (string)$windowStart],
+        );
+
+        if ($createdAt === false) {
+            return null;
+        }
+
+        return DateTime::createFromString($createdAt);
+    }
+
+    /**
+     * @return list<array{id: int, subjectHash: string, createdAt: DateTime}>
+     */
+    public function findLoginAttempts() : array
+    {
+        $loginAttempts = $this->dbConnection->fetchAllAssociative(
+            'SELECT `id`, `subject_hash`, `created_at` FROM `user_login_attempt` ORDER BY `created_at` DESC',
+        );
+
+        return array_map(
+            static fn(array $loginAttempt) : array => [
+                'id' => (int)$loginAttempt['id'],
+                'subjectHash' => (string)$loginAttempt['subject_hash'],
+                'createdAt' => DateTime::createFromString((string)$loginAttempt['created_at']),
+            ],
+            $loginAttempts,
+        );
+    }
+
+    public function deleteAllLoginAttempts() : void
+    {
+        $this->dbConnection->executeStatement('DELETE FROM `user_login_attempt`');
+    }
+
     public function replacePasswordResetToken(int $userId, string $tokenHash, DateTime $expirationDate) : void
     {
         $createdAt = DateTime::create();

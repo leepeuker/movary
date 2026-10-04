@@ -65,6 +65,11 @@ class StatusCode
         return new self(401, 'Unauthorized');
     }
 
+    public static function createTooManyRequests() : self
+    {
+        return new self(429, 'Too Many Requests');
+    }
+
     public static function createUnsupportedMediaType() : self
     {
         // Returns HTTP code 415: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415

@@ -21,6 +21,8 @@ $application->add($container->get(Movary\Command\UserHistoryExport::class));
 $application->add($container->get(Movary\Command\UserRatingExport::class));
 $application->add($container->get(Movary\Command\UserUpdate::class));
 $application->add($container->get(Movary\Command\UserList::class));
+$application->add($container->get(Movary\Command\UserLoginAttemptList::class));
+$application->add($container->get(Movary\Command\UserLoginAttemptFlush::class));
 $application->add($container->get(Movary\Command\UserPasswordRequestReset::class));
 $application->add($container->get(Movary\Command\UserPasswordListResets::class));
 $application->add($container->get(Movary\Command\UserPasswordRevokeReset::class));

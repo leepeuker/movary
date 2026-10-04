@@ -15,18 +15,20 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 
 ### General
 
-| NAME                                        | DEFAULT VALUE | INFO                                                                    | Web UI |
-|:--------------------------------------------|:-------------:|:------------------------------------------------------------------------|:------:|
-| `TMDB_API_KEY`                              |       -       | **Required** (get key [here](https://www.themoviedb.org/settings/api))  |  yes   |
-| `APPLICATION_URL`                           |       -       | Public base url of the application (e.g. `htttp://localhost`)           |  yes   |
-| `APPLICATION_NAME`                          |   `Movary`    | Application name, displayed e.g. as brand name in the navbar            |  yes   |
-| `TMDB_ENABLE_IMAGE_CACHING`                 |      `0`      | More info [here](features/tmdb-data.md#image-cache)                     |        |
-| `ENABLE_REGISTRATION`                       |      `0`      | Enables public user registration                                        |        |
-| `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |     `15`      | Minimum time between background jobs processing                         |        |
-| `TIMEZONE`                                  |     `UTC`     | Supported timezones [here](https://www.php.net/manual/en/timezones.php) |  yes   |
-| `DEFAULT_LOGIN_EMAIL`                       |       -       | Email address to always autofill on login page                          |        |
-| `DEFAULT_LOGIN_PASSWORD`                    |       -       | Password to always autofill on login page                               |        |
-| `TOTP_ISSUER`                               |   `Movary`    | The issuer used when setting up two factor authentication               |        |
+| NAME                                        | DEFAULT VALUE | INFO                                                                           | Web UI |
+|:--------------------------------------------|:-------------:|:-------------------------------------------------------------------------------|:------:|
+| `TMDB_API_KEY`                              |       -       | **Required** (get key [here](https://www.themoviedb.org/settings/api))         |  yes   |
+| `APPLICATION_URL`                           |       -       | Public base url of the application (e.g. `htttp://localhost`)                  |  yes   |
+| `APPLICATION_NAME`                          |   `Movary`    | Application name, displayed e.g. as brand name in the navbar                   |  yes   |
+| `TMDB_ENABLE_IMAGE_CACHING`                 |      `0`      | More info [here](features/tmdb-data.md#image-cache)                            |        |
+| `ENABLE_REGISTRATION`                       |      `0`      | Enables public user registration                                               |        |
+| `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |     `15`      | Minimum time between background jobs processing                                |        |
+| `TIMEZONE`                                  |     `UTC`     | Supported timezones [here](https://www.php.net/manual/en/timezones.php)        |  yes   |
+| `LOGIN_ATTEMPT_LIMIT`                       |      `5`      | Positive number of failed attempts allowed before login is temporarily blocked |        |
+| `LOGIN_ATTEMPT_WINDOW_IN_SECONDS`           |     `900`     | Positive period during which failed login attempts are counted (seconds)       |        |
+| `DEFAULT_LOGIN_EMAIL`                       |       -       | Email address to always autofill on login page                                 |        |
+| `DEFAULT_LOGIN_PASSWORD`                    |       -       | Password to always autofill on login page                                      |        |
+| `TOTP_ISSUER`                               |   `Movary`    | The issuer used when setting up two factor authentication                      |        |
 
 When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication cookies as secure.
 
