@@ -98,14 +98,14 @@ class ServerSettingsTest extends TestCase
         self::assertSame(60, $this->subject->getLoginAttemptWindowInSeconds());
     }
 
-    public function testLoginAttemptSettingsAllowZeroValues() : void
+    public function testLoginAttemptSettingsUseDefaultsForNonPositiveValues() : void
     {
         $this->configMock
             ->expects(self::exactly(2))
             ->method('getAsString')
-            ->willReturn('0');
+            ->willReturnOnConsecutiveCalls('0', '-1');
 
-        self::assertSame(0, $this->subject->getLoginAttemptLimit());
-        self::assertSame(0, $this->subject->getLoginAttemptWindowInSeconds());
+        self::assertSame(5, $this->subject->getLoginAttemptLimit());
+        self::assertSame(900, $this->subject->getLoginAttemptWindowInSeconds());
     }
 }

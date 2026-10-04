@@ -98,12 +98,12 @@ class ServerSettings
 
     public function getLoginAttemptLimit() : int
     {
-        return (int)($this->getByKey(self::LOGIN_ATTEMPT_LIMIT) ?? 5);
+        return $this->getPositiveIntegerByKey(self::LOGIN_ATTEMPT_LIMIT, 5);
     }
 
     public function getLoginAttemptWindowInSeconds() : int
     {
-        return (int)($this->getByKey(self::LOGIN_ATTEMPT_WINDOW_IN_SECONDS) ?? 900);
+        return $this->getPositiveIntegerByKey(self::LOGIN_ATTEMPT_WINDOW_IN_SECONDS, 900);
     }
 
     public function getPlexAppName() : string
@@ -391,6 +391,13 @@ class ServerSettings
         }
 
         return (string)$value === '' ? null : (string)$value;
+    }
+
+    private function getPositiveIntegerByKey(string $key, int $default) : int
+    {
+        $value = (int)($this->getByKey($key) ?? $default);
+
+        return $value > 0 ? $value : $default;
     }
 
     private function isSetInEnvironment(string $key) : bool
