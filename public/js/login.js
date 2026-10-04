@@ -44,15 +44,27 @@ async function submitCredentials() {
     }
 
     if (response.status === 429) {
-        const retryAfter = response.headers.get('Retry-After');
-        const message = retryAfter
-            ? 'Too many login attempts. Please try again in ' + retryAfter + ' seconds.'
-            : 'Too many login attempts. Please try again later.';
-        addAlert('loginErrors', message, 'danger', false);
+        addAlert('loginErrors', createLoginRateLimitMessage(response.headers.get('Retry-After')), 'danger', false);
         return;
     }
 
     addAlert('loginErrors', 'Unexpected server error', 'danger', false);
+}
+
+function createLoginRateLimitMessage(retryAfter) {
+    const retryAfterSeconds = Number.parseInt(retryAfter, 10);
+    if (Number.isFinite(retryAfterSeconds) === false || retryAfterSeconds <= 0) {
+        return 'Too many login attempts. Please try again later.';
+    }
+
+    if (retryAfterSeconds < 60) {
+        return 'Too many login attempts. Please try again in ' + retryAfterSeconds + ' seconds.';
+    }
+
+    const retryAfterMinutes = Math.ceil(retryAfterSeconds / 60);
+    const minuteLabel = retryAfterMinutes === 1 ? 'minute' : 'minutes';
+
+    return 'Too many login attempts. Please try again in ' + retryAfterMinutes + ' ' + minuteLabel + '.';
 }
 
 function loginRequest() {
