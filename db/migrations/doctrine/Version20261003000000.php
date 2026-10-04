@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -16,7 +16,7 @@ final class Version20261003000000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function up(Schema $schema) : void
     {
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->addSql('ALTER TABLE user_auth_token MODIFY token CHAR(64) NOT NULL');
         }
 

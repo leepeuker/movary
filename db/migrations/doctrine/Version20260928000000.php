@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
@@ -29,7 +29,7 @@ final class Version20260928000000 extends AbstractMigration
             $this->connection->createSchemaManager()->createSchemaConfig(),
         );
 
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             self::applyMysqlPhysicalSchema($targetSchema);
         }
 
@@ -41,7 +41,7 @@ final class Version20260928000000 extends AbstractMigration
             $this->addSql($sql);
         }
 
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->addSql(
                 'ALTER TABLE person ADD CONSTRAINT chk_person_gender '
                 . 'CHECK (gender IN (0, 1, 2, 3))',

@@ -2,7 +2,7 @@
 
 namespace Movary\DatabaseMigration;
 
-use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -35,7 +35,7 @@ final class Version20261003190000 extends AbstractMigration
     }
 
     private function replaceLocationForeignKey(string $onDelete) : void {
-        if ($this->platform instanceof MySQLPlatform) {
+        if ($this->platform instanceof AbstractMySQLPlatform) {
             $this->addSql(
                 'ALTER TABLE movie_user_watch_dates DROP FOREIGN KEY ' . self::LOCATION_CONSTRAINT,
             );
