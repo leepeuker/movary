@@ -57,6 +57,7 @@ class DashboardFactory
             DashboardRow::createTopLocations(),
             DashboardRow::createLastPlaysCinema(),
             DashboardRow::createMostWatchedProductionCountries(),
+            DashboardRow::createPersonalRatingDistribution(),
         );
     }
 
@@ -76,6 +77,7 @@ class DashboardFactory
             DashboardRow::createTopLocations()->getId() === $rowId => DashboardRow::createTopLocations($isVisible, $isExtended),
             DashboardRow::createLastPlaysCinema()->getId() === $rowId => DashboardRow::createLastPlaysCinema($isVisible, $isExtended),
             DashboardRow::createMostWatchedProductionCountries()->getId() === $rowId => DashboardRow::createMostWatchedProductionCountries($isVisible, $isExtended),
+            DashboardRow::createPersonalRatingDistribution()->getId() === $rowId => DashboardRow::createPersonalRatingDistribution($isVisible, $isExtended),
 
             default => throw new RuntimeException('Not supported dashboard row id: ' . $rowId)
         };

@@ -1,0 +1,23 @@
+{% macro create(dashboardRow, personalRatingDistribution) %}
+
+    {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {{ rowItemToggle.create(dashboardRow) }}
+
+    {% set maxCount = 1 %}
+    {% for rating in personalRatingDistribution %}
+        {% set maxCount = max(maxCount, rating.count) %}
+    {% endfor %}
+
+    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem;">
+        <div class="rating-distribution-chart">
+            {% for rating in personalRatingDistribution %}
+                <div class="rating-distribution-column" title="{{ rating.rating }}/10: {{ rating.count }} ratings">
+                    <div class="rating-distribution-bar-area" role="progressbar" aria-label="{{ rating.rating }} out of 10" aria-valuenow="{{ rating.count }}" aria-valuemin="0" aria-valuemax="{{ maxCount }}">
+                        <div class="rating-distribution-bar {{ rating.count > 0 ? 'rating-distribution-bar-visible' }}" data-count="Count: {{ rating.count }}" style="height: {{ rating.count / maxCount * 100 }}%"></div>
+                    </div>
+                    <span class="rating-distribution-label">{{ rating.rating }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </li>
+{% endmacro %}

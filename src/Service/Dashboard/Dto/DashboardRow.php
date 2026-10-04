@@ -72,6 +72,11 @@ class DashboardRow
         return self::create(9, 'Latest in Watchlist', $isVisible, $isExtended);
     }
 
+    public static function createPersonalRatingDistribution(bool $isVisible = true, bool $isExtended = false) : self
+    {
+        return self::create(13, 'Rating distribution', $isVisible, $isExtended);
+    }
+
     private static function create(int $id, string $name, bool $isVisible, bool $isExtended) : self
     {
         return new self($id, $name, $isVisible, $isExtended);
@@ -140,6 +145,11 @@ class DashboardRow
     public function isMostWatchedReleaseYears() : bool
     {
         return $this->getId() === self::createMostWatchedReleaseYears()->getId();
+    }
+
+    public function isPersonalRatingDistribution() : bool
+    {
+        return $this->getId() === self::createPersonalRatingDistribution()->getId();
     }
 
     public function isTopLocations() : bool

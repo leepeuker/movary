@@ -116,4 +116,25 @@ class MovieRepositoryTest extends TestCase
             ['result'],
         );
     }
+
+    public function testFetchPersonalRatingDistribution() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                'SELECT rating, COUNT(*) as count
+            FROM movie_user_rating
+            WHERE user_id = ?
+            GROUP BY rating
+            ORDER BY rating',
+                [42],
+            )
+            ->willReturn([['rating' => '7', 'count' => '3']]);
+
+        self::assertSame(
+            [['rating' => 7, 'count' => 3]],
+            $this->subject->fetchPersonalRatingDistribution(42),
+        );
+    }
 }

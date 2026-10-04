@@ -209,6 +209,29 @@ class MovieRepository
         )[0];
     }
 
+    /**
+     * @return list<array{rating: int, count: int}>
+     */
+    public function fetchPersonalRatingDistribution(int $userId) : array
+    {
+        /** @var list<array{rating: mixed, count: mixed}> $ratings */
+        $ratings = $this->dbConnection->fetchAllAssociative(
+            'SELECT rating, COUNT(*) as count
+            FROM movie_user_rating
+            WHERE user_id = ?
+            GROUP BY rating
+            ORDER BY rating',
+            [$userId],
+        );
+
+        $distribution = [];
+        foreach ($ratings as $rating) {
+            $distribution[] = ['rating' => (int)$rating['rating'], 'count' => (int)$rating['count']];
+        }
+
+        return $distribution;
+    }
+
     public function fetchAverageRuntime(int $userId) : float
     {
         return (float)$this->dbConnection->executeQuery(
