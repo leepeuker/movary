@@ -1,4 +1,4 @@
-{% macro create(dashboardRow, personalRatingDistribution) %}
+{% macro create(dashboardRow, personalRatingDistribution, routeUsername) %}
 
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
     {{ rowItemToggle.create(dashboardRow) }}
@@ -11,11 +11,22 @@
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem;">
         <div class="rating-distribution-chart">
             {% for rating in personalRatingDistribution %}
-                <div class="rating-distribution-column" title="{{ rating.rating }}/10: {{ rating.count }} ratings">
-                    <div class="rating-distribution-bar-area" role="progressbar" aria-label="{{ rating.rating }} out of 10" aria-valuenow="{{ rating.count }}" aria-valuemin="0" aria-valuemax="{{ maxCount }}">
-                        <div class="rating-distribution-bar {{ rating.count > 0 ? 'rating-distribution-bar-visible' }}" data-count="Count: {{ rating.count }}" style="height: {{ rating.count / maxCount * 100 }}%"></div>
+                <div class="rating-distribution-column">
+                    <div class="rating-distribution-bar-area">
+                        {% if rating.count > 0 %}
+                            <a class="rating-distribution-bar rating-distribution-bar-visible"
+                               aria-label="View {{ rating.count }} {{ rating.count == 1 ? 'movie' : 'movies' }} rated {{ rating.rating }} out of 10"
+                               data-count="Count: {{ rating.count }}"
+                               href="{{ applicationUrl }}/users/{{ routeUsername }}/movies?sb=title&amp;so=asc&amp;pp=24&amp;ur=1&amp;minur={{ rating.rating }}&amp;maxur={{ rating.rating }}"
+                               style="height: {{ rating.count / maxCount * 100 }}%"></a>
+                        {% else %}
+                            <div class="rating-distribution-bar" style="height: 0"></div>
+                        {% endif %}
                     </div>
-                    <span class="rating-distribution-label">{{ rating.rating }}</span>
+                    <span class="rating-distribution-label">
+                        {{ rating.rating }}
+                        <span class="visually-hidden">out of 10: {{ rating.count }} {{ rating.count == 1 ? 'rating' : 'ratings' }}</span>
+                    </span>
                 </div>
             {% endfor %}
         </div>

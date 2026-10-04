@@ -216,11 +216,12 @@ class MovieRepository
     {
         /** @var list<array{rating: mixed, count: mixed}> $ratings */
         $ratings = $this->dbConnection->fetchAllAssociative(
-            'SELECT rating, COUNT(*) as count
-            FROM movie_user_rating
-            WHERE user_id = ?
-            GROUP BY rating
-            ORDER BY rating',
+            'SELECT mur.rating, COUNT(DISTINCT mur.movie_id) as count
+            FROM movie_user_rating mur
+            JOIN movie_user_watch_dates muwd ON muwd.movie_id = mur.movie_id AND muwd.user_id = mur.user_id
+            WHERE mur.user_id = ?
+            GROUP BY mur.rating
+            ORDER BY mur.rating',
             [$userId],
         );
 

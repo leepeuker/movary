@@ -61,16 +61,17 @@
 
 .rating-distribution-bar {
     position: relative;
-    width: 70%;
-    background-color: var(--bs-primary);
-    cursor: pointer;
+    width: 100%;
+    background-color: var(--bs-secondary-color);
 }
 
 .rating-distribution-bar-visible {
+    cursor: pointer;
     min-height: 0.25rem;
 }
 
-.rating-distribution-bar:hover::after {
+.rating-distribution-bar-visible:hover::after,
+.rating-distribution-bar-visible:focus::after {
     position: absolute;
     right: 50%;
     bottom: calc(100% + 0.5rem);
@@ -84,6 +85,11 @@
     font-size: 0.8rem;
     transform: translateX(50%);
     white-space: nowrap;
+}
+
+.rating-distribution-bar-visible:focus-visible {
+    outline: 0.2rem solid var(--bs-focus-ring-color);
+    outline-offset: 0.15rem;
 }
 
 .rating-distribution-label {
