@@ -4,23 +4,23 @@ namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\UserRepository;
+use Movary\Service\ServerSettings;
 use Movary\ValueObject\DateTime;
 
 class LoginAttemptLimiter
 {
-    private const int ACCOUNT_ATTEMPT_LIMIT = 5;
-
-    private const int WINDOW_IN_SECONDS = 900;
-
     public function __construct(
         private readonly UserRepository $repository,
+        private readonly ServerSettings $serverSettings,
     ) {
     }
 
     public function reserveAttempt(string $email) : int
     {
         $now = DateTime::create();
-        $windowStart = $now->subSeconds(self::WINDOW_IN_SECONDS);
+        $attemptLimit = $this->serverSettings->getLoginAttemptLimit();
+        $windowInSeconds = $this->serverSettings->getLoginAttemptWindowInSeconds();
+        $windowStart = $now->subSeconds($windowInSeconds);
         $subjectHash = $this->hashSubject($this->normalizeEmail($email));
 
         $this->repository->deleteLoginAttemptsBefore($windowStart);
@@ -28,9 +28,10 @@ class LoginAttemptLimiter
         $attemptId = $this->repository->createLoginAttempt($subjectHash, $now);
         $retryAfterSeconds = $this->findRetryAfterSeconds(
             $subjectHash,
-            self::ACCOUNT_ATTEMPT_LIMIT,
+            $attemptLimit,
             $now,
             $windowStart,
+            $windowInSeconds,
         );
 
         if ($retryAfterSeconds > 0) {
@@ -72,6 +73,7 @@ class LoginAttemptLimiter
         int $attemptLimit,
         DateTime $now,
         DateTime $windowStart,
+        int $windowInSeconds,
     ) : int {
         $firstAttemptAboveLimit = $this->repository->findLoginAttemptAboveLimitDate(
             $subjectHash,
@@ -84,7 +86,7 @@ class LoginAttemptLimiter
         }
 
         $retryAfterSeconds = (int)$firstAttemptAboveLimit->format('U')
-            + self::WINDOW_IN_SECONDS
+            + $windowInSeconds
             - (int)$now->format('U');
 
         return max(1, $retryAfterSeconds);

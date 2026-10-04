@@ -70,4 +70,42 @@ class ServerSettingsTest extends TestCase
 
         self::assertTrue($this->subject->isEmailEnabled());
     }
+
+    public function testLoginAttemptSettingsUseDefaults() : void
+    {
+        $this->configMock
+            ->expects(self::exactly(2))
+            ->method('getAsString')
+            ->willThrowException(ConfigNotSetException::create('setting'));
+        $this->dbConnectionMock
+            ->expects(self::exactly(2))
+            ->method('fetchFirstColumn')
+            ->willReturn([]);
+
+        self::assertSame(5, $this->subject->getLoginAttemptLimit());
+        self::assertSame(900, $this->subject->getLoginAttemptWindowInSeconds());
+    }
+
+    public function testLoginAttemptSettingsUseEnvironmentValues() : void
+    {
+        $this->configMock
+            ->expects(self::exactly(2))
+            ->method('getAsString')
+            ->willReturnOnConsecutiveCalls('2', '60');
+        $this->dbConnectionMock->expects(self::never())->method('fetchFirstColumn');
+
+        self::assertSame(2, $this->subject->getLoginAttemptLimit());
+        self::assertSame(60, $this->subject->getLoginAttemptWindowInSeconds());
+    }
+
+    public function testLoginAttemptSettingsAllowZeroValues() : void
+    {
+        $this->configMock
+            ->expects(self::exactly(2))
+            ->method('getAsString')
+            ->willReturn('0');
+
+        self::assertSame(0, $this->subject->getLoginAttemptLimit());
+        self::assertSame(0, $this->subject->getLoginAttemptWindowInSeconds());
+    }
 }

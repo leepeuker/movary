@@ -5,22 +5,30 @@ namespace Tests\Unit\Movary\Domain\User\Service;
 use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\Service\LoginAttemptLimiter;
 use Movary\Domain\User\UserRepository;
+use Movary\Service\ServerSettings;
 use Movary\ValueObject\DateTime;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(LoginAttemptLimiter::class)]
+#[AllowMockObjectsWithoutExpectations]
 class LoginAttemptLimiterTest extends TestCase
 {
-    private MockObject|UserRepository $repositoryMock;
+    private UserRepository&MockObject $repositoryMock;
+
+    private ServerSettings&MockObject $serverSettingsMock;
 
     private LoginAttemptLimiter $subject;
 
     protected function setUp() : void
     {
         $this->repositoryMock = $this->createMock(UserRepository::class);
-        $this->subject = new LoginAttemptLimiter($this->repositoryMock);
+        $this->serverSettingsMock = $this->createMock(ServerSettings::class);
+        $this->serverSettingsMock->method('getLoginAttemptLimit')->willReturn(5);
+        $this->serverSettingsMock->method('getLoginAttemptWindowInSeconds')->willReturn(900);
+        $this->subject = new LoginAttemptLimiter($this->repositoryMock, $this->serverSettingsMock);
     }
 
     public function testReservesAttemptWhenLimitIsNotReached() : void
@@ -52,6 +60,22 @@ class LoginAttemptLimiterTest extends TestCase
         $this->expectException(LoginAttemptLimitReached::class);
 
         $this->subject->reserveAttempt('user@example.com');
+    }
+
+    public function testUsesConfiguredLimitAndWindow() : void
+    {
+        $this->serverSettingsMock = $this->createMock(ServerSettings::class);
+        $this->serverSettingsMock->method('getLoginAttemptLimit')->willReturn(2);
+        $this->serverSettingsMock->method('getLoginAttemptWindowInSeconds')->willReturn(60);
+        $this->subject = new LoginAttemptLimiter($this->repositoryMock, $this->serverSettingsMock);
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('findLoginAttemptAboveLimitDate')
+            ->with(hash('sha256', 'user@example.com'), 2, self::isInstanceOf(DateTime::class))
+            ->willReturn(null);
+        $this->repositoryMock->expects(self::once())->method('createLoginAttempt')->willReturn(1);
+
+        self::assertSame(1, $this->subject->reserveAttempt('user@example.com'));
     }
 
     public function testReleaseAttempt() : void
