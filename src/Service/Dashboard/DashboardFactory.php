@@ -11,17 +11,17 @@ class DashboardFactory
 {
     public function createDashboardRowsForUser(UserEntity $user) : DashboardRowList
     {
-        $visibleRows = (string)$user->getDashboardVisibleRows();
+        $visibleRowsSetting = $user->getDashboardVisibleRows();
         $extendedRows = (string)$user->getDashboardExtendedRows();
         $orderRows = (string)$user->getDashboardOrderRows();
 
-        $visibleRows = $visibleRows !== '' ? explode(';', $visibleRows) : [];
-        $extendedRows = $extendedRows !== '' ? explode(';', $extendedRows) : [];
-        $orderRows = $orderRows !== '' ? explode(';', $orderRows) : [];
-
-        if (empty($visibleRows) === true) {
+        if ($visibleRowsSetting === null) {
             return $this->createDefaultDashboardRows();
         }
+
+        $visibleRows = $visibleRowsSetting !== '' ? explode(';', $visibleRowsSetting) : [];
+        $extendedRows = $extendedRows !== '' ? explode(';', $extendedRows) : [];
+        $orderRows = $orderRows !== '' ? explode(';', $orderRows) : [];
 
         $dashboardRows = DashboardRowList::create();
 
