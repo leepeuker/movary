@@ -54,6 +54,7 @@ class AuthenticationTest extends TestCase
             $this->createMock(TwoFactorAuthenticationApi::class),
             $this->loginAttemptLimiterMock,
             $this->serverSettingsMock,
+            $this->requestMock,
         );
     }
 

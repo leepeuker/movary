@@ -28,6 +28,11 @@ class LoginAttemptLimiterTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('findLoginAttemptAboveLimitDate')
+            ->with(
+                hash('sha256', 'user@example.com'),
+                5,
+                self::isInstanceOf(DateTime::class),
+            )
             ->willReturn(null);
         $this->repositoryMock->expects(self::once())->method('deleteLoginAttemptsBefore');
         $this->repositoryMock->expects(self::once())->method('createLoginAttempt')->willReturn(1);

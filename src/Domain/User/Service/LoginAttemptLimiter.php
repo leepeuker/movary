@@ -26,7 +26,12 @@ class LoginAttemptLimiter
         $this->repository->deleteLoginAttemptsBefore($windowStart);
         // Reserve before verification so concurrent requests cannot all pass the limit check.
         $attemptId = $this->repository->createLoginAttempt($subjectHash, $now);
-        $retryAfterSeconds = $this->findRetryAfterSeconds($subjectHash, $now, $windowStart);
+        $retryAfterSeconds = $this->findRetryAfterSeconds(
+            $subjectHash,
+            self::ACCOUNT_ATTEMPT_LIMIT,
+            $now,
+            $windowStart,
+        );
 
         if ($retryAfterSeconds > 0) {
             $this->repository->deleteLoginAttempt($attemptId);

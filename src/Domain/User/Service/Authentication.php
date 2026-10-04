@@ -32,6 +32,7 @@ class Authentication
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
         private readonly ServerSettings $serverSettings,
+        private readonly Request $request,
     ) {
     }
 
