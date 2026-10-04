@@ -13,12 +13,15 @@ use Movary\Service\ImageUrlService;
 use Movary\ValueObject\Date;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MovieHistoryApi::class)]
 class MovieHistoryApiTest extends TestCase
 {
     private MovieHistoryRepository&MockObject $repositoryMock;
+
+    private MovieRepository&Stub $movieRepositoryStub;
 
     private MovieHistoryApi $subject;
 
@@ -32,9 +35,11 @@ class MovieHistoryApiTest extends TestCase
         $userMock->method('isMastodonEnabled')->willReturn(false);
         $userApiMock->method('fetchUser')->willReturn($userMock);
 
+        $this->movieRepositoryStub = $this->createStub(MovieRepository::class);
+
         $this->subject = new MovieHistoryApi(
             $this->repositoryMock,
-            $this->createStub(MovieRepository::class),
+            $this->movieRepositoryStub,
             $this->createStub(TmdbApi::class),
             $this->createStub(ImageUrlService::class),
             $this->createStub(JobQueueApi::class),
@@ -87,5 +92,32 @@ class MovieHistoryApiTest extends TestCase
             ->with(11, 22, $watchedAt, 2, null, 1, null);
 
         $this->subject->create(11, 22, $watchedAt, 2);
+    }
+
+    public function testFetchPersonalRatingDistributionIncludesRatingsWithoutEntries() : void
+    {
+        $this->repositoryMock->expects(self::never())->method('fetchHighestPositionForWatchDate');
+        $this->movieRepositoryStub
+            ->method('fetchPersonalRatingDistribution')
+            ->willReturn([
+                ['rating' => 2, 'count' => 3],
+                ['rating' => 8, 'count' => 1],
+            ]);
+
+        self::assertSame(
+            [
+                ['rating' => 1, 'count' => 0],
+                ['rating' => 2, 'count' => 3],
+                ['rating' => 3, 'count' => 0],
+                ['rating' => 4, 'count' => 0],
+                ['rating' => 5, 'count' => 0],
+                ['rating' => 6, 'count' => 0],
+                ['rating' => 7, 'count' => 0],
+                ['rating' => 8, 'count' => 1],
+                ['rating' => 9, 'count' => 0],
+                ['rating' => 10, 'count' => 0],
+            ],
+            $this->subject->fetchPersonalRatingDistribution(42),
+        );
     }
 }

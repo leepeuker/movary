@@ -86,6 +86,7 @@ class DashboardController
             $row->isWatchlist() => ['watchlistItems' => $this->movieWatchlistApi->fetchWatchlistPaginated($requestedUserId, 6, 1)],
             $row->isTopLocations() => ['topLocations' => $this->movieHistoryApi->fetchTopLocations($requestedUserId)],
             $row->isMostWatchedProductionCountries() => ['mostWatchedProductionCountries' => $this->movieHistoryApi->fetchMostWatchedProductionCountries($requestedUserId)],
+            $row->isPersonalRatingDistribution() => ['personalRatingDistribution' => $this->movieHistoryApi->fetchPersonalRatingDistribution($requestedUserId)],
             default => [],
         };
     }

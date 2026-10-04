@@ -119,6 +119,24 @@ class MovieHistoryApi
         return round($this->movieRepository->fetchAveragePersonalRating($userId), 1);
     }
 
+    /**
+     * @return list<array{rating: int, count: int}>
+     */
+    public function fetchPersonalRatingDistribution(int $userId) : array
+    {
+        $countsByRating = [];
+        foreach ($this->movieRepository->fetchPersonalRatingDistribution($userId) as $rating) {
+            $countsByRating[$rating['rating']] = $rating['count'];
+        }
+
+        $distribution = [];
+        for ($rating = 1; $rating <= 10; ++$rating) {
+            $distribution[] = ['rating' => $rating, 'count' => $countsByRating[$rating] ?? 0];
+        }
+
+        return $distribution;
+    }
+
     public function fetchAveragePlaysPerDay(int $userId) : float
     {
         $totalPlayCount = $this->movieRepository->fetchHistoryCount($userId);

@@ -84,6 +84,9 @@
                     {% elseif dashboardRow.isMostWatchedProductionCountries and dashboardRow.isVisible %}
                         {% import "component/dashboard/row-most-watched-production-countries.html.twig" as dashboardMostWatchedProductionCountries %}
                         {{ dashboardMostWatchedProductionCountries.create(dashboardRow, mostWatchedProductionCountries, routeUsername) }}
+                    {% elseif dashboardRow.isPersonalRatingDistribution and dashboardRow.isVisible %}
+                        {% import "component/dashboard/row-rating-distribution.html.twig" as dashboardRatingDistribution %}
+                        {{ dashboardRatingDistribution.create(dashboardRow, personalRatingDistribution, routeUsername) }}
                     {% endif %}
                 {% endfor %}
             </div>

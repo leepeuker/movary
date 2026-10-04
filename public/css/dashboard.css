@@ -36,3 +36,65 @@
     border-right: none;!important;
     display: none;
 }
+
+.rating-distribution-chart {
+    display: flex;
+    gap: 0.25rem;
+    width: 100%;
+    height: 12rem;
+}
+
+.rating-distribution-column {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.rating-distribution-bar-area {
+    display: flex;
+    flex: 1;
+    align-items: end;
+    justify-content: center;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.rating-distribution-bar {
+    position: relative;
+    width: 100%;
+    background-color: var(--bs-secondary-color);
+}
+
+.rating-distribution-bar-visible {
+    cursor: pointer;
+    min-height: 0.25rem;
+}
+
+.rating-distribution-bar-visible:hover::after,
+.rating-distribution-bar-visible:focus::after {
+    position: absolute;
+    right: 50%;
+    bottom: calc(100% + 0.5rem);
+    z-index: 1;
+    width: max-content;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--bs-dark);
+    border-radius: 0.25rem;
+    color: var(--bs-light);
+    content: attr(data-count);
+    font-size: 0.8rem;
+    transform: translateX(50%);
+    white-space: nowrap;
+}
+
+.rating-distribution-bar-visible:focus-visible {
+    outline: 0.2rem solid var(--bs-focus-ring-color);
+    outline-offset: 0.15rem;
+}
+
+.rating-distribution-label {
+    padding-top: 0.25rem;
+    color: var(--bs-secondary-color);
+    font-size: 0.8rem;
+    text-align: center;
+}
