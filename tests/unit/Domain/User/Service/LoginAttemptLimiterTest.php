@@ -61,6 +61,25 @@ class LoginAttemptLimiterTest extends TestCase
         $this->subject->releaseAttempt(1);
     }
 
+    public function testFetchAttempts() : void
+    {
+        $attempts = [[
+            'id' => 1,
+            'subjectHash' => 'hash',
+            'createdAt' => DateTime::create(),
+        ]];
+        $this->repositoryMock->expects(self::once())->method('findLoginAttempts')->willReturn($attempts);
+
+        self::assertSame($attempts, $this->subject->fetchAttempts());
+    }
+
+    public function testFlushAttempts() : void
+    {
+        $this->repositoryMock->expects(self::once())->method('deleteAllLoginAttempts');
+
+        $this->subject->flushAttempts();
+    }
+
     public function testResetsOnlyAccountAttemptsAfterSuccessfulLogin() : void
     {
         $this->repositoryMock

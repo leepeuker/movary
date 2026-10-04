@@ -63,6 +63,40 @@ class UserRepositoryTest extends TestCase
         );
     }
 
+    public function testFindLoginAttempts() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with('SELECT `id`, `subject_hash`, `created_at` FROM `user_login_attempt` ORDER BY `created_at` DESC')
+            ->willReturn([
+                [
+                    'id' => '12',
+                    'subject_hash' => 'hash',
+                    'created_at' => '2026-10-03 12:00:00',
+                ],
+            ]);
+
+        self::assertEquals(
+            [[
+                'id' => 12,
+                'subjectHash' => 'hash',
+                'createdAt' => DateTime::createFromString('2026-10-03 12:00:00'),
+            ]],
+            $this->subject->findLoginAttempts(),
+        );
+    }
+
+    public function testDeleteAllLoginAttempts() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with('DELETE FROM `user_login_attempt`');
+
+        $this->subject->deleteAllLoginAttempts();
+    }
+
     public function testFindAuthTokenData() : void
     {
         $this->dbConnectionMock

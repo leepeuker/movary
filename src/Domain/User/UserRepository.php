@@ -91,6 +91,30 @@ class UserRepository
         return DateTime::createFromString($createdAt);
     }
 
+    /**
+     * @return list<array{id: int, subjectHash: string, createdAt: DateTime}>
+     */
+    public function findLoginAttempts() : array
+    {
+        $loginAttempts = $this->dbConnection->fetchAllAssociative(
+            'SELECT `id`, `subject_hash`, `created_at` FROM `user_login_attempt` ORDER BY `created_at` DESC',
+        );
+
+        return array_map(
+            static fn(array $loginAttempt) : array => [
+                'id' => (int)$loginAttempt['id'],
+                'subjectHash' => (string)$loginAttempt['subject_hash'],
+                'createdAt' => DateTime::createFromString((string)$loginAttempt['created_at']),
+            ],
+            $loginAttempts,
+        );
+    }
+
+    public function deleteAllLoginAttempts() : void
+    {
+        $this->dbConnection->executeStatement('DELETE FROM `user_login_attempt`');
+    }
+
     public function replacePasswordResetToken(int $userId, string $tokenHash, DateTime $expirationDate) : void
     {
         $createdAt = DateTime::create();

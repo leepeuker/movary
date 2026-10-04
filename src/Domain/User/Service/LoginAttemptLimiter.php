@@ -47,6 +47,19 @@ class LoginAttemptLimiter
         $this->repository->deleteLoginAttempt($attemptId);
     }
 
+    /**
+     * @return list<array{id: int, subjectHash: string, createdAt: DateTime}>
+     */
+    public function fetchAttempts() : array
+    {
+        return $this->repository->findLoginAttempts();
+    }
+
+    public function flushAttempts() : void
+    {
+        $this->repository->deleteAllLoginAttempts();
+    }
+
     public function resetAccountAttempts(string $email) : void
     {
         $this->repository->deleteLoginAttemptsForSubject(
