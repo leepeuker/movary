@@ -31,32 +31,31 @@ class UserRepositoryTest extends TestCase
             ->with(
                 'user_login_attempt',
                 [
-                    'scope' => 'account',
                     'subject_hash' => 'hash',
                     'created_at' => '2026-10-03 12:00:00',
                 ],
             );
+        $this->dbConnectionMock->expects(self::once())->method('lastInsertId')->willReturn('12');
 
-        $this->subject->createLoginAttempt('account', 'hash', $createdAt);
+        self::assertSame(12, $this->subject->createLoginAttempt('hash', $createdAt));
     }
 
-    public function testFindLoginAttemptThresholdDate() : void
+    public function testFindLoginAttemptAboveLimitDate() : void
     {
         $this->dbConnectionMock
             ->expects(self::once())
             ->method('fetchOne')
             ->with(
                 'SELECT `created_at` FROM `user_login_attempt` '
-                . 'WHERE `scope` = ? AND `subject_hash` = ? AND `created_at` >= ? '
-                . 'ORDER BY `created_at` DESC LIMIT 4, 1',
-                ['account', 'hash', '2026-10-03 12:00:00'],
+                . 'WHERE `subject_hash` = ? AND `created_at` >= ? '
+                . 'ORDER BY `created_at` DESC LIMIT 5, 1',
+                ['hash', '2026-10-03 12:00:00'],
             )
             ->willReturn('2026-10-03 12:01:00');
 
         self::assertEquals(
             DateTime::createFromString('2026-10-03 12:01:00'),
-            $this->subject->findLoginAttemptThresholdDate(
-                'account',
+            $this->subject->findLoginAttemptAboveLimitDate(
                 'hash',
                 5,
                 DateTime::createFromString('2026-10-03 12:00:00'),

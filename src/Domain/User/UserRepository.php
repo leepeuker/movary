@@ -41,16 +41,17 @@ class UserRepository
         );
     }
 
-    public function createLoginAttempt(string $scope, string $subjectHash, DateTime $createdAt) : void
+    public function createLoginAttempt(string $subjectHash, DateTime $createdAt) : int
     {
         $this->dbConnection->insert(
             'user_login_attempt',
             [
-                'scope' => $scope,
                 'subject_hash' => $subjectHash,
                 'created_at' => (string)$createdAt,
             ],
         );
+
+        return (int)$this->dbConnection->lastInsertId();
     }
 
     public function deleteLoginAttemptsBefore(DateTime $date) : void
@@ -61,28 +62,26 @@ class UserRepository
         );
     }
 
-    public function deleteLoginAttemptsForSubject(string $scope, string $subjectHash) : void
+    public function deleteLoginAttempt(int $id) : void
     {
-        $this->dbConnection->delete(
-            'user_login_attempt',
-            [
-                'scope' => $scope,
-                'subject_hash' => $subjectHash,
-            ],
-        );
+        $this->dbConnection->delete('user_login_attempt', ['id' => $id]);
     }
 
-    public function findLoginAttemptThresholdDate(
-        string $scope,
+    public function deleteLoginAttemptsForSubject(string $subjectHash) : void
+    {
+        $this->dbConnection->delete('user_login_attempt', ['subject_hash' => $subjectHash]);
+    }
+
+    public function findLoginAttemptAboveLimitDate(
         string $subjectHash,
         int $attemptLimit,
         DateTime $windowStart,
     ) : ?DateTime {
         $createdAt = $this->dbConnection->fetchOne(
             'SELECT `created_at` FROM `user_login_attempt` '
-            . 'WHERE `scope` = ? AND `subject_hash` = ? AND `created_at` >= ? '
-            . 'ORDER BY `created_at` DESC LIMIT ' . ($attemptLimit - 1) . ', 1',
-            [$scope, $subjectHash, (string)$windowStart],
+            . 'WHERE `subject_hash` = ? AND `created_at` >= ? '
+            . 'ORDER BY `created_at` DESC LIMIT ' . $attemptLimit . ', 1',
+            [$subjectHash, (string)$windowStart],
         );
 
         if ($createdAt === false) {

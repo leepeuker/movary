@@ -8,13 +8,7 @@ use Movary\ValueObject\DateTime;
 
 class LoginAttemptLimiter
 {
-    private const string ACCOUNT_SCOPE = 'account';
-
-    private const string IP_SCOPE = 'ip';
-
     private const int ACCOUNT_ATTEMPT_LIMIT = 5;
-
-    private const int IP_ATTEMPT_LIMIT = 20;
 
     private const int WINDOW_IN_SECONDS = 900;
 
@@ -23,79 +17,55 @@ class LoginAttemptLimiter
     ) {
     }
 
-    public function ensureAttemptIsAllowed(string $email, ?string $clientIp) : void
+    public function reserveAttempt(string $email) : int
     {
         $now = DateTime::create();
         $windowStart = $now->subSeconds(self::WINDOW_IN_SECONDS);
+        $subjectHash = $this->hashSubject($this->normalizeEmail($email));
 
-        $retryAfterSeconds = $this->findRetryAfterSeconds(
-            self::ACCOUNT_SCOPE,
-            $this->hashSubject($this->normalizeEmail($email)),
-            self::ACCOUNT_ATTEMPT_LIMIT,
-            $now,
-            $windowStart,
-        );
-
-        if ($clientIp !== null) {
-            $retryAfterSeconds = max(
-                $retryAfterSeconds,
-                $this->findRetryAfterSeconds(
-                    self::IP_SCOPE,
-                    $this->hashSubject($clientIp),
-                    self::IP_ATTEMPT_LIMIT,
-                    $now,
-                    $windowStart,
-                ),
-            );
-        }
+        $this->repository->deleteLoginAttemptsBefore($windowStart);
+        // Reserve before verification so concurrent requests cannot all pass the limit check.
+        $attemptId = $this->repository->createLoginAttempt($subjectHash, $now);
+        $retryAfterSeconds = $this->findRetryAfterSeconds($subjectHash, $now, $windowStart);
 
         if ($retryAfterSeconds > 0) {
+            $this->repository->deleteLoginAttempt($attemptId);
+
             throw new LoginAttemptLimitReached($retryAfterSeconds);
         }
+
+        return $attemptId;
     }
 
-    public function recordFailedAttempt(string $email, ?string $clientIp) : void
+    public function releaseAttempt(int $attemptId) : void
     {
-        $now = DateTime::create();
-        $this->repository->deleteLoginAttemptsBefore($now->subSeconds(self::WINDOW_IN_SECONDS));
-        $this->repository->createLoginAttempt(
-            self::ACCOUNT_SCOPE,
-            $this->hashSubject($this->normalizeEmail($email)),
-            $now,
-        );
-
-        if ($clientIp !== null) {
-            $this->repository->createLoginAttempt(self::IP_SCOPE, $this->hashSubject($clientIp), $now);
-        }
+        $this->repository->deleteLoginAttempt($attemptId);
     }
 
     public function resetAccountAttempts(string $email) : void
     {
         $this->repository->deleteLoginAttemptsForSubject(
-            self::ACCOUNT_SCOPE,
             $this->hashSubject($this->normalizeEmail($email)),
         );
     }
 
     private function findRetryAfterSeconds(
-        string $scope,
         string $subjectHash,
         int $attemptLimit,
         DateTime $now,
         DateTime $windowStart,
     ) : int {
-        $firstAttemptInLimitWindow = $this->repository->findLoginAttemptThresholdDate(
-            $scope,
+        $firstAttemptAboveLimit = $this->repository->findLoginAttemptAboveLimitDate(
             $subjectHash,
             $attemptLimit,
             $windowStart,
         );
 
-        if ($firstAttemptInLimitWindow === null) {
+        if ($firstAttemptAboveLimit === null) {
             return 0;
         }
 
-        $retryAfterSeconds = (int)$firstAttemptInLimitWindow->format('U')
+        $retryAfterSeconds = (int)$firstAttemptAboveLimit->format('U')
             + self::WINDOW_IN_SECONDS
             - (int)$now->format('U');
 

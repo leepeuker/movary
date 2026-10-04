@@ -23,39 +23,37 @@ class LoginAttemptLimiterTest extends TestCase
         $this->subject = new LoginAttemptLimiter($this->repositoryMock);
     }
 
-    public function testAllowsAttemptWhenNoThresholdIsReached() : void
-    {
-        $this->repositoryMock
-            ->expects(self::exactly(2))
-            ->method('findLoginAttemptThresholdDate')
-            ->willReturn(null);
-
-        $this->subject->ensureAttemptIsAllowed('User@Example.com', '127.0.0.1');
-    }
-
-    public function testRejectsAttemptWhenAccountThresholdIsReached() : void
+    public function testReservesAttemptWhenLimitIsNotReached() : void
     {
         $this->repositoryMock
             ->expects(self::once())
-            ->method('findLoginAttemptThresholdDate')
+            ->method('findLoginAttemptAboveLimitDate')
+            ->willReturn(null);
+        $this->repositoryMock->expects(self::once())->method('deleteLoginAttemptsBefore');
+        $this->repositoryMock->expects(self::once())->method('createLoginAttempt')->willReturn(1);
+
+        self::assertSame(1, $this->subject->reserveAttempt('User@Example.com'));
+    }
+
+    public function testRejectsAndReleasesAttemptWhenLimitIsReached() : void
+    {
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('findLoginAttemptAboveLimitDate')
             ->willReturn(DateTime::create());
+        $this->repositoryMock->expects(self::once())->method('createLoginAttempt')->willReturn(1);
+        $this->repositoryMock->expects(self::once())->method('deleteLoginAttempt')->with(1);
 
         $this->expectException(LoginAttemptLimitReached::class);
 
-        $this->subject->ensureAttemptIsAllowed('user@example.com', null);
+        $this->subject->reserveAttempt('user@example.com');
     }
 
-    public function testRecordsAttemptsForAccountAndClientIp() : void
+    public function testReleaseAttempt() : void
     {
-        $this->repositoryMock
-            ->expects(self::once())
-            ->method('deleteLoginAttemptsBefore');
-        $this->repositoryMock
-            ->expects(self::exactly(2))
-            ->method('createLoginAttempt')
-            ->withAnyParameters();
+        $this->repositoryMock->expects(self::once())->method('deleteLoginAttempt')->with(1);
 
-        $this->subject->recordFailedAttempt('User@Example.com', '127.0.0.1');
+        $this->subject->releaseAttempt(1);
     }
 
     public function testResetsOnlyAccountAttemptsAfterSuccessfulLogin() : void
@@ -63,7 +61,7 @@ class LoginAttemptLimiterTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('deleteLoginAttemptsForSubject')
-            ->with('account', hash('sha256', 'user@example.com'));
+            ->with(hash('sha256', 'user@example.com'));
 
         $this->subject->resetAccountAttempts('User@Example.com');
     }

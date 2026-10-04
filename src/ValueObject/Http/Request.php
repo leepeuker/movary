@@ -15,7 +15,6 @@ class Request
         private readonly string $body,
         private readonly array $filesParameters,
         private readonly array $headers,
-        private readonly ?string $clientIp,
         private readonly string $userAgent,
         private readonly ?string $httpHost,
         private readonly ?string $httpReferer,
@@ -46,7 +45,6 @@ class Request
             $body,
             $filesParameters,
             $headers,
-            self::getServerSetting('REMOTE_ADDR'),
             $userAgent,
             $httpHost,
             $httpReferer,
@@ -131,11 +129,6 @@ class Request
     public function getBody() : string
     {
         return $this->body;
-    }
-
-    public function getClientIp() : ?string
-    {
-        return $this->clientIp;
     }
 
     public function getFileParameters() : array

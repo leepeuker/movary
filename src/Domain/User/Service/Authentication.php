@@ -32,7 +32,6 @@ class Authentication
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
         private readonly ServerSettings $serverSettings,
-        private readonly Request $request,
     ) {
     }
 
@@ -57,43 +56,38 @@ class Authentication
         string $password,
         ?int $userTotpCode = null,
     ) : UserEntity {
-        $clientIp = $this->request->getClientIp();
-        $this->loginAttemptLimiter->ensureAttemptIsAllowed($email, $clientIp);
+        $attemptId = $this->loginAttemptLimiter->reserveAttempt($email);
 
-        try {
-            $user = $this->repository->findUserByEmail($email);
+        $user = $this->repository->findUserByEmail($email);
 
-            if ($user === null) {
-                throw EmailNotFound::create();
-            }
+        if ($user === null) {
+            throw EmailNotFound::create();
+        }
 
-            if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
-                throw InvalidPassword::create();
-            }
+        if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
+            throw InvalidPassword::create();
+        }
 
-            $totpUri = $this->userApi->findTotpUri($user->getId());
-            if ($totpUri === null) {
-                $this->loginAttemptLimiter->resetAccountAttempts($email);
-
-                return $user;
-            }
-
-            if ($userTotpCode === null) {
-                throw MissingTotpCode::create();
-            }
-
-            if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
-                throw InvalidTotpCode::create();
-            }
-
+        $totpUri = $this->userApi->findTotpUri($user->getId());
+        if ($totpUri === null) {
             $this->loginAttemptLimiter->resetAccountAttempts($email);
 
             return $user;
-        } catch (EmailNotFound|InvalidPassword|MissingTotpCode|InvalidTotpCode $exception) {
-            $this->loginAttemptLimiter->recordFailedAttempt($email, $clientIp);
-
-            throw $exception;
         }
+
+        if ($userTotpCode === null) {
+            $this->loginAttemptLimiter->releaseAttempt($attemptId);
+
+            throw MissingTotpCode::create();
+        }
+
+        if ($this->twoFactorAuthenticationApi->verifyTotpUri($user->getId(), $userTotpCode) === false) {
+            throw InvalidTotpCode::create();
+        }
+
+        $this->loginAttemptLimiter->resetAccountAttempts($email);
+
+        return $user;
     }
 
     public function getCurrentUser() : UserEntity

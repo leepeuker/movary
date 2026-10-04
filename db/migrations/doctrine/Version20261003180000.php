@@ -20,7 +20,6 @@ final class Version20261003180000 extends AbstractMigration
             $this->addSql(
                 'CREATE TABLE user_login_attempt ('
                 . 'id INT AUTO_INCREMENT NOT NULL, '
-                . 'scope VARCHAR(16) NOT NULL, '
                 . 'subject_hash CHAR(64) NOT NULL, '
                 . 'created_at DATETIME NOT NULL, '
                 . 'PRIMARY KEY(id)'
@@ -30,7 +29,6 @@ final class Version20261003180000 extends AbstractMigration
             $this->addSql(
                 'CREATE TABLE user_login_attempt ('
                 . 'id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, '
-                . 'scope VARCHAR(16) NOT NULL, '
                 . 'subject_hash CHAR(64) NOT NULL, '
                 . 'created_at DATETIME NOT NULL'
                 . ')',
@@ -38,7 +36,7 @@ final class Version20261003180000 extends AbstractMigration
         }
         $this->addSql(
             'CREATE INDEX index_user_login_attempt_subject '
-            . 'ON user_login_attempt (scope, subject_hash, created_at)',
+            . 'ON user_login_attempt (subject_hash, created_at)',
         );
         $this->addSql('CREATE INDEX index_user_login_attempt_created_at ON user_login_attempt (created_at)');
     }
