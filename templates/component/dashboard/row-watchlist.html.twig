@@ -7,19 +7,18 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for watchlistItem in watchlistItems %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}-{{ watchlistItem.title|slugify }}"
-                         style="cursor: pointer;">
+                    <div class="card h-100 position-relative">
                         <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title }}" type="hidden">
-                        <div style="height: 100%">
+                        <a class="h-100" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}-{{ watchlistItem.title|slugify }}"
+                           style="cursor: pointer;">
                             <img src="{{ watchlistItem.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
                                  alt="{{ watchlistItem.title }} Poster">
-
-                        </div>
+                        </a>
                         <div class="card-footer" style="padding: 0.1rem">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ watchlistItem.created_at|date(dateFormatPhp) }}</small>
                         </div>
-                    </a>
+                    </div>
                 </div>
             {% endfor %}
         </div>

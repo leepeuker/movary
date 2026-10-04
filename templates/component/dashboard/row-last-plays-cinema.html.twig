@@ -7,13 +7,12 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for lastPlay in lastPlaysCinema %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}-{{ lastPlay.title|slugify }}">
-                        <div style="height: 100%">
+                    <div class="card h-100 position-relative">
+                        <a class="h-100" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}-{{ lastPlay.title|slugify }}">
                             <img src="{{ lastPlay.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
                                  alt="{{ lastPlay.title }} Poster">
-
-                        </div>
+                        </a>
                         <div class="card-footer" style="padding: 0.1rem">
                             <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>
                         </div>
@@ -23,7 +22,7 @@
                                             {{ lastPlay.user_rating }}
                                         </span>
                         {% endif %}
-                    </a>
+                    </div>
                 </div>
             {% endfor %}
         </div>
