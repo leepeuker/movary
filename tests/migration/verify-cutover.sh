@@ -132,7 +132,7 @@ query_sqlite release-0.73.1.sqlite \
     "INSERT INTO server_setting (key, value) VALUES ('release-setting', 'preserved')"
 
 run_sqlite_app_command release-0.73.1.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261004100000' \
+assert_equal 'Movary\DatabaseMigration\Version20261004104000' \
     "$(query_sqlite release-0.73.1.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite \
@@ -243,33 +243,25 @@ assert_equal 0 "$(query_sqlite missing-history.sqlite "SELECT COUNT(*) FROM sqli
     'SQLite initialized Doctrine metadata for an incomplete legacy history'
 
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261004100000' \
+assert_equal 'Movary\DatabaseMigration\Version20261004104000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite legacy database did not record the latest Doctrine migration'
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 run_sqlite_app_command null-genre.sqlite database:migration:status >/dev/null
-run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null
-assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
-    "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'SQLite did not roll back the login-attempt migration'
-run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
-    "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'SQLite did not roll back the location foreign-key migration'
 if run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null 2>&1; then
-    echo 'SQLite rolled back the irreversible authentication-token migration' >&2
+    echo 'SQLite rolled back the irreversible MySQL repair migration' >&2
     exit 1
 fi
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261004104000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'SQLite removed the authentication-token migration after rejected rollback'
+    'SQLite removed the MySQL repair migration after rejected rollback'
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 
 run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
 assert_equal 28 "$(query_sqlite doctrine-fresh.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
     'Fresh SQLite Doctrine database has an unexpected table count'
-assert_equal 'Movary\DatabaseMigration\Version20261004100000' \
+assert_equal 'Movary\DatabaseMigration\Version20261004104000' \
     "$(query_sqlite doctrine-fresh.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'Fresh SQLite database did not execute the latest Doctrine migration'
 
@@ -323,7 +315,7 @@ mysql_query movary_release "INSERT INTO user_auth_token (id, user_id, token, dev
 mysql_query movary_release "INSERT INTO server_setting (\`key\`, value) VALUES ('release-setting', 'preserved')"
 
 run_mysql_app_command movary_release database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261004100000' \
+assert_equal 'Movary\DatabaseMigration\Version20261004104000' \
     "$(mysql_query movary_release 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
@@ -387,26 +379,18 @@ assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movi
     'MySQL watched cache does not isolate identical Trakt IDs by user'
 
 run_mysql_app_command movary database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261004100000' \
+assert_equal 'Movary\DatabaseMigration\Version20261004104000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL legacy database did not record the latest Doctrine migration'
 run_mysql_app_command movary database:migration:migrate
 run_mysql_app_command movary database:migration:status >/dev/null
-run_mysql_app_command movary database:migration:rollback >/dev/null
-assert_equal 'Movary\DatabaseMigration\Version20261003190000' \
-    "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'MySQL did not roll back the login-attempt migration'
-run_mysql_app_command movary database:migration:rollback >/dev/null
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
-    "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'MySQL did not roll back the location foreign-key migration'
 if run_mysql_app_command movary database:migration:rollback >/dev/null 2>&1; then
-    echo 'MySQL rolled back the irreversible authentication-token migration' >&2
+    echo 'MySQL rolled back the irreversible repair migration' >&2
     exit 1
 fi
-assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261004104000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
-    'MySQL removed the authentication-token migration after rejected rollback'
+    'MySQL removed the repair migration after rejected rollback'
 run_mysql_app_command movary database:migration:migrate
 
 docker exec "$mysql_container" mysql --user=root --password=movary-root \
@@ -510,6 +494,21 @@ assert_equal 'double|3|1' "$(mysql_query doctrine_fresh \
        AND TABLE_NAME = 'movie'
        AND COLUMN_NAME = 'imdb_rating_average'")" \
     'Fresh MySQL Doctrine database does not preserve IMDb rating precision'
+
+mysql_query doctrine_fresh "ALTER TABLE user_auth_token MODIFY token CHAR(32) NOT NULL; ALTER TABLE movie_user_watch_dates DROP FOREIGN KEY fk_movie_user_watch_dates_location_id; ALTER TABLE movie_user_watch_dates ADD CONSTRAINT fk_movie_user_watch_dates_location_id FOREIGN KEY (location_id) REFERENCES location (id) ON DELETE CASCADE; ALTER TABLE person DROP CHECK chk_person_gender; ALTER TABLE user DROP CHECK chk_user_mastodon_post_visibility; DROP INDEX index_user_login_attempt_subject ON user_login_attempt; DROP INDEX index_user_login_attempt_created_at ON user_login_attempt; DELETE FROM doctrine_migration_versions WHERE version = 'Movary\\\\DatabaseMigration\\\\Version20261004104000'"
+run_mysql_app_command doctrine_fresh database:migration:migrate
+assert_equal 2 "$(mysql_query doctrine_fresh \
+    "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND CONSTRAINT_TYPE = 'CHECK'")" \
+    'MySQL repair migration did not restore missing value-domain checks'
+assert_equal 'char(64)|NO' "$(mysql_query doctrine_fresh \
+    "SELECT CONCAT_WS('|', COLUMN_TYPE, IS_NULLABLE) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_auth_token' AND COLUMN_NAME = 'token'")" \
+    'MySQL repair migration did not restore the authentication-token column definition'
+assert_equal 'SET NULL' "$(mysql_query doctrine_fresh \
+    "SELECT DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'movie_user_watch_dates' AND CONSTRAINT_NAME = 'fk_movie_user_watch_dates_location_id'")" \
+    'MySQL repair migration did not restore the location foreign-key delete rule'
+assert_equal 2 "$(mysql_query doctrine_fresh \
+    "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_login_attempt' AND INDEX_NAME IN ('index_user_login_attempt_subject', 'index_user_login_attempt_created_at')")" \
+    'MySQL repair migration did not restore login-attempt indexes'
 
 docker exec "$mysql_container" mysql --user=root --password=movary-root movary_drift \
     --execute='ALTER TABLE movie_cast DROP FOREIGN KEY movie_cast_ibfk_1'
