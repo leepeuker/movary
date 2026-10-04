@@ -7,17 +7,19 @@
         <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for mostWatchedActress in mostWatchedActresses %}
                 <div class="col" style="padding-bottom: 1rem;">
-                    <a class="card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedActress.id }}-{{ mostWatchedActress.name|slugify }}"
-                         style="cursor: pointer;">
+                    <div class="card h-100 position-relative">
                         <div class="card-header text-truncate" style="padding: 0.2rem">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.name }}</small>
                         </div>
                         <input id="actorName_{{ mostWatchedActress.id }}" value="{{ mostWatchedActress.name }}" type="hidden">
-                        <img src="{{ mostWatchedActress.poster_path }}" alt="{{ mostWatchedActress.name }} Poster">
+                        <a href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedActress.id }}-{{ mostWatchedActress.name|slugify }}"
+                           style="cursor: pointer;">
+                            <img style="max-width: 100%" src="{{ mostWatchedActress.poster_path }}" alt="{{ mostWatchedActress.name }} Poster">
+                        </a>
                         <div class="card-footer" style="padding: 0.1rem">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActress.uniqueCount }}x</small>
                         </div>
-                    </a>
+                    </div>
                 </div>
             {% endfor %}
         </div>
