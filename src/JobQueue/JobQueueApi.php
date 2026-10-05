@@ -125,9 +125,16 @@ class JobQueueApi
         return $this->repository->addJob(JobType::createTraktImportRatings(), $jobStatus ?? JobStatus::createWaiting(), $userId);
     }
 
-    public function fetchJobsForStatusPage(int $limit) : array
+    public function countJobs(?JobQueueFilter $filter = null) : int
     {
-        $jobs = $this->repository->fetchJobs($limit);
+        return $filter === null ? $this->repository->countJobs() : $this->repository->countJobs($filter);
+    }
+
+    public function fetchJobsForStatusPage(int $limit, int $offset = 0, ?JobQueueFilter $filter = null) : array
+    {
+        $jobs = $filter === null
+            ? $this->repository->fetchJobs($limit, $offset)
+            : $this->repository->fetchJobs($limit, $offset, $filter);
 
         $jobsData = [];
         foreach ($jobs as $job) {

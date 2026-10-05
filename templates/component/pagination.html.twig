@@ -1,0 +1,31 @@
+{% if paginationElements.totalCount > 0 %}
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            {% if paginationElements.previous is null %}
+                <li class="page-item disabled"><span class="page-link" aria-hidden="true">&laquo;</span></li>
+                <li class="page-item disabled"><span class="page-link" aria-hidden="true">&lsaquo;</span></li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ paginationPath }}?{{ paginationQuery|merge({page: 1})|url_encode }}" aria-label="First page">&laquo;</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="{{ paginationPath }}?{{ paginationQuery|merge({page: paginationElements.previous})|url_encode }}" aria-label="Previous page">&lsaquo;</a>
+                </li>
+            {% endif %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ paginationElements.currentPage }} of {{ paginationElements.maxPage }}</span>
+            </li>
+            {% if paginationElements.next is null %}
+                <li class="page-item disabled"><span class="page-link" aria-hidden="true">&rsaquo;</span></li>
+                <li class="page-item disabled"><span class="page-link" aria-hidden="true">&raquo;</span></li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ paginationPath }}?{{ paginationQuery|merge({page: paginationElements.next})|url_encode }}" aria-label="Next page">&rsaquo;</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="{{ paginationPath }}?{{ paginationQuery|merge({page: paginationElements.maxPage})|url_encode }}" aria-label="Last page">&raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}

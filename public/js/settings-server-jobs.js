@@ -6,17 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     localStorage.setItem('alertMessageJobs', '')
 
-    let url = new URL(window.location.href)
-    let params = new URLSearchParams(url.search);
-    let jpp = params.get('jpp')
-
-    if (jpp !== null) {
-        document.getElementById('jobsPerPage').value = jpp
-    } else {
-        document.getElementById('jobsPerPage').value = 30
-    }
-
     registerJobRowEvents()
+    document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
     document.getElementById('jobRemoveConfirmButton').addEventListener('click', removeJob)
 });
 
@@ -139,10 +130,43 @@ async function removeJob() {
     refreshPage()
 }
 
-function refreshPage() {
+function refreshPage(resetPage = false) {
     const jobsPerPage = document.getElementById('jobsPerPage').value
+    const url = new URL(window.location.href)
 
-    window.location.href = APPLICATION_URL + '/settings/server/jobs?jpp=' + jobsPerPage
+    url.searchParams.set('perPage', jobsPerPage)
+    url.searchParams.delete('jpp')
+    if (resetPage) {
+        url.searchParams.set('page', '1')
+    }
+    window.location.href = url.toString()
+}
+
+function applyJobFilters() {
+    const url = new URL(window.location.href)
+
+    setOptionalQueryParameter(url, 'user', document.getElementById('jobFilterUser').value)
+    setOptionalQueryParameter(url, 'type', document.getElementById('jobFilterType').value)
+    setOptionalQueryParameter(url, 'status', document.getElementById('jobFilterStatus').value)
+    url.searchParams.set('page', '1')
+
+    window.location.href = url.toString()
+}
+
+function resetJobFilters() {
+    document.getElementById('jobFilterUser').value = ''
+    document.getElementById('jobFilterType').value = ''
+    document.getElementById('jobFilterStatus').value = ''
+    applyJobFilters()
+}
+
+function setOptionalQueryParameter(url, name, value) {
+    if (value === '') {
+        url.searchParams.delete(name)
+        return
+    }
+
+    url.searchParams.set(name, value)
 }
 
 async function removeAllJobs() {
