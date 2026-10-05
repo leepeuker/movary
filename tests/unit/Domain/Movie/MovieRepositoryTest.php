@@ -205,4 +205,41 @@ class MovieRepositoryTest extends TestCase
             ),
         );
     }
+
+    public function testFetchUniqueWatchedMoviesPaginatedIncludesLastWatchedDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains(
+                        $query,
+                        'MAX(mh.watched_at) OVER(PARTITION BY m.id) as lastWatchedAt',
+                    ),
+                ),
+                [42, 42, '%%'],
+            )
+            ->willReturn([['lastWatchedAt' => '2026-10-05 20:00:00']]);
+
+        self::assertSame(
+            [['lastWatchedAt' => '2026-10-05 20:00:00']],
+            $this->subject->fetchUniqueWatchedMoviesPaginated(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'title',
+                sortOrder: SortOrder::createAsc(),
+                releaseYear: null,
+                language: null,
+                genre: null,
+                hasUserRating: null,
+                userRatingMin: null,
+                userRatingMax: null,
+                locationId: null,
+                productionCountryCode: null,
+            ),
+        );
+    }
 }

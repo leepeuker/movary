@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="canonical" href="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
 
+    <script>
+        try {
+            document.documentElement.dataset.movieListView = localStorage.getItem('movieListView') === 'table' ? 'table' : 'posters';
+        } catch {
+            document.documentElement.dataset.movieListView = 'posters';
+        }
+    </script>
+
     <title>{% apply trim %}{% block title %}Movary{% endblock %}{% endapply %} | {{ applicationName }}</title>
     <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
 

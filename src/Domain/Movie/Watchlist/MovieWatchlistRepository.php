@@ -193,7 +193,7 @@ class MovieWatchlistRepository
         ?string $genre,
         ?string $productionCountryCode,
     ) : array {
-        $payload = [$userId, $userId];
+        $payload = [$userId, $userId, $userId];
 
         $offset = ($limit * $page) - $limit;
 
@@ -236,7 +236,10 @@ class MovieWatchlistRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT m.*, mur.rating as userRating, added_at
+            SELECT m.*, mur.rating as userRating, added_at,
+                (SELECT MAX(muwd.watched_at)
+                 FROM movie_user_watch_dates muwd
+                 WHERE muwd.movie_id = m.id AND muwd.user_id = ?) as lastWatchedAt
             FROM movie m
             JOIN watchlist wl on wl.movie_id = m.id and wl.user_id = ?
             LEFT JOIN movie_user_rating mur ON wl.movie_id = mur.movie_id and mur.user_id = ?

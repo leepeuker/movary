@@ -1034,7 +1034,9 @@ class MovieRepository
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT * FROM (
-                SELECT m.*, mur.rating as userRating, ROW_NUMBER() OVER(PARTITION BY m.id) rn
+                SELECT m.*, mur.rating as userRating,
+                    MAX(mh.watched_at) OVER(PARTITION BY m.id) as lastWatchedAt,
+                    ROW_NUMBER() OVER(PARTITION BY m.id) rn
                 FROM movie m
                 JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
                 LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?

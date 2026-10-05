@@ -6,6 +6,7 @@
 
 {% block scripts %}
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ applicationUrl }}/js/movie-list-view.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -17,11 +18,23 @@
 
             <form action="{{ applicationUrl }}/users/{{ routeUsername }}/history" method="GET">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="s" placeholder="Search history" value="{{ (searchTerm is null) ? '' : searchTerm }}">
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <input type="text" class="form-control" name="s" placeholder="Search history" value="{{ (searchTerm is null) ? '' : searchTerm }}"
+                           style="border-right-color: #aab0b3">
+                    <button class="btn btn-primary" type="submit" aria-label="Search history" title="Search history">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                    </button>
+                    <button id="movieViewToggleButton" class="btn btn-primary" type="button" aria-label="Show table view" title="Show table view"
+                            data-storage-key="movieListView" style="border-left-color: #aab0b3">
+                        <svg id="movieTableViewIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm15 2H1v3h14zm0 4H1v3h14zm0 4H1v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/>
+                        </svg>
+                        <svg id="moviePosterViewIcon" class="d-none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/>
+                        </svg>
+                    </button>
                 </div>
             </form>
-            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+            <div id="moviePosterView" class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for historyEntry in historyEntries %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <div class="card h-100 position-relative">
@@ -41,6 +54,38 @@
                     </div>
                     {% set lastDate = historyEntry.watched_at %}
                 {% endfor %}
+            </div>
+
+            <div id="movieTableView" class="table-responsive d-none">
+                <table class="table table-hover align-middle text-start">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-sm-table-cell" scope="col">Poster</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Release</th>
+                            <th scope="col">Runtime</th>
+                            <th class="d-none d-md-table-cell" scope="col">User rating</th>
+                            <th class="d-none d-lg-table-cell" scope="col">Watched</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for historyEntry in historyEntries %}
+                            {% set movieUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies/' ~ historyEntry.id ~ '-' ~ historyEntry.title|slugify %}
+                            <tr>
+                                <td class="d-none d-sm-table-cell">
+                                    <a href="{{ movieUrl }}">
+                                        <img src="{{ historyEntry.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ historyEntry.title }}">
+                                    </a>
+                                </td>
+                                <td><a href="{{ movieUrl }}">{{ historyEntry.title }}</a></td>
+                                <td>{{ historyEntry.release_date is null ? '—' : historyEntry.release_date|date(dateFormatPhp) }}</td>
+                                <td>{{ historyEntry.runtime is null ? '—' : historyEntry.runtime ~ ' min' }}</td>
+                                <td class="d-none d-md-table-cell">{{ historyEntry.userRating is null ? '—' : historyEntry.userRating }}</td>
+                                <td class="d-none d-lg-table-cell">{{ historyEntry.watched_at|date(dateFormatPhp) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
             <ul class="pagination justify-content-center">
