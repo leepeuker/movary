@@ -14,9 +14,15 @@ class JobQueueApi
     ) {
     }
 
-    public function addImdbSyncJob(JobStatus $jobStatus) : int
+    public function addImdbSyncJob(JobStatus $jobStatus, array $movieIds = []) : int
     {
-        return $this->repository->addJob(JobType::createImdbSync(), $jobStatus);
+        return $this->repository->addJob(
+            JobType::createImdbSync(),
+            $jobStatus,
+            parameters: [
+                'movieIds' => $movieIds,
+            ],
+        );
     }
 
     public function addJellyfinExportMoviesJob(int $userId, array $movieIds = [], ?JobStatus $jobStatus = null) : int
@@ -98,9 +104,15 @@ class JobQueueApi
         );
     }
 
-    public function addTmdbPersonSyncJob(JobStatus $createDone) : int
+    public function addTmdbPersonSyncJob(JobStatus $jobStatus, array $personIds = []) : int
     {
-        return $this->repository->addJob(JobType::createTmdbPersonSyncJob(), $createDone);
+        return $this->repository->addJob(
+            JobType::createTmdbPersonSyncJob(),
+            $jobStatus,
+            parameters: [
+                'personIds' => $personIds,
+            ],
+        );
     }
 
     public function addTraktImportHistoryJob(int $userId, ?JobStatus $jobStatus = null) : int

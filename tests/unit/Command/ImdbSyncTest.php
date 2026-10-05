@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Movary\Command;
 
+use Movary\Command\ImdbSync;
 use Movary\Command\Mapper\InputMapper;
-use Movary\Command\TmdbMovieSync;
 use Movary\JobQueue\JobQueueApi;
-use Movary\Service\Tmdb\SyncMovies;
+use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\ValueObject\JobStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -13,21 +13,21 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
-#[CoversClass(TmdbMovieSync::class)]
-class TmdbMovieSyncTest extends TestCase
+#[CoversClass(ImdbSync::class)]
+class ImdbSyncTest extends TestCase
 {
-    public function testOptionsArePassedToSyncServiceAndJob() : void
+    public function testMovieIdsOptionIsPassedToSyncServiceAndJob() : void
     {
-        $syncMovies = $this->createMock(SyncMovies::class);
-        $syncMovies
+        $sync = $this->createMock(ImdbMovieRatingSync::class);
+        $sync
             ->expects(self::once())
-            ->method('syncMovies')
-            ->with(null, null, [7, 8], true);
+            ->method('syncMultipleMovieRatings')
+            ->with(null, null, [7, 8], false);
 
         $jobQueueApi = $this->createMock(JobQueueApi::class);
         $jobQueueApi
             ->expects(self::once())
-            ->method('addTmdbMovieSyncJob')
+            ->method('addImdbSyncJob')
             ->with(
                 self::callback(static fn (JobStatus $status) : bool => (string)$status === 'in progress'),
                 [7, 8],
@@ -35,16 +35,13 @@ class TmdbMovieSyncTest extends TestCase
             ->willReturn(1);
         $jobQueueApi->expects(self::once())->method('updateJobStatus');
 
-        $tester = new CommandTester(new TmdbMovieSync(
-            $syncMovies,
+        $tester = new CommandTester(new ImdbSync(
+            $sync,
             $jobQueueApi,
             new InputMapper(),
             $this->createStub(LoggerInterface::class),
         ));
 
-        self::assertSame(Command::SUCCESS, $tester->execute([
-            '--movieIds' => '7,8',
-            '--never-synced' => true,
-        ]));
+        self::assertSame(Command::SUCCESS, $tester->execute(['--movieIds' => '7,8']));
     }
 }
