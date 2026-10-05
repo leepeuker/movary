@@ -158,9 +158,13 @@ class MovieApi
         return $this->repository->fetchAll();
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(
+        ?int $limit = null,
+        ?array $ids = null,
+        bool $onlyNeverSynced = false,
+    ) : Traversable
     {
-        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit, $ids);
+        return $this->movieRepository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit, $ids, $onlyNeverSynced);
     }
 
     public function fetchById(int $movieId) : MovieEntity

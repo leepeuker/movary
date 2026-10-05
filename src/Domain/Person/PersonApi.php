@@ -88,9 +88,13 @@ class PersonApi
         $this->repository->deleteById($id);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(
+        ?int $limit = null,
+        ?array $ids = null,
+        bool $onlyNeverSynced = false,
+    ) : Traversable
     {
-        return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit, $ids);
+        return $this->repository->fetchAllOrderedByLastUpdatedAtTmdbAsc($limit, $ids, $onlyNeverSynced);
     }
 
     public function findById(int $personId) : ?PersonEntity
