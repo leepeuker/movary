@@ -46,47 +46,22 @@
 
             <br>
 
-            <div class="list-group">
+            <div class="list-group" id="dashboardRows" data-username="{{ routeUsername }}">
                 {% for dashboardRow in dashboardRows %}
-                    {% if dashboardRow.isLastPlays and dashboardRow.isVisible %}
-                        {% import 'component/dashboard/row-last-plays.html.twig' as dashboardLastPlays %}
-                        {{ dashboardLastPlays.create(dashboardRow, lastPlays, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedActors and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-actors.html.twig" as dashboardMostWatchedActors %}
-                        {{ dashboardMostWatchedActors.create(dashboardRow, mostWatchedActors, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedActresses and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-actresses.html.twig" as dashboardMostWatchedActresses %}
-                        {{ dashboardMostWatchedActresses.create(dashboardRow, mostWatchedActresses, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedDirectors and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-directors.html.twig" as dashboardMostWatchedDirectors %}
-                        {{ dashboardMostWatchedDirectors.create(dashboardRow, mostWatchedDirectors, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedGenres and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-genres.html.twig" as dashboardMostWatchedGenres %}
-                        {{ dashboardMostWatchedGenres.create(dashboardRow, mostWatchedGenres, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedLanguages and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-languages.html.twig" as dashboardMostWatchedLanguages %}
-                        {{ dashboardMostWatchedLanguages.create(dashboardRow, mostWatchedLanguages, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedProductionCompanies and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-production-companies.html.twig" as dashboardMostWatchedProductionCompanies %}
-                        {{ dashboardMostWatchedProductionCompanies.create(dashboardRow, mostWatchedProductionCompanies, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedReleaseYears and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-release-year.html.twig" as dashboardMostWatchedReleaseYears %}
-                        {{ dashboardMostWatchedReleaseYears.create(dashboardRow, mostWatchedReleaseYears, routeUsername) }}
-                    {% elseif dashboardRow.isWatchlist and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-watchlist.html.twig" as dashboardWatchlist %}
-                        {{ dashboardWatchlist.create(dashboardRow, watchlistItems, routeUsername) }}
-                    {% elseif dashboardRow.isTopLocations and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-top-locations.html.twig" as dashboardTopLocations %}
-                        {{ dashboardTopLocations.create(dashboardRow, topLocations, routeUsername) }}
-                    {% elseif dashboardRow.isLastPlaysCinema and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-last-plays-cinema.html.twig" as dashboardTopLocations %}
-                        {{ dashboardTopLocations.create(dashboardRow, lastPlaysCinema, routeUsername) }}
-                    {% elseif dashboardRow.isMostWatchedProductionCountries and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-most-watched-production-countries.html.twig" as dashboardMostWatchedProductionCountries %}
-                        {{ dashboardMostWatchedProductionCountries.create(dashboardRow, mostWatchedProductionCountries, routeUsername) }}
-                    {% elseif dashboardRow.isPersonalRatingDistribution and dashboardRow.isVisible %}
-                        {% import "component/dashboard/row-rating-distribution.html.twig" as dashboardRatingDistribution %}
-                        {{ dashboardRatingDistribution.create(dashboardRow, personalRatingDistribution, routeUsername) }}
+                    {% if dashboardRow.isVisible %}
+                        {% if dashboardRow.isExtended %}
+                            {{ include('component/dashboard/row.html.twig') }}
+                        {% else %}
+                            {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+                            {{ rowItemToggle.create(dashboardRow) }}
+                            <li class="list-group-item dashboardRowPlaceholder inactiveItem py-4">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="spinner-border text-secondary" role="status">
+                                        <span class="visually-hidden">Loading {{ dashboardRow.name }}</span>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </div>

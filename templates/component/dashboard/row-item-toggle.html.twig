@@ -8,6 +8,8 @@
             {{ theme == 'dark' ? 'inactiveItemButton' : 'inactiveItemButton' }}
             {% endif %}
             "
+        data-dashboard-row-id="{{ dashboardRow.id }}"
+        data-dashboard-row-extended="{{ dashboardRow.isExtended ? 'true' : 'false' }}"
         onclick="toggleButton(this)">
         {{ dashboardRow.name }}
         <i class="bi {{ dashboardRow.isExtended ? 'bi-chevron-up' : 'bi-chevron-down' }} float-end"></i>
