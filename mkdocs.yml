@@ -50,6 +50,7 @@ nav:
       - Netflix: features/netflix.md
       - Radarr: features/radarr.md
       - Mastodon: features/mastodon.md
+  - Backup and restore: 'backup-and-restore.md'
   - Development:
       - Setup: development/setup.md
       - Directory structure: development/file-structure.md
