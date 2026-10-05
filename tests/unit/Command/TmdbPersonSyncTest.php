@@ -16,19 +16,22 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[CoversClass(TmdbPersonSync::class)]
 class TmdbPersonSyncTest extends TestCase
 {
-    public function testNeverSyncedOptionIsPassedToSyncService() : void
+    public function testOptionsArePassedToSyncServiceAndJob() : void
     {
         $syncPersons = $this->createMock(SyncPersons::class);
         $syncPersons
             ->expects(self::once())
             ->method('syncPersons')
-            ->with(null, null, null, true);
+            ->with(null, null, [7, 8], true);
 
         $jobQueueApi = $this->createMock(JobQueueApi::class);
         $jobQueueApi
             ->expects(self::once())
             ->method('addTmdbPersonSyncJob')
-            ->with(self::callback(static fn (JobStatus $status) : bool => (string)$status === 'in progress'))
+            ->with(
+                self::callback(static fn (JobStatus $status) : bool => (string)$status === 'in progress'),
+                [7, 8],
+            )
             ->willReturn(1);
         $jobQueueApi->expects(self::once())->method('updateJobStatus');
 
@@ -39,6 +42,9 @@ class TmdbPersonSyncTest extends TestCase
             $this->createStub(LoggerInterface::class),
         ));
 
-        self::assertSame(Command::SUCCESS, $tester->execute(['--never-synced' => true]));
+        self::assertSame(Command::SUCCESS, $tester->execute([
+            '--personIds' => '7,8',
+            '--never-synced' => true,
+        ]));
     }
 }

@@ -13,6 +13,24 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(JobQueueApi::class)]
 class JobQueueApiTest extends TestCase
 {
+    public function testAddImdbSyncJobAddsMovieIdsAsParameters() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJob')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'imdb_sync'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'in progress'),
+                null,
+                ['movieIds' => [7, 8]],
+            )
+            ->willReturn(5);
+
+        (new JobQueueApi($repository))->addImdbSyncJob(JobStatus::createInProgress(), [7, 8]);
+    }
+
     public function testAddPasswordResetEmailJobAddsWaitingJobWithoutSensitiveParameters() : void
     {
         /** @var JobQueueRepository&MockObject $repository */
@@ -47,6 +65,24 @@ class JobQueueApiTest extends TestCase
             ->willReturn(5);
 
         (new JobQueueApi($repository))->addTmdbMovieSyncJob(JobStatus::createWaiting(), [7, 8]);
+    }
+
+    public function testAddTmdbPersonSyncJobAddsPersonIdsAsParameters() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJob')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'tmdb_person_sync'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'in progress'),
+                null,
+                ['personIds' => [7, 8]],
+            )
+            ->willReturn(5);
+
+        (new JobQueueApi($repository))->addTmdbPersonSyncJob(JobStatus::createInProgress(), [7, 8]);
     }
 
     public function testFetchJobsForStatusPageMapsJobDetails() : void
