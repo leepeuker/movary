@@ -282,8 +282,6 @@ final class Version20261005130000 extends AbstractMigration
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function down(Schema $schema) : void
     {
-        $this->throwIrreversibleMigrationException(
-            'Country rows may be referenced or may have existed before this migration.',
-        );
+        // Preserve reference rows because they may predate this migration or be referenced by movies.
     }
 }
