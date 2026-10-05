@@ -56,6 +56,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     # Job Queue #
     #############
     $routes->add('GET', '/jobs', [Web\JobController::class, 'getJobs'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/job-queue/{jobId:\d+}', [Web\JobController::class, 'deleteJob'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
     $routes->add('POST', '/job-queue/purge-processed', [Web\JobController::class, 'purgeProcessedJobs'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,

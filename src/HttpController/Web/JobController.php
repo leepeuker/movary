@@ -37,6 +37,17 @@ class JobController
         return Response::createJson(Json::encode($jobs));
     }
 
+    public function deleteJob(Request $request) : Response
+    {
+        $jobId = (int)$request->getRouteParameters()['jobId'];
+
+        if ($this->jobQueueApi->deleteJob($jobId) === false) {
+            return Response::createNotFound();
+        }
+
+        return Response::createNoContent();
+    }
+
     public function purgeAllJobs() : Response
     {
         $this->jobQueueApi->purgeAllJobs();
