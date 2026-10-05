@@ -39,12 +39,18 @@ class JobQueueRepository
     public function fetchJobs(int $limit) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            "SELECT jobs.job_type, users.name, jobs.job_status, jobs.updated_at, jobs.created_at
+            "SELECT jobs.id, jobs.job_type, jobs.job_status, jobs.user_id, users.name, jobs.parameters,
+                jobs.updated_at, jobs.created_at
             FROM job_queue jobs
             LEFT JOIN user users on jobs.user_id = users.id
             ORDER BY jobs.created_at DESC, jobs.id DESC 
             LIMIT $limit",
         );
+    }
+
+    public function deleteJob(int $id) : bool
+    {
+        return $this->dbConnection->delete('job_queue', ['id' => $id]) === 1;
     }
 
     public function fetchOldestWaitingJob() : ?JobEntity

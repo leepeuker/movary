@@ -1,0 +1,51 @@
+<div class="modal fade" id="jobDetailsModal" tabindex="-1" aria-labelledby="jobDetailsModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="jobDetailsModalTitle">Job details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="row" class="text-nowrap">ID</th>
+                            <td class="text-break" id="jobDetailsId"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">User</th>
+                            <td class="text-break" id="jobDetailsUser"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Type</th>
+                            <td class="text-break" id="jobDetailsType"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Status</th>
+                            <td class="text-break" id="jobDetailsStatus"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Updated</th>
+                            <td class="text-break" id="jobDetailsUpdatedAt"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Created</th>
+                            <td class="text-break" id="jobDetailsCreatedAt"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap align-top">Parameters</th>
+                            <td><pre class="bg-body-tertiary border rounded p-2 mb-0 text-body" id="jobDetailsParameters" style="font-family: inherit; white-space: pre-wrap; overflow-wrap: anywhere;"></pre></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-warning mt-3 mb-0" id="jobDetailsRemovalWarning" role="alert"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-bs-target="#jobRemoveConfirmModal" data-bs-toggle="modal">Remove job</button>
+            </div>
+        </div>
+    </div>
+</div>

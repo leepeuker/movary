@@ -48,4 +48,47 @@ class JobQueueApiTest extends TestCase
 
         (new JobQueueApi($repository))->addTmdbMovieSyncJob(JobStatus::createWaiting(), [7, 8]);
     }
+
+    public function testFetchJobsForStatusPageMapsJobDetails() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('fetchJobs')
+            ->with(30)
+            ->willReturn([[
+                'id' => '7',
+                'job_type' => 'tmdb_movie_sync',
+                'job_status' => 'waiting',
+                'user_id' => '12',
+                'name' => 'Alice',
+                'parameters' => '{"movieIds":[34]}',
+                'updated_at' => null,
+                'created_at' => '2026-10-05 12:00:00',
+            ]]);
+
+        self::assertSame(
+            [[
+                'id' => 7,
+                'type' => 'tmdb_movie_sync',
+                'status' => 'waiting',
+                'userId' => 12,
+                'userName' => 'Alice',
+                'parameters' => ['movieIds' => [34]],
+                'updatedAt' => null,
+                'createdAt' => '2026-10-05 12:00:00',
+            ]],
+            (new JobQueueApi($repository))->fetchJobsForStatusPage(30),
+        );
+    }
+
+    public function testDeleteJobReturnsRepositoryResult() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository->expects(self::once())->method('deleteJob')->with(7)->willReturn(true);
+
+        self::assertTrue((new JobQueueApi($repository))->deleteJob(7));
+    }
 }

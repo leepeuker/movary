@@ -18,6 +18,8 @@
 
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
+            {{ include('component/modal-job-details.html.twig') }}
+            {{ include('component/modal-job-remove-confirm.html.twig') }}
             {{ include('component/modal-jobs-remove-all.html.twig') }}
             {{ include('component/modal-jobs-remove-processed.html.twig') }}
 
@@ -38,7 +40,7 @@
                     </p>
 
                     <div class="table-responsive" style="text-align: center;">
-                        <table class="table">
+                        <table class="table table-hover" id="jobsTable">
                             <thead>
                             <tr>
                                 <th scope="col">User</th>
@@ -50,7 +52,18 @@
                             </thead>
                             <tbody>
                             {% for job in jobs %}
-                                <tr>
+                                <tr role="button"
+                                    tabindex="0"
+                                    aria-label="View details for job {{ job.id }}"
+                                    data-job-id="{{ job.id }}"
+                                    data-job-user-id="{{ job.userId|default('-') }}"
+                                    data-job-user-name="{{ job.userName|default('-') }}"
+                                    data-job-type="{{ job.type }}"
+                                    data-job-status="{{ job.status }}"
+                                    data-job-parameters="{{ job.parameters|json_encode|e('html_attr') }}"
+                                    data-job-updated-at="{{ job.updatedAt|default('-') }}"
+                                    data-job-created-at="{{ job.createdAt }}"
+                                    style="cursor: pointer;">
                                     <td>{{ job.userName|default('-') }}</td>
                                     <td>{{ job.type }}</td>
                                     <td>{{ job.status }}</td>

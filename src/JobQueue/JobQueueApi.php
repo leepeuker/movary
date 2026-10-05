@@ -2,6 +2,7 @@
 
 namespace Movary\JobQueue;
 
+use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
@@ -119,15 +120,23 @@ class JobQueueApi
         $jobsData = [];
         foreach ($jobs as $job) {
             $jobsData[] = [
+                'id' => (int)$job['id'],
                 'type' => $job['job_type'],
                 'status' => $job['job_status'],
+                'userId' => $job['user_id'] === null ? null : (int)$job['user_id'],
                 'userName' => $job['name'],
+                'parameters' => $job['parameters'] === null ? [] : Json::decode($job['parameters']),
                 'updatedAt' => $job['updated_at'],
                 'createdAt' => $job['created_at'],
             ];
         }
 
         return $jobsData;
+    }
+
+    public function deleteJob(int $id) : bool
+    {
+        return $this->repository->deleteJob($id);
     }
 
     public function fetchOldestWaitingJob() : ?JobEntity
