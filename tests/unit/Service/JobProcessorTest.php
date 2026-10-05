@@ -23,6 +23,40 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(JobProcessor::class)]
 class JobProcessorTest extends TestCase
 {
+    public function testProcessJobPassesMovieIdsToTmdbSync() : void
+    {
+        $tmdbSyncMovies = $this->createMock(SyncMovies::class);
+        $tmdbSyncMovies
+            ->expects(self::once())
+            ->method('syncMovies')
+            ->with(null, null, [7, 8]);
+        $job = JobEntity::createFromArray([
+            'id' => 5,
+            'job_type' => 'tmdb_movie_sync',
+            'job_status' => 'waiting',
+            'user_id' => null,
+            'parameters' => Json::encode(['movieIds' => [7, 8]]),
+            'updated_at' => null,
+            'created_at' => '2026-09-28 12:00:00',
+        ]);
+        $subject = new JobProcessor(
+            traktSyncWatchedMovies: $this->createStub(ImportWatchedMovies::class),
+            traktSyncRatings: $this->createStub(TraktImportRatings::class),
+            letterboxdImportRatings: $this->createStub(LetterboxdImportRatings::class),
+            letterboxdImportHistory: $this->createStub(LetterboxdImportDiary::class),
+            tmdbSyncMovies: $tmdbSyncMovies,
+            tmdbImageCache: $this->createStub(TmdbImageCache::class),
+            plexWatchlistImporter: $this->createStub(PlexWatchlistImporter::class),
+            jellyfinExporter: $this->createStub(JellyfinMoviesExporter::class),
+            jellyfinImporter: $this->createStub(JellyfinMoviesImporter::class),
+            mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
+            mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
+            passwordResetEmailJobProcessor: $this->createStub(PasswordResetEmailJobProcessor::class),
+        );
+
+        $subject->processJob($job);
+    }
+
     public function testProcessJobDispatchesPasswordResetEmailJob() : void
     {
         $passwordResetEmailJobProcessor = $this->createMock(PasswordResetEmailJobProcessor::class);

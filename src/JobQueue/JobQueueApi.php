@@ -86,9 +86,15 @@ class JobQueueApi
         );
     }
 
-    public function addTmdbMovieSyncJob(JobStatus $jobStatus) : int
+    public function addTmdbMovieSyncJob(JobStatus $jobStatus, array $movieIds = []) : int
     {
-        return $this->repository->addJob(JobType::createTmdbMovieSync(), $jobStatus);
+        return $this->repository->addJob(
+            JobType::createTmdbMovieSync(),
+            $jobStatus,
+            parameters: [
+                'movieIds' => $movieIds,
+            ],
+        );
     }
 
     public function addTmdbPersonSyncJob(JobStatus $createDone) : int

@@ -6,6 +6,7 @@ use League\Csv\Reader;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
+use Movary\JobQueue\JobQueueScheduler;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\PersonalRating;
@@ -16,6 +17,7 @@ class ImportService
     public function __construct(
         private readonly MovieApi $movieApi,
         private readonly MovieWatchlistApi $watchlistApi,
+        private readonly JobQueueScheduler $jobQueueScheduler,
     ) {
     }
 
@@ -29,6 +31,10 @@ class ImportService
                 tmdbId: $tmdbId,
                 imdbId: $imdbId,
             );
+        }
+
+        if ($movie->getUpdatedAtTmdb() === null) {
+            $this->jobQueueScheduler->storeMovieIdForTmdbSyncJob($movie->getId());
         }
 
         return $movie;
