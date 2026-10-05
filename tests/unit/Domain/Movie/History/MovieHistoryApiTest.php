@@ -120,4 +120,32 @@ class MovieHistoryApiTest extends TestCase
             $this->subject->fetchPersonalRatingDistribution(42),
         );
     }
+
+    public function testFetchMostWatchedProductionCompaniesDoesNotFetchUnusedMovieTitles() : void
+    {
+        $productionCompanies = [
+            ['id' => 7, 'name' => 'Studio', 'count' => 3, 'origin_country' => 'US'],
+        ];
+        $movieRepositoryMock = $this->createMock(MovieRepository::class);
+        $movieRepositoryMock
+            ->expects(self::once())
+            ->method('fetchMostWatchedProductionCompanies')
+            ->with(42, 12)
+            ->willReturn($productionCompanies);
+        $movieRepositoryMock->expects(self::never())->method('fetchMoviesByProductionCompany');
+        $this->repositoryMock->expects(self::never())->method('fetchHighestPositionForWatchDate');
+        $subject = new MovieHistoryApi(
+            $this->repositoryMock,
+            $movieRepositoryMock,
+            $this->createStub(TmdbApi::class),
+            $this->createStub(ImageUrlService::class),
+            $this->createStub(JobQueueApi::class),
+            $this->createStub(UserApi::class),
+        );
+
+        self::assertSame(
+            $productionCompanies,
+            $subject->fetchMostWatchedProductionCompanies(42, 12),
+        );
+    }
 }

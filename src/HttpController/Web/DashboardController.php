@@ -49,24 +49,60 @@ class DashboardController
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($requestedUserId));
 
-        $renderData = array_merge(
-            [
-                'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
-                'totalPlayCount' => $this->movieApi->fetchTotalPlayCount($requestedUserId),
-                'uniqueMoviesCount' => $this->movieApi->fetchTotalPlayCountUnique($requestedUserId),
-                'totalHoursWatched' => $this->movieHistoryApi->fetchTotalHoursWatched($requestedUserId),
-                'averagePersonalRating' => $this->movieHistoryApi->fetchAveragePersonalRating($requestedUserId),
-                'averagePlaysPerDay' => $this->movieHistoryApi->fetchAveragePlaysPerDay($requestedUserId),
-                'averageRuntime' => $this->movieHistoryApi->fetchAverageRuntime($requestedUserId),
-                'firstDiaryEntry' => $this->movieHistoryApi->fetchFirstHistoryWatchDate($requestedUserId),
-                'dashboardRows' => $dashboardRows,
-            ],
-            $this->fetchVisibleDashboardRowData($dashboardRows, $requestedUserId, $currentUserId),
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render(
+                'page/dashboard.html.twig',
+                array_merge(
+                    [
+                        'users' => $this->userPageAuthorizationChecker->fetchAllVisibleUsernamesForCurrentVisitor(),
+                        'totalPlayCount' => $this->movieApi->fetchTotalPlayCount($requestedUserId),
+                        'uniqueMoviesCount' => $this->movieApi->fetchTotalPlayCountUnique($requestedUserId),
+                        'totalHoursWatched' => $this->movieHistoryApi->fetchTotalHoursWatched($requestedUserId),
+                        'averagePersonalRating' => $this->movieHistoryApi->fetchAveragePersonalRating($requestedUserId),
+                        'averagePlaysPerDay' => $this->movieHistoryApi->fetchAveragePlaysPerDay($requestedUserId),
+                        'averageRuntime' => $this->movieHistoryApi->fetchAverageRuntime($requestedUserId),
+                        'dashboardRows' => $dashboardRows,
+                    ],
+                    $this->fetchExtendedDashboardRowData($dashboardRows, $requestedUserId, $currentUserId),
+                ),
+            ),
         );
+    }
+
+    public function renderRow(Request $request) : Response
+    {
+        $routeParameters = $request->getRouteParameters();
+        $requestedUserId = $this->userApi->fetchUserByName((string)$routeParameters['username'])->getId();
+        $requestedRowId = (int)$routeParameters['rowId'];
+        $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($requestedUserId));
+
+        $requestedRow = null;
+        foreach ($dashboardRows as $dashboardRow) {
+            if ($dashboardRow->getId() === $requestedRowId) {
+                $requestedRow = $dashboardRow;
+                break;
+            }
+        }
+
+        if ($requestedRow === null || $requestedRow->isVisible() === false) {
+            return Response::createNotFound();
+        }
+
+        $currentUserId = null;
+        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
+            $currentUserId = $this->authenticationService->getCurrentUserId();
+        }
 
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/dashboard.html.twig', $renderData),
+            $this->twig->render(
+                'component/dashboard/row.html.twig',
+                array_merge(
+                    ['dashboardRow' => $requestedRow],
+                    $this->fetchDashboardRowData($requestedRow, $requestedUserId, $currentUserId),
+                ),
+            ),
         );
     }
 
@@ -91,12 +127,15 @@ class DashboardController
         };
     }
 
-    private function fetchVisibleDashboardRowData(DashboardRowList $dashboardRows, int $requestedUserId, ?int $currentUserId) : array
-    {
+    private function fetchExtendedDashboardRowData(
+        DashboardRowList $dashboardRows,
+        int $requestedUserId,
+        ?int $currentUserId,
+    ) : array {
         $renderData = [];
 
         foreach ($dashboardRows as $row) {
-            if ($row->isVisible() === false) {
+            if ($row->isVisible() === false || $row->isExtended() === false) {
                 continue;
             }
 

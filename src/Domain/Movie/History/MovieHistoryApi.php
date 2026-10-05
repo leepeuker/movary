@@ -257,18 +257,7 @@ class MovieHistoryApi
 
     public function fetchMostWatchedProductionCompanies(int $userId, ?int $limit = null) : array
     {
-        $mostWatchedProductionCompanies = $this->movieRepository->fetchMostWatchedProductionCompanies($userId, $limit);
-
-        foreach ($mostWatchedProductionCompanies as $index => $productionCompany) {
-            $moviesByProductionCompany = $this->movieRepository->fetchMoviesByProductionCompany($productionCompany['id'], $userId);
-            unset($mostWatchedProductionCompanies[$index]['id']);
-
-            foreach ($moviesByProductionCompany as $movieByProductionCompany) {
-                $mostWatchedProductionCompanies[$index]['movies'][] = $movieByProductionCompany['title'];
-            }
-        }
-
-        return $mostWatchedProductionCompanies;
+        return $this->movieRepository->fetchMostWatchedProductionCompanies($userId, $limit);
     }
 
     public function fetchMostWatchedProductionCountries(int $userId) : array
