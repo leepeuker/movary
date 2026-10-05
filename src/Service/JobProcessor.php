@@ -41,7 +41,7 @@ class JobProcessor
             $job->getType()->isOfTypeTmdbImageCache() => $this->tmdbImageCache->executeJob($job),
             $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
-            $job->getType()->isOfTypeTmdbMovieSync() => $this->tmdbSyncMovies->syncMovies(),
+            $job->getType()->isOfTypeTmdbMovieSync() => $this->tmdbSyncMovies->executeJob($job),
             $job->getType()->isOfTypePlexImportWatchlist() => $this->plexWatchlistImporter->executeJob($job),
             $job->getType()->isOfTypeJellyfinExportMovies() => $this->jellyfinExporter->executeJob($job),
             $job->getType()->isOfTypeJellyfinImportMovies() => $this->jellyfinImporter->executeJob($job),

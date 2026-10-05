@@ -30,4 +30,22 @@ class JobQueueApiTest extends TestCase
 
         (new JobQueueApi($repository))->addPasswordResetEmailJob(12, true);
     }
+
+    public function testAddTmdbMovieSyncJobAddsMovieIdsAsParameters() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJob')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'tmdb_movie_sync'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'waiting'),
+                null,
+                ['movieIds' => [7, 8]],
+            )
+            ->willReturn(5);
+
+        (new JobQueueApi($repository))->addTmdbMovieSyncJob(JobStatus::createWaiting(), [7, 8]);
+    }
 }

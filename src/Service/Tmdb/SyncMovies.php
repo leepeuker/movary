@@ -4,6 +4,7 @@ namespace Movary\Service\Tmdb;
 
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\JobQueue\JobEntity;
 use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -15,6 +16,11 @@ class SyncMovies
         private readonly MovieApi $movieApi,
         private readonly LoggerInterface $logger,
     ) {
+    }
+
+    public function executeJob(JobEntity $job) : void
+    {
+        $this->syncMovies(ids: $job->getParameters()['movieIds'] ?? []);
     }
 
     public function syncMovies(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null, ?array $ids = []) : void
