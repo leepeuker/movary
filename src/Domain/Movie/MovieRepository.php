@@ -975,6 +975,8 @@ class MovieRepository
 
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
+            'imdbRating' => 'imdb_rating_average',
+            'tmdbRating' => 'tmdb_vote_average',
             'releaseDate' => 'release_date',
             'watchDate' => 'watched_at',
             'runtime' => 'runtime',

@@ -8,6 +8,7 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Movary\Domain\Movie\MovieRepository;
+use Movary\ValueObject\SortOrder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -158,6 +159,50 @@ class MovieRepositoryTest extends TestCase
         self::assertSame(
             [['rating' => 7, 'count' => 3]],
             $this->subject->fetchPersonalRatingDistribution(42),
+        );
+    }
+
+    public static function provideExternalRatingSortData() : array
+    {
+        return [
+            'IMDb rating ascending' => ['imdbRating', SortOrder::createAsc(), 'imdb_rating_average asc'],
+            'TMDB rating descending' => ['tmdbRating', SortOrder::createDesc(), 'tmdb_vote_average desc'],
+        ];
+    }
+
+    #[DataProvider('provideExternalRatingSortData')]
+    public function testFetchUniqueWatchedMoviesPaginatedCanSortByExternalRating(
+        string $sortBy,
+        SortOrder $sortOrder,
+        string $expectedOrderBy,
+    ) : void {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(static fn(string $query) : bool => str_contains($query, "ORDER BY $expectedOrderBy,")),
+                [42, 42, '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchUniqueWatchedMoviesPaginated(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: $sortBy,
+                sortOrder: $sortOrder,
+                releaseYear: null,
+                language: null,
+                genre: null,
+                hasUserRating: null,
+                userRatingMin: null,
+                userRatingMax: null,
+                locationId: null,
+                productionCountryCode: null,
+            ),
         );
     }
 }
