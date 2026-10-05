@@ -21,6 +21,8 @@ use Throwable;
 )]
 class TmdbMovieSync extends Command
 {
+    private const string OPTION_NAME_NEVER_SYNC = 'never-synced';
+
     private const string OPTION_NAME_FORCE_HOURS = 'hours';
 
     private const string OPTION_NAME_FORCE_THRESHOLD = 'threshold';
@@ -41,6 +43,7 @@ class TmdbMovieSync extends Command
         $this
             ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Max number of movies to sync.')
             ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.')
+            ->addOption(self::OPTION_NAME_NEVER_SYNC, 'never-synced', InputOption::VALUE_NONE, 'Only sync movies which were never synced before.')
             ->addOption(self::OPTION_NAME_MOVIE_IDS, 'movieIds', InputOption::VALUE_REQUIRED, 'Comma seperated ids of movies to sync.');
     }
 
@@ -49,13 +52,14 @@ class TmdbMovieSync extends Command
         $maxAgeInHours = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_HOURS);
         $maxSyncsThreshold = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_THRESHOLD);
         $movieIds = $this->inputMapper->mapOptionToIds($input, self::OPTION_NAME_MOVIE_IDS);
+        $onlyNeverSynced = (bool)$input->getOption(self::OPTION_NAME_NEVER_SYNC);
 
         $jobId = $this->jobQueueApi->addTmdbMovieSyncJob(JobStatus::createInProgress());
 
         try {
             $this->generateOutput($output, 'Syncing movie meta data...');
 
-            $this->syncMovieDetails->syncMovies($maxAgeInHours, $maxSyncsThreshold, $movieIds);
+            $this->syncMovieDetails->syncMovies($maxAgeInHours, $maxSyncsThreshold, $movieIds, $onlyNeverSynced);
 
             $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
         } catch (Throwable $t) {

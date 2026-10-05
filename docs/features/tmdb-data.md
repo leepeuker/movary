@@ -25,6 +25,8 @@ php bin/console.php tmdb:person:sync
   Detailed information about the command
 - `--hours`
   Only update movies/persons which were last synced X hours or longer ago
+- `--never-synced`
+  Only update movies/persons which have never been synced before
 - `--threshold`
   Maximum number of movies/person to sync for this run
 

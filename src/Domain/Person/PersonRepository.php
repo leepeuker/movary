@@ -69,15 +69,25 @@ class PersonRepository
         $this->dbConnection->delete('person', ['id' => $id]);
     }
 
-    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(?int $limit = null, ?array $ids = null) : Traversable
+    public function fetchAllOrderedByLastUpdatedAtTmdbAsc(
+        ?int $limit = null,
+        ?array $ids = null,
+        bool $onlyNeverSynced = false,
+    ) : Traversable
     {
-        $whereQuery = '';
-        if ($ids !== null && count($ids) > 0) {
-            $placeholders = str_repeat('?, ', count($ids));
-            $whereQuery = ' WHERE id IN (' . trim($placeholders, ', ') . ')';
+        $filters = [];
+
+        if ($onlyNeverSynced === true) {
+            $filters[] = 'updated_at_tmdb IS NULL';
         }
 
-        $query = "SELECT * FROM `person` $whereQuery ORDER BY updated_at_tmdb, created_at";
+        if ($ids !== null && count($ids) > 0) {
+            $placeholders = str_repeat('?, ', count($ids));
+            $filters[] = 'id IN (' . trim($placeholders, ', ') . ')';
+        }
+
+        $whereQuery = count($filters) > 0 ? 'WHERE ' . implode(' AND ', $filters) . ' ' : '';
+        $query = "SELECT * FROM `person` {$whereQuery}ORDER BY updated_at_tmdb, created_at";
 
         if ($limit !== null) {
             $query .= ' LIMIT ' . $limit;

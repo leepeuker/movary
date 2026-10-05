@@ -21,6 +21,8 @@ use Throwable;
 )]
 class TmdbPersonSync extends Command
 {
+    private const string OPTION_NAME_NEVER_SYNC = 'never-synced';
+
     private const string OPTION_NAME_FORCE_HOURS = 'hours';
 
     private const string OPTION_NAME_FORCE_THRESHOLD = 'threshold';
@@ -41,6 +43,7 @@ class TmdbPersonSync extends Command
         $this
             ->addOption(self::OPTION_NAME_FORCE_THRESHOLD, 'threshold', InputOption::VALUE_REQUIRED, 'Max number of persons to sync.')
             ->addOption(self::OPTION_NAME_FORCE_HOURS, 'hours', InputOption::VALUE_REQUIRED, 'Hours since last updated.')
+            ->addOption(self::OPTION_NAME_NEVER_SYNC, 'never-synced', InputOption::VALUE_NONE, 'Only sync persons which were never synced before.')
             ->addOption(self::OPTION_NAME_PERSON_IDS, 'personIds', InputOption::VALUE_REQUIRED, 'Comma seperated ids of persons to sync.');
     }
 
@@ -49,13 +52,14 @@ class TmdbPersonSync extends Command
         $maxAgeInHours = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_HOURS);
         $maxSyncsThreshold = $this->inputMapper->mapOptionToInteger($input, self::OPTION_NAME_FORCE_THRESHOLD);
         $personIds = $this->inputMapper->mapOptionToIds($input, self::OPTION_NAME_PERSON_IDS);
+        $onlyNeverSynced = (bool)$input->getOption(self::OPTION_NAME_NEVER_SYNC);
 
         $jobId = $this->jobQueueApi->addTmdbPersonSyncJob(JobStatus::createInProgress());
 
         try {
             $this->generateOutput($output, 'Syncing person meta data...');
 
-            $this->syncPersons->syncPersons($maxAgeInHours, $maxSyncsThreshold, $personIds);
+            $this->syncPersons->syncPersons($maxAgeInHours, $maxSyncsThreshold, $personIds, $onlyNeverSynced);
 
             $this->jobQueueApi->updateJobStatus($jobId, JobStatus::createDone());
 

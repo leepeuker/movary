@@ -17,11 +17,16 @@ class SyncPersons
     ) {
     }
 
-    public function syncPersons(?int $maxAgeInHours = null, ?int $movieCountSyncThreshold = null, ?array $ids = []) : void
+    public function syncPersons(
+        ?int $maxAgeInHours = null,
+        ?int $personCountSyncThreshold = null,
+        ?array $ids = [],
+        bool $onlyNeverSynced = false,
+    ) : void
     {
         $this->personApi->deleteAllNotReferenced();
 
-        $persons = $this->personApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($movieCountSyncThreshold, $ids);
+        $persons = $this->personApi->fetchAllOrderedByLastUpdatedAtTmdbAsc($personCountSyncThreshold, $ids, $onlyNeverSynced);
 
         foreach ($persons as $person) {
             $person = PersonEntity::createFromArray($person);
