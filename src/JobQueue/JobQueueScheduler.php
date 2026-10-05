@@ -8,7 +8,7 @@ class JobQueueScheduler
 {
     private const int IMAGE_CACHE_BATCH_LIMIT = 250;
 
-    private const int TMDB_MOVIE_SYNC_BATCH_LIMIT = 100;
+    private const int TMDB_MOVIE_SYNC_BATCH_LIMIT = 250;
 
     private array $movieIdsStoredForTmdbSync = [];
 

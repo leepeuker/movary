@@ -23,13 +23,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(JobProcessor::class)]
 class JobProcessorTest extends TestCase
 {
-    public function testProcessJobPassesMovieIdsToTmdbSync() : void
+    public function testProcessJobDispatchesTmdbMovieSyncJob() : void
     {
         $tmdbSyncMovies = $this->createMock(SyncMovies::class);
-        $tmdbSyncMovies
-            ->expects(self::once())
-            ->method('syncMovies')
-            ->with(null, null, [7, 8]);
         $job = JobEntity::createFromArray([
             'id' => 5,
             'job_type' => 'tmdb_movie_sync',
@@ -39,6 +35,10 @@ class JobProcessorTest extends TestCase
             'updated_at' => null,
             'created_at' => '2026-09-28 12:00:00',
         ]);
+        $tmdbSyncMovies
+            ->expects(self::once())
+            ->method('executeJob')
+            ->with($job);
         $subject = new JobProcessor(
             traktSyncWatchedMovies: $this->createStub(ImportWatchedMovies::class),
             traktSyncRatings: $this->createStub(TraktImportRatings::class),

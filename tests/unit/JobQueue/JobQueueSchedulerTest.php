@@ -28,15 +28,15 @@ class JobQueueSchedulerTest extends TestCase
             );
 
         $subject = new JobQueueScheduler($jobQueueApi, false);
-        for ($movieId = 1; $movieId <= 100; $movieId++) {
+        for ($movieId = 1; $movieId <= 250; $movieId++) {
             $subject->storeMovieIdForTmdbSyncJob($movieId);
         }
-        $subject->storeMovieIdForTmdbSyncJob(100);
-        $subject->storeMovieIdForTmdbSyncJob(101);
+        $subject->storeMovieIdForTmdbSyncJob(250);
+        $subject->storeMovieIdForTmdbSyncJob(251);
 
         unset($subject);
 
-        self::assertSame(range(1, 100), $scheduledBatches[0]);
-        self::assertSame([101], $scheduledBatches[1]);
+        self::assertSame(range(1, 250), $scheduledBatches[0]);
+        self::assertSame([251], $scheduledBatches[1]);
     }
 }
