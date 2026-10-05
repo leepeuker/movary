@@ -62,9 +62,8 @@
                             <th class="d-none d-sm-table-cell" scope="col">Poster</th>
                             <th scope="col">Title</th>
                             <th scope="col">Release</th>
-                            <th scope="col">Runtime</th>
-                            <th class="d-none d-md-table-cell" scope="col">User rating</th>
-                            <th class="d-none d-lg-table-cell" scope="col">Last watched</th>
+                            <th class="d-none d-lg-table-cell" scope="col">Runtime</th>
+                            <th scope="col">Added</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,10 +76,9 @@
                                     </a>
                                 </td>
                                 <td><a href="{{ movieUrl }}">{{ watchlistEntry.title }}</a></td>
-                                <td>{{ watchlistEntry.release_date is null ? '—' : watchlistEntry.release_date|date(dateFormatPhp) }}</td>
-                                <td>{{ watchlistEntry.runtime is null ? '—' : watchlistEntry.runtime ~ ' min' }}</td>
-                                <td class="d-none d-md-table-cell">{{ watchlistEntry.userRating is null ? '—' : watchlistEntry.userRating }}</td>
-                                <td class="d-none d-lg-table-cell">{{ watchlistEntry.lastWatchedAt is null ? '—' : watchlistEntry.lastWatchedAt|date(dateFormatPhp) }}</td>
+                                <td>{{ watchlistEntry.release_date is null ? '—' : watchlistEntry.release_date|date('Y') }}</td>
+                                <td class="d-none d-lg-table-cell">{{ watchlistEntry.runtime is null ? '—' : watchlistEntry.runtime ~ ' min' }}</td>
+                                <td>{{ watchlistEntry.added_at|date(dateFormatPhp) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

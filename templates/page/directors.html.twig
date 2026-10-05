@@ -70,8 +70,9 @@
                             <th class="d-none d-sm-table-cell" scope="col">Poster</th>
                             <th scope="col">Name</th>
                             <th scope="col">Gender</th>
+                            <th class="d-none d-lg-table-cell" scope="col">Birthday</th>
                             <th scope="col">Unique appearances</th>
-                            <th class="d-none d-md-table-cell" scope="col">Total appearances</th>
+                            <th scope="col">Total appearances</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,8 +86,9 @@
                                 </td>
                                 <td><a href="{{ personUrl }}">{{ mostWatchedDirector.name }}</a></td>
                                 <td>{{ mostWatchedDirector.gender }}</td>
+                                <td class="d-none d-lg-table-cell">{{ mostWatchedDirector.birth_date is null ? '—' : mostWatchedDirector.birth_date|date(dateFormatPhp) }}</td>
                                 <td>{{ mostWatchedDirector.uniqueCount }}</td>
-                                <td class="d-none d-md-table-cell">{{ mostWatchedDirector.totalCount }}</td>
+                                <td>{{ mostWatchedDirector.totalCount }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

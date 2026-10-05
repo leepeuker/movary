@@ -63,9 +63,9 @@
                             <th class="d-none d-sm-table-cell" scope="col">Poster</th>
                             <th scope="col">Title</th>
                             <th scope="col">Release</th>
-                            <th scope="col">Runtime</th>
+                            <th class="d-none d-lg-table-cell" scope="col">Runtime</th>
                             <th class="d-none d-md-table-cell" scope="col">User rating</th>
-                            <th class="d-none d-lg-table-cell" scope="col">Watched</th>
+                            <th scope="col">Watched</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -78,10 +78,10 @@
                                     </a>
                                 </td>
                                 <td><a href="{{ movieUrl }}">{{ historyEntry.title }}</a></td>
-                                <td>{{ historyEntry.release_date is null ? '—' : historyEntry.release_date|date(dateFormatPhp) }}</td>
-                                <td>{{ historyEntry.runtime is null ? '—' : historyEntry.runtime ~ ' min' }}</td>
+                                <td>{{ historyEntry.release_date is null ? '—' : historyEntry.release_date|date('Y') }}</td>
+                                <td class="d-none d-lg-table-cell">{{ historyEntry.runtime is null ? '—' : historyEntry.runtime ~ ' min' }}</td>
                                 <td class="d-none d-md-table-cell">{{ historyEntry.userRating is null ? '—' : historyEntry.userRating }}</td>
-                                <td class="d-none d-lg-table-cell">{{ historyEntry.watched_at|date(dateFormatPhp) }}</td>
+                                <td>{{ historyEntry.watched_at|date(dateFormatPhp) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
