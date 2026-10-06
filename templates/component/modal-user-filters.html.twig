@@ -1,0 +1,24 @@
+<div class="modal fade" id="userFiltersModal" tabindex="-1" aria-labelledby="userFiltersModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="userFiltersModalTitle">Filter users</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="input-group">
+                    <label class="input-group-text" for="userFilterRole">Role</label>
+                    <select class="form-select" id="userFilterRole">
+                        <option value="" {{ userFilterRole is null ? 'selected' }}>All roles</option>
+                        <option value="admin" {{ userFilterRole == 'admin' ? 'selected' }}>Admin</option>
+                        <option value="user" {{ userFilterRole == 'user' ? 'selected' }}>User</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button class="btn btn-warning" type="button" onclick="resetUserFilters()">Reset</button>
+                <button class="btn btn-primary" type="button" onclick="applyUserFilters()">Apply filters</button>
+            </div>
+        </div>
+    </div>
+</div>

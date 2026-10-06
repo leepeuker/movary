@@ -4,7 +4,26 @@ const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');
 const passwordResetUserButton = document.getElementById('passwordResetUserButton');
 
-reloadTable()
+registerTableRowClickEvent()
+document.getElementById('usersPerPage').addEventListener('change', updateUsersPerPage)
+
+const urlParams = new URLSearchParams(window.location.search)
+const userCreatedName = urlParams.get('userCreated')
+if (userCreatedName) {
+    setUserManagementAlert('User was created: ' + userCreatedName)
+    removeQueryParameter('userCreated')
+}
+const userUpdatedName = urlParams.get('userUpdated')
+if (userUpdatedName) {
+    setUserManagementAlert('User was updated: ' + userUpdatedName)
+    removeQueryParameter('userUpdated')
+}
+const userDeletedName = urlParams.get('userDeleted')
+if (userDeletedName) {
+    setUserManagementAlert('User was deleted: ' + userDeletedName)
+    removeQueryParameter('userDeleted')
+}
+
 if (passwordResetUserButton !== null) {
     passwordResetUserButton.addEventListener('click', () => {
         sendPasswordReset(
@@ -20,9 +39,9 @@ function registerTableRowClickEvent() {
 
         rows[i].onclick = function () {
             prepareEditUserModal(
-                this.cells[0].innerHTML,
-                this.cells[1].innerHTML,
-                this.cells[2].innerHTML,
+                this.cells[0].textContent,
+                this.cells[1].textContent,
+                this.cells[2].textContent,
                 this.dataset.isAdmin === 'true'
             )
 
@@ -156,10 +175,7 @@ document.getElementById('createUserButton').addEventListener('click', async () =
         return
     }
 
-    setUserManagementAlert('User was created: ' + document.getElementById('userModalNameInput').value)
-
-    reloadTable()
-    userModal.hide()
+    redirectWithNotification('userCreated', document.getElementById('userModalNameInput').value)
 })
 
 function setUserModalAlertServerError(message = "Server error, please try again.") {
@@ -195,10 +211,7 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
         return
     }
 
-    setUserManagementAlert('User was updated: ' + document.getElementById('userModalNameInput').value)
-
-    reloadTable()
-    userModal.hide()
+    redirectWithNotification('userUpdated', document.getElementById('userModalNameInput').value)
 })
 
 document.getElementById('deleteUserButton').addEventListener('click', async () => {
@@ -215,10 +228,7 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
         return
     }
 
-    setUserManagementAlert('User was deleted: ' + document.getElementById('userModalNameInput').value)
-
-    reloadTable()
-    userModal.hide()
+    redirectWithNotification('userDeleted', document.getElementById('userModalNameInput').value)
 })
 
 function setUserManagementAlert(message, type = 'success') {
@@ -229,38 +239,49 @@ function setUserManagementAlert(message, type = 'success') {
     userManagementAlerts.style.textAlign = 'center'
 }
 
-async function reloadTable() {
-    table.getElementsByTagName('tbody')[0].innerHTML = ''
-    document.getElementById('userTableLoadingSpinner').classList.remove('d-none')
+function updateUsersPerPage() {
+    const url = new URL(window.location.href)
+    url.searchParams.set('perPage', document.getElementById('usersPerPage').value)
+    url.searchParams.set('page', '1')
 
-    const response = await fetch(APPLICATION_URL + '/settings/users');
+    window.location.href = url.toString()
+}
 
-    if (response.status !== 200) {
-        setUserManagementAlert('Could not load users', 'danger')
-        document.getElementById('userTableLoadingSpinner').classList.add('d-none')
+function refreshUsersPage() {
+    window.location.reload()
+}
 
-        return
+function applyUserFilters() {
+    const url = new URL(window.location.href)
+    const role = document.getElementById('userFilterRole').value
+
+    if (role === '') {
+        url.searchParams.delete('role')
+    } else {
+        url.searchParams.set('role', role)
     }
+    url.searchParams.set('page', '1')
 
-    const users = await response.json();
+    window.location.href = url.toString()
+}
 
-    document.getElementById('userTableLoadingSpinner').classList.add('d-none')
+function resetUserFilters() {
+    document.getElementById('userFilterRole').value = ''
+    applyUserFilters()
+}
 
-    users.forEach((user) => {
-        let row = document.createElement('tr');
-        const isAdmin = user.isAdmin === true || user.isAdmin === 1 || user.isAdmin === '1'
-        row.dataset.isAdmin = isAdmin ? 'true' : 'false'
-        row.innerHTML = '<td>' + user.id + '</td>';
-        row.innerHTML += '<td>' + user.name + '</td>';
-        row.innerHTML += '<td>' + user.email + '</td>';
-        row.innerHTML += '<td><span class="badge rounded-pill text-bg-' + (isAdmin ? 'light' : 'dark') + '">' + (isAdmin ? 'Admin' : 'User') + '</span></td>';
+function removeQueryParameter(name) {
+    const url = new URL(window.location.href)
+    url.searchParams.delete(name)
 
-        row.style.cursor = 'pointer'
+    window.history.replaceState(null, '', url.toString())
+}
 
-        table.getElementsByTagName('tbody')[0].appendChild(row);
-    })
+function redirectWithNotification(name, value) {
+    const url = new URL(window.location.href)
+    url.searchParams.set(name, value)
 
-    registerTableRowClickEvent()
+    window.location.href = url.toString()
 }
 
 async function sendPasswordReset(userId, userName) {

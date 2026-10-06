@@ -79,6 +79,16 @@ class UserApi
         return $this->repository->fetchAll();
     }
 
+    public function countUsers(?UserFilter $filter = null) : int
+    {
+        return $this->repository->countUsers($filter);
+    }
+
+    public function fetchAllPaginated(int $limit, int $offset, ?UserFilter $filter = null) : array
+    {
+        return $this->repository->fetchAllPaginated($limit, $offset, $filter);
+    }
+
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
     {
         return $this->repository->fetchAllHavingWatchedMovieInternVisibleUsernames($movieId);
