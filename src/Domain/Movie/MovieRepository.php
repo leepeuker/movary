@@ -119,7 +119,7 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.tmdb_poster_path, p.poster_path
+            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.birth_date, p.tmdb_poster_path, p.poster_path
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
@@ -293,7 +293,7 @@ class MovieRepository
 
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.tmdb_poster_path, p.poster_path
+            SELECT p.id, p.name, COUNT(DISTINCT m.id) as uniqueCount, COUNT(m.id) as totalCount, p.gender, p.birth_date, p.tmdb_poster_path, p.poster_path
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
@@ -1034,7 +1034,9 @@ class MovieRepository
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT * FROM (
-                SELECT m.*, mur.rating as userRating, ROW_NUMBER() OVER(PARTITION BY m.id) rn
+                SELECT m.*, mur.rating as userRating,
+                    MAX(mh.watched_at) OVER(PARTITION BY m.id) as lastWatchedAt,
+                    ROW_NUMBER() OVER(PARTITION BY m.id) rn
                 FROM movie m
                 JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
                 LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?

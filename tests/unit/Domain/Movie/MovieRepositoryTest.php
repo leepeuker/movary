@@ -162,6 +162,47 @@ class MovieRepositoryTest extends TestCase
         );
     }
 
+    public function testFetchPersonListsIncludeBirthDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::exactly(2))
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains($query, 'p.gender, p.birth_date,'),
+                ),
+                [42, '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchActors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'name',
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+        self::assertSame(
+            [],
+            $this->subject->fetchDirectors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'name',
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+    }
+
     public static function provideExternalRatingSortData() : array
     {
         return [
@@ -194,6 +235,43 @@ class MovieRepositoryTest extends TestCase
                 searchTerm: null,
                 sortBy: $sortBy,
                 sortOrder: $sortOrder,
+                releaseYear: null,
+                language: null,
+                genre: null,
+                hasUserRating: null,
+                userRatingMin: null,
+                userRatingMax: null,
+                locationId: null,
+                productionCountryCode: null,
+            ),
+        );
+    }
+
+    public function testFetchUniqueWatchedMoviesPaginatedIncludesLastWatchedDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains(
+                        $query,
+                        'MAX(mh.watched_at) OVER(PARTITION BY m.id) as lastWatchedAt',
+                    ),
+                ),
+                [42, 42, '%%'],
+            )
+            ->willReturn([['lastWatchedAt' => '2026-10-05 20:00:00']]);
+
+        self::assertSame(
+            [['lastWatchedAt' => '2026-10-05 20:00:00']],
+            $this->subject->fetchUniqueWatchedMoviesPaginated(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'title',
+                sortOrder: SortOrder::createAsc(),
                 releaseYear: null,
                 language: null,
                 genre: null,
