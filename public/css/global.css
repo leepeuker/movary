@@ -15,3 +15,16 @@ a.card-header:visited {
 #logPlayModalTitle a, #logPlayModalTitle a:visited {
   color: var(--bs-heading-color);
 }
+
+html[data-movie-list-view="posters"] #moviePosterView {
+  display: flex !important;
+}
+
+html[data-movie-list-view="posters"] #movieTableView,
+html[data-movie-list-view="table"] #moviePosterView {
+  display: none !important;
+}
+
+html[data-movie-list-view="table"] #movieTableView {
+  display: block !important;
+}

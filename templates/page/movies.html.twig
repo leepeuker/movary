@@ -7,6 +7,7 @@
 {% block scripts %}
     <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
     <script src="{{ applicationUrl }}/js/component/modal-advanced-search-movie.html.js"></script>
+    <script src="{{ applicationUrl }}/js/movie-list-view.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -19,16 +20,21 @@
 
             <div class="input-group mb-3">
                 <input type="text" class="form-control" name="s" placeholder="Search watched movies" value="{{ (searchTerm is null) ? '' : searchTerm }}" style="border-right-color: #aab0b3" id="searchTermInput">
-                <button class="btn btn-primary" type="button" onclick="search()" id="directSearchButton">
-                    <i class="bi bi-search"></i>
+                <button class="btn btn-primary" type="button" onclick="search()" id="directSearchButton" aria-label="Search watched movies" title="Search watched movies">
+                    <i class="bi bi-search" aria-hidden="true"></i>
                 </button>
                 <button id="toggleSearchOptionsButton" class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#searchOptionsMovieModal"
-                        style="border-left-color: #aab0b3">
-                    <i class="bi bi-filter"></i>
+                        aria-label="Open search options" title="Open search options" style="border-left-color: #aab0b3">
+                    <i class="bi bi-filter" aria-hidden="true"></i>
+                </button>
+                <button id="movieViewToggleButton" class="btn btn-primary" type="button" aria-label="Show table view" title="Show table view"
+                        data-storage-key="movieListView" style="border-left-color: #aab0b3">
+                    <i id="movieTableViewIcon" class="bi bi-table" aria-hidden="true"></i>
+                    <i id="moviePosterViewIcon" class="bi bi-grid-fill d-none" aria-hidden="true"></i>
                 </button>
             </div>
 
-            <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+            <div id="moviePosterView" class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
                 {% for movie in movies %}
                     <div class="col" style="padding-bottom: 1rem;">
                         <a class="card h-100 position-relative" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}-{{ movie.title|slugify }}">
@@ -42,6 +48,38 @@
                         </a>
                     </div>
                 {% endfor %}
+            </div>
+
+            <div id="movieTableView" class="table-responsive d-none">
+                <table class="table table-hover align-middle text-start" data-sort-by="{{ sortBy }}" data-sort-order="{{ sortOrder }}">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-sm-table-cell" scope="col">Poster</th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="title">Title</button></th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="releaseDate">Release</button></th>
+                            <th class="d-none d-lg-table-cell" scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="runtime">Runtime</button></th>
+                            <th class="d-none d-md-table-cell" scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="rating">User rating</button></th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="watchDate">Last watched</button></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for movie in movies %}
+                            {% set movieUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies/' ~ movie.id ~ '-' ~ movie.title|slugify %}
+                            <tr>
+                                <td class="d-none d-sm-table-cell">
+                                    <a href="{{ movieUrl }}">
+                                        <img src="{{ movie.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ movie.title }}">
+                                    </a>
+                                </td>
+                                <td><a href="{{ movieUrl }}">{{ movie.title }}</a></td>
+                                <td>{{ movie.release_date is null ? '—' : movie.release_date|date('Y') }}</td>
+                                <td class="d-none d-lg-table-cell">{{ movie.runtime is null ? '—' : movie.runtime ~ ' min' }}</td>
+                                <td class="d-none d-md-table-cell">{{ movie.userRating is null ? '—' : movie.userRating }}</td>
+                                <td>{{ movie.lastWatchedAt is null ? '—' : movie.lastWatchedAt|date(dateFormatPhp) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
             {% set searchTermQuery = (searchTerm is null) ? '' : "s=#{searchTerm}&" %}

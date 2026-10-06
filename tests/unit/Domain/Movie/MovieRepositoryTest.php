@@ -8,6 +8,7 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Movary\Domain\Movie\MovieRepository;
+use Movary\ValueObject\SortOrder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -158,6 +159,177 @@ class MovieRepositoryTest extends TestCase
         self::assertSame(
             [['rating' => 7, 'count' => 3]],
             $this->subject->fetchPersonalRatingDistribution(42),
+        );
+    }
+
+    public function testFetchPersonListsIncludeBirthDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::exactly(2))
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains($query, 'p.gender, p.birth_date,'),
+                ),
+                [42, '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchActors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'name',
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+        self::assertSame(
+            [],
+            $this->subject->fetchDirectors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'name',
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+    }
+
+    public static function providePersonListSortData() : array
+    {
+        return [
+            'birthday' => ['birthDate', 'p.birth_date asc'],
+        ];
+    }
+
+    #[DataProvider('providePersonListSortData')]
+    public function testFetchPersonListsCanSortByTableColumns(string $sortBy, string $expectedOrderBy) : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::exactly(2))
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains($query, "ORDER BY $expectedOrderBy, name asc"),
+                ),
+                [42, '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchActors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: $sortBy,
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+        self::assertSame(
+            [],
+            $this->subject->fetchDirectors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: $sortBy,
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+    }
+
+    public static function provideExternalRatingSortData() : array
+    {
+        return [
+            'IMDb rating ascending' => ['imdbRating', SortOrder::createAsc(), 'imdb_rating_average asc'],
+            'TMDB rating descending' => ['tmdbRating', SortOrder::createDesc(), 'tmdb_vote_average desc'],
+        ];
+    }
+
+    #[DataProvider('provideExternalRatingSortData')]
+    public function testFetchUniqueWatchedMoviesPaginatedCanSortByExternalRating(
+        string $sortBy,
+        SortOrder $sortOrder,
+        string $expectedOrderBy,
+    ) : void {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(static fn(string $query) : bool => str_contains($query, "ORDER BY $expectedOrderBy,")),
+                [42, 42, '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchUniqueWatchedMoviesPaginated(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: $sortBy,
+                sortOrder: $sortOrder,
+                releaseYear: null,
+                language: null,
+                genre: null,
+                hasUserRating: null,
+                userRatingMin: null,
+                userRatingMax: null,
+                locationId: null,
+                productionCountryCode: null,
+            ),
+        );
+    }
+
+    public function testFetchUniqueWatchedMoviesPaginatedIncludesLastWatchedDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains(
+                        $query,
+                        'MAX(mh.watched_at) OVER(PARTITION BY m.id) as lastWatchedAt',
+                    ),
+                ),
+                [42, 42, '%%'],
+            )
+            ->willReturn([['lastWatchedAt' => '2026-10-05 20:00:00']]);
+
+        self::assertSame(
+            [['lastWatchedAt' => '2026-10-05 20:00:00']],
+            $this->subject->fetchUniqueWatchedMoviesPaginated(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'title',
+                sortOrder: SortOrder::createAsc(),
+                releaseYear: null,
+                language: null,
+                genre: null,
+                hasUserRating: null,
+                userRatingMin: null,
+                userRatingMax: null,
+                locationId: null,
+                productionCountryCode: null,
+            ),
         );
     }
 }
