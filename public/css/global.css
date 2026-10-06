@@ -16,11 +16,6 @@ a.card-header:visited {
   color: var(--bs-heading-color);
 }
 
-#movieViewToggleButton .bi {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
 html[data-movie-list-view="posters"] #moviePosterView {
   display: flex !important;
 }
