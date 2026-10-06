@@ -52,14 +52,14 @@
             </div>
 
             <div id="movieTableView" class="table-responsive d-none">
-                <table class="table table-hover align-middle text-start">
+                <table class="table table-hover align-middle text-start" data-sort-by="{{ sortBy }}" data-sort-order="{{ sortOrder }}">
                     <thead>
                         <tr>
                             <th class="d-none d-sm-table-cell" scope="col">Poster</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Release</th>
-                            <th class="d-none d-lg-table-cell" scope="col">Runtime</th>
-                            <th scope="col">Added</th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="title">Title</button></th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="releaseDate">Release</button></th>
+                            <th class="d-none d-lg-table-cell" scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="runtime">Runtime</button></th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="addedAt">Added</button></th>
                         </tr>
                     </thead>
                     <tbody>

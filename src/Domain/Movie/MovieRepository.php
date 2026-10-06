@@ -104,6 +104,7 @@ class MovieRepository
         $sortBySanitized = match ($sortBy) {
             'uniqueAppearances' => 'COUNT(DISTINCT m.id) ',
             'totalAppearances' => 'COUNT(m.id) ',
+            'birthDate' => 'p.birth_date',
             default => 'name'
         };
 
@@ -278,6 +279,7 @@ class MovieRepository
         $sortBySanitized = match ($sortBy) {
             'uniqueAppearances' => 'COUNT(DISTINCT m.id) ',
             'totalAppearances' => 'COUNT(m.id) ',
+            'birthDate' => 'p.birth_date',
             default => 'name'
         };
 

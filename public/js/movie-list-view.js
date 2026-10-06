@@ -28,4 +28,32 @@ movieViewToggleButton.addEventListener('click', () => {
     setMovieView(currentMovieView === 'table' ? 'posters' : 'table');
 });
 
+document.querySelectorAll('#movieTableView button[data-sort-by]').forEach((sortButton) => {
+    const table = sortButton.closest('table');
+    const tableHeader = sortButton.closest('th');
+    const sortBy = sortButton.dataset.sortBy;
+    const isCurrentSort = table.dataset.sortBy === sortBy;
+    const nextSortOrder = isCurrentSort && table.dataset.sortOrder === 'asc' ? 'desc' : 'asc';
+    const label = sortButton.textContent.trim();
+
+    tableHeader.setAttribute('aria-sort', isCurrentSort ? (table.dataset.sortOrder === 'asc' ? 'ascending' : 'descending') : 'none');
+    sortButton.setAttribute('aria-label', `Sort by ${label}, ${nextSortOrder === 'asc' ? 'ascending' : 'descending'}`);
+
+    if (isCurrentSort) {
+        const directionIndicator = document.createElement('span');
+        directionIndicator.classList.add('fs-5');
+        directionIndicator.setAttribute('aria-hidden', 'true');
+        directionIndicator.textContent = table.dataset.sortOrder === 'asc' ? ' ↑' : ' ↓';
+        sortButton.appendChild(directionIndicator);
+    }
+
+    sortButton.addEventListener('click', () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sb', sortBy);
+        url.searchParams.set('so', nextSortOrder);
+        url.searchParams.delete('p');
+        window.location.assign(url.toString());
+    });
+});
+
 setMovieView(document.documentElement.dataset.movieListView);
