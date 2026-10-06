@@ -1,17 +1,9 @@
 <!DOCTYPE html>
-<html id="html" data-bs-theme="{{ theme }}">
+<html id="html" data-bs-theme="{{ theme }}" data-movie-list-view="posters">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="canonical" href="{{ applicationUrl }}{{ canonicalPath }}{{ canonicalExtra }}" />
-
-    <script>
-        try {
-            document.documentElement.dataset.movieListView = localStorage.getItem('movieListView') === 'table' ? 'table' : 'posters';
-        } catch {
-            document.documentElement.dataset.movieListView = 'posters';
-        }
-    </script>
 
     <title>{% apply trim %}{% block title %}Movary{% endblock %}{% endapply %} | {{ applicationName }}</title>
     <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
@@ -24,6 +16,8 @@
 
     <link href="{{ applicationUrl }}/css/bootstrap.min.css" rel="stylesheet">
     <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
+
+    <script src="{{ applicationUrl }}/js/movie-list-view-preference.js"></script>
 
     <meta name="theme-color" content="white">
     <link rel="stylesheet" href="{{ applicationUrl }}/css/bootstrap-icons-1.10.2.css">
