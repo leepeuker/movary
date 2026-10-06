@@ -60,15 +60,15 @@
             </div>
 
             <div id="movieTableView" class="table-responsive d-none">
-                <table class="table table-hover align-middle text-start">
+                <table class="table table-hover align-middle text-start" data-sort-by="{{ sortBy }}" data-sort-order="{{ sortOrder }}">
                     <thead>
                         <tr>
                             <th class="d-none d-sm-table-cell" scope="col">Poster</th>
-                            <th scope="col">Name</th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="name">Name</button></th>
                             <th scope="col">Gender</th>
-                            <th class="d-none d-lg-table-cell" scope="col">Birthday</th>
-                            <th scope="col">Unique appearances</th>
-                            <th scope="col">Total appearances</th>
+                            <th class="d-none d-lg-table-cell" scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="birthDate">Birthday</button></th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="uniqueAppearances">Unique appearances</button></th>
+                            <th scope="col"><button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="totalAppearances">Total appearances</button></th>
                         </tr>
                     </thead>
                     <tbody>

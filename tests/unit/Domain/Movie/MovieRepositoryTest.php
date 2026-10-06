@@ -203,6 +203,55 @@ class MovieRepositoryTest extends TestCase
         );
     }
 
+    public static function providePersonListSortData() : array
+    {
+        return [
+            'birthday' => ['birthDate', 'p.birth_date asc'],
+        ];
+    }
+
+    #[DataProvider('providePersonListSortData')]
+    public function testFetchPersonListsCanSortByTableColumns(string $sortBy, string $expectedOrderBy) : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::exactly(2))
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains($query, "ORDER BY $expectedOrderBy, name asc"),
+                ),
+                [42, '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchActors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: $sortBy,
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+        self::assertSame(
+            [],
+            $this->subject->fetchDirectors(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: $sortBy,
+                sortOrder: SortOrder::createAsc(),
+                gender: null,
+                personFilterUserId: null,
+            ),
+        );
+    }
+
     public static function provideExternalRatingSortData() : array
     {
         return [
