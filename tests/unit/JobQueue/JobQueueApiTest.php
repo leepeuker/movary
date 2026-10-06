@@ -3,6 +3,7 @@
 namespace Tests\Unit\Movary\JobQueue;
 
 use Movary\JobQueue\JobQueueApi;
+use Movary\JobQueue\JobQueueFilter;
 use Movary\JobQueue\JobQueueRepository;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
@@ -92,7 +93,7 @@ class JobQueueApiTest extends TestCase
         $repository
             ->expects(self::once())
             ->method('fetchJobs')
-            ->with(30)
+            ->with(30, 60)
             ->willReturn([[
                 'id' => '7',
                 'job_type' => 'tmdb_movie_sync',
@@ -115,8 +116,37 @@ class JobQueueApiTest extends TestCase
                 'updatedAt' => null,
                 'createdAt' => '2026-10-05 12:00:00',
             ]],
-            (new JobQueueApi($repository))->fetchJobsForStatusPage(30),
+            (new JobQueueApi($repository))->fetchJobsForStatusPage(30, 60),
         );
+    }
+
+    public function testCountJobsReturnsRepositoryResult() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository->expects(self::once())->method('countJobs')->willReturn(72);
+
+        self::assertSame(72, (new JobQueueApi($repository))->countJobs());
+    }
+
+    public function testCountJobsForwardsFilter() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $filter = JobQueueFilter::create(withoutUser: true);
+        $repository->expects(self::once())->method('countJobs')->with($filter)->willReturn(4);
+
+        self::assertSame(4, (new JobQueueApi($repository))->countJobs($filter));
+    }
+
+    public function testFetchJobsForStatusPageForwardsFilter() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $filter = JobQueueFilter::create(withoutUser: true);
+        $repository->expects(self::once())->method('fetchJobs')->with(20, 40, $filter)->willReturn([]);
+
+        self::assertSame([], (new JobQueueApi($repository))->fetchJobsForStatusPage(20, 40, $filter));
     }
 
     public function testDeleteJobReturnsRepositoryResult() : void

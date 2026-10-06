@@ -14,6 +14,8 @@ use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\HttpController\Web\Mapper\JobQueueFilterRequestMapper;
+use Movary\HttpController\Web\Mapper\PaginationRequestMapper;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\CannotSendEmailException;
@@ -23,6 +25,7 @@ use Movary\Service\Email\InvalidSmtpConfigException;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\Service\Email\TestEmailRenderer;
 use Movary\Service\Letterboxd\LetterboxdExporter;
+use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Radarr\RadarrFeedUrlGenerator;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
@@ -34,6 +37,8 @@ use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
+use Movary\ValueObject\JobStatus;
+use Movary\ValueObject\JobType;
 use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 use Twig\Environment;
@@ -64,6 +69,9 @@ class SettingsController
         private readonly CountryApi $countryApi,
         private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
         private readonly ApplicationUrlService $applicationUrlService,
+        private readonly PaginationRequestMapper $paginationRequestMapper,
+        private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly JobQueueFilterRequestMapper $jobQueueFilterRequestMapper,
     ) {
     }
 
@@ -496,15 +504,50 @@ class SettingsController
 
     public function renderServerJobsPage(Request $request) : Response
     {
-        $jobsPerPage = $request->getGetParameters()['jpp'] ?? 30;
+        $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250], ['jpp']);
+        $jobFilter = $this->jobQueueFilterRequestMapper->map($request);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $this->jobQueueApi->countJobs($jobFilter),
+            $paginationRequest->getPerPage(),
+            $paginationRequest->getPage(),
+        );
 
-        $jobs = $this->jobQueueApi->fetchJobsForStatusPage((int)$jobsPerPage);
+        $jobs = $this->jobQueueApi->fetchJobsForStatusPage(
+            $paginationRequest->getPerPage(),
+            $paginationElements->getOffset(),
+            $jobFilter,
+        );
+
+        $paginationQuery = ['perPage' => $paginationRequest->getPerPage()];
+        if ($jobFilter->isWithoutUser() === true) {
+            $paginationQuery['user'] = 'none';
+        } elseif ($jobFilter->getUserId() !== null) {
+            $paginationQuery['user'] = $jobFilter->getUserId();
+        }
+        if ($jobFilter->getType() !== null) {
+            $paginationQuery['type'] = (string)$jobFilter->getType();
+        }
+        if ($jobFilter->getStatus() !== null) {
+            $paginationQuery['status'] = (string)$jobFilter->getStatus();
+        }
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render(
                 'page/settings-server-jobs.html.twig',
-                ['jobs' => $jobs],
+                [
+                    'jobs' => $jobs,
+                    'jobsPerPage' => $paginationRequest->getPerPage(),
+                    'paginationElements' => $paginationElements,
+                    'paginationQuery' => $paginationQuery,
+                    'jobFilterUser' => $jobFilter->isWithoutUser() ? 'none' : $jobFilter->getUserId(),
+                    'jobFilterType' => $jobFilter->getType(),
+                    'jobFilterStatus' => $jobFilter->getStatus(),
+                    'jobFiltersActive' => $jobFilter->hasFilters(),
+                    'jobTypes' => JobType::getSupportedTypes(),
+                    'jobStatuses' => JobStatus::getSupportedStatuses(),
+                    'users' => $this->userApi->fetchAll(),
+                ],
             ),
         );
     }

@@ -35,24 +35,26 @@ class JobType implements JsonSerializable
 
     private const string TYPE_PLEX_IMPORT_WATCHLIST = 'plex_import_watchlist';
 
+    private const array SUPPORTED_TYPES = [
+        self::TYPE_LETTERBOXD_IMPORT_HISTORY,
+        self::TYPE_LETTERBOXD_IMPORT_RATINGS,
+        self::TYPE_TMDB_IMAGE_CACHE,
+        self::TYPE_TMDB_MOVIE_SYNC,
+        self::TYPE_TMDB_PERSON_SYNC,
+        self::TYPE_TRAKT_IMPORT_HISTORY,
+        self::TYPE_TRAKT_IMPORT_RATINGS,
+        self::TYPE_IMDB_SYNC,
+        self::TYPE_PLEX_IMPORT_WATCHLIST,
+        self::TYPE_JELLYFIN_EXPORT_HISTORY,
+        self::TYPE_JELLYFIN_IMPORT_HISTORY,
+        self::TYPE_PASSWORD_RESET_EMAIL,
+        self::TYPE_MASTODON_POST_PLAY,
+        self::TYPE_MASTODON_POST_WATCHLIST,
+    ];
+
     private function __construct(private readonly string $type)
     {
-        if (in_array($this->type, [
-                self::TYPE_LETTERBOXD_IMPORT_HISTORY,
-                self::TYPE_LETTERBOXD_IMPORT_RATINGS,
-                self::TYPE_TMDB_IMAGE_CACHE,
-                self::TYPE_TMDB_MOVIE_SYNC,
-                self::TYPE_TMDB_PERSON_SYNC,
-                self::TYPE_TRAKT_IMPORT_HISTORY,
-                self::TYPE_TRAKT_IMPORT_RATINGS,
-                self::TYPE_IMDB_SYNC,
-                self::TYPE_PLEX_IMPORT_WATCHLIST,
-                self::TYPE_JELLYFIN_EXPORT_HISTORY,
-                self::TYPE_JELLYFIN_IMPORT_HISTORY,
-                self::TYPE_PASSWORD_RESET_EMAIL,
-                self::TYPE_MASTODON_POST_PLAY,
-                self::TYPE_MASTODON_POST_WATCHLIST,
-            ]) === false) {
+        if (in_array($this->type, self::SUPPORTED_TYPES, true) === false) {
             throw new RuntimeException('Not supported job type: ' . $this->type);
         }
     }
@@ -135,6 +137,11 @@ class JobType implements JsonSerializable
     public static function createTraktImportRatings() : self
     {
         return new self(self::TYPE_TRAKT_IMPORT_RATINGS);
+    }
+
+    public static function getSupportedTypes() : array
+    {
+        return self::SUPPORTED_TYPES;
     }
 
     public function __toString() : string

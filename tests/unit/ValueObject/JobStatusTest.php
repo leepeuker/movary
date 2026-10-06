@@ -10,6 +10,11 @@ use RuntimeException;
 #[CoversClass(\Movary\ValueObject\JobStatus::class)]
 class JobStatusTest extends TestCase
 {
+    public function testGetSupportedStatusesReturnsEveryStatus() : void
+    {
+        self::assertSame(['done', 'in progress', 'waiting', 'failed'], JobStatus::getSupportedStatuses());
+    }
+
     public function testCreateDone() : void
     {
         $subject = JobStatus::createDone();

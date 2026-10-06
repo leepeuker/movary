@@ -36,16 +36,60 @@ class JobQueueRepository
         return (int)$lastInsertId;
     }
 
-    public function fetchJobs(int $limit) : array
+    public function countJobs(?JobQueueFilter $filter = null) : int
     {
+        if ($filter === null) {
+            return (int)$this->dbConnection->fetchOne('SELECT COUNT(*) FROM job_queue');
+        }
+
+        [$whereQuery, $parameters] = $this->createStatusPageFilter($filter);
+
+        return (int)$this->dbConnection->fetchOne("SELECT COUNT(*) FROM job_queue jobs$whereQuery", $parameters);
+    }
+
+    public function fetchJobs(int $limit, int $offset = 0, ?JobQueueFilter $filter = null) : array
+    {
+        [$whereQuery, $parameters] = $this->createStatusPageFilter($filter ?? JobQueueFilter::create());
+
         return $this->dbConnection->fetchAllAssociative(
             "SELECT jobs.id, jobs.job_type, jobs.job_status, jobs.user_id, users.name, jobs.parameters,
                 jobs.updated_at, jobs.created_at
             FROM job_queue jobs
             LEFT JOIN user users on jobs.user_id = users.id
+            $whereQuery
             ORDER BY jobs.created_at DESC, jobs.id DESC 
-            LIMIT $limit",
+            LIMIT $limit OFFSET $offset",
+            $parameters,
         );
+    }
+
+    /**
+     * @return array{string, list<int|string>}
+     */
+    private function createStatusPageFilter(JobQueueFilter $filter) : array
+    {
+        $conditions = [];
+        $parameters = [];
+        $userId = $filter->getUserId();
+
+        if ($filter->isWithoutUser() === true) {
+            $conditions[] = 'jobs.user_id IS NULL';
+        } elseif ($userId !== null) {
+            $conditions[] = 'jobs.user_id = ?';
+            $parameters[] = $userId;
+        }
+
+        if ($filter->getType() !== null) {
+            $conditions[] = 'jobs.job_type = ?';
+            $parameters[] = (string)$filter->getType();
+        }
+
+        if ($filter->getStatus() !== null) {
+            $conditions[] = 'jobs.job_status = ?';
+            $parameters[] = (string)$filter->getStatus();
+        }
+
+        return [count($conditions) === 0 ? '' : ' WHERE ' . implode(' AND ', $conditions), $parameters];
     }
 
     public function deleteJob(int $id) : bool

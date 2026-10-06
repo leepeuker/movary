@@ -10,6 +10,13 @@ use RuntimeException;
 #[CoversClass(\Movary\ValueObject\JobType::class)]
 class JobTypeTest extends TestCase
 {
+    public function testGetSupportedTypesIncludesEveryType() : void
+    {
+        self::assertContains('tmdb_movie_sync', JobType::getSupportedTypes());
+        self::assertContains('password_reset_email', JobType::getSupportedTypes());
+        self::assertCount(14, JobType::getSupportedTypes());
+    }
+
     public function testCreateImdbSync() : void
     {
         $subject = JobType::createImdbSync();
