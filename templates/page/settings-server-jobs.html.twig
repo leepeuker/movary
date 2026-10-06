@@ -25,7 +25,7 @@
             {{ include('component/modal-job-filters.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5 style="margin-bottom: 1rem">Job Queue</h5>
+                <h5 style="margin-bottom: 1rem">Job Queue Overview</h5>
                 <div style="text-align: left">
                     <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
                         <div class="d-flex align-items-center gap-2">
@@ -38,7 +38,7 @@
                             <label for="jobsPerPage" class="form-label mb-0">per page</label>
                         </div>
                         <div class="btn-group" role="group" aria-label="Job table actions">
-                            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#jobFiltersModal" aria-label="Filter jobs" title="Filter jobs">
+                            <button class="btn btn-primary {{ jobFiltersActive ? 'active' }}" type="button" data-bs-toggle="modal" data-bs-target="#jobFiltersModal" aria-label="Filter jobs" title="Filter jobs" aria-pressed="{{ jobFiltersActive ? 'true' : 'false' }}">
                                 <i class="bi bi-filter" aria-hidden="true"></i>
                             </button>
                             <button class="btn btn-primary" type="button" onclick="refreshPage()" aria-label="Refresh jobs" title="Refresh jobs" style="border-left-color: #aab0b3">
@@ -96,7 +96,7 @@
                 <hr> 
                 
                 <div>
-                    <h5>Queue maintenance</h6>
+                    <h5>Job Queue Maintenance</h6>
                     <small class="text-muted">Remove jobs that are no longer needed.</small>
                     <div style="margin-top:1rem">
                         <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#jobsRemoveProcessedModal">Remove processed jobs</button>
