@@ -10,7 +10,7 @@
                     <label class="input-group-text" for="jobFilterUser">User</label>
                     <select class="form-select" id="jobFilterUser">
                         <option value="" {{ jobFilterUser is null ? 'selected' }}>All users</option>
-                        <option value="none" {{ jobFilterUser == 'none' ? 'selected' }}>No user</option>
+                        <option value="none" {{ jobFilterUser == 'none' ? 'selected' }}>-</option>
                         {% for user in users %}
                             <option value="{{ user.id }}" {{ jobFilterUser == user.id ? 'selected' }}>{{ user.name }}</option>
                         {% endfor %}
