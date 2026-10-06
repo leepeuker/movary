@@ -67,6 +67,11 @@
                 <li class="dropdown-item">
                     <a class="nav-link {% if requestUrlPath starts with '/settings/server/users' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/users">Users</a>
                 </li>
+                {% if passwordResetAvailable == true %}
+                    <li class="dropdown-item">
+                        <a class="nav-link {% if requestUrlPath starts with '/settings/server/password-resets' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/password-resets">Password Resets</a>
+                    </li>
+                {% endif %}
                 <li class="dropdown-item">
                     <a class="nav-link {% if requestUrlPath starts with '/settings/server/email' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/email">Email</a>
                 </li>

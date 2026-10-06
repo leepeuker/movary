@@ -562,6 +562,14 @@ class SettingsController
         );
     }
 
+    public function renderServerPasswordResetsPage() : Response
+    {
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-password-resets.html.twig'),
+        );
+    }
+
     public function renderTraktPage() : Response
     {
         $traktCredentialsUpdated = $this->sessionWrapper->find('traktCredentialsUpdated');

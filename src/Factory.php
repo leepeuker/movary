@@ -431,6 +431,7 @@ class Factory
         $twig->addGlobal('currentUserLocationsEnabled', $user?->hasLocationsEnabled());
         $twig->addGlobal('currentUserMastodonEnabled', $user?->isMastodonEnabled());
         $twig->addGlobal('currentUserMastodonPostAutomatic', $user?->isMastodonPostAutomatic());
+        $twig->addGlobal('passwordResetAvailable', $container->get(Service\Email\EmailSupport::class)->isPasswordResetAvailable());
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);
