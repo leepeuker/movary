@@ -4,66 +4,56 @@ const table = document.getElementById('locationsTable');
 const rows = table.getElementsByTagName('tr');
 
 document.addEventListener('DOMContentLoaded', function () {
-    reloadTable()
+    registerTableRowClickEvent()
+    document.getElementById('locationsPerPage').addEventListener('change', updateLocationsPerPage)
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('toggle')) {
         let enableLocationsFeature = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Disable locations'
         setLocationsAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
-        window.history.replaceState(null, '', window.location.pathname);
+        removeQueryParameter('toggle')
     }
     let locationCreatedName = urlParams.get('locationCreated');
     if (locationCreatedName) {
         setLocationsAlert('Location was created: ' + locationCreatedName)
-        window.history.replaceState(null, '', window.location.pathname);
+        removeQueryParameter('locationCreated')
     }
     let locationDeletedName = urlParams.get('locationDeleted');
     if (locationDeletedName) {
         setLocationsAlert('Location was deleted: ' + locationDeletedName)
-        window.history.replaceState(null, '', window.location.pathname);
+        removeQueryParameter('locationDeleted')
     }
     let locationUpdatedName = urlParams.get('locationUpdated');
     if (locationUpdatedName) {
         setLocationsAlert('Location was updated: ' + locationUpdatedName)
-        window.history.replaceState(null, '', window.location.pathname);
+        removeQueryParameter('locationUpdated')
     }
 });
 
-async function reloadTable() {
-    table.getElementsByTagName('tbody')[0].innerHTML = ''
+function updateLocationsPerPage() {
+    const url = new URL(window.location.href)
+    url.searchParams.set('perPage', document.getElementById('locationsPerPage').value)
+    url.searchParams.set('page', '1')
 
-    if (document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations') {
-        return
-    }
+    window.location.href = url.toString()
+}
 
-    document.getElementById('locationsTableLoadingSpinner').classList.remove('d-none')
+function refreshLocationsPage() {
+    window.location.reload()
+}
 
-    const response = await fetch(APPLICATION_URL + '/settings/locations');
+function removeQueryParameter(name) {
+    const url = new URL(window.location.href)
+    url.searchParams.delete(name)
 
-    console.log(response.status)
-    if (response.status !== 200) {
-        setLocationsAlert('Could not load locations', 'danger')
-        document.getElementById('locationsTableLoadingSpinner').classList.add('d-none')
+    window.history.replaceState(null, '', url.toString())
+}
 
-        return
-    }
+function redirectWithNotification(name, value = '1') {
+    const url = new URL(window.location.href)
+    url.searchParams.set(name, value)
 
-    const locations = await response.json();
-
-    document.getElementById('locationsTableLoadingSpinner').classList.add('d-none')
-
-
-    locations.forEach((location) => {
-        let row = document.createElement('tr');
-        row.dataset.id = location.id
-        row.innerHTML += '<td>' + location.name + '</td>';
-        row.innerHTML += '<td class="d-none">' + location.isCinema + '</td>';
-        row.style.cursor = 'pointer'
-
-        table.getElementsByTagName('tbody')[0].appendChild(row);
-    })
-
-    registerTableRowClickEvent()
+    window.location.href = url.toString()
 }
 
 function setLocationsAlert(message, type = 'success') {
@@ -97,8 +87,8 @@ function registerTableRowClickEvent() {
 
             prepareEditLocationsModal(
                 this.dataset.id,
-                this.cells[0].innerHTML,
-                this.cells[1].innerHTML === 'true'
+                this.cells[0].textContent,
+                this.cells[1].textContent.trim() === 'true'
             )
 
             locationModal.show()
@@ -166,13 +156,7 @@ document.getElementById('createLocationButton').addEventListener('click', async 
         return
     }
 
-    let url = window.location.href;
-    if (url.indexOf('?') > -1){
-        url += '&locationCreated=' + categoryName
-    } else {
-        url += '?locationCreated=' + categoryName
-    }
-    window.location.href = url;
+    redirectWithNotification('locationCreated', categoryName)
 })
 
 function setLocationModalAlertServerError(message = "Server error, please try again.") {
@@ -214,13 +198,7 @@ document.getElementById('deleteLocationButton').addEventListener('click', async 
     }
 
     let categoryName = document.getElementById('locationModalNameInput').value;
-    let url = window.location.href;
-    if (url.indexOf('?') > -1){
-        url += '&locationDeleted=' + categoryName
-    } else {
-        url += '?locationDeleted=' + categoryName
-    }
-    window.location.href = url;
+    redirectWithNotification('locationDeleted', categoryName)
 })
 
 document.getElementById('updateLocationButton').addEventListener('click', async () => {
@@ -247,26 +225,14 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
         return
     }
 
-    let url = window.location.href;
-    if (url.indexOf('?') > -1){
-        url += '&locationUpdated=' + locationName
-    } else {
-        url += '?locationUpdated=' + locationName
-    }
-    window.location.href = url;
+    redirectWithNotification('locationUpdated', locationName)
 })
 
 async function toggleLocationFeature() {
     let enableLocationsFeature = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Enable locations'
     await sendRequestToggleLocationsFeature(enableLocationsFeature)
 
-    let url = window.location.href;
-    if (url.indexOf('?') > -1){
-        url += '&toggle=1'
-    } else {
-        url += '?toggle=1'
-    }
-    window.location.href = url;
+    redirectWithNotification('toggle')
 }
 
 async function sendRequestToggleLocationsFeature(isLocationsEnabled) {

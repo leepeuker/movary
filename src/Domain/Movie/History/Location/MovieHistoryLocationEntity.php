@@ -29,9 +29,19 @@ class MovieHistoryLocationEntity implements JsonSerializable
         return $this->id;
     }
 
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
     public function getUserId() : int
     {
         return $this->userId;
+    }
+
+    public function isCinema() : bool
+    {
+        return $this->isCinema;
     }
 
     public function jsonSerialize() : array
