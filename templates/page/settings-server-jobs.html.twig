@@ -93,11 +93,16 @@
 
                 <div id="alertJobsDiv"></div>
 
-                <div class="d-grid gap-2">
-                    <button class="btn btn-warning" type="button"  data-bs-toggle="modal" data-bs-target="#jobsRemoveProcessedModal">Remove processed jobs</button>
-                    <button class="btn btn-danger" type="button"  data-bs-toggle="modal" data-bs-target="#jobsRemoveAllModal">Remove all jobs</button>
+                <hr> 
+                
+                <div>
+                    <h5>Queue maintenance</h6>
+                    <small class="text-muted">Remove jobs that are no longer needed.</small>
+                    <div style="margin-top:1rem">
+                        <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#jobsRemoveProcessedModal">Remove processed jobs</button>
+                        <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#jobsRemoveAllModal">Remove all jobs</button>
+                    </div>
                 </div>
-                <br>
             </div>
         </div>
     </main>
