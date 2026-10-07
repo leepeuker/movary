@@ -1,12 +1,45 @@
-const passwordResetsTable = document.getElementById('passwordResetsTable');
 const revokeAllPasswordResetsButton = document.getElementById('revokeAllPasswordResetsButton');
 
-reloadPasswordResetTable()
+document.getElementById('passwordResetsPerPage').addEventListener('change', updatePasswordResetsPerPage)
+document.querySelectorAll('.password-reset-revoke-button').forEach((button) => {
+    button.addEventListener('click', () => revokePasswordReset(button.dataset.userId, button.dataset.userName))
+})
 
-function appendTextCell(row, value) {
-    const cell = document.createElement('td')
-    cell.textContent = value
-    row.appendChild(cell)
+const urlParams = new URLSearchParams(window.location.search)
+const revokedUserName = urlParams.get('resetRevoked')
+if (revokedUserName) {
+    setPasswordResetManagementAlert('Password reset was revoked for ' + revokedUserName)
+    removeQueryParameter('resetRevoked')
+}
+if (urlParams.get('allResetsRevoked')) {
+    setPasswordResetManagementAlert('All password reset links were revoked.')
+    removeQueryParameter('allResetsRevoked')
+}
+
+function updatePasswordResetsPerPage() {
+    const url = new URL(window.location.href)
+    url.searchParams.set('perPage', document.getElementById('passwordResetsPerPage').value)
+    url.searchParams.set('page', '1')
+
+    window.location.href = url.toString()
+}
+
+function refreshPasswordResetsPage() {
+    window.location.reload()
+}
+
+function removeQueryParameter(name) {
+    const url = new URL(window.location.href)
+    url.searchParams.delete(name)
+
+    window.history.replaceState(null, '', url.toString())
+}
+
+function redirectWithNotification(name, value = '1') {
+    const url = new URL(window.location.href)
+    url.searchParams.set(name, value)
+
+    window.location.href = url.toString()
 }
 
 function setPasswordResetManagementAlert(message, type = 'success') {
@@ -28,53 +61,6 @@ function setPasswordResetManagementAlert(message, type = 'success') {
     alerts.appendChild(alert)
 }
 
-async function reloadPasswordResetTable() {
-    const tableBody = passwordResetsTable.getElementsByTagName('tbody')[0]
-    const spinner = document.getElementById('passwordResetTableLoadingSpinner')
-    tableBody.replaceChildren()
-    spinner.classList.remove('d-none')
-    revokeAllPasswordResetsButton.disabled = true
-
-    const response = await fetch(APPLICATION_URL + '/settings/password-resets')
-    spinner.classList.add('d-none')
-
-    if (response.ok === false) {
-        setPasswordResetManagementAlert('Could not load password resets.', 'danger')
-        return
-    }
-
-    const resets = await response.json()
-    revokeAllPasswordResetsButton.disabled = resets.length === 0
-    if (resets.length === 0) {
-        const row = document.createElement('tr')
-        const cell = document.createElement('td')
-        cell.colSpan = 5
-        cell.className = 'text-muted'
-        cell.textContent = 'No active password resets.'
-        row.appendChild(cell)
-        tableBody.appendChild(row)
-        return
-    }
-
-    resets.forEach((reset) => {
-        const row = document.createElement('tr')
-        appendTextCell(row, reset.name)
-        appendTextCell(row, reset.email)
-        appendTextCell(row, reset.createdAt + ' UTC')
-        appendTextCell(row, reset.expirationDate + ' UTC')
-
-        const actionCell = document.createElement('td')
-        const revokeButton = document.createElement('button')
-        revokeButton.type = 'button'
-        revokeButton.className = 'btn btn-sm btn-danger'
-        revokeButton.textContent = 'Revoke'
-        revokeButton.addEventListener('click', () => revokePasswordReset(reset.userId, reset.name))
-        actionCell.appendChild(revokeButton)
-        row.appendChild(actionCell)
-        tableBody.appendChild(row)
-    })
-}
-
 async function revokeAllPasswordResets() {
     const modal = bootstrap.Modal.getInstance('#passwordResetsRevokeAllModal')
 
@@ -91,8 +77,7 @@ async function revokeAllPasswordResets() {
         return
     }
 
-    setPasswordResetManagementAlert('All password reset links were revoked.')
-    reloadPasswordResetTable()
+    redirectWithNotification('allResetsRevoked')
 }
 
 async function revokePasswordReset(userId, userName) {
@@ -109,6 +94,5 @@ async function revokePasswordReset(userId, userName) {
         return
     }
 
-    setPasswordResetManagementAlert('Password reset was revoked for ' + userName)
-    reloadPasswordResetTable()
+    redirectWithNotification('resetRevoked', userName)
 }

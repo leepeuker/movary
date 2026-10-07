@@ -363,6 +363,48 @@ class UserRepositoryTest extends TestCase
         );
     }
 
+    public function testCountPendingPasswordResetTokens() : void
+    {
+        $currentDate = DateTime::createFromString('2026-09-28 12:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT COUNT(*) FROM `user_password_reset_token` WHERE `expiration_date` > ?',
+                ['2026-09-28 12:00:00'],
+            )
+            ->willReturn('42');
+
+        self::assertSame(42, $this->subject->countPendingPasswordResetTokens($currentDate));
+    }
+
+    public function testFetchPendingPasswordResetTokensPaginated() : void
+    {
+        $currentDate = DateTime::createFromString('2026-09-28 12:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains($query, 'ORDER BY reset_token.`created_at` DESC')
+                        && str_contains($query, 'LIMIT 20 OFFSET 40'),
+                ),
+                ['2026-09-28 12:00:00'],
+            )
+            ->willReturn([[
+                'user_id' => '12',
+                'name' => 'Alice',
+                'email' => 'alice@example.com',
+                'expiration_date' => '2026-09-28 12:15:00',
+                'created_at' => '2026-09-28 12:00:00',
+            ]]);
+
+        $tokens = $this->subject->fetchPendingPasswordResetTokens($currentDate, 20, 40);
+
+        self::assertSame(12, $tokens[0]['userId']);
+        self::assertEquals(DateTime::createFromString('2026-09-28 12:15:00'), $tokens[0]['expirationDate']);
+    }
+
     public function testFindPasswordResetTokenCreationDate() : void
     {
         $this->dbConnectionMock

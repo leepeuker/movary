@@ -97,6 +97,19 @@ class PasswordResetTokenService
         return $this->repository->fetchPendingPasswordResetTokens(DateTime::create());
     }
 
+    public function countPendingTokens() : int
+    {
+        return $this->repository->countPendingPasswordResetTokens(DateTime::create());
+    }
+
+    /**
+     * @return array<array{userId: int, name: string, email: string, expirationDate: DateTime, createdAt: DateTime}>
+     */
+    public function fetchPendingTokensPaginated(int $limit, int $offset) : array
+    {
+        return $this->repository->fetchPendingPasswordResetTokens(DateTime::create(), $limit, $offset);
+    }
+
     private function hashToken(string $token) : string
     {
         return hash('sha256', $token);

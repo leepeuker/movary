@@ -607,11 +607,26 @@ class SettingsController
         );
     }
 
-    public function renderServerPasswordResetsPage() : Response
+    public function renderServerPasswordResetsPage(Request $request) : Response
     {
+        $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250]);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $this->passwordResetTokenService->countPendingTokens(),
+            $paginationRequest->getPerPage(),
+            $paginationRequest->getPage(),
+        );
+
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-server-password-resets.html.twig'),
+            $this->twig->render('page/settings-server-password-resets.html.twig', [
+                'passwordResets' => $this->passwordResetTokenService->fetchPendingTokensPaginated(
+                    $paginationRequest->getPerPage(),
+                    $paginationElements->getOffset(),
+                ),
+                'passwordResetsPerPage' => $paginationRequest->getPerPage(),
+                'paginationElements' => $paginationElements,
+                'paginationQuery' => ['perPage' => $paginationRequest->getPerPage()],
+            ]),
         );
     }
 
