@@ -32,11 +32,13 @@
                     {% endif %}
                 </div>
 
-                <div id="locationAlerts"></div>
+                <div id="locationToggleAlerts"></div>
+
+                <hr>
 
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-3 text-start">
                     <div class="d-flex align-items-center gap-2">
-                        <select class="form-select" id="locationsPerPage" style="width: 5rem">
+                        <select class="form-select" id="locationsPerPage" style="width: 5rem" {% if locationsEnabled == false %}disabled{% endif %}>
                             <option value="20" {{ locationsPerPage == 20 ? 'selected' }}>20</option>
                             <option value="50" {{ locationsPerPage == 50 ? 'selected' }}>50</option>
                             <option value="100" {{ locationsPerPage == 100 ? 'selected' }}>100</option>
@@ -44,7 +46,7 @@
                         </select>
                         <label for="locationsPerPage" class="form-label mb-0">per page</label>
                     </div>
-                    <button class="btn btn-primary" type="button" onclick="refreshLocationsPage()" aria-label="Refresh locations" title="Refresh locations">
+                    <button class="btn btn-primary" type="button" onclick="refreshLocationsPage()" aria-label="Refresh locations" title="Refresh locations" {% if locationsEnabled == false %}disabled{% endif %}>
                         <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -53,14 +55,17 @@
                     <table class="table table-hover" id="locationsTable">
                         <thead>
                         <tr>
-                            <th scope="col">Manage your locations</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Cinema</th>
+                            <th scope="col">Plays</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for location in locations %}
-                            <tr data-id="{{ location.id }}" style="cursor: pointer">
+                            <tr data-id="{{ location.id }}" data-is-cinema="{{ location.isCinema ? 'true' : 'false' }}" style="cursor: pointer">
                                 <td>{{ location.name }}</td>
-                                <td class="d-none">{{ location.isCinema ? 'true' : 'false' }}</td>
+                                <td>{{ location.isCinema ? 'Yes' : 'No' }}</td>
+                                <td>{{ location.plays }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -71,6 +76,8 @@
                     paginationPath: applicationUrl ~ '/settings/account/locations',
                     paginationQuery: paginationQuery,
                 }) }}
+
+                <div id="locationAlerts"></div>
 
                 <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn" {% if locationsEnabled == false %}disabled{% endif %}>Add Location</button>
                 <br>

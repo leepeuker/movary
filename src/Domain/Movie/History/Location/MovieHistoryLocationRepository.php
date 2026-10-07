@@ -82,10 +82,13 @@ class MovieHistoryLocationRepository
         int $offset,
     ) : MovieHistoryLocationEntityList {
         $data = $this->dbConnection->fetchAllAssociative(
-            "SELECT *
+            "SELECT `location`.*,
+                (SELECT COALESCE(SUM(plays), 0)
+                 FROM movie_user_watch_dates
+                 WHERE location_id = `location`.id) AS plays
             FROM `location`
-            WHERE user_id = ?
-            ORDER BY name, id
+            WHERE `location`.user_id = ?
+            ORDER BY `location`.name, `location`.id
             LIMIT $limit OFFSET $offset",
             [$userId],
         );

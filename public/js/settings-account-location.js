@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('toggle')) {
         let enableLocationsFeature = document.getElementById('toggleLocationsFeatureBtn').textContent === 'Disable locations'
-        setLocationsAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
+        setLocationsToggleAlert('Locations ' + (enableLocationsFeature === true ? 'enabled' : 'disabled'))
         removeQueryParameter('toggle')
     }
     let locationCreatedName = urlParams.get('locationCreated');
@@ -56,8 +56,12 @@ function redirectWithNotification(name, value = '1') {
     window.location.href = url.toString()
 }
 
-function setLocationsAlert(message, type = 'success') {
-    const locationAlerts = document.getElementById('locationAlerts');
+function setLocationsToggleAlert(message, type = 'success') {
+    setLocationsAlert(message, type, 'locationToggleAlerts')
+}
+
+function setLocationsAlert(message, type = 'success', alertContainerId = 'locationAlerts') {
+    const locationAlerts = document.getElementById(alertContainerId);
     locationAlerts.classList.remove('d-none');
     locationAlerts.innerHTML = '';
     locationAlerts.style.textAlign = 'center';
@@ -88,7 +92,7 @@ function registerTableRowClickEvent() {
             prepareEditLocationsModal(
                 this.dataset.id,
                 this.cells[0].textContent,
-                this.cells[1].textContent.trim() === 'true'
+                this.dataset.isCinema === 'true'
             )
 
             locationModal.show()

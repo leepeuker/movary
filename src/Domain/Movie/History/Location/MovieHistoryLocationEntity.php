@@ -11,6 +11,7 @@ class MovieHistoryLocationEntity implements JsonSerializable
         private readonly int $userId,
         private readonly string $name,
         private readonly bool $isCinema,
+        private readonly int $plays,
     ) {
     }
 
@@ -21,6 +22,7 @@ class MovieHistoryLocationEntity implements JsonSerializable
             (int)$data['user_id'],
             (string)$data['name'],
             (bool)$data['is_cinema'],
+            (int)($data['plays'] ?? 0),
         );
     }
 
@@ -42,6 +44,11 @@ class MovieHistoryLocationEntity implements JsonSerializable
     public function isCinema() : bool
     {
         return $this->isCinema;
+    }
+
+    public function getPlays() : int
+    {
+        return $this->plays;
     }
 
     public function jsonSerialize() : array

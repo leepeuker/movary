@@ -16,11 +16,25 @@ class MovieHistoryLocationEntityTest extends TestCase
             'user_id' => '12',
             'name' => 'Cinema',
             'is_cinema' => '1',
+            'plays' => '23',
         ]);
 
         self::assertSame(7, $location->getId());
         self::assertSame(12, $location->getUserId());
         self::assertSame('Cinema', $location->getName());
         self::assertTrue($location->isCinema());
+        self::assertSame(23, $location->getPlays());
+    }
+
+    public function testDefaultsPlaysToZero() : void
+    {
+        $location = MovieHistoryLocationEntity::createFromArray([
+            'id' => '7',
+            'user_id' => '12',
+            'name' => 'Home',
+            'is_cinema' => '0',
+        ]);
+
+        self::assertSame(0, $location->getPlays());
     }
 }
