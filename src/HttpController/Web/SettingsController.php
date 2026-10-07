@@ -577,15 +577,15 @@ class SettingsController
     public function renderServerUsersPage(Request $request) : Response
     {
         $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250]);
-        $userFilter = $this->userFilterRequestMapper->map($request);
+        $isAdminFilter = $this->userFilterRequestMapper->map($request);
         $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
-            $this->userApi->countUsers($userFilter),
+            $this->userApi->countUsers($isAdminFilter),
             $paginationRequest->getPerPage(),
             $paginationRequest->getPage(),
         );
         $paginationQuery = ['perPage' => $paginationRequest->getPerPage()];
-        if ($userFilter->getIsAdmin() !== null) {
-            $paginationQuery['role'] = $userFilter->getIsAdmin() ? 'admin' : 'user';
+        if ($isAdminFilter !== null) {
+            $paginationQuery['role'] = $isAdminFilter ? 'admin' : 'user';
         }
 
         return Response::create(
@@ -594,15 +594,15 @@ class SettingsController
                 'users' => $this->userApi->fetchAllPaginated(
                     $paginationRequest->getPerPage(),
                     $paginationElements->getOffset(),
-                    $userFilter,
+                    $isAdminFilter,
                 ),
                 'usersPerPage' => $paginationRequest->getPerPage(),
                 'paginationElements' => $paginationElements,
                 'paginationQuery' => $paginationQuery,
-                'userFilterRole' => $userFilter->getIsAdmin() === null
+                'userFilterRole' => $isAdminFilter === null
                     ? null
-                    : ($userFilter->getIsAdmin() ? 'admin' : 'user'),
-                'userFiltersActive' => $userFilter->hasFilters(),
+                    : ($isAdminFilter ? 'admin' : 'user'),
+                'userFiltersActive' => $isAdminFilter !== null,
             ]),
         );
     }

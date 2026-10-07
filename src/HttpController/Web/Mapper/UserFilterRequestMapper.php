@@ -2,19 +2,18 @@
 
 namespace Movary\HttpController\Web\Mapper;
 
-use Movary\Domain\User\UserFilter;
 use Movary\ValueObject\Http\Request;
 
 class UserFilterRequestMapper
 {
-    public function map(Request $request) : UserFilter
+    public function map(Request $request) : ?bool
     {
         $role = $request->getGetParameters()['role'] ?? null;
 
-        return UserFilter::create(match ($role) {
+        return match ($role) {
             'admin' => true,
             'user' => false,
             default => null,
-        });
+        };
     }
 }

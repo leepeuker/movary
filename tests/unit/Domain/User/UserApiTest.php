@@ -4,7 +4,6 @@ namespace Tests\Unit\Movary\Domain\User;
 
 use Movary\Domain\User\Service\Validator;
 use Movary\Domain\User\UserApi;
-use Movary\Domain\User\UserFilter;
 use Movary\Domain\User\UserRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -40,13 +39,12 @@ class UserApiTest extends TestCase
     {
         /** @var UserRepository&MockObject $repository */
         $repository = $this->createMock(UserRepository::class);
-        $filter = UserFilter::create(true);
-        $repository->expects(self::once())->method('countUsers')->with($filter)->willReturn(3);
-        $repository->expects(self::once())->method('fetchAllPaginated')->with(20, 0, $filter)->willReturn([]);
+        $repository->expects(self::once())->method('countUsers')->with(true)->willReturn(3);
+        $repository->expects(self::once())->method('fetchAllPaginated')->with(20, 0, true)->willReturn([]);
         $subject = $this->createSubject($repository);
 
-        self::assertSame(3, $subject->countUsers($filter));
-        self::assertSame([], $subject->fetchAllPaginated(20, 0, $filter));
+        self::assertSame(3, $subject->countUsers(true));
+        self::assertSame([], $subject->fetchAllPaginated(20, 0, true));
     }
 
     private function createSubject(UserRepository $repository) : UserApi

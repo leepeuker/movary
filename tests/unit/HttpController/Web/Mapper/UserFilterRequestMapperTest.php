@@ -28,8 +28,6 @@ class UserFilterRequestMapperTest extends TestCase
         $request = $this->createStub(Request::class);
         $request->method('getGetParameters')->willReturn($role === null ? [] : ['role' => $role]);
 
-        $filter = (new UserFilterRequestMapper())->map($request);
-
-        self::assertSame($expectedIsAdmin, $filter->getIsAdmin());
+        self::assertSame($expectedIsAdmin, (new UserFilterRequestMapper())->map($request));
     }
 }

@@ -3,7 +3,6 @@
 namespace Tests\Unit\Movary\Domain\User;
 
 use Doctrine\DBAL\Connection;
-use Movary\Domain\User\UserFilter;
 use Movary\Domain\User\UserRepository;
 use Movary\ValueObject\DateTime;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -60,7 +59,7 @@ class UserRepositoryTest extends TestCase
             ->with('SELECT COUNT(*) FROM `user` WHERE is_admin = ?', [1])
             ->willReturn('3');
 
-        self::assertSame(3, $this->subject->countUsers(UserFilter::create(true)));
+        self::assertSame(3, $this->subject->countUsers(true));
     }
 
     public function testFetchAllPaginatedAppliesRoleFilter() : void
@@ -77,7 +76,7 @@ class UserRepositoryTest extends TestCase
             )
             ->willReturn([]);
 
-        self::assertSame([], $this->subject->fetchAllPaginated(20, 40, UserFilter::create(false)));
+        self::assertSame([], $this->subject->fetchAllPaginated(20, 40, false));
     }
 
     public function testCreateLoginAttempt() : void

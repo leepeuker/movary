@@ -258,16 +258,16 @@ class UserRepository
         return $this->dbConnection->fetchAllAssociative('SELECT id, name, email, is_admin as isAdmin FROM `user` ORDER BY id');
     }
 
-    public function countUsers(?UserFilter $filter = null) : int
+    public function countUsers(?bool $isAdminFilter = null) : int
     {
-        [$whereQuery, $parameters] = $this->createUserFilter($filter ?? UserFilter::create());
+        [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
 
         return (int)$this->dbConnection->fetchOne("SELECT COUNT(*) FROM `user`$whereQuery", $parameters);
     }
 
-    public function fetchAllPaginated(int $limit, int $offset, ?UserFilter $filter = null) : array
+    public function fetchAllPaginated(int $limit, int $offset, ?bool $isAdminFilter = null) : array
     {
-        [$whereQuery, $parameters] = $this->createUserFilter($filter ?? UserFilter::create());
+        [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
 
         return $this->dbConnection->fetchAllAssociative(
             "SELECT id, name, email, is_admin as isAdmin
@@ -282,13 +282,13 @@ class UserRepository
     /**
      * @return array{string, list<int>}
      */
-    private function createUserFilter(UserFilter $filter) : array
+    private function createUserFilter(?bool $isAdminFilter) : array
     {
-        if ($filter->getIsAdmin() === null) {
+        if ($isAdminFilter === null) {
             return ['', []];
         }
 
-        return [' WHERE is_admin = ?', [(int)$filter->getIsAdmin()]];
+        return [' WHERE is_admin = ?', [(int)$isAdminFilter]];
     }
 
     /**

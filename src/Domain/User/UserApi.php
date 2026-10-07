@@ -79,14 +79,14 @@ class UserApi
         return $this->repository->fetchAll();
     }
 
-    public function countUsers(?UserFilter $filter = null) : int
+    public function countUsers(?bool $isAdminFilter = null) : int
     {
-        return $this->repository->countUsers($filter);
+        return $this->repository->countUsers($isAdminFilter);
     }
 
-    public function fetchAllPaginated(int $limit, int $offset, ?UserFilter $filter = null) : array
+    public function fetchAllPaginated(int $limit, int $offset, ?bool $isAdminFilter = null) : array
     {
-        return $this->repository->fetchAllPaginated($limit, $offset, $filter);
+        return $this->repository->fetchAllPaginated($limit, $offset, $isAdminFilter);
     }
 
     public function fetchAllHavingWatchedMovieInternVisibleUsernames(int $movieId) : array
