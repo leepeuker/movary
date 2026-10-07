@@ -294,14 +294,19 @@ class UserRepository
     /**
      * @return array<array{userId: int, name: string, email: string, expirationDate: DateTime, createdAt: DateTime}>
      */
-    public function fetchPendingPasswordResetTokens(DateTime $currentDate) : array
-    {
+    public function fetchPendingPasswordResetTokens(
+        DateTime $currentDate,
+        ?int $limit = null,
+        int $offset = 0,
+    ) : array {
+        $paginationQuery = $limit === null ? '' : " LIMIT $limit OFFSET $offset";
         $rows = $this->dbConnection->fetchAllAssociative(
             'SELECT reset_token.`user_id`, u.`name`, u.`email`, reset_token.`expiration_date`, reset_token.`created_at` '
             . 'FROM `user_password_reset_token` reset_token '
             . 'JOIN `user` u ON u.`id` = reset_token.`user_id` '
             . 'WHERE reset_token.`expiration_date` > ? '
-            . 'ORDER BY reset_token.`created_at` DESC',
+            . 'ORDER BY reset_token.`created_at` DESC'
+            . $paginationQuery,
             [(string)$currentDate],
         );
 
@@ -314,6 +319,14 @@ class UserRepository
                 'createdAt' => DateTime::createFromString($row['created_at']),
             ],
             $rows,
+        );
+    }
+
+    public function countPendingPasswordResetTokens(DateTime $currentDate) : int
+    {
+        return (int)$this->dbConnection->fetchOne(
+            'SELECT COUNT(*) FROM `user_password_reset_token` WHERE `expiration_date` > ?',
+            [(string)$currentDate],
         );
     }
 

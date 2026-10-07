@@ -182,6 +182,35 @@ class PasswordResetTokenServiceTest extends TestCase
         self::assertSame($pendingTokens, $this->subject->fetchPendingTokens());
     }
 
+    public function testCountPendingTokens() : void
+    {
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('countPendingPasswordResetTokens')
+            ->with(self::isInstanceOf(DateTime::class))
+            ->willReturn(42);
+
+        self::assertSame(42, $this->subject->countPendingTokens());
+    }
+
+    public function testFetchPendingTokensPaginated() : void
+    {
+        $pendingTokens = [[
+            'userId' => 12,
+            'name' => 'Alice',
+            'email' => 'alice@example.com',
+            'expirationDate' => DateTime::createFromString('+15 minutes'),
+            'createdAt' => DateTime::create(),
+        ]];
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('fetchPendingPasswordResetTokens')
+            ->with(self::isInstanceOf(DateTime::class), 20, 40)
+            ->willReturn($pendingTokens);
+
+        self::assertSame($pendingTokens, $this->subject->fetchPendingTokensPaginated(20, 40));
+    }
+
     public function testDeleteAllTokens() : void
     {
         $this->repositoryMock
