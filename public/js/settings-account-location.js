@@ -187,23 +187,41 @@ function validateCreateLocationInput() {
     return error
 }
 
-document.getElementById('deleteLocationButton').addEventListener('click', async () => {
-    if (confirm('Are you sure you want to delete the location?') === false) {
+document.getElementById('deleteLocationConfirmModal').addEventListener('show.bs.modal', () => {
+    const locationName = document.getElementById('locationModalNameInput').value
+    document.getElementById('deleteLocationConfirmMessage').textContent = 'Are you sure you want to delete the location "' + locationName + '"?'
+    document.getElementById('deleteLocationConfirmAlerts').innerHTML = ''
+})
+
+document.getElementById('deleteLocationConfirmButton').addEventListener('click', async () => {
+    const deleteButton = document.getElementById('deleteLocationConfirmButton')
+    deleteButton.disabled = true
+
+    let response
+    try {
+        response = await fetch(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
+            method: 'DELETE'
+        });
+    } catch (error) {
+        setLocationDeleteConfirmAlertServerError()
+
         return
+    } finally {
+        deleteButton.disabled = false
     }
 
-    const response = await fetch(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
-        method: 'DELETE'
-    });
-
     if (response.status !== 200) {
-        setLocationModalAlertServerError()
+        setLocationDeleteConfirmAlertServerError(await response.text())
         return
     }
 
     let categoryName = document.getElementById('locationModalNameInput').value;
     redirectWithNotification('locationDeleted', categoryName)
 })
+
+function setLocationDeleteConfirmAlertServerError(message = "Server error, please try again.") {
+    document.getElementById('deleteLocationConfirmAlerts').innerHTML = '<div class="alert alert-danger alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+}
 
 document.getElementById('updateLocationButton').addEventListener('click', async () => {
     if (validateCreateLocationInput() === true) {
