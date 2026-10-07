@@ -30,6 +30,7 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\DatabaseMigration\MigrationCoordinator;
+use Movary\Service\Email\EmailSupport;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
 use Movary\Service\ImageCacheService;
@@ -431,6 +432,10 @@ class Factory
         $twig->addGlobal('currentUserLocationsEnabled', $user?->hasLocationsEnabled());
         $twig->addGlobal('currentUserMastodonEnabled', $user?->isMastodonEnabled());
         $twig->addGlobal('currentUserMastodonPostAutomatic', $user?->isMastodonPostAutomatic());
+        $twig->addGlobal(
+            'passwordResetAvailable',
+            $user?->isAdmin() === true && $container->get(EmailSupport::class)->isPasswordResetAvailable(),
+        );
         $twig->addGlobal('routeUsername', $routeUsername ?? null);
         $twig->addGlobal('dateFormatPhp', $dateFormatPhp);
         $twig->addGlobal('dateFormatJavascript', $dataFormatJavascript);

@@ -576,9 +576,15 @@ class SettingsController
     {
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-server-users.html.twig', [
-                'passwordResetAvailable' => $this->emailSupport->isPasswordResetAvailable(),
-            ]),
+            $this->twig->render('page/settings-server-users.html.twig'),
+        );
+    }
+
+    public function renderServerPasswordResetsPage() : Response
+    {
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-password-resets.html.twig'),
         );
     }
 
