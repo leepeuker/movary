@@ -72,6 +72,7 @@ class SettingsController
         private readonly PaginationRequestMapper $paginationRequestMapper,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly JobQueueFilterRequestMapper $jobQueueFilterRequestMapper,
+        private readonly Movie\History\Location\MovieHistoryLocationApi $locationApi,
     ) {
     }
 
@@ -326,14 +327,33 @@ class SettingsController
         );
     }
 
-    public function renderLocationsAccountPage() : Response
+    public function renderLocationsAccountPage(Request $request) : Response
     {
         $user = $this->authenticationService->getCurrentUser();
+        $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250]);
+        $locationsEnabled = $user->hasLocationsEnabled();
+        $locationCount = $locationsEnabled ? $this->locationApi->countLocationsByUserId($user->getId()) : 0;
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $locationCount,
+            $paginationRequest->getPerPage(),
+            $paginationRequest->getPage(),
+        );
+        $locations = $locationsEnabled
+            ? $this->locationApi->findLocationsByUserIdPaginated(
+                $user->getId(),
+                $paginationRequest->getPerPage(),
+                $paginationElements->getOffset(),
+            )
+            : Movie\History\Location\MovieHistoryLocationEntityList::create();
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-locations.html.twig', [
-                'locationsEnabled' => $user->hasLocationsEnabled(),
+                'locationsEnabled' => $locationsEnabled,
+                'locations' => $locations,
+                'locationsPerPage' => $paginationRequest->getPerPage(),
+                'paginationElements' => $paginationElements,
+                'paginationQuery' => ['perPage' => $paginationRequest->getPerPage()],
             ]),
         );
     }

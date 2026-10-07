@@ -27,6 +27,14 @@ class MovieHistoryLocationRepository
         );
     }
 
+    public function countLocationsByUserId(int $userId) : int
+    {
+        return (int)$this->dbConnection->fetchOne(
+            'SELECT COUNT(*) FROM `location` WHERE user_id = ?',
+            [$userId],
+        );
+    }
+
     public function deleteLocation(int $locationId) : void
     {
         $this->dbConnection->delete('location', ['id' => $locationId]);
@@ -61,7 +69,27 @@ class MovieHistoryLocationRepository
             'SELECT *
             FROM `location` 
             WHERE user_id = ?
-            ORDER BY name',
+            ORDER BY name, id',
+            [$userId],
+        );
+
+        return MovieHistoryLocationEntityList::createFromArray($data);
+    }
+
+    public function findLocationsByUserIdPaginated(
+        int $userId,
+        int $limit,
+        int $offset,
+    ) : MovieHistoryLocationEntityList {
+        $data = $this->dbConnection->fetchAllAssociative(
+            "SELECT `location`.*,
+                (SELECT COALESCE(SUM(plays), 0)
+                 FROM movie_user_watch_dates
+                 WHERE location_id = `location`.id) AS plays
+            FROM `location`
+            WHERE `location`.user_id = ?
+            ORDER BY `location`.name, `location`.id
+            LIMIT $limit OFFSET $offset",
             [$userId],
         );
 

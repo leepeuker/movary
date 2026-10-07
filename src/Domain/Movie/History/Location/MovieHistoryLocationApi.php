@@ -28,6 +28,11 @@ class MovieHistoryLocationApi
         return $location->getId();
     }
 
+    public function countLocationsByUserId(int $userId) : int
+    {
+        return $this->locationRepository->countLocationsByUserId($userId);
+    }
+
     public function deleteLocation(int $locationId) : void
     {
         $this->locationRepository->deleteLocation($locationId);
@@ -57,6 +62,14 @@ class MovieHistoryLocationApi
     public function findLocationsByUserId(int $userId) : MovieHistoryLocationEntityList
     {
         return $this->locationRepository->findLocationsByUserId($userId);
+    }
+
+    public function findLocationsByUserIdPaginated(
+        int $userId,
+        int $limit,
+        int $offset,
+    ) : MovieHistoryLocationEntityList {
+        return $this->locationRepository->findLocationsByUserIdPaginated($userId, $limit, $offset);
     }
 
     public function updateLocation(int $locationId, string $name, bool $isCinema) : void
