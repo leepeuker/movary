@@ -1,9 +1,18 @@
 const revokeAllPasswordResetsButton = document.getElementById('revokeAllPasswordResetsButton');
 
 document.getElementById('passwordResetsPerPage').addEventListener('change', updatePasswordResetsPerPage)
-document.querySelectorAll('.password-reset-revoke-button').forEach((button) => {
-    button.addEventListener('click', () => revokePasswordReset(button.dataset.userId, button.dataset.userName))
+
+let selectedPasswordResetUserId = null
+let selectedPasswordResetUserName = ''
+
+document.getElementById('passwordResetRevokeModal').addEventListener('show.bs.modal', (event) => {
+    selectedPasswordResetUserId = event.relatedTarget.dataset.userId
+    selectedPasswordResetUserName = event.relatedTarget.dataset.userName
+    document.getElementById('passwordResetRevokeMessage').textContent = 'Are you sure you want to revoke the password reset for "' + selectedPasswordResetUserName + '"?'
+    document.getElementById('passwordResetRevokeAlerts').replaceChildren()
 })
+
+document.getElementById('passwordResetRevokeConfirmButton').addEventListener('click', revokePasswordReset)
 
 const urlParams = new URLSearchParams(window.location.search)
 const revokedUserName = urlParams.get('resetRevoked')
@@ -61,6 +70,17 @@ function setPasswordResetManagementAlert(message, type = 'success') {
     alerts.appendChild(alert)
 }
 
+function setPasswordResetRevokeAlert(message) {
+    const alerts = document.getElementById('passwordResetRevokeAlerts')
+    alerts.replaceChildren()
+
+    const alert = document.createElement('div')
+    alert.className = 'alert alert-danger mt-3 mb-0'
+    alert.setAttribute('role', 'alert')
+    alert.textContent = message
+    alerts.appendChild(alert)
+}
+
 async function revokeAllPasswordResets() {
     const modal = bootstrap.Modal.getInstance('#passwordResetsRevokeAllModal')
 
@@ -80,19 +100,27 @@ async function revokeAllPasswordResets() {
     redirectWithNotification('allResetsRevoked')
 }
 
-async function revokePasswordReset(userId, userName) {
-    if (confirm('Revoke the password reset for ' + userName + '?') === false) {
-        return
-    }
+async function revokePasswordReset() {
+    const confirmButton = document.getElementById('passwordResetRevokeConfirmButton')
+    confirmButton.disabled = true
 
-    const response = await fetch(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
-        method: 'DELETE'
-    })
+    let response
+    try {
+        response = await fetch(APPLICATION_URL + '/settings/users/' + selectedPasswordResetUserId + '/password-reset', {
+            method: 'DELETE'
+        })
+    } catch (error) {
+        setPasswordResetRevokeAlert('Could not revoke password reset.')
+
+        return
+    } finally {
+        confirmButton.disabled = false
+    }
 
     if (response.ok === false) {
-        setPasswordResetManagementAlert('Could not revoke password reset.', 'danger')
+        setPasswordResetRevokeAlert('Could not revoke password reset.')
         return
     }
 
-    redirectWithNotification('resetRevoked', userName)
+    redirectWithNotification('resetRevoked', selectedPasswordResetUserName)
 }
