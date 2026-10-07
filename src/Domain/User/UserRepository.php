@@ -258,6 +258,39 @@ class UserRepository
         return $this->dbConnection->fetchAllAssociative('SELECT id, name, email, is_admin as isAdmin FROM `user` ORDER BY id');
     }
 
+    public function countUsers(?bool $isAdminFilter = null) : int
+    {
+        [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
+
+        return (int)$this->dbConnection->fetchOne("SELECT COUNT(*) FROM `user`$whereQuery", $parameters);
+    }
+
+    public function fetchAllPaginated(int $limit, int $offset, ?bool $isAdminFilter = null) : array
+    {
+        [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
+
+        return $this->dbConnection->fetchAllAssociative(
+            "SELECT id, name, email, is_admin as isAdmin
+            FROM `user`
+            $whereQuery
+            ORDER BY id
+            LIMIT $limit OFFSET $offset",
+            $parameters,
+        );
+    }
+
+    /**
+     * @return array{string, list<int>}
+     */
+    private function createUserFilter(?bool $isAdminFilter) : array
+    {
+        if ($isAdminFilter === null) {
+            return ['', []];
+        }
+
+        return [' WHERE is_admin = ?', [(int)$isAdminFilter]];
+    }
+
     /**
      * @return array<array{userId: int, name: string, email: string, expirationDate: DateTime, createdAt: DateTime}>
      */

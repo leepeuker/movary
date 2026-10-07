@@ -16,6 +16,7 @@ use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\HttpController\Web\Mapper\JobQueueFilterRequestMapper;
 use Movary\HttpController\Web\Mapper\PaginationRequestMapper;
+use Movary\HttpController\Web\Mapper\UserFilterRequestMapper;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\CannotSendEmailException;
@@ -73,6 +74,7 @@ class SettingsController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly JobQueueFilterRequestMapper $jobQueueFilterRequestMapper,
         private readonly Movie\History\Location\MovieHistoryLocationApi $locationApi,
+        private readonly UserFilterRequestMapper $userFilterRequestMapper,
     ) {
     }
 
@@ -572,11 +574,36 @@ class SettingsController
         );
     }
 
-    public function renderServerUsersPage() : Response
+    public function renderServerUsersPage(Request $request) : Response
     {
+        $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250]);
+        $isAdminFilter = $this->userFilterRequestMapper->map($request);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $this->userApi->countUsers($isAdminFilter),
+            $paginationRequest->getPerPage(),
+            $paginationRequest->getPage(),
+        );
+        $paginationQuery = ['perPage' => $paginationRequest->getPerPage()];
+        if ($isAdminFilter !== null) {
+            $paginationQuery['role'] = $isAdminFilter ? 'admin' : 'user';
+        }
+
         return Response::create(
             StatusCode::createOk(),
-            $this->twig->render('page/settings-server-users.html.twig'),
+            $this->twig->render('page/settings-server-users.html.twig', [
+                'users' => $this->userApi->fetchAllPaginated(
+                    $paginationRequest->getPerPage(),
+                    $paginationElements->getOffset(),
+                    $isAdminFilter,
+                ),
+                'usersPerPage' => $paginationRequest->getPerPage(),
+                'paginationElements' => $paginationElements,
+                'paginationQuery' => $paginationQuery,
+                'userFilterRole' => $isAdminFilter === null
+                    ? null
+                    : ($isAdminFilter ? 'admin' : 'user'),
+                'userFiltersActive' => $isAdminFilter !== null,
+            ]),
         );
     }
 

@@ -22,6 +22,63 @@ class UserRepositoryTest extends TestCase
         $this->subject = new UserRepository($this->dbConnectionMock);
     }
 
+    public function testCountUsersReturnsIntegerCount() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with('SELECT COUNT(*) FROM `user`', [])
+            ->willReturn('72');
+
+        self::assertSame(72, $this->subject->countUsers());
+    }
+
+    public function testFetchAllPaginatedAppliesLimitAndOffset() : void
+    {
+        $users = [['id' => '7', 'name' => 'Alice', 'email' => 'alice@example.com', 'isAdmin' => '1']];
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains($query, 'ORDER BY id')
+                        && str_contains($query, 'LIMIT 20 OFFSET 40'),
+                ),
+                [],
+            )
+            ->willReturn($users);
+
+        self::assertSame($users, $this->subject->fetchAllPaginated(20, 40));
+    }
+
+    public function testCountUsersAppliesRoleFilter() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with('SELECT COUNT(*) FROM `user` WHERE is_admin = ?', [1])
+            ->willReturn('3');
+
+        self::assertSame(3, $this->subject->countUsers(true));
+    }
+
+    public function testFetchAllPaginatedAppliesRoleFilter() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains($query, 'WHERE is_admin = ?')
+                        && str_contains($query, 'LIMIT 20 OFFSET 40'),
+                ),
+                [0],
+            )
+            ->willReturn([]);
+
+        self::assertSame([], $this->subject->fetchAllPaginated(20, 40, false));
+    }
+
     public function testCreateLoginAttempt() : void
     {
         $createdAt = DateTime::createFromString('2026-10-03 12:00:00');
