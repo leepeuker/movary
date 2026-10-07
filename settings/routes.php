@@ -106,6 +106,11 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
     ]);
+    $routes->add('GET', '/settings/server/password-resets', [Web\SettingsController::class, 'renderServerPasswordResetsPage'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+        Web\Middleware\PasswordResetIsAvailable::class,
+    ]);
     $routes->add('GET', '/settings/server/email', [Web\SettingsController::class, 'renderServerEmailPage'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class
