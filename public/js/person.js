@@ -67,7 +67,10 @@ function showInTopLists() {
 
 async function sendRequest(action) {
     const personId = document.getElementById('personId').value;
-    const response = await fetch(APPLICATION_URL + '/persons/' + personId + '/' + action)
+    const response = await fetch(
+        APPLICATION_URL + '/persons/' + personId + '/' + action,
+        {method: 'POST'}
+    )
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

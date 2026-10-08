@@ -108,7 +108,7 @@ async function updateScrobbleOptions() {
 async function authenticateWithPlex() {
     const response = await fetch(
         APPLICATION_URL + '/settings/plex/authentication-url',
-        {signal: AbortSignal.timeout(4000)}
+        {method: 'POST', signal: AbortSignal.timeout(4000)}
     ).catch(function (error) {
         document.getElementById('alertPlexServerUrlLoadingSpinner').classList.add('d-none')
 
@@ -136,7 +136,7 @@ async function authenticateWithPlex() {
 async function removePlexAuthentication() {
     const response = await fetch(
         APPLICATION_URL + '/settings/plex/logout',
-        {signal: AbortSignal.timeout(4000)}
+        {method: 'DELETE', signal: AbortSignal.timeout(4000)}
     ).catch(function (error) {
         console.log(error)
 
