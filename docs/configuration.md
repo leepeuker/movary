@@ -18,6 +18,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | NAME                                        | DEFAULT VALUE | INFO                                                                           | Web UI |
 |:--------------------------------------------|:-------------:|:-------------------------------------------------------------------------------|:------:|
 | `TMDB_API_KEY`                              |       -       | **Required** (get key [here](https://www.themoviedb.org/settings/api))         |  yes   |
+| `APPLICATION_SECRET`                        |       -       | Required for stateless security features; 64 hexadecimal characters            |        |
 | `APPLICATION_URL`                           |       -       | Public base url of the application (e.g. `htttp://localhost`)                  |  yes   |
 | `APPLICATION_NAME`                          |   `Movary`    | Application name, displayed e.g. as brand name in the navbar                   |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |      `0`      | More info [here](features/tmdb-data.md#image-cache)                            |        |
@@ -31,6 +32,8 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `TOTP_ISSUER`                               |   `Movary`    | The issuer used when setting up two factor authentication                      |        |
 
 When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication cookies as secure.
+
+Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Keep the value stable across restarts and identical across all Movary instances. It can also be supplied through `APPLICATION_SECRET_FILE`, using the environment variable file convention described in the Docker installation documentation. Movary derives separate purpose-specific keys from this secret.
 
 ### Database
 
