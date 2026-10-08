@@ -226,12 +226,21 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
         return
     }
 
-    const response = await fetch(APPLICATION_URL + '/settings/users/' + document.getElementById('userModalIdInput').value, {
-        method: 'DELETE'
-    });
+    let response
+    try {
+        response = await fetch(APPLICATION_URL + '/settings/users/' + document.getElementById('userModalIdInput').value, {
+            method: 'DELETE'
+        });
+    } catch (error) {
+        setUserModalAlertServerError()
+        userModal.show()
+
+        return
+    }
 
     if (response.status !== 200) {
         setUserModalAlertServerError()
+        userModal.show()
         return
     }
 
@@ -302,16 +311,24 @@ async function sendPasswordReset(userId, userName) {
         return
     }
 
-    const response = await fetch(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
-        method: 'POST'
-    })
+    let response
+    try {
+        response = await fetch(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
+            method: 'POST'
+        })
+    } catch (error) {
+        setUserModalAlertServerError('Could not schedule password reset email.')
+        userModal.show()
+
+        return
+    }
 
     if (response.ok === false) {
         const message = await response.text()
         setUserModalAlertServerError(message || 'Could not schedule password reset email.')
+        userModal.show()
         return
     }
 
     setUserManagementAlert('Password reset email was scheduled for ' + userName)
-    userModal.hide()
 }

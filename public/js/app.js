@@ -555,13 +555,14 @@ function removeAlert(parentDivId) {
 
 let applicationDialogActive = false
 
-function showConfirmationModal({title, message, confirmLabel = 'Confirm', confirmClass = 'btn-primary'} = {}) {
+function showConfirmationModal({title, message, confirmLabel = 'Confirm', confirmClass = 'btn-primary', restoreSourceModalOnConfirm = false} = {}) {
     return showApplicationDialog({
         title: title,
         message: message,
         actionLabel: confirmLabel,
         actionClass: confirmClass,
         showActionButton: true,
+        restoreSourceModalOnConfirm: restoreSourceModalOnConfirm,
     })
 }
 
@@ -572,10 +573,11 @@ function showMessageModal({title = 'Notice', message} = {}) {
         actionLabel: '',
         actionClass: 'btn-primary',
         showActionButton: false,
+        restoreSourceModalOnConfirm: true,
     })
 }
 
-function showApplicationDialog({title, message, actionLabel, actionClass, showActionButton}) {
+function showApplicationDialog({title, message, actionLabel, actionClass, showActionButton, restoreSourceModalOnConfirm}) {
     if (applicationDialogActive === true) {
         return Promise.resolve(false)
     }
@@ -616,7 +618,7 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showAc
             applicationDialogActive = false
             actionButton.removeEventListener('click', confirm)
 
-            if (triggerElement !== null && document.contains(triggerElement)) {
+            if (triggerElement !== null && document.contains(triggerElement) && (sourceModalElement === null || sourceModalElement.classList.contains('show'))) {
                 triggerElement.focus()
             }
 
@@ -624,7 +626,7 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showAc
         }
 
         const restoreSourceModal = () => {
-            if (sourceModalElement === null || sourceModal === null) {
+            if (sourceModalElement === null || sourceModal === null || (confirmed === true && restoreSourceModalOnConfirm === false)) {
                 finish()
 
                 return
