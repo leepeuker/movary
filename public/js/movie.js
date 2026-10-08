@@ -255,7 +255,10 @@ function refreshTmdbData() {
 }
 
 async function addToWatchlistRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/add-watchlist')
+    const response = await fetch(
+        APPLICATION_URL + '/movies/' + getMovieId() + '/add-watchlist',
+        {method: 'POST'}
+    )
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -265,7 +268,10 @@ async function addToWatchlistRequest() {
 }
 
 async function removeFromWatchlistRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/remove-watchlist')
+    const response = await fetch(
+        APPLICATION_URL + '/movies/' + getMovieId() + '/remove-watchlist',
+        {method: 'DELETE'}
+    )
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -275,7 +281,10 @@ async function removeFromWatchlistRequest() {
 }
 
 async function refreshTmdbDataRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-tmdb')
+    const response = await fetch(
+        APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-tmdb',
+        {method: 'POST'}
+    )
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -306,7 +315,10 @@ function refreshImdbRating() {
 }
 
 async function refreshImdbRatingRequest() {
-    const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-imdb')
+    const response = await fetch(
+        APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-imdb',
+        {method: 'POST'}
+    )
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
