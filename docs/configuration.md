@@ -31,7 +31,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `DEFAULT_LOGIN_PASSWORD`                    |       -       | Password to always autofill on login page                                      |        |
 | `TOTP_ISSUER`                               |   `Movary`    | The issuer used when setting up two factor authentication                      |        |
 
-Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Movary uses it as the root secret for purpose-specific cryptographic keys. Keep the value stable across restarts and identical across all Movary instances. It can also be supplied through `APPLICATION_SECRET_FILE`, using the environment variable file convention described in the Docker installation documentation.
+Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Movary uses it as the root secret for purpose-specific cryptographic keys. Keep the value stable across restarts and identical across all Movary instances.
 
 When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication cookies as secure.
 
