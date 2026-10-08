@@ -215,7 +215,14 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
 })
 
 document.getElementById('deleteUserButton').addEventListener('click', async () => {
-    if (confirm('Are you sure you want to delete the user?') === false) {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete user',
+        message: 'Are you sure you want to delete the user?',
+        confirmLabel: 'Delete user',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
         return
     }
 
@@ -285,7 +292,13 @@ function redirectWithNotification(name, value) {
 }
 
 async function sendPasswordReset(userId, userName) {
-    if (confirm('Send a new password reset email to ' + userName + '?') === false) {
+    const confirmed = await showConfirmationModal({
+        title: 'Send password reset email',
+        message: 'Send a new password reset email to ' + userName + '?',
+        confirmLabel: 'Send email',
+    })
+
+    if (confirmed === false) {
         return
     }
 

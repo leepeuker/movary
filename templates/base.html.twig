@@ -34,6 +34,8 @@
 
 {% block body %}{% endblock %}
 
+{{ include('component/modal-dialog.html.twig') }}
+
 <script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
 <script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
 <script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>

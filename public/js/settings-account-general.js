@@ -63,8 +63,15 @@ function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchl
     })
 }
 
-function deleteApiToken() {
-    if (confirm('Do you really want to delete the api token?') === false) {
+async function deleteApiToken() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete API token',
+        message: 'Are you sure you want to delete the API token?',
+        confirmLabel: 'Delete token',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
         return
     }
 
@@ -79,8 +86,14 @@ function deleteApiToken() {
     })
 }
 
-function regenerateApiToken() {
-    if (confirm('Do you really want to regenerate the api token?') === false) {
+async function regenerateApiToken() {
+    const confirmed = await showConfirmationModal({
+        title: 'Regenerate API token',
+        message: 'Are you sure you want to regenerate the API token?',
+        confirmLabel: 'Regenerate token',
+    })
+
+    if (confirmed === false) {
         return
     }
 

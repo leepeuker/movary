@@ -53,43 +53,10 @@
                     </div>
                 </div>
 
-                <button id="deleteRadarrFeedButton" type="button" class="btn btn-danger {% if radarrFeedUrl == '-' %}disabled{% endif %}" data-bs-target="#confirmDeleteModal" data-bs-toggle="modal">
+                <button id="deleteRadarrFeedButton" type="button" class="btn btn-danger {% if radarrFeedUrl == '-' %}disabled{% endif %}" onclick="deleteRadarrFeedId()">
                     Delete url
                 </button>
-                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" data-bs-target="#confirmRegenerationModal" data-bs-toggle="modal">Regenerate url</button>
-            </div>
-        </div>
-
-        <div class="modal fade" id="confirmRegenerationModal" tabindex="-1" role="dialog" aria-labelledby="confirmRegenerationModal" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm regeneration</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to regenerate your Radarr feed url?
-                    </div>
-                    <div class="modal-footer">
-                        <a class="btn btn-primary" onclick="regenerateRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmRegenerationModal">Confirm</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModal" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm deletion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete your Radarr feed url?
-                    </div>
-                    <div class="modal-footer">
-                        <a class="btn btn-danger" onclick="deleteRadarrFeedId()" data-bs-dismiss="modal" data-bs-target="#confirmDeleteModal">Confirm</a>
-                    </div>
-                </div>
+                <button type="button" class="btn btn-primary  {% if isActive == '' %}disabled{% endif %}" onclick="regenerateRadarrFeedId()">Regenerate url</button>
             </div>
         </div>
     </main>

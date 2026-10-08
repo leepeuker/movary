@@ -1,5 +1,11 @@
-function regeneratePlexWebhook() {
-    if (confirm('Do you really want to regenerate the webhook url?') === false) {
+async function regeneratePlexWebhook() {
+    const confirmed = await showConfirmationModal({
+        title: 'Regenerate webhook URL',
+        message: 'Are you sure you want to regenerate the webhook URL?',
+        confirmLabel: 'Regenerate URL',
+    })
+
+    if (confirmed === false) {
         return
     }
 
@@ -15,8 +21,15 @@ function regeneratePlexWebhook() {
     })
 }
 
-function deletePlexWebhook() {
-    if (confirm('Do you really want to delete the webhook url?') === false) {
+async function deletePlexWebhook() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete webhook URL',
+        message: 'Are you sure you want to delete the webhook URL?',
+        confirmLabel: 'Delete URL',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
         return
     }
 
@@ -25,7 +38,7 @@ function deletePlexWebhook() {
     deletePlexWebhookRequest().then(() => {
         setPlexWebhookUrl()
         addAlert('alertWebhookUrlDiv', 'Deleted webhook url', 'success')
-    }).catch(() => {
+    }).catch((error) => {
         console.log(error)
         addAlert('alertWebhookUrlDiv', 'Could not delete webhook url', 'danger')
     })

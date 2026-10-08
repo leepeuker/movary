@@ -1,8 +1,14 @@
 const exportHistoryModal = new bootstrap.Modal('#exportHistoryModal', {keyboard: false})
 const importHistoryModal = new bootstrap.Modal('#importHistoryModal', {keyboard: false})
 
-function regenerateJellyfinWebhook() {
-    if (confirm('Do you really want to regenerate the webhook url?') === false) {
+async function regenerateJellyfinWebhook() {
+    const confirmed = await showConfirmationModal({
+        title: 'Regenerate webhook URL',
+        message: 'Are you sure you want to regenerate the webhook URL?',
+        confirmLabel: 'Regenerate URL',
+    })
+
+    if (confirmed === false) {
         return
     }
 
@@ -17,8 +23,15 @@ function regenerateJellyfinWebhook() {
     })
 }
 
-function deleteJellyfinWebhook() {
-    if (confirm('Do you really want to delete the webhook url?') === false) {
+async function deleteJellyfinWebhook() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete webhook URL',
+        message: 'Are you sure you want to delete the webhook URL?',
+        confirmLabel: 'Delete URL',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
         return
     }
 
