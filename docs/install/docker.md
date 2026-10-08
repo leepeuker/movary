@@ -46,9 +46,9 @@ For more info on Docker secrets, read the [official Docker documentation](https:
 
 ## Examples
 
-All examples include the environment variable `TMDB_API_KEY` (get a key [here](https://www.themoviedb.org/settings/api)).
-It is not strictly required to be set here but recommend.
-Many features of the application will not work correctly without it.
+All examples include the required `APPLICATION_SECRET`. Generate it with `openssl rand -hex 32` and keep it stable across restarts and identical across all Movary instances.
+
+The examples also include `TMDB_API_KEY` (get a key [here](https://www.themoviedb.org/settings/api)). It can alternatively be configured through the web UI, but many features will not work correctly without it.
 
 ### With SQLite
 
@@ -59,6 +59,7 @@ $ docker volume create movary-storage
 $ docker run --rm -d \
   --name movary \
   -p 80:8080 \
+  -e APPLICATION_SECRET="<application_secret>" \
   -e TMDB_API_KEY="<tmdb_key>" \
   -e DATABASE_MODE="sqlite" \
   -v movary-storage:/app/storage \
@@ -72,6 +73,7 @@ $ docker volume create movary-storage
 $ docker run --rm -d \
   --name movary \
   -p 80:8080 \
+  -e APPLICATION_SECRET="<application_secret>" \
   -e TMDB_API_KEY="<tmdb_key>" \
   -e DATABASE_MODE="mysql" \
   -e DATABASE_MYSQL_HOST="<host>" \
@@ -94,6 +96,7 @@ services:
     ports:
       - "80:8080"
     environment:
+      APPLICATION_SECRET: "<application_secret>"
       TMDB_API_KEY: "<tmdb_key>"
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
@@ -130,6 +133,7 @@ services:
     ports:
       - "80:8080"
     environment:
+      APPLICATION_SECRET_FILE: /run/secrets/application_secret
       TMDB_API_KEY_FILE: /run/secrets/tmdb_key
       DATABASE_MODE: "mysql"
       DATABASE_MYSQL_HOST: "mysql"
@@ -139,6 +143,7 @@ services:
     volumes:
       - movary-storage:/app/storage
     secrets:
+      - application_secret
       - tmdb_key
       - mysql_password
 
@@ -156,6 +161,8 @@ services:
       - mysql_password
 
 secrets:
+  application_secret:
+    file: /path/to/docker/secret/application_secret
   mysql_root_password:
     file: /path/to/docker/secret/mysql_root_password
   mysql_password:

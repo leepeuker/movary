@@ -18,6 +18,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | NAME                                        | DEFAULT VALUE | INFO                                                                           | Web UI |
 |:--------------------------------------------|:-------------:|:-------------------------------------------------------------------------------|:------:|
 | `TMDB_API_KEY`                              |       -       | **Required** (get key [here](https://www.themoviedb.org/settings/api))         |  yes   |
+| `APPLICATION_SECRET`                        |       -       | **Required**, stable application secret; 64 hexadecimal characters              |        |
 | `APPLICATION_URL`                           |       -       | Public base url of the application (e.g. `htttp://localhost`)                  |  yes   |
 | `APPLICATION_NAME`                          |   `Movary`    | Application name, displayed e.g. as brand name in the navbar                   |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |      `0`      | More info [here](features/tmdb-data.md#image-cache)                            |        |
@@ -29,6 +30,8 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `DEFAULT_LOGIN_EMAIL`                       |       -       | Email address to always autofill on login page                                 |        |
 | `DEFAULT_LOGIN_PASSWORD`                    |       -       | Password to always autofill on login page                                      |        |
 | `TOTP_ISSUER`                               |   `Movary`    | The issuer used when setting up two factor authentication                      |        |
+
+Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Movary uses it as the root secret for purpose-specific cryptographic keys. Keep the value stable across restarts and identical across all Movary instances.
 
 When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication cookies as secure.
 

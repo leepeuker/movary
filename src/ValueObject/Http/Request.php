@@ -15,6 +15,7 @@ class Request
         private readonly string $body,
         private readonly array $filesParameters,
         private readonly array $headers,
+        private readonly array $cookies,
         private readonly string $userAgent,
         private readonly ?string $httpHost,
         private readonly ?string $httpReferer,
@@ -34,6 +35,7 @@ class Request
         $postParameters = self::extractPostParameter();
         $filesParameters = self::extractFilesParameter();
         $headers = self::extractHeaders();
+        $cookies = self::extractCookies();
         $userAgent = self::extractUserAgent();
 
         $body = (string)file_get_contents('php://input');
@@ -45,6 +47,7 @@ class Request
             $body,
             $filesParameters,
             $headers,
+            $cookies,
             $userAgent,
             $httpHost,
             $httpReferer,
@@ -56,6 +59,11 @@ class Request
     {
         // phpcs:ignore MySource.PHP.GetRequestData
         return $_FILES;
+    }
+
+    private static function extractCookies() : array
+    {
+        return $_COOKIE;
     }
 
     private static function extractGetParameter() : array
@@ -136,6 +144,13 @@ class Request
         return $this->filesParameters;
     }
 
+    public function getCookie(string $name) : ?string
+    {
+        $value = $this->cookies[$name] ?? null;
+
+        return is_string($value) === true ? $value : null;
+    }
+
     public function getGetParameters() : array
     {
         return $this->getParameters;
@@ -144,6 +159,17 @@ class Request
     public function getHeaders() : array
     {
         return $this->headers;
+    }
+
+    public function getHeader(string $name) : ?string
+    {
+        foreach ($this->headers as $headerName => $value) {
+            if (strcasecmp((string)$headerName, $name) === 0) {
+                return is_string($value) === true ? $value : null;
+            }
+        }
+
+        return null;
     }
 
     public function getHttpHost() : ?string

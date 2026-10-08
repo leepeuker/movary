@@ -6,6 +6,7 @@ First steps for local development setup:
 - Copy the file `.env.example` to `.env` and customize it for your local environment
     - Set `USER_ID` to the UID owning the local files (`echo $UID`)
     - Add your `TMDB_API_KEY`
+    - Generate `APPLICATION_SECRET` with `openssl rand -hex 32`
 - Run `make build_development` to create your local development environment 
     - Build and start the development stage of the docker image from scratch
     - Mount project files in to the docker container (changes to files affect application in realtime)
