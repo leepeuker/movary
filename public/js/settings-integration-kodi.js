@@ -1,5 +1,11 @@
-function regenerateKodiWebhook() {
-    if (confirm('Do you really want to regenerate the webhook url?') === false) {
+async function regenerateKodiWebhook() {
+    const confirmed = await showConfirmationModal({
+        title: 'Regenerate webhook URL',
+        message: 'Are you sure you want to regenerate the webhook URL?',
+        confirmLabel: 'Regenerate URL',
+    })
+
+    if (confirmed === false) {
         return
     }
 
@@ -14,8 +20,15 @@ function regenerateKodiWebhook() {
     })
 }
 
-function deleteKodiWebhook() {
-    if (confirm('Do you really want to delete the webhook url?') === false) {
+async function deleteKodiWebhook() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete webhook URL',
+        message: 'Are you sure you want to delete the webhook URL?',
+        confirmLabel: 'Delete URL',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
         return
     }
 

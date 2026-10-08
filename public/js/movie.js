@@ -1,7 +1,12 @@
 let originalRating
 
-function deleteWatchDate() {
-    const confirmed = confirm('Are you sure?')
+async function deleteWatchDate() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete watch date',
+        message: 'Are you sure you want to delete this watch date?',
+        confirmLabel: 'Delete watch date',
+        confirmClass: 'btn-danger',
+    })
 
     if (confirmed === false) {
         return
@@ -198,20 +203,39 @@ function loadRatingModal() {
     editRatingModal.show()
 }
 
-function toggleWatchlist(isOnWatchlist) {
+async function toggleWatchlist(isOnWatchlist) {
     if (isOnWatchlist == null) {
-        addToWatchlistRequest().then(() => {
+        try {
+            await addToWatchlistRequest()
             location.reload()
-        }).catch(() => {
-            alert('Could not add to Watchlist')
-        })
-    } else {
-        if (! confirm("Remove from watchlist?"))
-            return;
-        removeFromWatchlistRequest().then(() => {
-            location.reload()
-        }).catch(() => {
-            alert('Could not remove from Watchlist')
+        } catch (error) {
+            await showMessageModal({
+                title: 'Watchlist update failed',
+                message: 'Could not add to watchlist.',
+            })
+        }
+
+        return
+    }
+
+    const confirmed = await showConfirmationModal({
+        title: 'Remove from watchlist',
+        message: 'Are you sure you want to remove this movie from your watchlist?',
+        confirmLabel: 'Remove from watchlist',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
+    try {
+        await removeFromWatchlistRequest()
+        location.reload()
+    } catch (error) {
+        await showMessageModal({
+            title: 'Watchlist update failed',
+            message: 'Could not remove from watchlist.',
         })
     }
 }

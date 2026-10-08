@@ -553,6 +553,100 @@ function removeAlert(parentDivId) {
     document.getElementById(parentDivId).innerHTML = ''
 }
 
+let applicationDialogActive = false
+
+function showConfirmationModal({title, message, confirmLabel = 'Confirm', confirmClass = 'btn-primary'} = {}) {
+    return showApplicationDialog({
+        title: title,
+        message: message,
+        actionLabel: confirmLabel,
+        actionClass: confirmClass,
+        showCancelButton: true,
+    })
+}
+
+function showMessageModal({title = 'Notice', message, closeLabel = 'Close', closeClass = 'btn-primary'} = {}) {
+    return showApplicationDialog({
+        title: title,
+        message: message,
+        actionLabel: closeLabel,
+        actionClass: closeClass,
+        showCancelButton: false,
+    })
+}
+
+function showApplicationDialog({title, message, actionLabel, actionClass, showCancelButton}) {
+    if (applicationDialogActive === true) {
+        return Promise.resolve(false)
+    }
+
+    const modalElement = document.getElementById('applicationDialogModal')
+    const titleElement = document.getElementById('applicationDialogModalTitle')
+    const messageElement = document.getElementById('applicationDialogModalMessage')
+    const cancelButton = document.getElementById('applicationDialogModalCancelButton')
+    const actionButton = document.getElementById('applicationDialogModalActionButton')
+
+    if (modalElement === null || titleElement === null || messageElement === null || cancelButton === null || actionButton === null) {
+        return Promise.reject(new Error('Application dialog modal is not available'))
+    }
+
+    applicationDialogActive = true
+
+    titleElement.textContent = title ?? ''
+    messageElement.textContent = message ?? ''
+    cancelButton.classList.toggle('d-none', showCancelButton === false)
+    actionButton.textContent = actionLabel
+    actionButton.className = 'btn ' + actionClass
+
+    const triggerElement = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const sourceModalElement = document.querySelector('.modal.show:not(#applicationDialogModal)')
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement)
+    const sourceModal = sourceModalElement === null ? null : bootstrap.Modal.getOrCreateInstance(sourceModalElement)
+
+    return new Promise((resolve) => {
+        let confirmed = false
+
+        const confirm = () => {
+            confirmed = true
+            modal.hide()
+        }
+
+        const finish = () => {
+            applicationDialogActive = false
+            actionButton.removeEventListener('click', confirm)
+
+            if (triggerElement !== null && document.contains(triggerElement)) {
+                triggerElement.focus()
+            }
+
+            resolve(confirmed)
+        }
+
+        const restoreSourceModal = () => {
+            if (sourceModalElement === null || sourceModal === null) {
+                finish()
+
+                return
+            }
+
+            sourceModalElement.addEventListener('shown.bs.modal', finish, {once: true})
+            sourceModal.show()
+        }
+
+        actionButton.addEventListener('click', confirm, {once: true})
+        modalElement.addEventListener('hidden.bs.modal', restoreSourceModal, {once: true})
+
+        if (sourceModalElement === null || sourceModal === null) {
+            modal.show()
+
+            return
+        }
+
+        sourceModalElement.addEventListener('hidden.bs.modal', () => modal.show(), {once: true})
+        sourceModal.hide()
+    })
+}
+
 async function logout() {
     await fetch(APPLICATION_URL + '/api/authentication/token', {
         method: 'DELETE',
