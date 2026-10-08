@@ -1,9 +1,16 @@
 document.getElementById('deleteHistoryButton').addEventListener('click', async () => {
-    const deleteHistoryModal = bootstrap.Modal.getInstance('#deleteHistoryModal');
+    const confirmed = await showConfirmationModal({
+        title: 'Delete history',
+        message: 'Are you sure you want to permanently delete your watch history? This action is not reversible!',
+        confirmLabel: 'Delete history',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     const response = await deleteUserHistory();
-
-    deleteHistoryModal.hide()
 
     switch (response.status) {
         case 204:
@@ -21,11 +28,18 @@ document.getElementById('deleteHistoryButton').addEventListener('click', async (
 });
 
 document.getElementById('deleteRatingsButton').addEventListener('click', async () => {
-    const deleteRatingsModal = bootstrap.Modal.getInstance('#deleteRatingsModal');
+    const confirmed = await showConfirmationModal({
+        title: 'Delete ratings',
+        message: 'Are you sure you want to permanently delete your movie ratings? This action is not reversible!',
+        confirmLabel: 'Delete ratings',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     const response = await deleteUserRatings();
-
-    deleteRatingsModal.hide()
 
     switch (response.status) {
         case 204:
@@ -44,11 +58,18 @@ document.getElementById('deleteRatingsButton').addEventListener('click', async (
 });
 
 document.getElementById('deleteAccountButton').addEventListener('click', async () => {
-    const deleteAccountModal = bootstrap.Modal.getInstance('#deleteAccountModal');
+    const confirmed = await showConfirmationModal({
+        title: 'Delete account',
+        message: 'Are you sure you want to permanently delete your account with all your data? This action is not reversible!',
+        confirmLabel: 'Delete account',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     const response = await deleteUserAccount();
-
-    deleteAccountModal.hide()
 
     switch (response.status) {
         case 204:

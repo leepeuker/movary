@@ -20,8 +20,6 @@
             {{ include('component/settings-nav.html.twig') }}
             {{ include('component/modal-job-details.html.twig') }}
             {{ include('component/modal-job-remove-confirm.html.twig') }}
-            {{ include('component/modal-jobs-remove-all.html.twig') }}
-            {{ include('component/modal-jobs-remove-processed.html.twig') }}
             {{ include('component/modal-job-filters.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
@@ -98,8 +96,8 @@
                 <div>
                     <h5>Job Queue Maintenance</h6>
                     <div style="margin-top:1rem">
-                        <button class="btn btn-outline-warning" type="button" data-bs-toggle="modal" data-bs-target="#jobsRemoveProcessedModal">Remove processed jobs</button>
-                        <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#jobsRemoveAllModal">Remove all jobs</button>
+                        <button class="btn btn-outline-warning" type="button" onclick="removeProcessedJobs()">Remove processed jobs</button>
+                        <button class="btn btn-outline-danger" type="button" onclick="removeAllJobs()">Remove all jobs</button>
                     </div>
                 </div>
             </div>

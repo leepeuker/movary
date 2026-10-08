@@ -82,10 +82,18 @@ function setPasswordResetRevokeAlert(message) {
 }
 
 async function revokeAllPasswordResets() {
-    const modal = bootstrap.Modal.getInstance('#passwordResetsRevokeAllModal')
+    const confirmed = await showConfirmationModal({
+        title: 'Revoke all reset links',
+        message: 'Are you sure you want to revoke all active password reset links? Existing reset links will no longer be valid.',
+        confirmLabel: 'Revoke all',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     revokeAllPasswordResetsButton.disabled = true
-    modal.hide()
 
     const response = await fetch(APPLICATION_URL + '/settings/password-resets', {
         method: 'DELETE'

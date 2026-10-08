@@ -170,11 +170,18 @@ function setOptionalQueryParameter(url, name, value) {
 }
 
 async function removeAllJobs() {
-    const jobsRemoveAllModal = bootstrap.Modal.getInstance('#jobsRemoveAllModal');
+    const confirmed = await showConfirmationModal({
+        title: 'Remove all jobs',
+        message: 'Are you sure you want to remove all jobs? This will not stop jobs currently in progress.',
+        confirmLabel: 'Remove all jobs',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     addAlert('alertJobsDiv', 'Removing all jobs...', 'info');
-
-    jobsRemoveAllModal.hide()
 
     try {
         const response = await fetch(
@@ -202,11 +209,18 @@ async function removeAllJobs() {
 }
 
 async function removeProcessedJobs() {
-    const jobsRemoveProcessedModal = bootstrap.Modal.getInstance('#jobsRemoveProcessedModal');
+    const confirmed = await showConfirmationModal({
+        title: 'Remove processed jobs',
+        message: 'Are you sure you want to remove all processed jobs? This includes all jobs with status "done" and "failed".',
+        confirmLabel: 'Remove processed jobs',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     addAlert('alertJobsDiv', 'Removing processed jobs...', 'info');
-
-    jobsRemoveProcessedModal.hide()
 
     try {
         const response = await fetch(
