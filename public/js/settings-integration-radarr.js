@@ -1,4 +1,14 @@
 async function regenerateRadarrFeedId() {
+    const confirmed = await showConfirmationModal({
+        title: 'Regenerate Radarr feed URL',
+        message: 'Are you sure you want to regenerate your Radarr feed URL?',
+        confirmLabel: 'Regenerate URL',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
     removeAlert('alertFeedUrlDiv')
 
     regenerateRadarrFeedRequest().then(webhookUrl => {
@@ -23,6 +33,17 @@ async function regenerateRadarrFeedRequest() {
 }
 
 async function deleteRadarrFeedId() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete Radarr feed URL',
+        message: 'Are you sure you want to delete your Radarr feed URL?',
+        confirmLabel: 'Delete URL',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
     await fetch(APPLICATION_URL + '/settings/radarr/feed', {'method': 'delete'}).then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
