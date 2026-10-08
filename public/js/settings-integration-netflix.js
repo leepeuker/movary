@@ -396,7 +396,7 @@ function processNetflixData(netflixActivityItems) {
 
         removebtn.className = 'btn btn-danger';
         removebtn.innerHTML = '<i class="bi bi-trash-fill"></i>';
-        removebtn.addEventListener('click', triggerRemoveNetflixModal);
+        removebtn.addEventListener('click', confirmRemoveNetflixItem);
 
         tmdb.className = 'w-50 tmdb-column';
         tmdb_div.className = "row";
@@ -623,17 +623,20 @@ function getNetflixRatingFromStars(row) {
     return rating;
 }
 
-function triggerRemoveNetflixModal() {
-    const removeNetflixModal = new bootstrap.Modal('#removeNetflixItemModal');
-    document.getElementById('removeNetflixItemModal').setAttribute('data-NetflixRowId', this.closest('.netflixrow').id);
-    removeNetflixModal.show();
-}
+async function confirmRemoveNetflixItem() {
+    const row = this.closest('.netflixrow')
+    const confirmed = await showConfirmationModal({
+        title: 'Remove Netflix item',
+        message: 'Are you sure you want to remove this item? You can import it again later.',
+        confirmLabel: 'Remove',
+        confirmClass: 'btn-danger',
+    })
 
-function removeNetflixItem() {
-    const removeNetflixModal = bootstrap.Modal.getInstance(document.getElementById('removeNetflixItemModal'));
-    let NetflixRowId = document.getElementById('removeNetflixItemModal').dataset.netflixrowid;
-    document.querySelector('tr#' + NetflixRowId).remove();
-    removeNetflixModal.hide();
+    if (confirmed === false) {
+        return
+    }
+
+    row.remove()
 }
 
 function enable(el) {

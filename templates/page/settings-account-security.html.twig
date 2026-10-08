@@ -81,9 +81,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endif %}
+            <div id="twoFactorAuthenticationDisableAlertDiv"></div>
             <div class="mb-3">
                 {% if totpEnabled == true %}
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTwoFactorAuthenticationModal">Disable Two-Factor Authentication
+                    <button type="button" class="btn btn-danger" onclick="disableTOTP(this)">Disable Two-Factor Authentication
                     </button>
                 {% else %}
                     <button type="button" class="btn btn-primary" onclick="showAddTwoFactorAuthenticationModal()">Enable Two-Factor Authentication</button>
@@ -92,5 +93,4 @@
         </div>
     </main>
     {{ include('component/modal-add-two-factor-authentication.html.twig') }}
-    {{ include('component/modal-delete-two-factor-authentication.html.twig') }}
 {% endblock %}
