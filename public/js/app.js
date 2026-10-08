@@ -562,20 +562,22 @@ function showConfirmationModal({title, message, confirmLabel = 'Confirm', confir
         actionLabel: confirmLabel,
         actionClass: confirmClass,
         showCancelButton: true,
+        showActionButton: true,
     })
 }
 
-function showMessageModal({title = 'Notice', message, closeLabel = 'Close', closeClass = 'btn-primary'} = {}) {
+function showMessageModal({title = 'Notice', message} = {}) {
     return showApplicationDialog({
         title: title,
         message: message,
-        actionLabel: closeLabel,
-        actionClass: closeClass,
+        actionLabel: '',
+        actionClass: 'btn-primary',
         showCancelButton: false,
+        showActionButton: false,
     })
 }
 
-function showApplicationDialog({title, message, actionLabel, actionClass, showCancelButton}) {
+function showApplicationDialog({title, message, actionLabel, actionClass, showCancelButton, showActionButton}) {
     if (applicationDialogActive === true) {
         return Promise.resolve(false)
     }
@@ -583,10 +585,11 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showCa
     const modalElement = document.getElementById('applicationDialogModal')
     const titleElement = document.getElementById('applicationDialogModalTitle')
     const messageElement = document.getElementById('applicationDialogModalMessage')
+    const footerElement = document.getElementById('applicationDialogModalFooter')
     const cancelButton = document.getElementById('applicationDialogModalCancelButton')
     const actionButton = document.getElementById('applicationDialogModalActionButton')
 
-    if (modalElement === null || titleElement === null || messageElement === null || cancelButton === null || actionButton === null) {
+    if (modalElement === null || titleElement === null || messageElement === null || footerElement === null || cancelButton === null || actionButton === null) {
         return Promise.reject(new Error('Application dialog modal is not available'))
     }
 
@@ -594,9 +597,11 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showCa
 
     titleElement.textContent = title ?? ''
     messageElement.textContent = message ?? ''
+    footerElement.classList.toggle('d-none', showCancelButton === false && showActionButton === false)
     cancelButton.classList.toggle('d-none', showCancelButton === false)
     actionButton.textContent = actionLabel
     actionButton.className = 'btn ' + actionClass
+    actionButton.classList.toggle('d-none', showActionButton === false)
 
     const triggerElement = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const sourceModalElement = document.querySelector('.modal.show:not(#applicationDialogModal)')
