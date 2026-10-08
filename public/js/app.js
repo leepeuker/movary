@@ -561,7 +561,6 @@ function showConfirmationModal({title, message, confirmLabel = 'Confirm', confir
         message: message,
         actionLabel: confirmLabel,
         actionClass: confirmClass,
-        showCancelButton: true,
         showActionButton: true,
     })
 }
@@ -572,12 +571,11 @@ function showMessageModal({title = 'Notice', message} = {}) {
         message: message,
         actionLabel: '',
         actionClass: 'btn-primary',
-        showCancelButton: false,
         showActionButton: false,
     })
 }
 
-function showApplicationDialog({title, message, actionLabel, actionClass, showCancelButton, showActionButton}) {
+function showApplicationDialog({title, message, actionLabel, actionClass, showActionButton}) {
     if (applicationDialogActive === true) {
         return Promise.resolve(false)
     }
@@ -586,10 +584,9 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showCa
     const titleElement = document.getElementById('applicationDialogModalTitle')
     const messageElement = document.getElementById('applicationDialogModalMessage')
     const footerElement = document.getElementById('applicationDialogModalFooter')
-    const cancelButton = document.getElementById('applicationDialogModalCancelButton')
     const actionButton = document.getElementById('applicationDialogModalActionButton')
 
-    if (modalElement === null || titleElement === null || messageElement === null || footerElement === null || cancelButton === null || actionButton === null) {
+    if (modalElement === null || titleElement === null || messageElement === null || footerElement === null || actionButton === null) {
         return Promise.reject(new Error('Application dialog modal is not available'))
     }
 
@@ -597,8 +594,7 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showCa
 
     titleElement.textContent = title ?? ''
     messageElement.textContent = message ?? ''
-    footerElement.classList.toggle('d-none', showCancelButton === false && showActionButton === false)
-    cancelButton.classList.toggle('d-none', showCancelButton === false)
+    footerElement.classList.toggle('d-none', showActionButton === false)
     actionButton.textContent = actionLabel
     actionButton.className = 'btn ' + actionClass
     actionButton.classList.toggle('d-none', showActionButton === false)
