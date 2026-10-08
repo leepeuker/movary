@@ -40,11 +40,12 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="jobDetailsAlerts"></div>
                 <div class="alert alert-warning mt-3 mb-0" id="jobDetailsRemovalWarning" role="alert"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" data-bs-target="#jobRemoveConfirmModal" data-bs-toggle="modal">Remove job</button>
+                <button type="button" class="btn btn-danger" id="jobRemoveButton" onclick="removeJob()">Remove job</button>
             </div>
         </div>
     </div>
