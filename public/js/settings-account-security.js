@@ -128,18 +128,35 @@ async function enableTOTP() {
     });
 }
 
-async function disableTOTP() {
-    await fetch(APPLICATION_URL + '/settings/account/security/disable-totp', {
-        method: 'POST'
-    }).then(function(response) {
-        if(response.ok) {
+async function disableTOTP(button) {
+    const confirmed = await showConfirmationModal({
+        title: 'Disable two-factor authentication',
+        message: 'Are you sure you want to disable two-factor authentication? Your account will no longer require an authentication code when signing in.',
+        confirmLabel: 'Disable',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
+    button.disabled = true
+
+    try {
+        const response = await fetch(APPLICATION_URL + '/settings/account/security/disable-totp', {
+            method: 'POST'
+        })
+
+        if (response.ok) {
             window.location.reload();
-        } else if(response.status === 400) {
-            addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
-        } else if(400 < response.status < 600) {
-            addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+
+            return
         }
-    }).catch(function(error) {
-        addAlert('twoFactorAuthenticationAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
-    });
+
+        addAlert('twoFactorAuthenticationDisableAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+    } catch (error) {
+        addAlert('twoFactorAuthenticationDisableAlertDiv', 'Something has gone wrong. Check the logs in Movary and try again', 'danger');
+    } finally {
+        button.disabled = false
+    }
 }

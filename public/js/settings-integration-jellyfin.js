@@ -1,6 +1,3 @@
-const exportHistoryModal = new bootstrap.Modal('#exportHistoryModal', {keyboard: false})
-const importHistoryModal = new bootstrap.Modal('#importHistoryModal', {keyboard: false})
-
 async function regenerateJellyfinWebhook() {
     const confirmed = await showConfirmationModal({
         title: 'Regenerate webhook URL',
@@ -278,18 +275,24 @@ async function updateSyncOptions() {
 }
 
 async function exportJellyfin() {
+    const confirmed = await showConfirmationModal({
+        title: 'Confirm export',
+        message: 'Are you sure you want to export your history? This will mark all movies with Movary watch dates as watched in Jellyfin and update their last play date to the latest watch date.',
+        confirmLabel: 'Submit',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
     const response = await fetch(
         APPLICATION_URL + '/jobs/schedule/jellyfin-export-history',
         {'method': 'POST'}
     ).catch(function (error) {
         addAlert('alertJellyfinExportHistoryDiv', 'History export could not be scheduled', 'danger')
 
-        exportHistoryModal.hide()
-
         throw new Error(`HTTP error! status: ${response.status}`)
     });
-
-    exportHistoryModal.hide()
 
     if (!response.ok) {
         if (response.status === 400) {
@@ -304,22 +307,27 @@ async function exportJellyfin() {
     }
 
     addAlert('alertJellyfinExportHistoryDiv', 'History export scheduled', 'success')
-    exportHistoryModal.hide()
 }
 
 async function importJellyfin() {
+    const confirmed = await showConfirmationModal({
+        title: 'Confirm import',
+        message: 'Are you sure you want to import your history? This will add missing watch dates to Movary for all movies with Jellyfin plays. Movies with multiple plays in Jellyfin will result in only one watch date, using the most recent date.',
+        confirmLabel: 'Submit',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
     const response = await fetch(
         APPLICATION_URL + '/jobs/schedule/jellyfin-import-history',
         {'method': 'POST'}
     ).catch(function (error) {
         addAlert('alertJellyfinImportHistoryDiv', 'History import could not be scheduled', 'danger')
 
-        importHistoryModal.hide()
-
         throw new Error(`HTTP error! status: ${response.status}`)
     });
-
-    importHistoryModal.hide()
 
     if (!response.ok) {
         if (response.status === 400) {
@@ -334,5 +342,4 @@ async function importJellyfin() {
     }
 
     addAlert('alertJellyfinImportHistoryDiv', 'History import scheduled', 'success')
-    importHistoryModal.hide()
 }

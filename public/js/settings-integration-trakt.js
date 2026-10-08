@@ -46,11 +46,18 @@ function toggleTableVisibility() {
 }
 
 async function traktImportRatings() {
-    const importRatingsModal = bootstrap.Modal.getInstance('#traktImportRatings');
+    const confirmed = await showConfirmationModal({
+        title: 'Import ratings',
+        message: 'Are you sure you want to import the Trakt.tv movie ratings? This will only add missing data and not change existing data.',
+        confirmLabel: 'Import',
+        confirmClass: 'btn-warning',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     const response = await importTraktRatings();
-
-    importRatingsModal.hide()
 
     switch (response.status) {
         case 204:
@@ -74,11 +81,18 @@ function importTraktRatings() {
 }
 
 async function traktImportHistory() {
-    const importHistoryModal = bootstrap.Modal.getInstance('#traktImportHistory');
+    const confirmed = await showConfirmationModal({
+        title: 'Import history',
+        message: 'Are you sure you want to import the Trakt.tv movie history? This will only add missing data and not change existing data.',
+        confirmLabel: 'Import',
+        confirmClass: 'btn-warning',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     const response = await importTraktHistory();
-
-    importHistoryModal.hide()
 
     switch (response.status) {
         case 204:
