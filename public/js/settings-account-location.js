@@ -187,15 +187,22 @@ function validateCreateLocationInput() {
     return error
 }
 
-document.getElementById('deleteLocationConfirmModal').addEventListener('show.bs.modal', () => {
+document.getElementById('deleteLocationButton').addEventListener('click', async () => {
     const locationName = document.getElementById('locationModalNameInput').value
-    document.getElementById('deleteLocationConfirmMessage').textContent = 'Are you sure you want to delete the location "' + locationName + '"?'
-    document.getElementById('deleteLocationConfirmAlerts').innerHTML = ''
-})
+    const confirmed = await showConfirmationModal({
+        title: 'Delete location',
+        message: 'Are you sure you want to delete the location "' + locationName + '"?',
+        confirmLabel: 'Delete location',
+        confirmClass: 'btn-danger',
+    })
 
-document.getElementById('deleteLocationConfirmButton').addEventListener('click', async () => {
-    const deleteButton = document.getElementById('deleteLocationConfirmButton')
+    if (confirmed === false) {
+        return
+    }
+
+    const deleteButton = document.getElementById('deleteLocationButton')
     deleteButton.disabled = true
+    document.getElementById('locationModalAlerts').innerHTML = ''
 
     let response
     try {
@@ -203,7 +210,8 @@ document.getElementById('deleteLocationConfirmButton').addEventListener('click',
             method: 'DELETE'
         });
     } catch (error) {
-        setLocationDeleteConfirmAlertServerError()
+        setLocationModalAlertServerError()
+        locationModal.show()
 
         return
     } finally {
@@ -211,17 +219,13 @@ document.getElementById('deleteLocationConfirmButton').addEventListener('click',
     }
 
     if (response.status !== 200) {
-        setLocationDeleteConfirmAlertServerError(await response.text())
+        setLocationModalAlertServerError(await response.text())
+        locationModal.show()
         return
     }
 
-    let categoryName = document.getElementById('locationModalNameInput').value;
-    redirectWithNotification('locationDeleted', categoryName)
+    redirectWithNotification('locationDeleted', locationName)
 })
-
-function setLocationDeleteConfirmAlertServerError(message = "Server error, please try again.") {
-    document.getElementById('deleteLocationConfirmAlerts').innerHTML = '<div class="alert alert-danger alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
-}
 
 document.getElementById('updateLocationButton').addEventListener('click', async () => {
     if (validateCreateLocationInput() === true) {

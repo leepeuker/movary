@@ -24,6 +24,7 @@ async function deleteWatchDate() {
         },
         error: function (xhr, textStatus, errorThrown) {
             addAlert('alertMovieModalDiv', 'Could not delete watch date.', 'danger')
+            bootstrap.Modal.getOrCreateInstance('#editWatchDateModal').show()
         }
     })
 }

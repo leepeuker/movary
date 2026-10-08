@@ -8,10 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     registerJobRowEvents()
     document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
-    document.getElementById('jobRemoveConfirmButton').addEventListener('click', removeJob)
 });
 
 let selectedJobId = null
+let selectedJobStatus = null
 
 function registerJobRowEvents() {
     document.querySelectorAll('#jobsTable tbody tr').forEach((row) => {
@@ -29,6 +29,7 @@ function registerJobRowEvents() {
 
 function showJobDetails(row) {
     selectedJobId = row.dataset.jobId
+    selectedJobStatus = row.dataset.jobStatus
 
     document.getElementById('jobDetailsId').textContent = row.dataset.jobId
     document.getElementById('jobDetailsUser').textContent = formatJobUser(row.dataset.jobUserName, row.dataset.jobUserId)
@@ -37,39 +38,31 @@ function showJobDetails(row) {
     document.getElementById('jobDetailsUpdatedAt').textContent = row.dataset.jobUpdatedAt
     document.getElementById('jobDetailsCreatedAt').textContent = row.dataset.jobCreatedAt
     document.getElementById('jobDetailsParameters').textContent = formatJobParameters(row.dataset.jobParameters)
+    document.getElementById('jobDetailsAlerts').innerHTML = ''
 
+    const removalWarningMessage = getJobRemovalWarning(row.dataset.jobStatus)
     const removalWarning = document.getElementById('jobDetailsRemovalWarning')
-    if (row.dataset.jobStatus === 'in progress') {
+    if (removalWarningMessage !== '') {
         removalWarning.classList.remove('d-none')
-        removalWarning.textContent = 'Removing this record will not stop the job that is currently in progress.'
-    } else if (row.dataset.jobStatus === 'waiting') {
-        removalWarning.classList.remove('d-none')
-        removalWarning.textContent = 'Removing this job prevents it from being processed unless a worker has already claimed it.'
+        removalWarning.textContent = removalWarningMessage
     } else {
         removalWarning.classList.add('d-none')
         removalWarning.textContent = ''
     }
 
-    prepareJobRemoveConfirmation(row.dataset.jobId, row.dataset.jobStatus)
-
     bootstrap.Modal.getOrCreateInstance('#jobDetailsModal').show()
 }
 
-function prepareJobRemoveConfirmation(jobId, jobStatus) {
-    document.getElementById('jobRemoveConfirmMessage').textContent = 'Are you sure you want to remove job ' + jobId + '?'
-    document.getElementById('jobRemoveConfirmAlerts').innerHTML = ''
-
-    const warning = document.getElementById('jobRemoveConfirmWarning')
+function getJobRemovalWarning(jobStatus) {
     if (jobStatus === 'in progress') {
-        warning.classList.remove('d-none')
-        warning.textContent = 'This will not stop the job that is currently in progress.'
-    } else if (jobStatus === 'waiting') {
-        warning.classList.remove('d-none')
-        warning.textContent = 'This prevents the job from being processed unless a worker has already claimed it.'
-    } else {
-        warning.classList.add('d-none')
-        warning.textContent = ''
+        return 'Removing this record will not stop the job that is currently in progress.'
     }
+
+    if (jobStatus === 'waiting') {
+        return 'Removing this job prevents it from being processed unless a worker has already claimed it.'
+    }
+
+    return ''
 }
 
 function formatJobUser(userName, userId) {
@@ -101,7 +94,24 @@ async function removeJob() {
         return
     }
 
-    const removeButton = document.getElementById('jobRemoveConfirmButton')
+    const removalWarning = getJobRemovalWarning(selectedJobStatus)
+    let confirmationMessage = 'Are you sure you want to remove job ' + selectedJobId + '?'
+    if (removalWarning !== '') {
+        confirmationMessage += ' ' + removalWarning
+    }
+
+    const confirmed = await showConfirmationModal({
+        title: 'Remove job',
+        message: confirmationMessage,
+        confirmLabel: 'Remove job',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
+    const removeButton = document.getElementById('jobRemoveButton')
     removeButton.disabled = true
 
     try {
@@ -112,13 +122,15 @@ async function removeJob() {
 
         if (!response.ok) {
             console.error('Response status: ' + response.status)
-            addAlert('jobRemoveConfirmAlerts', 'Could not remove job', 'danger')
+            addAlert('jobDetailsAlerts', 'Could not remove job', 'danger')
+            bootstrap.Modal.getOrCreateInstance('#jobDetailsModal').show()
 
             return
         }
     } catch (error) {
         console.error(error)
-        addAlert('jobRemoveConfirmAlerts', 'Could not remove job', 'danger')
+        addAlert('jobDetailsAlerts', 'Could not remove job', 'danger')
+        bootstrap.Modal.getOrCreateInstance('#jobDetailsModal').show()
 
         return
     } finally {
@@ -126,7 +138,6 @@ async function removeJob() {
     }
 
     localStorage.setItem('alertMessageJobs', 'Removed job ' + selectedJobId)
-    bootstrap.Modal.getInstance('#jobRemoveConfirmModal').hide()
     refreshPage()
 }
 
@@ -170,11 +181,18 @@ function setOptionalQueryParameter(url, name, value) {
 }
 
 async function removeAllJobs() {
-    const jobsRemoveAllModal = bootstrap.Modal.getInstance('#jobsRemoveAllModal');
+    const confirmed = await showConfirmationModal({
+        title: 'Remove all jobs',
+        message: 'Are you sure you want to remove all jobs? This will not stop jobs currently in progress.',
+        confirmLabel: 'Remove all jobs',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     addAlert('alertJobsDiv', 'Removing all jobs...', 'info');
-
-    jobsRemoveAllModal.hide()
 
     try {
         const response = await fetch(
@@ -202,11 +220,18 @@ async function removeAllJobs() {
 }
 
 async function removeProcessedJobs() {
-    const jobsRemoveProcessedModal = bootstrap.Modal.getInstance('#jobsRemoveProcessedModal');
+    const confirmed = await showConfirmationModal({
+        title: 'Remove processed jobs',
+        message: 'Are you sure you want to remove all processed jobs? This includes all jobs with status "done" and "failed".',
+        confirmLabel: 'Remove processed jobs',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
 
     addAlert('alertJobsDiv', 'Removing processed jobs...', 'info');
-
-    jobsRemoveProcessedModal.hide()
 
     try {
         const response = await fetch(
