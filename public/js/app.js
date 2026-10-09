@@ -1,7 +1,7 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
         navigator.serviceWorker
-            .register(APPLICATION_URL + '/serviceWorker.js')
+            .register(APPLICATION_URL + '/serviceWorker.js?v=' + encodeURIComponent(JAVASCRIPT_VERSION))
             .then(function (registration) {
                 console.log('Service Worker registered with scope:', registration.scope);
             })

@@ -37,11 +37,14 @@
 
 {{ include('component/modal-dialog.html.twig') }}
 
-<script>window.APPLICATION_URL = "{{ applicationUrl  }}";</script>
+<script>
+    window.APPLICATION_URL = "{{ applicationUrl }}";
+    window.JAVASCRIPT_VERSION = "{{ javascriptVersion }}";
+</script>
 <script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
 <script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
 <script src="{{ applicationUrl }}/js/datepicker-full-1.2.0.min.js"></script>
-<script src="{{ applicationUrl }}/js/app.js"></script>
+<script src="{{ applicationUrl }}/js/app.js?v={{ javascriptVersion }}"></script>
 
 {% block scripts %}{% endblock %}
 </body>

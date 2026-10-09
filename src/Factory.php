@@ -97,6 +97,16 @@ class Factory
         return new Service\ApplicationSecret($config->getAsString('APPLICATION_SECRET'));
     }
 
+    public static function createJavascriptVersion(File $file) : string
+    {
+        return hash(
+            'sha256',
+            $file->readFile(self::createDirectoryAppRoot() . 'public/js/app.js')
+                . "\0"
+                . $file->readFile(self::createDirectoryAppRoot() . 'public/serviceWorker.js'),
+        );
+    }
+
     public static function createCreatePublicStorageLink(ContainerInterface $container) : CreatePublicStorageLink
     {
         return new CreatePublicStorageLink(
@@ -449,6 +459,7 @@ class Factory
         $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routenameSlugSuffix . '$/', '', $currentRequest->getPath()));
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
         $twig->addGlobal('csrfToken', $container->get(Service\CsrfTokenProvider::class)->getToken());
+        $twig->addGlobal('javascriptVersion', self::createJavascriptVersion($container->get(File::class)));
 
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
