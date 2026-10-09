@@ -15,6 +15,9 @@ $builder->addDefinitions(
         \Movary\Api\Imdb\ImdbApi::class => DI\factory([Factory::class, 'createImdbApi']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\ImageUrlService::class => DI\factory([Factory::class, 'createUrlGenerator']),
+        \Movary\Service\FlashMessage\FlashMessageService::class => DI\factory(
+            [Factory::class, 'createFlashMessageService'],
+        ),
         \Movary\Service\Export\ExportService::class => DI\factory([Factory::class, 'createExportService']),
         \Movary\HttpController\Api\OpenApiController::class => DI\factory([Factory::class, 'createOpenApiController']),
         \Movary\HttpController\Web\AuthenticationController::class => DI\factory([Factory::class, 'createAuthenticationController']),

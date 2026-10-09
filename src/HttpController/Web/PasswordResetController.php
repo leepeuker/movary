@@ -6,7 +6,9 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\PasswordResetRequestService;
 use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Service\ApplicationUrlService;
-use Movary\Util\SessionWrapper;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageDestination;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -21,7 +23,7 @@ class PasswordResetController
         private readonly Environment $twig,
         private readonly PasswordResetRequestService $requestService,
         private readonly PasswordResetTokenService $tokenService,
-        private readonly SessionWrapper $sessionWrapper,
+        private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly LoggerInterface $logger,
     ) {
@@ -29,8 +31,8 @@ class PasswordResetController
 
     public function renderRequestPage() : Response
     {
-        $requestSubmitted = $this->sessionWrapper->find('passwordResetRequested') === true;
-        $this->sessionWrapper->unset('passwordResetRequested');
+        $messages = $this->flashMessageService->consumeFor(FlashMessageDestination::PASSWORD_RESET_REQUEST);
+        $requestSubmitted = in_array(FlashMessage::PASSWORD_RESET_REQUESTED, $messages, true);
 
         return Response::create(
             StatusCode::createOk(),
@@ -45,7 +47,7 @@ class PasswordResetController
     {
         $email = $this->getStringParameter($request->getPostParameters(), 'email');
         $this->requestService->request($email);
-        $this->sessionWrapper->set('passwordResetRequested', true);
+        $this->flashMessageService->add(FlashMessage::PASSWORD_RESET_REQUESTED);
 
         return Response::createSeeOther(
             $this->applicationUrlService->createApplicationUrl(RelativeUrl::create('/forgot-password')),
