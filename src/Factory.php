@@ -334,6 +334,7 @@ class Factory
             $config->getAsBool('ENABLE_REGISTRATION', false),
             $config->getAsStringNullable('DEFAULT_LOGIN_EMAIL'),
             $config->getAsStringNullable('DEFAULT_LOGIN_PASSWORD'),
+            $container->get(Authentication::class),
         );
     }
 

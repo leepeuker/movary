@@ -1,5 +1,3 @@
-const MOVARY_CLIENT_IDENTIFIER = 'Movary Web';
-
 async function submitCredentials() {
     const urlParams = new URLSearchParams(window.location.search);
     const safeRedirect = getSafeRedirect(urlParams.get('redirect'), APPLICATION_URL);
@@ -68,11 +66,10 @@ function createLoginRateLimitMessage(retryAfter) {
 }
 
 function loginRequest() {
-    return fetchWithCsrf(APPLICATION_URL + '/api/authentication/token', {
+    return fetchWithCsrf(APPLICATION_URL + '/login', {
         method: 'POST',
         headers: {
-            'Content-type': 'application/json',
-            'X-Movary-Client': MOVARY_CLIENT_IDENTIFIER
+            'Content-type': 'application/json'
         },
         body: JSON.stringify({
             'email': document.getElementById('email').value,

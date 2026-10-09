@@ -2,7 +2,14 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Exception\InvalidCredentials;
+use Movary\Domain\User\Exception\InvalidTotpCode;
+use Movary\Domain\User\Exception\LoginAttemptLimitReached;
+use Movary\Domain\User\Exception\MissingTotpCode;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Service\Email\EmailSupport;
+use Movary\Util\Json;
+use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -16,7 +23,72 @@ class AuthenticationController
         private readonly bool $registrationEnabled,
         private readonly ?string $defaultEmail,
         private readonly ?string $defaultPassword,
+        private readonly Authentication $authenticationService,
     ) {
+    }
+
+    public function login(Request $request) : Response
+    {
+        $requestBody = Json::decode($request->getBody());
+
+        if (isset($requestBody['email'], $requestBody['password']) === false) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingCredentials',
+                    'message' => 'Email or password is missing'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        $totpCode = empty($requestBody['totpCode']) === true ? null : (int)$requestBody['totpCode'];
+        $rememberMe = $requestBody['rememberMe'] ?? false;
+
+        try {
+            $this->authenticationService->login(
+                $requestBody['email'],
+                $requestBody['password'],
+                (bool)$rememberMe,
+                CreateUserController::MOVARY_WEB_CLIENT,
+                $request->getUserAgent(),
+                $totpCode,
+            );
+        } catch (LoginAttemptLimitReached $exception) {
+            return Response::create(
+                StatusCode::createTooManyRequests(),
+                Json::encode([
+                    'error' => 'InvalidCredentials',
+                    'message' => 'Invalid credentials'
+                ]),
+                [Header::createContentTypeJson(), Header::createRetryAfter($exception->getRetryAfterSeconds())],
+            );
+        } catch (MissingTotpCode) {
+            return Response::createBadRequest(
+                Json::encode([
+                    'error' => 'MissingTotpCode',
+                    'message' => 'Two-factor authentication code missing'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        } catch (InvalidTotpCode) {
+            return Response::createUnauthorized(
+                Json::encode([
+                    'error' => 'InvalidTotpCode',
+                    'message' => 'Two-factor authentication code wrong'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        } catch (InvalidCredentials) {
+            return Response::createUnauthorized(
+                Json::encode([
+                    'error' => 'InvalidCredentials',
+                    'message' => 'Invalid credentials'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        }
+
+        return Response::createOk();
     }
 
     public function renderLoginPage(Request $request) : Response
