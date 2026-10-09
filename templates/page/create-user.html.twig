@@ -14,6 +14,7 @@
     </script>
     <main role="main" class="form-signin w-100 m-auto text-center">
         <form action="{{ applicationUrl }}/create-user" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <h1 class="">Movary</h1>
             <p>{{ subtitle }}</p>
             <div class="form-floating" style="margin-bottom: 0.3rem">

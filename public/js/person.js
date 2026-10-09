@@ -67,7 +67,7 @@ function showInTopLists() {
 
 async function sendRequest(action) {
     const personId = document.getElementById('personId').value;
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/persons/' + personId + '/' + action,
         {method: 'POST'}
     )

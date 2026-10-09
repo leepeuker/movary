@@ -44,7 +44,7 @@ async function deleteKodiWebhook() {
 }
 
 async function regenerateKodiWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/kodi/webhook', {'method': 'put'})
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/kodi/webhook', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -55,7 +55,7 @@ async function regenerateKodiWebhookRequest() {
 }
 
 async function deleteKodiWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/kodi/webhook', {'method': 'delete'})
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/kodi/webhook', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -79,7 +79,7 @@ function setKodiWebhookUrl(webhookUrl) {
 async function updateScrobbleOptions() {
     removeAlert('alertWebhookOptionsDiv')
 
-    await fetch(APPLICATION_URL + '/settings/kodi', {
+    await fetchWithCsrf(APPLICATION_URL + '/settings/kodi', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'

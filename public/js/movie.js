@@ -15,6 +15,7 @@ async function deleteWatchDate() {
     $.ajax({
         url: APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
         type: 'DELETE',
+        headers: {'X-CSRF-Token': getCsrfToken()},
         data: JSON.stringify({
             'date': document.getElementById('originalWatchDate').value,
             'dateFormat': document.getElementById('dateFormatPhp').value
@@ -66,7 +67,7 @@ function getRouteUsername() {
 function saveRating() {
     let newRating = getRatingFromStars('editRatingModal')
 
-    fetch(APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
+    fetchWithCsrf(APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/rating', {
         method: 'post',
         headers: {
             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -174,6 +175,7 @@ function editWatchDate() {
     $.ajax({
         url: apiUrl,
         type: 'POST',
+        headers: {'X-CSRF-Token': getCsrfToken()},
         data: JSON.stringify({
             'newWatchDate': newWatchDate,
             'originalWatchDate': originalWatchDate,
@@ -255,7 +257,7 @@ function refreshTmdbData() {
 }
 
 async function addToWatchlistRequest() {
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/movies/' + getMovieId() + '/add-watchlist',
         {method: 'POST'}
     )
@@ -268,7 +270,7 @@ async function addToWatchlistRequest() {
 }
 
 async function removeFromWatchlistRequest() {
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/movies/' + getMovieId() + '/remove-watchlist',
         {method: 'DELETE'}
     )
@@ -281,7 +283,7 @@ async function removeFromWatchlistRequest() {
 }
 
 async function refreshTmdbDataRequest() {
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-tmdb',
         {method: 'POST'}
     )
@@ -315,7 +317,7 @@ function refreshImdbRating() {
 }
 
 async function refreshImdbRatingRequest() {
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/movies/' + getMovieId() + '/refresh-imdb',
         {method: 'POST'}
     )

@@ -14,6 +14,30 @@ if ('serviceWorker' in navigator) {
 const PASSWORD_MIN_LENGTH = 8
 let currentModalVersion = 1;
 
+function fetchWithCsrf(input, options = {}) {
+    const requestUrl = new URL(input instanceof Request ? input.url : input, window.location.href)
+    const method = (options.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase()
+    const unsafeMethods = ['POST', 'PUT', 'PATCH', 'DELETE']
+
+    if (requestUrl.origin !== window.location.origin || unsafeMethods.includes(method) === false) {
+        return window.fetch(input, options)
+    }
+
+    const headers = new Headers(options.headers ?? (input instanceof Request ? input.headers : undefined))
+    headers.set('X-CSRF-Token', getCsrfToken())
+
+    return window.fetch(input, {...options, headers: headers})
+}
+
+function getCsrfToken() {
+    const token = document.querySelector('meta[name="csrf-token"]')?.content
+    if (token == null || token === '') {
+        throw new Error('Missing CSRF token')
+    }
+
+    return token
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
     const darkModeInput = document.getElementById('darkModeInput');
@@ -325,7 +349,7 @@ function addToWatchlist(context) {
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
     const postToMastodon = document.getElementById('postToMastodon').checked
 
-    fetch(APPLICATION_URL + '/add-movie-to-watchlist', {
+    fetchWithCsrf(APPLICATION_URL + '/add-movie-to-watchlist', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -361,7 +385,7 @@ function logMovie(context) {
         return
     }
 
-    fetch(APPLICATION_URL + '/log-movie', {
+    fetchWithCsrf(APPLICATION_URL + '/log-movie', {
         method: 'post', headers: {
             'Content-type': 'application/json',
         }, body: JSON.stringify({
@@ -651,7 +675,7 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showAc
 }
 
 async function logout() {
-    await fetch(APPLICATION_URL + '/api/authentication/token', {
+    await fetchWithCsrf(APPLICATION_URL + '/api/authentication/token', {
         method: 'DELETE',
     });
 

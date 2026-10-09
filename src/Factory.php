@@ -447,6 +447,7 @@ class Factory
         $twig->addGlobal('requestUrlPath', $currentRequest->getPath());
         $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routenameSlugSuffix . '$/', '', $currentRequest->getPath()));
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
+        $twig->addGlobal('csrfToken', $container->get(Service\CsrfTokenProvider::class)->getToken());
 
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"

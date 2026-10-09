@@ -115,7 +115,7 @@ async function removeJob() {
     removeButton.disabled = true
 
     try {
-        const response = await fetch(APPLICATION_URL + '/job-queue/' + selectedJobId, {
+        const response = await fetchWithCsrf(APPLICATION_URL + '/job-queue/' + selectedJobId, {
             method: 'DELETE',
             signal: AbortSignal.timeout(10000)
         })
@@ -195,7 +195,7 @@ async function removeAllJobs() {
     addAlert('alertJobsDiv', 'Removing all jobs...', 'info');
 
     try {
-        const response = await fetch(
+        const response = await fetchWithCsrf(
             APPLICATION_URL + '/job-queue/purge-all', {
                 method: 'POST',
                 signal: AbortSignal.timeout(10000)
@@ -234,7 +234,7 @@ async function removeProcessedJobs() {
     addAlert('alertJobsDiv', 'Removing processed jobs...', 'info');
 
     try {
-        const response = await fetch(
+        const response = await fetchWithCsrf(
             APPLICATION_URL + '/job-queue/purge-processed', {
                 method: 'POST',
                 signal: AbortSignal.timeout(10000)

@@ -18,7 +18,7 @@ use RuntimeException;
 
 class Authentication
 {
-    private const string AUTHENTICATION_COOKIE_NAME = 'id';
+    public const string AUTHENTICATION_COOKIE_NAME = 'id';
 
     private const int MAX_EXPIRATION_AGE_IN_DAYS = 30;
 
