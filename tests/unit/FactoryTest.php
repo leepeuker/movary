@@ -11,20 +11,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Factory::class)]
 class FactoryTest extends TestCase
 {
-    public function testCreatesJavascriptVersionFromServedFileContents() : void
-    {
-        $file = $this->createMock(File::class);
-        $file
-            ->expects(self::exactly(2))
-            ->method('readFile')
-            ->willReturnOnConsecutiveCalls('application-javascript', 'service-worker-javascript');
-
-        self::assertSame(
-            hash('sha256', "application-javascript\0service-worker-javascript"),
-            Factory::createJavascriptVersion($file),
-        );
-    }
-
     /** @psalm-suppress InternalMethod */
     public function testConfiguresMysqlTcpConnectionByDefault() : void
     {

@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ applicationUrl }}/css/dashboard.css" rel="stylesheet">
+    <link href="{{ asset_url('css/dashboard.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/dashboard.js"></script>
-    <script src="{{ applicationUrl }}/js/component/user-select.js"></script>
+    <script src="{{ asset_url('js/dashboard.js') }}"></script>
+    <script src="{{ asset_url('js/component/user-select.js') }}"></script>
 {% endblock %}
 
 {% block body %}

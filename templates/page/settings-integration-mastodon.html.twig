@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/settings-integration-mastodon.js"></script>
+    <script src="{{ asset_url('js/settings-integration-mastodon.js') }}"></script>
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet"/>
-    <link href="{{ applicationUrl }}/css/mastodon.css" rel="stylesheet"/>
+    <link href="{{ asset_url('css/settings.css') }}" rel="stylesheet"/>
+    <link href="{{ asset_url('css/mastodon.css') }}" rel="stylesheet"/>
 {% endblock %}
 
 {% block body %}

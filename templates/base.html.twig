@@ -15,15 +15,15 @@
     <meta property="og:image" content="{% block ogImage %}{{ applicationUrl }}/images/movary-logo-512x512.png{% endblock %}" />
     <meta property="og:description" content="Self hosted web app to track and rate your watched movies" />
 
-    <link href="{{ applicationUrl }}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset_url('css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
 
-    <script src="{{ applicationUrl }}/js/movie-list-view-preference.js"></script>
+    <script src="{{ asset_url('js/movie-list-view-preference.js') }}"></script>
 
     <meta name="theme-color" content="white">
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/bootstrap-icons-1.10.2.css">
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/datepicker-1.2.0.min.css">
-    <link rel="stylesheet" href="{{ applicationUrl }}/css/global.css">
+    <link rel="stylesheet" href="{{ asset_url('css/bootstrap-icons-1.10.2.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/datepicker-1.2.0.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/global.css') }}">
 {% block stylesheets %}{% endblock %}
 </head>
 <body>
@@ -39,12 +39,12 @@
 
 <script>
     window.APPLICATION_URL = "{{ applicationUrl }}";
-    window.JAVASCRIPT_VERSION = "{{ javascriptVersion }}";
+    window.SERVICE_WORKER_URL = "{{ asset_url('serviceWorker.js') }}";
 </script>
-<script src="{{ applicationUrl }}/js/jquery-3.3.1.js"></script>
-<script src="{{ applicationUrl }}/js/bootstrap.bundle.min.js"></script>
-<script src="{{ applicationUrl }}/js/datepicker-full-1.2.0.min.js"></script>
-<script src="{{ applicationUrl }}/js/app.js?v={{ javascriptVersion }}"></script>
+<script src="{{ asset_url('js/jquery-3.3.1.js') }}"></script>
+<script src="{{ asset_url('js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset_url('js/datepicker-full-1.2.0.min.js') }}"></script>
+<script src="{{ asset_url('js/app.js') }}"></script>
 
 {% block scripts %}{% endblock %}
 </body>

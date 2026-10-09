@@ -72,7 +72,11 @@ class ResponseTest extends TestCase
         $subject = Response::createZipDownload('zip content', 'export.zip');
 
         self::assertEquals(
-            [Header::createContentTypeZip(), Header::createAttachment('export.zip')],
+            [
+                Header::createContentTypeZip(),
+                Header::createAttachment('export.zip'),
+                Header::createCacheControlPrivate(),
+            ],
             $subject->getHeaders(),
         );
         self::assertSame(StatusCode::createOk()->getCode(), $subject->getStatusCode()->getCode());
@@ -109,6 +113,20 @@ class ResponseTest extends TestCase
 
         self::assertSame($subject->getBody(), 'foobar');
         self::assertEquals($subject->getStatusCode(), StatusCode::createOk());
-        self::assertEquals($subject->getHeaders(), [Header::createContentTypeJson()]);
+        self::assertEquals(
+            $subject->getHeaders(),
+            [Header::createContentTypeJson(), Header::createCacheControlPrivate()],
+        );
+    }
+
+    public function testExplicitCacheHeaderOverridesDefault() : void
+    {
+        $subject = Response::create(
+            StatusCode::createOk(),
+            'foobar',
+            [Header::createCache(3600)],
+        );
+
+        self::assertEquals([Header::createCache(3600)], $subject->getHeaders());
     }
 }
