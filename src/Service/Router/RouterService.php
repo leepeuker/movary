@@ -19,7 +19,6 @@ class RouterService
                     $middleware[] = Web\Middleware\ValidateCsrfToken::class;
                 }
 
-                $middleware[] = Web\Middleware\StartSession::class;
             }
 
             $routeCollector->addRoute(

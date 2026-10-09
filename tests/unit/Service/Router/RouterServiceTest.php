@@ -3,7 +3,6 @@
 namespace Tests\Unit\Movary\Service\Router;
 
 use FastRoute\RouteCollector;
-use Movary\HttpController\Web\Middleware\StartSession;
 use Movary\HttpController\Web\Middleware\ValidateCsrfToken;
 use Movary\Service\Router\Dto\RouteList;
 use Movary\Service\Router\RouterService;
@@ -29,7 +28,7 @@ class RouterServiceTest extends TestCase
                 '/test',
                 [
                     'handler' => self::HANDLER,
-                    'middleware' => ['ExistingMiddleware', ValidateCsrfToken::class, StartSession::class],
+                    'middleware' => ['ExistingMiddleware', ValidateCsrfToken::class],
                 ],
             );
 
@@ -48,7 +47,7 @@ class RouterServiceTest extends TestCase
             ->with(
                 'GET',
                 '/test',
-                ['handler' => self::HANDLER, 'middleware' => [StartSession::class]],
+                ['handler' => self::HANDLER, 'middleware' => []],
             );
 
         (new RouterService())->addRoutesToRouteCollector($collector, $routeList, true);
@@ -66,7 +65,7 @@ class RouterServiceTest extends TestCase
             ->with(
                 'POST',
                 '/webhook',
-                ['handler' => self::HANDLER, 'middleware' => [StartSession::class]],
+                ['handler' => self::HANDLER, 'middleware' => []],
             );
 
         (new RouterService())->addRoutesToRouteCollector($collector, $routeList, true);

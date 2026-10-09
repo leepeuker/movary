@@ -9,8 +9,8 @@ use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
 use Movary\Service\CookieSecurity;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Cookie;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -30,9 +30,9 @@ class AuthenticationTest extends TestCase
 
     private MockObject|UserRepository $userRepositoryMock;
 
-    private MockObject|SessionWrapper $sessionWrapperMock;
-
     private MockObject|CookieSecurity $cookieSecurityMock;
+
+    private MockObject|FlashMessageService $flashMessageServiceMock;
 
     private MockObject|LoginAttemptLimiter $loginAttemptLimiterMock;
 
@@ -42,16 +42,16 @@ class AuthenticationTest extends TestCase
 
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
         $this->userApiMock = $this->createMock(UserApi::class);
-        $this->sessionWrapperMock = $this->createMock(SessionWrapper::class);
         $this->cookieSecurityMock = $this->createMock(CookieSecurity::class);
+        $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->loginAttemptLimiterMock = $this->createMock(LoginAttemptLimiter::class);
         $this->subject = new Authentication(
             $this->userRepositoryMock,
             $this->userApiMock,
-            $this->sessionWrapperMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
             $this->loginAttemptLimiterMock,
             new Cookie($this->cookieSecurityMock, static fn() => true),
+            $this->flashMessageServiceMock,
         );
     }
 
@@ -164,16 +164,23 @@ class AuthenticationTest extends TestCase
 
     public function testSetAuthenticationCookieMakesTokenAvailableInCurrentRequest() : void
     {
-        $this->sessionWrapperMock->expects(self::once())->method('destroy');
-        $this->sessionWrapperMock->expects(self::once())->method('start');
         $this->cookieSecurityMock->expects(self::once())->method('isSecure')->willReturn(true);
 
-        $this->subject->setAuthenticationCookieAndNewSession(
+        $this->subject->setAuthenticationCookie(
             self::TOKEN,
             DateTime::createFromString('+1 hour'),
         );
 
         self::assertSame(self::TOKEN, $_COOKIE['id']);
+    }
+
+    public function testLogoutClearsPendingFlashMessagesWithoutAuthenticationCookie() : void
+    {
+        unset($_COOKIE['id']);
+        $this->userRepositoryMock->expects(self::never())->method('deleteAuthToken');
+        $this->flashMessageServiceMock->expects(self::once())->method('clear');
+
+        $this->subject->logout();
     }
 
     public function testLoginStoresHashedAuthenticationToken() : void
