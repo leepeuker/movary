@@ -377,6 +377,7 @@ class Factory
             $container->get(LoggerInterface::class),
             $container->get(Service\ApplicationUrlService::class),
             $container->get(Util\UrlValidator::class),
+            $container->get(Service\PlexCallbackStateService::class),
             $config->getAsBool('PLEX_VALIDATE_URL_SAFE', false),
         );
     }

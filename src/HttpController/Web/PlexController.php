@@ -8,6 +8,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\Plex\PlexScrobbler;
+use Movary\Service\PlexCallbackStateService;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\UrlValidator;
@@ -31,6 +32,7 @@ class PlexController
         private readonly LoggerInterface $logger,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly UrlValidator $urlValidator,
+        private readonly PlexCallbackStateService $callbackStateService,
         private readonly bool $validateUrlIsSafe = false,
     ) {
     }
@@ -42,15 +44,20 @@ class PlexController
         return Response::createOk();
     }
 
-    public function generatePlexAuthenticationUrl() : Response
+    public function generatePlexAuthenticationUrl(Request $request) : Response
     {
         $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
         if ($plexAccessToken !== null) {
             return Response::createBadRequest('User is already authenticated');
         }
 
+        $authenticationToken = $request->getCookie(Authentication::AUTHENTICATION_COOKIE_NAME);
+        if ($authenticationToken === null) {
+            return Response::createForbidden();
+        }
+
         try {
-            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl();
+            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl($authenticationToken);
         } catch (ConfigNotSetException $e) {
             return Response::createBadRequest($e->getMessage());
         }
@@ -84,12 +91,24 @@ class PlexController
         return Response::createOk();
     }
 
-    public function processPlexCallback() : Response
+    public function processPlexCallback(Request $request) : Response
     {
-        $plexClientId = $this->userApi->findPlexClientId($this->authenticationService->getCurrentUserId());
-        $plexClientCode = $this->userApi->findTemporaryPlexCode($this->authenticationService->getCurrentUserId());
+        $userId = $this->authenticationService->getCurrentUserId();
+        $plexClientId = $this->userApi->findPlexClientId($userId);
+        $plexClientCode = $this->userApi->findTemporaryPlexCode($userId);
         if ($plexClientId === null || $plexClientCode === null) {
             throw new RuntimeException('Missing plex client id or code');
+        }
+
+        $state = $request->getGetParameters()['state'] ?? null;
+        $state = is_string($state) === true ? $state : null;
+        if ($this->callbackStateService->isValid(
+            $state,
+            $plexClientId,
+            $plexClientCode,
+            $request->getCookie(Authentication::AUTHENTICATION_COOKIE_NAME),
+        ) === false) {
+            return Response::createForbidden();
         }
 
         $plexAccessToken = $this->plexApi->findPlexAccessToken($plexClientId, $plexClientCode);
@@ -97,12 +116,14 @@ class PlexController
             throw new RuntimeException('Missing plex client id or code');
         }
 
-        $this->userApi->updatePlexAccessToken($this->authenticationService->getCurrentUserId(), (string)$plexAccessToken);
+        $this->userApi->updatePlexAccessToken($userId, (string)$plexAccessToken);
+        $this->userApi->updatePlexClientId($userId, null);
+        $this->userApi->updateTemporaryPlexClientCode($userId, null);
 
         $plexAccount = $this->plexApi->findPlexAccount($plexAccessToken);
         if ($plexAccount !== null) {
             $plexAccountId = $plexAccount->getPlexId();
-            $this->userApi->updatePlexAccountId($this->authenticationService->getCurrentUserId(), (string)$plexAccountId);
+            $this->userApi->updatePlexAccountId($userId, (string)$plexAccountId);
         }
 
         return Response::createSeeOther(
