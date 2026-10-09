@@ -4,14 +4,27 @@ namespace Movary\ValueObject\Http;
 
 class Response
 {
+    /** @var array<Header> */
+    private readonly array $headers;
+
     /**
      * @param array<Header> $headers
      */
     private function __construct(
         private readonly StatusCode $statusCode,
         private readonly ?string $body = null,
-        private readonly ?array $headers = [],
+        ?array $headers = [],
     ) {
+        $headers = (array)$headers;
+        foreach ($headers as $header) {
+            if ($header->getName() === 'Cache-Control') {
+                $this->headers = $headers;
+
+                return;
+            }
+        }
+
+        $this->headers = [...$headers, Header::createCacheControlPrivate()];
     }
 
     public static function create(StatusCode $statusCode, ?string $body = null, ?array $headers = []) : self
@@ -119,7 +132,7 @@ class Response
 
     public function getHeaders() : array
     {
-        return (array)$this->headers;
+        return $this->headers;
     }
 
     public function getStatusCode() : StatusCode

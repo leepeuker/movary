@@ -29,6 +29,7 @@ use Movary\HttpController\Web\JobController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\AssetUrlGenerator;
 use Movary\Service\DatabaseMigration\MigrationCoordinator;
 use Movary\Service\Email\EmailSupport;
 use Movary\Service\Export\ExportService;
@@ -53,6 +54,7 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 use Twig;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class Factory
 {
@@ -449,6 +451,13 @@ class Factory
         $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routenameSlugSuffix . '$/', '', $currentRequest->getPath()));
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
         $twig->addGlobal('csrfToken', $container->get(Service\CsrfTokenProvider::class)->getToken());
+
+        $assetUrlGenerator = new AssetUrlGenerator(
+            $container->get(File::class),
+            self::createDirectoryAppRoot() . 'public',
+            $applicationUrl,
+        );
+        $twig->addFunction(new TwigFunction('asset_url', [$assetUrlGenerator, 'generate']));
 
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"

@@ -112,7 +112,7 @@ class AuthenticationControllerTest extends TestCase
         self::assertEquals(StatusCode::createTooManyRequests(), $response->getStatusCode());
         self::assertSame('{"error":"InvalidCredentials","message":"Invalid credentials"}', $response->getBody());
         self::assertSame(
-            ['Content-Type: application/json', 'Retry-After: 60'],
+            ['Content-Type: application/json', 'Retry-After: 60', 'Cache-Control: private, no-cache'],
             array_map(static fn($header) => (string)$header, $response->getHeaders()),
         );
     }

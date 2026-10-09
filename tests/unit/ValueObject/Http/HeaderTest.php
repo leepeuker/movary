@@ -49,4 +49,12 @@ class HeaderTest extends TestCase
     {
         self::assertSame('Location: foobar', (string)Header::createLocation('foobar'));
     }
+
+    public function testCreateCacheControlPrivate() : void
+    {
+        $subject = Header::createCacheControlPrivate();
+
+        self::assertSame('Cache-Control: private, no-cache', (string)$subject);
+        self::assertSame('Cache-Control', $subject->getName());
+    }
 }

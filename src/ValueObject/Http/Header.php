@@ -37,6 +37,11 @@ class Header
         return new self('Location', $value);
     }
 
+    public static function createCacheControlPrivate() : self
+    {
+        return new self('Cache-Control', 'private, no-cache');
+    }
+
     public static function createRetryAfter(int $seconds) : self
     {
         return new self('Retry-After', (string)$seconds);
@@ -59,5 +64,10 @@ class Header
     public function __toString() : string
     {
         return $this->name . ': ' . $this->value;
+    }
+
+    public function getName() : string
+    {
+        return $this->name;
     }
 }

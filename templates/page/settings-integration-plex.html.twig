@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ applicationUrl }}/js/settings-integration-plex.js"></script>
-    <script src="{{ applicationUrl }}/js/component/modal-job.js"></script>
+    <script src="{{ asset_url('js/settings-integration-plex.js') }}"></script>
+    <script src="{{ asset_url('js/component/modal-job.js') }}"></script>
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ applicationUrl }}/css/settings.css" rel="stylesheet">
+    <link href="{{ asset_url('css/settings.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
