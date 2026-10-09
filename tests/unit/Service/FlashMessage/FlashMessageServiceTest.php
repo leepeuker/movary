@@ -104,10 +104,7 @@ class FlashMessageServiceTest extends TestCase
     {
         $this->subject->add(FlashMessage::PASSWORD_RESET_REQUESTED);
 
-        self::assertSame(
-            [FlashMessage::PASSWORD_RESET_REQUESTED],
-            $this->subject->consumeFor(FlashMessageDestination::PASSWORD_RESET_REQUEST),
-        );
+        self::assertTrue($this->subject->consume(FlashMessage::PASSWORD_RESET_REQUESTED));
         self::assertSame(
             [FlashMessageService::COOKIE_NAME_PREFIX . FlashMessage::PASSWORD_RESET_REQUESTED->value],
             $this->deletedCookieNames,
@@ -119,8 +116,14 @@ class FlashMessageServiceTest extends TestCase
         $cookieName = FlashMessageService::COOKIE_NAME_PREFIX . FlashMessage::PASSWORD_RESET_REQUESTED->value;
         $this->cookieValues[$cookieName] = 'invalid-cookie';
 
-        self::assertSame([], $this->subject->consumeFor(FlashMessageDestination::PASSWORD_RESET_REQUEST));
+        self::assertFalse($this->subject->consume(FlashMessage::PASSWORD_RESET_REQUESTED));
         self::assertSame([$cookieName], $this->deletedCookieNames);
+    }
+
+    public function testConsumeReturnsFalseWhenMessageDoesNotExist() : void
+    {
+        self::assertFalse($this->subject->consume(FlashMessage::PASSWORD_RESET_REQUESTED));
+        self::assertSame([], $this->deletedCookieNames);
     }
 
     public function testClearDeletesCookie() : void

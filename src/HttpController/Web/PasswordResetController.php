@@ -7,7 +7,6 @@ use Movary\Domain\User\Service\PasswordResetRequestService;
 use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
-use Movary\Service\FlashMessage\FlashMessageDestination;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -31,8 +30,7 @@ class PasswordResetController
 
     public function renderRequestPage() : Response
     {
-        $messages = $this->flashMessageService->consumeFor(FlashMessageDestination::PASSWORD_RESET_REQUEST);
-        $requestSubmitted = in_array(FlashMessage::PASSWORD_RESET_REQUESTED, $messages, true);
+        $requestSubmitted = $this->flashMessageService->consume(FlashMessage::PASSWORD_RESET_REQUESTED);
 
         return Response::create(
             StatusCode::createOk(),

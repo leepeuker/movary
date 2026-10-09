@@ -8,7 +8,6 @@ use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\HttpController\Web\PasswordResetController;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
-use Movary\Service\FlashMessage\FlashMessageDestination;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\StatusCode;
@@ -81,9 +80,9 @@ class PasswordResetControllerTest extends TestCase
     {
         $this->flashMessageServiceMock
             ->expects(self::once())
-            ->method('consumeFor')
-            ->with(FlashMessageDestination::PASSWORD_RESET_REQUEST)
-            ->willReturn([FlashMessage::PASSWORD_RESET_REQUESTED]);
+            ->method('consume')
+            ->with(FlashMessage::PASSWORD_RESET_REQUESTED)
+            ->willReturn(true);
         $this->twigMock
             ->expects(self::once())
             ->method('render')
@@ -102,8 +101,10 @@ class PasswordResetControllerTest extends TestCase
     public function testRenderRequestPageDoesNotShowConfirmationWithoutMessage() : void
     {
         $this->flashMessageServiceMock
-            ->method('consumeFor')
-            ->willReturn([]);
+            ->expects(self::once())
+            ->method('consume')
+            ->with(FlashMessage::PASSWORD_RESET_REQUESTED)
+            ->willReturn(false);
         $this->twigMock
             ->expects(self::once())
             ->method('render')

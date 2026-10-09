@@ -41,6 +41,19 @@ class FlashMessageService
         }
     }
 
+    public function consume(FlashMessage $message) : bool
+    {
+        $cookieName = $this->createCookieName($message);
+        $cookieValue = $this->cookie->find($cookieName);
+        if ($cookieValue === null) {
+            return false;
+        }
+
+        $this->cookie->delete($cookieName, $this->cookieSecurity->isSecure());
+
+        return $this->codec->isValid($message, $cookieValue, ($this->clock)());
+    }
+
     /** @return array<FlashMessage> */
     public function consumeFor(FlashMessageDestination $destination) : array
     {
@@ -51,14 +64,7 @@ class FlashMessageService
                 continue;
             }
 
-            $cookieName = $this->createCookieName($message);
-            $cookieValue = $this->cookie->find($cookieName);
-            if ($cookieValue === null) {
-                continue;
-            }
-
-            $this->cookie->delete($cookieName, $this->cookieSecurity->isSecure());
-            if ($this->codec->isValid($message, $cookieValue, ($this->clock)()) === true) {
+            if ($this->consume($message) === true) {
                 $consumed[] = $message;
             }
         }
