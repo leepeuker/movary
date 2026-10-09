@@ -10,8 +10,8 @@ use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\HttpController\Web\CreateUserController;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Cookie;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use RuntimeException;
@@ -28,10 +28,10 @@ class Authentication
     public function __construct(
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
-        private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
         private readonly Cookie $cookie,
+        private readonly FlashMessageService $flashMessageService,
     ) {
     }
 
@@ -221,7 +221,7 @@ class Authentication
             return $userAndToken;
         }
 
-        $this->setAuthenticationCookieAndNewSession($token, $authTokenExpirationDate);
+        $this->setAuthenticationCookie($token, $authTokenExpirationDate);
 
         return $userAndToken;
     }
@@ -235,14 +235,11 @@ class Authentication
             $this->clearAuthenticationCookie();
         }
 
-        $this->sessionWrapper->destroy();
-        $this->sessionWrapper->start();
+        $this->flashMessageService->clear();
     }
 
-    public function setAuthenticationCookieAndNewSession(string $token, DateTime $expirationDate) : void
+    public function setAuthenticationCookie(string $token, DateTime $expirationDate) : void
     {
-        $this->sessionWrapper->destroy();
-        $this->sessionWrapper->start();
         $this->cookie->set(
             self::AUTHENTICATION_COOKIE_NAME,
             $token,
