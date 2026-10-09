@@ -7,7 +7,8 @@ use Movary\Domain\User\Service\PasswordResetRequestService;
 use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\HttpController\Web\PasswordResetController;
 use Movary\Service\ApplicationUrlService;
-use Movary\Util\SessionWrapper;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\RelativeUrl;
@@ -26,7 +27,7 @@ class PasswordResetControllerTest extends TestCase
 
     private PasswordResetRequestService|MockObject $requestServiceMock;
 
-    private SessionWrapper|MockObject $sessionWrapperMock;
+    private FlashMessageService|MockObject $flashMessageServiceMock;
 
     private PasswordResetController $subject;
 
@@ -39,13 +40,13 @@ class PasswordResetControllerTest extends TestCase
         $this->twigMock = $this->createMock(Environment::class);
         $this->requestServiceMock = $this->createMock(PasswordResetRequestService::class);
         $this->tokenServiceMock = $this->createMock(PasswordResetTokenService::class);
-        $this->sessionWrapperMock = $this->createMock(SessionWrapper::class);
+        $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->subject = new PasswordResetController(
             $this->twigMock,
             $this->requestServiceMock,
             $this->tokenServiceMock,
-            $this->sessionWrapperMock,
+            $this->flashMessageServiceMock,
             $this->applicationUrlServiceMock,
             $this->createMock(LoggerInterface::class),
         );
@@ -59,10 +60,10 @@ class PasswordResetControllerTest extends TestCase
             ->expects(self::once())
             ->method('request')
             ->with(' user@example.com ');
-        $this->sessionWrapperMock
+        $this->flashMessageServiceMock
             ->expects(self::once())
-            ->method('set')
-            ->with('passwordResetRequested', true);
+            ->method('add')
+            ->with(FlashMessage::PASSWORD_RESET_REQUESTED);
         $this->applicationUrlServiceMock
             ->expects(self::once())
             ->method('createApplicationUrl')
@@ -73,6 +74,46 @@ class PasswordResetControllerTest extends TestCase
 
         self::assertEquals(StatusCode::createSeeOther(), $response->getStatusCode());
         self::assertSame('Location: /movary/forgot-password', (string)$response->getHeaders()[0]);
+    }
+
+    public function testRenderRequestPageConsumesConfirmation() : void
+    {
+        $this->flashMessageServiceMock
+            ->expects(self::once())
+            ->method('consume')
+            ->with(FlashMessage::PASSWORD_RESET_REQUESTED)
+            ->willReturn(true);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/password-reset-request.html.twig',
+                ['requestSubmitted' => true],
+            )
+            ->willReturn('confirmation');
+
+        $response = $this->subject->renderRequestPage();
+
+        self::assertEquals(StatusCode::createOk(), $response->getStatusCode());
+        self::assertSame('confirmation', $response->getBody());
+    }
+
+    public function testRenderRequestPageDoesNotShowConfirmationWithoutMessage() : void
+    {
+        $this->flashMessageServiceMock
+            ->expects(self::once())
+            ->method('consume')
+            ->with(FlashMessage::PASSWORD_RESET_REQUESTED)
+            ->willReturn(false);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/password-reset-request.html.twig',
+                ['requestSubmitted' => false],
+            );
+
+        $this->subject->renderRequestPage();
     }
 
     public function testRenderResetPageShowsFormForValidToken() : void

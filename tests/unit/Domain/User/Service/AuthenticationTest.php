@@ -8,7 +8,8 @@ use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
-use Movary\Service\ServerSettings;
+use Movary\Service\CookieSecurity;
+use Movary\Util\Cookie;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -31,9 +32,7 @@ class AuthenticationTest extends TestCase
 
     private MockObject|SessionWrapper $sessionWrapperMock;
 
-    private MockObject|ServerSettings $serverSettingsMock;
-
-    private MockObject|Request $requestMock;
+    private MockObject|CookieSecurity $cookieSecurityMock;
 
     private MockObject|LoginAttemptLimiter $loginAttemptLimiterMock;
 
@@ -44,8 +43,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock = $this->createMock(UserRepository::class);
         $this->userApiMock = $this->createMock(UserApi::class);
         $this->sessionWrapperMock = $this->createMock(SessionWrapper::class);
-        $this->serverSettingsMock = $this->createMock(ServerSettings::class);
-        $this->requestMock = $this->createMock(Request::class);
+        $this->cookieSecurityMock = $this->createMock(CookieSecurity::class);
         $this->loginAttemptLimiterMock = $this->createMock(LoginAttemptLimiter::class);
         $this->subject = new Authentication(
             $this->userRepositoryMock,
@@ -53,8 +51,7 @@ class AuthenticationTest extends TestCase
             $this->sessionWrapperMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
             $this->loginAttemptLimiterMock,
-            $this->serverSettingsMock,
-            $this->requestMock,
+            new Cookie($this->cookieSecurityMock, static fn() => true),
         );
     }
 
@@ -169,6 +166,7 @@ class AuthenticationTest extends TestCase
     {
         $this->sessionWrapperMock->expects(self::once())->method('destroy');
         $this->sessionWrapperMock->expects(self::once())->method('start');
+        $this->cookieSecurityMock->expects(self::once())->method('isSecure')->willReturn(true);
 
         $this->subject->setAuthenticationCookieAndNewSession(
             self::TOKEN,
@@ -261,33 +259,5 @@ class AuthenticationTest extends TestCase
         $this->expectException(\Movary\Domain\User\Exception\MissingTotpCode::class);
 
         $this->subject->findUserAndVerifyAuthentication('user@example.com', 'password');
-    }
-
-    public function testAuthenticationCookieIsSecureForHttpsRequests() : void
-    {
-        $this->requestMock->expects(self::once())->method('isHttps')->willReturn(true);
-        $this->serverSettingsMock->expects(self::never())->method('getApplicationUrl');
-
-        self::assertTrue($this->subject->isAuthenticationCookieSecure());
-    }
-
-    public function testAuthenticationCookieIsSecureForHttpsApplicationUrl() : void
-    {
-        $this->serverSettingsMock
-            ->expects(self::once())
-            ->method('getApplicationUrl')
-            ->willReturn('https://movary.example.com');
-
-        self::assertTrue($this->subject->isAuthenticationCookieSecure());
-    }
-
-    public function testAuthenticationCookieIsNotSecureForHttpApplicationUrl() : void
-    {
-        $this->serverSettingsMock
-            ->expects(self::once())
-            ->method('getApplicationUrl')
-            ->willReturn('http://movary.example.com');
-
-        self::assertFalse($this->subject->isAuthenticationCookieSecure());
     }
 }

@@ -10,7 +10,7 @@ use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\HttpController\Web\CreateUserController;
-use Movary\Service\ServerSettings;
+use Movary\Util\Cookie;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -31,8 +31,7 @@ class Authentication
         private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
-        private readonly ServerSettings $serverSettings,
-        private readonly Request $request,
+        private readonly Cookie $cookie,
     ) {
     }
 
@@ -244,43 +243,16 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
-        $_COOKIE[self::AUTHENTICATION_COOKIE_NAME] = $token;
-        setcookie(
+        $this->cookie->set(
             self::AUTHENTICATION_COOKIE_NAME,
             $token,
-            [
-                'expires' => (int)$expirationDate->format('U'),
-                'path' => '/',
-                'httponly' => true,
-                'samesite' => 'Lax',
-                'secure' => $this->isAuthenticationCookieSecure(),
-            ],
+            (int)$expirationDate->format('U'),
         );
     }
 
     private function clearAuthenticationCookie() : void
     {
-        unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-        setcookie(
-            self::AUTHENTICATION_COOKIE_NAME,
-            '',
-            [
-                'expires' => 1,
-                'path' => '/',
-                'httponly' => true,
-                'samesite' => 'Lax',
-                'secure' => $this->isAuthenticationCookieSecure(),
-            ],
-        );
-    }
-
-    public function isAuthenticationCookieSecure() : bool
-    {
-        if ($this->request->isHttps() === true) {
-            return true;
-        }
-
-        return str_starts_with(strtolower($this->serverSettings->getApplicationUrl() ?? ''), 'https://');
+        $this->cookie->delete(self::AUTHENTICATION_COOKIE_NAME);
     }
 
     private function findUserIdByValidAuthToken(string $token) : ?int
@@ -308,9 +280,7 @@ class Authentication
 
     private function getAuthenticationCookie() : ?string
     {
-        $token = $_COOKIE[self::AUTHENTICATION_COOKIE_NAME] ?? null;
-
-        return is_string($token) === true && $token !== '' ? $token : null;
+        return $this->cookie->find(self::AUTHENTICATION_COOKIE_NAME);
     }
 
     private function isUserPageVisibleForUser(UserEntity $targetUser, ?int $requestUserId) : bool

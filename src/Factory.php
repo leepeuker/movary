@@ -34,6 +34,8 @@ use Movary\Service\DatabaseMigration\MigrationCoordinator;
 use Movary\Service\Email\EmailSupport;
 use Movary\Service\Export\ExportService;
 use Movary\Service\Export\ExportWriter;
+use Movary\Service\FlashMessage\FlashMessageCookieCodec;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\ImageCacheService;
 use Movary\Service\ImageUrlService;
 use Movary\Service\JobProcessor;
@@ -248,6 +250,17 @@ class Factory
             $container->get(MovieWatchlistApi::class),
             $container->get(ExportWriter::class),
             self::createDirectoryStorage(),
+        );
+    }
+
+    public static function createFlashMessageService(
+        ContainerInterface $container,
+        Service\ApplicationSecret $applicationSecret,
+    ) : FlashMessageService {
+        return new FlashMessageService(
+            new FlashMessageCookieCodec($applicationSecret),
+            $container->get(Util\Cookie::class),
+            static fn() : int => time(),
         );
     }
 
