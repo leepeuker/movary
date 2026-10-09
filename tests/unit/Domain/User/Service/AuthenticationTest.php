@@ -9,6 +9,7 @@ use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
 use Movary\Service\CookieSecurity;
+use Movary\Util\Cookie;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -50,6 +51,7 @@ class AuthenticationTest extends TestCase
             $this->sessionWrapperMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
             $this->loginAttemptLimiterMock,
+            new Cookie(static fn() => true),
             $this->cookieSecurityMock,
         );
     }

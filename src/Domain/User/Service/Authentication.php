@@ -11,6 +11,7 @@ use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\Service\CookieSecurity;
+use Movary\Util\Cookie;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
@@ -31,6 +32,7 @@ class Authentication
         private readonly SessionWrapper $sessionWrapper,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
+        private readonly Cookie $cookie,
         private readonly CookieSecurity $cookieSecurity,
     ) {
     }
@@ -243,33 +245,19 @@ class Authentication
     {
         $this->sessionWrapper->destroy();
         $this->sessionWrapper->start();
-        $_COOKIE[self::AUTHENTICATION_COOKIE_NAME] = $token;
-        setcookie(
+        $this->cookie->set(
             self::AUTHENTICATION_COOKIE_NAME,
             $token,
-            [
-                'expires' => (int)$expirationDate->format('U'),
-                'path' => '/',
-                'httponly' => true,
-                'samesite' => 'Lax',
-                'secure' => $this->cookieSecurity->isSecure(),
-            ],
+            (int)$expirationDate->format('U'),
+            $this->cookieSecurity->isSecure(),
         );
     }
 
     private function clearAuthenticationCookie() : void
     {
-        unset($_COOKIE[self::AUTHENTICATION_COOKIE_NAME]);
-        setcookie(
+        $this->cookie->delete(
             self::AUTHENTICATION_COOKIE_NAME,
-            '',
-            [
-                'expires' => 1,
-                'path' => '/',
-                'httponly' => true,
-                'samesite' => 'Lax',
-                'secure' => $this->cookieSecurity->isSecure(),
-            ],
+            $this->cookieSecurity->isSecure(),
         );
     }
 
@@ -298,9 +286,7 @@ class Authentication
 
     private function getAuthenticationCookie() : ?string
     {
-        $token = $_COOKIE[self::AUTHENTICATION_COOKIE_NAME] ?? null;
-
-        return is_string($token) === true && $token !== '' ? $token : null;
+        return $this->cookie->find(self::AUTHENTICATION_COOKIE_NAME);
     }
 
     private function isUserPageVisibleForUser(UserEntity $targetUser, ?int $requestUserId) : bool

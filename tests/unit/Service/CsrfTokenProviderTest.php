@@ -6,6 +6,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Service\CookieSecurity;
 use Movary\Service\CsrfTokenProvider;
 use Movary\Service\CsrfTokenService;
+use Movary\Util\Cookie;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -34,10 +35,13 @@ class CsrfTokenProviderTest extends TestCase
 
         $cookieSecurity = $this->createMock(CookieSecurity::class);
         $cookieSecurity->expects(self::never())->method('isSecure');
+        $cookie = $this->createMock(Cookie::class);
+        $cookie->expects(self::never())->method('set');
 
         $subject = new CsrfTokenProvider(
             $tokenService,
             $request,
+            $cookie,
             $cookieSecurity,
         );
 
@@ -69,10 +73,16 @@ class CsrfTokenProviderTest extends TestCase
 
         $cookieSecurity = $this->createMock(CookieSecurity::class);
         $cookieSecurity->expects(self::once())->method('isSecure')->willReturn(true);
+        $cookie = $this->createMock(Cookie::class);
+        $cookie
+            ->expects(self::once())
+            ->method('set')
+            ->with(CsrfTokenProvider::COOKIE_NAME, 'new-csrf-token', null, true);
 
         $subject = new CsrfTokenProvider(
             $tokenService,
             $request,
+            $cookie,
             $cookieSecurity,
         );
 

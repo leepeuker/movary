@@ -52,6 +52,20 @@ class CookieTest extends TestCase
         self::assertFalse($options['secure']);
     }
 
+    public function testSetWithoutExpirationCreatesSessionCookie() : void
+    {
+        $options = [];
+        $subject = new Cookie(static function (string $name, string $value, array $cookieOptions) use (&$options) : void {
+            self::assertSame('test', $name);
+            self::assertSame('value', $value);
+            $options = $cookieOptions;
+        });
+
+        $subject->set('test', 'value', null, true);
+
+        self::assertArrayNotHasKey('expires', $options);
+    }
+
     public function testFindOnlyReturnsNonEmptyString() : void
     {
         $subject = new Cookie();

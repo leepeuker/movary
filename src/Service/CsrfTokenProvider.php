@@ -3,6 +3,7 @@
 namespace Movary\Service;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Util\Cookie;
 use Movary\ValueObject\Http\Request;
 
 class CsrfTokenProvider
@@ -14,6 +15,7 @@ class CsrfTokenProvider
     public function __construct(
         private readonly CsrfTokenService $tokenService,
         private readonly Request $request,
+        private readonly Cookie $cookie,
         private readonly CookieSecurity $cookieSecurity,
     ) {
     }
@@ -36,15 +38,11 @@ class CsrfTokenProvider
         }
 
         $this->token = $this->tokenService->create($authenticationToken);
-        setcookie(
+        $this->cookie->set(
             self::COOKIE_NAME,
             $this->token,
-            [
-                'path' => '/',
-                'httponly' => true,
-                'samesite' => 'Lax',
-                'secure' => $this->cookieSecurity->isSecure(),
-            ],
+            null,
+            $this->cookieSecurity->isSecure(),
         );
 
         return $this->token;

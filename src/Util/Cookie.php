@@ -40,19 +40,25 @@ class Cookie
         return is_string($value) === true && $value !== '' ? $value : null;
     }
 
-    public function set(string $name, string $value, int $expires, bool $secure) : void
+    public function set(string $name, string $value, ?int $expires, bool $secure) : void
     {
         $_COOKIE[$name] = $value;
+
+        $options = [];
+        if ($expires !== null) {
+            $options['expires'] = $expires;
+        }
+        $options += [
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax',
+            'secure' => $secure,
+        ];
+
         ($this->writer)(
             $name,
             $value,
-            [
-                'expires' => $expires,
-                'path' => '/',
-                'httponly' => true,
-                'samesite' => 'Lax',
-                'secure' => $secure,
-            ],
+            $options,
         );
     }
 }
