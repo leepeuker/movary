@@ -80,7 +80,7 @@ async function searchTMDB() {
     let searchQuery = document.getElementById('tmdbSearchModalInput').value;
 
     await createSpinner(document.getElementById('tmdbSearchResultsDiv'), 'tmdb');
-    await fetch(APPLICATION_URL + '/api/movies/search?search=' + searchQuery, {
+    await fetch(APPLICATION_URL + '/movies/search?search=' + searchQuery, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

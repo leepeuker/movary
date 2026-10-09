@@ -19,6 +19,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
+    $routes->add('POST', '/login', [Web\AuthenticationController::class, 'login'], [Web\Middleware\UserIsUnauthenticated::class]);
     $routes->add('DELETE', '/logout', [Web\LogoutController::class, 'logout'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/forgot-password', [Web\PasswordResetController::class, 'renderRequestPage'], [
         Web\Middleware\PasswordResetIsAvailable::class,
@@ -229,6 +230,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     ##########
     # Movies #
     ##########
+    $routes->add('GET', '/movies/search', [Web\MovieSearchController::class, 'search'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/movies/{id:[0-9]+}/refresh-tmdb', [Web\Movie\MovieController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/movies/{id:[0-9]+}/refresh-imdb', [Web\Movie\MovieController::class, 'refreshImdbRating'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/movies/{id:[0-9]+}/watch-providers', [Web\Movie\MovieWatchProviderController::class, 'getWatchProviders']);
