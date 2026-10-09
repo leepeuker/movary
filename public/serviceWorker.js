@@ -1,24 +1,11 @@
-var staticDevCoffee = 'movary';
-var assets = [
-  '/',
-  '/index.php',
-  '/js/style.js'
-];
+const LEGACY_CACHE_NAME = 'movary'
 
-const version = 1
-
-self.addEventListener("install", installEvent => {
-  installEvent.waitUntil(
-    caches.open(staticDevCoffee).then(cache => {
-      cache.addAll(assets)
-    })
-  )
+self.addEventListener('install', event => {
+    event.waitUntil(self.skipWaiting())
 })
 
-self.addEventListener("fetch", fetchEvent => {
-  fetchEvent.respondWith(
-    caches.match(fetchEvent.request).then(res => {
-      return res || fetch(fetchEvent.request)
-    })
-  )
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.delete(LEGACY_CACHE_NAME).then(() => self.clients.claim())
+    )
 })
