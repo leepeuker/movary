@@ -4,7 +4,6 @@ namespace Tests\Unit\Movary\Service;
 
 use InvalidArgumentException;
 use Movary\Service\ApplicationSecret;
-use Movary\ValueObject\Config;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +12,7 @@ class ApplicationSecretTest extends TestCase
 {
     public function testDerivesDifferentKeysForDifferentPurposes() : void
     {
-        $subject = new ApplicationSecret($this->createConfig(str_repeat('a', 64)));
+        $subject = new ApplicationSecret(str_repeat('a', 64));
 
         self::assertNotSame($subject->deriveKey('csrf'), $subject->deriveKey('plex-callback'));
         self::assertSame(32, strlen($subject->deriveKey('csrf')));
@@ -26,18 +25,6 @@ class ApplicationSecretTest extends TestCase
             'APPLICATION_SECRET must contain exactly 64 hexadecimal characters.',
         );
 
-        new ApplicationSecret($this->createConfig('too-short'));
-    }
-
-    private function createConfig(string $applicationSecret) : Config
-    {
-        $config = $this->createMock(Config::class);
-        $config
-            ->expects(self::once())
-            ->method('getAsString')
-            ->with('APPLICATION_SECRET')
-            ->willReturn($applicationSecret);
-
-        return $config;
+        new ApplicationSecret('too-short');
     }
 }
