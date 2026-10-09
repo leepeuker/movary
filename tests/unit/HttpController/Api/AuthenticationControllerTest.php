@@ -63,6 +63,38 @@ class AuthenticationControllerTest extends TestCase
         self::assertSame('{"user":{"id":12,"name":"example","isAdmin":false}}', $response->getBody());
     }
 
+    public function testDestroyTokenRequiresExplicitHeaderToken() : void
+    {
+        $request = $this->createMock(Request::class);
+        $this->authenticationMock
+            ->expects(self::once())
+            ->method('getTokenFromHeader')
+            ->with($request)
+            ->willReturn(null);
+        $this->authenticationMock->expects(self::never())->method('deleteToken');
+        $this->authenticationMock->expects(self::never())->method('logout');
+
+        $response = $this->subject->destroyToken($request);
+
+        self::assertEquals(StatusCode::createBadRequest(), $response->getStatusCode());
+    }
+
+    public function testDestroyTokenDeletesExplicitHeaderToken() : void
+    {
+        $request = $this->createMock(Request::class);
+        $this->authenticationMock
+            ->expects(self::once())
+            ->method('getTokenFromHeader')
+            ->with($request)
+            ->willReturn(self::TOKEN);
+        $this->authenticationMock->expects(self::once())->method('deleteToken')->with(self::TOKEN);
+        $this->authenticationMock->expects(self::never())->method('logout');
+
+        $response = $this->subject->destroyToken($request);
+
+        self::assertSame(204, $response->getStatusCode()->getCode());
+    }
+
     public function testCreateTokenReturnsRetryAfterWhenLoginIsRateLimited() : void
     {
         $request = $this->createMock(Request::class);

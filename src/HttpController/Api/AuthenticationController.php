@@ -109,13 +109,7 @@ class AuthenticationController
 
     public function destroyToken(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $this->authenticationService->logout();
-
-            return Response::CreateNoContent();
-        }
-
-        $apiToken = $this->authenticationService->getToken($request);
+        $apiToken = $this->authenticationService->getTokenFromHeader($request);
         if ($apiToken === null) {
             return Response::createBadRequest(
                 Json::encode([

@@ -19,6 +19,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('GET', '/', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class, Web\Middleware\ServerHasNoUsers::class]);
     $routes->add('GET', '/login', [Web\AuthenticationController::class, 'renderLoginPage'], [Web\Middleware\UserIsUnauthenticated::class]);
+    $routes->add('DELETE', '/logout', [Web\LogoutController::class, 'logout'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/forgot-password', [Web\PasswordResetController::class, 'renderRequestPage'], [
         Web\Middleware\PasswordResetIsAvailable::class,
     ]);
@@ -48,9 +49,9 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     #####################
     # Webhook listeners # !!! Deprecated use new api routes
     #####################
-    $routes->add('POST', '/plex/{id:.+}', [Web\PlexController::class, 'handlePlexWebhook']);
-    $routes->add('POST', '/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook']);
-    $routes->add('POST', '/emby/{id:.+}', [Web\EmbyController::class, 'handleEmbyWebhook']);
+    $routes->add('POST', '/plex/{id:.+}', [Web\PlexController::class, 'handlePlexWebhook'], csrfProtectionEnabled: false);
+    $routes->add('POST', '/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook'], csrfProtectionEnabled: false);
+    $routes->add('POST', '/emby/{id:.+}', [Web\EmbyController::class, 'handleEmbyWebhook'], csrfProtectionEnabled: false);
 
     #############
     # Job Queue #
@@ -148,7 +149,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/settings/plex/server-url-save', [Web\PlexController::class, 'savePlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/plex/server-url-verify', [Web\PlexController::class, 'verifyPlexServerUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/plex/authentication-url', [Web\PlexController::class, 'generatePlexAuthenticationUrl'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/plex/callback', [Web\PlexController::class, 'processPlexCallback'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/plex/callback', [Web\PlexController::class, 'processPlexCallback'], [Web\Middleware\UserIsAuthenticated::class], csrfProtectionEnabled: false);
     $routes->add('POST', '/settings/plex', [Web\SettingsController::class, 'updatePlex'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('PUT', '/settings/plex/webhook', [Web\PlexController::class, 'regeneratePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/plex/webhook', [Web\PlexController::class, 'deletePlexWebhookUrl'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -302,7 +303,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', $routeUserPlayed, [Api\PlayedController::class, 'deleteFromPlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('PUT', $routeUserPlayed, [Api\PlayedController::class, 'updatePlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
-    $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticatedWithHeader::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
 
     $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);

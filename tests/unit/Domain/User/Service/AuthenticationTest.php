@@ -83,7 +83,11 @@ class AuthenticationTest extends TestCase
     public function testGetUserIdByTokenReturnsApiTokenUser() : void
     {
         $request = $this->createMock(Request::class);
-        $request->method('getHeaders')->willReturn(['X-Movary-Token' => self::TOKEN]);
+        $request
+            ->expects(self::once())
+            ->method('getHeader')
+            ->with('X-Movary-Token')
+            ->willReturn(self::TOKEN);
 
         $this->userApiMock
             ->expects(self::once())
@@ -95,10 +99,50 @@ class AuthenticationTest extends TestCase
         self::assertSame(12, $this->subject->getUserIdByToken($request));
     }
 
+    public function testGetUserIdByTokenFromHeaderDoesNotUseAuthenticationCookie() : void
+    {
+        $_COOKIE['id'] = 'cookie-token';
+        $request = $this->createMock(Request::class);
+        $request
+            ->expects(self::once())
+            ->method('getHeader')
+            ->with('X-Movary-Token')
+            ->willReturn(self::TOKEN);
+
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findUserIdByApiToken')
+            ->with(self::TOKEN)
+            ->willReturn(12);
+        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
+
+        self::assertSame(12, $this->subject->getUserIdByTokenFromHeader($request));
+    }
+
+    public function testGetUserIdByTokenFromHeaderRejectsCookieOnlyAuthentication() : void
+    {
+        $_COOKIE['id'] = self::TOKEN;
+        $request = $this->createMock(Request::class);
+        $request
+            ->expects(self::once())
+            ->method('getHeader')
+            ->with('X-Movary-Token')
+            ->willReturn(null);
+
+        $this->userApiMock->expects(self::never())->method('findUserIdByApiToken');
+        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
+
+        self::assertNull($this->subject->getUserIdByTokenFromHeader($request));
+    }
+
     public function testGetUserIdByTokenRejectsAndDeletesExpiredAuthenticationToken() : void
     {
         $request = $this->createMock(Request::class);
-        $request->method('getHeaders')->willReturn(['X-Movary-Token' => self::TOKEN]);
+        $request
+            ->expects(self::once())
+            ->method('getHeader')
+            ->with('X-Movary-Token')
+            ->willReturn(self::TOKEN);
 
         $this->userApiMock
             ->expects(self::once())

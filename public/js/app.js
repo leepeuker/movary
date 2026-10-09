@@ -675,7 +675,7 @@ function showApplicationDialog({title, message, actionLabel, actionClass, showAc
 }
 
 async function logout() {
-    await fetchWithCsrf(APPLICATION_URL + '/api/authentication/token', {
+    await fetchWithCsrf(APPLICATION_URL + '/logout', {
         method: 'DELETE',
     });
 
