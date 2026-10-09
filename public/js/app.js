@@ -1,14 +1,4 @@
 if ('serviceWorker' in navigator) {
-    let reloadingForServiceWorkerUpdate = false
-    navigator.serviceWorker.addEventListener('controllerchange', function () {
-        if (reloadingForServiceWorkerUpdate === true) {
-            return
-        }
-
-        reloadingForServiceWorkerUpdate = true
-        window.location.reload()
-    })
-
     window.addEventListener('load', function () {
         navigator.serviceWorker
             .register(APPLICATION_URL + '/serviceWorker.js')
