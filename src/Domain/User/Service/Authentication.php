@@ -115,12 +115,34 @@ class Authentication
             return $tokenInCookie;
         }
 
-        return $request->getHeaders()['X-Movary-Token'] ?? null;
+        return $this->getTokenFromHeader($request);
+    }
+
+    public function getTokenFromHeader(Request $request) : ?string
+    {
+        $token = $request->getHeader('X-Movary-Token');
+
+        return $token === '' ? null : $token;
     }
 
     public function getUserIdByToken(Request $request) : ?int
     {
         $token = $this->getToken($request);
+        if ($token === null) {
+            return null;
+        }
+
+        $apiTokenUserId = $this->userApi->findUserIdByApiToken($token);
+        if ($apiTokenUserId !== null) {
+            return $apiTokenUserId;
+        }
+
+        return $this->findUserIdByValidAuthToken($token);
+    }
+
+    public function getUserIdByTokenFromHeader(Request $request) : ?int
+    {
+        $token = $this->getTokenFromHeader($request);
         if ($token === null) {
             return null;
         }

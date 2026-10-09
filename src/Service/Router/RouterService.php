@@ -13,6 +13,12 @@ class RouterService
         foreach ($routeList as $route) {
             $middleware = $route->getMiddleware();
             if ($isWebRoute === true) {
+                if (in_array($route->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE'], true)
+                    && $route->isCsrfProtectionEnabled() === true
+                ) {
+                    $middleware[] = Web\Middleware\ValidateCsrfToken::class;
+                }
+
                 $middleware[] = Web\Middleware\StartSession::class;
             }
 

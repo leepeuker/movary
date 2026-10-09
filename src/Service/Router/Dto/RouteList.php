@@ -14,9 +14,14 @@ class RouteList extends AbstractList
         return new self();
     }
 
-    public function add(string $httpMethod, string $route, array $handler, array $middleware = []) : Route
-    {
-        $route = Route::create($httpMethod, $route, $handler, $middleware);
+    public function add(
+        string $httpMethod,
+        string $route,
+        array $handler,
+        array $middleware = [],
+        bool $csrfProtectionEnabled = true,
+    ) : Route {
+        $route = Route::create($httpMethod, $route, $handler, $middleware, $csrfProtectionEnabled);
         $this->data[] = $route;
 
         return $route;
