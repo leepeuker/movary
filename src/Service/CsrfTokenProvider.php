@@ -14,7 +14,7 @@ class CsrfTokenProvider
     public function __construct(
         private readonly CsrfTokenService $tokenService,
         private readonly Request $request,
-        private readonly ServerSettings $serverSettings,
+        private readonly CookieSecurity $cookieSecurity,
     ) {
     }
 
@@ -43,19 +43,10 @@ class CsrfTokenProvider
                 'path' => '/',
                 'httponly' => true,
                 'samesite' => 'Lax',
-                'secure' => $this->isSecure(),
+                'secure' => $this->cookieSecurity->isSecure(),
             ],
         );
 
         return $this->token;
-    }
-
-    private function isSecure() : bool
-    {
-        if ($this->request->isHttps() === true) {
-            return true;
-        }
-
-        return str_starts_with(strtolower($this->serverSettings->getApplicationUrl() ?? ''), 'https://');
     }
 }

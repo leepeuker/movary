@@ -3,9 +3,9 @@
 namespace Tests\Unit\Movary\Service;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Service\CookieSecurity;
 use Movary\Service\CsrfTokenProvider;
 use Movary\Service\CsrfTokenService;
-use Movary\Service\ServerSettings;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -32,13 +32,13 @@ class CsrfTokenProviderTest extends TestCase
             ->willReturn(true);
         $tokenService->expects(self::never())->method('create');
 
-        $serverSettings = $this->createMock(ServerSettings::class);
-        $serverSettings->expects(self::never())->method('getApplicationUrl');
+        $cookieSecurity = $this->createMock(CookieSecurity::class);
+        $cookieSecurity->expects(self::never())->method('isSecure');
 
         $subject = new CsrfTokenProvider(
             $tokenService,
             $request,
-            $serverSettings,
+            $cookieSecurity,
         );
 
         self::assertSame('csrf-token', $subject->getToken());
@@ -55,8 +55,6 @@ class CsrfTokenProviderTest extends TestCase
                 [Authentication::AUTHENTICATION_COOKIE_NAME, 'authentication-token'],
                 [CsrfTokenProvider::COOKIE_NAME, 'invalid-csrf-token'],
             ]);
-        $request->expects(self::once())->method('isHttps')->willReturn(true);
-
         $tokenService = $this->createMock(CsrfTokenService::class);
         $tokenService
             ->expects(self::once())
@@ -69,13 +67,13 @@ class CsrfTokenProviderTest extends TestCase
             ->with('authentication-token')
             ->willReturn('new-csrf-token');
 
-        $serverSettings = $this->createMock(ServerSettings::class);
-        $serverSettings->expects(self::never())->method('getApplicationUrl');
+        $cookieSecurity = $this->createMock(CookieSecurity::class);
+        $cookieSecurity->expects(self::once())->method('isSecure')->willReturn(true);
 
         $subject = new CsrfTokenProvider(
             $tokenService,
             $request,
-            $serverSettings,
+            $cookieSecurity,
         );
 
         self::assertSame('new-csrf-token', $subject->getToken());
