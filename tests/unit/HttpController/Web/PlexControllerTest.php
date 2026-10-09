@@ -5,6 +5,8 @@ namespace Tests\Unit\Movary\HttpController\Web;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\PlexController;
 use Movary\Service\ApplicationUrlService;
@@ -60,7 +62,7 @@ class PlexControllerTest extends TestCase
             ->method('getCookie')
             ->with(Authentication::AUTHENTICATION_COOKIE_NAME)
             ->willReturn('authentication-token');
-        $this->authentication->expects(self::once())->method('getCurrentUserId')->willReturn(12);
+        $this->authentication->expects(self::once())->method('requireWebSession')->willReturn(AuthenticatedUser::create(12, CredentialType::WEB_SESSION));
         $this->userApi->expects(self::once())->method('findPlexAccessToken')->with(12)->willReturn(null);
         $this->plexApi
             ->expects(self::once())
@@ -126,7 +128,7 @@ class PlexControllerTest extends TestCase
 
     private function prepareStoredCallbackData() : void
     {
-        $this->authentication->expects(self::once())->method('getCurrentUserId')->willReturn(12);
+        $this->authentication->expects(self::once())->method('requireWebSession')->willReturn(AuthenticatedUser::create(12, CredentialType::WEB_SESSION));
         $this->userApi->expects(self::once())->method('findPlexClientId')->with(12)->willReturn('pin-id');
         $this->userApi->expects(self::once())->method('findTemporaryPlexCode')->with(12)->willReturn('plex-code');
     }

@@ -20,7 +20,7 @@ class LocationController
 
     public function createLocation(Request $request) : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
         $requestData = Json::decode($request->getBody());
 
         $this->locationApi->createLocation(
@@ -35,7 +35,7 @@ class LocationController
     public function deleteLocation(Request $request) : Response
     {
         $locationId = (int)$request->getRouteParameters()['locationId'];
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
 
         $location = $this->locationApi->findLocationById($locationId);
 
@@ -54,7 +54,7 @@ class LocationController
 
     public function fetchLocations() : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
 
         $locations = $this->locationApi->findLocationsByUserId($currentUser->getId());
 
@@ -63,7 +63,7 @@ class LocationController
 
     public function fetchToggleFeature() : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
 
         $isLocationsEnabled = $this->userApi->isLocationsEnabled($currentUser->getId());
 
@@ -76,7 +76,7 @@ class LocationController
 
     public function updateLocation(Request $request) : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
         $locationId = (int)$request->getRouteParameters()['locationId'];
         $requestData = Json::decode($request->getBody());
 
@@ -101,7 +101,7 @@ class LocationController
 
     public function updateToggleFeature(Request $request) : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
         $requestData = Json::decode($request->getBody());
 
         $this->userApi->updateLocationsEnabled(

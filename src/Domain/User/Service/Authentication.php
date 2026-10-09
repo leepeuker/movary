@@ -80,6 +80,16 @@ class Authentication
         return AuthenticatedUser::create($userId, CredentialType::WEB_SESSION);
     }
 
+    public function requireWebSession() : AuthenticatedUser
+    {
+        $authenticatedUser = $this->authenticateWebSession();
+        if ($authenticatedUser === null) {
+            throw new RuntimeException('Could not find an authenticated web session');
+        }
+
+        return $authenticatedUser;
+    }
+
     public function deleteToken(string $token) : void
     {
         $this->repository->deleteAuthToken($this->hashToken($token));
@@ -131,14 +141,7 @@ class Authentication
 
     public function getCurrentUserId() : int
     {
-        $token = $this->getAuthenticationCookie();
-        $userId = $token === null ? null : $this->findUserIdByValidAuthToken($token);
-
-        if ($userId === null) {
-            throw new RuntimeException('Could not find a current user');
-        }
-
-        return $userId;
+        return $this->requireWebSession()->getUserId();
     }
 
     public function getToken(Request $request) : ?string
@@ -190,17 +193,7 @@ class Authentication
 
     public function isUserAuthenticatedWithCookie() : bool
     {
-        $token = $this->getAuthenticationCookie();
-
-        if ($token !== null && $this->findUserIdByValidAuthToken($token) !== null) {
-            return true;
-        }
-
-        if ($token !== null) {
-            $this->clearAuthenticationCookie();
-        }
-
-        return false;
+        return $this->authenticateWebSession() !== null;
     }
 
     public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
@@ -210,14 +203,14 @@ class Authentication
         return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
+    public function isUserPageVisible(UserEntity $targetUser, ?AuthenticatedUser $authenticatedUser) : bool
+    {
+        return $this->isUserPageVisibleForUser($targetUser, $authenticatedUser?->getUserId());
+    }
+
     public function isUserPageVisibleForWebRequest(UserEntity $targetUser) : bool
     {
-        $requestUserId = null;
-        if ($this->isUserAuthenticatedWithCookie() === true) {
-            $requestUserId = $this->getCurrentUserId();
-        }
-
-        return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
+        return $this->isUserPageVisible($targetUser, $this->authenticateWebSession());
     }
 
     public function isValidToken(string $token) : bool

@@ -157,6 +157,14 @@ class AuthenticationTest extends TestCase
         self::assertNull($this->subject->authenticateWebSession());
     }
 
+    public function testRequireWebSessionRejectsMissingCookie() : void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Could not find an authenticated web session');
+
+        $this->subject->requireWebSession();
+    }
+
     public function testGetCurrentUserIdUsesValidatedCookieToken() : void
     {
         $_COOKIE['id'] = self::TOKEN;

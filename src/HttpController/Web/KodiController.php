@@ -19,14 +19,14 @@ class KodiController
 
     public function deleteKodiWebhookUrl() : Response
     {
-        $this->userApi->deleteKodiWebhookId($this->authenticationService->getCurrentUserId());
+        $this->userApi->deleteKodiWebhookId($this->authenticationService->requireWebSession()->getUserId());
 
         return Response::createOk();
     }
 
     public function regenerateKodiWebhookUrl() : Response
     {
-        $webhookId = $this->userApi->regenerateKodiWebhookId($this->authenticationService->getCurrentUserId());
+        $webhookId = $this->userApi->regenerateKodiWebhookId($this->authenticationService->requireWebSession()->getUserId());
 
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildKodiWebhookUrl($webhookId)]));
     }

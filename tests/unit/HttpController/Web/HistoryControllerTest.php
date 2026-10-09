@@ -6,6 +6,8 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
@@ -44,7 +46,7 @@ class HistoryControllerTest extends TestCase
         $this->movieApiMock = $this->createMock(MovieApi::class);
         $this->userApiMock = $this->createMock(UserApi::class);
 
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(12);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(12, CredentialType::WEB_SESSION));
 
         $user = $this->createMock(UserEntity::class);
         $user->method('getName')->willReturn('alice');

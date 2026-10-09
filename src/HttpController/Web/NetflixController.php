@@ -24,7 +24,7 @@ class NetflixController
 
     public function importNetflixData(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
         $items = Json::decode($request->getBody());
 
         $this->netflixMovieImporter->importWatchDates($userId, $items);

@@ -3,6 +3,8 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Web\SettingsController;
@@ -59,8 +61,7 @@ class SettingsControllerTest extends TestCase
 
         $user = $this->createMock(UserEntity::class);
         $user->method('hasCoreAccountChangesDisabled')->willReturn(false);
-        $this->authenticationMock->method('getCurrentUser')->willReturn($user);
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->userApiMock
             ->method('fetchUser')
             ->willReturnCallback(static function (int $userId) use ($user) : UserEntity {

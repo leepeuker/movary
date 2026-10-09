@@ -3,6 +3,8 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Web\ImportController;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
@@ -57,7 +59,7 @@ class ImportControllerTest extends TestCase
         FlashMessage $successMessage,
     ) : void {
         $request = $this->createRequest($exportType, [$exportType => ['tmp_name' => '/tmp/import.csv']]);
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->importServiceMock
             ->expects(self::once())
             ->method($importMethod)
@@ -79,7 +81,7 @@ class ImportControllerTest extends TestCase
         FlashMessage $failureMessage,
     ) : void {
         $request = $this->createRequest($exportType, []);
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->importServiceMock->expects(self::never())->method($importMethod);
         $this->flashMessageServiceMock->expects(self::once())->method('add')->with($failureMessage);
         $this->loggerMock->expects(self::once())->method('error');
@@ -93,7 +95,7 @@ class ImportControllerTest extends TestCase
     public function testUnknownImportTypeDoesNotAddMessage() : void
     {
         $request = $this->createRequest('unknown', []);
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->flashMessageServiceMock->expects(self::never())->method('add');
         $this->loggerMock->expects(self::once())->method('error');
         $this->expectDataPageRedirect();

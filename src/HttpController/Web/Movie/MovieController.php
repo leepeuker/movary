@@ -70,10 +70,8 @@ class MovieController
         $userName = (string)$request->getRouteParameters()['username'];
         $userId = $this->userApi->fetchUserByName($userName)->getId();
 
-        $currentUser = null;
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $currentUser = $this->authenticationService->getCurrentUser();
-        }
+        $authenticatedUser = $this->authenticationService->authenticateWebSession();
+        $currentUser = $authenticatedUser === null ? null : $this->userApi->fetchUser($authenticatedUser->getUserId());
 
         $movieId = (int)$request->getRouteParameters()['id'];
 

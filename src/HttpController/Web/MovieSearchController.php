@@ -25,7 +25,7 @@ class MovieSearchController
     public function search(Request $request) : Response
     {
         $requestData = $this->searchRequestMapper->mapRequest($request);
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $tmdbResponse = $this->tmdbApi->searchMovie(
             $requestData->getSearchTerm(),

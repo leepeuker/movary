@@ -22,7 +22,7 @@ class MovieRatingController
 
     public function fetchMovieRatingByTmdbdId(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
         $tmdbId = $request->getGetParameters()['tmdbId'] ?? null;
 
         $userRating = null;
@@ -39,7 +39,7 @@ class MovieRatingController
 
     public function updateRating(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
@@ -54,7 +54,7 @@ class MovieRatingController
             $personalRating = PersonalRating::create((int)$postParameters['rating']);
         }
 
-        $this->movieApi->updateUserRating($movieId, $this->authenticationService->getCurrentUserId(), $personalRating);
+        $this->movieApi->updateUserRating($movieId, $this->authenticationService->requireWebSession()->getUserId(), $personalRating);
 
         return Response::create(StatusCode::createNoContent());
     }

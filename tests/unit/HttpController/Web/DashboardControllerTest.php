@@ -150,7 +150,7 @@ class DashboardControllerTest extends TestCase
             ->method('createDashboardRowsForUser')
             ->with($user)
             ->willReturn(DashboardRowList::create($dashboardRow));
-        $this->authenticationMock->method('isUserAuthenticatedWithCookie')->willReturn(false);
+        $this->authenticationMock->method('authenticateWebSession')->willReturn(null);
         $this->movieHistoryApiMock->expects(self::once())->method('fetchLastPlays')->with(42)->willReturn($lastPlays);
         $this->twigMock
             ->expects(self::once())

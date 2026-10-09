@@ -18,7 +18,7 @@ class MovieWatchlistController
     public function addToWatchlist(Request $request) : Response
     {
         $movieId = (int)$request->getRouteParameters()['id'];
-        $userId = $this->authenticationService->getCurrentUser()->getId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $this->movieWatchlistApi->addMovieToWatchlist($userId, $movieId);
 
@@ -28,7 +28,7 @@ class MovieWatchlistController
     public function removeFromWatchlist(Request $request) : Response
     {
         $movieId = (int)$request->getRouteParameters()['id'];
-        $userId = $this->authenticationService->getCurrentUser()->getId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $this->movieWatchlistApi->removeMovieFromWatchlist($userId, $movieId);
 

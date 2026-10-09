@@ -22,8 +22,9 @@ class UserController
 
     public function createUser(Request $request) : Response
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false
-            || $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+        $authenticatedUser = $this->authenticationService->authenticateWebSession();
+        if ($authenticatedUser === null
+            || $this->userApi->fetchUser($authenticatedUser->getUserId())->isAdmin() === false) {
             return Response::createForbidden();
         }
 
@@ -52,7 +53,7 @@ class UserController
     public function deleteUser(Request $request) : Response
     {
         $userId = (int)$request->getRouteParameters()['userId'];
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
 
         if ($currentUser->getId() !== $userId && $currentUser->isAdmin() === false) {
             return Response::createForbidden();
@@ -65,8 +66,9 @@ class UserController
 
     public function fetchUsers() : Response
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === false
-            || $this->authenticationService->getCurrentUser()->isAdmin() === false) {
+        $authenticatedUser = $this->authenticationService->authenticateWebSession();
+        if ($authenticatedUser === null
+            || $this->userApi->fetchUser($authenticatedUser->getUserId())->isAdmin() === false) {
             return Response::createForbidden();
         }
 
@@ -76,7 +78,7 @@ class UserController
     public function updateUser(Request $request) : Response
     {
         $userId = (int)$request->getRouteParameters()['userId'];
-        $currentUser = $this->authenticationService->getCurrentUser();
+        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
 
         if ($currentUser->getId() !== $userId && $currentUser->isAdmin() === false) {
             return Response::createForbidden();

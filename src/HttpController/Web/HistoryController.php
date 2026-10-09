@@ -39,7 +39,7 @@ class HistoryController
 
     public function createHistoryEntry(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
@@ -80,7 +80,7 @@ class HistoryController
 
     public function deleteHistoryEntry(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
@@ -98,7 +98,7 @@ class HistoryController
 
     public function logMovie(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $requestData = Json::decode($request->getBody());
 

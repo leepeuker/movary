@@ -42,10 +42,7 @@ class DashboardController
     {
         $requestedUserId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
-        $currentUserId = null;
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $currentUserId = $this->authenticationService->getCurrentUserId();
-        }
+        $currentUserId = $this->authenticationService->authenticateWebSession()?->getUserId();
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($this->userApi->fetchUser($requestedUserId));
 
@@ -89,10 +86,7 @@ class DashboardController
             return Response::createNotFound();
         }
 
-        $currentUserId = null;
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $currentUserId = $this->authenticationService->getCurrentUserId();
-        }
+        $currentUserId = $this->authenticationService->authenticateWebSession()?->getUserId();
 
         return Response::create(
             StatusCode::createOk(),

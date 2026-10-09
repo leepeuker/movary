@@ -33,7 +33,7 @@ class JellyfinController
 
     public function authenticateJellyfinAccount(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $username = Json::decode($request->getBody())['username'];
         $password = Json::decode($request->getBody())['password'];
@@ -56,7 +56,7 @@ class JellyfinController
 
     public function deleteJellyfinWebhookUrl() : Response
     {
-        $this->userApi->deleteJellyfinWebhookId($this->authenticationService->getCurrentUserId());
+        $this->userApi->deleteJellyfinWebhookId($this->authenticationService->requireWebSession()->getUserId());
 
         return Response::createOk();
     }
@@ -86,14 +86,14 @@ class JellyfinController
 
     public function regenerateJellyfinWebhookUrl() : Response
     {
-        $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->getCurrentUserId());
+        $webhookId = $this->userApi->regenerateJellyfinWebhookId($this->authenticationService->requireWebSession()->getUserId());
 
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildJellyfinWebhookUrl($webhookId)]));
     }
 
     public function removeJellyfinAuthentication() : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($userId);
 
         if ($jellyfinAuthentication === null) {
@@ -116,7 +116,7 @@ class JellyfinController
     public function saveJellyfinServerUrl(Request $request) : Response
     {
         $jellyfinServerUrlString = Json::decode($request->getBody())['JellyfinServerUrl'];
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         if (empty($jellyfinServerUrlString)) {
             $this->userApi->updateJellyfinServerUrl($userId, null);
@@ -148,7 +148,7 @@ class JellyfinController
     public function saveJellyfinSyncOptions(Request $request) : Response
     {
         $syncWatches = Json::decode($request->getBody())['syncWatches'];
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $this->userApi->updateJellyfinSyncEnabled($userId, $syncWatches);
 
@@ -175,7 +175,7 @@ class JellyfinController
             }
         }
 
-        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->getCurrentUserId());
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->requireWebSession()->getUserId());
 
         $authenticationVerified = $jellyfinAuthentication !== null;
         $jellyfinServerInfo = null;

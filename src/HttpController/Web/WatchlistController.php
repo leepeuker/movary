@@ -33,7 +33,7 @@ class WatchlistController
 
     public function addMovieToWatchlist(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $requestData = Json::decode($request->getBody());
 
