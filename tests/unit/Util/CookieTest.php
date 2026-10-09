@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\Util;
 
+use Movary\Service\CookieSecurity;
 use Movary\Util\Cookie;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -17,13 +18,18 @@ class CookieTest extends TestCase
     public function testSetUsesSecureHttpOnlySameSiteCookie() : void
     {
         $options = [];
-        $subject = new Cookie(static function (string $name, string $value, array $cookieOptions) use (&$options) : void {
-            self::assertSame('test', $name);
-            self::assertSame('value', $value);
-            $options = $cookieOptions;
-        });
+        $cookieSecurity = $this->createMock(CookieSecurity::class);
+        $cookieSecurity->expects(self::once())->method('isSecure')->willReturn(true);
+        $subject = new Cookie(
+            $cookieSecurity,
+            static function (string $name, string $value, array $cookieOptions) use (&$options) : void {
+                self::assertSame('test', $name);
+                self::assertSame('value', $value);
+                $options = $cookieOptions;
+            },
+        );
 
-        $subject->set('test', 'value', 1300, true);
+        $subject->set('test', 'value', 1300);
 
         self::assertSame('value', $_COOKIE['test']);
         self::assertSame([
@@ -39,13 +45,18 @@ class CookieTest extends TestCase
     {
         $_COOKIE['test'] = 'value';
         $options = [];
-        $subject = new Cookie(static function (string $name, string $value, array $cookieOptions) use (&$options) : void {
-            self::assertSame('test', $name);
-            self::assertSame('', $value);
-            $options = $cookieOptions;
-        });
+        $cookieSecurity = $this->createMock(CookieSecurity::class);
+        $cookieSecurity->expects(self::once())->method('isSecure')->willReturn(false);
+        $subject = new Cookie(
+            $cookieSecurity,
+            static function (string $name, string $value, array $cookieOptions) use (&$options) : void {
+                self::assertSame('test', $name);
+                self::assertSame('', $value);
+                $options = $cookieOptions;
+            },
+        );
 
-        $subject->delete('test', false);
+        $subject->delete('test');
 
         self::assertArrayNotHasKey('test', $_COOKIE);
         self::assertSame(1, $options['expires']);
@@ -55,20 +66,27 @@ class CookieTest extends TestCase
     public function testSetWithoutExpirationCreatesSessionCookie() : void
     {
         $options = [];
-        $subject = new Cookie(static function (string $name, string $value, array $cookieOptions) use (&$options) : void {
-            self::assertSame('test', $name);
-            self::assertSame('value', $value);
-            $options = $cookieOptions;
-        });
+        $cookieSecurity = $this->createMock(CookieSecurity::class);
+        $cookieSecurity->expects(self::once())->method('isSecure')->willReturn(true);
+        $subject = new Cookie(
+            $cookieSecurity,
+            static function (string $name, string $value, array $cookieOptions) use (&$options) : void {
+                self::assertSame('test', $name);
+                self::assertSame('value', $value);
+                $options = $cookieOptions;
+            },
+        );
 
-        $subject->set('test', 'value', null, true);
+        $subject->set('test', 'value', null);
 
         self::assertArrayNotHasKey('expires', $options);
     }
 
     public function testFindOnlyReturnsNonEmptyString() : void
     {
-        $subject = new Cookie();
+        $cookieSecurity = $this->createMock(CookieSecurity::class);
+        $cookieSecurity->expects(self::never())->method('isSecure');
+        $subject = new Cookie($cookieSecurity);
         self::assertNull($subject->find('test'));
 
         $_COOKIE['test'] = '';

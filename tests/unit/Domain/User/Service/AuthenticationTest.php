@@ -51,8 +51,7 @@ class AuthenticationTest extends TestCase
             $this->sessionWrapperMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
             $this->loginAttemptLimiterMock,
-            new Cookie(static fn() => true),
-            $this->cookieSecurityMock,
+            new Cookie($this->cookieSecurityMock, static fn() => true),
         );
     }
 

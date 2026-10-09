@@ -258,7 +258,6 @@ class Factory
         return new FlashMessageService(
             new FlashMessageCookieCodec($applicationSecret),
             $container->get(Util\Cookie::class),
-            $container->get(Service\CookieSecurity::class),
             static fn() : int => time(),
         );
     }

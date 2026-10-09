@@ -16,7 +16,6 @@ class CsrfTokenProvider
         private readonly CsrfTokenService $tokenService,
         private readonly Request $request,
         private readonly Cookie $cookie,
-        private readonly CookieSecurity $cookieSecurity,
     ) {
     }
 
@@ -42,7 +41,6 @@ class CsrfTokenProvider
             self::COOKIE_NAME,
             $this->token,
             null,
-            $this->cookieSecurity->isSecure(),
         );
 
         return $this->token;

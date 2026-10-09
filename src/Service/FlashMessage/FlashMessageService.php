@@ -3,7 +3,6 @@
 namespace Movary\Service\FlashMessage;
 
 use Closure;
-use Movary\Service\CookieSecurity;
 use Movary\Util\Cookie;
 
 class FlashMessageService
@@ -15,7 +14,6 @@ class FlashMessageService
     public function __construct(
         private readonly FlashMessageCookieCodec $codec,
         private readonly Cookie $cookie,
-        private readonly CookieSecurity $cookieSecurity,
         private readonly Closure $clock,
     ) {
     }
@@ -27,7 +25,6 @@ class FlashMessageService
             $this->createCookieName($message),
             $this->codec->encode($message, $expires),
             $expires,
-            $this->cookieSecurity->isSecure(),
         );
     }
 
@@ -36,7 +33,7 @@ class FlashMessageService
         foreach (FlashMessage::cases() as $message) {
             $cookieName = $this->createCookieName($message);
             if ($this->cookie->find($cookieName) !== null) {
-                $this->cookie->delete($cookieName, $this->cookieSecurity->isSecure());
+                $this->cookie->delete($cookieName);
             }
         }
     }
@@ -49,7 +46,7 @@ class FlashMessageService
             return false;
         }
 
-        $this->cookie->delete($cookieName, $this->cookieSecurity->isSecure());
+        $this->cookie->delete($cookieName);
 
         return $this->codec->isValid($message, $cookieValue, ($this->clock)());
     }

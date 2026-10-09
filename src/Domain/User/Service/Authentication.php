@@ -10,7 +10,6 @@ use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\HttpController\Web\CreateUserController;
-use Movary\Service\CookieSecurity;
 use Movary\Util\Cookie;
 use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateTime;
@@ -33,7 +32,6 @@ class Authentication
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
         private readonly Cookie $cookie,
-        private readonly CookieSecurity $cookieSecurity,
     ) {
     }
 
@@ -249,16 +247,12 @@ class Authentication
             self::AUTHENTICATION_COOKIE_NAME,
             $token,
             (int)$expirationDate->format('U'),
-            $this->cookieSecurity->isSecure(),
         );
     }
 
     private function clearAuthenticationCookie() : void
     {
-        $this->cookie->delete(
-            self::AUTHENTICATION_COOKIE_NAME,
-            $this->cookieSecurity->isSecure(),
-        );
+        $this->cookie->delete(self::AUTHENTICATION_COOKIE_NAME);
     }
 
     private function findUserIdByValidAuthToken(string $token) : ?int

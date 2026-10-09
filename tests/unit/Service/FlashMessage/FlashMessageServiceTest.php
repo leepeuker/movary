@@ -3,7 +3,6 @@
 namespace Tests\Unit\Movary\Service\FlashMessage;
 
 use Movary\Service\ApplicationSecret;
-use Movary\Service\CookieSecurity;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageCookieCodec;
 use Movary\Service\FlashMessage\FlashMessageDestination;
@@ -24,8 +23,6 @@ class FlashMessageServiceTest extends TestCase
 
     private Cookie&MockObject $cookie;
 
-    private bool $cookieSecure = false;
-
     /** @var array<string, string> */
     private array $cookieValues = [];
 
@@ -43,23 +40,17 @@ class FlashMessageServiceTest extends TestCase
             string $name,
             string $value,
             int $expires,
-            bool $secure,
         ) : void {
             self::assertSame(1300, $expires);
-            $this->cookieSecure = $secure;
             $this->cookieValues[$name] = $value;
         });
-        $this->cookie->method('delete')->willReturnCallback(function (string $name, bool $secure) : void {
-            $this->cookieSecure = $secure;
+        $this->cookie->method('delete')->willReturnCallback(function (string $name) : void {
             $this->deletedCookieNames[] = $name;
             unset($this->cookieValues[$name]);
         });
-        $cookieSecurity = $this->createMock(CookieSecurity::class);
-        $cookieSecurity->method('isSecure')->willReturn(true);
         $this->subject = new FlashMessageService(
             $this->codec,
             $this->cookie,
-            $cookieSecurity,
             static fn() : int => 1000,
         );
     }
@@ -69,7 +60,6 @@ class FlashMessageServiceTest extends TestCase
         $this->subject->add(FlashMessage::TRAKT_HISTORY_IMPORT_SCHEDULED);
         $this->createSubject()->add(FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED);
 
-        self::assertTrue($this->cookieSecure);
         self::assertSame([
             FlashMessageService::COOKIE_NAME_PREFIX . FlashMessage::TRAKT_HISTORY_IMPORT_SCHEDULED->value,
             FlashMessageService::COOKIE_NAME_PREFIX . FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED->value,
@@ -135,18 +125,13 @@ class FlashMessageServiceTest extends TestCase
 
         self::assertCount(2, $this->deletedCookieNames);
         self::assertSame([], $this->cookieValues);
-        self::assertTrue($this->cookieSecure);
     }
 
     private function createSubject() : FlashMessageService
     {
-        $cookieSecurity = $this->createMock(CookieSecurity::class);
-        $cookieSecurity->method('isSecure')->willReturn(true);
-
         return new FlashMessageService(
             $this->codec,
             $this->cookie,
-            $cookieSecurity,
             static fn() : int => 1000,
         );
     }

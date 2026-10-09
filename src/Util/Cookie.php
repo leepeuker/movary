@@ -3,12 +3,16 @@
 namespace Movary\Util;
 
 use Closure;
+use Movary\Service\CookieSecurity;
 
 class Cookie
 {
     private readonly Closure $writer;
 
-    public function __construct(?Closure $writer = null)
+    public function __construct(
+        private readonly CookieSecurity $cookieSecurity,
+        ?Closure $writer = null,
+    )
     {
         $this->writer = $writer ?? static fn(string $name, string $value, array $options) : bool => setcookie(
             $name,
@@ -17,7 +21,7 @@ class Cookie
         );
     }
 
-    public function delete(string $name, bool $secure) : void
+    public function delete(string $name) : void
     {
         unset($_COOKIE[$name]);
         ($this->writer)(
@@ -28,7 +32,7 @@ class Cookie
                 'path' => '/',
                 'httponly' => true,
                 'samesite' => 'Lax',
-                'secure' => $secure,
+                'secure' => $this->cookieSecurity->isSecure(),
             ],
         );
     }
@@ -40,7 +44,7 @@ class Cookie
         return is_string($value) === true && $value !== '' ? $value : null;
     }
 
-    public function set(string $name, string $value, ?int $expires, bool $secure) : void
+    public function set(string $name, string $value, ?int $expires) : void
     {
         $_COOKIE[$name] = $value;
 
@@ -52,7 +56,7 @@ class Cookie
             'path' => '/',
             'httponly' => true,
             'samesite' => 'Lax',
-            'secure' => $secure,
+            'secure' => $this->cookieSecurity->isSecure(),
         ];
 
         ($this->writer)(
