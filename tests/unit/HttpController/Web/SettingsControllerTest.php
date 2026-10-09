@@ -9,6 +9,8 @@ use Movary\HttpController\Web\SettingsController;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
+use Movary\Service\Dashboard\DashboardFactory;
+use Movary\Service\Dashboard\Dto\DashboardRowList;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\RelativeUrl;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -30,6 +32,8 @@ class SettingsControllerTest extends TestCase
 
     private FlashMessageService|MockObject $flashMessageServiceMock;
 
+    private DashboardFactory|MockObject $dashboardFactoryMock;
+
     private SettingsController $subject;
 
     private Environment|MockObject $twigMock;
@@ -43,16 +47,19 @@ class SettingsControllerTest extends TestCase
         $this->userApiMock = $this->createMock(UserApi::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
+        $this->dashboardFactoryMock = $this->createMock(DashboardFactory::class);
         $this->subject = $this->createSubject([
             'twig' => $this->twigMock,
             'authenticationService' => $this->authenticationMock,
             'userApi' => $this->userApiMock,
             'flashMessageService' => $this->flashMessageServiceMock,
             'applicationUrlService' => $this->applicationUrlServiceMock,
+            'dashboardFactory' => $this->dashboardFactoryMock,
         ]);
 
         $user = $this->createMock(UserEntity::class);
         $user->method('hasCoreAccountChangesDisabled')->willReturn(false);
+        $this->authenticationMock->method('getCurrentUser')->willReturn($user);
         $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
         $this->userApiMock
             ->method('fetchUser')
@@ -185,6 +192,91 @@ class SettingsControllerTest extends TestCase
 
         self::assertSame(303, $response->getStatusCode()->getCode());
         self::assertSame('Location: /movary/settings/integrations/trakt', (string)$response->getHeaders()[0]);
+    }
+
+    public function testResetDashboardRowsAddsMessage() : void
+    {
+        $this->userApiMock->expects(self::once())->method('updateVisibleDashboardRows')->with(42, null);
+        $this->userApiMock->expects(self::once())->method('updateExtendedDashboardRows')->with(42, null);
+        $this->userApiMock->expects(self::once())->method('updateOrderDashboardRows')->with(42, null);
+        $this->flashMessageServiceMock
+            ->expects(self::once())
+            ->method('add')
+            ->with(FlashMessage::DASHBOARD_ROWS_RESET);
+
+        self::assertSame(200, $this->subject->resetDashboardRows()->getStatusCode()->getCode());
+    }
+
+    public function testUpdateMastodonAddsMessage() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getPostParameters')->willReturn([
+            'mastodonEnable' => 'on',
+            'mastodonOnByDefault' => 'on',
+            'mastodonUsername' => ' user ',
+            'mastodonAccessToken' => ' token ',
+            'mastodonVisibility' => 'private',
+        ]);
+        $this->userApiMock->expects(self::once())->method('updateMastodonPostEnabled')->with(42, true);
+        $this->userApiMock->expects(self::once())->method('updateMastodonUsername')->with(42, 'user');
+        $this->userApiMock->expects(self::once())->method('updateMastodonAccessToken')->with(42, 'token');
+        $this->userApiMock->expects(self::once())->method('updateMastodonPostAutomatic')->with(42, true);
+        $this->userApiMock->expects(self::once())->method('updateMastodonPostVisibility')->with(42, 'private');
+        $this->flashMessageServiceMock
+            ->expects(self::once())
+            ->method('add')
+            ->with(FlashMessage::MASTODON_CREDENTIALS_UPDATED);
+        $this->applicationUrlServiceMock->method('createApplicationUrl')->willReturn('/movary/settings/mastodon');
+
+        $response = $this->subject->updateMastodon($request);
+
+        self::assertSame(303, $response->getStatusCode()->getCode());
+    }
+
+    public function testRenderDashboardPageConsumesResetMessageOnce() : void
+    {
+        $this->dashboardFactoryMock
+            ->expects(self::exactly(2))
+            ->method('createDashboardRowsForUser')
+            ->willReturn(DashboardRowList::create());
+
+        $this->assertIntegrationMessageConsumedOnce(
+            FlashMessage::DASHBOARD_ROWS_RESET,
+            'dashboardRowsSuccessfullyReset',
+            'page/settings-account-dashboard.html.twig',
+            ['dashboardRowsSuccessfullyReset'],
+            fn() => $this->subject->renderDashboardAccountPage(),
+        );
+    }
+
+    public function testRenderMastodonPageConsumesCredentialsMessageOnce() : void
+    {
+        $this->assertIntegrationMessageConsumedOnce(
+            FlashMessage::MASTODON_CREDENTIALS_UPDATED,
+            'mastodonCredentialsUpdated',
+            'page/settings-integration-mastodon.html.twig',
+            ['mastodonCredentialsUpdated'],
+            fn() => $this->subject->renderMastodonPage(),
+        );
+    }
+
+    #[DataProvider('provideTwoFactorMessages')]
+    public function testRenderSecurityPageConsumesTwoFactorMessageOnce(FlashMessage $message, string $variable) : void
+    {
+        $this->assertIntegrationMessageConsumedOnce(
+            $message,
+            $variable,
+            'page/settings-account-security.html.twig',
+            ['twoFactorAuthenticationEnabled', 'twoFactorAuthenticationDisabled'],
+            fn() => $this->subject->renderSecurityAccountPage(),
+        );
+    }
+
+    /** @return iterable<string, array{FlashMessage, string}> */
+    public static function provideTwoFactorMessages() : iterable
+    {
+        yield 'enabled' => [FlashMessage::TWO_FACTOR_AUTHENTICATION_ENABLED, 'twoFactorAuthenticationEnabled'];
+        yield 'disabled' => [FlashMessage::TWO_FACTOR_AUTHENTICATION_DISABLED, 'twoFactorAuthenticationDisabled'];
     }
 
     /** @return iterable<string, array{FlashMessage, string}> */

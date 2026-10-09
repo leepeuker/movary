@@ -33,7 +33,6 @@ use Movary\Service\Radarr\RadarrFeedUrlGenerator;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Header;
@@ -56,7 +55,6 @@ class SettingsController
         private readonly Movie\MovieApi $movieApi,
         private readonly GithubApi $githubApi,
         private readonly PlexApi $plexApi,
-        private readonly SessionWrapper $sessionWrapper,
         private readonly FlashMessageService $flashMessageService,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
@@ -162,14 +160,13 @@ class SettingsController
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($user);
 
-        $dashboardRowsSuccessfullyReset = $this->sessionWrapper->find('dashboardRowsSuccessfullyReset');
-        $this->sessionWrapper->unset('dashboardRowsSuccessfullyReset');
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-dashboard.html.twig', [
                 'dashboardRows' => $dashboardRows,
-                'dashboardRowsSuccessfullyReset' => $dashboardRowsSuccessfullyReset,
+                'dashboardRowsSuccessfullyReset' => $this->flashMessageService->consume(
+                    FlashMessage::DASHBOARD_ROWS_RESET,
+                ),
             ]),
         );
     }
@@ -362,9 +359,6 @@ class SettingsController
 
     public function renderMastodonPage() : Response
     {
-        $mastodonCredentialsUpdated = $this->sessionWrapper->find('mastodonCredentialsUpdated');
-        $this->sessionWrapper->unset('mastodonCredentialsUpdated');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         return Response::create(
@@ -372,7 +366,9 @@ class SettingsController
             $this->twig->render(
                 'page/settings-integration-mastodon.html.twig',
                 [
-                    'mastodonCredentialsUpdated' => $mastodonCredentialsUpdated,
+                    'mastodonCredentialsUpdated' => $this->flashMessageService->consume(
+                        FlashMessage::MASTODON_CREDENTIALS_UPDATED,
+                    ),
                     'mastodonEnable' => $user->isMastodonEnabled(),
                     'mastodonOnByDefault' => $user->isMastodonPostAutomatic(),
                     'mastodonUsername' => $user->getMastodonUsername(),
@@ -459,21 +455,17 @@ class SettingsController
 
         $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
 
-        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
-        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
-
-        $this->sessionWrapper->unset(
-            'twoFactorAuthenticationDisabled',
-            'twoFactorAuthenticationEnabled',
-        );
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-security.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'totpEnabled' => $totpEnabled,
-                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
-                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
+                'twoFactorAuthenticationEnabled' => $this->flashMessageService->consume(
+                    FlashMessage::TWO_FACTOR_AUTHENTICATION_ENABLED,
+                ),
+                'twoFactorAuthenticationDisabled' => $this->flashMessageService->consume(
+                    FlashMessage::TWO_FACTOR_AUTHENTICATION_DISABLED,
+                ),
             ]),
         );
     }
@@ -661,7 +653,7 @@ class SettingsController
         $this->userApi->updateExtendedDashboardRows($userId, null);
         $this->userApi->updateOrderDashboardRows($userId, null);
 
-        $this->sessionWrapper->set('dashboardRowsSuccessfullyReset', true);
+        $this->flashMessageService->add(FlashMessage::DASHBOARD_ROWS_RESET);
 
         return Response::createOk();
     }
@@ -825,7 +817,7 @@ class SettingsController
         $this->userApi->updateMastodonPostAutomatic($userId, $mastodonOnByDefault);
         $this->userApi->updateMastodonPostVisibility($userId, $mastodonPostVisibility);
 
-        $this->sessionWrapper->set('mastodonCredentialsUpdated', true);
+        $this->flashMessageService->add(FlashMessage::MASTODON_CREDENTIALS_UPDATED);
 
         $redirectUrl = $this->applicationUrlService->createApplicationUrl(
             RelativeUrl::create('/settings/integrations/mastodon')
