@@ -9,6 +9,8 @@ use Movary\Domain\User\Exception\MissingTotpCode;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Cookie;
@@ -44,6 +46,38 @@ class Authentication
         }
 
         return DateTime::createFromString(date('Y-m-d H:i:s', $timestamp));
+    }
+
+    public function authenticateApiToken(Request $request) : ?AuthenticatedUser
+    {
+        $token = $request->getHeader('X-Movary-Token');
+        if ($token === null || $token === '') {
+            return null;
+        }
+
+        $userId = $this->userApi->findUserIdByApiToken($token);
+        if ($userId === null) {
+            return null;
+        }
+
+        return AuthenticatedUser::create($userId, CredentialType::API_TOKEN);
+    }
+
+    public function authenticateWebSession() : ?AuthenticatedUser
+    {
+        $token = $this->getAuthenticationCookie();
+        if ($token === null) {
+            return null;
+        }
+
+        $userId = $this->findUserIdByValidAuthToken($token);
+        if ($userId === null) {
+            $this->clearAuthenticationCookie();
+
+            return null;
+        }
+
+        return AuthenticatedUser::create($userId, CredentialType::WEB_SESSION);
     }
 
     public function deleteToken(string $token) : void

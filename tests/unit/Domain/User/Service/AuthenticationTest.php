@@ -8,6 +8,7 @@ use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Service\CookieSecurity;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Cookie;
@@ -58,6 +59,102 @@ class AuthenticationTest extends TestCase
     protected function tearDown() : void
     {
         unset($_COOKIE['id']);
+    }
+
+    public function testAuthenticateApiTokenReturnsAuthenticatedUser() : void
+    {
+        $_COOKIE['id'] = 'web-session-token';
+        $request = $this->createMock(Request::class);
+        $request
+            ->expects(self::once())
+            ->method('getHeader')
+            ->with('X-Movary-Token')
+            ->willReturn(self::TOKEN);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findUserIdByApiToken')
+            ->with(self::TOKEN)
+            ->willReturn(12);
+        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
+
+        $result = $this->subject->authenticateApiToken($request);
+
+        self::assertSame(12, $result?->getUserId());
+        self::assertSame(CredentialType::API_TOKEN, $result?->getCredentialType());
+    }
+
+    public function testAuthenticateApiTokenRejectsSessionToken() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request
+            ->expects(self::once())
+            ->method('getHeader')
+            ->with('X-Movary-Token')
+            ->willReturn(self::TOKEN);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findUserIdByApiToken')
+            ->with(self::TOKEN)
+            ->willReturn(null);
+        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
+
+        self::assertNull($this->subject->authenticateApiToken($request));
+    }
+
+    public function testAuthenticateApiTokenRejectsMissingHeader() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(null);
+        $this->userApiMock->expects(self::never())->method('findUserIdByApiToken');
+
+        self::assertNull($this->subject->authenticateApiToken($request));
+    }
+
+    public function testAuthenticateWebSessionReturnsAuthenticatedUser() : void
+    {
+        $_COOKIE['id'] = self::TOKEN;
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('findAuthTokenData')
+            ->with(hash('sha256', self::TOKEN))
+            ->willReturn([
+                'userId' => 12,
+                'expirationDate' => DateTime::createFromString('+1 hour'),
+            ]);
+        $this->userApiMock->expects(self::never())->method('findUserIdByApiToken');
+
+        $result = $this->subject->authenticateWebSession();
+
+        self::assertSame(12, $result?->getUserId());
+        self::assertSame(CredentialType::WEB_SESSION, $result?->getCredentialType());
+    }
+
+    public function testAuthenticateWebSessionRejectsExpiredTokenAndClearsCookie() : void
+    {
+        $_COOKIE['id'] = self::TOKEN;
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('findAuthTokenData')
+            ->with(hash('sha256', self::TOKEN))
+            ->willReturn([
+                'userId' => 12,
+                'expirationDate' => DateTime::createFromString('-1 hour'),
+            ]);
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('deleteAuthToken')
+            ->with(hash('sha256', self::TOKEN));
+        $this->cookieSecurityMock->expects(self::once())->method('isSecure')->willReturn(true);
+
+        self::assertNull($this->subject->authenticateWebSession());
+        self::assertArrayNotHasKey('id', $_COOKIE);
+    }
+
+    public function testAuthenticateWebSessionRejectsMissingCookie() : void
+    {
+        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
+
+        self::assertNull($this->subject->authenticateWebSession());
     }
 
     public function testGetCurrentUserIdUsesValidatedCookieToken() : void
