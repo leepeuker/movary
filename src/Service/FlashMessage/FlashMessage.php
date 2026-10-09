@@ -6,6 +6,8 @@ enum FlashMessage : string
 {
     case CREATE_USER_EMAIL_NOT_UNIQUE = 'create-user-email-not-unique';
 
+    case CREATE_USER_GENERIC_ERROR = 'create-user-generic-error';
+
     case CREATE_USER_MISSING_FORM_DATA = 'create-user-missing-form-data';
 
     case CREATE_USER_PASSWORDS_NOT_EQUAL = 'create-user-passwords-not-equal';
@@ -56,6 +58,7 @@ enum FlashMessage : string
     {
         return match ($this) {
             self::CREATE_USER_EMAIL_NOT_UNIQUE,
+            self::CREATE_USER_GENERIC_ERROR,
             self::CREATE_USER_MISSING_FORM_DATA,
             self::CREATE_USER_PASSWORDS_NOT_EQUAL,
             self::CREATE_USER_PASSWORD_TOO_SHORT,

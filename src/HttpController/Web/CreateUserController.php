@@ -9,7 +9,8 @@ use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
-use Movary\Util\SessionWrapper;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -26,7 +27,7 @@ class CreateUserController
         private readonly Environment $twig,
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
-        private readonly SessionWrapper $sessionWrapper,
+        private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $applicationUrlService,
     ) {
     }
@@ -44,7 +45,7 @@ class CreateUserController
         $repeatPassword = empty($postParameters['password']) === true ? null : (string)$postParameters['repeatPassword'];
 
         if ($email === null || $name === null || $password === null || $repeatPassword === null) {
-            $this->sessionWrapper->set('missingFormData', true);
+            $this->flashMessageService->add(FlashMessage::CREATE_USER_MISSING_FORM_DATA);
 
             $redirectUrl = $this->applicationUrlService->createApplicationUrl(RelativeUrl::create('/create-user'));
 
@@ -56,7 +57,7 @@ class CreateUserController
         }
 
         if ($password !== $repeatPassword) {
-            $this->sessionWrapper->set('errorPasswordNotEqual', true);
+            $this->flashMessageService->add(FlashMessage::CREATE_USER_PASSWORDS_NOT_EQUAL);
 
             $redirectUrl = $this->applicationUrlService->createApplicationUrl(RelativeUrl::create('/create-user'));
 
@@ -67,20 +68,25 @@ class CreateUserController
             );
         }
 
+        $flashMessage = null;
         try {
             $this->userApi->createUser($email, $password, $name, $hasUsers === false);
 
             $this->authenticationService->login($email, $password, false, self::MOVARY_WEB_CLIENT, $userAgent);
         } catch (PasswordTooShort) {
-            $this->sessionWrapper->set('errorPasswordTooShort', true);
+            $flashMessage = FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT;
         } catch (UsernameInvalidFormat) {
-            $this->sessionWrapper->set('errorUsernameInvalidFormat', true);
+            $flashMessage = FlashMessage::CREATE_USER_USERNAME_INVALID;
         } catch (UsernameNotUnique) {
-            $this->sessionWrapper->set('errorUsernameUnique', true);
+            $flashMessage = FlashMessage::CREATE_USER_USERNAME_NOT_UNIQUE;
         } catch (EmailNotUnique) {
-            $this->sessionWrapper->set('errorEmailUnique', true);
+            $flashMessage = FlashMessage::CREATE_USER_EMAIL_NOT_UNIQUE;
         } catch (Throwable) {
-            $this->sessionWrapper->set('errorGeneric', true);
+            $flashMessage = FlashMessage::CREATE_USER_GENERIC_ERROR;
+        }
+
+        if ($flashMessage !== null) {
+            $this->flashMessageService->add($flashMessage);
         }
 
         return Response::create(
@@ -94,35 +100,31 @@ class CreateUserController
     {
         $hasUsers = $this->userApi->hasUsers();
 
-        $errorPasswordTooShort = $this->sessionWrapper->find('errorPasswordTooShort');
-        $errorPasswordNotEqual = $this->sessionWrapper->find('errorPasswordNotEqual');
-        $errorUsernameInvalidFormat = $this->sessionWrapper->find('errorUsernameInvalidFormat');
-        $errorUsernameUnique = $this->sessionWrapper->find('errorUsernameUnique');
-        $errorEmailUnique = $this->sessionWrapper->find('errorEmailUnique');
-        $missingFormData = $this->sessionWrapper->find('missingFormData');
-        $errorGeneric = $this->sessionWrapper->find('errorGeneric');
-
-        $this->sessionWrapper->unset(
-            'errorPasswordTooShort',
-            'errorPasswordNotEqual',
-            'errorUsernameInvalidFormat',
-            'errorUsernameUnique',
-            'errorEmailUnique',
-            'errorGeneric',
-            'missingFormData',
-        );
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/create-user.html.twig', [
                 'subtitle' => $hasUsers === false ? 'Create initial admin user' : 'Create new user',
-                'errorPasswordTooShort' => $errorPasswordTooShort,
-                'errorPasswordNotEqual' => $errorPasswordNotEqual,
-                'errorUsernameInvalidFormat' => $errorUsernameInvalidFormat,
-                'errorUsernameUnique' => $errorUsernameUnique,
-                'errorEmailUnique' => $errorEmailUnique,
-                'errorGeneric' => $errorGeneric,
-                'missingFormData' => $missingFormData
+                'errorPasswordTooShort' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT,
+                ),
+                'errorPasswordNotEqual' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_PASSWORDS_NOT_EQUAL,
+                ),
+                'errorUsernameInvalidFormat' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_USERNAME_INVALID,
+                ),
+                'errorUsernameUnique' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_USERNAME_NOT_UNIQUE,
+                ),
+                'errorEmailUnique' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_EMAIL_NOT_UNIQUE,
+                ),
+                'errorGeneric' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_GENERIC_ERROR,
+                ),
+                'missingFormData' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_MISSING_FORM_DATA,
+                ),
             ]),
         );
     }
