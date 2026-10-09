@@ -7,6 +7,7 @@ audit_directory=$(mktemp -d)
 chmod 0777 "$audit_directory"
 network_name="movary-migration-test-$$"
 mysql_container="movary-migration-test-mysql-$$"
+application_secret='0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
 
 cleanup() {
     docker rm --force "$mysql_container" >/dev/null 2>&1 || true
@@ -48,6 +49,7 @@ run_sqlite_app_command() {
     shift
 
     docker run --rm --entrypoint php \
+        --env "APPLICATION_SECRET=$application_secret" \
         --env DATABASE_MODE=sqlite \
         --env "DATABASE_SQLITE=../audit/$database_file" \
         --volume "$audit_directory:/audit" \
@@ -60,6 +62,7 @@ run_mysql_app_command() {
     shift
 
     docker run --rm --entrypoint php \
+        --env "APPLICATION_SECRET=$application_secret" \
         --network "$network_name" \
         --env DATABASE_MODE=mysql \
         --env DATABASE_MYSQL_HOST="$mysql_container" \
