@@ -4,8 +4,9 @@ namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\ImportService;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -21,7 +22,7 @@ class ImportController
         private readonly Authentication $authenticationService,
         private readonly ImportService $importService,
         private readonly LoggerInterface $logger,
-        private readonly SessionWrapper $sessionWrapper,
+        private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $urlService,
     ) {
     }
@@ -41,7 +42,11 @@ class ImportController
             };
         } catch (Throwable $t) {
             $this->logger->error('Could not import: ' . $exportType, ['exception' => $t]);
-            $this->sessionWrapper->set('importHistoryError', $exportType);
+
+            $failureMessage = $this->getFailureMessage($exportType);
+            if ($failureMessage !== null) {
+                $this->flashMessageService->add($failureMessage);
+            }
         }
 
         $redirectUrl = $this->urlService->createApplicationUrl(RelativeUrl::create('/settings/account/data'));
@@ -61,7 +66,7 @@ class ImportController
 
         $this->importService->importHistory($userId, $fileParameter['history']['tmp_name']);
 
-        $this->sessionWrapper->set('importHistorySuccessful', true);
+        $this->flashMessageService->add(FlashMessage::IMPORT_HISTORY_SUCCESSFUL);
     }
 
     private function importRatings(int $userId, array $fileParameter) : void
@@ -72,7 +77,7 @@ class ImportController
 
         $this->importService->importRatings($userId, $fileParameter['ratings']['tmp_name']);
 
-        $this->sessionWrapper->set('importRatingsSuccessful', true);
+        $this->flashMessageService->add(FlashMessage::IMPORT_RATINGS_SUCCESSFUL);
     }
 
     private function importWatchlist(int $userId, array $fileParameter) : void
@@ -83,6 +88,16 @@ class ImportController
 
         $this->importService->importWatchlist($userId, $fileParameter['watchlist']['tmp_name']);
 
-        $this->sessionWrapper->set('importWatchlistSuccessful', true);
+        $this->flashMessageService->add(FlashMessage::IMPORT_WATCHLIST_SUCCESSFUL);
+    }
+
+    private function getFailureMessage(string $exportType) : ?FlashMessage
+    {
+        return match ($exportType) {
+            'history' => FlashMessage::IMPORT_HISTORY_FAILED,
+            'ratings' => FlashMessage::IMPORT_RATINGS_FAILED,
+            'watchlist' => FlashMessage::IMPORT_WATCHLIST_FAILED,
+            default => null,
+        };
     }
 }

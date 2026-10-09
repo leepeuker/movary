@@ -25,6 +25,8 @@ use Movary\Service\Email\EmailSupport;
 use Movary\Service\Email\InvalidSmtpConfigException;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\Service\Email\TestEmailRenderer;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Radarr\RadarrFeedUrlGenerator;
@@ -55,6 +57,7 @@ class SettingsController
         private readonly GithubApi $githubApi,
         private readonly PlexApi $plexApi,
         private readonly SessionWrapper $sessionWrapper,
+        private readonly FlashMessageService $flashMessageService,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
         private readonly JellyfinApi $jellyfinApi,
@@ -175,17 +178,12 @@ class SettingsController
     {
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
-        $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
-        $importWatchlistSuccessful = $this->sessionWrapper->find('importWatchlistSuccessful');
-        $importHistoryError = $this->sessionWrapper->find('importHistoryError');
-
-        $this->sessionWrapper->unset(
-            'importHistorySuccessful',
-            'importRatingsSuccessful',
-            'importWatchlistSuccessful',
-            'importHistoryError',
-        );
+        $importHistoryError = match (true) {
+            $this->flashMessageService->consume(FlashMessage::IMPORT_HISTORY_FAILED) => 'history',
+            $this->flashMessageService->consume(FlashMessage::IMPORT_RATINGS_FAILED) => 'ratings',
+            $this->flashMessageService->consume(FlashMessage::IMPORT_WATCHLIST_FAILED) => 'watchlist',
+            default => null,
+        };
 
         $user = $this->userApi->fetchUser($userId);
 
@@ -193,9 +191,15 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-data.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'importHistorySuccessful' => $importHistorySuccessful,
-                'importRatingsSuccessful' => $importRatingsSuccessful,
-                'importWatchlistSuccessful' => $importWatchlistSuccessful,
+                'importHistorySuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::IMPORT_HISTORY_SUCCESSFUL,
+                ),
+                'importRatingsSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::IMPORT_RATINGS_SUCCESSFUL,
+                ),
+                'importWatchlistSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::IMPORT_WATCHLIST_SUCCESSFUL,
+                ),
                 'importHistoryError' => $importHistoryError,
             ]),
         );
