@@ -68,7 +68,7 @@ function createLoginRateLimitMessage(retryAfter) {
 }
 
 function loginRequest() {
-    return fetch(APPLICATION_URL + '/api/authentication/token', {
+    return fetchWithCsrf(APPLICATION_URL + '/api/authentication/token', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json',

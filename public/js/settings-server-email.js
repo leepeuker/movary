@@ -75,7 +75,7 @@ document.getElementById('emailSettingsUpdateButton').addEventListener('click', a
 });
 
 function updateEmail() {
-    return fetch(APPLICATION_URL + '/settings/server/email', {
+    return fetchWithCsrf(APPLICATION_URL + '/settings/server/email', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify(getEditableSmtpSettings())
@@ -161,7 +161,7 @@ document.getElementById('sendTestEmailButton').addEventListener('click', async (
 });
 
 function testEmail(recipient) {
-    return fetch(APPLICATION_URL + '/settings/server/email-test', {
+    return fetchWithCsrf(APPLICATION_URL + '/settings/server/email-test', {
         method: 'POST', headers: {
             'Content-Type': 'application/json'
         }, body: JSON.stringify({

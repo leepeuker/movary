@@ -35,6 +35,7 @@
                 </div>
 
                 <form action="{{ applicationUrl }}/jobs/schedule/letterboxd-diary-sync" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                     <h5 style="margin-bottom: 0.5rem">Import History</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the diary.csv file</p>
                     <div class="input-group mb-3">
@@ -63,6 +64,7 @@
                 <br>
 
                 <form action="{{ applicationUrl }}/jobs/schedule/letterboxd-ratings-sync" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                     <h5 style="margin-bottom: 0.5rem">Import Ratings</h5>
                     <p class="text-muted" style="margin-bottom: 0.5rem">Upload the ratings.csv file</p>
                     <div class="input-group mb-3">

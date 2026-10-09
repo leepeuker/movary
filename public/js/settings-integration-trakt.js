@@ -11,7 +11,7 @@ async function verifyTraktCredentials() {
     document.getElementById('verifyButton').disabled = true;
     alertPlaceholder.innerHTML = ''
 
-    const response = await fetch(APPLICATION_URL + '/settings/trakt/verify-credentials', {
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/trakt/verify-credentials', {
         method: 'post',
         headers: {
             'Content-type': 'application/json',
@@ -75,7 +75,7 @@ async function traktImportRatings() {
 }
 
 function importTraktRatings() {
-    return fetch(APPLICATION_URL + '/jobs/schedule/trakt-ratings-sync', {
+    return fetchWithCsrf(APPLICATION_URL + '/jobs/schedule/trakt-ratings-sync', {
         method: 'POST',
     })
 }
@@ -110,7 +110,7 @@ async function traktImportHistory() {
 }
 
 function importTraktHistory() {
-    return fetch(APPLICATION_URL + '/jobs/schedule/trakt-history-sync', {
+    return fetchWithCsrf(APPLICATION_URL + '/jobs/schedule/trakt-history-sync', {
         method: 'POST',
     })
 }

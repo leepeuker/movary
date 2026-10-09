@@ -44,7 +44,7 @@ async function deleteJellyfinWebhook() {
 }
 
 async function regenerateJellyfinWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/jellyfin/webhook', {'method': 'put'})
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/jellyfin/webhook', {'method': 'put'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -55,7 +55,7 @@ async function regenerateJellyfinWebhookRequest() {
 }
 
 async function deleteJellyfinWebhookRequest() {
-    const response = await fetch(APPLICATION_URL + '/settings/jellyfin/webhook', {'method': 'delete'})
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/jellyfin/webhook', {'method': 'delete'})
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -79,7 +79,7 @@ function setJellyfinWebhookUrl(webhookUrl) {
 async function updateScrobbleOptions() {
     removeAlert('alertWebhookOptionsDiv')
 
-    await fetch(APPLICATION_URL + '/settings/jellyfin', {
+    await fetchWithCsrf(APPLICATION_URL + '/settings/jellyfin', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -107,7 +107,7 @@ async function saveJellyfinServerUrl() {
 
     const jellyfinServerUrl = document.getElementById('jellyfinServerUrlInput').value;
 
-    await fetch(APPLICATION_URL + '/settings/jellyfin/server-url-save', {
+    await fetchWithCsrf(APPLICATION_URL + '/settings/jellyfin/server-url-save', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ async function verifyJellyfinServerUrl() {
     document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.remove('d-none')
     removeAlert('alertJellyfinServerUrlDiv');
 
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/settings/jellyfin/server-url-verify', {
             method: 'POST',
             headers: {
@@ -193,7 +193,7 @@ async function authenticateJellyfinAccount() {
     document.getElementById('jellyfinAuthenticationModalLoadingSpinner').classList.remove('d-none')
     removeAlert('alertJellyfinAuthenticationModalDiv')
 
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/settings/jellyfin/authenticate', {
             method: 'POST',
             headers: {
@@ -229,7 +229,7 @@ async function authenticateJellyfinAccount() {
 }
 
 async function removeJellyfinAuthentication() {
-    await fetch(APPLICATION_URL + '/settings/jellyfin/remove-authentication', {
+    await fetchWithCsrf(APPLICATION_URL + '/settings/jellyfin/remove-authentication', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ async function removeJellyfinAuthentication() {
 async function updateSyncOptions() {
     removeAlert('alertJellyfinSyncDiv')
 
-    await fetch(APPLICATION_URL + '/settings/jellyfin/sync', {
+    await fetchWithCsrf(APPLICATION_URL + '/settings/jellyfin/sync', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -285,7 +285,7 @@ async function exportJellyfin() {
         return
     }
 
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/jobs/schedule/jellyfin-export-history',
         {'method': 'POST'}
     ).catch(function (error) {
@@ -320,7 +320,7 @@ async function importJellyfin() {
         return
     }
 
-    const response = await fetch(
+    const response = await fetchWithCsrf(
         APPLICATION_URL + '/jobs/schedule/jellyfin-import-history',
         {'method': 'POST'}
     ).catch(function (error) {

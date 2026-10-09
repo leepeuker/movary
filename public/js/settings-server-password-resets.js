@@ -76,7 +76,7 @@ async function revokeAllPasswordResets() {
 
     revokeAllPasswordResetsButton.disabled = true
 
-    const response = await fetch(APPLICATION_URL + '/settings/password-resets', {
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/password-resets', {
         method: 'DELETE'
     })
 
@@ -108,7 +108,7 @@ async function revokePasswordReset(button) {
 
     let response
     try {
-        response = await fetch(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
+        response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
             method: 'DELETE'
         })
     } catch (error) {

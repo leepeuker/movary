@@ -157,7 +157,7 @@ document.getElementById('createUserButton').addEventListener('click', async () =
         return;
     }
 
-    const response = await fetch(APPLICATION_URL + '/settings/users', {
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/users', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -192,7 +192,7 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
         password = null
     }
 
-    const response = await fetch(APPLICATION_URL + '/settings/users/' + document.getElementById('userModalIdInput').value, {
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + document.getElementById('userModalIdInput').value, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -228,7 +228,7 @@ document.getElementById('deleteUserButton').addEventListener('click', async () =
 
     let response
     try {
-        response = await fetch(APPLICATION_URL + '/settings/users/' + document.getElementById('userModalIdInput').value, {
+        response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + document.getElementById('userModalIdInput').value, {
             method: 'DELETE'
         });
     } catch (error) {
@@ -313,7 +313,7 @@ async function sendPasswordReset(userId, userName) {
 
     let response
     try {
-        response = await fetch(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
+        response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
             method: 'POST'
         })
     } catch (error) {

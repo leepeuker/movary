@@ -144,7 +144,7 @@ document.getElementById('createLocationButton').addEventListener('click', async 
 
     let categoryName = document.getElementById('locationModalNameInput').value;
     let isCinema = document.getElementById('locationModalCinemaInput').checked;
-    const response = await fetch(APPLICATION_URL + '/settings/locations', {
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/locations', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -206,7 +206,7 @@ document.getElementById('deleteLocationButton').addEventListener('click', async 
 
     let response
     try {
-        response = await fetch(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
+        response = await fetchWithCsrf(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
             method: 'DELETE'
         });
     } catch (error) {
@@ -234,7 +234,7 @@ document.getElementById('updateLocationButton').addEventListener('click', async 
 
     let locationName = document.getElementById('locationModalNameInput').value;
     let isCinema = document.getElementById('locationModalCinemaInput').checked;
-    const response = await fetch(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/locations/' + document.getElementById('locationModalIdInput').value, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -262,7 +262,7 @@ async function toggleLocationFeature() {
 }
 
 async function sendRequestToggleLocationsFeature(isLocationsEnabled) {
-    const response = await fetch(APPLICATION_URL + '/settings/locations/toggle-feature', {
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/locations/toggle-feature', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

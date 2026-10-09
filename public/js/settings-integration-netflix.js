@@ -21,7 +21,7 @@ async function importNetflixHistory() {
     disable(document.getElementById('importNetflixButton'));
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
-    await fetch(APPLICATION_URL + '/settings/netflix/import', {
+    await fetchWithCsrf(APPLICATION_URL + '/settings/netflix/import', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
@@ -52,7 +52,7 @@ async function uploadNetflixHistory() {
     setDefaultTable()
 
     await createSpinner(document.getElementById('netflixTableBody'), 'netflix');
-    await fetch(APPLICATION_URL + '/settings/netflix', {
+    await fetchWithCsrf(APPLICATION_URL + '/settings/netflix', {
         method: 'POST', body: requestFormData
     }).then(response => {
         document.getElementById('netflixTableBody').querySelector('div.spinner-border').parentElement.remove();

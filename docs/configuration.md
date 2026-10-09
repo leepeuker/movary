@@ -33,7 +33,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 
 Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Movary uses it as the root secret for purpose-specific cryptographic keys. Keep the value stable across restarts and identical across all Movary instances.
 
-When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication cookies as secure.
+When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication and CSRF cookies as secure.
 
 ### Database
 

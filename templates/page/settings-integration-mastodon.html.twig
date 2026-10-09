@@ -43,6 +43,7 @@
             </div>
 
             <form action="{{ applicationUrl }}/settings/integrations/mastodon" method="post" id="mastodonForm">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                 <div style="padding-bottom: 1rem;padding-top: 0.5rem">
                     <input
                             {% if mastodonEnable %}checked{% endif %}
