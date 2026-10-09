@@ -309,26 +309,22 @@ class SettingsController
     {
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $letterboxdDiarySyncSuccessful = $this->sessionWrapper->find('letterboxdDiarySyncSuccessful');
-        $letterboxdRatingsSyncSuccessful = $this->sessionWrapper->find('letterboxdRatingsSyncSuccessful');
-        $letterboxdRatingsImportFileInvalid = $this->sessionWrapper->find('letterboxdRatingsImportFileInvalid');
-        $letterboxdDiaryImportFileInvalid = $this->sessionWrapper->find('letterboxdDiaryImportFileInvalid');
-
-        $this->sessionWrapper->unset(
-            'letterboxdDiarySyncSuccessful',
-            'letterboxdRatingsSyncSuccessful',
-            'letterboxdRatingsImportFileInvalid',
-            'letterboxdDiaryImportFileInvalid',
-        );
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-letterboxd.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
-                'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
-                'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
-                'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+                'letterboxdDiarySyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_DIARY_SYNC_SCHEDULED,
+                ),
+                'letterboxdRatingsSyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_RATINGS_SYNC_SCHEDULED,
+                ),
+                'letterboxdRatingsImportFileInvalid' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_RATINGS_FILE_INVALID,
+                ),
+                'letterboxdDiaryImportFileInvalid' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_DIARY_FILE_INVALID,
+                ),
             ]),
         );
     }
@@ -636,12 +632,6 @@ class SettingsController
 
     public function renderTraktPage() : Response
     {
-        $traktCredentialsUpdated = $this->sessionWrapper->find('traktCredentialsUpdated');
-        $scheduledTraktHistoryImport = $this->sessionWrapper->find('scheduledTraktHistoryImport');
-        $scheduledTraktRatingsImport = $this->sessionWrapper->find('scheduledTraktRatingsImport');
-
-        $this->sessionWrapper->unset('traktCredentialsUpdated', 'scheduledTraktHistoryImport', 'scheduledTraktRatingsImport');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         return Response::create(
@@ -650,9 +640,15 @@ class SettingsController
                 'traktClientId' => $user->getTraktClientId(),
                 'traktUserName' => $user->getTraktUserName(),
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'traktCredentialsUpdated' => $traktCredentialsUpdated,
-                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
-                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
+                'traktCredentialsUpdated' => $this->flashMessageService->consume(
+                    FlashMessage::TRAKT_CREDENTIALS_UPDATED,
+                ),
+                'traktScheduleHistorySyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::TRAKT_HISTORY_IMPORT_SCHEDULED,
+                ),
+                'traktScheduleRatingsSyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED,
+                ),
             ]),
         );
     }
@@ -988,7 +984,7 @@ class SettingsController
         $this->userApi->updateTraktClientId($userId, $traktClientId);
         $this->userApi->updateTraktUserName($userId, $traktUserName);
 
-        $this->sessionWrapper->set('traktCredentialsUpdated', true);
+        $this->flashMessageService->add(FlashMessage::TRAKT_CREDENTIALS_UPDATED);
 
         $redirectUrl = $this->applicationUrlService->createApplicationUrl(
             RelativeUrl::create('/settings/integrations/trakt')

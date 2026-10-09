@@ -6,8 +6,11 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Web\SettingsController;
+use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
+use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\RelativeUrl;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,6 +24,8 @@ use Twig\Environment;
 #[AllowMockObjectsWithoutExpectations]
 class SettingsControllerTest extends TestCase
 {
+    private ApplicationUrlService|MockObject $applicationUrlServiceMock;
+
     private Authentication|MockObject $authenticationMock;
 
     private FlashMessageService|MockObject $flashMessageServiceMock;
@@ -37,11 +42,13 @@ class SettingsControllerTest extends TestCase
         $this->authenticationMock = $this->createMock(Authentication::class);
         $this->userApiMock = $this->createMock(UserApi::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
+        $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->subject = $this->createSubject([
             'twig' => $this->twigMock,
             'authenticationService' => $this->authenticationMock,
             'userApi' => $this->userApiMock,
             'flashMessageService' => $this->flashMessageServiceMock,
+            'applicationUrlService' => $this->applicationUrlServiceMock,
         ]);
 
         $user = $this->createMock(UserEntity::class);
@@ -131,6 +138,55 @@ class SettingsControllerTest extends TestCase
         $this->subject->renderDataAccountPage();
     }
 
+    #[DataProvider('provideLetterboxdMessages')]
+    public function testRenderLetterboxdPageConsumesMessageOnce(FlashMessage $message, string $variable) : void
+    {
+        $this->assertIntegrationMessageConsumedOnce(
+            $message,
+            $variable,
+            'page/settings-integration-letterboxd.html.twig',
+            self::getLetterboxdVariables(),
+            fn() => $this->subject->renderLetterboxdPage(),
+        );
+    }
+
+    #[DataProvider('provideTraktMessages')]
+    public function testRenderTraktPageConsumesMessageOnce(FlashMessage $message, string $variable) : void
+    {
+        $this->assertIntegrationMessageConsumedOnce(
+            $message,
+            $variable,
+            'page/settings-integration-trakt.html.twig',
+            self::getTraktVariables(),
+            fn() => $this->subject->renderTraktPage(),
+        );
+    }
+
+    public function testUpdateTraktAddsCredentialsUpdatedMessage() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getPostParameters')->willReturn([
+            'traktClientId' => 'client-id',
+            'traktUserName' => 'username',
+        ]);
+        $this->userApiMock->expects(self::once())->method('updateTraktClientId')->with(42, 'client-id');
+        $this->userApiMock->expects(self::once())->method('updateTraktUserName')->with(42, 'username');
+        $this->flashMessageServiceMock
+            ->expects(self::once())
+            ->method('add')
+            ->with(FlashMessage::TRAKT_CREDENTIALS_UPDATED);
+        $this->applicationUrlServiceMock
+            ->expects(self::once())
+            ->method('createApplicationUrl')
+            ->with(self::callback(static fn(RelativeUrl $url) => (string)$url === '/settings/integrations/trakt'))
+            ->willReturn('/movary/settings/integrations/trakt');
+
+        $response = $this->subject->updateTrakt($request);
+
+        self::assertSame(303, $response->getStatusCode()->getCode());
+        self::assertSame('Location: /movary/settings/integrations/trakt', (string)$response->getHeaders()[0]);
+    }
+
     /** @return iterable<string, array{FlashMessage, string}> */
     public static function provideSuccessMessages() : iterable
     {
@@ -145,6 +201,41 @@ class SettingsControllerTest extends TestCase
         yield 'history' => [FlashMessage::IMPORT_HISTORY_FAILED, 'history'];
         yield 'ratings' => [FlashMessage::IMPORT_RATINGS_FAILED, 'ratings'];
         yield 'watchlist' => [FlashMessage::IMPORT_WATCHLIST_FAILED, 'watchlist'];
+    }
+
+    /** @return iterable<string, array{FlashMessage, string}> */
+    public static function provideLetterboxdMessages() : iterable
+    {
+        yield 'diary scheduled' => [
+            FlashMessage::LETTERBOXD_DIARY_SYNC_SCHEDULED,
+            'letterboxdDiarySyncSuccessful',
+        ];
+        yield 'ratings scheduled' => [
+            FlashMessage::LETTERBOXD_RATINGS_SYNC_SCHEDULED,
+            'letterboxdRatingsSyncSuccessful',
+        ];
+        yield 'ratings invalid' => [
+            FlashMessage::LETTERBOXD_RATINGS_FILE_INVALID,
+            'letterboxdRatingsImportFileInvalid',
+        ];
+        yield 'diary invalid' => [
+            FlashMessage::LETTERBOXD_DIARY_FILE_INVALID,
+            'letterboxdDiaryImportFileInvalid',
+        ];
+    }
+
+    /** @return iterable<string, array{FlashMessage, string}> */
+    public static function provideTraktMessages() : iterable
+    {
+        yield 'credentials updated' => [FlashMessage::TRAKT_CREDENTIALS_UPDATED, 'traktCredentialsUpdated'];
+        yield 'history scheduled' => [
+            FlashMessage::TRAKT_HISTORY_IMPORT_SCHEDULED,
+            'traktScheduleHistorySyncSuccessful',
+        ];
+        yield 'ratings scheduled' => [
+            FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED,
+            'traktScheduleRatingsSyncSuccessful',
+        ];
     }
 
     /** @param array<string, object> $dependencies */
@@ -176,6 +267,60 @@ class SettingsControllerTest extends TestCase
         return $subject;
     }
 
+    /**
+     * @param array<string> $variables
+     * @param callable(): mixed $renderPage
+     */
+    private function assertIntegrationMessageConsumedOnce(
+        FlashMessage $message,
+        string $variable,
+        string $template,
+        array $variables,
+        callable $renderPage,
+    ) : void {
+        $messageConsumed = false;
+        $this->flashMessageServiceMock
+            ->method('consume')
+            ->willReturnCallback(static function (FlashMessage $candidate) use ($message, &$messageConsumed) : bool {
+                if ($candidate !== $message || $messageConsumed === true) {
+                    return false;
+                }
+
+                $messageConsumed = true;
+
+                return true;
+            });
+
+        $renderCount = 0;
+        $this->twigMock
+            ->expects(self::exactly(2))
+            ->method('render')
+            ->willReturnCallback(
+                static function (string $renderedTemplate, array $data) use (
+                    $template,
+                    $variable,
+                    $variables,
+                    &$renderCount,
+                ) : string {
+                    self::assertSame($template, $renderedTemplate);
+                    self::assertSame($renderCount === 0, $data[$variable]);
+
+                    foreach ($variables as $otherVariable) {
+                        if ($otherVariable !== $variable) {
+                            self::assertFalse($data[$otherVariable]);
+                        }
+                    }
+
+                    $renderCount++;
+
+                    return 'integration';
+                },
+            );
+
+        $renderPage();
+        $renderPage();
+    }
+
     /** @return array<string> */
     private static function getSuccessVariables() : array
     {
@@ -183,6 +328,27 @@ class SettingsControllerTest extends TestCase
             'importHistorySuccessful',
             'importRatingsSuccessful',
             'importWatchlistSuccessful',
+        ];
+    }
+
+    /** @return array<string> */
+    private static function getLetterboxdVariables() : array
+    {
+        return [
+            'letterboxdDiarySyncSuccessful',
+            'letterboxdRatingsSyncSuccessful',
+            'letterboxdRatingsImportFileInvalid',
+            'letterboxdDiaryImportFileInvalid',
+        ];
+    }
+
+    /** @return array<string> */
+    private static function getTraktVariables() : array
+    {
+        return [
+            'traktCredentialsUpdated',
+            'traktScheduleHistorySyncSuccessful',
+            'traktScheduleRatingsSyncSuccessful',
         ];
     }
 }
