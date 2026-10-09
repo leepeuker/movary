@@ -43,7 +43,6 @@ use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Service\ServerSettings;
 use Movary\Service\SlugifyService;
 use Movary\Util\File;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\DateTime;
@@ -313,7 +312,7 @@ class Factory
             $container->get(Authentication::class),
             $container->get(JobQueueApi::class),
             $container->get(LetterboxdCsvValidator::class),
-            $container->get(SessionWrapper::class),
+            $container->get(FlashMessageService::class),
             $container->get(ApplicationUrlService::class),
             self::createDirectoryStorageApp(),
         );

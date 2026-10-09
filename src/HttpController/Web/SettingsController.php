@@ -25,13 +25,14 @@ use Movary\Service\Email\EmailSupport;
 use Movary\Service\Email\InvalidSmtpConfigException;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\Service\Email\TestEmailRenderer;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\Letterboxd\LetterboxdExporter;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Service\Radarr\RadarrFeedUrlGenerator;
 use Movary\Service\ServerSettings;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Header;
@@ -54,7 +55,7 @@ class SettingsController
         private readonly Movie\MovieApi $movieApi,
         private readonly GithubApi $githubApi,
         private readonly PlexApi $plexApi,
-        private readonly SessionWrapper $sessionWrapper,
+        private readonly FlashMessageService $flashMessageService,
         private readonly LetterboxdExporter $letterboxdExporter,
         private readonly TraktApi $traktApi,
         private readonly JellyfinApi $jellyfinApi,
@@ -159,14 +160,13 @@ class SettingsController
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($user);
 
-        $dashboardRowsSuccessfullyReset = $this->sessionWrapper->find('dashboardRowsSuccessfullyReset');
-        $this->sessionWrapper->unset('dashboardRowsSuccessfullyReset');
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-dashboard.html.twig', [
                 'dashboardRows' => $dashboardRows,
-                'dashboardRowsSuccessfullyReset' => $dashboardRowsSuccessfullyReset,
+                'dashboardRowsSuccessfullyReset' => $this->flashMessageService->consume(
+                    FlashMessage::DASHBOARD_ROWS_RESET,
+                ),
             ]),
         );
     }
@@ -175,17 +175,12 @@ class SettingsController
     {
         $userId = $this->authenticationService->getCurrentUserId();
 
-        $importHistorySuccessful = $this->sessionWrapper->find('importHistorySuccessful');
-        $importRatingsSuccessful = $this->sessionWrapper->find('importRatingsSuccessful');
-        $importWatchlistSuccessful = $this->sessionWrapper->find('importWatchlistSuccessful');
-        $importHistoryError = $this->sessionWrapper->find('importHistoryError');
-
-        $this->sessionWrapper->unset(
-            'importHistorySuccessful',
-            'importRatingsSuccessful',
-            'importWatchlistSuccessful',
-            'importHistoryError',
-        );
+        $importHistoryError = match (true) {
+            $this->flashMessageService->consume(FlashMessage::IMPORT_HISTORY_FAILED) => 'history',
+            $this->flashMessageService->consume(FlashMessage::IMPORT_RATINGS_FAILED) => 'ratings',
+            $this->flashMessageService->consume(FlashMessage::IMPORT_WATCHLIST_FAILED) => 'watchlist',
+            default => null,
+        };
 
         $user = $this->userApi->fetchUser($userId);
 
@@ -193,9 +188,15 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-data.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'importHistorySuccessful' => $importHistorySuccessful,
-                'importRatingsSuccessful' => $importRatingsSuccessful,
-                'importWatchlistSuccessful' => $importWatchlistSuccessful,
+                'importHistorySuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::IMPORT_HISTORY_SUCCESSFUL,
+                ),
+                'importRatingsSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::IMPORT_RATINGS_SUCCESSFUL,
+                ),
+                'importWatchlistSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::IMPORT_WATCHLIST_SUCCESSFUL,
+                ),
                 'importHistoryError' => $importHistoryError,
             ]),
         );
@@ -305,26 +306,22 @@ class SettingsController
     {
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
-        $letterboxdDiarySyncSuccessful = $this->sessionWrapper->find('letterboxdDiarySyncSuccessful');
-        $letterboxdRatingsSyncSuccessful = $this->sessionWrapper->find('letterboxdRatingsSyncSuccessful');
-        $letterboxdRatingsImportFileInvalid = $this->sessionWrapper->find('letterboxdRatingsImportFileInvalid');
-        $letterboxdDiaryImportFileInvalid = $this->sessionWrapper->find('letterboxdDiaryImportFileInvalid');
-
-        $this->sessionWrapper->unset(
-            'letterboxdDiarySyncSuccessful',
-            'letterboxdRatingsSyncSuccessful',
-            'letterboxdRatingsImportFileInvalid',
-            'letterboxdDiaryImportFileInvalid',
-        );
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-integration-letterboxd.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'letterboxdDiarySyncSuccessful' => $letterboxdDiarySyncSuccessful,
-                'letterboxdRatingsSyncSuccessful' => $letterboxdRatingsSyncSuccessful,
-                'letterboxdRatingsImportFileInvalid' => $letterboxdRatingsImportFileInvalid,
-                'letterboxdDiaryImportFileInvalid' => $letterboxdDiaryImportFileInvalid,
+                'letterboxdDiarySyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_DIARY_SYNC_SCHEDULED,
+                ),
+                'letterboxdRatingsSyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_RATINGS_SYNC_SCHEDULED,
+                ),
+                'letterboxdRatingsImportFileInvalid' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_RATINGS_FILE_INVALID,
+                ),
+                'letterboxdDiaryImportFileInvalid' => $this->flashMessageService->consume(
+                    FlashMessage::LETTERBOXD_DIARY_FILE_INVALID,
+                ),
             ]),
         );
     }
@@ -362,9 +359,6 @@ class SettingsController
 
     public function renderMastodonPage() : Response
     {
-        $mastodonCredentialsUpdated = $this->sessionWrapper->find('mastodonCredentialsUpdated');
-        $this->sessionWrapper->unset('mastodonCredentialsUpdated');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         return Response::create(
@@ -372,7 +366,9 @@ class SettingsController
             $this->twig->render(
                 'page/settings-integration-mastodon.html.twig',
                 [
-                    'mastodonCredentialsUpdated' => $mastodonCredentialsUpdated,
+                    'mastodonCredentialsUpdated' => $this->flashMessageService->consume(
+                        FlashMessage::MASTODON_CREDENTIALS_UPDATED,
+                    ),
                     'mastodonEnable' => $user->isMastodonEnabled(),
                     'mastodonOnByDefault' => $user->isMastodonPostAutomatic(),
                     'mastodonUsername' => $user->getMastodonUsername(),
@@ -459,21 +455,17 @@ class SettingsController
 
         $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
 
-        $twoFactorAuthenticationEnabled = $this->sessionWrapper->find('twoFactorAuthenticationEnabled');
-        $twoFactorAuthenticationDisabled = $this->sessionWrapper->find('twoFactorAuthenticationDisabled');
-
-        $this->sessionWrapper->unset(
-            'twoFactorAuthenticationDisabled',
-            'twoFactorAuthenticationEnabled',
-        );
-
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-security.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
                 'totpEnabled' => $totpEnabled,
-                'twoFactorAuthenticationEnabled' => $twoFactorAuthenticationEnabled,
-                'twoFactorAuthenticationDisabled' => $twoFactorAuthenticationDisabled
+                'twoFactorAuthenticationEnabled' => $this->flashMessageService->consume(
+                    FlashMessage::TWO_FACTOR_AUTHENTICATION_ENABLED,
+                ),
+                'twoFactorAuthenticationDisabled' => $this->flashMessageService->consume(
+                    FlashMessage::TWO_FACTOR_AUTHENTICATION_DISABLED,
+                ),
             ]),
         );
     }
@@ -632,12 +624,6 @@ class SettingsController
 
     public function renderTraktPage() : Response
     {
-        $traktCredentialsUpdated = $this->sessionWrapper->find('traktCredentialsUpdated');
-        $scheduledTraktHistoryImport = $this->sessionWrapper->find('scheduledTraktHistoryImport');
-        $scheduledTraktRatingsImport = $this->sessionWrapper->find('scheduledTraktRatingsImport');
-
-        $this->sessionWrapper->unset('traktCredentialsUpdated', 'scheduledTraktHistoryImport', 'scheduledTraktRatingsImport');
-
         $user = $this->userApi->fetchUser($this->authenticationService->getCurrentUserId());
 
         return Response::create(
@@ -646,9 +632,15 @@ class SettingsController
                 'traktClientId' => $user->getTraktClientId(),
                 'traktUserName' => $user->getTraktUserName(),
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
-                'traktCredentialsUpdated' => $traktCredentialsUpdated,
-                'traktScheduleHistorySyncSuccessful' => $scheduledTraktHistoryImport,
-                'traktScheduleRatingsSyncSuccessful' => $scheduledTraktRatingsImport,
+                'traktCredentialsUpdated' => $this->flashMessageService->consume(
+                    FlashMessage::TRAKT_CREDENTIALS_UPDATED,
+                ),
+                'traktScheduleHistorySyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::TRAKT_HISTORY_IMPORT_SCHEDULED,
+                ),
+                'traktScheduleRatingsSyncSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED,
+                ),
             ]),
         );
     }
@@ -661,7 +653,7 @@ class SettingsController
         $this->userApi->updateExtendedDashboardRows($userId, null);
         $this->userApi->updateOrderDashboardRows($userId, null);
 
-        $this->sessionWrapper->set('dashboardRowsSuccessfullyReset', true);
+        $this->flashMessageService->add(FlashMessage::DASHBOARD_ROWS_RESET);
 
         return Response::createOk();
     }
@@ -825,7 +817,7 @@ class SettingsController
         $this->userApi->updateMastodonPostAutomatic($userId, $mastodonOnByDefault);
         $this->userApi->updateMastodonPostVisibility($userId, $mastodonPostVisibility);
 
-        $this->sessionWrapper->set('mastodonCredentialsUpdated', true);
+        $this->flashMessageService->add(FlashMessage::MASTODON_CREDENTIALS_UPDATED);
 
         $redirectUrl = $this->applicationUrlService->createApplicationUrl(
             RelativeUrl::create('/settings/integrations/mastodon')
@@ -984,7 +976,7 @@ class SettingsController
         $this->userApi->updateTraktClientId($userId, $traktClientId);
         $this->userApi->updateTraktUserName($userId, $traktUserName);
 
-        $this->sessionWrapper->set('traktCredentialsUpdated', true);
+        $this->flashMessageService->add(FlashMessage::TRAKT_CREDENTIALS_UPDATED);
 
         $redirectUrl = $this->applicationUrlService->createApplicationUrl(
             RelativeUrl::create('/settings/integrations/trakt')

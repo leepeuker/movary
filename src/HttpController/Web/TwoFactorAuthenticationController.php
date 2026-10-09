@@ -5,8 +5,9 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Json;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -16,7 +17,7 @@ class TwoFactorAuthenticationController
         private readonly Authentication $authenticationService,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly TwoFactorAuthenticationFactory $twoFactorAuthenticationFactory,
-        private readonly SessionWrapper $sessionWrapper,
+        private readonly FlashMessageService $flashMessageService,
     ) {
     }
 
@@ -36,7 +37,7 @@ class TwoFactorAuthenticationController
     public function disableTOTP() : Response
     {
         $this->twoFactorAuthenticationApi->deleteTotp($this->authenticationService->getCurrentUserId());
-        $this->sessionWrapper->set('twoFactorAuthenticationDisabled', true);
+        $this->flashMessageService->add(FlashMessage::TWO_FACTOR_AUTHENTICATION_DISABLED);
 
         return Response::createOk();
     }
@@ -55,7 +56,7 @@ class TwoFactorAuthenticationController
         }
 
         $this->twoFactorAuthenticationApi->updateTotpUri($userId, $uri);
-        $this->sessionWrapper->set('twoFactorAuthenticationEnabled', true);
+        $this->flashMessageService->add(FlashMessage::TWO_FACTOR_AUTHENTICATION_ENABLED);
 
         return Response::createOk();
     }

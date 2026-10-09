@@ -58,6 +58,11 @@
                     Email is already used
                 </div>
             {% endif %}
+            {% if errorGeneric == true %}
+                <div class="alert alert-danger" role="alert">
+                    Could not create user
+                </div>
+            {% endif %}
             {% if missingFormData == true %}
                 <div class="alert alert-danger" role="alert">
                     Please fill out all fields

@@ -5,9 +5,10 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\User\Service\Authentication;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ApplicationUrlService;
+use Movary\Service\FlashMessage\FlashMessage;
+use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
-use Movary\Util\SessionWrapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\JobType;
@@ -20,7 +21,7 @@ class JobController
         private readonly Authentication $authenticationService,
         private readonly JobQueueApi $jobQueueApi,
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
-        private readonly SessionWrapper $sessionWrapper,
+        private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly string $appStorageDirectory,
     ) {
@@ -94,7 +95,7 @@ class JobController
         move_uploaded_file($fileParameters['diaryCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidDiaryCsv($targetFile) === false) {
-            $this->sessionWrapper->set('letterboxdDiaryImportFileInvalid', true);
+            $this->flashMessageService->add(FlashMessage::LETTERBOXD_DIARY_FILE_INVALID);
 
             return Response::createSeeOther(
                 $this->applicationUrlService->createApplicationUrl(
@@ -105,7 +106,7 @@ class JobController
 
         $this->jobQueueApi->addLetterboxdImportHistoryJob($userId, $targetFile);
 
-        $this->sessionWrapper->set('letterboxdDiarySyncSuccessful', true);
+        $this->flashMessageService->add(FlashMessage::LETTERBOXD_DIARY_SYNC_SCHEDULED);
 
         return Response::createSeeOther(
             $this->applicationUrlService->createApplicationUrl(
@@ -119,8 +120,6 @@ class JobController
         $fileParameters = $request->getFileParameters();
 
         if (empty($fileParameters['ratingsCsv']['tmp_name']) === true) {
-            $this->sessionWrapper->set('letterboxdRatingsImportFileMissing', true);
-
             return Response::createSeeOther(
                 $this->applicationUrlService->createApplicationUrl(
                     RelativeUrl::create('/settings/integrations/letterboxd'),
@@ -134,7 +133,7 @@ class JobController
         move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
 
         if ($this->letterboxdImportHistoryFileValidator->isValidRatingsCsv($targetFile) === false) {
-            $this->sessionWrapper->set('letterboxdRatingsImportFileInvalid', true);
+            $this->flashMessageService->add(FlashMessage::LETTERBOXD_RATINGS_FILE_INVALID);
 
             return Response::createSeeOther(
                 $this->applicationUrlService->createApplicationUrl(
@@ -145,7 +144,7 @@ class JobController
 
         $this->jobQueueApi->addLetterboxdImportRatingsJob($userId, $targetFile);
 
-        $this->sessionWrapper->set('letterboxdRatingsSyncSuccessful', true);
+        $this->flashMessageService->add(FlashMessage::LETTERBOXD_RATINGS_SYNC_SCHEDULED);
 
         return Response::createSeeOther(
             $this->applicationUrlService->createApplicationUrl(
@@ -167,7 +166,7 @@ class JobController
     {
         $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
 
-        $this->sessionWrapper->set('scheduledTraktHistoryImport', true);
+        $this->flashMessageService->add(FlashMessage::TRAKT_HISTORY_IMPORT_SCHEDULED);
 
         return Response::createNoContent();
     }
@@ -176,7 +175,7 @@ class JobController
     {
         $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
 
-        $this->sessionWrapper->set('scheduledTraktRatingsImport', true);
+        $this->flashMessageService->add(FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED);
 
         return Response::createNoContent();
     }
