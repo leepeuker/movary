@@ -92,6 +92,11 @@ class Factory
         );
     }
 
+    public static function createApplicationSecret(Config $config) : Service\ApplicationSecret
+    {
+        return new Service\ApplicationSecret($config->getAsString('APPLICATION_SECRET'));
+    }
+
     public static function createCreatePublicStorageLink(ContainerInterface $container) : CreatePublicStorageLink
     {
         return new CreatePublicStorageLink(

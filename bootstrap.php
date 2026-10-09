@@ -8,6 +8,7 @@ $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(
     [
         \Movary\ValueObject\Config::class => DI\factory([Factory::class, 'createConfig']),
+        \Movary\Service\ApplicationSecret::class => DI\factory([Factory::class, 'createApplicationSecret']),
         \Movary\Api\Trakt\TraktApi::class => DI\factory([Factory::class, 'createTraktApi']),
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),

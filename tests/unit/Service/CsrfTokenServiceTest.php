@@ -4,7 +4,6 @@ namespace Tests\Unit\Movary\Service;
 
 use Movary\Service\ApplicationSecret;
 use Movary\Service\CsrfTokenService;
-use Movary\ValueObject\Config;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -93,13 +92,6 @@ class CsrfTokenServiceTest extends TestCase
 
     private function createService(string $applicationSecret) : CsrfTokenService
     {
-        $config = $this->createMock(Config::class);
-        $config
-            ->expects(self::once())
-            ->method('getAsString')
-            ->with('APPLICATION_SECRET')
-            ->willReturn($applicationSecret);
-
-        return new CsrfTokenService(new ApplicationSecret($config));
+        return new CsrfTokenService(new ApplicationSecret($applicationSecret));
     }
 }

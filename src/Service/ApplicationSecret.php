@@ -3,15 +3,13 @@
 namespace Movary\Service;
 
 use InvalidArgumentException;
-use Movary\ValueObject\Config;
 
 class ApplicationSecret
 {
     private readonly string $secret;
 
-    public function __construct(Config $config)
+    public function __construct(string $encodedSecret)
     {
-        $encodedSecret = $config->getAsString('APPLICATION_SECRET');
         if (preg_match('/\A[0-9a-f]{64}\z/Di', $encodedSecret) !== 1) {
             throw new InvalidArgumentException(
                 'APPLICATION_SECRET must contain exactly 64 hexadecimal characters.',
