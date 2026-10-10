@@ -5,6 +5,8 @@ namespace Tests\Unit\Movary\HttpController\Api\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Api\Middleware\IsAuthorizedToWriteUserData;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -27,9 +29,9 @@ class IsAuthorizedToWriteUserDataTest extends TestCase
         $authentication = $this->createMock(Authentication::class);
         $authentication
             ->expects(self::once())
-            ->method('getUserIdByTokenFromHeader')
+            ->method('authenticateApiToken')
             ->with($request)
-            ->willReturn(12);
+            ->willReturn(AuthenticatedUser::create(12, CredentialType::API_TOKEN));
 
         self::assertNull((new IsAuthorizedToWriteUserData($userApi, $authentication))($request));
     }
@@ -48,7 +50,7 @@ class IsAuthorizedToWriteUserDataTest extends TestCase
         $authentication = $this->createMock(Authentication::class);
         $authentication
             ->expects(self::once())
-            ->method('getUserIdByTokenFromHeader')
+            ->method('authenticateApiToken')
             ->with($request)
             ->willReturn(null);
         $authentication->expects(self::never())->method('getUserIdByToken');

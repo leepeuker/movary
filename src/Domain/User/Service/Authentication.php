@@ -63,6 +63,16 @@ class Authentication
         return AuthenticatedUser::create($userId, CredentialType::API_TOKEN);
     }
 
+    public function requireApiToken(Request $request) : AuthenticatedUser
+    {
+        $authenticatedUser = $this->authenticateApiToken($request);
+        if ($authenticatedUser === null) {
+            throw new RuntimeException('Could not find a valid API token');
+        }
+
+        return $authenticatedUser;
+    }
+
     public function authenticateWebSession() : ?AuthenticatedUser
     {
         $token = $this->getAuthenticationCookie();

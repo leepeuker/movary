@@ -5,15 +5,15 @@ namespace Tests\Unit\Movary\HttpController\Api\Middleware;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
-use Movary\HttpController\Api\Middleware\IsAuthenticatedWithHeader;
+use Movary\HttpController\Api\Middleware\IsAuthenticated;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(\Movary\HttpController\Api\Middleware\IsAuthenticatedWithHeader::class)]
-class IsAuthenticatedWithHeaderTest extends TestCase
+#[CoversClass(IsAuthenticated::class)]
+class IsAuthenticatedTest extends TestCase
 {
-    public function testAcceptsExplicitHeaderToken() : void
+    public function testAcceptsPersonalApiToken() : void
     {
         $request = $this->createStub(Request::class);
         $authentication = $this->createMock(Authentication::class);
@@ -23,20 +23,16 @@ class IsAuthenticatedWithHeaderTest extends TestCase
             ->with($request)
             ->willReturn(AuthenticatedUser::create(12, CredentialType::API_TOKEN));
 
-        self::assertNull((new IsAuthenticatedWithHeader($authentication))($request));
+        self::assertNull((new IsAuthenticated($authentication))($request));
     }
 
-    public function testRejectsMissingOrInvalidHeaderToken() : void
+    public function testRejectsMissingOrInvalidPersonalApiToken() : void
     {
         $request = $this->createStub(Request::class);
         $authentication = $this->createMock(Authentication::class);
-        $authentication
-            ->expects(self::once())
-            ->method('authenticateApiToken')
-            ->with($request)
-            ->willReturn(null);
+        $authentication->expects(self::once())->method('authenticateApiToken')->with($request)->willReturn(null);
 
-        $response = (new IsAuthenticatedWithHeader($authentication))($request);
+        $response = (new IsAuthenticated($authentication))($request);
 
         self::assertNotNull($response);
         self::assertSame(403, $response->getStatusCode()->getCode());

@@ -14,7 +14,7 @@ class IsAuthenticatedWithHeader implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
-        if ($this->authenticationService->getUserIdByTokenFromHeader($request) === null) {
+        if ($this->authenticationService->authenticateApiToken($request) === null) {
             return Response::createForbidden();
         }
 

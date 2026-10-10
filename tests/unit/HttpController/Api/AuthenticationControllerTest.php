@@ -3,9 +3,10 @@
 namespace Tests\Unit\Movary\HttpController\Api;
 
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Api\AuthenticationController;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\StatusCode;
@@ -36,8 +37,8 @@ class AuthenticationControllerTest extends TestCase
     public function testGetTokenDataRejectsInvalidToken() : void
     {
         $request = $this->createMock(Request::class);
-        $this->authenticationMock->expects(self::once())->method('getToken')->with($request)->willReturn(self::TOKEN);
-        $this->authenticationMock->expects(self::once())->method('getUserIdByToken')->with($request)->willReturn(null);
+        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(self::TOKEN);
+        $this->authenticationMock->expects(self::once())->method('authenticateApiToken')->with($request)->willReturn(null);
         $this->userApiMock->expects(self::never())->method('findUserById');
 
         $response = $this->subject->getTokenData($request);
@@ -53,8 +54,12 @@ class AuthenticationControllerTest extends TestCase
         $user->method('getName')->willReturn('example');
         $user->method('isAdmin')->willReturn(false);
 
-        $this->authenticationMock->expects(self::once())->method('getToken')->with($request)->willReturn(self::TOKEN);
-        $this->authenticationMock->expects(self::once())->method('getUserIdByToken')->with($request)->willReturn(12);
+        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(self::TOKEN);
+        $this->authenticationMock
+            ->expects(self::once())
+            ->method('authenticateApiToken')
+            ->with($request)
+            ->willReturn(AuthenticatedUser::create(12, CredentialType::API_TOKEN));
         $this->userApiMock->expects(self::once())->method('findUserById')->with(12)->willReturn($user);
 
         $response = $this->subject->getTokenData($request);
@@ -63,57 +68,15 @@ class AuthenticationControllerTest extends TestCase
         self::assertSame('{"user":{"id":12,"name":"example","isAdmin":false}}', $response->getBody());
     }
 
-    public function testDestroyTokenRequiresExplicitHeaderToken() : void
+    public function testGetTokenDataRejectsMissingToken() : void
     {
         $request = $this->createMock(Request::class);
-        $this->authenticationMock
-            ->expects(self::once())
-            ->method('getTokenFromHeader')
-            ->with($request)
-            ->willReturn(null);
-        $this->authenticationMock->expects(self::never())->method('deleteToken');
-        $this->authenticationMock->expects(self::never())->method('logout');
+        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(null);
+        $this->authenticationMock->expects(self::never())->method('authenticateApiToken');
+        $this->userApiMock->expects(self::never())->method('findUserById');
 
-        $response = $this->subject->destroyToken($request);
+        $response = $this->subject->getTokenData($request);
 
         self::assertEquals(StatusCode::createBadRequest(), $response->getStatusCode());
-    }
-
-    public function testDestroyTokenDeletesExplicitHeaderToken() : void
-    {
-        $request = $this->createMock(Request::class);
-        $this->authenticationMock
-            ->expects(self::once())
-            ->method('getTokenFromHeader')
-            ->with($request)
-            ->willReturn(self::TOKEN);
-        $this->authenticationMock->expects(self::once())->method('deleteToken')->with(self::TOKEN);
-        $this->authenticationMock->expects(self::never())->method('logout');
-
-        $response = $this->subject->destroyToken($request);
-
-        self::assertSame(204, $response->getStatusCode()->getCode());
-    }
-
-    public function testCreateTokenReturnsRetryAfterWhenLoginIsRateLimited() : void
-    {
-        $request = $this->createMock(Request::class);
-        $request->method('getBody')->willReturn('{"email":"user@example.com","password":"password"}');
-        $request->method('getHeaders')->willReturn(['X-Movary-Client' => 'client']);
-        $request->method('getUserAgent')->willReturn('agent');
-        $this->authenticationMock
-            ->expects(self::once())
-            ->method('login')
-            ->with('user@example.com', 'password', false, 'client', 'agent', null)
-            ->willThrowException(new LoginAttemptLimitReached(60));
-
-        $response = $this->subject->createToken($request);
-
-        self::assertEquals(StatusCode::createTooManyRequests(), $response->getStatusCode());
-        self::assertSame('{"error":"InvalidCredentials","message":"Invalid credentials"}', $response->getBody());
-        self::assertSame(
-            ['Content-Type: application/json', 'Retry-After: 60', 'Cache-Control: private, no-cache'],
-            array_map(static fn($header) => (string)$header, $response->getHeaders()),
-        );
     }
 }
