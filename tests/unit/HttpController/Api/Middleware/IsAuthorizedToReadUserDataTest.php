@@ -36,8 +36,6 @@ class IsAuthorizedToReadUserDataTest extends TestCase
             ->method('isUserPageVisible')
             ->with($requestedUser, $authenticatedUser)
             ->willReturn(true);
-        $authentication->expects(self::never())->method('isUserPageVisibleForApiRequest');
-
         self::assertNull((new IsAuthorizedToReadUserData($userApi, $authentication))($request));
     }
 

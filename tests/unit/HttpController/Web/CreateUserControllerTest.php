@@ -102,7 +102,7 @@ class CreateUserControllerTest extends TestCase
             ->method('createUser')
             ->with('user@example.com', 'password', 'user', false)
             ->willThrowException($exception);
-        $this->authenticationMock->expects(self::never())->method('login');
+        $this->authenticationMock->expects(self::never())->method('loginWebSession');
         $this->flashMessageServiceMock->expects(self::once())->method('add')->with($message);
         $this->applicationUrlServiceMock->method('createApplicationUrl')->willReturn('/movary');
 
@@ -120,6 +120,26 @@ class CreateUserControllerTest extends TestCase
             ->expects(self::once())
             ->method('add')
             ->with(FlashMessage::CREATE_USER_GENERIC_ERROR);
+        $this->applicationUrlServiceMock->method('createApplicationUrl')->willReturn('/movary');
+
+        $response = $this->subject->createUser($request);
+
+        self::assertEquals(StatusCode::createSeeOther(), $response->getStatusCode());
+        self::assertSame('Location: /movary', (string)$response->getHeaders()[0]);
+    }
+
+    public function testCreateUserStartsWebSession() : void
+    {
+        $request = $this->createRequest($this->createValidParameters());
+        $this->userApiMock->method('hasUsers')->willReturn(true);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('createUser')
+            ->with('user@example.com', 'password', 'user', false);
+        $this->authenticationMock
+            ->expects(self::once())
+            ->method('loginWebSession')
+            ->with('user@example.com', 'password', false, 'user agent');
         $this->applicationUrlServiceMock->method('createApplicationUrl')->willReturn('/movary');
 
         $response = $this->subject->createUser($request);

@@ -53,8 +53,6 @@ class IsAuthorizedToWriteUserDataTest extends TestCase
             ->method('authenticateApiToken')
             ->with($request)
             ->willReturn(null);
-        $authentication->expects(self::never())->method('getUserIdByToken');
-
         $response = (new IsAuthorizedToWriteUserData($userApi, $authentication))($request);
 
         self::assertNotNull($response);

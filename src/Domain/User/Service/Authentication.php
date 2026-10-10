@@ -11,7 +11,6 @@ use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
-use Movary\HttpController\Web\CreateUserController;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Cookie;
 use Movary\ValueObject\DateTime;
@@ -23,6 +22,8 @@ class Authentication
     public const string AUTHENTICATION_COOKIE_NAME = 'id';
 
     private const int MAX_EXPIRATION_AGE_IN_DAYS = 30;
+
+    private const string WEB_SESSION_DEVICE_NAME = 'Movary Web';
 
     /** @var array<string, int> */
     private array $validatedAuthTokenUserIds = [];
@@ -154,63 +155,9 @@ class Authentication
         return $this->requireWebSession()->getUserId();
     }
 
-    public function getToken(Request $request) : ?string
-    {
-        $tokenInCookie = $this->getAuthenticationCookie();
-        if ($tokenInCookie !== null) {
-            return $tokenInCookie;
-        }
-
-        return $this->getTokenFromHeader($request);
-    }
-
-    public function getTokenFromHeader(Request $request) : ?string
-    {
-        $token = $request->getHeader('X-Movary-Token');
-
-        return $token === '' ? null : $token;
-    }
-
-    public function getUserIdByToken(Request $request) : ?int
-    {
-        $token = $this->getToken($request);
-        if ($token === null) {
-            return null;
-        }
-
-        $apiTokenUserId = $this->userApi->findUserIdByApiToken($token);
-        if ($apiTokenUserId !== null) {
-            return $apiTokenUserId;
-        }
-
-        return $this->findUserIdByValidAuthToken($token);
-    }
-
-    public function getUserIdByTokenFromHeader(Request $request) : ?int
-    {
-        $token = $this->getTokenFromHeader($request);
-        if ($token === null) {
-            return null;
-        }
-
-        $apiTokenUserId = $this->userApi->findUserIdByApiToken($token);
-        if ($apiTokenUserId !== null) {
-            return $apiTokenUserId;
-        }
-
-        return $this->findUserIdByValidAuthToken($token);
-    }
-
     public function isUserAuthenticatedWithCookie() : bool
     {
         return $this->authenticateWebSession() !== null;
-    }
-
-    public function isUserPageVisibleForApiRequest(Request $request, UserEntity $targetUser) : bool
-    {
-        $requestUserId = $this->getUserIdByToken($request);
-
-        return $this->isUserPageVisibleForUser($targetUser, $requestUserId);
     }
 
     public function isUserPageVisible(UserEntity $targetUser, ?AuthenticatedUser $authenticatedUser) : bool
@@ -223,26 +170,13 @@ class Authentication
         return $this->isUserPageVisible($targetUser, $this->authenticateWebSession());
     }
 
-    public function isValidToken(string $token) : bool
-    {
-        return match (true) {
-            $this->isValidApiToken($token) => true,
-            $this->isValidAuthToken($token) => true,
-            default => false,
-        };
-    }
-
-    /**
-     * @return array{user: UserEntity, token: string}
-     */
-    public function login(
+    public function loginWebSession(
         string $email,
         string $password,
         bool $rememberMe,
-        string $deviceName,
         string $userAgent,
         ?int $userTotpInput = null,
-    ) : array {
+    ) : void {
         $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput);
 
         $authTokenExpirationDate = $this->createExpirationDate();
@@ -250,17 +184,14 @@ class Authentication
             $authTokenExpirationDate = $this->createExpirationDate(self::MAX_EXPIRATION_AGE_IN_DAYS);
         }
 
-        $token = $this->setAuthenticationToken($user->getId(), $deviceName, $userAgent, $authTokenExpirationDate);
-
-        $userAndToken = ['user' => $user, 'token' => $token];
-
-        if ($deviceName !== CreateUserController::MOVARY_WEB_CLIENT) {
-            return $userAndToken;
-        }
+        $token = $this->setAuthenticationToken(
+            $user->getId(),
+            self::WEB_SESSION_DEVICE_NAME,
+            $userAgent,
+            $authTokenExpirationDate,
+        );
 
         $this->setAuthenticationCookie($token, $authTokenExpirationDate);
-
-        return $userAndToken;
     }
 
     public function logout() : void
@@ -330,16 +261,6 @@ class Authentication
         }
 
         return $targetUser->getId() === $requestUserId;
-    }
-
-    private function isValidApiToken(string $token) : bool
-    {
-        return $this->userApi->findUserIdByApiToken($token) !== null;
-    }
-
-    private function isValidAuthToken(string $token) : bool
-    {
-        return $this->findUserIdByValidAuthToken($token) !== null;
     }
 
     private function setAuthenticationToken(int $userId, string $deviceName, string $userAgent, DateTime $expirationDate) : string

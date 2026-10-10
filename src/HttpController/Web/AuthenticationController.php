@@ -45,11 +45,10 @@ class AuthenticationController
         $rememberMe = $requestBody['rememberMe'] ?? false;
 
         try {
-            $this->authenticationService->login(
+            $this->authenticationService->loginWebSession(
                 $requestBody['email'],
                 $requestBody['password'],
                 (bool)$rememberMe,
-                CreateUserController::MOVARY_WEB_CLIENT,
                 $request->getUserAgent(),
                 $totpCode,
             );
