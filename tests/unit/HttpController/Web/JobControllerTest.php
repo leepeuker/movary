@@ -3,6 +3,8 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Web\JobController;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ApplicationUrlService;
@@ -73,7 +75,7 @@ class JobControllerTest extends TestCase
     #[DataProvider('provideTraktImports')]
     public function testScheduleTraktImportAddsMessage(string $jobMethod, FlashMessage $message) : void
     {
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->jobQueueApiMock->expects(self::once())->method($jobMethod)->with(42);
         $this->flashMessageServiceMock->expects(self::once())->method('add')->with($message);
 
@@ -111,7 +113,7 @@ class JobControllerTest extends TestCase
         FlashMessage $invalidMessage,
     ) : void {
         $request = $this->createLetterboxdRequest($fileField);
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->letterboxdCsvValidatorMock->expects(self::once())->method($validatorMethod)->willReturn(false);
         $this->jobQueueApiMock->expects(self::never())->method($jobMethod);
         $this->flashMessageServiceMock->expects(self::once())->method('add')->with($invalidMessage);
@@ -134,7 +136,7 @@ class JobControllerTest extends TestCase
         FlashMessage $successMessage,
     ) : void {
         $request = $this->createLetterboxdRequest($fileField);
-        $this->authenticationMock->method('getCurrentUserId')->willReturn(42);
+        $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $targetFile = null;
         $this->letterboxdCsvValidatorMock
             ->expects(self::once())

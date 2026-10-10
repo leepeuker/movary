@@ -19,7 +19,7 @@ class UserHasJellyfinToken implements MiddlewareInterface
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function __invoke(Request $request) : ?Response
     {
-        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->getCurrentUserId());
+        $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->requireWebSession()->getUserId());
 
         if ($jellyfinAuthentication !== null) {
             return null;

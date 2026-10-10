@@ -19,7 +19,7 @@ class UserIsAuthenticated implements MiddlewareInterface
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function __invoke(Request $request) : ?Response
     {
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
+        if ($this->authenticationService->authenticateWebSession() !== null) {
             return null;
         }
 

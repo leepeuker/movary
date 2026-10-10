@@ -5,7 +5,7 @@ namespace Movary\HttpController\Web\Movie;
 use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
-use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\Service\Imdb\ImdbMovieRatingSync;
@@ -27,7 +27,7 @@ class MovieController
         private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
         private readonly SlugifyService $slugify,
         private readonly CountryApi $countryApi,
-        private readonly Authentication $authenticationService,
+        private readonly CurrentWebUser $currentWebUser,
         private readonly UserApi $userApi,
     ) {
     }
@@ -70,10 +70,7 @@ class MovieController
         $userName = (string)$request->getRouteParameters()['username'];
         $userId = $this->userApi->fetchUserByName($userName)->getId();
 
-        $currentUser = null;
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $currentUser = $this->authenticationService->getCurrentUser();
-        }
+        $currentUser = $this->currentWebUser->findUser();
 
         $movieId = (int)$request->getRouteParameters()['id'];
 

@@ -20,8 +20,8 @@ use Movary\Api\Trakt\TraktClient;
 use Movary\Command\CreatePublicStorageLink;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
-use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\AuthenticationController;
@@ -393,6 +393,7 @@ class Factory
             $container->get(Service\ApplicationUrlService::class),
             $container->get(Util\UrlValidator::class),
             $container->get(Service\PlexCallbackStateService::class),
+            $container->get(CurrentWebUser::class),
             $config->getAsBool('PLEX_VALIDATE_URL_SAFE', false),
         );
     }
@@ -422,19 +423,13 @@ class Factory
         $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;
         $routenameSlugSuffix = $currentRequest->getRouteParameters()['nameSlugSuffix'] ?? null;
 
-        $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticatedWithCookie();
+        $user = $container->get(CurrentWebUser::class)->findUser();
 
-        $twig->addGlobal('loggedIn', $userAuthenticated);
+        $twig->addGlobal('loggedIn', $user !== null);
 
-        $user = null;
         $dateFormatPhp = DateFormat::getPhpDefault();
         $dataFormatJavascript = DateFormat::getJavascriptDefault();
-        if ($userAuthenticated === true) {
-            $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
-
-            /** @var User\UserEntity $user */
-            $user = $container->get(User\UserApi::class)->findUserById($currentUserId);
-
+        if ($user !== null) {
             $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());
         }

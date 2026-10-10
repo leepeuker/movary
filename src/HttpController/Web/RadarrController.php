@@ -19,14 +19,14 @@ class RadarrController
 
     public function deleteRadarrFeedUrl() : Response
     {
-        $this->userApi->deleteRadarrFeedId($this->authenticationService->getCurrentUserId());
+        $this->userApi->deleteRadarrFeedId($this->authenticationService->requireWebSession()->getUserId());
 
         return Response::createOk();
     }
 
     public function regenerateRadarrFeedUrl() : Response
     {
-        $feedId = $this->userApi->regenerateRadarrFeedId($this->authenticationService->getCurrentUserId());
+        $feedId = $this->userApi->regenerateRadarrFeedId($this->authenticationService->requireWebSession()->getUserId());
         $feedUrl = $this->radarrFeedUrlGenerator->generateUrl($feedId);
 
         return Response::createJson(Json::encode(['url' => $feedUrl]));

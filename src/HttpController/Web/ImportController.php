@@ -29,7 +29,7 @@ class ImportController
 
     public function handleCsvImport(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
         $exportType = $request->getRouteParameters()['exportType'];
         $fileParameters = $request->getFileParameters();
 

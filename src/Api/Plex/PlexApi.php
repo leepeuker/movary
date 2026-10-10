@@ -8,7 +8,6 @@ use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
 use Movary\Api\Plex\Exception\PlexAuthenticationInvalid;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Domain\Movie\MovieApi;
-use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\PlexCallbackStateService;
 use Movary\Service\ServerSettings;
@@ -35,7 +34,6 @@ class PlexApi
     private const string BASE_URL = 'https://app.plex.tv/auth#?';
 
     public function __construct(
-        private readonly Authentication $authenticationService,
         private readonly ServerSettings $serverSettings,
         private readonly LoggerInterface $logger,
         private readonly PlexTvClient $plexTvClient,
@@ -190,14 +188,14 @@ class PlexApi
      * 3. Based on the info returned by the Plex API, a new url will be generated, which looks like this: `https://app.plex.tv/auth#?clientID=<clientIdentifier>&code=<clientCode>&context[device][product]=<AppName>&forwardUrl=<urlCallback>`
      * 4. The URL is returned to the settingsController
      */
-    public function generatePlexAuthenticationUrl(string $authenticationToken) : string
+    public function generatePlexAuthenticationUrl(int $userId, string $authenticationToken) : string
     {
         $relativeUrl = RelativeUrl::create('/pins');
 
         $plexAuthenticationData = $this->plexTvClient->post($relativeUrl);
 
-        $this->userApi->updatePlexClientId($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['id']);
-        $this->userApi->updateTemporaryPlexClientCode($this->authenticationService->getCurrentUserId(), $plexAuthenticationData['code']);
+        $this->userApi->updatePlexClientId($userId, $plexAuthenticationData['id']);
+        $this->userApi->updateTemporaryPlexClientCode($userId, $plexAuthenticationData['code']);
 
         $plexAppName = $plexAuthenticationData['product'];
         $plexClientIdentifier = $plexAuthenticationData['clientIdentifier'];

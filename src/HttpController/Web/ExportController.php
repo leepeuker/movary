@@ -19,7 +19,7 @@ class ExportController
 
     public function getCsvExport(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $exportType = $request->getRouteParameters()['exportType'] ?? null;
 

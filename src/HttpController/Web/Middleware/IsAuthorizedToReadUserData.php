@@ -27,7 +27,8 @@ class IsAuthorizedToReadUserData implements MiddlewareInterface
             return Response::createNotFound();
         }
 
-        if ($this->authenticationService->isUserPageVisibleForWebRequest($requestedUser) === true) {
+        $authenticatedUser = $this->authenticationService->authenticateWebSession();
+        if ($this->authenticationService->isUserPageVisible($requestedUser, $authenticatedUser) === true) {
             return null;
         }
 

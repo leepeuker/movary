@@ -37,7 +37,7 @@ class PersonController
 
     public function hideInTopLists(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $personId = (int)$request->getRouteParameters()['id'];
 
@@ -96,11 +96,10 @@ class PersonController
             $imdbUrl = $this->imdbUrlGenerator->generatePersonUrl($imdbId);
         }
 
-        $isHiddenInTopLists = false;
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $currentUserId = $this->authenticationService->getCurrentUserId();
-            $isHiddenInTopLists = $this->userApi->hasHiddenPerson($currentUserId, $personId);
-        }
+        $authenticatedUser = $this->authenticationService->authenticateWebSession();
+        $isHiddenInTopLists = $authenticatedUser === null
+            ? false
+            : $this->userApi->hasHiddenPerson($authenticatedUser->getUserId(), $personId);
 
         $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
             $person->getTmdbPosterPath(),
@@ -138,7 +137,7 @@ class PersonController
 
     public function showInTopLists(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $personId = (int)$request->getRouteParameters()['id'];
 

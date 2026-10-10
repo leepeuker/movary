@@ -33,7 +33,7 @@ class JobController
 
         $jobType = JobType::createFromString($parameters['type']);
 
-        $jobs = $this->jobQueueApi->find($this->authenticationService->getCurrentUserId(), $jobType);
+        $jobs = $this->jobQueueApi->find($this->authenticationService->requireWebSession()->getUserId(), $jobType);
 
         return Response::createJson(Json::encode($jobs));
     }
@@ -65,7 +65,7 @@ class JobController
 
     public function scheduleJellyfinExportHistory() : Response
     {
-        $currentUserId = $this->authenticationService->getCurrentUserId();
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
 
         $this->jobQueueApi->addJellyfinExportMoviesJob($currentUserId);
 
@@ -74,7 +74,7 @@ class JobController
 
     public function scheduleJellyfinImportHistory() : Response
     {
-        $currentUserId = $this->authenticationService->getCurrentUserId();
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
 
         $this->jobQueueApi->addJellyfinImportMoviesJob($currentUserId);
 
@@ -89,7 +89,7 @@ class JobController
             throw new RuntimeException('Missing ratings csv file');
         }
 
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $targetFile = $this->appStorageDirectory . 'letterboxd-diary-' . $userId . '-' . time() . '.csv';
         move_uploaded_file($fileParameters['diaryCsv']['tmp_name'], $targetFile);
@@ -127,7 +127,7 @@ class JobController
             );
         }
 
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $targetFile = $this->appStorageDirectory . 'letterboxd-ratings-' . $userId . '-' . time() . '.csv';
         move_uploaded_file($fileParameters['ratingsCsv']['tmp_name'], $targetFile);
@@ -155,16 +155,15 @@ class JobController
 
     public function schedulePlexWatchlistImport() : Response
     {
-        $currentUser = $this->authenticationService->getCurrentUser();
-
-        $this->jobQueueApi->addPlexImportWatchlistJob($currentUser->getId());
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $this->jobQueueApi->addPlexImportWatchlistJob($userId);
 
         return Response::createNoContent();
     }
 
     public function scheduleTraktHistorySync() : Response
     {
-        $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->getCurrentUserId());
+        $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->requireWebSession()->getUserId());
 
         $this->flashMessageService->add(FlashMessage::TRAKT_HISTORY_IMPORT_SCHEDULED);
 
@@ -173,7 +172,7 @@ class JobController
 
     public function scheduleTraktRatingsSync() : Response
     {
-        $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->getCurrentUserId());
+        $this->jobQueueApi->addTraktImportRatingsJob($this->authenticationService->requireWebSession()->getUserId());
 
         $this->flashMessageService->add(FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED);
 

@@ -28,10 +28,7 @@ class ActorsController
     {
         $requestData = $this->requestMapper->mapRenderPageRequest($request);
 
-        $currentUserId = null;
-        if ($this->authenticationService->isUserAuthenticatedWithCookie() === true) {
-            $currentUserId = $this->authenticationService->getCurrentUserId();
-        }
+        $currentUserId = $this->authenticationService->authenticateWebSession()?->getUserId();
 
         $personFilterUserId = $requestData->getSortBy() !== 'name' ? $currentUserId : null;
 

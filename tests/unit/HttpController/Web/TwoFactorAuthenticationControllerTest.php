@@ -3,6 +3,9 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
 use Movary\HttpController\Web\TwoFactorAuthenticationController;
@@ -20,7 +23,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     public function testDisableTotpAddsDisabledMessage() : void
     {
         $authentication = $this->createMock(Authentication::class);
-        $authentication->expects(self::once())->method('getCurrentUserId')->willReturn(42);
+        $authentication->expects(self::once())->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $twoFactorApi = $this->createMock(TwoFactorAuthenticationApi::class);
         $twoFactorApi->expects(self::once())->method('deleteTotp')->with(42);
         $flashMessageService = $this->createMock(FlashMessageService::class);
@@ -33,6 +36,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $twoFactorApi,
             $this->createMock(TwoFactorAuthenticationFactory::class),
             $flashMessageService,
+            $this->createMock(CurrentWebUser::class),
         );
 
         self::assertSame(200, $subject->disableTOTP()->getStatusCode()->getCode());
@@ -41,7 +45,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     public function testEnableTotpAddsEnabledMessageForValidCode() : void
     {
         $authentication = $this->createMock(Authentication::class);
-        $authentication->expects(self::once())->method('getCurrentUserId')->willReturn(42);
+        $authentication->expects(self::once())->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $twoFactorApi = $this->createMock(TwoFactorAuthenticationApi::class);
         $twoFactorApi
             ->expects(self::once())
@@ -59,6 +63,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $twoFactorApi,
             $this->createMock(TwoFactorAuthenticationFactory::class),
             $flashMessageService,
+            $this->createMock(CurrentWebUser::class),
         );
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn('{"input":123456,"uri":"otpauth://totp/test"}');
@@ -69,7 +74,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
     public function testEnableTotpDoesNotAddMessageForInvalidCode() : void
     {
         $authentication = $this->createMock(Authentication::class);
-        $authentication->expects(self::once())->method('getCurrentUserId')->willReturn(42);
+        $authentication->expects(self::once())->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $twoFactorApi = $this->createMock(TwoFactorAuthenticationApi::class);
         $twoFactorApi->expects(self::once())->method('verifyTotpUri')->willReturn(false);
         $twoFactorApi->expects(self::never())->method('updateTotpUri');
@@ -80,6 +85,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $twoFactorApi,
             $this->createMock(TwoFactorAuthenticationFactory::class),
             $flashMessageService,
+            $this->createMock(CurrentWebUser::class),
         );
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn('{"input":123456,"uri":"otpauth://totp/test"}');

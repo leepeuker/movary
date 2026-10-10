@@ -5,6 +5,7 @@ namespace Movary\HttpController\Web;
 use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\Plex\PlexScrobbler;
@@ -33,20 +34,22 @@ class PlexController
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly UrlValidator $urlValidator,
         private readonly PlexCallbackStateService $callbackStateService,
+        private readonly CurrentWebUser $currentWebUser,
         private readonly bool $validateUrlIsSafe = false,
     ) {
     }
 
     public function deletePlexWebhookUrl() : Response
     {
-        $this->userApi->deletePlexWebhookId($this->authenticationService->getCurrentUserId());
+        $this->userApi->deletePlexWebhookId($this->authenticationService->requireWebSession()->getUserId());
 
         return Response::createOk();
     }
 
     public function generatePlexAuthenticationUrl(Request $request) : Response
     {
-        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->getCurrentUserId());
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $plexAccessToken = $this->userApi->findPlexAccessToken($userId);
         if ($plexAccessToken !== null) {
             return Response::createBadRequest('User is already authenticated');
         }
@@ -57,7 +60,7 @@ class PlexController
         }
 
         try {
-            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl($authenticationToken);
+            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl($userId, $authenticationToken);
         } catch (ConfigNotSetException $e) {
             return Response::createBadRequest($e->getMessage());
         }
@@ -93,7 +96,7 @@ class PlexController
 
     public function processPlexCallback(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
         $plexClientId = $this->userApi->findPlexClientId($userId);
         $plexClientCode = $this->userApi->findTemporaryPlexCode($userId);
         if ($plexClientId === null || $plexClientCode === null) {
@@ -135,14 +138,14 @@ class PlexController
 
     public function regeneratePlexWebhookUrl() : Response
     {
-        $webhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->getCurrentUserId());
+        $webhookId = $this->userApi->regeneratePlexWebhookId($this->authenticationService->requireWebSession()->getUserId());
 
         return Response::createJson(Json::encode(['url' => $this->webhookUrlBuilder->buildPlexWebhookUrl($webhookId)]));
     }
 
     public function removePlexAccessTokens() : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $this->userApi->updatePlexAccessToken($userId, null);
         $this->userApi->updatePlexClientId($userId, null);
@@ -154,7 +157,7 @@ class PlexController
 
     public function savePlexServerUrl(Request $request) : Response
     {
-        $userId = $this->authenticationService->getCurrentUserId();
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $plexServerUrl = Json::decode($request->getBody())['plexServerUrl'];
         if (empty($plexServerUrl)) {
@@ -180,7 +183,7 @@ class PlexController
 
     public function verifyPlexServerUrl(Request $request) : Response
     {
-        $plexAccessToken = $this->authenticationService->getCurrentUser()->getPlexAccessToken();
+        $plexAccessToken = $this->currentWebUser->requireUser()->getPlexAccessToken();
         if ($plexAccessToken === null) {
             return Response::createBadRequest('Plex authentication is missing');
         }

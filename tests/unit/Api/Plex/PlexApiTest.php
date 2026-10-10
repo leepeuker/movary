@@ -6,7 +6,6 @@ use Movary\Api\Plex\PlexApi;
 use Movary\Api\Plex\PlexTvClient;
 use Movary\Api\Plex\PlexUserClient;
 use Movary\Domain\Movie\MovieApi;
-use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\UserApi;
 use Movary\Service\PlexCallbackStateService;
 use Movary\Service\ServerSettings;
@@ -19,8 +18,6 @@ class PlexApiTest extends TestCase
 {
     public function testAuthenticationUrlContainsSignedCallbackState() : void
     {
-        $authentication = $this->createMock(Authentication::class);
-        $authentication->expects(self::exactly(2))->method('getCurrentUserId')->willReturn(12);
         $serverSettings = $this->createMock(ServerSettings::class);
         $serverSettings
             ->expects(self::once())
@@ -46,7 +43,6 @@ class PlexApiTest extends TestCase
             ->with('123', 'plex-code', 'authentication-token')
             ->willReturn('signed-state');
         $subject = new PlexApi(
-            $authentication,
             $serverSettings,
             $this->createStub(LoggerInterface::class),
             $plexTvClient,
@@ -56,7 +52,7 @@ class PlexApiTest extends TestCase
             $stateService,
         );
 
-        $authenticationUrl = $subject->generatePlexAuthenticationUrl('authentication-token');
+        $authenticationUrl = $subject->generatePlexAuthenticationUrl(12, 'authentication-token');
         $fragment = parse_url($authenticationUrl, PHP_URL_FRAGMENT);
         self::assertIsString($fragment);
         parse_str(ltrim($fragment, '?'), $parameters);

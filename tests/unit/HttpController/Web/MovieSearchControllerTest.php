@@ -4,6 +4,8 @@ namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Api\Dto\SearchRequestDto;
 use Movary\HttpController\Api\RequestMapper\SearchRequestMapper;
 use Movary\HttpController\Api\ResponseMapper\MovieSearchResponseMapper;
@@ -22,7 +24,7 @@ class MovieSearchControllerTest extends TestCase
         $requestData = SearchRequestDto::create('Matrix', 1, null);
 
         $authentication = $this->createMock(Authentication::class);
-        $authentication->expects(self::once())->method('getCurrentUserId')->willReturn(12);
+        $authentication->expects(self::once())->method('requireWebSession')->willReturn(AuthenticatedUser::create(12, CredentialType::WEB_SESSION));
         $requestMapper = $this->createMock(SearchRequestMapper::class);
         $requestMapper->expects(self::once())->method('mapRequest')->with($request)->willReturn($requestData);
         $tmdbApi = $this->createMock(TmdbApi::class);
