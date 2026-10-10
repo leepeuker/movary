@@ -11,6 +11,9 @@
                 <a class="nav-link {% if requestUrlPath starts with '/settings/account/security' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/security">Security</a>
             </li>
             <li class="dropdown-item">
+                <a class="nav-link {% if requestUrlPath starts with '/settings/account/api-tokens' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/api-tokens">API tokens</a>
+            </li>
+            <li class="dropdown-item">
                 <a class="nav-link {% if requestUrlPath starts with '/settings/account/locations' %}active{% endif %}" href="{{ applicationUrl }}/settings/account/locations">Locations</a>
             </li>
             <li class="dropdown-item">

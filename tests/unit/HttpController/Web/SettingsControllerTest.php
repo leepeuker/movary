@@ -4,16 +4,21 @@ namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Web\SettingsController;
+use Movary\HttpController\Web\Mapper\PaginationRequestMapper;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Dashboard\Dto\DashboardRowList;
+use Movary\Service\PaginationElementsCalculator;
+use Movary\Util\Json;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\RelativeUrl;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -37,6 +42,8 @@ class SettingsControllerTest extends TestCase
 
     private DashboardFactory|MockObject $dashboardFactoryMock;
 
+    private PersonalApiTokenService|MockObject $personalApiTokenServiceMock;
+
     private SettingsController $subject;
 
     private Environment|MockObject $twigMock;
@@ -54,6 +61,7 @@ class SettingsControllerTest extends TestCase
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->dashboardFactoryMock = $this->createMock(DashboardFactory::class);
+        $this->personalApiTokenServiceMock = $this->createMock(PersonalApiTokenService::class);
         $this->subject = $this->createSubject([
             'twig' => $this->twigMock,
             'authenticationService' => $this->authenticationMock,
@@ -61,6 +69,9 @@ class SettingsControllerTest extends TestCase
             'flashMessageService' => $this->flashMessageServiceMock,
             'applicationUrlService' => $this->applicationUrlServiceMock,
             'dashboardFactory' => $this->dashboardFactoryMock,
+            'personalApiTokenService' => $this->personalApiTokenServiceMock,
+            'paginationRequestMapper' => new PaginationRequestMapper(),
+            'paginationElementsCalculator' => new PaginationElementsCalculator(),
             'currentWebUser' => $this->currentWebUserMock,
         ]);
 
@@ -68,6 +79,89 @@ class SettingsControllerTest extends TestCase
         $user->method('hasCoreAccountChangesDisabled')->willReturn(false);
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->currentWebUserMock->method('requireUser')->willReturn($user);
+    }
+
+    public function testCreatesPersonalApiToken() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getBody')->willReturn(Json::encode([
+            'name' => 'Home automation',
+            'expirationDays' => 90,
+        ]));
+        $this->personalApiTokenServiceMock
+            ->expects(self::once())
+            ->method('createToken')
+            ->with(42, 'Home automation', 90)
+            ->willReturn([
+                'token' => 'mvy_pat_v1_token',
+                'expiresAt' => DateTime::createFromString('2027-01-08 12:00:00'),
+            ]);
+
+        $response = $this->subject->createApiToken($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame([
+            'token' => 'mvy_pat_v1_token',
+            'expiresAt' => '2027-01-08 12:00:00',
+        ], Json::decode((string)$response->getBody()));
+    }
+
+    public function testRevokesOwnedPersonalApiToken() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getRouteParameters')->willReturn(['tokenId' => '7']);
+        $this->personalApiTokenServiceMock
+            ->expects(self::once())
+            ->method('revokeToken')
+            ->with(42, 7);
+
+        self::assertSame(200, $this->subject->revokeApiToken($request)->getStatusCode()->getCode());
+    }
+
+    public function testRevokesAllPersonalApiTokens() : void
+    {
+        $this->personalApiTokenServiceMock
+            ->expects(self::once())
+            ->method('revokeAllTokens')
+            ->with(42);
+
+        self::assertSame(200, $this->subject->revokeAllApiTokens()->getStatusCode()->getCode());
+    }
+
+    public function testRendersPaginatedPersonalApiTokens() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getGetParameters')->willReturn(['page' => '2', 'perPage' => '50']);
+        $this->personalApiTokenServiceMock
+            ->expects(self::once())
+            ->method('countTokens')
+            ->with(42)
+            ->willReturn(70);
+        $this->personalApiTokenServiceMock
+            ->expects(self::once())
+            ->method('fetchTokensPaginated')
+            ->with(42, 50, 50)
+            ->willReturn([]);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/settings-account-api-tokens.html.twig',
+                self::callback(static function (array $data) : bool {
+                    self::assertSame([], $data['apiTokens']);
+                    self::assertSame(50, $data['apiTokensPerPage']);
+                    self::assertSame(70, $data['paginationElements']->getTotalCount());
+                    self::assertSame(['perPage' => 50], $data['paginationQuery']);
+
+                    return true;
+                }),
+            )
+            ->willReturn('api tokens');
+
+        $response = $this->subject->renderApiTokensAccountPage($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame('api tokens', $response->getBody());
     }
 
     #[DataProvider('provideSuccessMessages')]

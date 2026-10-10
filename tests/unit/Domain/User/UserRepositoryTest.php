@@ -505,4 +505,133 @@ class UserRepositoryTest extends TestCase
 
         $this->subject->replacePasswordResetToken(12, 'token-hash', $expirationDate);
     }
+
+    public function testCreatesPersonalApiToken() : void
+    {
+        $createdAt = DateTime::createFromString('2026-10-10 12:00:00');
+        $expiresAt = DateTime::createFromString('2027-10-10 12:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('insert')
+            ->with('user_api_token', [
+                'user_id' => 12,
+                'name' => 'CLI',
+                'token_hash' => 'token-hash',
+                'token_prefix' => 'mvy_pat_v1_abcdefgh',
+                'created_at' => '2026-10-10 12:00:00',
+                'last_used_at' => null,
+                'expires_at' => '2027-10-10 12:00:00',
+            ]);
+
+        $this->subject->createPersonalApiToken(
+            12,
+            'CLI',
+            'token-hash',
+            'mvy_pat_v1_abcdefgh',
+            $createdAt,
+            $expiresAt,
+        );
+    }
+
+    public function testFetchesPersonalApiTokenMetadata() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                'SELECT `id`, `name`, `token_prefix`, `created_at`, `last_used_at`, `expires_at` '
+                . 'FROM `user_api_token` WHERE `user_id` = ? ORDER BY `created_at` DESC, `id` DESC '
+                . 'LIMIT 20 OFFSET 40',
+                [12],
+            )
+            ->willReturn([[
+                'id' => '4',
+                'name' => 'CLI',
+                'token_prefix' => 'mvy_pat_v1_abcdefgh',
+                'created_at' => '2026-10-10 12:00:00',
+                'last_used_at' => '2026-10-10 13:00:00',
+                'expires_at' => null,
+            ]]);
+
+        self::assertEquals([[
+            'id' => 4,
+            'name' => 'CLI',
+            'tokenPrefix' => 'mvy_pat_v1_abcdefgh',
+            'createdAt' => DateTime::createFromString('2026-10-10 12:00:00'),
+            'lastUsedAt' => DateTime::createFromString('2026-10-10 13:00:00'),
+            'expiresAt' => null,
+        ]], $this->subject->fetchPersonalApiTokensPaginated(12, 20, 40));
+    }
+
+    public function testCountsPersonalApiTokens() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with('SELECT COUNT(*) FROM `user_api_token` WHERE `user_id` = ?', [12])
+            ->willReturn('3');
+
+        self::assertSame(3, $this->subject->countPersonalApiTokens(12));
+    }
+
+    public function testFindsPersonalApiTokenData() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->with(
+                'SELECT `id`, `user_id`, `expires_at`, `last_used_at` '
+                . 'FROM `user_api_token` WHERE `token_hash` = ?',
+                ['token-hash'],
+            )
+            ->willReturn([
+                'id' => '4',
+                'user_id' => '12',
+                'expires_at' => '2027-10-10 12:00:00',
+                'last_used_at' => null,
+            ]);
+
+        self::assertEquals([
+            'id' => 4,
+            'userId' => 12,
+            'expiresAt' => DateTime::createFromString('2027-10-10 12:00:00'),
+            'lastUsedAt' => null,
+        ], $this->subject->findPersonalApiTokenData('token-hash'));
+    }
+
+    public function testUpdatesPersonalApiTokenLastUsedTimestampWhenStillStale() : void
+    {
+        $lastUsedAt = DateTime::createFromString('2026-10-10 12:30:00');
+        $lastUsedUpdateThreshold = DateTime::createFromString('2026-10-10 12:15:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with(
+                'UPDATE `user_api_token` SET `last_used_at` = ? '
+                . 'WHERE `id` = ? AND (`last_used_at` IS NULL OR `last_used_at` < ?)',
+                ['2026-10-10 12:30:00', 4, '2026-10-10 12:15:00'],
+            );
+
+        $this->subject->updatePersonalApiTokenLastUsedAt(4, $lastUsedAt, $lastUsedUpdateThreshold);
+    }
+
+    public function testRevokesPersonalApiTokenOnlyForOwner() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_api_token', ['id' => 4, 'user_id' => 12]);
+
+        $this->subject->deletePersonalApiToken(12, 4);
+    }
+
+    public function testRevokesAllPersonalApiTokensForUser() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_api_token', ['user_id' => 12]);
+
+        $this->subject->deleteAllPersonalApiTokens(12);
+    }
 }

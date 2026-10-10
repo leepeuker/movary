@@ -110,33 +110,6 @@
                 <div id="alertGeneralAccountDiv"></div>
 
                 <button type="submit" class="btn btn-primary" id="generalAccountUpdateButton">Submit</button>
-
-                <hr>
-
-                <h5>Api token</h5>
-
-                <p>Used for authentication against the Movary API.</p>
-
-                <div class="mb-3">
-                    <input type="text"
-                           class="form-control"
-                           value="{{ apiToken }}"
-                           id="apiToken"
-                           style="text-align: center;"
-                           disabled>
-                </div>
-
-                <div id="alertApiTokenDiv"></div>
-
-                <button id="deleteApiTokenButton"
-                        type="button"
-                        class="btn btn-danger "
-                        onclick="deleteApiToken()"
-                        {% if apiToken == '' %}disabled{% endif %}>
-                    Delete token
-                </button>
-                <button type="button" class="btn btn-primary" onclick="regenerateApiToken()">Regenerate token</button>
-
             </div>
         </div>
     </main>
