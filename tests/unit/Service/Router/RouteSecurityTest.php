@@ -5,7 +5,7 @@ namespace Tests\Unit\Movary\Service\Router;
 use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Movary\HttpController\Api\Middleware\IsAuthenticatedWithHeader;
+use Movary\HttpController\Api\Middleware\IsAuthenticated;
 use Movary\HttpController\Api\Middleware\IsAuthorizedToWriteUserData;
 use Movary\HttpController\Web\Middleware\ValidateCsrfToken;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -58,7 +58,7 @@ class RouteSecurityTest extends TestCase
         }
     }
 
-    public function testUnsafeApiRoutesWithoutHeaderMiddlewareAreLimitedToExplicitBoundaries() : void
+    public function testUnsafeApiRoutesWithoutAuthenticationMiddlewareAreLimitedToExplicitBoundaries() : void
     {
         $routes = array_filter(
             $this->collectRoutes(),
@@ -68,9 +68,9 @@ class RouteSecurityTest extends TestCase
 
         $explicitBoundaries = [];
         foreach ($routes as $route) {
-            $usesHeaderAuthentication = in_array(IsAuthenticatedWithHeader::class, $route['middleware'], true)
+            $usesApiAuthentication = in_array(IsAuthenticated::class, $route['middleware'], true)
                 || in_array(IsAuthorizedToWriteUserData::class, $route['middleware'], true);
-            if ($usesHeaderAuthentication === false) {
+            if ($usesApiAuthentication === false) {
                 $explicitBoundaries[] = $route['method'] . ' ' . $route['path'];
             }
         }

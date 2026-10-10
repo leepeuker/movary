@@ -81,6 +81,7 @@ class AuthenticationTest extends TestCase
 
         self::assertSame(12, $result?->getUserId());
         self::assertSame(CredentialType::API_TOKEN, $result?->getCredentialType());
+        self::assertSame($result, $this->subject->authenticateApiToken($request));
     }
 
     public function testAuthenticateApiTokenRejectsSessionToken() : void
@@ -99,6 +100,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
 
         self::assertNull($this->subject->authenticateApiToken($request));
+        self::assertNull($this->subject->authenticateApiToken($request));
     }
 
     public function testAuthenticateApiTokenRejectsMissingHeader() : void
@@ -107,6 +109,7 @@ class AuthenticationTest extends TestCase
         $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(null);
         $this->userApiMock->expects(self::never())->method('findUserIdByApiToken');
 
+        self::assertNull($this->subject->authenticateApiToken($request));
         self::assertNull($this->subject->authenticateApiToken($request));
     }
 
@@ -159,6 +162,7 @@ class AuthenticationTest extends TestCase
 
         self::assertSame(12, $result?->getUserId());
         self::assertSame(CredentialType::WEB_SESSION, $result?->getCredentialType());
+        self::assertSame($result, $this->subject->authenticateWebSession());
     }
 
     public function testAuthenticateWebSessionRejectsExpiredTokenAndClearsCookie() : void
@@ -180,12 +184,14 @@ class AuthenticationTest extends TestCase
 
         self::assertNull($this->subject->authenticateWebSession());
         self::assertArrayNotHasKey('id', $_COOKIE);
+        self::assertNull($this->subject->authenticateWebSession());
     }
 
     public function testAuthenticateWebSessionRejectsMissingCookie() : void
     {
         $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
 
+        self::assertNull($this->subject->authenticateWebSession());
         self::assertNull($this->subject->authenticateWebSession());
     }
 
@@ -197,10 +203,18 @@ class AuthenticationTest extends TestCase
         $this->subject->requireWebSession();
     }
 
-    public function testGetCurrentUserIdUsesValidatedCookieToken() : void
+    public function testLogoutClearsPendingFlashMessagesWithoutAuthenticationCookie() : void
+    {
+        unset($_COOKIE['id']);
+        $this->userRepositoryMock->expects(self::never())->method('deleteAuthToken');
+        $this->flashMessageServiceMock->expects(self::once())->method('clear');
+
+        $this->subject->logout();
+    }
+
+    public function testLogoutInvalidatesCachedWebSession() : void
     {
         $_COOKIE['id'] = self::TOKEN;
-
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('findAuthTokenData')
@@ -209,30 +223,17 @@ class AuthenticationTest extends TestCase
                 'userId' => 12,
                 'expirationDate' => DateTime::createFromString('+1 hour'),
             ]);
-
-        self::assertTrue($this->subject->isUserAuthenticatedWithCookie());
-        self::assertSame(12, $this->subject->getCurrentUserId());
-    }
-
-    public function testSetAuthenticationCookieMakesTokenAvailableInCurrentRequest() : void
-    {
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('deleteAuthToken')
+            ->with(hash('sha256', self::TOKEN));
         $this->cookieSecurityMock->expects(self::once())->method('isSecure')->willReturn(true);
-
-        $this->subject->setAuthenticationCookie(
-            self::TOKEN,
-            DateTime::createFromString('+1 hour'),
-        );
-
-        self::assertSame(self::TOKEN, $_COOKIE['id']);
-    }
-
-    public function testLogoutClearsPendingFlashMessagesWithoutAuthenticationCookie() : void
-    {
-        unset($_COOKIE['id']);
-        $this->userRepositoryMock->expects(self::never())->method('deleteAuthToken');
         $this->flashMessageServiceMock->expects(self::once())->method('clear');
 
+        self::assertSame(12, $this->subject->requireWebSession()->getUserId());
         $this->subject->logout();
+
+        self::assertNull($this->subject->authenticateWebSession());
     }
 
     public function testLoginWebSessionStoresHashedTokenAndSetsCookie() : void
@@ -264,6 +265,7 @@ class AuthenticationTest extends TestCase
 
         self::assertArrayHasKey('id', $_COOKIE);
         self::assertSame(hash('sha256', $_COOKIE['id']), $storedToken);
+        self::assertSame(12, $this->subject->requireWebSession()->getUserId());
     }
 
     public function testLoginWebSessionUsesRememberMeExpiration() : void
@@ -313,7 +315,7 @@ class AuthenticationTest extends TestCase
 
         $this->expectException(InvalidPassword::class);
 
-        $this->subject->findUserAndVerifyAuthentication('user@example.com', 'wrong-password');
+        $this->subject->loginWebSession('user@example.com', 'wrong-password', false, 'agent');
     }
 
     public function testSuccessfulLoginResetsAccountRateLimit() : void
@@ -333,7 +335,9 @@ class AuthenticationTest extends TestCase
             ->method('resetAccountAttempts')
             ->with('user@example.com');
 
-        self::assertSame($user, $this->subject->findUserAndVerifyAuthentication('user@example.com', 'password'));
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
+
+        self::assertSame(12, $this->subject->requireWebSession()->getUserId());
     }
 
     public function testMissingTotpCodeReleasesRateLimitReservation() : void
@@ -348,6 +352,6 @@ class AuthenticationTest extends TestCase
 
         $this->expectException(\Movary\Domain\User\Exception\MissingTotpCode::class);
 
-        $this->subject->findUserAndVerifyAuthentication('user@example.com', 'password');
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
     }
 }
