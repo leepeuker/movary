@@ -29,9 +29,14 @@ html[data-movie-list-view="table"] #movieTableView {
   display: block !important;
 }
 
-.poster-grid {
+.poster-grid,
+.dashboard-card-grid {
   --bs-gutter-x: 0.75rem;
   --bs-gutter-y: 0.75rem;
+}
+
+.dashboard-card-grid {
+  margin-bottom: 0.75rem;
 }
 
 .poster-link {
