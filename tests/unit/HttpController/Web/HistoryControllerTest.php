@@ -6,6 +6,7 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
@@ -49,8 +50,10 @@ class HistoryControllerTest extends TestCase
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(12, CredentialType::WEB_SESSION));
 
         $user = $this->createMock(UserEntity::class);
+        $user->method('getId')->willReturn(12);
         $user->method('getName')->willReturn('alice');
-        $this->userApiMock->expects(self::once())->method('fetchUser')->with(12)->willReturn($user);
+        $currentWebUser = $this->createMock(CurrentWebUser::class);
+        $currentWebUser->method('requireUser')->willReturn($user);
 
         $this->subject = new HistoryController(
             $this->createMock(Environment::class),
@@ -62,6 +65,7 @@ class HistoryControllerTest extends TestCase
             $this->authenticationMock,
             $this->createMock(UserPageAuthorizationChecker::class),
             $this->createMock(PaginationElementsCalculator::class),
+            $currentWebUser,
         );
     }
 

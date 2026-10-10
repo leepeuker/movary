@@ -6,6 +6,7 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
@@ -34,16 +35,19 @@ class HistoryController
         private readonly Authentication $authenticationService,
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly CurrentWebUser $currentWebUser,
     ) {
     }
 
     public function createHistoryEntry(Request $request) : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $currentUser = $this->currentWebUser->requireUser();
 
-        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
+        if ($currentUser->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
         }
+
+        $userId = $currentUser->getId();
 
         $requestBody = Json::decode($request->getBody());
 
@@ -80,11 +84,13 @@ class HistoryController
 
     public function deleteHistoryEntry(Request $request) : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $currentUser = $this->currentWebUser->requireUser();
 
-        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
+        if ($currentUser->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
         }
+
+        $userId = $currentUser->getId();
 
         $requestBody = Json::decode($request->getBody());
 

@@ -10,6 +10,7 @@ use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
@@ -76,13 +77,14 @@ class SettingsController
         private readonly JobQueueFilterRequestMapper $jobQueueFilterRequestMapper,
         private readonly Movie\History\Location\MovieHistoryLocationApi $locationApi,
         private readonly UserFilterRequestMapper $userFilterRequestMapper,
+        private readonly CurrentWebUser $currentWebUser,
     ) {
     }
 
     public function deleteAccount() : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
-        $user = $this->userApi->fetchUser($userId);
+        $user = $this->currentWebUser->requireUser();
+        $userId = $user->getId();
 
         if ($user->hasCoreAccountChangesDisabled() === true) {
             throw new RuntimeException('Account deletion is disabled for user: ' . $userId);
@@ -156,7 +158,7 @@ class SettingsController
 
     public function renderDashboardAccountPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         $dashboardRows = $this->dashboardFactory->createDashboardRowsForUser($user);
 
@@ -173,8 +175,6 @@ class SettingsController
 
     public function renderDataAccountPage() : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
-
         $importHistoryError = match (true) {
             $this->flashMessageService->consume(FlashMessage::IMPORT_HISTORY_FAILED) => 'history',
             $this->flashMessageService->consume(FlashMessage::IMPORT_RATINGS_FAILED) => 'ratings',
@@ -182,7 +182,7 @@ class SettingsController
             default => null,
         };
 
-        $user = $this->userApi->fetchUser($userId);
+        $user = $this->currentWebUser->requireUser();
 
         return Response::create(
             StatusCode::createOk(),
@@ -204,7 +204,7 @@ class SettingsController
 
     public function renderEmbyPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getEmbyWebhookId();
@@ -225,7 +225,7 @@ class SettingsController
 
     public function renderGeneralAccountPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         return Response::create(
             StatusCode::createOk(),
@@ -248,7 +248,7 @@ class SettingsController
 
     public function renderJellyfinPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getJellyfinWebhookId();
@@ -283,7 +283,7 @@ class SettingsController
 
     public function renderKodiPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $webhookId = $user->getKodiWebhookId();
@@ -304,7 +304,7 @@ class SettingsController
 
     public function renderLetterboxdPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         return Response::create(
             StatusCode::createOk(),
@@ -328,7 +328,7 @@ class SettingsController
 
     public function renderLocationsAccountPage(Request $request) : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
         $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250]);
         $locationsEnabled = $user->hasLocationsEnabled();
         $locationCount = $locationsEnabled ? $this->locationApi->countLocationsByUserId($user->getId()) : 0;
@@ -359,7 +359,7 @@ class SettingsController
 
     public function renderMastodonPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         return Response::create(
             StatusCode::createOk(),
@@ -405,7 +405,7 @@ class SettingsController
             }
         }
 
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
         $plexWebhookId = $user->getPlexWebhookId();
@@ -431,7 +431,7 @@ class SettingsController
 
     public function renderRadarrPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         $radarrFeedId = $user->getRadarrFeedId();
         $hasApplicationUrl = $this->applicationUrlService->hasApplicationUrl();
@@ -451,7 +451,7 @@ class SettingsController
 
     public function renderSecurityAccountPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         $totpEnabled = $this->twoFactorAuthenticationService->findTotpUri($user->getId()) === null ? false : true;
 
@@ -624,7 +624,7 @@ class SettingsController
 
     public function renderTraktPage() : Response
     {
-        $user = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $user = $this->currentWebUser->requireUser();
 
         return Response::create(
             StatusCode::createOk(),
@@ -832,8 +832,8 @@ class SettingsController
 
     public function updatePassword(Request $request) : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
-        $user = $this->userApi->fetchUser($userId);
+        $user = $this->currentWebUser->requireUser();
+        $userId = $user->getId();
 
         $responseData = Json::decode($request->getBody());
 

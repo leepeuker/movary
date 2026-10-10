@@ -5,6 +5,7 @@ namespace Movary\HttpController\Web;
 use Movary\Api\Plex\Dto\PlexUserClientConfiguration;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\Plex\PlexScrobbler;
@@ -33,6 +34,7 @@ class PlexController
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly UrlValidator $urlValidator,
         private readonly PlexCallbackStateService $callbackStateService,
+        private readonly CurrentWebUser $currentWebUser,
         private readonly bool $validateUrlIsSafe = false,
     ) {
     }
@@ -181,7 +183,7 @@ class PlexController
 
     public function verifyPlexServerUrl(Request $request) : Response
     {
-        $plexAccessToken = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId())->getPlexAccessToken();
+        $plexAccessToken = $this->currentWebUser->requireUser()->getPlexAccessToken();
         if ($plexAccessToken === null) {
             return Response::createBadRequest('Plex authentication is missing');
         }

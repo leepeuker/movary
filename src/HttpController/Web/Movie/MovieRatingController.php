@@ -4,7 +4,7 @@ namespace Movary\HttpController\Web\Movie;
 
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
-use Movary\Domain\User\UserApi;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -15,8 +15,8 @@ class MovieRatingController
 {
     public function __construct(
         private readonly MovieApi $movieApi,
-        private readonly UserApi $userApi,
         private readonly Authentication $authenticationService,
+        private readonly CurrentWebUser $currentWebUser,
     ) {
     }
 
@@ -39,9 +39,9 @@ class MovieRatingController
 
     public function updateRating(Request $request) : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $currentUser = $this->currentWebUser->requireUser();
 
-        if ($this->userApi->fetchUser($userId)->getName() !== $request->getRouteParameters()['username']) {
+        if ($currentUser->getName() !== $request->getRouteParameters()['username']) {
             return Response::createForbidden();
         }
 
@@ -54,7 +54,7 @@ class MovieRatingController
             $personalRating = PersonalRating::create((int)$postParameters['rating']);
         }
 
-        $this->movieApi->updateUserRating($movieId, $this->authenticationService->requireWebSession()->getUserId(), $personalRating);
+        $this->movieApi->updateUserRating($movieId, $currentUser->getId(), $personalRating);
 
         return Response::create(StatusCode::createNoContent());
     }

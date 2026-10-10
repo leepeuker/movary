@@ -3,9 +3,9 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
-use Movary\Domain\User\UserApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\Service\TwoFactorAuthenticationFactory;
 use Movary\HttpController\Web\TwoFactorAuthenticationController;
@@ -36,7 +36,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $twoFactorApi,
             $this->createMock(TwoFactorAuthenticationFactory::class),
             $flashMessageService,
-            $this->createMock(UserApi::class),
+            $this->createMock(CurrentWebUser::class),
         );
 
         self::assertSame(200, $subject->disableTOTP()->getStatusCode()->getCode());
@@ -63,7 +63,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $twoFactorApi,
             $this->createMock(TwoFactorAuthenticationFactory::class),
             $flashMessageService,
-            $this->createMock(UserApi::class),
+            $this->createMock(CurrentWebUser::class),
         );
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn('{"input":123456,"uri":"otpauth://totp/test"}');
@@ -85,7 +85,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $twoFactorApi,
             $this->createMock(TwoFactorAuthenticationFactory::class),
             $flashMessageService,
-            $this->createMock(UserApi::class),
+            $this->createMock(CurrentWebUser::class),
         );
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn('{"input":123456,"uri":"otpauth://totp/test"}');

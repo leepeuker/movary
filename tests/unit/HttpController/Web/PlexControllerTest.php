@@ -5,6 +5,7 @@ namespace Tests\Unit\Movary\HttpController\Web;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Api\Plex\PlexApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\UserApi;
@@ -51,6 +52,7 @@ class PlexControllerTest extends TestCase
             $this->createMock(ApplicationUrlService::class),
             $this->createMock(UrlValidator::class),
             $this->stateService,
+            $this->createMock(CurrentWebUser::class),
         );
     }
 

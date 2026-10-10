@@ -6,7 +6,7 @@ use Movary\Domain\User\Exception\EmailNotUnique;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
-use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\UserApi;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
@@ -15,16 +15,15 @@ use Movary\ValueObject\Http\Response;
 class UserController
 {
     public function __construct(
-        private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
+        private readonly CurrentWebUser $currentWebUser,
     ) {
     }
 
     public function createUser(Request $request) : Response
     {
-        $authenticatedUser = $this->authenticationService->authenticateWebSession();
-        if ($authenticatedUser === null
-            || $this->userApi->fetchUser($authenticatedUser->getUserId())->isAdmin() === false) {
+        $currentUser = $this->currentWebUser->findUser();
+        if ($currentUser === null || $currentUser->isAdmin() === false) {
             return Response::createForbidden();
         }
 
@@ -53,7 +52,7 @@ class UserController
     public function deleteUser(Request $request) : Response
     {
         $userId = (int)$request->getRouteParameters()['userId'];
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUser = $this->currentWebUser->requireUser();
 
         if ($currentUser->getId() !== $userId && $currentUser->isAdmin() === false) {
             return Response::createForbidden();
@@ -66,9 +65,8 @@ class UserController
 
     public function fetchUsers() : Response
     {
-        $authenticatedUser = $this->authenticationService->authenticateWebSession();
-        if ($authenticatedUser === null
-            || $this->userApi->fetchUser($authenticatedUser->getUserId())->isAdmin() === false) {
+        $currentUser = $this->currentWebUser->findUser();
+        if ($currentUser === null || $currentUser->isAdmin() === false) {
             return Response::createForbidden();
         }
 
@@ -78,7 +76,7 @@ class UserController
     public function updateUser(Request $request) : Response
     {
         $userId = (int)$request->getRouteParameters()['userId'];
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUser = $this->currentWebUser->requireUser();
 
         if ($currentUser->getId() !== $userId && $currentUser->isAdmin() === false) {
             return Response::createForbidden();

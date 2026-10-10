@@ -3,6 +3,7 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\UserApi;
@@ -42,11 +43,14 @@ class SettingsControllerTest extends TestCase
 
     private UserApi|MockObject $userApiMock;
 
+    private CurrentWebUser|MockObject $currentWebUserMock;
+
     protected function setUp() : void
     {
         $this->twigMock = $this->createMock(Environment::class);
         $this->authenticationMock = $this->createMock(Authentication::class);
         $this->userApiMock = $this->createMock(UserApi::class);
+        $this->currentWebUserMock = $this->createMock(CurrentWebUser::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->dashboardFactoryMock = $this->createMock(DashboardFactory::class);
@@ -57,18 +61,13 @@ class SettingsControllerTest extends TestCase
             'flashMessageService' => $this->flashMessageServiceMock,
             'applicationUrlService' => $this->applicationUrlServiceMock,
             'dashboardFactory' => $this->dashboardFactoryMock,
+            'currentWebUser' => $this->currentWebUserMock,
         ]);
 
         $user = $this->createMock(UserEntity::class);
         $user->method('hasCoreAccountChangesDisabled')->willReturn(false);
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
-        $this->userApiMock
-            ->method('fetchUser')
-            ->willReturnCallback(static function (int $userId) use ($user) : UserEntity {
-                self::assertSame(42, $userId);
-
-                return $user;
-            });
+        $this->currentWebUserMock->method('requireUser')->willReturn($user);
     }
 
     #[DataProvider('provideSuccessMessages')]

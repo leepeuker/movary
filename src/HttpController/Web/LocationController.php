@@ -20,11 +20,11 @@ class LocationController
 
     public function createLocation(Request $request) : Response
     {
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
         $requestData = Json::decode($request->getBody());
 
         $this->locationApi->createLocation(
-            $currentUser->getId(),
+            $currentUserId,
             $requestData['name'],
             empty($requestData['isCinema']) === false,
         );
@@ -35,7 +35,7 @@ class LocationController
     public function deleteLocation(Request $request) : Response
     {
         $locationId = (int)$request->getRouteParameters()['locationId'];
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
 
         $location = $this->locationApi->findLocationById($locationId);
 
@@ -43,7 +43,7 @@ class LocationController
             return Response::createOk();
         }
 
-        if ($location->getUserId() !== $currentUser->getId()) {
+        if ($location->getUserId() !== $currentUserId) {
             return Response::createForbidden();
         }
 
@@ -54,18 +54,18 @@ class LocationController
 
     public function fetchLocations() : Response
     {
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
 
-        $locations = $this->locationApi->findLocationsByUserId($currentUser->getId());
+        $locations = $this->locationApi->findLocationsByUserId($currentUserId);
 
         return Response::createJson(Json::encode($locations));
     }
 
     public function fetchToggleFeature() : Response
     {
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
 
-        $isLocationsEnabled = $this->userApi->isLocationsEnabled($currentUser->getId());
+        $isLocationsEnabled = $this->userApi->isLocationsEnabled($currentUserId);
 
         return Response::createJson(
             Json::encode(
@@ -76,7 +76,7 @@ class LocationController
 
     public function updateLocation(Request $request) : Response
     {
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
         $locationId = (int)$request->getRouteParameters()['locationId'];
         $requestData = Json::decode($request->getBody());
 
@@ -86,7 +86,7 @@ class LocationController
             return Response::createOk();
         }
 
-        if ($location->getUserId() !== $currentUser->getId()) {
+        if ($location->getUserId() !== $currentUserId) {
             return Response::createForbidden();
         }
 
@@ -101,11 +101,11 @@ class LocationController
 
     public function updateToggleFeature(Request $request) : Response
     {
-        $currentUser = $this->userApi->fetchUser($this->authenticationService->requireWebSession()->getUserId());
+        $currentUserId = $this->authenticationService->requireWebSession()->getUserId();
         $requestData = Json::decode($request->getBody());
 
         $this->userApi->updateLocationsEnabled(
-            $currentUser->getId(),
+            $currentUserId,
             $requestData['locationsEnabled'],
         );
 
