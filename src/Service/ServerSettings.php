@@ -45,6 +45,8 @@ class ServerSettings
     private const string SMTP_WITH_AUTH = 'SMTP_WITH_AUTH';
 
     private const string TMDB_API_KEY = 'TMDB_API_KEY';
+    
+    private const string TMDB_LANGUAGE = 'TMDB_LANGUAGE';
 
     private const string LOGIN_ATTEMPT_LIMIT = 'LOGIN_ATTEMPT_LIMIT';
 
@@ -159,6 +161,11 @@ class ServerSettings
     public function getTmdbApiKey() : ?string
     {
         return (string)$this->getByKey(self::TMDB_API_KEY);
+    }
+
+    public function getTmdbLanguage(): ?string
+    {
+	return (string)$this->getByKey(self::TMDB_LANGUAGE) ?? 'en-US';
     }
 
     public function getTotpIssuer() : string
