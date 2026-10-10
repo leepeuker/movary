@@ -28,3 +28,34 @@ html[data-movie-list-view="table"] #moviePosterView {
 html[data-movie-list-view="table"] #movieTableView {
   display: block !important;
 }
+
+.poster-grid {
+  --bs-gutter-x: 0.75rem;
+  --bs-gutter-y: 0.75rem;
+}
+
+.poster-link {
+  transition: filter 150ms ease-in-out;
+}
+
+.poster-link:hover,
+.poster-link:focus-visible {
+  filter: brightness(0.85);
+}
+
+.poster-link:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+}
+
+.poster-rating {
+  top: 6px;
+  right: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+}
+
+.poster-footer {
+  padding: 0.3rem 0.25rem;
+}
