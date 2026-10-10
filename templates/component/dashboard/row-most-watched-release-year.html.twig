@@ -4,10 +4,10 @@
     {{ rowItemToggle.create(dashboardRow) }}
 
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
-        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+        <div class="dashboard-card-grid row row-cols-3 row-cols-md-3 row-cols-lg-6">
             {% for mostWatchedReleaseYear in mostWatchedReleaseYears %}
                 {% if loop.index <= 12 %}
-                    <div class="col" style="padding-bottom: 1rem;">
+                    <div class="col">
                         <a class="card h-100 position-relative"
                              style="cursor: pointer"
                              href="{{ applicationUrl }}/users/{{ routeUsername }}/movies?ry={{ mostWatchedReleaseYear.name }}">
