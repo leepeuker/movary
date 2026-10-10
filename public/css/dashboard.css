@@ -1,10 +1,45 @@
+.overview-title {
+    margin: 1rem 0 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.overview-stat {
+    display: block;
+    padding: 0.75rem;
+}
+
 .stat-value {
     font-size: 1.5rem;
-    font-weight: bold
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.stat-unit {
+    margin-left: 0.2rem;
+    color: var(--bs-secondary-color);
+    font-size: 0.9rem;
 }
 
 .stat-description {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--bs-secondary-color);
     font-size: 0.8rem;
+}
+
+@media (min-width: 768px) {
+    .overview-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 .last-plays-value {

@@ -19,32 +19,33 @@
         <div style="text-align: center;padding-bottom: 1rem">
             {{ include('component/user-select.html.twig') }}
 
-            <h2 style="padding-bottom: 0.5rem">Overview</h2>
-            <div class="row justify-content-md-center {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
-                <div class="col ">
-                    <span class="stat-value">{{ totalPlayCount }}</span><br><span class="stat-description">TOTAL PLAYS</span>
+            <h2 class="overview-title">All-time overview</h2>
+            <div class="overview-grid {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
+                <div class="overview-stat card">
+                    <span class="stat-value">{{ totalPlayCount|number_format(0, '.', ',') }}</span>
+                    <span class="stat-description">Total plays</span>
                 </div>
-                <div class="col ">
-                    <span class="stat-value">{{ uniqueMoviesCount }}</span><br><span class="stat-description">UNIQUE MOVIES</span>
+                <div class="overview-stat card">
+                    <span class="stat-value">{{ uniqueMoviesCount|number_format(0, '.', ',') }}</span>
+                    <span class="stat-description">Unique movies</span>
                 </div>
-                <div class="col">
-                    <span class="stat-value">{{ totalHoursWatched }}</span><br><span class="stat-description font-weight-light">HOURS WATCHED</span>
+                <div class="overview-stat card">
+                    <span class="stat-value">{{ totalHoursWatched|number_format(0, '.', ',') }}</span><span class="stat-unit">h</span>
+                    <span class="stat-description">Hours watched</span>
+                </div>
+                <div class="overview-stat card">
+                    <span class="stat-value">{{ averagePlaysPerDay }}</span>
+                    <span class="stat-description">Plays per day</span>
+                </div>
+                <div class="overview-stat card">
+                    <span class="stat-value">{{ averagePersonalRating }}</span><span class="stat-unit">/ 10</span>
+                    <span class="stat-description">Average rating</span>
+                </div>
+                <div class="overview-stat card">
+                    <span class="stat-value">{{ averageRuntime }}</span><span class="stat-unit">min</span>
+                    <span class="stat-description">Average runtime</span>
                 </div>
             </div>
-            <br>
-            <div class="row justify-content-md-center {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
-                <div class="col ">
-                    <span class="stat-value">{{ averagePlaysPerDay }}</span><br><span class="stat-description">PLAYS PER DAY</span>
-                </div>
-                <div class="col ">
-                    <span class="stat-value">{{ averageRuntime }}</span><br><span class="stat-description">AVERAGE RUNTIME</span>
-                </div>
-                <div class="col ">
-                    <span class="stat-value">{{ averagePersonalRating }}</span><br><span class="stat-description">AVERAGE RATING</span>
-                </div>
-            </div>
-
-            <br>
 
             <div class="list-group" id="dashboardRows" data-username="{{ routeUsername }}">
                 {% for dashboardRow in dashboardRows %}
