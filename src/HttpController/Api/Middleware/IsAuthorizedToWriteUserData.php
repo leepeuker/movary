@@ -24,7 +24,8 @@ class IsAuthorizedToWriteUserData implements MiddlewareInterface
             return Response::createNotFound();
         }
 
-        if ($this->authenticationService->getUserIdByTokenFromHeader($request) !== $requestedUser->getId()) {
+        $authenticatedUser = $this->authenticationService->authenticateApiToken($request);
+        if ($authenticatedUser?->getUserId() !== $requestedUser->getId()) {
             return Response::createForbidden();
         }
 

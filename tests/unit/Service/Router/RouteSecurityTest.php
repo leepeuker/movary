@@ -78,8 +78,6 @@ class RouteSecurityTest extends TestCase
         sort($explicitBoundaries);
         self::assertSame(
             [
-                'DELETE /api/authentication/token',
-                'POST /api/authentication/token',
                 'POST /api/webhook/emby/{id:.+}',
                 'POST /api/webhook/jellyfin/{id:.+}',
                 'POST /api/webhook/kodi/{id:.+}',
@@ -87,6 +85,18 @@ class RouteSecurityTest extends TestCase
             ],
             $explicitBoundaries,
         );
+    }
+
+    public function testApiAuthenticationTokenRouteOnlySupportsIdentityCheck() : void
+    {
+        $methods = [];
+        foreach ($this->collectRoutes() as $route) {
+            if ($route['path'] === '/api/authentication/token') {
+                $methods[] = $route['method'];
+            }
+        }
+
+        self::assertSame(['GET'], $methods);
     }
 
     /** @return list<array{method: string, path: string, middleware: array<string>}> */

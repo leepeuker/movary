@@ -24,7 +24,8 @@ class IsAuthorizedToReadUserData implements MiddlewareInterface
             return Response::createNotFound();
         }
 
-        if ($this->authenticationService->isUserPageVisibleForApiRequest($request, $requestedUser) === false) {
+        $authenticatedUser = $this->authenticationService->authenticateApiToken($request);
+        if ($this->authenticationService->isUserPageVisible($requestedUser, $authenticatedUser) === false) {
             return Response::createForbidden();
         }
 

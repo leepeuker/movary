@@ -110,6 +110,38 @@ class AuthenticationTest extends TestCase
         self::assertNull($this->subject->authenticateApiToken($request));
     }
 
+    public function testRequireApiTokenReturnsAuthenticatedUser() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getHeader')->willReturn(self::TOKEN);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findUserIdByApiToken')
+            ->with(self::TOKEN)
+            ->willReturn(12);
+
+        $result = $this->subject->requireApiToken($request);
+
+        self::assertSame(12, $result->getUserId());
+        self::assertSame(CredentialType::API_TOKEN, $result->getCredentialType());
+    }
+
+    public function testRequireApiTokenRejectsInvalidToken() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getHeader')->willReturn(self::TOKEN);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findUserIdByApiToken')
+            ->with(self::TOKEN)
+            ->willReturn(null);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Could not find a valid API token');
+
+        $this->subject->requireApiToken($request);
+    }
+
     public function testAuthenticateWebSessionReturnsAuthenticatedUser() : void
     {
         $_COOKIE['id'] = self::TOKEN;
