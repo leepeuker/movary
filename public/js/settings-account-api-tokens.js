@@ -75,7 +75,7 @@ function showCreateApiTokenModal() {
     document.getElementById('revokeApiTokenButton').classList.add('d-none')
     document.getElementById('finishApiTokenCreationButton').classList.add('d-none')
     document.getElementById('apiTokenModalCloseButton').classList.remove('d-none')
-    document.getElementById('apiTokenModalAlerts').innerHTML = ''
+    removeAlert('apiTokenModalAlerts')
 
     apiTokenModal.show()
 }
@@ -93,7 +93,7 @@ function showApiTokenDetailsModal(row) {
     document.getElementById('createApiTokenButton').classList.add('d-none')
     document.getElementById('finishApiTokenCreationButton').classList.add('d-none')
     document.getElementById('apiTokenModalCloseButton').classList.remove('d-none')
-    document.getElementById('apiTokenModalAlerts').innerHTML = ''
+    removeAlert('apiTokenModalAlerts')
 
     const revokeButton = document.getElementById('revokeApiTokenButton')
     revokeButton.dataset.tokenId = row.dataset.tokenId
@@ -107,11 +107,11 @@ async function createApiToken() {
     const nameInput = document.getElementById('apiTokenNameInput')
     const name = nameInput.value.trim()
     nameInput.classList.remove('invalid-input')
-    document.getElementById('apiTokenModalAlerts').innerHTML = ''
+    removeAlert('apiTokenModalAlerts')
 
     if (name.length === 0 || name.length > 100) {
         nameInput.classList.add('invalid-input')
-        setApiTokenModalError('The token name must contain between 1 and 100 characters.')
+        addAlert('apiTokenModalAlerts', 'The token name must contain between 1 and 100 characters.', 'danger')
 
         return
     }
@@ -131,7 +131,7 @@ async function createApiToken() {
             }),
         })
     } catch (error) {
-        setApiTokenModalError()
+        addAlert('apiTokenModalAlerts', 'Server error, please try again.', 'danger')
 
         return
     } finally {
@@ -139,7 +139,7 @@ async function createApiToken() {
     }
 
     if (response.ok === false) {
-        setApiTokenModalError(await response.text())
+        addAlert('apiTokenModalAlerts', await response.text(), 'danger')
 
         return
     }
@@ -163,7 +163,11 @@ async function copyCreatedApiToken() {
         await navigator.clipboard.writeText(document.getElementById('createdApiTokenInput').value)
         button.textContent = 'Copied'
     } catch (error) {
-        setApiTokenModalError('The token could not be copied. Select it and copy it manually.')
+        addAlert(
+            'apiTokenModalAlerts',
+            'The token could not be copied. Select it and copy it manually.',
+            'danger',
+        )
     }
 }
 
@@ -223,22 +227,11 @@ async function sendApiTokenDeleteRequest(url, notificationName, showErrorInModal
 
 function showApiTokenDeleteError(showInModal) {
     if (showInModal === true) {
-        setApiTokenModalError('Could not revoke the API token.')
+        addAlert('apiTokenModalAlerts', 'Could not revoke the API token.', 'danger')
         apiTokenModal.show()
 
         return
     }
 
     addAlert('apiTokenManagementAlerts', 'Could not revoke the API token.', 'danger')
-}
-
-function setApiTokenModalError(message = 'Server error, please try again.') {
-    const alerts = document.getElementById('apiTokenModalAlerts')
-    alerts.innerHTML = ''
-
-    const alert = document.createElement('div')
-    alert.className = 'alert alert-danger'
-    alert.setAttribute('role', 'alert')
-    alert.textContent = message
-    alerts.appendChild(alert)
 }
