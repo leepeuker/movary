@@ -67,7 +67,7 @@ class PlexControllerTest extends TestCase
         $this->plexApi
             ->expects(self::once())
             ->method('generatePlexAuthenticationUrl')
-            ->with('authentication-token')
+            ->with(12, 'authentication-token')
             ->willReturn('https://app.plex.tv/auth');
 
         $response = $this->subject->generatePlexAuthenticationUrl($request);

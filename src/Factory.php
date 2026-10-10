@@ -422,18 +422,16 @@ class Factory
         $routeUsername = $currentRequest->getRouteParameters()['username'] ?? null;
         $routenameSlugSuffix = $currentRequest->getRouteParameters()['nameSlugSuffix'] ?? null;
 
-        $userAuthenticated = $container->get(Authentication::class)->isUserAuthenticatedWithCookie();
+        $authenticatedUser = $container->get(Authentication::class)->authenticateWebSession();
 
-        $twig->addGlobal('loggedIn', $userAuthenticated);
+        $twig->addGlobal('loggedIn', $authenticatedUser !== null);
 
         $user = null;
         $dateFormatPhp = DateFormat::getPhpDefault();
         $dataFormatJavascript = DateFormat::getJavascriptDefault();
-        if ($userAuthenticated === true) {
-            $currentUserId = $container->get(Authentication::class)->getCurrentUserId();
-
+        if ($authenticatedUser !== null) {
             /** @var User\UserEntity $user */
-            $user = $container->get(User\UserApi::class)->findUserById($currentUserId);
+            $user = $container->get(User\UserApi::class)->findUserById($authenticatedUser->getUserId());
 
             $dateFormatPhp = DateFormat::getPhpById($user->getDateFormatId());
             $dataFormatJavascript = DateFormat::getJavascriptById($user->getDateFormatId());

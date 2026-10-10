@@ -46,7 +46,8 @@ class PlexController
 
     public function generatePlexAuthenticationUrl(Request $request) : Response
     {
-        $plexAccessToken = $this->userApi->findPlexAccessToken($this->authenticationService->requireWebSession()->getUserId());
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $plexAccessToken = $this->userApi->findPlexAccessToken($userId);
         if ($plexAccessToken !== null) {
             return Response::createBadRequest('User is already authenticated');
         }
@@ -57,7 +58,7 @@ class PlexController
         }
 
         try {
-            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl($authenticationToken);
+            $plexAuthenticationUrl = $this->plexApi->generatePlexAuthenticationUrl($userId, $authenticationToken);
         } catch (ConfigNotSetException $e) {
             return Response::createBadRequest($e->getMessage());
         }
