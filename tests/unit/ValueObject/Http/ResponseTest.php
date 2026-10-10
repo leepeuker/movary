@@ -19,6 +19,17 @@ class ResponseTest extends TestCase
         );
     }
 
+    public function testCreateBearerUnauthorized() : void
+    {
+        $response = Response::createBearerUnauthorized();
+
+        self::assertSame(401, $response->getStatusCode()->getCode());
+        self::assertEquals(
+            [Header::createWwwAuthenticateBearer(), Header::createCacheControlPrivate()],
+            $response->getHeaders(),
+        );
+    }
+
     public function testCreateCsv() : void
     {
         self::assertEquals(

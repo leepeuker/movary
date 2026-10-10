@@ -45,6 +45,11 @@ class HeaderTest extends TestCase
         self::assertSame('Retry-After: 60', (string)Header::createRetryAfter(60));
     }
 
+    public function testCreateWwwAuthenticateBearer() : void
+    {
+        self::assertSame('WWW-Authenticate: Bearer', (string)Header::createWwwAuthenticateBearer());
+    }
+
     public function testCreateLocation() : void
     {
         self::assertSame('Location: foobar', (string)Header::createLocation('foobar'));

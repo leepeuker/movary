@@ -37,6 +37,7 @@ nav:
       - Manual: install/manual.md
   - Getting started: 'getting-started.md'
   - Configuration: 'configuration.md'
+  - API authentication: 'api-authentication.md'
   - Features:
       - TMDB Data: features/tmdb-data.md
       - IMDb Rating: features/imdb-rating.md

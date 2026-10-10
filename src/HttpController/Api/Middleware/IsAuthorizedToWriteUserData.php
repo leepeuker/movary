@@ -17,6 +17,11 @@ class IsAuthorizedToWriteUserData implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
+        $authenticatedUser = $this->authenticationService->authenticateApiToken($request);
+        if ($authenticatedUser === null) {
+            return Response::createBearerUnauthorized();
+        }
+
         $requestedUsername = (string)$request->getRouteParameters()['username'];
 
         $requestedUser = $this->userApi->findUserByName($requestedUsername);
@@ -24,8 +29,7 @@ class IsAuthorizedToWriteUserData implements MiddlewareInterface
             return Response::createNotFound();
         }
 
-        $authenticatedUser = $this->authenticationService->authenticateApiToken($request);
-        if ($authenticatedUser?->getUserId() !== $requestedUser->getId()) {
+        if ($authenticatedUser->getUserId() !== $requestedUser->getId()) {
             return Response::createForbidden();
         }
 

@@ -66,15 +66,17 @@ class AuthenticationTest extends TestCase
         unset($_COOKIE['id']);
     }
 
-    public function testAuthenticateApiTokenReturnsAuthenticatedUser() : void
+    public function testAuthenticateApiTokenAcceptsBearerToken() : void
     {
         $_COOKIE['id'] = 'web-session-token';
         $request = $this->createMock(Request::class);
         $request
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('getHeader')
-            ->with('X-Movary-Token')
-            ->willReturn(self::TOKEN);
+            ->willReturnMap([
+                ['Authorization', 'Bearer ' . self::TOKEN],
+                ['X-Movary-Token', null],
+            ]);
         $this->personalApiTokenServiceMock
             ->expects(self::once())
             ->method('findUserIdByToken')
@@ -89,14 +91,72 @@ class AuthenticationTest extends TestCase
         self::assertSame($result, $this->subject->authenticateApiToken($request));
     }
 
+    public function testAuthenticateApiTokenAcceptsCustomHeaderToken() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getHeader')->willReturnMap([
+            ['Authorization', null],
+            ['X-Movary-Token', self::TOKEN],
+        ]);
+        $this->personalApiTokenServiceMock
+            ->expects(self::once())
+            ->method('findUserIdByToken')
+            ->with(self::TOKEN)
+            ->willReturn(12);
+
+        self::assertSame(12, $this->subject->authenticateApiToken($request)?->getUserId());
+    }
+
+    public function testAuthenticateApiTokenAcceptsCustomHeaderBehindBasicAuthentication() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getHeader')->willReturnMap([
+            ['Authorization', 'Basic dXNlcjpwYXNzd29yZA=='],
+            ['X-Movary-Token', self::TOKEN],
+        ]);
+        $this->personalApiTokenServiceMock
+            ->expects(self::once())
+            ->method('findUserIdByToken')
+            ->with(self::TOKEN)
+            ->willReturn(12);
+
+        self::assertSame(12, $this->subject->authenticateApiToken($request)?->getUserId());
+    }
+
+    public function testAuthenticateApiTokenRejectsBearerAndCustomHeadersTogether() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getHeader')->willReturnMap([
+            ['Authorization', 'Bearer ' . self::TOKEN],
+            ['X-Movary-Token', self::TOKEN],
+        ]);
+        $this->personalApiTokenServiceMock->expects(self::never())->method('findUserIdByToken');
+
+        self::assertNull($this->subject->authenticateApiToken($request));
+    }
+
+    public function testAuthenticateApiTokenRejectsMalformedBearerHeader() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getHeader')->willReturnMap([
+            ['Authorization', 'Bearer'],
+            ['X-Movary-Token', null],
+        ]);
+        $this->personalApiTokenServiceMock->expects(self::never())->method('findUserIdByToken');
+
+        self::assertNull($this->subject->authenticateApiToken($request));
+    }
+
     public function testAuthenticateApiTokenRejectsSessionToken() : void
     {
         $request = $this->createMock(Request::class);
         $request
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('getHeader')
-            ->with('X-Movary-Token')
-            ->willReturn(self::TOKEN);
+            ->willReturnMap([
+                ['Authorization', 'Bearer ' . self::TOKEN],
+                ['X-Movary-Token', null],
+            ]);
         $this->personalApiTokenServiceMock
             ->expects(self::once())
             ->method('findUserIdByToken')
@@ -108,11 +168,13 @@ class AuthenticationTest extends TestCase
         self::assertNull($this->subject->authenticateApiToken($request));
     }
 
-    public function testAuthenticateApiTokenRejectsMissingHeader() : void
+    public function testAuthenticateApiTokenRejectsCookieOnlyRequest() : void
     {
+        $_COOKIE['id'] = self::TOKEN;
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(null);
+        $request->expects(self::exactly(2))->method('getHeader')->willReturn(null);
         $this->personalApiTokenServiceMock->expects(self::never())->method('findUserIdByToken');
+        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
 
         self::assertNull($this->subject->authenticateApiToken($request));
         self::assertNull($this->subject->authenticateApiToken($request));
@@ -121,7 +183,10 @@ class AuthenticationTest extends TestCase
     public function testRequireApiTokenReturnsAuthenticatedUser() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getHeader')->willReturn(self::TOKEN);
+        $request->method('getHeader')->willReturnMap([
+            ['Authorization', 'Bearer ' . self::TOKEN],
+            ['X-Movary-Token', null],
+        ]);
         $this->personalApiTokenServiceMock
             ->expects(self::once())
             ->method('findUserIdByToken')
@@ -137,7 +202,10 @@ class AuthenticationTest extends TestCase
     public function testRequireApiTokenRejectsInvalidToken() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getHeader')->willReturn(self::TOKEN);
+        $request->method('getHeader')->willReturnMap([
+            ['Authorization', 'Bearer ' . self::TOKEN],
+            ['X-Movary-Token', null],
+        ]);
         $this->personalApiTokenServiceMock
             ->expects(self::once())
             ->method('findUserIdByToken')

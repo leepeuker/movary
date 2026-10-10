@@ -42,18 +42,34 @@ class IsAuthorizedToReadUserDataTest extends TestCase
     public function testCookieOnlyRequestHasNoApiIdentity() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['username' => 'example']);
-        $requestedUser = $this->createStub(UserEntity::class);
-
-        $userApi = $this->createStub(UserApi::class);
-        $userApi->method('findUserByName')->willReturn($requestedUser);
+        $userApi = $this->createMock(UserApi::class);
+        $userApi->expects(self::never())->method('findUserByName');
 
         $authentication = $this->createMock(Authentication::class);
         $authentication->expects(self::once())->method('authenticateApiToken')->with($request)->willReturn(null);
+        $authentication->expects(self::never())->method('isUserPageVisible');
+
+        $response = (new IsAuthorizedToReadUserData($userApi, $authentication))($request);
+
+        self::assertNotNull($response);
+        self::assertSame(401, $response->getStatusCode()->getCode());
+        self::assertContains('WWW-Authenticate: Bearer', array_map('strval', $response->getHeaders()));
+    }
+
+    public function testReturnsForbiddenAfterAuthenticationWhenUserIsNotVisible() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getRouteParameters')->willReturn(['username' => 'example']);
+        $requestedUser = $this->createStub(UserEntity::class);
+        $authenticatedUser = AuthenticatedUser::create(12, CredentialType::API_TOKEN);
+        $userApi = $this->createStub(UserApi::class);
+        $userApi->method('findUserByName')->willReturn($requestedUser);
+        $authentication = $this->createMock(Authentication::class);
+        $authentication->method('authenticateApiToken')->willReturn($authenticatedUser);
         $authentication
             ->expects(self::once())
             ->method('isUserPageVisible')
-            ->with($requestedUser, null)
+            ->with($requestedUser, $authenticatedUser)
             ->willReturn(false);
 
         $response = (new IsAuthorizedToReadUserData($userApi, $authentication))($request);

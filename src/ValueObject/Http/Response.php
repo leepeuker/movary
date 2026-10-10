@@ -120,6 +120,11 @@ class Response
         return new self(StatusCode::createUnauthorized(), $message, $headers);
     }
 
+    public static function createBearerUnauthorized() : self
+    {
+        return self::createUnauthorized(headers: [Header::createWwwAuthenticateBearer()]);
+    }
+
     public static function createUnsupportedMediaType() : self
     {
         return new self(StatusCode::createUnsupportedMediaType());

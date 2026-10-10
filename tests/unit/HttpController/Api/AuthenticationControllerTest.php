@@ -19,8 +19,6 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class AuthenticationControllerTest extends TestCase
 {
-    private const string TOKEN = 'authentication-token';
-
     private MockObject|Authentication $authenticationMock;
 
     private AuthenticationController $subject;
@@ -37,13 +35,13 @@ class AuthenticationControllerTest extends TestCase
     public function testGetTokenDataRejectsInvalidToken() : void
     {
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(self::TOKEN);
         $this->authenticationMock->expects(self::once())->method('authenticateApiToken')->with($request)->willReturn(null);
         $this->userApiMock->expects(self::never())->method('findUserById');
 
         $response = $this->subject->getTokenData($request);
 
         self::assertEquals(StatusCode::createUnauthorized(), $response->getStatusCode());
+        self::assertContains('WWW-Authenticate: Bearer', array_map('strval', $response->getHeaders()));
     }
 
     public function testGetTokenDataReturnsValidatedTokenUser() : void
@@ -54,7 +52,6 @@ class AuthenticationControllerTest extends TestCase
         $user->method('getName')->willReturn('example');
         $user->method('isAdmin')->willReturn(false);
 
-        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(self::TOKEN);
         $this->authenticationMock
             ->expects(self::once())
             ->method('authenticateApiToken')
@@ -71,12 +68,12 @@ class AuthenticationControllerTest extends TestCase
     public function testGetTokenDataRejectsMissingToken() : void
     {
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(null);
-        $this->authenticationMock->expects(self::never())->method('authenticateApiToken');
+        $this->authenticationMock->expects(self::once())->method('authenticateApiToken')->with($request)->willReturn(null);
         $this->userApiMock->expects(self::never())->method('findUserById');
 
         $response = $this->subject->getTokenData($request);
 
-        self::assertEquals(StatusCode::createBadRequest(), $response->getStatusCode());
+        self::assertEquals(StatusCode::createUnauthorized(), $response->getStatusCode());
+        self::assertContains('WWW-Authenticate: Bearer', array_map('strval', $response->getHeaders()));
     }
 }
