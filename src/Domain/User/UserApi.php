@@ -29,11 +29,6 @@ class UserApi
         $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
     }
 
-    public function deleteApiToken(int $userId) : void
-    {
-        $this->repository->deleteApiToken($userId);
-    }
-
     public function deleteEmbyWebhookId(int $userId) : void
     {
         $this->repository->setEmbyWebhookId($userId, null);
@@ -152,16 +147,6 @@ class UserApi
         return $user;
     }
 
-    public function findApiTokenByUserId(int $userId) : ?string
-    {
-        return $this->repository->findApiTokenByUserId($userId);
-    }
-
-    public function findByToken(string $token) : ?UserEntity
-    {
-        return $this->repository->findUserByToken($token);
-    }
-
     public function findJellyfinAuthentication(int $userId) : ?JellyfinAuthenticationData
     {
         $authData = $this->repository->findJellyfinAuthenticationData($userId);
@@ -242,11 +227,6 @@ class UserApi
         return $this->repository->findUserByName($name);
     }
 
-    public function findUserIdByApiToken(string $apiToken) : ?int
-    {
-        return $this->repository->findUserIdByApiToken($apiToken);
-    }
-
     public function findUserIdByEmbyWebhookId(string $webhookId) : ?int
     {
         return $this->repository->findUserIdByEmbyWebhookId($webhookId);
@@ -270,13 +250,6 @@ class UserApi
     public function findUserIdByRadarrFeedId(string $feedId) : ?int
     {
         return $this->repository->findUserIdByRadarrFeedId($feedId);
-    }
-
-    public function generateApiToken(int $userId) : void
-    {
-        $token = bin2hex(random_bytes(16));
-
-        $this->repository->createApiToken($userId, $token);
     }
 
     public function hasHiddenPerson(int $userId, int $personId) : bool

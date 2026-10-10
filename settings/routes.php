@@ -85,9 +85,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     # Settings #
     ############
     $routes->add('GET', '/settings/account/general', [Web\SettingsController::class, 'renderGeneralAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('GET', '/settings/account/general/api-token', [Web\SettingsController::class, 'getApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('DELETE', '/settings/account/general/api-token', [Web\SettingsController::class, 'deleteApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
-    $routes->add('PUT', '/settings/account/general/api-token', [Web\SettingsController::class, 'regenerateApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/settings/account/api-tokens', [Web\SettingsController::class, 'renderApiTokensAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/settings/account/api-tokens', [Web\SettingsController::class, 'createApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/account/api-tokens', [Web\SettingsController::class, 'revokeAllApiTokens'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/account/api-tokens/{tokenId:\d+}', [Web\SettingsController::class, 'revokeApiToken'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/dashboard', [Web\SettingsController::class, 'renderDashboardAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/locations', [Web\SettingsController::class, 'renderLocationsAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/settings/account/security', [Web\SettingsController::class, 'renderSecurityAccountPage'], [Web\Middleware\UserIsAuthenticated::class]);

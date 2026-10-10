@@ -1,0 +1,60 @@
+<div class="modal fade" id="apiTokenModal" tabindex="-1" aria-labelledby="apiTokenModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="apiTokenModalTitle">Create personal API token</h1>
+                <button type="button" class="btn-close" id="apiTokenModalCloseButton" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="apiTokenCreationForm">
+                    <div class="mb-3">
+                        <label for="apiTokenNameInput" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="apiTokenNameInput" maxlength="100" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="apiTokenExpirationInput" class="form-label">Expiration</label>
+                        <select class="form-select" id="apiTokenExpirationInput">
+                            <option value="30">30 days</option>
+                            <option value="90" selected>90 days</option>
+                            <option value="365">365 days</option>
+                            <option value="">Never</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-none text-start" id="apiTokenDetails">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8" id="apiTokenDetailsName"></dd>
+                        <dt class="col-sm-4">Token</dt>
+                        <dd class="col-sm-8"><code id="apiTokenDetailsPrefix"></code></dd>
+                        <dt class="col-sm-4">Created</dt>
+                        <dd class="col-sm-8" id="apiTokenDetailsCreatedAt"></dd>
+                        <dt class="col-sm-4">Last used</dt>
+                        <dd class="col-sm-8" id="apiTokenDetailsLastUsedAt"></dd>
+                        <dt class="col-sm-4">Expires</dt>
+                        <dd class="col-sm-8" id="apiTokenDetailsExpiresAt"></dd>
+                    </dl>
+                </div>
+
+                <div id="apiTokenModalAlerts"></div>
+
+                <div class="d-none" id="createdApiTokenContainer">
+                    <div class="alert alert-warning" role="alert">
+                        Copy this token now. It will not be shown again.
+                    </div>
+                    <p id="createdApiTokenExpiration"></p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="createdApiTokenInput" readonly>
+                        <button type="button" class="btn btn-outline-secondary" id="copyCreatedApiTokenButton">Copy</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger d-none" id="revokeApiTokenButton">Revoke token</button>
+                <button type="button" class="btn btn-primary" id="createApiTokenButton">Create token</button>
+                <button type="button" class="btn btn-primary d-none" id="finishApiTokenCreationButton">Done</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -135,7 +135,7 @@ query_sqlite release-0.73.1.sqlite \
     "INSERT INTO server_setting (key, value) VALUES ('release-setting', 'preserved')"
 
 run_sqlite_app_command release-0.73.1.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261005130000' \
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
     "$(query_sqlite release-0.73.1.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite \
@@ -147,6 +147,10 @@ assert_equal '8|release-watch|release-location' "$(query_sqlite release-0.73.1.s
 assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
     "SELECT COUNT(*) FROM user_api_token a INNER JOIN user_auth_token u ON u.user_id = a.user_id INNER JOIN watchlist w ON w.user_id = a.user_id WHERE a.user_id = 1")" \
     'SQLite 0.73.1 fixture did not preserve tokens and watchlist data'
+assert_equal 'Legacy token|a3a8ee4379333906f4ddb7724687e37ddf917ecf78feca566ce8a07b1025318f|12345678|2026-01-01|1|1' \
+    "$(query_sqlite release-0.73.1.sqlite \
+        "SELECT name || '|' || token_hash || '|' || token_prefix || '|' || created_at || '|' || (last_used_at IS NULL) || '|' || (expires_at IS NULL) FROM user_api_token WHERE user_id = 1")" \
+    'SQLite 0.73.1 fixture did not convert the personal token safely'
 assert_equal preserved "$(query_sqlite release-0.73.1.sqlite \
     "SELECT value FROM server_setting WHERE key = 'release-setting'")" \
     'SQLite 0.73.1 fixture did not preserve server settings'
@@ -246,11 +250,20 @@ assert_equal 0 "$(query_sqlite missing-history.sqlite "SELECT COUNT(*) FROM sqli
     'SQLite initialized Doctrine metadata for an incomplete legacy history'
 
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261005130000' \
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite legacy database did not record the latest Doctrine migration'
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 run_sqlite_app_command null-genre.sqlite database:migration:status >/dev/null
+if run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null 2>&1; then
+    echo 'SQLite rolled back the irreversible personal-token migration' >&2
+    exit 1
+fi
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+    "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'SQLite removed the personal-token migration after rejected rollback'
+query_sqlite null-genre.sqlite \
+    "DELETE FROM doctrine_migration_versions WHERE version LIKE '%Version20261010120000'"
 run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null
 assert_equal 'Movary\DatabaseMigration\Version20261004100000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
@@ -278,7 +291,7 @@ run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
 assert_equal 28 "$(query_sqlite doctrine-fresh.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
     'Fresh SQLite Doctrine database has an unexpected table count'
-assert_equal 'Movary\DatabaseMigration\Version20261005130000' \
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
     "$(query_sqlite doctrine-fresh.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'Fresh SQLite database did not execute the latest Doctrine migration'
 
@@ -332,7 +345,7 @@ mysql_query movary_release "INSERT INTO user_auth_token (id, user_id, token, dev
 mysql_query movary_release "INSERT INTO server_setting (\`key\`, value) VALUES ('release-setting', 'preserved')"
 
 run_mysql_app_command movary_release database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261005130000' \
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
     "$(mysql_query movary_release 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
@@ -344,6 +357,10 @@ assert_equal '8|release-watch|release-location' "$(mysql_query movary_release \
 assert_equal 1 "$(mysql_query movary_release \
     "SELECT COUNT(*) FROM user_api_token a INNER JOIN user_auth_token u ON u.user_id = a.user_id INNER JOIN watchlist w ON w.user_id = a.user_id WHERE a.user_id = 1")" \
     'MySQL 0.73.1 fixture did not preserve tokens and watchlist data'
+assert_equal 'Legacy token|a3a8ee4379333906f4ddb7724687e37ddf917ecf78feca566ce8a07b1025318f|12345678|2026-01-01 00:00:00|1|1' \
+    "$(mysql_query movary_release \
+        "SELECT CONCAT_WS('|', name, token_hash, token_prefix, created_at, last_used_at IS NULL, expires_at IS NULL) FROM user_api_token WHERE user_id = 1")" \
+    'MySQL 0.73.1 fixture did not convert the personal token safely'
 assert_equal preserved "$(mysql_query movary_release \
     "SELECT value FROM server_setting WHERE \`key\` = 'release-setting'")" \
     'MySQL 0.73.1 fixture did not preserve server settings'
@@ -396,11 +413,20 @@ assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movi
     'MySQL watched cache does not isolate identical Trakt IDs by user'
 
 run_mysql_app_command movary database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261005130000' \
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL legacy database did not record the latest Doctrine migration'
 run_mysql_app_command movary database:migration:migrate
 run_mysql_app_command movary database:migration:status >/dev/null
+if run_mysql_app_command movary database:migration:rollback >/dev/null 2>&1; then
+    echo 'MySQL rolled back the irreversible personal-token migration' >&2
+    exit 1
+fi
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+    "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'MySQL removed the personal-token migration after rejected rollback'
+mysql_query movary \
+    "DELETE FROM doctrine_migration_versions WHERE version LIKE '%Version20261010120000'"
 run_mysql_app_command movary database:migration:rollback >/dev/null
 assert_equal 'Movary\DatabaseMigration\Version20261004100000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \

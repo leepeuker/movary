@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Settings - API Tokens
+{% endblock %}
+
+{% block stylesheets %}
+    <link href="{{ asset_url('css/settings.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ asset_url('js/settings-account-api-tokens.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <main role="main" class="container">
+        {{ include('component/navbar.html.twig') }}
+
+        <div style="text-align: center;">
+            {{ include('component/settings-nav.html.twig') }}
+
+            <div style="padding-bottom: 1rem;padding-top: 1rem">
+                <h5 style="margin-bottom: 1rem;">Personal API tokens</h5>
+
+                <p class="text-muted">
+                    Use tokens with trusted API clients and automation. Tokens have the same API permissions as your
+                    account, so only send them over HTTPS. A new token is shown once after creation.
+                </p>
+
+                <div id="apiTokenManagementAlerts"></div>
+
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3 text-start">
+                    <div class="d-flex align-items-center gap-2">
+                        <select class="form-select" id="apiTokensPerPage" style="width: 5rem">
+                            <option value="20" {{ apiTokensPerPage == 20 ? 'selected' }}>20</option>
+                            <option value="50" {{ apiTokensPerPage == 50 ? 'selected' }}>50</option>
+                            <option value="100" {{ apiTokensPerPage == 100 ? 'selected' }}>100</option>
+                            <option value="250" {{ apiTokensPerPage == 250 ? 'selected' }}>250</option>
+                        </select>
+                        <label for="apiTokensPerPage" class="form-label mb-0">per page</label>
+                    </div>
+                    <button class="btn btn-primary" type="button" onclick="refreshApiTokensPage()" aria-label="Refresh API tokens" title="Refresh API tokens">
+                        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="apiTokensTable">
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Token prefix</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Last used</th>
+                            <th scope="col">Expires</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for token in apiTokens %}
+                            <tr class="api-token-row"
+                                data-token-id="{{ token.id }}"
+                                data-token-name="{{ token.name }}"
+                                data-token-prefix="{{ token.tokenPrefix }}…"
+                                data-token-created-at="{{ token.createdAt }} UTC"
+                                data-token-last-used-at="{{ token.lastUsedAt == null ? 'Not used' : token.lastUsedAt ~ ' UTC' }}"
+                                data-token-expires-at="{{ token.expiresAt == null ? 'Never' : token.expiresAt ~ ' UTC' }}"
+                                tabindex="0"
+                                role="button"
+                                style="cursor: pointer">
+                                <td>{{ token.name }}</td>
+                                <td><code>{{ token.tokenPrefix }}…</code></td>
+                                <td>{{ token.createdAt }} UTC</td>
+                                <td>{{ token.lastUsedAt == null ? 'Not used' : token.lastUsedAt ~ ' UTC' }}</td>
+                                <td>{{ token.expiresAt == null ? 'Never' : token.expiresAt ~ ' UTC' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-muted">No personal API tokens.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {{ include('component/pagination.html.twig', {
+                    paginationPath: applicationUrl ~ '/settings/account/api-tokens',
+                    paginationQuery: paginationQuery,
+                }) }}
+
+                <div class="d-grid gap-2 mt-3">
+                    <button type="button" class="btn btn-primary" onclick="showCreateApiTokenModal()">Add token</button>
+                    <button type="button" class="btn btn-danger" onclick="revokeAllApiTokens()" {{ paginationElements.totalCount == 0 ? 'disabled' }}>Revoke all tokens</button>
+                </div>
+            </div>
+        </div>
+
+        {{ include('component/modal-api-token.html.twig') }}
+    </main>
+{% endblock %}

@@ -36,6 +36,7 @@ class Authentication
     public function __construct(
         private readonly UserRepository $repository,
         private readonly UserApi $userApi,
+        private readonly PersonalApiTokenService $personalApiTokenService,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
         private readonly Cookie $cookie,
@@ -67,7 +68,7 @@ class Authentication
             return null;
         }
 
-        $userId = $this->userApi->findUserIdByApiToken($token);
+        $userId = $this->personalApiTokenService->findUserIdByToken($token);
         if ($userId === null) {
             return null;
         }

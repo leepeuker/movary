@@ -4,6 +4,7 @@ namespace Tests\Unit\Movary\Domain\User\Service;
 
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\LoginAttemptLimiter;
+use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
@@ -37,6 +38,8 @@ class AuthenticationTest extends TestCase
 
     private MockObject|LoginAttemptLimiter $loginAttemptLimiterMock;
 
+    private MockObject|PersonalApiTokenService $personalApiTokenServiceMock;
+
     protected function setUp() : void
     {
         unset($_COOKIE['id']);
@@ -46,9 +49,11 @@ class AuthenticationTest extends TestCase
         $this->cookieSecurityMock = $this->createMock(CookieSecurity::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->loginAttemptLimiterMock = $this->createMock(LoginAttemptLimiter::class);
+        $this->personalApiTokenServiceMock = $this->createMock(PersonalApiTokenService::class);
         $this->subject = new Authentication(
             $this->userRepositoryMock,
             $this->userApiMock,
+            $this->personalApiTokenServiceMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
             $this->loginAttemptLimiterMock,
             new Cookie($this->cookieSecurityMock, static fn() => true),
@@ -70,9 +75,9 @@ class AuthenticationTest extends TestCase
             ->method('getHeader')
             ->with('X-Movary-Token')
             ->willReturn(self::TOKEN);
-        $this->userApiMock
+        $this->personalApiTokenServiceMock
             ->expects(self::once())
-            ->method('findUserIdByApiToken')
+            ->method('findUserIdByToken')
             ->with(self::TOKEN)
             ->willReturn(12);
         $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
@@ -92,9 +97,9 @@ class AuthenticationTest extends TestCase
             ->method('getHeader')
             ->with('X-Movary-Token')
             ->willReturn(self::TOKEN);
-        $this->userApiMock
+        $this->personalApiTokenServiceMock
             ->expects(self::once())
-            ->method('findUserIdByApiToken')
+            ->method('findUserIdByToken')
             ->with(self::TOKEN)
             ->willReturn(null);
         $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
@@ -107,7 +112,7 @@ class AuthenticationTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $request->expects(self::once())->method('getHeader')->with('X-Movary-Token')->willReturn(null);
-        $this->userApiMock->expects(self::never())->method('findUserIdByApiToken');
+        $this->personalApiTokenServiceMock->expects(self::never())->method('findUserIdByToken');
 
         self::assertNull($this->subject->authenticateApiToken($request));
         self::assertNull($this->subject->authenticateApiToken($request));
@@ -117,9 +122,9 @@ class AuthenticationTest extends TestCase
     {
         $request = $this->createStub(Request::class);
         $request->method('getHeader')->willReturn(self::TOKEN);
-        $this->userApiMock
+        $this->personalApiTokenServiceMock
             ->expects(self::once())
-            ->method('findUserIdByApiToken')
+            ->method('findUserIdByToken')
             ->with(self::TOKEN)
             ->willReturn(12);
 
@@ -133,9 +138,9 @@ class AuthenticationTest extends TestCase
     {
         $request = $this->createStub(Request::class);
         $request->method('getHeader')->willReturn(self::TOKEN);
-        $this->userApiMock
+        $this->personalApiTokenServiceMock
             ->expects(self::once())
-            ->method('findUserIdByApiToken')
+            ->method('findUserIdByToken')
             ->with(self::TOKEN)
             ->willReturn(null);
 
@@ -156,7 +161,7 @@ class AuthenticationTest extends TestCase
                 'userId' => 12,
                 'expirationDate' => DateTime::createFromString('+1 hour'),
             ]);
-        $this->userApiMock->expects(self::never())->method('findUserIdByApiToken');
+        $this->personalApiTokenServiceMock->expects(self::never())->method('findUserIdByToken');
 
         $result = $this->subject->authenticateWebSession();
 

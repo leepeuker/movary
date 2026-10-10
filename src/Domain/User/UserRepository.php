@@ -14,18 +14,6 @@ class UserRepository
     {
     }
 
-    public function createApiToken(int $userId, string $token) : void
-    {
-        $this->dbConnection->insert(
-            'user_api_token',
-            [
-                'user_id' => $userId,
-                'token' => $token,
-                'created_at' => (string)DateTime::create(),
-            ],
-        );
-    }
-
     public function createAuthToken(int $userId, string $token, string $deviceName, string $userAgent, DateTime $expirationDate) : void
     {
         $this->dbConnection->insert(
@@ -52,6 +40,28 @@ class UserRepository
         );
 
         return (int)$this->dbConnection->lastInsertId();
+    }
+
+    public function createPersonalApiToken(
+        int $userId,
+        string $name,
+        string $tokenHash,
+        string $tokenPrefix,
+        DateTime $createdAt,
+        ?DateTime $expiresAt,
+    ) : void {
+        $this->dbConnection->insert(
+            'user_api_token',
+            [
+                'user_id' => $userId,
+                'name' => $name,
+                'token_hash' => $tokenHash,
+                'token_prefix' => $tokenPrefix,
+                'created_at' => (string)$createdAt,
+                'last_used_at' => null,
+                'expires_at' => $expiresAt === null ? null : (string)$expiresAt,
+            ],
+        );
     }
 
     public function deleteLoginAttemptsBefore(DateTime $date) : void
@@ -199,14 +209,14 @@ class UserRepository
         );
     }
 
-    public function deleteApiToken(int $userId) : void
+    public function deleteAllPersonalApiTokens(int $userId) : void
     {
-        $this->dbConnection->delete(
-            'user_api_token',
-            [
-                'user_id' => $userId,
-            ],
-        );
+        $this->dbConnection->delete('user_api_token', ['user_id' => $userId]);
+    }
+
+    public function deletePersonalApiToken(int $userId, int $tokenId) : void
+    {
+        $this->dbConnection->delete('user_api_token', ['id' => $tokenId, 'user_id' => $userId]);
     }
 
     public function deleteAuthToken(string $token) : void
@@ -263,6 +273,14 @@ class UserRepository
         [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
 
         return (int)$this->dbConnection->fetchOne("SELECT COUNT(*) FROM `user`$whereQuery", $parameters);
+    }
+
+    public function countPersonalApiTokens(int $userId) : int
+    {
+        return (int)$this->dbConnection->fetchOne(
+            'SELECT COUNT(*) FROM `user_api_token` WHERE `user_id` = ?',
+            [$userId],
+        );
     }
 
     public function fetchAllPaginated(int $limit, int $offset, ?bool $isAdminFilter = null) : array
@@ -413,16 +431,6 @@ class UserRepository
         );
     }
 
-    public function findApiTokenByUserId(int $userId) : ?string
-    {
-        return $this->dbConnection->fetchFirstColumn(
-            'SELECT token
-            FROM `user_api_token` 
-            WHERE user_id = ?',
-            [$userId],
-        )[0] ?? null;
-    }
-
     public function findAuthTokenExpirationDate(string $token) : ?DateTime
     {
         $expirationDate = $this->dbConnection->fetchOne('SELECT `expiration_date` FROM `user_auth_token` WHERE `token` = ?', [$token]);
@@ -483,6 +491,81 @@ class UserRepository
             'expirationDate' => DateTime::createFromString($data['expiration_date']),
             'createdAt' => DateTime::createFromString($data['created_at']),
         ];
+    }
+
+    /**
+     * @return list<array{
+     *     id: int,
+     *     name: string,
+     *     tokenPrefix: string,
+     *     createdAt: DateTime,
+     *     lastUsedAt: null|DateTime,
+     *     expiresAt: null|DateTime
+     * }>
+     */
+    public function fetchPersonalApiTokensPaginated(int $userId, int $limit, int $offset) : array
+    {
+        $tokens = $this->dbConnection->fetchAllAssociative(
+            'SELECT `id`, `name`, `token_prefix`, `created_at`, `last_used_at`, `expires_at` '
+            . 'FROM `user_api_token` WHERE `user_id` = ? ORDER BY `created_at` DESC, `id` DESC '
+            . 'LIMIT ' . $limit . ' OFFSET ' . $offset,
+            [$userId],
+        );
+
+        return array_map(
+            static fn(array $token) : array => [
+                'id' => (int)$token['id'],
+                'name' => (string)$token['name'],
+                'tokenPrefix' => (string)$token['token_prefix'],
+                'createdAt' => DateTime::createFromString((string)$token['created_at']),
+                'lastUsedAt' => $token['last_used_at'] === null
+                    ? null
+                    : DateTime::createFromString((string)$token['last_used_at']),
+                'expiresAt' => $token['expires_at'] === null
+                    ? null
+                    : DateTime::createFromString((string)$token['expires_at']),
+            ],
+            $tokens,
+        );
+    }
+
+    /**
+     * @return null|array{id: int, userId: int, expiresAt: null|DateTime, lastUsedAt: null|DateTime}
+     */
+    public function findPersonalApiTokenData(string $tokenHash) : ?array
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT `id`, `user_id`, `expires_at`, `last_used_at` '
+            . 'FROM `user_api_token` WHERE `token_hash` = ?',
+            [$tokenHash],
+        );
+
+        if ($data === false) {
+            return null;
+        }
+
+        return [
+            'id' => (int)$data['id'],
+            'userId' => (int)$data['user_id'],
+            'expiresAt' => $data['expires_at'] === null
+                ? null
+                : DateTime::createFromString((string)$data['expires_at']),
+            'lastUsedAt' => $data['last_used_at'] === null
+                ? null
+                : DateTime::createFromString((string)$data['last_used_at']),
+        ];
+    }
+
+    public function updatePersonalApiTokenLastUsedAt(
+        int $tokenId,
+        DateTime $lastUsedAt,
+        DateTime $lastUsedUpdateThreshold,
+    ) : void {
+        $this->dbConnection->executeStatement(
+            'UPDATE `user_api_token` SET `last_used_at` = ? '
+            . 'WHERE `id` = ? AND (`last_used_at` IS NULL OR `last_used_at` < ?)',
+            [(string)$lastUsedAt, $tokenId, (string)$lastUsedUpdateThreshold],
+        );
     }
 
     public function findJellyfinAuthenticationData(int $userId) : ?array
@@ -630,40 +713,6 @@ class UserRepository
         }
 
         return UserEntity::createFromArray($data);
-    }
-
-    public function findUserByToken(string $apiToken) : ?UserEntity
-    {
-        $data = $this->dbConnection->fetchAssociative(
-            'SELECT user.*
-            FROM user
-            LEFT JOIN user_api_token ON user.id = user_api_token.user_id
-            LEFT JOIN user_auth_token ON user.id = user_auth_token.user_id
-            WHERE user_api_token.token = ? OR user_auth_token.token = ?',
-            [$apiToken, $apiToken],
-        );
-
-        if (empty($data) === true) {
-            return null;
-        }
-
-        return UserEntity::createFromArray($data);
-    }
-
-    public function findUserIdByApiToken(string $apiToken) : ?int
-    {
-        $result = $this->dbConnection->fetchFirstColumn(
-            'SELECT user_id
-            FROM `user_api_token` 
-            WHERE token = ?',
-            [$apiToken],
-        );
-
-        if (count($result) !== 1) {
-            return null;
-        }
-
-        return (int)$result[0];
     }
 
     public function findUserIdByAuthToken(string $token) : ?int

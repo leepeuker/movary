@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController\Web;
 
+use InvalidArgumentException;
 use Movary\Api\Github\GithubApi;
 use Movary\Api\Jellyfin\JellyfinApi;
 use Movary\Api\Plex\PlexApi;
@@ -12,6 +13,7 @@ use Movary\Domain\User;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\PasswordResetTokenService;
+use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
@@ -69,6 +71,7 @@ class SettingsController
         private readonly SmtpConfigFactory $smtpConfigFactory,
         private readonly EmailSupport $emailSupport,
         private readonly PasswordResetTokenService $passwordResetTokenService,
+        private readonly PersonalApiTokenService $personalApiTokenService,
         private readonly CountryApi $countryApi,
         private readonly RadarrFeedUrlGenerator $radarrFeedUrlGenerator,
         private readonly ApplicationUrlService $applicationUrlService,
@@ -97,11 +100,27 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
-    public function deleteApiToken() : Response
+    public function createApiToken(Request $request) : Response
     {
-        $this->userApi->deleteApiToken($this->authenticationService->requireWebSession()->getUserId());
+        $requestData = Json::decode($request->getBody());
+        $name = $requestData['name'] ?? null;
+        $expirationDays = $requestData['expirationDays'] ?? null;
 
-        return Response::createOk();
+        if (is_string($name) === false || ($expirationDays !== null && is_int($expirationDays) === false)) {
+            return Response::createBadRequest('Invalid personal API token data.');
+        }
+
+        try {
+            $createdToken = $this->personalApiTokenService->createToken(
+                $this->authenticationService->requireWebSession()->getUserId(),
+                $name,
+                $expirationDays,
+            );
+        } catch (InvalidArgumentException $exception) {
+            return Response::createBadRequest($exception->getMessage());
+        }
+
+        return Response::createJson(Json::encode($createdToken));
     }
 
     public function deleteHistory() : Response
@@ -128,21 +147,23 @@ class SettingsController
         );
     }
 
-    public function getApiToken() : Response
+    public function revokeAllApiTokens() : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $this->personalApiTokenService->revokeAllTokens(
+            $this->authenticationService->requireWebSession()->getUserId(),
+        );
 
-        return Response::createJson(Json::encode(['token' => $this->userApi->findApiTokenByUserId($userId)]));
+        return Response::createOk();
     }
 
-    public function regenerateApiToken() : Response
+    public function revokeApiToken(Request $request) : Response
     {
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $this->personalApiTokenService->revokeToken(
+            $this->authenticationService->requireWebSession()->getUserId(),
+            (int)$request->getRouteParameters()['tokenId'],
+        );
 
-        $this->userApi->deleteApiToken($userId);
-        $this->userApi->generateApiToken($userId);
-
-        return Response::createJson(Json::encode(['token' => $this->userApi->findApiTokenByUserId($userId)]));
+        return Response::createOk();
     }
 
     public function renderAppPage() : Response
@@ -238,7 +259,6 @@ class SettingsController
                 'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
                 'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'userCountry' => $user->getCountry(),
-                'apiToken' => $this->userApi->findApiTokenByUserId($user->getId()),
                 'displayCharacterNamesInput' => $user->getDisplayCharacterNames(),
                 'displayTmdbRatingsInput' => $user->getDisplayTmdbRating(),
                 'displayImdbRatingsInput' => $user->getDisplayImdbRating(),
@@ -322,6 +342,31 @@ class SettingsController
                 'letterboxdDiaryImportFileInvalid' => $this->flashMessageService->consume(
                     FlashMessage::LETTERBOXD_DIARY_FILE_INVALID,
                 ),
+            ]),
+        );
+    }
+
+    public function renderApiTokensAccountPage(Request $request) : Response
+    {
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250]);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $this->personalApiTokenService->countTokens($userId),
+            $paginationRequest->getPerPage(),
+            $paginationRequest->getPage(),
+        );
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-account-api-tokens.html.twig', [
+                'apiTokens' => $this->personalApiTokenService->fetchTokensPaginated(
+                    $userId,
+                    $paginationRequest->getPerPage(),
+                    $paginationElements->getOffset(),
+                ),
+                'apiTokensPerPage' => $paginationRequest->getPerPage(),
+                'paginationElements' => $paginationElements,
+                'paginationQuery' => ['perPage' => $paginationRequest->getPerPage()],
             ]),
         );
     }
