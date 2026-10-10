@@ -27,11 +27,11 @@ class Authentication
 
     private bool $apiTokenAuthenticationResolved = false;
 
-    private ?AuthenticatedUser $apiTokenAuthenticatedUser = null;
+    private ?AuthenticatedUser $authenticatedApiUser = null;
 
     private bool $webSessionAuthenticationResolved = false;
 
-    private ?AuthenticatedUser $webSessionAuthenticatedUser = null;
+    private ?AuthenticatedUser $authenticatedWebUser = null;
 
     public function __construct(
         private readonly UserRepository $repository,
@@ -43,7 +43,7 @@ class Authentication
     ) {
     }
 
-    public function createExpirationDate(int $days = 1) : DateTime
+    private function createExpirationDate(int $days = 1) : DateTime
     {
         $timestamp = strtotime('+' . $days . ' day');
 
@@ -57,7 +57,7 @@ class Authentication
     public function authenticateApiToken(Request $request) : ?AuthenticatedUser
     {
         if ($this->apiTokenAuthenticationResolved === true) {
-            return $this->apiTokenAuthenticatedUser;
+            return $this->authenticatedApiUser;
         }
 
         $this->apiTokenAuthenticationResolved = true;
@@ -72,9 +72,9 @@ class Authentication
             return null;
         }
 
-        $this->apiTokenAuthenticatedUser = AuthenticatedUser::create($userId, CredentialType::API_TOKEN);
+        $this->authenticatedApiUser = AuthenticatedUser::create($userId, CredentialType::API_TOKEN);
 
-        return $this->apiTokenAuthenticatedUser;
+        return $this->authenticatedApiUser;
     }
 
     public function requireApiToken(Request $request) : AuthenticatedUser
@@ -90,7 +90,7 @@ class Authentication
     public function authenticateWebSession() : ?AuthenticatedUser
     {
         if ($this->webSessionAuthenticationResolved === true) {
-            return $this->webSessionAuthenticatedUser;
+            return $this->authenticatedWebUser;
         }
 
         $this->webSessionAuthenticationResolved = true;
@@ -107,9 +107,9 @@ class Authentication
             return null;
         }
 
-        $this->webSessionAuthenticatedUser = AuthenticatedUser::create($userId, CredentialType::WEB_SESSION);
+        $this->authenticatedWebUser = AuthenticatedUser::create($userId, CredentialType::WEB_SESSION);
 
-        return $this->webSessionAuthenticatedUser;
+        return $this->authenticatedWebUser;
     }
 
     public function requireWebSession() : AuthenticatedUser
@@ -122,12 +122,12 @@ class Authentication
         return $authenticatedUser;
     }
 
-    public function deleteToken(string $token) : void
+    private function deleteToken(string $token) : void
     {
         $this->repository->deleteAuthToken($this->hashToken($token));
     }
 
-    public function findUserAndVerifyAuthentication(
+    private function findUserAndVerifyAuthentication(
         string $email,
         string $password,
         ?int $userTotpCode = null,
@@ -166,29 +166,9 @@ class Authentication
         return $user;
     }
 
-    public function getCurrentUser() : UserEntity
-    {
-        return $this->userApi->fetchUser($this->getCurrentUserId());
-    }
-
-    public function getCurrentUserId() : int
-    {
-        return $this->requireWebSession()->getUserId();
-    }
-
-    public function isUserAuthenticatedWithCookie() : bool
-    {
-        return $this->authenticateWebSession() !== null;
-    }
-
     public function isUserPageVisible(UserEntity $targetUser, ?AuthenticatedUser $authenticatedUser) : bool
     {
         return $this->isUserPageVisibleForUser($targetUser, $authenticatedUser?->getUserId());
-    }
-
-    public function isUserPageVisibleForWebRequest(UserEntity $targetUser) : bool
-    {
-        return $this->isUserPageVisible($targetUser, $this->authenticateWebSession());
     }
 
     public function loginWebSession(
@@ -213,7 +193,7 @@ class Authentication
         );
 
         $this->setAuthenticationCookie($token, $authTokenExpirationDate);
-        $this->webSessionAuthenticatedUser = AuthenticatedUser::create(
+        $this->authenticatedWebUser = AuthenticatedUser::create(
             $user->getId(),
             CredentialType::WEB_SESSION,
         );
@@ -229,13 +209,13 @@ class Authentication
             $this->clearAuthenticationCookie();
         }
 
-        $this->webSessionAuthenticatedUser = null;
+        $this->authenticatedWebUser = null;
         $this->webSessionAuthenticationResolved = true;
 
         $this->flashMessageService->clear();
     }
 
-    public function setAuthenticationCookie(string $token, DateTime $expirationDate) : void
+    private function setAuthenticationCookie(string $token, DateTime $expirationDate) : void
     {
         $this->cookie->set(
             self::AUTHENTICATION_COOKIE_NAME,

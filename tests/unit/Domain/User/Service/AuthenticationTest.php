@@ -203,35 +203,6 @@ class AuthenticationTest extends TestCase
         $this->subject->requireWebSession();
     }
 
-    public function testGetCurrentUserIdUsesValidatedCookieToken() : void
-    {
-        $_COOKIE['id'] = self::TOKEN;
-
-        $this->userRepositoryMock
-            ->expects(self::once())
-            ->method('findAuthTokenData')
-            ->with(hash('sha256', self::TOKEN))
-            ->willReturn([
-                'userId' => 12,
-                'expirationDate' => DateTime::createFromString('+1 hour'),
-            ]);
-
-        self::assertTrue($this->subject->isUserAuthenticatedWithCookie());
-        self::assertSame(12, $this->subject->getCurrentUserId());
-    }
-
-    public function testSetAuthenticationCookieMakesTokenAvailableInCurrentRequest() : void
-    {
-        $this->cookieSecurityMock->expects(self::once())->method('isSecure')->willReturn(true);
-
-        $this->subject->setAuthenticationCookie(
-            self::TOKEN,
-            DateTime::createFromString('+1 hour'),
-        );
-
-        self::assertSame(self::TOKEN, $_COOKIE['id']);
-    }
-
     public function testLogoutClearsPendingFlashMessagesWithoutAuthenticationCookie() : void
     {
         unset($_COOKIE['id']);
@@ -344,7 +315,7 @@ class AuthenticationTest extends TestCase
 
         $this->expectException(InvalidPassword::class);
 
-        $this->subject->findUserAndVerifyAuthentication('user@example.com', 'wrong-password');
+        $this->subject->loginWebSession('user@example.com', 'wrong-password', false, 'agent');
     }
 
     public function testSuccessfulLoginResetsAccountRateLimit() : void
@@ -364,7 +335,9 @@ class AuthenticationTest extends TestCase
             ->method('resetAccountAttempts')
             ->with('user@example.com');
 
-        self::assertSame($user, $this->subject->findUserAndVerifyAuthentication('user@example.com', 'password'));
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
+
+        self::assertSame(12, $this->subject->requireWebSession()->getUserId());
     }
 
     public function testMissingTotpCodeReleasesRateLimitReservation() : void
@@ -379,6 +352,6 @@ class AuthenticationTest extends TestCase
 
         $this->expectException(\Movary\Domain\User\Exception\MissingTotpCode::class);
 
-        $this->subject->findUserAndVerifyAuthentication('user@example.com', 'password');
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
     }
 }
