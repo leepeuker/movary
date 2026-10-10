@@ -214,91 +214,6 @@ class AuthenticationTest extends TestCase
         self::assertSame(12, $this->subject->getCurrentUserId());
     }
 
-    public function testGetUserIdByTokenReturnsApiTokenUser() : void
-    {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects(self::once())
-            ->method('getHeader')
-            ->with('X-Movary-Token')
-            ->willReturn(self::TOKEN);
-
-        $this->userApiMock
-            ->expects(self::once())
-            ->method('findUserIdByApiToken')
-            ->with(self::TOKEN)
-            ->willReturn(12);
-        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
-
-        self::assertSame(12, $this->subject->getUserIdByToken($request));
-    }
-
-    public function testGetUserIdByTokenFromHeaderDoesNotUseAuthenticationCookie() : void
-    {
-        $_COOKIE['id'] = 'cookie-token';
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects(self::once())
-            ->method('getHeader')
-            ->with('X-Movary-Token')
-            ->willReturn(self::TOKEN);
-
-        $this->userApiMock
-            ->expects(self::once())
-            ->method('findUserIdByApiToken')
-            ->with(self::TOKEN)
-            ->willReturn(12);
-        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
-
-        self::assertSame(12, $this->subject->getUserIdByTokenFromHeader($request));
-    }
-
-    public function testGetUserIdByTokenFromHeaderRejectsCookieOnlyAuthentication() : void
-    {
-        $_COOKIE['id'] = self::TOKEN;
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects(self::once())
-            ->method('getHeader')
-            ->with('X-Movary-Token')
-            ->willReturn(null);
-
-        $this->userApiMock->expects(self::never())->method('findUserIdByApiToken');
-        $this->userRepositoryMock->expects(self::never())->method('findAuthTokenData');
-
-        self::assertNull($this->subject->getUserIdByTokenFromHeader($request));
-    }
-
-    public function testGetUserIdByTokenRejectsAndDeletesExpiredAuthenticationToken() : void
-    {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects(self::once())
-            ->method('getHeader')
-            ->with('X-Movary-Token')
-            ->willReturn(self::TOKEN);
-
-        $this->userApiMock
-            ->expects(self::once())
-            ->method('findUserIdByApiToken')
-            ->with(self::TOKEN)
-            ->willReturn(null);
-        $this->userRepositoryMock
-            ->expects(self::once())
-            ->method('findAuthTokenData')
-            ->with(hash('sha256', self::TOKEN))
-            ->willReturn([
-                'userId' => 12,
-                'expirationDate' => DateTime::createFromString('-1 hour'),
-            ]);
-        $this->userRepositoryMock
-            ->expects(self::once())
-            ->method('deleteAuthToken')
-            ->with(hash('sha256', self::TOKEN));
-
-        self::assertNull($this->subject->getUserIdByToken($request));
-    }
-
     public function testSetAuthenticationCookieMakesTokenAvailableInCurrentRequest() : void
     {
         $this->cookieSecurityMock->expects(self::once())->method('isSecure')->willReturn(true);
@@ -320,7 +235,7 @@ class AuthenticationTest extends TestCase
         $this->subject->logout();
     }
 
-    public function testLoginStoresHashedAuthenticationToken() : void
+    public function testLoginWebSessionStoresHashedTokenAndSetsCookie() : void
     {
         $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
         $user->method('getId')->willReturn(12);
@@ -339,15 +254,46 @@ class AuthenticationTest extends TestCase
                 DateTime $expirationDate,
             ) use (&$storedToken) : void {
                 self::assertSame(12, $userId);
-                self::assertSame('api-client', $deviceName);
+                self::assertSame('Movary Web', $deviceName);
                 self::assertSame('agent', $userAgent);
                 self::assertInstanceOf(DateTime::class, $expirationDate);
                 $storedToken = $tokenHash;
             });
 
-        $result = $this->subject->login('user@example.com', 'password', false, 'api-client', 'agent');
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
 
-        self::assertSame(hash('sha256', $result['token']), $storedToken);
+        self::assertArrayHasKey('id', $_COOKIE);
+        self::assertSame(hash('sha256', $_COOKIE['id']), $storedToken);
+    }
+
+    public function testLoginWebSessionUsesRememberMeExpiration() : void
+    {
+        $user = $this->createStub(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->willReturn(true);
+        $this->userApiMock->method('findTotpUri')->willReturn(null);
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('createAuthToken')
+            ->willReturnCallback(static function (
+                int $userId,
+                string $tokenHash,
+                string $deviceName,
+                string $userAgent,
+                DateTime $expirationDate,
+            ) : void {
+                self::assertSame(12, $userId);
+                self::assertNotSame('', $tokenHash);
+                self::assertSame('Movary Web', $deviceName);
+                self::assertSame('agent', $userAgent);
+                self::assertSame(
+                    DateTime::createFromString('+30 days')->format('Y-m-d'),
+                    $expirationDate->format('Y-m-d'),
+                );
+            });
+
+        $this->subject->loginWebSession('user@example.com', 'password', true, 'agent');
     }
 
     public function testFailedPasswordIsRecordedForRateLimiting() : void

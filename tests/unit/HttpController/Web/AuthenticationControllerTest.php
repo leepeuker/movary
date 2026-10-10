@@ -108,8 +108,8 @@ class AuthenticationControllerTest extends TestCase
         $request->method('getUserAgent')->willReturn('agent');
         $this->authenticationMock
             ->expects(self::once())
-            ->method('login')
-            ->with('user@example.com', 'password', false, 'Movary Web', 'agent', null);
+            ->method('loginWebSession')
+            ->with('user@example.com', 'password', false, 'agent', null);
 
         $response = $this->createSubject()->login($request);
 
@@ -122,7 +122,7 @@ class AuthenticationControllerTest extends TestCase
         $request->method('getBody')->willReturn('{"email":"user@example.com","password":"password"}');
         $request->method('getUserAgent')->willReturn('agent');
         $this->authenticationMock
-            ->method('login')
+            ->method('loginWebSession')
             ->willThrowException(new LoginAttemptLimitReached(60));
 
         $response = $this->createSubject()->login($request);
