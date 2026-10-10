@@ -25,8 +25,13 @@ class Authentication
 
     private const string WEB_SESSION_DEVICE_NAME = 'Movary Web';
 
-    /** @var array<string, int> */
-    private array $validatedAuthTokenUserIds = [];
+    private bool $apiTokenAuthenticationResolved = false;
+
+    private ?AuthenticatedUser $apiTokenAuthenticatedUser = null;
+
+    private bool $webSessionAuthenticationResolved = false;
+
+    private ?AuthenticatedUser $webSessionAuthenticatedUser = null;
 
     public function __construct(
         private readonly UserRepository $repository,
@@ -51,6 +56,12 @@ class Authentication
 
     public function authenticateApiToken(Request $request) : ?AuthenticatedUser
     {
+        if ($this->apiTokenAuthenticationResolved === true) {
+            return $this->apiTokenAuthenticatedUser;
+        }
+
+        $this->apiTokenAuthenticationResolved = true;
+
         $token = $request->getHeader('X-Movary-Token');
         if ($token === null || $token === '') {
             return null;
@@ -61,7 +72,9 @@ class Authentication
             return null;
         }
 
-        return AuthenticatedUser::create($userId, CredentialType::API_TOKEN);
+        $this->apiTokenAuthenticatedUser = AuthenticatedUser::create($userId, CredentialType::API_TOKEN);
+
+        return $this->apiTokenAuthenticatedUser;
     }
 
     public function requireApiToken(Request $request) : AuthenticatedUser
@@ -76,6 +89,12 @@ class Authentication
 
     public function authenticateWebSession() : ?AuthenticatedUser
     {
+        if ($this->webSessionAuthenticationResolved === true) {
+            return $this->webSessionAuthenticatedUser;
+        }
+
+        $this->webSessionAuthenticationResolved = true;
+
         $token = $this->getAuthenticationCookie();
         if ($token === null) {
             return null;
@@ -88,7 +107,9 @@ class Authentication
             return null;
         }
 
-        return AuthenticatedUser::create($userId, CredentialType::WEB_SESSION);
+        $this->webSessionAuthenticatedUser = AuthenticatedUser::create($userId, CredentialType::WEB_SESSION);
+
+        return $this->webSessionAuthenticatedUser;
     }
 
     public function requireWebSession() : AuthenticatedUser
@@ -192,6 +213,11 @@ class Authentication
         );
 
         $this->setAuthenticationCookie($token, $authTokenExpirationDate);
+        $this->webSessionAuthenticatedUser = AuthenticatedUser::create(
+            $user->getId(),
+            CredentialType::WEB_SESSION,
+        );
+        $this->webSessionAuthenticationResolved = true;
     }
 
     public function logout() : void
@@ -202,6 +228,9 @@ class Authentication
             $this->deleteToken($token);
             $this->clearAuthenticationCookie();
         }
+
+        $this->webSessionAuthenticatedUser = null;
+        $this->webSessionAuthenticationResolved = true;
 
         $this->flashMessageService->clear();
     }
@@ -222,10 +251,6 @@ class Authentication
 
     private function findUserIdByValidAuthToken(string $token) : ?int
     {
-        if (isset($this->validatedAuthTokenUserIds[$token]) === true) {
-            return $this->validatedAuthTokenUserIds[$token];
-        }
-
         $tokenHash = $this->hashToken($token);
         $tokenData = $this->repository->findAuthTokenData($tokenHash);
         if ($tokenData === null) {
@@ -237,8 +262,6 @@ class Authentication
 
             return null;
         }
-
-        $this->validatedAuthTokenUserIds[$token] = $tokenData['userId'];
 
         return $tokenData['userId'];
     }
