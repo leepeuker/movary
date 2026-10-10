@@ -47,6 +47,11 @@ class Header
         return new self('Retry-After', (string)$seconds);
     }
 
+    public static function createWwwAuthenticateBearer() : self
+    {
+        return new self('WWW-Authenticate', 'Bearer');
+    }
+
     public static function createAttachment(string $filename) : self
     {
         if (preg_match('/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/D', $filename) !== 1) {

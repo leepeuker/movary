@@ -17,6 +17,11 @@ class IsAuthorizedToReadUserData implements MiddlewareInterface
 
     public function __invoke(Request $request) : ?Response
     {
+        $authenticatedUser = $this->authenticationService->authenticateApiToken($request);
+        if ($authenticatedUser === null) {
+            return Response::createBearerUnauthorized();
+        }
+
         $requestedUsername = (string)$request->getRouteParameters()['username'];
 
         $requestedUser = $this->userApi->findUserByName($requestedUsername);
@@ -24,7 +29,6 @@ class IsAuthorizedToReadUserData implements MiddlewareInterface
             return Response::createNotFound();
         }
 
-        $authenticatedUser = $this->authenticationService->authenticateApiToken($request);
         if ($this->authenticationService->isUserPageVisible($requestedUser, $authenticatedUser) === false) {
             return Response::createForbidden();
         }

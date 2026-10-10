@@ -35,6 +35,7 @@ class IsAuthenticatedTest extends TestCase
         $response = (new IsAuthenticated($authentication))($request);
 
         self::assertNotNull($response);
-        self::assertSame(403, $response->getStatusCode()->getCode());
+        self::assertSame(401, $response->getStatusCode()->getCode());
+        self::assertContains('WWW-Authenticate: Bearer', array_map('strval', $response->getHeaders()));
     }
 }

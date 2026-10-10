@@ -102,6 +102,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -111,7 +114,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -165,6 +171,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -174,7 +183,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -228,6 +240,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -237,7 +252,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -282,6 +300,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -291,7 +312,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       }
@@ -418,6 +442,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -427,7 +454,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -468,6 +498,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -477,7 +510,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -518,6 +554,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -527,7 +566,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       }
@@ -668,6 +710,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -677,7 +722,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -736,6 +784,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -745,7 +796,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -804,6 +858,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -813,7 +870,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       },
@@ -862,6 +922,9 @@
           "204": {
             "$ref": "#/components/responses/204"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -871,7 +934,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       }
@@ -916,13 +982,19 @@
           "400": {
             "$ref": "#/components/responses/400"
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           }
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       }
@@ -1032,6 +1104,9 @@
               }
             }
           },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
           "403": {
             "$ref": "#/components/responses/403"
           },
@@ -1041,7 +1116,10 @@
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       }
@@ -1161,16 +1239,6 @@
         ],
         "summary": "Get authentication data",
         "description": "Get information about the user authenticated by the supplied personal API token.",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "X-Movary-Token",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1186,7 +1254,7 @@
                           "type": "string",
                           "description": "The name of the user"
                         },
-                        "userId": {
+                        "id": {
                           "type": "integer",
                           "description": "The id of the user"
                         },
@@ -1201,16 +1269,16 @@
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
           "401": {
             "$ref": "#/components/responses/401"
           }
         },
         "security": [
           {
-            "token": []
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
           }
         ]
       }
@@ -1403,40 +1471,34 @@
         }
       },
       "401": {
-        "description": "The provided credentials or TOTP code are not valid",
-        "content": {
-          "application/json": {
+        "description": "A personal API credential is missing or invalid",
+        "headers": {
+          "WWW-Authenticate": {
             "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string",
-                  "description": "The error type",
-                  "example": "ErrorType"
-                },
-                "message": {
-                  "type": "string",
-                  "description": "The error message",
-                  "example": "This is the error message"
-                }
-              }
+              "type": "string",
+              "example": "Bearer"
             }
           }
         }
       },
       "403": {
-        "description": "Not authorized to access resource"
+        "description": "The authenticated user is not authorized to access the resource"
       },
       "404": {
         "description": "The resource was not found"
       }
     },
     "securitySchemes": {
-      "token": {
+      "bearerToken": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Personal API token supplied as an Authorization Bearer credential."
+      },
+      "movaryToken": {
         "type": "apiKey",
         "name": "X-Movary-Token",
         "in": "header",
-        "description": "Personal API token generated in the user's account settings."
+        "description": "Personal API token supplied in Movary's custom header. This remains supported for reverse proxies that use Authorization for Basic authentication."
       }
     }
   }

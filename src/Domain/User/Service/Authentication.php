@@ -63,7 +63,7 @@ class Authentication
 
         $this->apiTokenAuthenticationResolved = true;
 
-        $token = $request->getHeader('X-Movary-Token');
+        $token = $this->extractPersonalApiToken($request);
         if ($token === null || $token === '') {
             return null;
         }
@@ -76,6 +76,23 @@ class Authentication
         $this->authenticatedApiUser = AuthenticatedUser::create($userId, CredentialType::API_TOKEN);
 
         return $this->authenticatedApiUser;
+    }
+
+    private function extractPersonalApiToken(Request $request) : ?string
+    {
+        $authorization = $request->getHeader('Authorization');
+        $customHeaderToken = $request->getHeader('X-Movary-Token');
+
+        $bearerToken = null;
+        if ($authorization !== null && preg_match('/\ABearer +([^\s]+)\z/Di', $authorization, $matches) === 1) {
+            $bearerToken = $matches[1];
+        }
+
+        if ($bearerToken !== null && $customHeaderToken !== null) {
+            return null;
+        }
+
+        return $bearerToken ?? $customHeaderToken;
     }
 
     public function requireApiToken(Request $request) : AuthenticatedUser

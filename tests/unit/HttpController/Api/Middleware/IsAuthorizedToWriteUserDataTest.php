@@ -39,13 +39,8 @@ class IsAuthorizedToWriteUserDataTest extends TestCase
     public function testRejectsCookieOnlyAuthentication() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['username' => 'example']);
-
-        $user = $this->createStub(UserEntity::class);
-        $user->method('getId')->willReturn(12);
-
         $userApi = $this->createMock(UserApi::class);
-        $userApi->expects(self::once())->method('findUserByName')->with('example')->willReturn($user);
+        $userApi->expects(self::never())->method('findUserByName');
 
         $authentication = $this->createMock(Authentication::class);
         $authentication
@@ -53,6 +48,26 @@ class IsAuthorizedToWriteUserDataTest extends TestCase
             ->method('authenticateApiToken')
             ->with($request)
             ->willReturn(null);
+        $response = (new IsAuthorizedToWriteUserData($userApi, $authentication))($request);
+
+        self::assertNotNull($response);
+        self::assertSame(401, $response->getStatusCode()->getCode());
+        self::assertContains('WWW-Authenticate: Bearer', array_map('strval', $response->getHeaders()));
+    }
+
+    public function testReturnsForbiddenWhenAuthenticatedAsDifferentUser() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getRouteParameters')->willReturn(['username' => 'example']);
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getId')->willReturn(13);
+        $userApi = $this->createStub(UserApi::class);
+        $userApi->method('findUserByName')->willReturn($user);
+        $authentication = $this->createStub(Authentication::class);
+        $authentication
+            ->method('authenticateApiToken')
+            ->willReturn(AuthenticatedUser::create(12, CredentialType::API_TOKEN));
+
         $response = (new IsAuthorizedToWriteUserData($userApi, $authentication))($request);
 
         self::assertNotNull($response);
