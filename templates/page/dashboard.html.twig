@@ -19,19 +19,19 @@
         <div style="text-align: center;padding-bottom: 1rem">
             {{ include('component/user-select.html.twig') }}
 
-            <h2 class="overview-title">All-time overview</h2>
+            <h2 class="overview-title">Overview</h2>
             <div class="overview-grid {{ theme == 'dark' ? 'text-light' : 'text-dark' }} theme-text-color">
                 <div class="overview-stat card">
-                    <span class="stat-value">{{ totalPlayCount|number_format(0, '.', ',') }}</span>
+                    <span class="stat-value">{{ totalPlayCount }}</span>
                     <span class="stat-description">Total plays</span>
                 </div>
                 <div class="overview-stat card">
-                    <span class="stat-value">{{ uniqueMoviesCount|number_format(0, '.', ',') }}</span>
+                    <span class="stat-value">{{ uniqueMoviesCount }}</span>
                     <span class="stat-description">Unique movies</span>
                 </div>
                 <div class="overview-stat card">
-                    <span class="stat-value">{{ totalHoursWatched|number_format(0, '.', ',') }}</span><span class="stat-unit">h</span>
-                    <span class="stat-description">Hours watched</span>
+                    <span class="stat-value">{{ totalHoursWatched }}</span><span class="stat-unit">h</span>
+                    <span class="stat-description">Total watch time</span>
                 </div>
                 <div class="overview-stat card">
                     <span class="stat-value">{{ averagePlaysPerDay }}</span>
