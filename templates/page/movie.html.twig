@@ -47,7 +47,7 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ movie.posterPath }}" style="width: 13rem;align-self: start;">
+                <img src="{{ movie.posterPath }}" class="rounded-2" style="width: 13rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -254,7 +254,7 @@
 
                     <a
                         href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ castMember.id }}-{{ castMember.name|slugify }}"
-                        class="{% if displayCharacterNames == false %}card-img-bottom{% endif %}"
+                        class="poster-link d-block {% if displayCharacterNames == false %}card-img-bottom{% endif %}"
                         >
                         <img src="{{ castMember.posterPath }}"
                             alt="{{ castMember.name }} Poster"
@@ -299,7 +299,7 @@
                     </span>
 
                     <a
-                        class="card-img-bottom"
+                        class="poster-link d-block card-img-bottom"
                         href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ director.id }}-{{ director.name|slugify }}"
                     >
                         <img src="{{ director.posterPath }}"

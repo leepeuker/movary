@@ -32,7 +32,7 @@
 
         <div style="display: flex;">
             <div style="text-align: center">
-                <img src="{{ person.posterPath }}" style="width: 13rem;align-self: start;">
+                <img src="{{ person.posterPath }}" class="rounded-2" style="width: 13rem;align-self: start;">
             </div>
 
             <div style="padding-left: 1rem">
@@ -122,17 +122,17 @@
             <div class="tab-pane fade show {% if person.knownForDepartment == 'Acting' or (moviesAsDirector is empty and moviesAsActor is not empty) %}active{% endif %}"
                  id="acting" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                 {% if moviesAsActor is not empty %}
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                    <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
                         {% for movieAsActor in moviesAsActor %}
-                            <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <a class="card h-100 position-relative" style="cursor: pointer"
+                            <div class="col position-relative">
+                                <a class="poster-link card h-100 position-relative"
                                      href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}-{{ movieAsActor.title|slugify }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
 
                                     {% if movieAsActor.userRating is not null %}
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                        <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
                                             {{ movieAsActor.userRating }}
                                         </span>
                                     {% endif %}
@@ -143,17 +143,17 @@
                 {% endif %}
                 {% if moviesFromWatchlistAsActor is not empty %}
                     <h6>From your watch list</h6>
-                    <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                    <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
                         {% for movieAsActor in moviesFromWatchlistAsActor %}
-                            <div class="col position-relative" style="padding-bottom: 1rem;">
-                                <a class="card h-100 position-relative" style="cursor: pointer"
+                            <div class="col position-relative">
+                                <a class="poster-link card h-100 position-relative"
                                      href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}">
                                     <div class="position-relative">
                                         <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title }} Poster">
                                     </div>
 
                                     {% if movieAsActor.userRating is not null %}
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                        <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
                                             {{ movieAsActor.userRating }}
                                         </span>
                                     {% endif %}
@@ -166,17 +166,17 @@
             <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' or (moviesAsActor is empty and moviesAsDirector is not empty) %}active{% endif %}"
                  id="director" role="tabpanel" aria-labelledby="profile-tab"
                  tabindex="0">
-                <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
                     {% for movieAsDirector in moviesAsDirector %}
-                        <div class="col position-relative" style="padding-bottom: 1rem">
-                            <a class="card h-100 position-relative" style="cursor: pointer"
+                        <div class="col position-relative">
+                            <a class="poster-link card h-100 position-relative"
                                  href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
                                 <div class="position-relative">
                                     <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
                                 </div>
                                 {% if movieAsDirector.userRating is not null %}
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                    <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
                                         {{ movieAsDirector.userRating }}
                                     </span>
                                 {% endif %}
@@ -187,17 +187,17 @@
 
                 {% if moviesFromWatchlistAsDirector is not empty %}
                   <h6>From your watch list</h6>
-                  <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6" style="text-align: center;margin-top: 1rem">
+                  <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
                       {% for movieAsDirector in moviesFromWatchlistAsDirector %}
-                          <div class="col position-relative" style="padding-bottom: 1rem">
-                              <a class="card h-100 position-relative" style="cursor: pointer"
+                          <div class="col position-relative">
+                              <a class="poster-link card h-100 position-relative"
                                    href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
                                   <div class="position-relative">
                                       <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title }} Poster">
 
                                   </div>
                                   {% if movieAsDirector.userRating is not null %}
-                                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark" style="font-size: 0.8rem">
+                                      <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
                                           {{ movieAsDirector.userRating }}
                                       </span>
                                   {% endif %}

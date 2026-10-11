@@ -4,25 +4,24 @@
     {{ rowItemToggle.create(dashboardRow) }}
 
     <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
-        <div class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+        <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6">
             {% for watchlistItem in watchlistItems %}
-                <div class="col" style="padding-bottom: 1rem;">
+                <div class="col">
                     <div class="card h-100 position-relative">
                         <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title }}" type="hidden">
-                        <a class="h-100" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}-{{ watchlistItem.title|slugify }}"
-                           style="cursor: pointer;">
+                        <a class="poster-link d-block h-100" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}-{{ watchlistItem.title|slugify }}">
                             <img src="{{ watchlistItem.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
                                  alt="{{ watchlistItem.title }} Poster">
                         </a>
-                        <div class="card-footer" style="padding: 0.1rem">
+                        <div class="poster-footer card-footer">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ watchlistItem.created_at|date(dateFormatPhp) }}</small>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"
+        <a class="btn btn-outline-secondary btn-sm mt-3" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"
            style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
     </li>
 {% endmacro %}
