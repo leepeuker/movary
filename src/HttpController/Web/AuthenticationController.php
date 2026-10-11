@@ -41,7 +41,13 @@ class AuthenticationController
             );
         }
 
-        $totpCode = empty($requestBody['totpCode']) === true ? null : (int)$requestBody['totpCode'];
+        $totpCode = $requestBody['totpCode'] ?? null;
+        if (is_string($totpCode) === false) {
+            $totpCode = '';
+        }
+        if ($totpCode === '') {
+            $totpCode = null;
+        }
         $rememberMe = $requestBody['rememberMe'] ?? false;
 
         try {
