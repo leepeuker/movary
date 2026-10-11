@@ -29,13 +29,14 @@ html[data-movie-list-view="table"] #movieTableView {
   display: block !important;
 }
 
-.poster-grid,
-.dashboard-card-grid {
-  --bs-gutter-x: 0.75rem;
-  --bs-gutter-y: 0.75rem;
+.poster-grid {
+  --bs-gutter-x: 1rem;
+  --bs-gutter-y: 1rem;
 }
 
 .dashboard-card-grid {
+  --bs-gutter-x: 0.75rem;
+  --bs-gutter-y: 0.75rem;
   margin-bottom: 0.75rem;
 }
 
