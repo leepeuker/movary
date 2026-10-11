@@ -315,8 +315,16 @@ class AuthenticationTest extends TestCase
         $user->method('getId')->willReturn(12);
         $storedToken = null;
         $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
-        $this->userApiMock->method('isValidPassword')->with(12, 'password')->willReturn(true);
-        $this->userApiMock->method('findTotpUri')->with(12)->willReturn(null);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('isValidPassword')
+            ->with(12, 'password')
+            ->willReturn(true);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findTotpUri')
+            ->with(12)
+            ->willReturn(null);
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('createAuthToken')
@@ -375,8 +383,16 @@ class AuthenticationTest extends TestCase
     {
         $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
         $user->method('getId')->willReturn(12);
-        $this->userRepositoryMock->method('findUserByEmail')->with('user@example.com')->willReturn($user);
-        $this->userApiMock->method('isValidPassword')->with(12, 'wrong-password')->willReturn(false);
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('findUserByEmail')
+            ->with('user@example.com')
+            ->willReturn($user);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('isValidPassword')
+            ->with(12, 'wrong-password')
+            ->willReturn(false);
         $this->loginAttemptLimiterMock
             ->expects(self::once())
             ->method('reserveAttempt')
@@ -395,9 +411,21 @@ class AuthenticationTest extends TestCase
     {
         $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
         $user->method('getId')->willReturn(12);
-        $this->userRepositoryMock->method('findUserByEmail')->with('user@example.com')->willReturn($user);
-        $this->userApiMock->method('isValidPassword')->with(12, 'password')->willReturn(true);
-        $this->userApiMock->method('findTotpUri')->with(12)->willReturn(null);
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('findUserByEmail')
+            ->with('user@example.com')
+            ->willReturn($user);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('isValidPassword')
+            ->with(12, 'password')
+            ->willReturn(true);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findTotpUri')
+            ->with(12)
+            ->willReturn(null);
         $this->loginAttemptLimiterMock
             ->expects(self::once())
             ->method('reserveAttempt')
@@ -417,9 +445,21 @@ class AuthenticationTest extends TestCase
     {
         $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
         $user->method('getId')->willReturn(12);
-        $this->userRepositoryMock->method('findUserByEmail')->with('user@example.com')->willReturn($user);
-        $this->userApiMock->method('isValidPassword')->with(12, 'password')->willReturn(true);
-        $this->userApiMock->method('findTotpUri')->with(12)->willReturn('otpauth://totp/example');
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('findUserByEmail')
+            ->with('user@example.com')
+            ->willReturn($user);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('isValidPassword')
+            ->with(12, 'password')
+            ->willReturn(true);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('findTotpUri')
+            ->with(12)
+            ->willReturn('otpauth://totp/example');
         $this->loginAttemptLimiterMock->expects(self::once())->method('reserveAttempt')->willReturn(1);
         $this->loginAttemptLimiterMock->expects(self::once())->method('releaseAttempt')->with(1);
 
