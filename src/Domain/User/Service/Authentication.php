@@ -148,7 +148,7 @@ class Authentication
     private function findUserAndVerifyAuthentication(
         string $email,
         string $password,
-        ?int $userTotpCode = null,
+        ?string $userTotpCode = null,
     ) : UserEntity {
         $attemptId = $this->loginAttemptLimiter->reserveAttempt($email);
 
@@ -194,7 +194,7 @@ class Authentication
         string $password,
         bool $rememberMe,
         string $userAgent,
-        ?int $userTotpInput = null,
+        ?string $userTotpInput = null,
     ) : void {
         $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput);
 

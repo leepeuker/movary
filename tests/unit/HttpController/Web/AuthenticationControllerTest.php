@@ -116,6 +116,23 @@ class AuthenticationControllerTest extends TestCase
         self::assertEquals(StatusCode::createOk(), $response->getStatusCode());
     }
 
+    public function testLoginPreservesLeadingZeroInTotpCode() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request
+            ->method('getBody')
+            ->willReturn('{"email":"user@example.com","password":"password","totpCode":"012345"}');
+        $request->method('getUserAgent')->willReturn('agent');
+        $this->authenticationMock
+            ->expects(self::once())
+            ->method('loginWebSession')
+            ->with('user@example.com', 'password', false, 'agent', '012345');
+
+        $response = $this->createSubject()->login($request);
+
+        self::assertEquals(StatusCode::createOk(), $response->getStatusCode());
+    }
+
     public function testLoginReturnsRetryAfterWhenRateLimited() : void
     {
         $request = $this->createMock(Request::class);
