@@ -25,7 +25,7 @@ You can authenticate Movary against Plex on the Plex integration settings page (
 
 !!! Info
 
-    Requires the server configuration [PLEX_IDENTIFIER](/configuration/#third-party-integrations) to be set.
+    Requires the server configuration [PLEX_IDENTIFIER](../configuration.md#third-party-integrations) to be set.
 
 During the authentication process a Plex access token is generated and stored in Movary. 
 This token will be used in all further Plex API requests.

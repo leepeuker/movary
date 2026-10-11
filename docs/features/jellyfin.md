@@ -27,7 +27,7 @@ You can authenticate Movary against Jellyfin on the Jellyfin integration setting
 
 !!! Info
 
-    Requires the server configuration [JELLYFIN_DEVICE_ID](/configuration/#third-party-integrations) to be set.
+    Requires the server configuration [JELLYFIN_DEVICE_ID](../configuration.md#third-party-integrations) to be set.
 
 During the authentication process a Jellyfin access token is generated and stored in Movary.
 This token will be used in all further Jellyfin API requests.
