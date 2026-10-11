@@ -44,11 +44,6 @@ html[data-movie-list-view="table"] #movieTableView {
   transition: filter 150ms ease-in-out;
 }
 
-.poster-link:hover,
-.poster-link:focus-visible {
-  filter: brightness(0.85);
-}
-
 .poster-link:focus-visible {
   outline: 2px solid var(--bs-primary);
   outline-offset: -2px;
