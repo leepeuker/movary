@@ -32,6 +32,14 @@ class Response
         return new self($statusCode, $body, $headers);
     }
 
+    public static function createSensitive(
+        StatusCode $statusCode,
+        ?string $body = null,
+        ?array $headers = [],
+    ) : self {
+        return new self($statusCode, $body, self::createSensitiveHeaders($headers));
+    }
+
     public static function createBadRequest(?string $body = null, ?array $headers = []) : self
     {
         return new self(StatusCode::createBadRequest(), $body, $headers);
@@ -59,6 +67,18 @@ class Response
     public static function createJson(string $body, ?StatusCode $statusCode = null) : self
     {
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
+    }
+
+    public static function createSensitiveJson(
+        string $body,
+        ?StatusCode $statusCode = null,
+        ?array $headers = [],
+    ) : self {
+        return self::createSensitive(
+            $statusCode ?? StatusCode::createOk(),
+            $body,
+            [Header::createContentTypeJson(), ...(array)$headers],
+        );
     }
 
     public static function createZipDownload(string $body, string $downloadName) : self
@@ -115,6 +135,14 @@ class Response
         return new self(StatusCode::createSeeOther(), null, [Header::createLocation($targetUrl)]);
     }
 
+    public static function createSensitiveSeeOther(string $targetUrl, ?array $headers = []) : self
+    {
+        return self::createSensitive(
+            StatusCode::createSeeOther(),
+            headers: [Header::createLocation($targetUrl), ...(array)$headers],
+        );
+    }
+
     public static function createUnauthorized(?string $message = null, ?array $headers = []) : self
     {
         return new self(StatusCode::createUnauthorized(), $message, $headers);
@@ -143,5 +171,24 @@ class Response
     public function getStatusCode() : StatusCode
     {
         return $this->statusCode;
+    }
+
+    /**
+     * @param array<Header>|null $headers
+     * @return array<Header>
+     */
+    private static function createSensitiveHeaders(?array $headers) : array
+    {
+        $headers = array_filter(
+            (array)$headers,
+            static fn(Header $header) : bool => $header->getName() !== 'Cache-Control'
+                && $header->getName() !== 'Pragma',
+        );
+
+        return [
+            ...$headers,
+            Header::createCacheControlNoStore(),
+            Header::createPragmaNoCache(),
+        ];
     }
 }

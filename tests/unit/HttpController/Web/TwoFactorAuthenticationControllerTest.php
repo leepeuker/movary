@@ -12,6 +12,7 @@ use Movary\HttpController\Web\TwoFactorAuthenticationController;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\ValueObject\Http\Request;
+use OTPHP\TOTP;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +21,34 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class TwoFactorAuthenticationControllerTest extends TestCase
 {
+    public function testCreateTotpUriReturnsSensitiveProvisioningData() : void
+    {
+        $totp = TOTP::createFromSecret('JBSWY3DPEHPK3PXP');
+        $totp->setLabel('movary');
+        $totp->setIssuer('Movary');
+        $factory = $this->createMock(TwoFactorAuthenticationFactory::class);
+        $factory->expects(self::once())->method('createTotp')->with('movary')->willReturn($totp);
+        $currentWebUser = $this->createMock(CurrentWebUser::class);
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getName')->willReturn('movary');
+        $currentWebUser->method('requireUser')->willReturn($user);
+        $subject = new TwoFactorAuthenticationController(
+            $this->createMock(Authentication::class),
+            $this->createMock(TwoFactorAuthenticationApi::class),
+            $factory,
+            $this->createMock(FlashMessageService::class),
+            $currentWebUser,
+        );
+
+        $response = $subject->createTotpUri();
+
+        self::assertSame(
+            ['uri' => $totp->getProvisioningUri(), 'secret' => 'JBSWY3DPEHPK3PXP'],
+            json_decode((string)$response->getBody(), true),
+        );
+        $this->assertSensitiveHeaders($response->getHeaders(), contentTypeJson: true);
+    }
+
     public function testDisableTotpAddsDisabledMessage() : void
     {
         $authentication = $this->createMock(Authentication::class);
@@ -68,7 +97,10 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn('{"input":"012345","uri":"otpauth://totp/test"}');
 
-        self::assertSame(200, $subject->enableTOTP($request)->getStatusCode()->getCode());
+        $response = $subject->enableTOTP($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        $this->assertSensitiveHeaders($response->getHeaders());
     }
 
     public function testEnableTotpDoesNotAddMessageForInvalidCode() : void
@@ -90,6 +122,21 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->method('getBody')->willReturn('{"input":"123456","uri":"otpauth://totp/test"}');
 
-        self::assertSame(400, $subject->enableTOTP($request)->getStatusCode()->getCode());
+        $response = $subject->enableTOTP($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        $this->assertSensitiveHeaders($response->getHeaders());
+    }
+
+    private function assertSensitiveHeaders(array $headers, bool $contentTypeJson = false) : void
+    {
+        $headers = array_map('strval', $headers);
+
+        self::assertContains('Cache-Control: no-store', $headers);
+        self::assertContains('Pragma: no-cache', $headers);
+        self::assertNotContains('Cache-Control: private, no-cache', $headers);
+        if ($contentTypeJson === true) {
+            self::assertContains('Content-Type: application/json', $headers);
+        }
     }
 }

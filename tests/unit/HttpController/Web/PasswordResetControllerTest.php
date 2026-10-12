@@ -10,6 +10,7 @@ use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\RelativeUrl;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -137,6 +138,24 @@ class PasswordResetControllerTest extends TestCase
 
         self::assertEquals(StatusCode::createOk(), $response->getStatusCode());
         self::assertSame('reset form', $response->getBody());
+        $this->assertSensitiveResetHeaders($response);
+    }
+
+    public function testRenderResetPageShowsErrorForInvalidToken() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getGetParameters')->willReturn(['token' => 'invalid-token']);
+        $this->tokenServiceMock->method('findUserIdByToken')->willReturn(null);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with('page/password-reset.html.twig', self::callback(
+                static fn(array $data) => $data['token'] === 'invalid-token' && $data['tokenValid'] === false,
+            ));
+
+        $response = $this->subject->renderResetPage($request);
+
+        $this->assertSensitiveResetHeaders($response);
     }
 
     public function testResetPasswordRejectsInvalidToken() : void
@@ -151,7 +170,26 @@ class PasswordResetControllerTest extends TestCase
                 static fn(array $data) => $data['token'] === '' && $data['tokenValid'] === false,
             ));
 
-        $this->subject->resetPassword($request);
+        $response = $this->subject->resetPassword($request);
+
+        $this->assertSensitiveResetHeaders($response);
+    }
+
+    public function testResetPasswordRejectsMissingFields() : void
+    {
+        $request = $this->createResetRequest('', '');
+        $this->tokenServiceMock->method('findUserIdByToken')->willReturn(12);
+        $this->tokenServiceMock->expects(self::never())->method('resetPassword');
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with('page/password-reset.html.twig', self::callback(
+                static fn(array $data) => $data['missingFormData'] === true,
+            ));
+
+        $response = $this->subject->resetPassword($request);
+
+        $this->assertSensitiveResetHeaders($response);
     }
 
     public function testResetPasswordRejectsMismatchedPasswords() : void
@@ -167,7 +205,9 @@ class PasswordResetControllerTest extends TestCase
                     && $data['passwordsDoNotMatch'] === true,
             ));
 
-        $this->subject->resetPassword($request);
+        $response = $this->subject->resetPassword($request);
+
+        $this->assertSensitiveResetHeaders($response);
     }
 
     public function testResetPasswordShowsPasswordPolicyError() : void
@@ -184,7 +224,43 @@ class PasswordResetControllerTest extends TestCase
                 static fn(array $data) => $data['minimumPasswordLength'] === 8,
             ));
 
-        $this->subject->resetPassword($request);
+        $response = $this->subject->resetPassword($request);
+
+        $this->assertSensitiveResetHeaders($response);
+    }
+
+    public function testResetPasswordShowsInvalidTokenWhenRepositoryUpdateFails() : void
+    {
+        $request = $this->createResetRequest();
+        $this->tokenServiceMock->method('findUserIdByToken')->willReturn(12);
+        $this->tokenServiceMock->method('resetPassword')->willReturn(false);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with('page/password-reset.html.twig', self::callback(
+                static fn(array $data) => $data['token'] === '' && $data['tokenValid'] === false,
+            ));
+
+        $response = $this->subject->resetPassword($request);
+
+        $this->assertSensitiveResetHeaders($response);
+    }
+
+    public function testResetPasswordShowsGenericErrorForUnexpectedFailure() : void
+    {
+        $request = $this->createResetRequest();
+        $this->tokenServiceMock->method('findUserIdByToken')->willReturn(12);
+        $this->tokenServiceMock->method('resetPassword')->willThrowException(new \RuntimeException('failure'));
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with('page/password-reset.html.twig', self::callback(
+                static fn(array $data) => $data['token'] === 'reset-token' && $data['genericError'] === true,
+            ));
+
+        $response = $this->subject->resetPassword($request);
+
+        $this->assertSensitiveResetHeaders($response);
     }
 
     public function testResetPasswordRedirectsToLoginAfterSuccess() : void
@@ -208,6 +284,7 @@ class PasswordResetControllerTest extends TestCase
 
         self::assertEquals(StatusCode::createSeeOther(), $response->getStatusCode());
         self::assertSame('Location: /movary/login?password-reset=success', (string)$response->getHeaders()[0]);
+        $this->assertSensitiveResetHeaders($response);
     }
 
     private function createResetRequest(
@@ -222,5 +299,15 @@ class PasswordResetControllerTest extends TestCase
         ]);
 
         return $request;
+    }
+
+    private function assertSensitiveResetHeaders(Response $response) : void
+    {
+        $headers = array_map('strval', $response->getHeaders());
+
+        self::assertContains('Cache-Control: no-store', $headers);
+        self::assertContains('Pragma: no-cache', $headers);
+        self::assertContains('Referrer-Policy: no-referrer', $headers);
+        self::assertNotContains('Cache-Control: private, no-cache', $headers);
     }
 }

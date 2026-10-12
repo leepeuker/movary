@@ -62,4 +62,19 @@ class HeaderTest extends TestCase
         self::assertSame('Cache-Control: private, no-cache', (string)$subject);
         self::assertSame('Cache-Control', $subject->getName());
     }
+
+    public function testCreateCacheControlNoStore() : void
+    {
+        self::assertSame('Cache-Control: no-store', (string)Header::createCacheControlNoStore());
+    }
+
+    public function testCreatePragmaNoCache() : void
+    {
+        self::assertSame('Pragma: no-cache', (string)Header::createPragmaNoCache());
+    }
+
+    public function testCreateReferrerPolicyNoReferrer() : void
+    {
+        self::assertSame('Referrer-Policy: no-referrer', (string)Header::createReferrerPolicyNoReferrer());
+    }
 }

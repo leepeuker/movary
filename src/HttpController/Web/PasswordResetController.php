@@ -8,6 +8,7 @@ use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
+use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -93,10 +94,11 @@ class PasswordResetController
             return $this->renderResetForm($token, true, genericError: true);
         }
 
-        return Response::createSeeOther(
+        return Response::createSensitiveSeeOther(
             $this->applicationUrlService->createApplicationUrl(
                 RelativeUrl::create('/login?password-reset=success'),
             ),
+            [Header::createReferrerPolicyNoReferrer()],
         );
     }
 
@@ -120,7 +122,7 @@ class PasswordResetController
         ?int $minimumPasswordLength = null,
         bool $genericError = false,
     ) : Response {
-        return Response::create(
+        return Response::createSensitive(
             StatusCode::createOk(),
             $this->twig->render(
                 'page/password-reset.html.twig',
@@ -133,6 +135,7 @@ class PasswordResetController
                     'genericError' => $genericError,
                 ],
             ),
+            [Header::createReferrerPolicyNoReferrer()],
         );
     }
 }

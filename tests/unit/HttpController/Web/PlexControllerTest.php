@@ -75,6 +75,10 @@ class PlexControllerTest extends TestCase
         $response = $this->subject->generatePlexAuthenticationUrl($request);
 
         self::assertSame('{"authenticationUrl":"https:\/\/app.plex.tv\/auth"}', $response->getBody());
+        self::assertSame(
+            ['Content-Type: application/json', 'Cache-Control: no-store', 'Pragma: no-cache'],
+            array_map('strval', $response->getHeaders()),
+        );
     }
 
     public function testCallbackRejectsInvalidStateBeforePlexLookup() : void

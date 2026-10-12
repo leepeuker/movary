@@ -121,7 +121,7 @@ class SettingsController
             return Response::createBadRequest($exception->getMessage());
         }
 
-        return Response::createJson(Json::encode($createdToken));
+        return Response::createSensitiveJson(Json::encode($createdToken));
     }
 
     public function deleteHistory() : Response
