@@ -205,6 +205,32 @@ function displayLogModalTmdbSearchError(message) {
     document.getElementById('logPlayModalSearchErrorAlert').classList.remove('d-none')
 }
 
+function formatMovieTitle(localizedTitle, originalTitle) {
+    if (!localizedTitle) {
+        return originalTitle || ''
+    }
+
+    if (!originalTitle || originalTitle === localizedTitle) {
+        return localizedTitle
+    }
+
+    if (MOVIE_TITLE_DISPLAY === 'original') {
+        return originalTitle
+    }
+
+    if (MOVIE_TITLE_DISPLAY === 'both') {
+        return localizedTitle + ' (' + originalTitle + ')'
+    }
+
+    return localizedTitle
+}
+
+function encodeBase64(value) {
+    const utf8Bytes = new TextEncoder().encode(value)
+
+    return btoa(String.fromCharCode(...utf8Bytes))
+}
+
 function loadLogModalSearchResults(data) {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
 
@@ -216,6 +242,7 @@ function loadLogModalSearchResults(data) {
     searchResultList.style.marginTop = '1rem'
 
     data.forEach((item, index) => {
+        const displayTitle = formatMovieTitle(item.title, item.originalTitle)
         let listElement = document.createElement('li');
         listElement.className = 'list-group-item list-group-item-action'
         listElement.style.cursor = 'pointer'
@@ -230,13 +257,13 @@ function loadLogModalSearchResults(data) {
         }
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
-        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(item.title)
+        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + encodeBase64(displayTitle)
         isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : '';
         isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : '';
         listElement.innerHTML = `
-            <img src="${posterPath}" alt="Poster for ${item.title}" style="margin-right: .5rem; width: 3rem">
+            <img src="${posterPath}" alt="Poster for ${displayTitle}" style="margin-right: .5rem; width: 3rem">
             <p style="margin: 0;">
-                <b>${item.title}</b> (${releaseYear})${isWatchedEl}${isOnWatchlistEl}
+                <b>${displayTitle}</b> (${releaseYear})${isWatchedEl}${isOnWatchlistEl}
                 <br>
                 <span style="opacity: 0.75; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-height: 2lh;">
                     ${item.overview}
@@ -247,7 +274,7 @@ function loadLogModalSearchResults(data) {
         if (item.ids.movary)
             listElement.dataset.movaryId = item.ids.movary
         listElement.dataset.poster = item.tmdbPosterPath
-        listElement.dataset.title = item.title
+        listElement.dataset.title = displayTitle
         listElement.dataset.releaseYear = releaseYear
         if (item.isOnWatchlist)
             listElement.dataset.isOnWatchlist = 'on'

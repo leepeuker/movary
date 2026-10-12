@@ -5,6 +5,7 @@ namespace Movary\Domain\Movie\Watchlist;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 
@@ -145,7 +146,8 @@ class MovieWatchlistRepository
             $payload[] = $productionCountryCode;
         }
 
-        $whereQuery = 'WHERE m.title LIKE ? ';
+        $whereQuery = 'WHERE (m.title LIKE ? OR m.original_title LIKE ?) ';
+        $payload[] = "%$searchTerm%";
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
@@ -192,17 +194,20 @@ class MovieWatchlistRepository
         ?string $language,
         ?string $genre,
         ?string $productionCountryCode,
+        MovieTitleDisplay $movieTitleDisplay,
     ) : array {
         $payload = [$userId, $userId];
 
         $offset = ($limit * $page) - $limit;
+
+        $movieTitleSortExpression = $this->getMovieTitleSortExpression($movieTitleDisplay);
 
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
             'releaseDate' => 'release_date',
             'addedAt' => 'added_at',
             'runtime' => 'runtime',
-            default => 'title'
+            default => $movieTitleSortExpression
         };
 
         $joinProductionCountry = '';
@@ -211,7 +216,8 @@ class MovieWatchlistRepository
             $payload[] = $productionCountryCode;
         }
 
-        $whereQuery = 'WHERE m.title LIKE ? ';
+        $whereQuery = 'WHERE (m.title LIKE ? OR m.original_title LIKE ?) ';
+        $payload[] = "%$searchTerm%";
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
@@ -245,7 +251,7 @@ class MovieWatchlistRepository
             $joinProductionCountry
             $whereQuery
             GROUP BY m.id, title, release_date, added_at, rating
-            ORDER BY $sortBySanitized $sortOrder, title asc
+            ORDER BY $sortBySanitized $sortOrder, $movieTitleSortExpression asc
             LIMIT $offset, $limit
             SQL,
             $payload,
@@ -268,5 +274,14 @@ class MovieWatchlistRepository
                 'user_id' => $userId,
             ],
         );
+    }
+
+    private function getMovieTitleSortExpression(MovieTitleDisplay $movieTitleDisplay) : string
+    {
+        if ($movieTitleDisplay->displaysOriginal() === true) {
+            return "LOWER(COALESCE(NULLIF(m.original_title, ''), m.title))";
+        }
+
+        return "LOWER(COALESCE(NULLIF(m.title, ''), m.original_title))";
     }
 }

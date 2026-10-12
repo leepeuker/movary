@@ -6,6 +6,7 @@ const countryInput = document.getElementById('countryInput')
 const displayCharacterNamesInput = document.getElementById('displayCharacterNamesInput')
 const displayTmdbRatingsInput = document.getElementById('displayTmdbRatingsInput')
 const displayImdbRatingsInput = document.getElementById('displayImdbRatingsInput')
+const movieTitleDisplayInput = document.getElementById('movieTitleDisplayInput')
 
 document.getElementById('generalAccountUpdateButton').addEventListener('click', async () => {
     nameInput.classList.remove('invalid-input');
@@ -24,7 +25,8 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
         countryInput.value,
         displayCharacterNamesInput.checked,
         displayTmdbRatingsInput.checked,
-        displayImdbRatingsInput.checked
+        displayImdbRatingsInput.checked,
+        movieTitleDisplayInput.value
     )
 
     switch (response.status) {
@@ -44,7 +46,7 @@ document.getElementById('generalAccountUpdateButton').addEventListener('click', 
     }
 });
 
-function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country, displayCharacterNames, displayTmdbRatings, displayImdbRatings) {
+function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchlistRemoval, country, displayCharacterNames, displayTmdbRatings, displayImdbRatings, movieTitleDisplay) {
     return fetchWithCsrf(APPLICATION_URL + '/settings/account', {
         method: 'POST',
         headers: {
@@ -58,7 +60,8 @@ function updateGeneral(dateFormat, username, privacyLevel, enableAutomaticWatchl
             'country': country,
             'displayCharacterNames': displayCharacterNames,
             'displayTmdbRatings': displayTmdbRatings,
-            'displayImdbRatings': displayImdbRatings
+            'displayImdbRatings': displayImdbRatings,
+            'movieTitleDisplay': movieTitleDisplay
         })
     })
 }

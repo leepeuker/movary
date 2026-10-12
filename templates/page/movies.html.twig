@@ -38,7 +38,7 @@
                 {% for movie in movies %}
                     <div class="col">
                         <a class="poster-link card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}-{{ movie.title|slugify }}">
-                            <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom object-fit-cover h-100" alt="{{ movie.title }} Poster">
+                            <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom object-fit-cover h-100" alt="{{ movie.title|movie_title(movie.original_title) }} Poster">
 
                             {% if movie.userRating is not null %}
                                 <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
@@ -68,10 +68,10 @@
                             <tr>
                                 <td class="d-none d-sm-table-cell">
                                     <a href="{{ movieUrl }}">
-                                        <img src="{{ movie.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ movie.title }}">
+                                        <img src="{{ movie.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ movie.title|movie_title(movie.original_title) }}">
                                     </a>
                                 </td>
-                                <td><a href="{{ movieUrl }}">{{ movie.title }}</a></td>
+                                <td><a href="{{ movieUrl }}">{{ movie.title|movie_title(movie.original_title) }}</a></td>
                                 <td>{{ movie.release_date is null ? '—' : movie.release_date|date('Y') }}</td>
                                 <td class="d-none d-lg-table-cell">{{ movie.runtime is null ? '—' : movie.runtime ~ ' min' }}</td>
                                 <td class="d-none d-md-table-cell">{{ movie.userRating is null ? '—' : movie.userRating }}</td>

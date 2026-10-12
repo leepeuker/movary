@@ -8,11 +8,11 @@
             {% for watchlistItem in watchlistItems %}
                 <div class="col">
                     <div class="card h-100 position-relative">
-                        <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title }}" type="hidden">
+                        <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title|movie_title(watchlistItem.original_title) }}" type="hidden">
                         <a class="poster-link d-block h-100" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}-{{ watchlistItem.title|slugify }}">
                             <img src="{{ watchlistItem.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
-                                 alt="{{ watchlistItem.title }} Poster">
+                                 alt="{{ watchlistItem.title|movie_title(watchlistItem.original_title) }} Poster">
                         </a>
                         <div class="poster-footer card-footer">
                             <small class="text-muted" style="font-size: 0.9rem;">{{ watchlistItem.created_at|date(dateFormatPhp) }}</small>

@@ -47,6 +47,7 @@ use Movary\ValueObject\Config;
 use Movary\ValueObject\DateFormat;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\MovieTitleDisplay;
 use Phinx\Console\PhinxApplication;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -470,6 +471,17 @@ class Factory
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
         $twig->addFilter(new TwigFilter('slugify', [$container->get(SlugifyService::class), 'slugify']));
+        $movieTitleDisplay = $user?->getMovieTitleDisplay() ?? MovieTitleDisplay::createLocalized();
+        $twig->addGlobal('movieTitleDisplay', (string)$movieTitleDisplay);
+        $movieTitleFormatter = $container->get(Service\MovieTitleFormatter::class);
+        $twig->addFilter(new TwigFilter(
+            'movie_title',
+            static fn(string $localizedTitle, ?string $originalTitle) : string => $movieTitleFormatter->format(
+                $localizedTitle,
+                $originalTitle,
+                $movieTitleDisplay,
+            ),
+        ));
 
         return $twig;
     }

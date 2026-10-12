@@ -135,7 +135,7 @@ query_sqlite release-0.73.1.sqlite \
     "INSERT INTO server_setting (key, value) VALUES ('release-setting', 'preserved')"
 
 run_sqlite_app_command release-0.73.1.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261012120000' \
     "$(query_sqlite release-0.73.1.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite \
@@ -250,11 +250,19 @@ assert_equal 0 "$(query_sqlite missing-history.sqlite "SELECT COUNT(*) FROM sqli
     'SQLite initialized Doctrine metadata for an incomplete legacy history'
 
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261012120000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite legacy database did not record the latest Doctrine migration'
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 run_sqlite_app_command null-genre.sqlite database:migration:status >/dev/null
+assert_equal 1 "$(query_sqlite null-genre.sqlite "SELECT COUNT(*) FROM pragma_table_info('movie') WHERE name = 'original_title'")" \
+    'SQLite did not add the original movie title column'
+assert_equal 1 "$(query_sqlite null-genre.sqlite "SELECT COUNT(*) FROM pragma_table_info('user') WHERE name = 'movie_title_display'")" \
+    'SQLite did not add the movie title display preference'
+run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+    "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'SQLite did not roll back the movie title migration'
 if run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null 2>&1; then
     echo 'SQLite rolled back the irreversible personal-token migration' >&2
     exit 1
@@ -291,7 +299,7 @@ run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
 assert_equal 28 "$(query_sqlite doctrine-fresh.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
     'Fresh SQLite Doctrine database has an unexpected table count'
-assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261012120000' \
     "$(query_sqlite doctrine-fresh.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'Fresh SQLite database did not execute the latest Doctrine migration'
 
@@ -345,7 +353,7 @@ mysql_query movary_release "INSERT INTO user_auth_token (id, user_id, token, dev
 mysql_query movary_release "INSERT INTO server_setting (\`key\`, value) VALUES ('release-setting', 'preserved')"
 
 run_mysql_app_command movary_release database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261012120000' \
     "$(mysql_query movary_release 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
@@ -413,11 +421,19 @@ assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movi
     'MySQL watched cache does not isolate identical Trakt IDs by user'
 
 run_mysql_app_command movary database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261012120000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL legacy database did not record the latest Doctrine migration'
 run_mysql_app_command movary database:migration:migrate
 run_mysql_app_command movary database:migration:status >/dev/null
+assert_equal 1 "$(mysql_query movary "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'movie' AND COLUMN_NAME = 'original_title'")" \
+    'MySQL did not add the original movie title column'
+assert_equal 1 "$(mysql_query movary "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'movie_title_display'")" \
+    'MySQL did not add the movie title display preference'
+run_mysql_app_command movary database:migration:rollback >/dev/null
+assert_equal 'Movary\DatabaseMigration\Version20261010120000' \
+    "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'MySQL did not roll back the movie title migration'
 if run_mysql_app_command movary database:migration:rollback >/dev/null 2>&1; then
     echo 'MySQL rolled back the irreversible personal-token migration' >&2
     exit 1

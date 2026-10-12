@@ -10,6 +10,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\ImdbRating;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -36,11 +37,13 @@ class MovieRepository
         ?string $tmdbBackdropPath = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
+        ?string $originalTitle = null,
     ) : MovieEntity {
         $this->dbConnection->insert(
             'movie',
             [
                 'title' => $title,
+                'original_title' => $originalTitle,
                 'tagline' => $tagline,
                 'overview' => $overview,
                 'original_language' => $originalLanguage,
@@ -418,9 +421,9 @@ class MovieRepository
                 SELECT COUNT(*)
                 FROM movie_user_watch_dates mh
                 JOIN movie m on mh.movie_id = m.id AND watched_at IS NOT NULL
-                WHERE m.title LIKE ? AND user_id = ?
+                WHERE (m.title LIKE ? OR m.original_title LIKE ?) AND user_id = ?
                 SQL,
-                ["%$searchTerm%", $userId],
+                ["%$searchTerm%", "%$searchTerm%", $userId],
             )[0];
         }
 
@@ -439,7 +442,8 @@ class MovieRepository
         $whereQuery = '';
         if ($searchTerm !== null) {
             $payload[] = "%$searchTerm%";
-            $whereQuery .= 'WHERE  m.title LIKE ?';
+            $payload[] = "%$searchTerm%";
+            $whereQuery .= 'WHERE (m.title LIKE ? OR m.original_title LIKE ?)';
         }
 
         return $this->dbConnection->fetchAllAssociative(
@@ -903,7 +907,8 @@ class MovieRepository
             $payload[] = $productionCountryCode;
         }
 
-        $whereQuery = 'WHERE m.title LIKE ? ';
+        $whereQuery = 'WHERE (m.title LIKE ? OR m.original_title LIKE ?) ';
+        $payload[] = "%$searchTerm%";
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
@@ -970,10 +975,13 @@ class MovieRepository
         ?int $userRatingMax,
         ?int $locationId,
         ?string $productionCountryCode,
+        MovieTitleDisplay $movieTitleDisplay,
     ) : array {
         $payload = [$userId, $userId];
 
         $offset = ($limit * $page) - $limit;
+
+        $movieTitleSortExpression = $this->getMovieTitleSortExpression($movieTitleDisplay);
 
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
@@ -982,7 +990,7 @@ class MovieRepository
             'releaseDate' => 'release_date',
             'watchDate' => 'watched_at',
             'runtime' => 'runtime',
-            default => 'LOWER(title)'
+            default => $movieTitleSortExpression
         };
 
         $joinProductionCountry = '';
@@ -996,7 +1004,8 @@ class MovieRepository
             $sortByWatchDatePosition = "mh.position $sortOrder, ";
         }
 
-        $whereQuery = 'WHERE m.title LIKE ? ';
+        $whereQuery = 'WHERE (m.title LIKE ? OR m.original_title LIKE ?) ';
+        $payload[] = "%$searchTerm%";
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
@@ -1047,7 +1056,7 @@ class MovieRepository
                 $joinProductionCountry
                 $whereQuery
                 GROUP BY m.id, title, release_date, watched_at, rating, mh.position
-                ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition LOWER(title) asc
+                ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition $movieTitleSortExpression asc
             ) a
             WHERE rn = 1
             LIMIT $offset, $limit
@@ -1140,9 +1149,15 @@ class MovieRepository
     public function findByTitleAndYear(string $title, Year $releaseYear) : ?MovieEntity
     {
         if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
-            $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE title = ? AND strftime(\'%Y\',release_date) = ?', [$title, $releaseYear]);
+            $data = $this->dbConnection->fetchAssociative(
+                'SELECT * FROM `movie` WHERE (title = ? OR original_title = ?) AND strftime(\'%Y\',release_date) = ?',
+                [$title, $title, $releaseYear],
+            );
         } else {
-            $data = $this->dbConnection->fetchAssociative('SELECT * FROM `movie` WHERE title = ? AND YEAR(release_date) = ?', [$title, $releaseYear]);
+            $data = $this->dbConnection->fetchAssociative(
+                'SELECT * FROM `movie` WHERE (title = ? OR original_title = ?) AND YEAR(release_date) = ?',
+                [$title, $title, $releaseYear],
+            );
         }
 
         return $data === false ? null : MovieEntity::createFromArray($data);
@@ -1242,11 +1257,13 @@ class MovieRepository
         ?string $tmdbPosterPath,
         ?string $tmdbBackdropPath,
         ?string $imdbId,
+        ?string $originalTitle,
     ) : MovieEntity {
         $this->dbConnection->update(
             'movie',
             [
                 'tagline' => $tagline,
+                'original_title' => $originalTitle,
                 'overview' => $overview,
                 'original_language' => $originalLanguage,
                 'release_date' => $releaseDate === null ? null : Date::createFromDateTime($releaseDate),
@@ -1323,5 +1340,14 @@ class MovieRepository
         }
 
         return MovieEntity::createFromArray($data);
+    }
+
+    private function getMovieTitleSortExpression(MovieTitleDisplay $movieTitleDisplay) : string
+    {
+        if ($movieTitleDisplay->displaysOriginal() === true) {
+            return "LOWER(COALESCE(NULLIF(m.original_title, ''), m.title))";
+        }
+
+        return "LOWER(COALESCE(NULLIF(m.title, ''), m.original_title))";
     }
 }

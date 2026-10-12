@@ -11,7 +11,7 @@
                         <a class="poster-link d-block h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}-{{ lastPlay.title|slugify }}">
                             <img src="{{ lastPlay.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
-                                 alt="{{ lastPlay.title }} Poster">
+                                 alt="{{ lastPlay.title|movie_title(lastPlay.original_title) }} Poster">
 
                             {% if lastPlay.user_rating is not null %}
                                 <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">

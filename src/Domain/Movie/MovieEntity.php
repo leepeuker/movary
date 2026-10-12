@@ -10,6 +10,7 @@ class MovieEntity
     private function __construct(
         private readonly int $id,
         private readonly string $title,
+        private readonly ?string $originalTitle,
         private readonly ?TraktId $traktId,
         private readonly ?string $imdbId,
         private readonly int $tmdbId,
@@ -34,6 +35,7 @@ class MovieEntity
         return new self(
             (int)$data['id'],
             $data['title'],
+            $data['original_title'],
             empty($data['trakt_id']) === false ? TraktId::createFromString((string)$data['trakt_id']) : null,
             empty($data['imdb_id']) === false ? (string)$data['imdb_id'] : null,
             (int)$data['tmdb_id'],
@@ -76,6 +78,11 @@ class MovieEntity
     public function getOriginalLanguage() : ?string
     {
         return $this->originalLanguage;
+    }
+
+    public function getOriginalTitle() : ?string
+    {
+        return $this->originalTitle;
     }
 
     public function getOverview() : ?string

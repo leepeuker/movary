@@ -35,7 +35,7 @@
                     <div class="col">
                         <div class="card h-100">
                             <a class="poster-link d-block h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ historyEntry.id }}-{{ historyEntry.title|slugify }}">
-                                <img src="{{ historyEntry.poster_path }}" class="card-img-top object-fit-cover h-100" alt="{{ historyEntry.title }} Poster">
+                                <img src="{{ historyEntry.poster_path }}" class="card-img-top object-fit-cover h-100" alt="{{ historyEntry.title|movie_title(historyEntry.original_title) }} Poster">
 
                                 {% if historyEntry.userRating is not null %}
                                     <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
@@ -70,10 +70,10 @@
                             <tr>
                                 <td class="d-none d-sm-table-cell">
                                     <a href="{{ movieUrl }}">
-                                        <img src="{{ historyEntry.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ historyEntry.title }}">
+                                        <img src="{{ historyEntry.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ historyEntry.title|movie_title(historyEntry.original_title) }}">
                                     </a>
                                 </td>
-                                <td><a href="{{ movieUrl }}">{{ historyEntry.title }}</a></td>
+                                <td><a href="{{ movieUrl }}">{{ historyEntry.title|movie_title(historyEntry.original_title) }}</a></td>
                                 <td>{{ historyEntry.release_date is null ? '—' : historyEntry.release_date|date('Y') }}</td>
                                 <td class="d-none d-lg-table-cell">{{ historyEntry.runtime is null ? '—' : historyEntry.runtime ~ ' min' }}</td>
                                 <td class="d-none d-md-table-cell">{{ historyEntry.userRating is null ? '—' : historyEntry.userRating }}</td>

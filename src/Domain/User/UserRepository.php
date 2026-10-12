@@ -5,6 +5,7 @@ namespace Movary\Domain\User;
 use Doctrine\DBAL\Connection;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\Url;
 use RuntimeException;
 
@@ -956,6 +957,15 @@ class UserRepository
             [
                 'id' => $userId,
             ],
+        );
+    }
+
+    public function updateMovieTitleDisplay(int $userId, MovieTitleDisplay $movieTitleDisplay) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            ['movie_title_display' => (string)$movieTitleDisplay],
+            ['id' => $userId],
         );
     }
 

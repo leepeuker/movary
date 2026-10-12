@@ -23,6 +23,7 @@ use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -104,6 +105,7 @@ class MovieApi
         ?string $tmdbBackdropPath = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
+        ?string $originalTitle = null,
     ) : MovieEntity {
         return $this->repository->create(
             $title,
@@ -119,6 +121,7 @@ class MovieApi
             $tmdbBackdropPath,
             $traktId,
             $imdbId,
+            $originalTitle,
         );
     }
 
@@ -350,6 +353,7 @@ class MovieApi
         ?int $userRatingMax,
         ?int $locationId,
         ?string $productionCountryCode,
+        ?MovieTitleDisplay $movieTitleDisplay = null,
     ) : array {
         return $this->historyApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
@@ -366,6 +370,7 @@ class MovieApi
             $userRatingMax,
             $locationId,
             $productionCountryCode,
+            $movieTitleDisplay,
         );
     }
 
@@ -437,6 +442,7 @@ class MovieApi
             'tmdbId' => $entity->getTmdbId(),
             'imdbId' => $entity->getImdbId(),
             'title' => $entity->getTitle(),
+            'originalTitle' => $entity->getOriginalTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'posterPath' => $posterPath,
             'tagline' => $entity->getTagline(),
@@ -605,6 +611,7 @@ class MovieApi
         ?string $tmdbPosterPath,
         ?string $tmdbBackdropPath,
         ?string $imdbId,
+        ?string $originalTitle,
     ) : MovieEntity {
         return $this->repository->updateDetails(
             $movieId,
@@ -618,6 +625,7 @@ class MovieApi
             $tmdbPosterPath,
             $tmdbBackdropPath,
             $imdbId,
+            $originalTitle,
         );
     }
 

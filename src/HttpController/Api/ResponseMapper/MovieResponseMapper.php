@@ -16,6 +16,7 @@ class MovieResponseMapper
             $movieData['title'],
             (int)$movieData['tmdb_id'],
             DateTime::createFromString($movieData['created_at']),
+            $movieData['original_title'],
             empty($movieData['trakt_id']) === false ? TraktId::createFromString((string)$movieData['trakt_id']) : null,
             $movieData['imdb_id'],
             $movieData['letterboxd_id'],
