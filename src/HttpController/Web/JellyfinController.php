@@ -11,6 +11,7 @@ use Movary\Service\Jellyfin\JellyfinScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\UrlValidator;
+use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -129,14 +130,14 @@ class JellyfinController
             $jellyfinServerUrl = Url::createFromString($jellyfinServerUrlString);
         } catch (InvalidUrl) {
             $this->logger->info('Jellyfin: Provided server url is not a valid url: ' . $jellyfinServerUrlString);
-            return Response::createBadRequest('Provided server url is not a valid url');
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
         }
 
         try {
             $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl, $this->serverUrlAllowlist);
-        } catch (InvalidUrl $e) {
+        } catch (InvalidSafeUrl $e) {
             $this->logger->warning('Jellyfin: Could not validate server url: ' . $e->getMessage());
-            return Response::createBadRequest('Could not validate server url');
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $this->userApi->updateJellyfinServerUrl($userId, $jellyfinServerUrl);
@@ -162,14 +163,14 @@ class JellyfinController
             $jellyfinServerUrl = Url::createFromString($jellyfinServerUrlString);
         } catch (InvalidUrl) {
             $this->logger->info('Jellyfin: Provided server url is not a valid url: ' . $jellyfinServerUrlString);
-            return Response::createBadRequest('Provided server url is not a valid url');
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
         }
 
         try {
             $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl, $this->serverUrlAllowlist);
-        } catch (InvalidUrl $e) {
+        } catch (InvalidSafeUrl $e) {
             $this->logger->warning('Jellyfin: Could not validate server url: ' . $e->getMessage());
-            return Response::createBadRequest('Could not validate server url');
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->requireWebSession()->getUserId());

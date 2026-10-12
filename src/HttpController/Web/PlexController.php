@@ -14,6 +14,7 @@ use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\UrlValidator;
 use Movary\ValueObject\Exception\ConfigNotSetException;
+use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -169,10 +170,15 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
+        } catch (InvalidUrl) {
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
+        }
+
+        try {
             $this->urlValidator->validateUrlIsSafe($plexServerUrl, $this->serverUrlAllowlist);
-        } catch (InvalidUrl $e) {
+        } catch (InvalidSafeUrl $e) {
             $this->logger->warning('Plex: Could not validate server url: ' . $e->getMessage());
-            return Response::createBadRequest('Could not validate server url');
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $this->userApi->updatePlexServerUrl($userId, $plexServerUrl);
@@ -191,10 +197,15 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
+        } catch (InvalidUrl) {
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
+        }
+
+        try {
             $this->urlValidator->validateUrlIsSafe($plexServerUrl, $this->serverUrlAllowlist);
-        } catch (InvalidUrl $e) {
+        } catch (InvalidSafeUrl $e) {
             $this->logger->warning('Plex: Connection test failed: ' . $e->getMessage());
-            return Response::createBadRequest('Connection test failed');
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $userClientConfiguration = PlexUserClientConfiguration::create($plexAccessToken, $plexServerUrl);

@@ -16,6 +16,7 @@ use Movary\Service\PlexCallbackStateService;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\UrlValidator;
 use Movary\Util\ValidatedUrl;
+use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Url;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -79,6 +80,27 @@ class PlexControllerTest extends TestCase
         $response = $this->subject->savePlexServerUrl($request);
 
         self::assertSame(200, $response->getStatusCode()->getCode());
+    }
+
+    public function testSaveServerUrlReturnsSafeValidationReason() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn('{"plexServerUrl":"http://plex.local:32400"}');
+        $this->authentication->method('requireWebSession')->willReturn(
+            AuthenticatedUser::create(12, CredentialType::WEB_SESSION),
+        );
+        $this->urlValidator->method('validateUrlIsSafe')->willThrowException(
+            InvalidSafeUrl::createForDisallowedDestination('plex.local', '192.168.1.10'),
+        );
+        $this->userApi->expects(self::never())->method('updatePlexServerUrl');
+
+        $response = $this->subject->savePlexServerUrl($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        self::assertSame(
+            'Server URL resolves to a private or reserved IP address.',
+            $response->getBody(),
+        );
     }
 
     public function testAuthenticationUrlBindsStateToAuthenticationCookie() : void

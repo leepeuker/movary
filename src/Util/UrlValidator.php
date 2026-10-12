@@ -39,13 +39,13 @@ class UrlValidator
 
         $scheme = strtolower($parsedUrl['scheme']);
         if (in_array($scheme, self::ALLOWED_SCHEMES, true) === false) {
-            throw new InvalidSafeUrl('URL scheme not allowed: ' . $scheme);
+            throw InvalidSafeUrl::createForDisallowedScheme($scheme);
         }
 
         $host = $this->normalizeHost($parsedUrl['host']);
         $port = $parsedUrl['port'] ?? ($scheme === 'https' ? 443 : 80);
         if (in_array($port, self::ALLOWED_PORTS, true) === false) {
-            throw new InvalidSafeUrl('Port not allowed: ' . $port);
+            throw InvalidSafeUrl::createForDisallowedPort($port);
         }
 
         $addresses = filter_var($host, FILTER_VALIDATE_IP) === false
@@ -53,16 +53,16 @@ class UrlValidator
             : [$host];
 
         if ($addresses === []) {
-            throw new InvalidSafeUrl('Could not resolve hostname: ' . $host);
+            throw InvalidSafeUrl::createForUnresolvedHostname($host);
         }
 
         foreach ($addresses as $address) {
             if (filter_var($address, FILTER_VALIDATE_IP) === false) {
-                throw new InvalidSafeUrl('Hostname resolved to an invalid IP address: ' . $host);
+                throw InvalidSafeUrl::createForInvalidResolvedAddress($host);
             }
 
             if ($this->isPublicIp($address) === false && $this->isAllowed($host, $address, $allowlist) === false) {
-                throw new InvalidSafeUrl('Destination is not allowed: ' . $host . ' -> ' . $address);
+                throw InvalidSafeUrl::createForDisallowedDestination($host, $address);
             }
         }
 

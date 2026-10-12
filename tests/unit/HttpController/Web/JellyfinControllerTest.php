@@ -12,6 +12,7 @@ use Movary\Service\Jellyfin\JellyfinScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\UrlValidator;
 use Movary\Util\ValidatedUrl;
+use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Url;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -55,5 +56,38 @@ class JellyfinControllerTest extends TestCase
         $response = $subject->saveJellyfinServerUrl($request);
 
         self::assertSame(200, $response->getStatusCode()->getCode());
+    }
+
+    public function testSaveServerUrlReturnsSafeValidationReason() : void
+    {
+        $authentication = $this->createStub(Authentication::class);
+        $authentication->method('requireWebSession')->willReturn(
+            AuthenticatedUser::create(12, CredentialType::WEB_SESSION),
+        );
+        $userApi = $this->createMock(UserApi::class);
+        $userApi->expects(self::never())->method('updateJellyfinServerUrl');
+        $urlValidator = $this->createStub(UrlValidator::class);
+        $urlValidator->method('validateUrlIsSafe')->willThrowException(
+            InvalidSafeUrl::createForDisallowedDestination('jellyfin.local', '192.168.1.10'),
+        );
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn('{"JellyfinServerUrl":"http://jellyfin.local:8096"}');
+        $subject = new JellyfinController(
+            $authentication,
+            $userApi,
+            $this->createStub(JellyfinScrobbler::class),
+            $this->createStub(WebhookUrlBuilder::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(JellyfinApi::class),
+            $urlValidator,
+        );
+
+        $response = $subject->saveJellyfinServerUrl($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        self::assertSame(
+            'Server URL resolves to a private or reserved IP address.',
+            $response->getBody(),
+        );
     }
 }

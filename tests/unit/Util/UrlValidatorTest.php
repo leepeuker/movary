@@ -97,34 +97,61 @@ class UrlValidatorTest extends TestCase
     }
 
     #[DataProvider('provideUnsafeUrls')]
-    public function testRejectsUnsafeUrl(string $url) : void
+    public function testRejectsUnsafeUrl(string $url, string $expectedUserMessage) : void
     {
-        $this->expectException(InvalidSafeUrl::class);
+        try {
+            (new UrlValidator($this->createStub(DnsResolver::class)))->validateUrlIsSafe(Url::createFromString($url));
+            self::fail('Expected unsafe URL to be rejected');
+        } catch (InvalidSafeUrl $e) {
+            self::assertSame($expectedUserMessage, $e->getUserMessage());
+        }
+    }
 
-        (new UrlValidator($this->createStub(DnsResolver::class)))->validateUrlIsSafe(Url::createFromString($url));
+    public function testExplainsHostnameResolutionFailure() : void
+    {
+        $dnsResolver = $this->createStub(DnsResolver::class);
+        $dnsResolver->method('resolve')->willReturn([]);
+
+        try {
+            (new UrlValidator($dnsResolver))->validateUrlIsSafe(Url::createFromString('https://unknown.example'));
+            self::fail('Expected unresolved hostname to be rejected');
+        } catch (InvalidSafeUrl $e) {
+            self::assertSame(
+                'Server hostname could not be resolved. Check the hostname and DNS configuration.',
+                $e->getUserMessage(),
+            );
+        }
     }
 
     public static function provideUnsafeUrls() : array
     {
         return [
-            'unsupported scheme' => ['ftp://8.8.8.8'],
-            'unsupported port' => ['https://8.8.8.8:22'],
-            'private IPv4' => ['http://10.0.0.1'],
-            'shared IPv4' => ['http://100.64.0.1'],
-            'protocol assignment IPv4' => ['http://192.0.0.1'],
-            'documentation IPv4' => ['http://192.0.2.1'],
-            'deprecated 6to4 relay IPv4' => ['http://192.88.99.1'],
-            'benchmarking IPv4' => ['http://198.18.0.1'],
-            'multicast IPv4' => ['http://224.0.0.1'],
-            'loopback IPv6' => ['http://[::1]'],
-            'documentation IPv6' => ['http://[2001:db8::1]'],
-            'segment routing IPv6' => ['http://[5f00::1]'],
-            'multicast IPv6' => ['http://[ff02::1]'],
-            'IPv4-mapped private address' => ['http://[::ffff:10.0.0.1]'],
-            'NAT64 transition address' => ['http://[64:ff9b::808:808]'],
-            'NAT64 private address' => ['http://[64:ff9b::a9fe:a9fe]'],
-            'NAT64 shared address' => ['http://[64:ff9b::6440:1]'],
-            '6to4 private address' => ['http://[2002:0a00:0001::]'],
+            'unsupported scheme' => ['ftp://8.8.8.8', 'Server URL must use http:// or https://.'],
+            'unsupported port' => [
+                'https://8.8.8.8:22',
+                'Server URL uses an unsupported port. Allowed ports: 80, 443, 8096, 8920, and 32400.',
+            ],
+            'private IPv4' => ['http://10.0.0.1', self::disallowedDestinationMessage()],
+            'shared IPv4' => ['http://100.64.0.1', self::disallowedDestinationMessage()],
+            'protocol assignment IPv4' => ['http://192.0.0.1', self::disallowedDestinationMessage()],
+            'documentation IPv4' => ['http://192.0.2.1', self::disallowedDestinationMessage()],
+            'deprecated 6to4 relay IPv4' => ['http://192.88.99.1', self::disallowedDestinationMessage()],
+            'benchmarking IPv4' => ['http://198.18.0.1', self::disallowedDestinationMessage()],
+            'multicast IPv4' => ['http://224.0.0.1', self::disallowedDestinationMessage()],
+            'loopback IPv6' => ['http://[::1]', self::disallowedDestinationMessage()],
+            'documentation IPv6' => ['http://[2001:db8::1]', self::disallowedDestinationMessage()],
+            'segment routing IPv6' => ['http://[5f00::1]', self::disallowedDestinationMessage()],
+            'multicast IPv6' => ['http://[ff02::1]', self::disallowedDestinationMessage()],
+            'IPv4-mapped private address' => ['http://[::ffff:10.0.0.1]', self::disallowedDestinationMessage()],
+            'NAT64 transition address' => ['http://[64:ff9b::808:808]', self::disallowedDestinationMessage()],
+            'NAT64 private address' => ['http://[64:ff9b::a9fe:a9fe]', self::disallowedDestinationMessage()],
+            'NAT64 shared address' => ['http://[64:ff9b::6440:1]', self::disallowedDestinationMessage()],
+            '6to4 private address' => ['http://[2002:0a00:0001::]', self::disallowedDestinationMessage()],
         ];
+    }
+
+    private static function disallowedDestinationMessage() : string
+    {
+        return 'Server URL resolves to a private or reserved IP address.';
     }
 }
