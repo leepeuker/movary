@@ -23,6 +23,7 @@ use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\ImdbRating;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -352,6 +353,7 @@ class MovieApi
         ?int $userRatingMax,
         ?int $locationId,
         ?string $productionCountryCode,
+        ?MovieTitleDisplay $movieTitleDisplay = null,
     ) : array {
         return $this->historyApi->fetchUniqueWatchedMoviesPaginated(
             $userId,
@@ -368,6 +370,7 @@ class MovieApi
             $userRatingMax,
             $locationId,
             $productionCountryCode,
+            $movieTitleDisplay,
         );
     }
 

@@ -10,6 +10,7 @@ use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
 use Movary\ValueObject\ImdbRating;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\PersonalRating;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -974,12 +975,13 @@ class MovieRepository
         ?int $userRatingMax,
         ?int $locationId,
         ?string $productionCountryCode,
+        MovieTitleDisplay $movieTitleDisplay,
     ) : array {
         $payload = [$userId, $userId];
 
         $offset = ($limit * $page) - $limit;
 
-        $movieTitleSortExpression = $this->getMovieTitleSortExpression($userId);
+        $movieTitleSortExpression = $this->getMovieTitleSortExpression($movieTitleDisplay);
 
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
@@ -1340,10 +1342,12 @@ class MovieRepository
         return MovieEntity::createFromArray($data);
     }
 
-    private function getMovieTitleSortExpression(int $userId) : string
+    private function getMovieTitleSortExpression(MovieTitleDisplay $movieTitleDisplay) : string
     {
-        return "CASE WHEN (SELECT movie_title_display FROM `user` WHERE id = $userId) = 'original' "
-            . "THEN LOWER(COALESCE(NULLIF(m.original_title, ''), m.title)) "
-            . "ELSE LOWER(COALESCE(NULLIF(m.title, ''), m.original_title)) END";
+        if ($movieTitleDisplay->displaysOriginal() === true) {
+            return "LOWER(COALESCE(NULLIF(m.original_title, ''), m.title))";
+        }
+
+        return "LOWER(COALESCE(NULLIF(m.title, ''), m.original_title))";
     }
 }

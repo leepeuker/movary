@@ -34,21 +34,21 @@
                 </button>
             </div>
 
-            <div id="moviePosterView" class="row row-cols-3 row-cols-md-3 row-cols-lg-6">
+            <div id="moviePosterView" class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6">
                 {% for mostWatchedActor in mostWatchedActors %}
-                    <div class="col" style="padding-bottom: 1rem;">
+                    <div class="col">
                         <div class="card h-100 position-relative">
                             <div class="card-header text-truncate" style="padding: 0.2rem">
                                 <small class="text-muted" style="font-size: 0.9rem;">{{ mostWatchedActor.name }}</small>
                             </div>
                             <input id="actorName_{{ mostWatchedActor.id }}" value="{{ mostWatchedActor.name }}" type="hidden">
-                            <a class="{% if sortBy != 'uniqueAppearances' and sortBy != 'totalAppearances' %}card-img-bottom{% endif %}"
-                               href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}-{{ mostWatchedActor.name|slugify }}" style="cursor: pointer">
+                            <a class="poster-link d-block {% if sortBy != 'uniqueAppearances' and sortBy != 'totalAppearances' %}card-img-bottom{% endif %}"
+                               href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ mostWatchedActor.id }}-{{ mostWatchedActor.name|slugify }}">
                                 <img class="{% if sortBy != 'uniqueAppearances' and sortBy != 'totalAppearances' %}card-img-bottom{% endif %}"
                                      style="max-width: 100%" src="{{ mostWatchedActor.poster_path }}" alt="{{ mostWatchedActor.name }} Poster">
                             </a>
                             {% if sortBy == 'uniqueAppearances' or sortBy == 'totalAppearances' %}
-                                <div class="card-footer" style="padding: 0.1rem">
+                                <div class="poster-footer card-footer">
                                     <small class="text-muted" style="font-size: 0.8rem">
                                         {% if sortBy == 'uniqueAppearances' %} {{ mostWatchedActor.uniqueCount }} {% else %} {{ mostWatchedActor.totalCount }} {% endif %}
                                     </small>
@@ -98,7 +98,7 @@
             {% set genderQuery = (filterGender is null) ? '' : "ge=#{filterGender}&" %}
             {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/actors?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genderQuery ~ languageQuery %}
 
-            <ul class="pagination justify-content-center">
+            <ul class="pagination justify-content-center mt-3">
                 {% if paginationElements.previous is null %}
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&laquo;</span></p></li>
                     <li class="page-item disabled"><p class="page-link"><span aria-hidden="true">&lsaquo;</span></p></li>

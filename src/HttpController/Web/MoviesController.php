@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\MoviesRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
@@ -19,6 +20,7 @@ class MoviesController
         private readonly UserPageAuthorizationChecker $userPageAuthorizationChecker,
         private readonly MoviesRequestMapper $moviesRequestMapper,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
+        private readonly CurrentWebUser $currentWebUser,
     ) {
     }
 
@@ -41,6 +43,7 @@ class MoviesController
             $requestData->getUserRatingMax(),
             $requestData->getLocationId(),
             $requestData->getProductionCountryCode(),
+            $this->currentWebUser->findUser()?->getMovieTitleDisplay(),
         );
 
         $watchedMoviesCount = $this->movieApi->fetchUniqueWatchedMoviesCount(

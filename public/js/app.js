@@ -225,6 +225,12 @@ function formatMovieTitle(localizedTitle, originalTitle) {
     return localizedTitle
 }
 
+function encodeBase64(value) {
+    const utf8Bytes = new TextEncoder().encode(value)
+
+    return btoa(String.fromCharCode(...utf8Bytes))
+}
+
 function loadLogModalSearchResults(data) {
     let searchResultList = document.getElementById('logPlayModalSearchResultList');
 
@@ -251,7 +257,7 @@ function loadLogModalSearchResults(data) {
         }
 
         backdropPath = item.backdrop_path != null ? 'https://image.tmdb.org/t/p/w780' + item.backdrop_path : null;
-        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + btoa(displayTitle)
+        posterPath = item.tmdbPosterPath != null ? 'https://image.tmdb.org/t/p/w92' + item.tmdbPosterPath : APPLICATION_URL + '/images/placeholder/' + encodeBase64(displayTitle)
         isWatchedEl = item.isWatched ? '<i class="bi bi-eye-fill" data-bs-toggle="tooltip" data-bs-title="Watched"></i>' : '';
         isOnWatchlistEl = item.isOnWatchlist ? '<i class="bi bi-bookmark-fill" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></i>' : '';
         listElement.innerHTML = `

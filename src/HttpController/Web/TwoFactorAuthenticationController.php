@@ -49,8 +49,12 @@ class TwoFactorAuthenticationController
         $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         $requestData = Json::decode($request->getBody());
-        $input = (int)$requestData['input'];
+        $input = $requestData['input'];
         $uri = $requestData['uri'];
+
+        if (is_string($input) === false) {
+            return Response::createBadRequest();
+        }
 
         $valid = $this->twoFactorAuthenticationApi->verifyTotpUri($userId, $input, $uri);
         if ($valid === false) {

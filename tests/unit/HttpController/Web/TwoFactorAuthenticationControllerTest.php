@@ -50,7 +50,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
         $twoFactorApi
             ->expects(self::once())
             ->method('verifyTotpUri')
-            ->with(42, 123456, 'otpauth://totp/test')
+            ->with(42, '012345', 'otpauth://totp/test')
             ->willReturn(true);
         $twoFactorApi->expects(self::once())->method('updateTotpUri')->with(42, 'otpauth://totp/test');
         $flashMessageService = $this->createMock(FlashMessageService::class);
@@ -66,7 +66,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $this->createMock(CurrentWebUser::class),
         );
         $request = $this->createMock(Request::class);
-        $request->method('getBody')->willReturn('{"input":123456,"uri":"otpauth://totp/test"}');
+        $request->method('getBody')->willReturn('{"input":"012345","uri":"otpauth://totp/test"}');
 
         self::assertSame(200, $subject->enableTOTP($request)->getStatusCode()->getCode());
     }
@@ -88,7 +88,7 @@ class TwoFactorAuthenticationControllerTest extends TestCase
             $this->createMock(CurrentWebUser::class),
         );
         $request = $this->createMock(Request::class);
-        $request->method('getBody')->willReturn('{"input":123456,"uri":"otpauth://totp/test"}');
+        $request->method('getBody')->willReturn('{"input":"123456","uri":"otpauth://totp/test"}');
 
         self::assertSame(400, $subject->enableTOTP($request)->getStatusCode()->getCode());
     }

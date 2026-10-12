@@ -5,6 +5,7 @@ namespace Movary\HttpController\Web;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\WatchlistRequestMapper;
 use Movary\JobQueue\JobQueueApi;
@@ -28,6 +29,7 @@ class WatchlistController
         private readonly Authentication $authenticationService,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly WatchlistRequestMapper $watchlistRequestMapper,
+        private readonly CurrentWebUser $currentWebUser,
     ) {
     }
 
@@ -74,6 +76,7 @@ class WatchlistController
             $requestData->getLanguage(),
             $requestData->getGenre(),
             $requestData->getProductionCountryCode(),
+            $this->currentWebUser->findUser()?->getMovieTitleDisplay(),
         );
         $watchlistCount = $this->movieWatchlistApi->fetchWatchlistCount(
             $requestData->getUserId(),

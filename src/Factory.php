@@ -471,10 +471,7 @@ class Factory
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
         $twig->addFilter(new TwigFilter('slugify', [$container->get(SlugifyService::class), 'slugify']));
-        $titleDisplayUser = $routeUsername === null
-            ? $user
-            : $container->get(UserApi::class)->findUserByName($routeUsername);
-        $movieTitleDisplay = $titleDisplayUser?->getMovieTitleDisplay() ?? MovieTitleDisplay::createLocalized();
+        $movieTitleDisplay = $user?->getMovieTitleDisplay() ?? MovieTitleDisplay::createLocalized();
         $twig->addGlobal('movieTitleDisplay', (string)$movieTitleDisplay);
         $movieTitleFormatter = $container->get(Service\MovieTitleFormatter::class);
         $twig->addFilter(new TwigFilter(

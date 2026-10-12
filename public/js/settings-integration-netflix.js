@@ -318,7 +318,7 @@ function processTMDBData(data) {
 
         media_div.setAttribute('data-tmdbid', item['ids']['tmdb'])
 
-        img.src = item['tmdbPosterPath'] != null ? 'https://image.tmdb.org/t/p/w92' + item['tmdbPosterPath'] : APPLICATION_URL + '/images/placeholder/' + btoa(displayTitle);
+        img.src = item['tmdbPosterPath'] != null ? 'https://image.tmdb.org/t/p/w92' + item['tmdbPosterPath'] : APPLICATION_URL + '/images/placeholder/' + encodeBase64(displayTitle);
         img.className = 'img-fluid';
         img.alt = 'Cover of ' + displayTitle;
         img.style.width = '92px';

@@ -7,6 +7,7 @@ use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ImageUrlService;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 use Psr\Log\LoggerInterface;
@@ -113,6 +114,7 @@ class MovieWatchlistApi
         ?string $language = null,
         ?string $genre = null,
         ?string $productionCountryCode = null,
+        ?MovieTitleDisplay $movieTitleDisplay = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createDesc();
@@ -129,6 +131,7 @@ class MovieWatchlistApi
             $language,
             $genre,
             $productionCountryCode,
+            $movieTitleDisplay ?? MovieTitleDisplay::createLocalized(),
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($watchlistEntries);

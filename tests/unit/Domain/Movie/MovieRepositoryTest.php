@@ -8,6 +8,7 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Movary\Domain\Movie\MovieRepository;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\SortOrder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -292,6 +293,7 @@ class MovieRepositoryTest extends TestCase
                 userRatingMax: null,
                 locationId: null,
                 productionCountryCode: null,
+                movieTitleDisplay: MovieTitleDisplay::createLocalized(),
             ),
         );
     }
@@ -329,6 +331,45 @@ class MovieRepositoryTest extends TestCase
                 userRatingMax: null,
                 locationId: null,
                 productionCountryCode: null,
+                movieTitleDisplay: MovieTitleDisplay::createLocalized(),
+            ),
+        );
+    }
+
+    public function testFetchUniqueWatchedMoviesPaginatedSortsByViewerTitlePreference() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains(
+                        $query,
+                        "ORDER BY LOWER(COALESCE(NULLIF(m.original_title, ''), m.title)) asc",
+                    ) && str_contains($query, 'SELECT movie_title_display FROM `user`') === false,
+                ),
+                [42, 42, '%%', '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchUniqueWatchedMoviesPaginated(
+                userId: 42,
+                limit: 24,
+                page: 1,
+                searchTerm: null,
+                sortBy: 'title',
+                sortOrder: SortOrder::createAsc(),
+                releaseYear: null,
+                language: null,
+                genre: null,
+                hasUserRating: null,
+                userRatingMin: null,
+                userRatingMax: null,
+                locationId: null,
+                productionCountryCode: null,
+                movieTitleDisplay: MovieTitleDisplay::createFromString('original'),
             ),
         );
     }

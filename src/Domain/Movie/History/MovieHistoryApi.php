@@ -9,6 +9,7 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ImageUrlService;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 
@@ -290,6 +291,7 @@ class MovieHistoryApi
         ?int $userRatingMax = null,
         ?int $locationId = null,
         ?string $productionCountryCode = null,
+        ?MovieTitleDisplay $movieTitleDisplay = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -310,6 +312,7 @@ class MovieHistoryApi
             $userRatingMax,
             $locationId,
             $productionCountryCode,
+            $movieTitleDisplay ?? MovieTitleDisplay::createLocalized(),
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);
@@ -481,6 +484,7 @@ class MovieHistoryApi
         ?int $userRatingMax = null,
         ?int $locationId = null,
         ?string $productionCountryCode = null,
+        ?MovieTitleDisplay $movieTitleDisplay = null,
     ) : array {
         if ($sortOrder === null) {
             $sortOrder = SortOrder::createAsc();
@@ -501,6 +505,7 @@ class MovieHistoryApi
             $userRatingMax,
             $locationId,
             $productionCountryCode,
+            $movieTitleDisplay ?? MovieTitleDisplay::createLocalized(),
         );
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($movies);

@@ -5,6 +5,7 @@ namespace Movary\Domain\Movie\Watchlist;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\ValueObject\DateTime;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
 
@@ -193,12 +194,13 @@ class MovieWatchlistRepository
         ?string $language,
         ?string $genre,
         ?string $productionCountryCode,
+        MovieTitleDisplay $movieTitleDisplay,
     ) : array {
         $payload = [$userId, $userId];
 
         $offset = ($limit * $page) - $limit;
 
-        $movieTitleSortExpression = $this->getMovieTitleSortExpression($userId);
+        $movieTitleSortExpression = $this->getMovieTitleSortExpression($movieTitleDisplay);
 
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
@@ -274,10 +276,12 @@ class MovieWatchlistRepository
         );
     }
 
-    private function getMovieTitleSortExpression(int $userId) : string
+    private function getMovieTitleSortExpression(MovieTitleDisplay $movieTitleDisplay) : string
     {
-        return "CASE WHEN (SELECT movie_title_display FROM `user` WHERE id = $userId) = 'original' "
-            . "THEN LOWER(COALESCE(NULLIF(m.original_title, ''), m.title)) "
-            . "ELSE LOWER(COALESCE(NULLIF(m.title, ''), m.original_title)) END";
+        if ($movieTitleDisplay->displaysOriginal() === true) {
+            return "LOWER(COALESCE(NULLIF(m.original_title, ''), m.title))";
+        }
+
+        return "LOWER(COALESCE(NULLIF(m.title, ''), m.original_title))";
     }
 }
