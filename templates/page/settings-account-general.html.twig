@@ -59,9 +59,9 @@
                 <div class="mb-3">
                     <label for="movieTitleDisplayInput" class="form-label"><b>Movie titles</b></label>
                     <select class="form-select" style="text-align: center;padding-right:0;" required id="movieTitleDisplayInput" aria-describedby="movieTitleDisplayHelp">
-                        <option value="localized" {% if movieTitleDisplay == 'localized' %}selected{% endif %}>Localized title</option>
-                        <option value="original" {% if movieTitleDisplay == 'original' %}selected{% endif %}>Original title</option>
-                        <option value="both" {% if movieTitleDisplay == 'both' %}selected{% endif %}>Localized and original title</option>
+                        <option value="localized" {% if movieTitleDisplay == 'localized' %}selected{% endif %}>Localized</option>
+                        <option value="original" {% if movieTitleDisplay == 'original' %}selected{% endif %}>Original</option>
+                        <option value="both" {% if movieTitleDisplay == 'both' %}selected{% endif %}>Localized and original</option>
                     </select>
                     <div id="movieTitleDisplayHelp" class="form-text">Choose how movie titles are displayed</div>
                 </div>
