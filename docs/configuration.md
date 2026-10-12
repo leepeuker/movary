@@ -68,7 +68,7 @@ Required for some third party integrations. Only necessary if the relevant third
 | `JELLYFIN_APP_NAME`          |   `Movary`    | Used for Jellyfin Authentication                                                                   |        |
 | `JELLYFIN_URL_ALLOWLIST`     |       -       | Comma-separated hostnames, IPs, or CIDRs allowed for private Jellyfin servers                      |        |
 
-Jellyfin and Plex server URLs are restricted to HTTP(S) destinations on ports 80, 443, 8096, and 8920. Public destinations are allowed by default. Private, reserved, and loopback destinations must be explicitly listed in the corresponding allowlist. Hostname entries are exact matches; CIDR entries can be used to authorize a private network, for example `jellyfin.home,192.168.1.0/24,fd00::/64`.
+Jellyfin and Plex server URLs are restricted to HTTP(S) destinations on ports 80, 443, 8096, 8920, and 32400. Public destinations are allowed by default. Private, reserved, and loopback destinations must be explicitly listed in the corresponding allowlist. Hostname entries are exact matches; CIDR entries can be used to authorize a private network, for example `jellyfin.home,192.168.1.0/24,fd00::/64`.
 
 ### Email
 

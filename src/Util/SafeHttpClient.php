@@ -13,6 +13,8 @@ use Psr\Http\Message\ResponseInterface;
 
 class SafeHttpClient
 {
+    private const int DEFAULT_TIMEOUT = 5;
+
     private readonly Client $client;
 
     private readonly bool $usesCurlHandler;
@@ -35,7 +37,7 @@ class SafeHttpClient
         }
 
         $config[RequestOptions::PROXY] = '';
-        $config[RequestOptions::TIMEOUT] ??= 4;
+        $config[RequestOptions::TIMEOUT] ??= self::DEFAULT_TIMEOUT;
 
         $this->client = new Client($config);
     }

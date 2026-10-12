@@ -45,6 +45,7 @@ class SafeHttpClientTest extends TestCase
         self::assertSame('jellyfin.example:8920', $transaction['request']->getHeaderLine('Host'));
         self::assertFalse($options['allow_redirects']);
         self::assertSame('', $options['proxy']);
+        self::assertSame(30, $options['timeout']);
         self::assertSame('jellyfin.example', $streamContext['ssl']['peer_name']);
     }
 

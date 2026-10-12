@@ -40,6 +40,17 @@ class UrlValidatorTest extends TestCase
         (new UrlValidator($dnsResolver))->validateUrlIsSafe(Url::createFromString('https://media.example.com'));
     }
 
+    public function testRejectsHostnameIfAaaaRecordIsPrivate() : void
+    {
+        $dnsResolver = $this->createStub(DnsResolver::class);
+        $dnsResolver->method('resolve')->willReturn(['8.8.8.8', 'fd00::1']);
+
+        $this->expectException(InvalidSafeUrl::class);
+        $this->expectExceptionMessage('Destination is not allowed');
+
+        (new UrlValidator($dnsResolver))->validateUrlIsSafe(Url::createFromString('https://media.example.com'));
+    }
+
     public function testAllowsPrivateAddressForExactHostname() : void
     {
         $dnsResolver = $this->createStub(DnsResolver::class);
@@ -63,6 +74,16 @@ class UrlValidatorTest extends TestCase
         self::assertSame('[fd00::12]', parse_url($validatedUrl->createPinnedUrl(
             Url::createFromString('https://[fd00::12]'),
         ), PHP_URL_HOST));
+    }
+
+    public function testAllowsStandardPlexPort() : void
+    {
+        $validatedUrl = (new UrlValidator($this->createStub(DnsResolver::class)))->validateUrlIsSafe(
+            Url::createFromString('http://192.168.1.10:32400'),
+            ['192.168.1.10'],
+        );
+
+        self::assertSame('192.168.1.10:32400:192.168.1.10', $validatedUrl->createCurlResolveEntry());
     }
 
     #[DataProvider('provideUnsafeUrls')]

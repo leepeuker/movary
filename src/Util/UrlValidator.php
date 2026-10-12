@@ -7,7 +7,7 @@ use Movary\ValueObject\Url;
 
 class UrlValidator
 {
-    private const array ALLOWED_PORTS = [80, 443, 8096, 8920];
+    private const array ALLOWED_PORTS = [80, 443, 8096, 8920, 32400];
 
     private const array ALLOWED_SCHEMES = ['http', 'https'];
 
