@@ -4,7 +4,6 @@ namespace Movary\Api\Jellyfin;
 
 use Exception;
 use Generator;
-use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
@@ -13,6 +12,7 @@ use Movary\Api\Jellyfin\Exception\JellyfinNotFoundError;
 use Movary\Api\Jellyfin\Exception\JellyfinServerConnectionError;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
+use Movary\Util\SafeHttpClient;
 use Movary\ValueObject\Url;
 use RuntimeException;
 
@@ -23,7 +23,7 @@ class JellyfinClient
     private const int DEFAULT_TIMEOUT = 4;
 
     public function __construct(
-        private readonly HttpClient $httpClient,
+        private readonly SafeHttpClient $httpClient,
         private readonly ServerSettings $serverSettings,
     ) {
     }

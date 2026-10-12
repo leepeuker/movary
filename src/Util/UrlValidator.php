@@ -7,130 +7,186 @@ use Movary\ValueObject\Url;
 
 class UrlValidator
 {
-    private const array BLOCKED_HOSTS
-        = [
-            'metadata.google.internal',
-            '169.254.169.254',  // AWS metadata
-            'metadata.azure.internal',
-            'metadata.rackspace.com',
-            '169.254.169.254/latest/meta-data/',
-            'metadata.service.consul',
-            '169.254.169.254/latest',
-        ];
+    private const array ALLOWED_PORTS = [80, 443, 8096, 8920];
 
-    private const array ALLOWED_LOCALHOST
-        = [
-            'localhost',
-            '127.0.0.1',
-            '::1',
-        ];
+    private const array ALLOWED_SCHEMES = ['http', 'https'];
 
-    private const array INTERNAL_DNS_PATTERNS
-        = [
-            '.internal',
-            '.local',
-            '.docker',
-            '.corp',
-            '.lan',
-            '.home',
-            '.priv',
-        ];
+    public function __construct(private readonly DnsResolver $dnsResolver)
+    {
+    }
 
-    private const array ALLOWED_PORTS = [80, 443, 8096, 8920]; // 8096 and 8920 are Jellyfin defaults
-
-    public function validateUrlIsSafe(Url $url): void
+    /** @param array<int, string> $allowlist */
+    public function validateUrlIsSafe(Url $url, array $allowlist = []) : ValidatedUrl
     {
         $parsedUrl = parse_url((string)$url);
 
-        if ($parsedUrl === false || !isset($parsedUrl['host'])) {
+        if ($parsedUrl === false || isset($parsedUrl['host']) === false || isset($parsedUrl['scheme']) === false) {
             throw InvalidSafeUrl::create((string)$url);
         }
 
-        $host = strtolower($parsedUrl['host']);
-        $port = $parsedUrl['port'] ?? (($parsedUrl['scheme'] ?? null) === 'https' ? 443 : 80);
-
-        $this->validateHost($host);
-        $this->validatePort($port);
-        $this->validateResolvedIp($host);
-    }
-
-    private function validateHost(string $host): void
-    {
-        // Block known internal/metadata endpoints
-        foreach (self::BLOCKED_HOSTS as $blocked) {
-            if (str_contains($host, $blocked)) {
-                throw new InvalidSafeUrl('Blocked internal host: ' . $host);
-            }
+        $scheme = strtolower($parsedUrl['scheme']);
+        if (in_array($scheme, self::ALLOWED_SCHEMES, true) === false) {
+            throw new InvalidSafeUrl('URL scheme not allowed: ' . $scheme);
         }
 
-        // Block localhost
-        if ($this->isAllowedLocalhost($host)) {
-            throw new InvalidSafeUrl('Localhost access not allowed: ' . $host);
-        }
-
-        // Block private IP ranges
-        if ($this->isPrivateIp($host)) {
-            throw new InvalidSafeUrl('Private IP address not allowed: ' . $host);
-        }
-
-        // Block internal DNS patterns
-        if ($this->isInternalDns($host)) {
-            throw new InvalidSafeUrl('Internal DNS name not allowed: ' . $host);
-        }
-    }
-
-    private function validatePort(int $port): void
-    {
-        // Block suspicious ports (except common web ports)
-        if (!in_array($port, self::ALLOWED_PORTS, true)) {
+        $host = $this->normalizeHost($parsedUrl['host']);
+        $port = $parsedUrl['port'] ?? ($scheme === 'https' ? 443 : 80);
+        if (in_array($port, self::ALLOWED_PORTS, true) === false) {
             throw new InvalidSafeUrl('Port not allowed: ' . $port);
         }
-    }
 
-    private function validateResolvedIp(string $host): void
-    {
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            return;
-        }
+        $addresses = filter_var($host, FILTER_VALIDATE_IP) === false
+            ? $this->dnsResolver->resolve($host)
+            : [$host];
 
-        // Resolve hostname to IP addresses
-        $ips = gethostbynamel($host);
-
-        if ($ips === false) {
+        if ($addresses === []) {
             throw new InvalidSafeUrl('Could not resolve hostname: ' . $host);
         }
 
-        foreach ($ips as $ip) {
-            // Check if resolved IP is private (but allow localhost)
-            if ($this->isPrivateIp($ip) && !$this->isAllowedLocalhost($ip)) {
-                throw new InvalidSafeUrl('Hostname resolves to private IP: ' . $host . ' -> ' . $ip);
+        foreach ($addresses as $address) {
+            if (filter_var($address, FILTER_VALIDATE_IP) === false) {
+                throw new InvalidSafeUrl('Hostname resolved to an invalid IP address: ' . $host);
+            }
+
+            if ($this->isPublicIp($address) === false && $this->isAllowed($host, $address, $allowlist) === false) {
+                throw new InvalidSafeUrl('Destination is not allowed: ' . $host . ' -> ' . $address);
             }
         }
+
+        return new ValidatedUrl($scheme, $host, $port, $addresses[0]);
     }
 
-    private function isAllowedLocalhost(string $host): bool
+    /** @param array<int, string> $allowlist */
+    private function isAllowed(string $host, string $ip, array $allowlist) : bool
     {
-        return in_array($host, self::ALLOWED_LOCALHOST, true);
-    }
+        foreach ($allowlist as $entry) {
+            $entry = trim($entry);
+            if ($entry === '') {
+                continue;
+            }
 
-    private function isPrivateIp(string $host): bool
-    {
-        if (!filter_var($host, FILTER_VALIDATE_IP)) {
-            return false;
-        }
+            if (str_contains($entry, '/') === true && $this->ipMatchesCidr($ip, $entry) === true) {
+                return true;
+            }
 
-        // Use FILTER_FLAG_NO_PRIV_RANGE and FILTER_FLAG_NO_RES_RANGE to block private and reserved IPs
-        return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
-    }
+            $normalizedEntry = $this->normalizeHost($entry);
+            if (filter_var($normalizedEntry, FILTER_VALIDATE_IP) !== false) {
+                if (inet_pton($normalizedEntry) === inet_pton($ip)) {
+                    return true;
+                }
 
-    private function isInternalDns(string $host): bool
-    {
-        foreach (self::INTERNAL_DNS_PATTERNS as $pattern) {
-            if (str_ends_with($host, $pattern)) {
+                continue;
+            }
+
+            if (strtolower($normalizedEntry) === strtolower($host)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function isPublicIp(string $ip) : bool
+    {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            return false;
+        }
+
+        foreach ($this->extractEmbeddedIpv4Addresses($ip) as $embeddedIp) {
+            if (filter_var($embeddedIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** @return array<int, string> */
+    private function extractEmbeddedIpv4Addresses(string $ip) : array
+    {
+        $packed = inet_pton($ip);
+        if ($packed === false || strlen($packed) !== 16) {
+            return [];
+        }
+
+        $hex = bin2hex($packed);
+
+        if (str_starts_with($hex, '00000000000000000000ffff') === true
+            || str_starts_with($hex, '0064ff9b0000000000000000') === true
+        ) {
+            return [$this->unpackIpv4(substr($packed, 12, 4))];
+        }
+
+        if (str_starts_with($hex, '2002') === true) {
+            return [$this->unpackIpv4(substr($packed, 2, 4))];
+        }
+
+        if (str_starts_with($hex, '20010000') === true) {
+            return [
+                $this->unpackIpv4(substr($packed, 4, 4)),
+                $this->unpackIpv4(substr($packed, 12, 4) ^ "\xff\xff\xff\xff"),
+            ];
+        }
+
+        if (substr($hex, 16, 8) === '00005efe' || substr($hex, 16, 8) === '02005efe') {
+            return [$this->unpackIpv4(substr($packed, 12, 4))];
+        }
+
+        return [];
+    }
+
+    private function ipMatchesCidr(string $ip, string $cidr) : bool
+    {
+        $cidrParts = explode('/', $cidr, 2);
+        if (count($cidrParts) !== 2 || ctype_digit($cidrParts[1]) === false) {
+            return false;
+        }
+        [$network, $prefixLength] = $cidrParts;
+
+        $packedIp = inet_pton($ip);
+        $packedNetwork = inet_pton($this->normalizeHost($network));
+        if ($packedIp === false || $packedNetwork === false || strlen($packedIp) !== strlen($packedNetwork)) {
+            return false;
+        }
+
+        $prefixLength = (int)$prefixLength;
+        $maximumPrefixLength = strlen($packedIp) * 8;
+        if ($prefixLength < 0 || $prefixLength > $maximumPrefixLength) {
+            return false;
+        }
+
+        $completeBytes = intdiv($prefixLength, 8);
+        $remainingBits = $prefixLength % 8;
+
+        if (substr($packedIp, 0, $completeBytes) !== substr($packedNetwork, 0, $completeBytes)) {
+            return false;
+        }
+
+        if ($remainingBits === 0) {
+            return true;
+        }
+
+        $mask = (0xff << (8 - $remainingBits)) & 0xff;
+
+        return (ord($packedIp[$completeBytes]) & $mask) === (ord($packedNetwork[$completeBytes]) & $mask);
+    }
+
+    private function normalizeHost(string $host) : string
+    {
+        if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+            return substr($host, 1, -1);
+        }
+
+        return $host;
+    }
+
+    private function unpackIpv4(string $packed) : string
+    {
+        $ip = inet_ntop($packed);
+        if ($ip === false) {
+            throw new InvalidSafeUrl('Could not normalize embedded IPv4 address');
+        }
+
+        return $ip;
     }
 }

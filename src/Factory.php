@@ -304,7 +304,17 @@ class Factory
             $container->get(LoggerInterface::class),
             $container->get(Api\Jellyfin\JellyfinApi::class),
             $container->get(Util\UrlValidator::class),
-            $config->getAsBool('JELLYFIN_VALIDATE_URL_SAFE', false),
+            self::parseServerUrlAllowlist($config->getAsString('JELLYFIN_URL_ALLOWLIST', '')),
+        );
+    }
+
+    public static function createJellyfinClient(ContainerInterface $container, Config $config) : Api\Jellyfin\JellyfinClient
+    {
+        $allowlist = self::parseServerUrlAllowlist($config->getAsString('JELLYFIN_URL_ALLOWLIST', ''));
+
+        return new Api\Jellyfin\JellyfinClient(
+            new Util\SafeHttpClient($container->get(Util\UrlValidator::class), $allowlist),
+            $container->get(Service\ServerSettings::class),
         );
     }
 
@@ -396,7 +406,27 @@ class Factory
             $container->get(Util\UrlValidator::class),
             $container->get(Service\PlexCallbackStateService::class),
             $container->get(CurrentWebUser::class),
-            $config->getAsBool('PLEX_VALIDATE_URL_SAFE', false),
+            self::parseServerUrlAllowlist($config->getAsString('PLEX_URL_ALLOWLIST', '')),
+        );
+    }
+
+    public static function createPlexUserClient(ContainerInterface $container, Config $config) : Api\Plex\PlexUserClient
+    {
+        $allowlist = self::parseServerUrlAllowlist($config->getAsString('PLEX_URL_ALLOWLIST', ''));
+
+        return new Api\Plex\PlexUserClient(
+            new Util\SafeHttpClient($container->get(Util\UrlValidator::class), $allowlist),
+            $container->get(Service\ServerSettings::class),
+        );
+    }
+
+    public static function createPlexTvClient(ContainerInterface $container, Config $config) : Api\Plex\PlexTvClient
+    {
+        $allowlist = self::parseServerUrlAllowlist($config->getAsString('PLEX_URL_ALLOWLIST', ''));
+
+        return new Api\Plex\PlexTvClient(
+            new Util\SafeHttpClient($container->get(Util\UrlValidator::class), $allowlist),
+            $container->get(Service\ServerSettings::class),
         );
     }
 
@@ -587,6 +617,12 @@ class Factory
     private static function getTmdbEnabledImageCaching(Config $config) : bool
     {
         return $config->getAsBool('TMDB_ENABLE_IMAGE_CACHING', self::DEFAULT_TMDB_IMAGE_CACHING);
+    }
+
+    /** @return array<int, string> */
+    private static function parseServerUrlAllowlist(string $allowlist) : array
+    {
+        return array_values(array_filter(array_map('trim', explode(',', $allowlist))));
     }
 
     public function createProcessJobCommand(ContainerInterface $container, Config $config) : Command\ProcessJobs

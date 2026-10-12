@@ -15,7 +15,9 @@ use Movary\Service\Plex\PlexScrobbler;
 use Movary\Service\PlexCallbackStateService;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\UrlValidator;
+use Movary\Util\ValidatedUrl;
 use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\Url;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -36,12 +38,15 @@ class PlexControllerTest extends TestCase
 
     private MockObject|UserApi $userApi;
 
+    private MockObject|UrlValidator $urlValidator;
+
     protected function setUp() : void
     {
         $this->authentication = $this->createMock(Authentication::class);
         $this->userApi = $this->createMock(UserApi::class);
         $this->plexApi = $this->createMock(PlexApi::class);
         $this->stateService = $this->createMock(PlexCallbackStateService::class);
+        $this->urlValidator = $this->createMock(UrlValidator::class);
         $this->subject = new PlexController(
             $this->authentication,
             $this->userApi,
@@ -50,10 +55,30 @@ class PlexControllerTest extends TestCase
             $this->createMock(WebhookUrlBuilder::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(ApplicationUrlService::class),
-            $this->createMock(UrlValidator::class),
+            $this->urlValidator,
             $this->stateService,
             $this->createMock(CurrentWebUser::class),
         );
+    }
+
+    public function testSaveServerUrlAlwaysValidatesDestination() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())->method('getBody')->willReturn('{"plexServerUrl":"https://plex.example"}');
+        $this->authentication->expects(self::once())->method('requireWebSession')->willReturn(
+            AuthenticatedUser::create(12, CredentialType::WEB_SESSION),
+        );
+        $serverUrl = Url::createFromString('https://plex.example');
+        $this->urlValidator
+            ->expects(self::once())
+            ->method('validateUrlIsSafe')
+            ->with($serverUrl, [])
+            ->willReturn($this->createStub(ValidatedUrl::class));
+        $this->userApi->expects(self::once())->method('updatePlexServerUrl')->with(12, $serverUrl);
+
+        $response = $this->subject->savePlexServerUrl($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
     }
 
     public function testAuthenticationUrlBindsStateToAuthenticationCookie() : void

@@ -13,6 +13,9 @@ $builder->addDefinitions(
         \Movary\Service\ImageCacheService::class => DI\factory([Factory::class, 'createImageCacheService']),
         \Movary\JobQueue\JobQueueScheduler::class => DI\factory([Factory::class, 'createJobQueueScheduler']),
         \Movary\Api\Imdb\ImdbApi::class => DI\factory([Factory::class, 'createImdbApi']),
+        \Movary\Api\Jellyfin\JellyfinClient::class => DI\factory([Factory::class, 'createJellyfinClient']),
+        \Movary\Api\Plex\PlexTvClient::class => DI\factory([Factory::class, 'createPlexTvClient']),
+        \Movary\Api\Plex\PlexUserClient::class => DI\factory([Factory::class, 'createPlexUserClient']),
         \Movary\Api\Tmdb\TmdbClient::class => DI\factory([Factory::class, 'createTmdbApiClient']),
         \Movary\Service\ImageUrlService::class => DI\factory([Factory::class, 'createUrlGenerator']),
         \Movary\Service\FlashMessage\FlashMessageService::class => DI\factory(

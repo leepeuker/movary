@@ -24,6 +24,7 @@ use RuntimeException;
 
 class PlexController
 {
+    /** @param array<int, string> $serverUrlAllowlist */
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
@@ -35,7 +36,7 @@ class PlexController
         private readonly UrlValidator $urlValidator,
         private readonly PlexCallbackStateService $callbackStateService,
         private readonly CurrentWebUser $currentWebUser,
-        private readonly bool $validateUrlIsSafe = false,
+        private readonly array $serverUrlAllowlist = [],
     ) {
     }
 
@@ -168,12 +169,10 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
-            if ($this->validateUrlIsSafe === true) {
-                $this->urlValidator->validateUrlIsSafe($plexServerUrl);
-            }
+            $this->urlValidator->validateUrlIsSafe($plexServerUrl, $this->serverUrlAllowlist);
         } catch (InvalidUrl $e) {
-            $this->logger->warning('Plex: Could not safe server url: ' . $e->getMessage());
-            return Response::createBadRequest('Could not safe server url');
+            $this->logger->warning('Plex: Could not validate server url: ' . $e->getMessage());
+            return Response::createBadRequest('Could not validate server url');
         }
 
         $this->userApi->updatePlexServerUrl($userId, $plexServerUrl);
@@ -192,9 +191,7 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
-            if ($this->validateUrlIsSafe === true) {
-                $this->urlValidator->validateUrlIsSafe($plexServerUrl);
-            }
+            $this->urlValidator->validateUrlIsSafe($plexServerUrl, $this->serverUrlAllowlist);
         } catch (InvalidUrl $e) {
             $this->logger->warning('Plex: Connection test failed: ' . $e->getMessage());
             return Response::createBadRequest('Connection test failed');
