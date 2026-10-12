@@ -15,7 +15,7 @@ class PasswordResetTokenService
 
     public function __construct(
         private readonly UserRepository $repository,
-        private readonly Validator $validator,
+        private readonly PasswordPolicy $passwordPolicy,
     ) {
     }
 
@@ -47,7 +47,7 @@ class PasswordResetTokenService
 
     public function resetPassword(string $token, string $newPassword) : bool
     {
-        $this->validator->ensurePasswordIsValid($newPassword);
+        $this->passwordPolicy->ensurePasswordIsValid($newPassword);
 
         return $this->repository->resetPasswordWithToken(
             $this->hashToken($token),

@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
@@ -73,6 +74,8 @@ class CreateUserController
             $this->authenticationService->loginWebSession($email, $password, false, $userAgent);
         } catch (PasswordTooShort) {
             $flashMessage = FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT;
+        } catch (PasswordInvalidEncoding) {
+            $flashMessage = FlashMessage::CREATE_USER_PASSWORD_INVALID_ENCODING;
         } catch (UsernameInvalidFormat) {
             $flashMessage = FlashMessage::CREATE_USER_USERNAME_INVALID;
         } catch (UsernameNotUnique) {
@@ -104,6 +107,9 @@ class CreateUserController
                 'subtitle' => $hasUsers === false ? 'Create initial admin user' : 'Create new user',
                 'errorPasswordTooShort' => $this->flashMessageService->consume(
                     FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT,
+                ),
+                'errorPasswordInvalidEncoding' => $this->flashMessageService->consume(
+                    FlashMessage::CREATE_USER_PASSWORD_INVALID_ENCODING,
                 ),
                 'errorPasswordNotEqual' => $this->flashMessageService->consume(
                     FlashMessage::CREATE_USER_PASSWORDS_NOT_EQUAL,

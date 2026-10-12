@@ -3,6 +3,7 @@
 namespace Movary\Command;
 
 use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
@@ -53,7 +54,14 @@ class UserCreate extends Command
 
             return Command::FAILURE;
         } catch (PasswordTooShort $e) {
-            $this->generateOutput($output, 'Could not create user: Password must contain at least 8 characters');
+            $this->generateOutput(
+                $output,
+                sprintf('Could not create user: Password must contain at least %d characters', $e->getMinLength()),
+            );
+
+            return Command::FAILURE;
+        } catch (PasswordInvalidEncoding) {
+            $this->generateOutput($output, 'Could not create user: Password must contain valid Unicode text');
 
             return Command::FAILURE;
         } catch (UsernameInvalidFormat $e) {

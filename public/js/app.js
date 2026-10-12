@@ -11,7 +11,6 @@ if ('serviceWorker' in navigator) {
     })
 }
 
-const PASSWORD_MIN_LENGTH = 8
 let currentModalVersion = 1;
 
 function fetchWithCsrf(input, options = {}) {

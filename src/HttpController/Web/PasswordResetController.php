@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\PasswordResetRequestService;
 use Movary\Domain\User\Service\PasswordResetTokenService;
@@ -88,6 +89,8 @@ class PasswordResetController
             }
         } catch (PasswordTooShort $exception) {
             return $this->renderResetForm($token, true, minimumPasswordLength: $exception->getMinLength());
+        } catch (PasswordInvalidEncoding) {
+            return $this->renderResetForm($token, true, invalidPasswordEncoding: true);
         } catch (Throwable $exception) {
             $this->logger->error('Could not reset password.', ['exception' => $exception]);
 
@@ -120,6 +123,7 @@ class PasswordResetController
         bool $missingFormData = false,
         bool $passwordsDoNotMatch = false,
         ?int $minimumPasswordLength = null,
+        bool $invalidPasswordEncoding = false,
         bool $genericError = false,
     ) : Response {
         return Response::createSensitive(
@@ -132,6 +136,7 @@ class PasswordResetController
                     'missingFormData' => $missingFormData,
                     'passwordsDoNotMatch' => $passwordsDoNotMatch,
                     'minimumPasswordLength' => $minimumPasswordLength,
+                    'invalidPasswordEncoding' => $invalidPasswordEncoding,
                     'genericError' => $genericError,
                 ],
             ),

@@ -2,6 +2,7 @@
 
 namespace Movary\Command;
 
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Domain\User\UserApi;
@@ -72,6 +73,10 @@ class UserPasswordSet extends Command
             $this->tokenService->deleteTokenForUser($userId);
         } catch (PasswordTooShort $exception) {
             $this->generateOutput($output, sprintf('Password must contain at least %d characters.', $exception->getMinLength()));
+
+            return Command::FAILURE;
+        } catch (PasswordInvalidEncoding) {
+            $this->generateOutput($output, 'Password must contain valid Unicode text.');
 
             return Command::FAILURE;
         } catch (Throwable $throwable) {

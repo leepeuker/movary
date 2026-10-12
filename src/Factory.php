@@ -22,6 +22,7 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\AuthenticationController;
@@ -460,6 +461,7 @@ class Factory
         $twig->addGlobal('canonicalPath', preg_replace('/-?' . $routenameSlugSuffix . '$/', '', $currentRequest->getPath()));
         $twig->addGlobal('theme', $_COOKIE['theme'] ?? 'light');
         $twig->addGlobal('csrfToken', $container->get(Service\CsrfTokenProvider::class)->getToken());
+        $twig->addGlobal('passwordMinimumLength', PasswordPolicy::MINIMUM_LENGTH);
 
         $assetUrlGenerator = new AssetUrlGenerator(
             $container->get(File::class),
