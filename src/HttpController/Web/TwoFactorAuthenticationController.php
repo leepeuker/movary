@@ -11,6 +11,7 @@ use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 
 class TwoFactorAuthenticationController
 {
@@ -33,7 +34,7 @@ class TwoFactorAuthenticationController
             'secret' => $totp->getSecret()
         ]);
 
-        return Response::createJson($response);
+        return Response::createSensitiveJson($response);
     }
 
     public function disableTOTP() : Response
@@ -58,12 +59,12 @@ class TwoFactorAuthenticationController
 
         $valid = $this->twoFactorAuthenticationApi->verifyTotpUri($userId, $input, $uri);
         if ($valid === false) {
-            return Response::createBadRequest();
+            return Response::createSensitive(StatusCode::createBadRequest());
         }
 
         $this->twoFactorAuthenticationApi->updateTotpUri($userId, $uri);
         $this->flashMessageService->add(FlashMessage::TWO_FACTOR_AUTHENTICATION_ENABLED);
 
-        return Response::createOk();
+        return Response::createSensitive(StatusCode::createOk());
     }
 }

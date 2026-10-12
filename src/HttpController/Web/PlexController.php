@@ -65,7 +65,7 @@ class PlexController
             return Response::createBadRequest($e->getMessage());
         }
 
-        return Response::createJson(Json::encode(['authenticationUrl' => $plexAuthenticationUrl]));
+        return Response::createSensitiveJson(Json::encode(['authenticationUrl' => $plexAuthenticationUrl]));
     }
 
     /**

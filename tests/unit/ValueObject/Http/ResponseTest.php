@@ -78,6 +78,73 @@ class ResponseTest extends TestCase
         );
     }
 
+    public function testCreateSensitive() : void
+    {
+        $subject = Response::createSensitive(
+            StatusCode::createBadRequest(),
+            'foobar',
+            [Header::createRetryAfter(60)],
+        );
+
+        self::assertSame(400, $subject->getStatusCode()->getCode());
+        self::assertSame('foobar', $subject->getBody());
+        self::assertEquals(
+            [
+                Header::createRetryAfter(60),
+                Header::createCacheControlNoStore(),
+                Header::createPragmaNoCache(),
+            ],
+            $subject->getHeaders(),
+        );
+    }
+
+    public function testCreateSensitiveReplacesCallerCacheHeaders() : void
+    {
+        $subject = Response::createSensitive(
+            StatusCode::createOk(),
+            headers: [Header::createCache(3600), Header::createPragmaNoCache()],
+        );
+
+        self::assertEquals(
+            [Header::createCacheControlNoStore(), Header::createPragmaNoCache()],
+            $subject->getHeaders(),
+        );
+    }
+
+    public function testCreateSensitiveJson() : void
+    {
+        $subject = Response::createSensitiveJson('foobar', headers: [Header::createRetryAfter(60)]);
+
+        self::assertEquals(
+            [
+                Header::createContentTypeJson(),
+                Header::createRetryAfter(60),
+                Header::createCacheControlNoStore(),
+                Header::createPragmaNoCache(),
+            ],
+            $subject->getHeaders(),
+        );
+    }
+
+    public function testCreateSensitiveSeeOther() : void
+    {
+        $subject = Response::createSensitiveSeeOther(
+            '/foobar',
+            [Header::createReferrerPolicyNoReferrer()],
+        );
+
+        self::assertSame(303, $subject->getStatusCode()->getCode());
+        self::assertEquals(
+            [
+                Header::createLocation('/foobar'),
+                Header::createReferrerPolicyNoReferrer(),
+                Header::createCacheControlNoStore(),
+                Header::createPragmaNoCache(),
+            ],
+            $subject->getHeaders(),
+        );
+    }
+
     public function testCreateZipDownload() : void
     {
         $subject = Response::createZipDownload('zip content', 'export.zip');
@@ -139,5 +206,15 @@ class ResponseTest extends TestCase
         );
 
         self::assertEquals([Header::createCache(3600)], $subject->getHeaders());
+    }
+
+    public function testCreateSvgRetainsPublicCacheHeader() : void
+    {
+        $subject = Response::createSVG('svg', cacheDurationInSeconds: 3600);
+
+        self::assertEquals(
+            [Header::createContentTypeSVG(), Header::createCache(3600)],
+            $subject->getHeaders(),
+        );
     }
 }

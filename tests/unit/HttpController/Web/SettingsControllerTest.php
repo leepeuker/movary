@@ -105,6 +105,10 @@ class SettingsControllerTest extends TestCase
             'token' => 'mvy_pat_v1_token',
             'expiresAt' => '2027-01-08 12:00:00',
         ], Json::decode((string)$response->getBody()));
+        self::assertSame(
+            ['Content-Type: application/json', 'Cache-Control: no-store', 'Pragma: no-cache'],
+            array_map('strval', $response->getHeaders()),
+        );
     }
 
     public function testUpdatesMovieTitleDisplayPreference() : void

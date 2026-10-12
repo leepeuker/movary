@@ -42,6 +42,21 @@ class Header
         return new self('Cache-Control', 'private, no-cache');
     }
 
+    public static function createCacheControlNoStore() : self
+    {
+        return new self('Cache-Control', 'no-store');
+    }
+
+    public static function createPragmaNoCache() : self
+    {
+        return new self('Pragma', 'no-cache');
+    }
+
+    public static function createReferrerPolicyNoReferrer() : self
+    {
+        return new self('Referrer-Policy', 'no-referrer');
+    }
+
     public static function createRetryAfter(int $seconds) : self
     {
         return new self('Retry-After', (string)$seconds);
