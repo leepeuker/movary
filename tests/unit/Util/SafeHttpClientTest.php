@@ -45,7 +45,7 @@ class SafeHttpClientTest extends TestCase
         self::assertSame('jellyfin.example:8920', $transaction['request']->getHeaderLine('Host'));
         self::assertFalse($options['allow_redirects']);
         self::assertSame('', $options['proxy']);
-        self::assertSame(30, $options['timeout']);
+        self::assertSame(5, $options['timeout']);
         self::assertSame('jellyfin.example', $streamContext['ssl']['peer_name']);
     }
 
@@ -82,5 +82,31 @@ class SafeHttpClientTest extends TestCase
         );
         self::assertSame('jellyfin.example', $transaction['request']->getUri()->getHost());
         self::assertFalse($options['allow_redirects']);
+    }
+
+    public function testCurlHandlerDoesNotResolveIpLiteral() : void
+    {
+        if (defined('CURLOPT_RESOLVE') === false) {
+            self::markTestSkipped('PHP cURL is not installed');
+        }
+
+        /** @var array<int, array{request: RequestInterface, response: ?ResponseInterface, error: ?Throwable, options: array<string, mixed>}> $history */
+        $history = [];
+        $handler = HandlerStack::create(new MockHandler([new Response()]));
+        $handler->push(Middleware::history($history));
+        $subject = new SafeHttpClient(
+            new UrlValidator($this->createStub(DnsResolver::class)),
+            ['fd00::/64'],
+            ['handler' => $handler],
+            true,
+        );
+
+        $subject->request('GET', 'http://[fd00::12]');
+
+        /** @var array{request: RequestInterface, response: ?ResponseInterface, error: ?Throwable, options: array<string, mixed>} $transaction */
+        $transaction = $history[0];
+        $curlOptions = $transaction['options']['curl'];
+
+        self::assertArrayNotHasKey(constant('CURLOPT_RESOLVE'), $curlOptions);
     }
 }

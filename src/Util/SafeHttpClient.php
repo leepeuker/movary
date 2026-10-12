@@ -64,7 +64,9 @@ class SafeHttpClient
 
         if ($this->usesCurlHandler === true) {
             $curlOptions = $options[RequestOptions::CURL] ?? [];
-            $curlOptions[constant('CURLOPT_RESOLVE')] = [$validatedUrl->createCurlResolveEntry()];
+            if (filter_var($validatedUrl->getHost(), FILTER_VALIDATE_IP) === false) {
+                $curlOptions[constant('CURLOPT_RESOLVE')] = [$validatedUrl->createCurlResolveEntry()];
+            }
             $options[RequestOptions::CURL] = $curlOptions;
 
             return [(string)$url, $options];

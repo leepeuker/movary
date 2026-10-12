@@ -86,6 +86,16 @@ class UrlValidatorTest extends TestCase
         self::assertSame('192.168.1.10:32400:192.168.1.10', $validatedUrl->createCurlResolveEntry());
     }
 
+    public function testAllowsReservedAddressInConfiguredCidr() : void
+    {
+        $validatedUrl = (new UrlValidator($this->createStub(DnsResolver::class)))->validateUrlIsSafe(
+            Url::createFromString('http://198.18.0.10'),
+            ['198.18.0.0/15'],
+        );
+
+        self::assertSame('198.18.0.10:80:198.18.0.10', $validatedUrl->createCurlResolveEntry());
+    }
+
     #[DataProvider('provideUnsafeUrls')]
     public function testRejectsUnsafeUrl(string $url) : void
     {
@@ -100,9 +110,20 @@ class UrlValidatorTest extends TestCase
             'unsupported scheme' => ['ftp://8.8.8.8'],
             'unsupported port' => ['https://8.8.8.8:22'],
             'private IPv4' => ['http://10.0.0.1'],
+            'shared IPv4' => ['http://100.64.0.1'],
+            'protocol assignment IPv4' => ['http://192.0.0.1'],
+            'documentation IPv4' => ['http://192.0.2.1'],
+            'deprecated 6to4 relay IPv4' => ['http://192.88.99.1'],
+            'benchmarking IPv4' => ['http://198.18.0.1'],
+            'multicast IPv4' => ['http://224.0.0.1'],
             'loopback IPv6' => ['http://[::1]'],
+            'documentation IPv6' => ['http://[2001:db8::1]'],
+            'segment routing IPv6' => ['http://[5f00::1]'],
+            'multicast IPv6' => ['http://[ff02::1]'],
             'IPv4-mapped private address' => ['http://[::ffff:10.0.0.1]'],
+            'NAT64 transition address' => ['http://[64:ff9b::808:808]'],
             'NAT64 private address' => ['http://[64:ff9b::a9fe:a9fe]'],
+            'NAT64 shared address' => ['http://[64:ff9b::6440:1]'],
             '6to4 private address' => ['http://[2002:0a00:0001::]'],
         ];
     }

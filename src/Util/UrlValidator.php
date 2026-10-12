@@ -4,12 +4,25 @@ namespace Movary\Util;
 
 use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Url;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class UrlValidator
 {
     private const array ALLOWED_PORTS = [80, 443, 8096, 8920, 32400];
 
     private const array ALLOWED_SCHEMES = ['http', 'https'];
+
+    // Non-global ranges not covered by IpUtils::PRIVATE_SUBNETS.
+    private const array NON_GLOBAL_IPV4_CIDRS = [
+        '192.0.0.0/24',
+        '192.88.99.0/24',
+        '224.0.0.0/4',
+    ];
+
+    private const array NON_GLOBAL_IPV6_CIDRS = [
+        '2001::/23',
+        '3fff::/20',
+    ];
 
     public function __construct(private readonly DnsResolver $dnsResolver)
     {
@@ -88,87 +101,25 @@ class UrlValidator
 
     private function isPublicIp(string $ip) : bool
     {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+        if (IpUtils::isPrivateIp($ip) === true) {
             return false;
         }
 
-        foreach ($this->extractEmbeddedIpv4Addresses($ip) as $embeddedIp) {
-            if (filter_var($embeddedIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-                return false;
-            }
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+            return IpUtils::checkIp($ip, self::NON_GLOBAL_IPV4_CIDRS) === false && filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE,
+            ) !== false;
         }
 
-        return true;
-    }
-
-    /** @return array<int, string> */
-    private function extractEmbeddedIpv4Addresses(string $ip) : array
-    {
-        $packed = inet_pton($ip);
-        if ($packed === false || strlen($packed) !== 16) {
-            return [];
-        }
-
-        $hex = bin2hex($packed);
-
-        if (str_starts_with($hex, '00000000000000000000ffff') === true
-            || str_starts_with($hex, '0064ff9b0000000000000000') === true
-        ) {
-            return [$this->unpackIpv4(substr($packed, 12, 4))];
-        }
-
-        if (str_starts_with($hex, '2002') === true) {
-            return [$this->unpackIpv4(substr($packed, 2, 4))];
-        }
-
-        if (str_starts_with($hex, '20010000') === true) {
-            return [
-                $this->unpackIpv4(substr($packed, 4, 4)),
-                $this->unpackIpv4(substr($packed, 12, 4) ^ "\xff\xff\xff\xff"),
-            ];
-        }
-
-        if (substr($hex, 16, 8) === '00005efe' || substr($hex, 16, 8) === '02005efe') {
-            return [$this->unpackIpv4(substr($packed, 12, 4))];
-        }
-
-        return [];
+        return IpUtils::checkIp($ip, '2000::/3')
+            && IpUtils::checkIp($ip, self::NON_GLOBAL_IPV6_CIDRS) === false;
     }
 
     private function ipMatchesCidr(string $ip, string $cidr) : bool
     {
-        $cidrParts = explode('/', $cidr, 2);
-        if (count($cidrParts) !== 2 || ctype_digit($cidrParts[1]) === false) {
-            return false;
-        }
-        [$network, $prefixLength] = $cidrParts;
-
-        $packedIp = inet_pton($ip);
-        $packedNetwork = inet_pton($this->normalizeHost($network));
-        if ($packedIp === false || $packedNetwork === false || strlen($packedIp) !== strlen($packedNetwork)) {
-            return false;
-        }
-
-        $prefixLength = (int)$prefixLength;
-        $maximumPrefixLength = strlen($packedIp) * 8;
-        if ($prefixLength < 0 || $prefixLength > $maximumPrefixLength) {
-            return false;
-        }
-
-        $completeBytes = intdiv($prefixLength, 8);
-        $remainingBits = $prefixLength % 8;
-
-        if (substr($packedIp, 0, $completeBytes) !== substr($packedNetwork, 0, $completeBytes)) {
-            return false;
-        }
-
-        if ($remainingBits === 0) {
-            return true;
-        }
-
-        $mask = (0xff << (8 - $remainingBits)) & 0xff;
-
-        return (ord($packedIp[$completeBytes]) & $mask) === (ord($packedNetwork[$completeBytes]) & $mask);
+        return IpUtils::checkIp($ip, $cidr);
     }
 
     private function normalizeHost(string $host) : string
@@ -178,15 +129,5 @@ class UrlValidator
         }
 
         return $host;
-    }
-
-    private function unpackIpv4(string $packed) : string
-    {
-        $ip = inet_ntop($packed);
-        if ($ip === false) {
-            throw new InvalidSafeUrl('Could not normalize embedded IPv4 address');
-        }
-
-        return $ip;
     }
 }
