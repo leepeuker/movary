@@ -10,6 +10,7 @@ class MovieSearchResultDto implements JsonSerializable
     public function __construct(
         private readonly int $tmdbId,
         private readonly string $title,
+        private readonly string $originalTitle,
         private readonly ?string $overview,
         private readonly ?Date $releaseDate,
         private readonly ?string $originalLanguage,
@@ -23,6 +24,7 @@ class MovieSearchResultDto implements JsonSerializable
     public static function create(
         int $tmdbId,
         string $title,
+        string $originalTitle,
         ?string $overview = null,
         ?Date $releaseDate = null,
         ?string $originalLanguage = null,
@@ -34,6 +36,7 @@ class MovieSearchResultDto implements JsonSerializable
         return new self(
             $tmdbId,
             $title,
+            $originalTitle,
             $overview,
             $releaseDate,
             $originalLanguage,
@@ -53,6 +56,7 @@ class MovieSearchResultDto implements JsonSerializable
     {
         return [
             'title' => $this->title,
+            'originalTitle' => $this->originalTitle,
             'releaseDate' => $this->releaseDate,
             'overview' => $this->overview,
             'originalLanguage' => $this->originalLanguage,
@@ -71,6 +75,7 @@ class MovieSearchResultDto implements JsonSerializable
         return MovieSearchResultDto::create(
             $this->tmdbId,
             $this->title,
+            $this->originalTitle,
             $this->overview,
             $this->releaseDate,
             $this->originalLanguage,
@@ -86,6 +91,7 @@ class MovieSearchResultDto implements JsonSerializable
         return MovieSearchResultDto::create(
             $this->tmdbId,
             $this->title,
+            $this->originalTitle,
             $this->overview,
             $this->releaseDate,
             $this->originalLanguage,
@@ -101,6 +107,7 @@ class MovieSearchResultDto implements JsonSerializable
         return MovieSearchResultDto::create(
             $this->tmdbId,
             $this->title,
+            $this->originalTitle,
             $this->overview,
             $this->releaseDate,
             $this->originalLanguage,

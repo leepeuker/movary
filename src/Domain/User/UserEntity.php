@@ -3,6 +3,7 @@
 namespace Movary\Domain\User;
 
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\Url;
 
 class UserEntity
@@ -40,6 +41,7 @@ class UserEntity
         private readonly bool $hasLocationsEnabled,
         private readonly bool $displayTmdbRating,
         private readonly bool $displayImdbRating,
+        private readonly MovieTitleDisplay $movieTitleDisplay,
         private readonly bool $mastodonEnabled,
         private readonly ?string $mastodonUsername,
         private readonly ?string $mastodonAccessToken,
@@ -83,6 +85,7 @@ class UserEntity
             (bool)$data['locations_enabled'],
             (bool)$data['display_tmdb_rating'],
             (bool)$data['display_imdb_rating'],
+            MovieTitleDisplay::createFromString($data['movie_title_display']),
             (bool)$data['mastodon_enabled'],
             $data['mastodon_username'],
             $data['mastodon_access_token'],
@@ -129,6 +132,11 @@ class UserEntity
     public function getDisplayTmdbRating() : bool
     {
         return $this->displayTmdbRating;
+    }
+
+    public function getMovieTitleDisplay() : MovieTitleDisplay
+    {
+        return $this->movieTitleDisplay;
     }
 
     public function getEmail() : string

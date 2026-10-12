@@ -104,6 +104,7 @@ class MovieApi
         ?string $tmdbBackdropPath = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
+        ?string $originalTitle = null,
     ) : MovieEntity {
         return $this->repository->create(
             $title,
@@ -119,6 +120,7 @@ class MovieApi
             $tmdbBackdropPath,
             $traktId,
             $imdbId,
+            $originalTitle,
         );
     }
 
@@ -437,6 +439,7 @@ class MovieApi
             'tmdbId' => $entity->getTmdbId(),
             'imdbId' => $entity->getImdbId(),
             'title' => $entity->getTitle(),
+            'originalTitle' => $entity->getOriginalTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'posterPath' => $posterPath,
             'tagline' => $entity->getTagline(),
@@ -605,6 +608,7 @@ class MovieApi
         ?string $tmdbPosterPath,
         ?string $tmdbBackdropPath,
         ?string $imdbId,
+        ?string $originalTitle,
     ) : MovieEntity {
         return $this->repository->updateDetails(
             $movieId,
@@ -618,6 +622,7 @@ class MovieApi
             $tmdbPosterPath,
             $tmdbBackdropPath,
             $imdbId,
+            $originalTitle,
         );
     }
 

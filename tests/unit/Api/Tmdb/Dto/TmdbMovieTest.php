@@ -18,6 +18,7 @@ class TmdbMovieTest extends TestCase
         $testData = [
             'id' => 12,
             'title' => 'title',
+            'original_title' => 'originalTitle',
             'original_language' => 'originalLanguage',
             'tagline' => null,
             'overview' => null,
@@ -55,6 +56,7 @@ class TmdbMovieTest extends TestCase
         $testData = [
             'id' => 12,
             'title' => 'title',
+            'original_title' => 'originalTitle',
             'original_language' => 'originalLanguage',
             'tagline' => 'tagline...',
             'overview' => 'overview...',
@@ -105,6 +107,7 @@ class TmdbMovieTest extends TestCase
     {
         self::assertSame(12, $subject->getId());
         self::assertSame('title', $subject->getTitle());
+        self::assertSame('originalTitle', $subject->getOriginalTitle());
         self::assertSame('originalLanguage', $subject->getOriginalLanguage());
         self::assertEquals(DateTime::createFromString('1998-08-28'), $subject->getReleaseDate());
         self::assertEquals(1, $subject->getVoteCount());

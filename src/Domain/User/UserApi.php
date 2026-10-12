@@ -7,6 +7,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\Validator;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\Url;
 use Ramsey\Uuid\Uuid;
 use RuntimeException;
@@ -351,6 +352,11 @@ class UserApi
     public function updateDisplayTmdbRating(int $userId, bool $displayTmdbRating) : void
     {
         $this->repository->updateDisplayTmdbRating($userId, $displayTmdbRating);
+    }
+
+    public function updateMovieTitleDisplay(int $userId, MovieTitleDisplay $movieTitleDisplay) : void
+    {
+        $this->repository->updateMovieTitleDisplay($userId, $movieTitleDisplay);
     }
 
     public function updateEmail(int $userId, string $email) : void

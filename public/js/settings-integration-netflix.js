@@ -299,6 +299,7 @@ function createPageNavigation(itemsPerPage, totalItemsCount, reset = null) {
 function processTMDBData(data) {
     let parent = document.getElementById('tmdbSearchResultsDiv');
     data.forEach((item) => {
+        const displayTitle = formatMovieTitle(item['title'], item['originalTitle'])
         let media_div = document.createElement('div');
         let thumb_div = document.createElement('div');
         let descr_div = document.createElement('div');
@@ -317,12 +318,12 @@ function processTMDBData(data) {
 
         media_div.setAttribute('data-tmdbid', item['ids']['tmdb'])
 
-        img.src = item['tmdbPosterPath'] != null ? 'https://image.tmdb.org/t/p/w92' + item['tmdbPosterPath'] : APPLICATION_URL + '/images/placeholder/' + btoa(item.title);
+        img.src = item['tmdbPosterPath'] != null ? 'https://image.tmdb.org/t/p/w92' + item['tmdbPosterPath'] : APPLICATION_URL + '/images/placeholder/' + btoa(displayTitle);
         img.className = 'img-fluid';
-        img.alt = 'Cover of ' + item['title'];
+        img.alt = 'Cover of ' + displayTitle;
         img.style.width = '92px';
 
-        link.innerText = item['title'];
+        link.innerText = displayTitle;
         link.href = 'https://www.themoviedb.org/movie/' + item['ids']['tmdb'];
         link.target = '_blank';
         heading.append(link);
@@ -427,7 +428,11 @@ function processNetflixData(netflixActivityItems) {
 
 
         if (netflixActivityItem.tmdbMatch !== null) {
-            tmdb_cover.alt = 'Cover of ' + netflixActivityItem.tmdbMatch.title;
+            const displayTitle = formatMovieTitle(
+                netflixActivityItem.tmdbMatch.title,
+                netflixActivityItem.tmdbMatch.original_title
+            )
+            tmdb_cover.alt = 'Cover of ' + displayTitle;
             row.setAttribute('data-tmdbid', netflixActivityItem.tmdbMatch.id);
         } else {
             tmdb_cover.alt = 'Cover of missing item';
@@ -441,7 +446,10 @@ function processNetflixData(netflixActivityItems) {
         } else {
             tmdb_cover.src = 'https://image.tmdb.org/t/p/w92' + netflixActivityItem.tmdbMatch.poster_path;
             tmdb_link.href = 'https://www.themoviedb.org/movie/' + netflixActivityItem.tmdbMatch.id;
-            tmdb_link.innerText = netflixActivityItem.tmdbMatch.title;
+            tmdb_link.innerText = formatMovieTitle(
+                netflixActivityItem.tmdbMatch.title,
+                netflixActivityItem.tmdbMatch.original_title
+            );
         }
 
         if (netflixActivityItem.tmdbMatch === null || netflixActivityItem.tmdbMatch.overview === null) {

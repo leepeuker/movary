@@ -11,7 +11,7 @@
                         <a class="h-100" style="cursor: pointer" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ lastPlay.id }}-{{ lastPlay.title|slugify }}">
                             <img src="{{ lastPlay.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
-                                 alt="{{ lastPlay.title }} Poster">
+                                 alt="{{ lastPlay.title|movie_title(lastPlay.original_title) }} Poster">
                         </a>
                         <div class="card-footer" style="padding: 0.1rem">
                             <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>

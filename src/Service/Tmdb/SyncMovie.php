@@ -47,6 +47,7 @@ class SyncMovie
             if ($movie === null) {
                 $movie = $this->movieApi->create(
                     title: $tmdbMovie->getTitle(),
+                    originalTitle: $tmdbMovie->getOriginalTitle(),
                     tmdbId: $tmdbId,
                     tagline: $tmdbMovie->getTagline(),
                     overview: $tmdbMovie->getOverview(),
@@ -78,6 +79,7 @@ class SyncMovie
                     tmdbPosterPath: $tmdbMovie->getPosterPath(),
                     tmdbBackdropPath: $tmdbMovie->getBackdropPath(),
                     imdbId: $movie->getImdbId(),
+                    originalTitle: $tmdbMovie->getOriginalTitle(),
                 );
 
                 if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()) {

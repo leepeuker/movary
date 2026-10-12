@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title -%}
-    {{ movie.title }} ({{ movie.releaseDate|date("Y") }})
+    {{ movie.title|movie_title(movie.originalTitle) }} ({{ movie.releaseDate|date("Y") }})
 {%- endblock %}
 
 {% block ogImage -%}
@@ -22,7 +22,13 @@
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
 
-        <h2 style="display: flex;margin-bottom: 0.2rem">{{ movie.title }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
+        {% set primaryTitle = movieTitleDisplay == 'original' and movie.originalTitle is not empty
+            ? movie.originalTitle
+            : (movie.title is not empty ? movie.title : movie.originalTitle) %}
+        <h2 style="display: flex;margin-bottom: 0.2rem">{{ primaryTitle }} {% if movie.releaseDate is not null %}({{ movie.releaseDate|date("Y") }}){% endif %}</h2>
+        {% if movie.originalTitle is not empty and movie.originalTitle != primaryTitle %}
+            <div class="fs-5 text-body-secondary mb-1">{{ movie.originalTitle }}</div>
+        {% endif %}
 
         <input type="hidden" id="movieId" value="{{ movie.id }}">
         <input type="hidden" id="username" value="{{ routeUsername }}">
@@ -178,7 +184,7 @@
                     <button type="button"
                             class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="logSpecificMovieButton"
-                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
+                            onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|movie_title(movie.originalTitle)|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
                     </button>
                 </div>
                 <div class="row mb-2">

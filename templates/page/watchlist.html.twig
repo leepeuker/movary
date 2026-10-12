@@ -45,7 +45,7 @@
                             style="cursor: pointer; position: relative;"
                             id="card-{{ watchlistEntry.id }}"
                         >
-                            <img data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom object-fit-cover h-100" alt="{{ watchlistEntry.title }} Poster">
+                            <img data-movieId="{{ watchlistEntry.id }}" src="{{ watchlistEntry.poster_path }}" class="card-img-top card-img-bottom object-fit-cover h-100" alt="{{ watchlistEntry.title|movie_title(watchlistEntry.original_title) }} Poster">
                        </a>
                     </div>
                 {% endfor %}
@@ -68,10 +68,10 @@
                             <tr>
                                 <td class="d-none d-sm-table-cell">
                                     <a href="{{ movieUrl }}">
-                                        <img src="{{ watchlistEntry.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ watchlistEntry.title }}">
+                                        <img src="{{ watchlistEntry.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ watchlistEntry.title|movie_title(watchlistEntry.original_title) }}">
                                     </a>
                                 </td>
-                                <td><a href="{{ movieUrl }}">{{ watchlistEntry.title }}</a></td>
+                                <td><a href="{{ movieUrl }}">{{ watchlistEntry.title|movie_title(watchlistEntry.original_title) }}</a></td>
                                 <td>{{ watchlistEntry.release_date is null ? '—' : watchlistEntry.release_date|date('Y') }}</td>
                                 <td class="d-none d-lg-table-cell">{{ watchlistEntry.runtime is null ? '—' : watchlistEntry.runtime ~ ' min' }}</td>
                                 <td>{{ watchlistEntry.added_at|date(dateFormatPhp) }}</td>

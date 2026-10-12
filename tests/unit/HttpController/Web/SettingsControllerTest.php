@@ -20,6 +20,7 @@ use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\RelativeUrl;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -104,6 +105,38 @@ class SettingsControllerTest extends TestCase
             'token' => 'mvy_pat_v1_token',
             'expiresAt' => '2027-01-08 12:00:00',
         ], Json::decode((string)$response->getBody()));
+    }
+
+    public function testUpdatesMovieTitleDisplayPreference() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getBody')->willReturn(Json::encode([
+            'username' => 'movary',
+            'movieTitleDisplay' => 'original',
+        ]));
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('updateMovieTitleDisplay')
+            ->with(
+                42,
+                self::callback(
+                    static fn(MovieTitleDisplay $display) : bool => (string)$display === 'original',
+                ),
+            );
+
+        self::assertSame(200, $this->subject->updateGeneral($request)->getStatusCode()->getCode());
+    }
+
+    public function testRejectsInvalidMovieTitleDisplayPreference() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getBody')->willReturn(Json::encode([
+            'username' => 'movary',
+            'movieTitleDisplay' => 'invalid',
+        ]));
+        $this->userApiMock->expects(self::never())->method('updateMovieTitleDisplay');
+
+        self::assertSame(400, $this->subject->updateGeneral($request)->getStatusCode()->getCode());
     }
 
     public function testRevokesOwnedPersonalApiToken() : void

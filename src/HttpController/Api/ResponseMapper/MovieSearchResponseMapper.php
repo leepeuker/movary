@@ -57,6 +57,7 @@ class MovieSearchResponseMapper
         return MovieSearchResultDto::create(
             $tmdbResponse['id'],
             $tmdbResponse['title'],
+            $tmdbResponse['original_title'],
             $tmdbResponse['overview'],
             empty($tmdbResponse['release_date']) === true ? null : Date::createFromString($tmdbResponse['release_date']),
             $tmdbResponse['original_language'],

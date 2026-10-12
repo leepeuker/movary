@@ -1053,6 +1053,10 @@
                           "title": {
                             "$ref": "#/components/schemas/title"
                           },
+                          "originalTitle": {
+                            "type": "string",
+                            "example": "千と千尋の神隠し"
+                          },
                           "releaseDate": {
                             "$ref": "#/components/schemas/releaseDateNullable"
                           },
@@ -1291,6 +1295,11 @@
         "properties": {
           "title": {
             "$ref": "#/components/schemas/title"
+          },
+          "originalTitle": {
+            "type": "string",
+            "nullable": true,
+            "example": "千と千尋の神隠し"
           },
           "releaseDate": {
             "$ref": "#/components/schemas/releaseDateNullable"

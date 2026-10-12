@@ -14,6 +14,7 @@ class MovieDto implements JsonSerializable
         private readonly string $title,
         private readonly int $tmdbId,
         private readonly DateTime $createdAt,
+        private readonly ?string $originalTitle = null,
         private readonly ?TraktId $traktId = null,
         private readonly ?string $imdbId = null,
         private readonly ?string $letterboxdId = null,
@@ -37,6 +38,7 @@ class MovieDto implements JsonSerializable
         string $title,
         int $tmdbId,
         DateTime $createdAt,
+        ?string $originalTitle = null,
         ?TraktId $traktId = null,
         ?string $imdbId = null,
         ?string $letterboxdId = null,
@@ -58,6 +60,7 @@ class MovieDto implements JsonSerializable
             $title,
             $tmdbId,
             $createdAt,
+            $originalTitle,
             $traktId,
             $imdbId,
             $letterboxdId,
@@ -85,6 +88,7 @@ class MovieDto implements JsonSerializable
     {
         return [
             'title' => $this->title,
+            'originalTitle' => $this->originalTitle,
             'releaseDate' => $this->releaseDate,
             'tagline' => $this->tagline,
             'overview' => $this->overview,

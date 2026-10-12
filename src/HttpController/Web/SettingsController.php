@@ -44,6 +44,7 @@ use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
+use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
 use Twig\Environment;
@@ -262,6 +263,7 @@ class SettingsController
                 'displayCharacterNamesInput' => $user->getDisplayCharacterNames(),
                 'displayTmdbRatingsInput' => $user->getDisplayTmdbRating(),
                 'displayImdbRatingsInput' => $user->getDisplayImdbRating(),
+                'movieTitleDisplay' => (string)$user->getMovieTitleDisplay(),
             ]),
         );
     }
@@ -777,6 +779,7 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function updateGeneral(Request $request) : Response
     {
         $requestData = Json::decode($request->getBody());
@@ -793,6 +796,9 @@ class SettingsController
         $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         try {
+            $movieTitleDisplay = isset($requestData['movieTitleDisplay']) === true
+                ? MovieTitleDisplay::createFromString($requestData['movieTitleDisplay'])
+                : null;
             $this->userApi->updatePrivacyLevel($userId, $privacyLevel);
             $this->userApi->updateDateFormatId($userId, $dateFormat);
             $this->userApi->updateCountry($userId, $country);
@@ -801,6 +807,11 @@ class SettingsController
             $this->userApi->updateDisplayCharacterNames($userId, $displayCharacterNames);
             $this->userApi->updateDisplayTmdbRating($userId, $displayTmdbRatings);
             $this->userApi->updateDisplayImdbRating($userId, $displayImdbRatings);
+            if ($movieTitleDisplay !== null) {
+                $this->userApi->updateMovieTitleDisplay($userId, $movieTitleDisplay);
+            }
+        } catch (InvalidArgumentException $exception) {
+            return Response::createBadRequest($exception->getMessage());
         } catch (User\Exception\UsernameInvalidFormat) {
             return Response::createBadRequest('Username not meeting requirements');
         } catch (User\Exception\UsernameNotUnique) {

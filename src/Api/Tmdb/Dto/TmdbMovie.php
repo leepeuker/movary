@@ -9,6 +9,7 @@ class TmdbMovie
     private function __construct(
         private readonly int $id,
         private readonly string $title,
+        private readonly string $originalTitle,
         private readonly string $originalLanguage,
         private readonly ?string $tagline,
         private readonly ?string $overview,
@@ -31,6 +32,7 @@ class TmdbMovie
         return new self(
             $data['id'],
             $data['title'],
+            $data['original_title'],
             $data['original_language'],
             empty($data['tagline']) === true ? null : $data['tagline'],
             empty($data['overview']) === true ? null : $data['overview'],
@@ -76,6 +78,11 @@ class TmdbMovie
     public function getOriginalLanguage() : string
     {
         return $this->originalLanguage;
+    }
+
+    public function getOriginalTitle() : string
+    {
+        return $this->originalTitle;
     }
 
     public function getOverview() : ?string

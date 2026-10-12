@@ -145,7 +145,8 @@ class MovieWatchlistRepository
             $payload[] = $productionCountryCode;
         }
 
-        $whereQuery = 'WHERE m.title LIKE ? ';
+        $whereQuery = 'WHERE (m.title LIKE ? OR m.original_title LIKE ?) ';
+        $payload[] = "%$searchTerm%";
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
@@ -197,12 +198,14 @@ class MovieWatchlistRepository
 
         $offset = ($limit * $page) - $limit;
 
+        $movieTitleSortExpression = $this->getMovieTitleSortExpression($userId);
+
         $sortBySanitized = match ($sortBy) {
             'rating' => 'rating',
             'releaseDate' => 'release_date',
             'addedAt' => 'added_at',
             'runtime' => 'runtime',
-            default => 'title'
+            default => $movieTitleSortExpression
         };
 
         $joinProductionCountry = '';
@@ -211,7 +214,8 @@ class MovieWatchlistRepository
             $payload[] = $productionCountryCode;
         }
 
-        $whereQuery = 'WHERE m.title LIKE ? ';
+        $whereQuery = 'WHERE (m.title LIKE ? OR m.original_title LIKE ?) ';
+        $payload[] = "%$searchTerm%";
         $payload[] = "%$searchTerm%";
 
         if (empty($releaseYear) === false) {
@@ -245,7 +249,7 @@ class MovieWatchlistRepository
             $joinProductionCountry
             $whereQuery
             GROUP BY m.id, title, release_date, added_at, rating
-            ORDER BY $sortBySanitized $sortOrder, title asc
+            ORDER BY $sortBySanitized $sortOrder, $movieTitleSortExpression asc
             LIMIT $offset, $limit
             SQL,
             $payload,
@@ -268,5 +272,12 @@ class MovieWatchlistRepository
                 'user_id' => $userId,
             ],
         );
+    }
+
+    private function getMovieTitleSortExpression(int $userId) : string
+    {
+        return "CASE WHEN (SELECT movie_title_display FROM `user` WHERE id = $userId) = 'original' "
+            . "THEN LOWER(COALESCE(NULLIF(m.original_title, ''), m.title)) "
+            . "ELSE LOWER(COALESCE(NULLIF(m.title, ''), m.original_title)) END";
     }
 }

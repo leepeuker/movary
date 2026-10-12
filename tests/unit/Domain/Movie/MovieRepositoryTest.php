@@ -271,7 +271,7 @@ class MovieRepositoryTest extends TestCase
             ->method('fetchAllAssociative')
             ->with(
                 self::callback(static fn(string $query) : bool => str_contains($query, "ORDER BY $expectedOrderBy,")),
-                [42, 42, '%%'],
+                [42, 42, '%%', '%%'],
             )
             ->willReturn([]);
 
@@ -308,7 +308,7 @@ class MovieRepositoryTest extends TestCase
                         'MAX(mh.watched_at) OVER(PARTITION BY m.id) as lastWatchedAt',
                     ),
                 ),
-                [42, 42, '%%'],
+                [42, 42, '%%', '%%'],
             )
             ->willReturn([['lastWatchedAt' => '2026-10-05 20:00:00']]);
 
@@ -331,5 +331,60 @@ class MovieRepositoryTest extends TestCase
                 productionCountryCode: null,
             ),
         );
+    }
+
+    public function testUpdateDetailsStoresOriginalTitle() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'movie',
+                self::callback(
+                    static fn(array $data) : bool => $data['original_title'] === '千と千尋の神隠し',
+                ),
+                ['id' => 12],
+            );
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->willReturn([
+                'id' => 12,
+                'title' => 'Spirited Away',
+                'original_title' => '千と千尋の神隠し',
+                'trakt_id' => null,
+                'imdb_id' => null,
+                'tmdb_id' => 129,
+                'poster_path' => null,
+                'overview' => null,
+                'tagline' => null,
+                'original_language' => 'ja',
+                'runtime' => null,
+                'release_date' => null,
+                'tmdb_vote_average' => null,
+                'tmdb_vote_count' => null,
+                'tmdb_poster_path' => null,
+                'imdb_rating_average' => null,
+                'imdb_rating_vote_count' => null,
+                'updated_at_tmdb' => null,
+                'updated_at_imdb' => null,
+            ]);
+
+        $movie = $this->subject->updateDetails(
+            id: 12,
+            tagline: null,
+            overview: null,
+            originalLanguage: 'ja',
+            releaseDate: null,
+            runtime: null,
+            tmdbVoteAverage: null,
+            tmdbVoteCount: null,
+            tmdbPosterPath: null,
+            tmdbBackdropPath: null,
+            imdbId: null,
+            originalTitle: '千と千尋の神隠し',
+        );
+
+        self::assertSame('千と千尋の神隠し', $movie->getOriginalTitle());
     }
 }
