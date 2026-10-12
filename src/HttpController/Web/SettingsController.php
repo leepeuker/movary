@@ -796,9 +796,7 @@ class SettingsController
         $userId = $this->authenticationService->requireWebSession()->getUserId();
 
         try {
-            $movieTitleDisplay = isset($requestData['movieTitleDisplay']) === true
-                ? MovieTitleDisplay::createFromString($requestData['movieTitleDisplay'])
-                : null;
+            $movieTitleDisplay = MovieTitleDisplay::createFromString((string)($requestData['movieTitleDisplay'] ?? ''));
             $this->userApi->updatePrivacyLevel($userId, $privacyLevel);
             $this->userApi->updateDateFormatId($userId, $dateFormat);
             $this->userApi->updateCountry($userId, $country);
@@ -807,9 +805,7 @@ class SettingsController
             $this->userApi->updateDisplayCharacterNames($userId, $displayCharacterNames);
             $this->userApi->updateDisplayTmdbRating($userId, $displayTmdbRatings);
             $this->userApi->updateDisplayImdbRating($userId, $displayImdbRatings);
-            if ($movieTitleDisplay !== null) {
-                $this->userApi->updateMovieTitleDisplay($userId, $movieTitleDisplay);
-            }
+            $this->userApi->updateMovieTitleDisplay($userId, $movieTitleDisplay);
         } catch (InvalidArgumentException $exception) {
             return Response::createBadRequest($exception->getMessage());
         } catch (User\Exception\UsernameInvalidFormat) {

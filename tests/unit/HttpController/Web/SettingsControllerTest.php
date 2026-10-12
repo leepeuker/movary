@@ -139,6 +139,17 @@ class SettingsControllerTest extends TestCase
         self::assertSame(400, $this->subject->updateGeneral($request)->getStatusCode()->getCode());
     }
 
+    public function testRejectsMissingMovieTitleDisplayPreference() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getBody')->willReturn(Json::encode([
+            'username' => 'movary',
+        ]));
+        $this->userApiMock->expects(self::never())->method('updateMovieTitleDisplay');
+
+        self::assertSame(400, $this->subject->updateGeneral($request)->getStatusCode()->getCode());
+    }
+
     public function testRevokesOwnedPersonalApiToken() : void
     {
         $request = $this->createMock(Request::class);
