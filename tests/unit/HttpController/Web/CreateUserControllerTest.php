@@ -3,6 +3,7 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
@@ -154,7 +155,7 @@ class CreateUserControllerTest extends TestCase
         $messageConsumed = false;
         $this->userApiMock->method('hasUsers')->willReturn(false);
         $this->flashMessageServiceMock
-            ->expects(self::exactly(14))
+            ->expects(self::exactly(16))
             ->method('consume')
             ->willReturnCallback(static function (FlashMessage $candidate) use ($message, &$messageConsumed) : bool {
                 if ($candidate !== $message || $messageConsumed === true) {
@@ -197,8 +198,12 @@ class CreateUserControllerTest extends TestCase
     public static function provideValidationErrors() : iterable
     {
         yield 'password too short' => [
-            new PasswordTooShort(8),
+            new PasswordTooShort(15),
             FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT,
+        ];
+        yield 'password invalid encoding' => [
+            new PasswordInvalidEncoding(),
+            FlashMessage::CREATE_USER_PASSWORD_INVALID_ENCODING,
         ];
         yield 'username invalid' => [
             UsernameInvalidFormat::create(),
@@ -220,6 +225,10 @@ class CreateUserControllerTest extends TestCase
         yield 'password too short' => [
             FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT,
             'errorPasswordTooShort',
+        ];
+        yield 'password invalid encoding' => [
+            FlashMessage::CREATE_USER_PASSWORD_INVALID_ENCODING,
+            'errorPasswordInvalidEncoding',
         ];
         yield 'passwords not equal' => [
             FlashMessage::CREATE_USER_PASSWORDS_NOT_EQUAL,
@@ -282,6 +291,7 @@ class CreateUserControllerTest extends TestCase
     {
         return [
             'errorPasswordTooShort',
+            'errorPasswordInvalidEncoding',
             'errorPasswordNotEqual',
             'errorUsernameInvalidFormat',
             'errorUsernameUnique',

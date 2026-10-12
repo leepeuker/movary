@@ -82,14 +82,14 @@ class UserPasswordSetTest extends TestCase
         $this->userApiMock->method('findUserById')->willReturn($this->createMock(UserEntity::class));
         $this->userApiMock
             ->method('updatePassword')
-            ->willThrowException(new PasswordTooShort(8));
+            ->willThrowException(new PasswordTooShort(15));
         $this->tokenServiceMock->expects(self::never())->method('deleteTokenForUser');
         $this->tester->setInputs(['short', 'short']);
 
         $result = $this->tester->execute(['userId' => 12]);
 
         self::assertSame(Command::FAILURE, $result);
-        self::assertStringContainsString('Password must contain at least 8 characters.', $this->tester->getDisplay());
+        self::assertStringContainsString('Password must contain at least 15 characters.', $this->tester->getDisplay());
     }
 
     public function testRejectsUnknownUserBeforePrompting() : void

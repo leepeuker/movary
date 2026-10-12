@@ -6,6 +6,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\Url;
@@ -17,13 +18,14 @@ class UserApi
     public function __construct(
         private readonly UserRepository $repository,
         private readonly Validator $userValidator,
+        private readonly PasswordPolicy $passwordPolicy,
     ) {
     }
 
     public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
     {
         $this->userValidator->ensureEmailIsUnique($email);
-        $this->userValidator->ensurePasswordIsValid($password);
+        $this->passwordPolicy->ensurePasswordIsValid($password);
         $this->userValidator->ensureNameFormatIsValid($name);
         $this->userValidator->ensureNameIsUnique($name);
 
@@ -459,7 +461,7 @@ class UserApi
 
     public function updatePassword(int $userId, string $newPassword) : void
     {
-        $this->userValidator->ensurePasswordIsValid($newPassword);
+        $this->passwordPolicy->ensurePasswordIsValid($newPassword);
 
         if ($this->repository->findUserById($userId) === null) {
             throw new RuntimeException('There is no user with id: ' . $userId);

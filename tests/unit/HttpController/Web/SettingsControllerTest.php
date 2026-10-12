@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\HttpController\Web;
 
+use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\PersonalApiTokenService;
@@ -53,6 +54,8 @@ class SettingsControllerTest extends TestCase
 
     private CurrentWebUser|MockObject $currentWebUserMock;
 
+    private UserEntity|MockObject $userMock;
+
     protected function setUp() : void
     {
         $this->twigMock = $this->createMock(Environment::class);
@@ -76,10 +79,57 @@ class SettingsControllerTest extends TestCase
             'currentWebUser' => $this->currentWebUserMock,
         ]);
 
-        $user = $this->createMock(UserEntity::class);
-        $user->method('hasCoreAccountChangesDisabled')->willReturn(false);
+        $this->userMock = $this->createMock(UserEntity::class);
+        $this->userMock->method('getId')->willReturn(42);
+        $this->userMock->method('hasCoreAccountChangesDisabled')->willReturn(false);
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
-        $this->currentWebUserMock->method('requireUser')->willReturn($user);
+        $this->currentWebUserMock->method('requireUser')->willReturn($this->userMock);
+    }
+
+    public function testUpdatePasswordUsesDomainPolicyAndPreservesBadRequestContract() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn(Json::encode([
+            'currentPassword' => 'legacy',
+            'newPassword' => 'too short',
+        ]));
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('isValidPassword')
+            ->with(42, 'legacy')
+            ->willReturn(true);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('updatePassword')
+            ->with(42, 'too short')
+            ->willThrowException(new PasswordTooShort(15));
+        $this->authenticationMock->expects(self::never())->method('logout');
+
+        $response = $this->subject->updatePassword($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        self::assertSame('New password not meeting requirements', $response->getBody());
+    }
+
+    public function testUpdatePasswordLogsOutAfterSuccessfulDomainUpdate() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn(Json::encode([
+            'currentPassword' => 'legacy',
+            'newPassword' => 'a secure password',
+        ]));
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('isValidPassword')
+            ->with(42, 'legacy')
+            ->willReturn(true);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('updatePassword')
+            ->with(42, 'a secure password');
+        $this->authenticationMock->expects(self::once())->method('logout');
+
+        self::assertSame(200, $this->subject->updatePassword($request)->getStatusCode()->getCode());
     }
 
     public function testCreatesPersonalApiToken() : void

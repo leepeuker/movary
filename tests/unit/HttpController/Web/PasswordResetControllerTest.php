@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\HttpController\Web;
 
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\PasswordResetRequestService;
 use Movary\Domain\User\Service\PasswordResetTokenService;
@@ -216,12 +217,31 @@ class PasswordResetControllerTest extends TestCase
         $this->tokenServiceMock->method('findUserIdByToken')->willReturn(12);
         $this->tokenServiceMock
             ->method('resetPassword')
-            ->willThrowException(new PasswordTooShort(8));
+            ->willThrowException(new PasswordTooShort(15));
         $this->twigMock
             ->expects(self::once())
             ->method('render')
             ->with('page/password-reset.html.twig', self::callback(
-                static fn(array $data) => $data['minimumPasswordLength'] === 8,
+                static fn(array $data) => $data['minimumPasswordLength'] === 15,
+            ));
+
+        $response = $this->subject->resetPassword($request);
+
+        $this->assertSensitiveResetHeaders($response);
+    }
+
+    public function testResetPasswordShowsInvalidEncodingError() : void
+    {
+        $request = $this->createResetRequest('invalid-password', 'invalid-password');
+        $this->tokenServiceMock->method('findUserIdByToken')->willReturn(12);
+        $this->tokenServiceMock
+            ->method('resetPassword')
+            ->willThrowException(new PasswordInvalidEncoding());
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with('page/password-reset.html.twig', self::callback(
+                static fn(array $data) => $data['invalidPasswordEncoding'] === true,
             ));
 
         $response = $this->subject->resetPassword($request);

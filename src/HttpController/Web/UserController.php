@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\EmailNotUnique;
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
@@ -42,6 +43,8 @@ class UserController
             return Response::createBadRequest('Name already in use.');
         } catch (PasswordTooShort) {
             return Response::createBadRequest('Password too short.');
+        } catch (PasswordInvalidEncoding) {
+            return Response::createBadRequest('Password must contain valid Unicode text.');
         } catch (UsernameInvalidFormat) {
             return Response::createBadRequest('Name is not in a valid format.');
         }
@@ -98,6 +101,8 @@ class UserController
             return Response::createBadRequest('Name already in use.');
         } catch (PasswordTooShort) {
             return Response::createBadRequest('Password too short.');
+        } catch (PasswordInvalidEncoding) {
+            return Response::createBadRequest('Password must contain valid Unicode text.');
         } catch (UsernameInvalidFormat) {
             return Response::createBadRequest('Name is not in a valid format.');
         }

@@ -12,6 +12,8 @@ enum FlashMessage : string
 
     case CREATE_USER_PASSWORDS_NOT_EQUAL = 'create-user-passwords-not-equal';
 
+    case CREATE_USER_PASSWORD_INVALID_ENCODING = 'create-user-password-invalid-encoding';
+
     case CREATE_USER_PASSWORD_TOO_SHORT = 'create-user-password-too-short';
 
     case CREATE_USER_USERNAME_INVALID = 'create-user-username-invalid';
@@ -61,6 +63,7 @@ enum FlashMessage : string
             self::CREATE_USER_GENERIC_ERROR,
             self::CREATE_USER_MISSING_FORM_DATA,
             self::CREATE_USER_PASSWORDS_NOT_EQUAL,
+            self::CREATE_USER_PASSWORD_INVALID_ENCODING,
             self::CREATE_USER_PASSWORD_TOO_SHORT,
             self::CREATE_USER_USERNAME_INVALID,
             self::CREATE_USER_USERNAME_NOT_UNIQUE => FlashMessageDestination::CREATE_USER,

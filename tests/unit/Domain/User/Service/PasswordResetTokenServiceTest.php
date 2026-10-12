@@ -3,7 +3,7 @@
 namespace Tests\Unit\Movary\Domain\User\Service;
 
 use Movary\Domain\User\Service\PasswordResetTokenService;
-use Movary\Domain\User\Service\Validator;
+use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\UserRepository;
 use Movary\ValueObject\DateTime;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -19,20 +19,20 @@ class PasswordResetTokenServiceTest extends TestCase
 
     private MockObject|UserRepository $repositoryMock;
 
-    private MockObject|Validator $validatorMock;
+    private MockObject|PasswordPolicy $passwordPolicyMock;
 
     private PasswordResetTokenService $subject;
 
     protected function setUp() : void
     {
         $this->repositoryMock = $this->createMock(UserRepository::class);
-        $this->validatorMock = $this->createMock(Validator::class);
-        $this->subject = new PasswordResetTokenService($this->repositoryMock, $this->validatorMock);
+        $this->passwordPolicyMock = $this->createMock(PasswordPolicy::class);
+        $this->subject = new PasswordResetTokenService($this->repositoryMock, $this->passwordPolicyMock);
     }
 
     public function testResetPasswordValidatesAndHashesPassword() : void
     {
-        $this->validatorMock
+        $this->passwordPolicyMock
             ->expects(self::once())
             ->method('ensurePasswordIsValid')
             ->with('new-password');

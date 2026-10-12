@@ -26,11 +26,11 @@
                 <label for="floatingName">Username <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="8" required>
+                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="{{ passwordMinimumLength }}" required>
                 <label for="floatingPassword">Password <span class="text-danger">*</span></label>
             </div>
             <div class="form-floating" style="margin-bottom: 1rem">
-                <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Repeat password" minlength="8" required>
+                <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Repeat password" minlength="{{ passwordMinimumLength }}" required>
                 <label for="floatingRepeatPassword">Repeat password <span class="text-danger">*</span></label>
             </div>
             {% if errorPasswordNotEqual == true %}
@@ -40,7 +40,12 @@
             {% endif %}
             {% if errorPasswordTooShort == true %}
                 <div class="alert alert-danger" role="alert">
-                    Password must be at least 8 characters
+                    Password must be at least {{ passwordMinimumLength }} characters
+                </div>
+            {% endif %}
+            {% if errorPasswordInvalidEncoding == true %}
+                <div class="alert alert-danger" role="alert">
+                    Password must contain valid Unicode text
                 </div>
             {% endif %}
             {% if errorUsernameInvalidFormat == true %}

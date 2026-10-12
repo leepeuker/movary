@@ -10,6 +10,8 @@ use Movary\Api\Trakt\TraktApi;
 use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie;
 use Movary\Domain\User;
+use Movary\Domain\User\Exception\PasswordInvalidEncoding;
+use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\PasswordResetTokenService;
@@ -896,15 +898,16 @@ class SettingsController
             return Response::createBadRequest('Current password wrong'); // Error message is referenced in JS!!!
         }
 
-        if (strlen($newPassword) < 8) {
-            return Response::createBadRequest('New password not meeting requirements'); // Error message is referenced in JS!!!
-        }
-
         if ($user->hasCoreAccountChangesDisabled() === true) {
             return Response::createForbidden();
         }
 
-        $this->userApi->updatePassword($userId, $newPassword);
+        try {
+            $this->userApi->updatePassword($userId, $newPassword);
+        } catch (PasswordTooShort | PasswordInvalidEncoding) {
+            return Response::createBadRequest('New password not meeting requirements'); // Error message is referenced in JS!!!
+        }
+
         $this->authenticationService->logout();
 
         return Response::create(StatusCode::createOk());

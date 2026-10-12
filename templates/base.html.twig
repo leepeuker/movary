@@ -41,6 +41,7 @@
     window.APPLICATION_URL = "{{ applicationUrl }}";
     window.MOVIE_TITLE_DISPLAY = {{ movieTitleDisplay|json_encode|raw }};
     window.SERVICE_WORKER_URL = "{{ asset_url('serviceWorker.js') }}";
+    window.PASSWORD_MIN_LENGTH = {{ passwordMinimumLength }};
 </script>
 <script src="{{ asset_url('js/jquery-3.3.1.js') }}"></script>
 <script src="{{ asset_url('js/bootstrap.bundle.min.js') }}"></script>

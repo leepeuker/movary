@@ -16,7 +16,7 @@ document.getElementById('changePasswordUpdateButton').addEventListener('click', 
         return
     }
 
-    if (newPassword.value.length < PASSWORD_MIN_LENGTH) {
+    if ([...newPassword.value].length < window.PASSWORD_MIN_LENGTH) {
         newPassword.classList.add('invalid-input');
         addAlert('alertChangePasswordDiv', errorMessageNewPasswordInvalid, 'danger')
         return

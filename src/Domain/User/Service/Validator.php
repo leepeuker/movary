@@ -3,15 +3,12 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Exception\EmailNotUnique;
-use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\UserRepository;
 
 class Validator
 {
-    private const int PASSWORD_MIN_LENGTH = 8;
-
     public function __construct(private readonly UserRepository $repository)
     {
     }
@@ -45,13 +42,6 @@ class Validator
 
         if ($user->getId() !== $expectUserId) {
             throw new UsernameNotUnique();
-        }
-    }
-
-    public function ensurePasswordIsValid(string $password) : void
-    {
-        if (strlen($password) < self::PASSWORD_MIN_LENGTH) {
-            throw new PasswordTooShort(self::PASSWORD_MIN_LENGTH);
         }
     }
 }
