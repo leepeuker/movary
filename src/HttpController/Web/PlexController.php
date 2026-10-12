@@ -14,6 +14,7 @@ use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\UrlValidator;
 use Movary\ValueObject\Exception\ConfigNotSetException;
+use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -24,6 +25,7 @@ use RuntimeException;
 
 class PlexController
 {
+    /** @param array<int, string> $serverUrlAllowlist */
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
@@ -35,7 +37,7 @@ class PlexController
         private readonly UrlValidator $urlValidator,
         private readonly PlexCallbackStateService $callbackStateService,
         private readonly CurrentWebUser $currentWebUser,
-        private readonly bool $validateUrlIsSafe = false,
+        private readonly array $serverUrlAllowlist = [],
     ) {
     }
 
@@ -168,12 +170,15 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
-            if ($this->validateUrlIsSafe === true) {
-                $this->urlValidator->validateUrlIsSafe($plexServerUrl);
-            }
-        } catch (InvalidUrl $e) {
-            $this->logger->warning('Plex: Could not safe server url: ' . $e->getMessage());
-            return Response::createBadRequest('Could not safe server url');
+        } catch (InvalidUrl) {
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
+        }
+
+        try {
+            $this->urlValidator->validateUrlIsSafe($plexServerUrl, $this->serverUrlAllowlist);
+        } catch (InvalidSafeUrl $e) {
+            $this->logger->warning('Plex: Could not validate server url: ' . $e->getMessage());
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $this->userApi->updatePlexServerUrl($userId, $plexServerUrl);
@@ -192,12 +197,15 @@ class PlexController
 
         try {
             $plexServerUrl = Url::createFromString($plexServerUrl);
-            if ($this->validateUrlIsSafe === true) {
-                $this->urlValidator->validateUrlIsSafe($plexServerUrl);
-            }
-        } catch (InvalidUrl $e) {
+        } catch (InvalidUrl) {
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
+        }
+
+        try {
+            $this->urlValidator->validateUrlIsSafe($plexServerUrl, $this->serverUrlAllowlist);
+        } catch (InvalidSafeUrl $e) {
             $this->logger->warning('Plex: Connection test failed: ' . $e->getMessage());
-            return Response::createBadRequest('Connection test failed');
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $userClientConfiguration = PlexUserClientConfiguration::create($plexAccessToken, $plexServerUrl);

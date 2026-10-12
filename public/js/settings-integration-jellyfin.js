@@ -115,10 +115,16 @@ async function saveJellyfinServerUrl() {
         body: JSON.stringify({
             'JellyfinServerUrl': jellyfinServerUrl
         })
-    }).then(response => {
+    }).then(async response => {
         document.getElementById('alertJellyfinServerUrlLoadingSpinner').classList.add('d-none')
 
         if (!response.ok) {
+            if (response.status === 400) {
+                addAlert('alertJellyfinServerUrlDiv', await response.text(), 'danger');
+
+                return;
+            }
+
             addAlert('alertJellyfinServerUrlDiv', 'Could not save server url', 'danger');
             return;
         }

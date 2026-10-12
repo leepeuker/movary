@@ -4,133 +4,130 @@ namespace Movary\Util;
 
 use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Url;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class UrlValidator
 {
-    private const array BLOCKED_HOSTS
-        = [
-            'metadata.google.internal',
-            '169.254.169.254',  // AWS metadata
-            'metadata.azure.internal',
-            'metadata.rackspace.com',
-            '169.254.169.254/latest/meta-data/',
-            'metadata.service.consul',
-            '169.254.169.254/latest',
-        ];
+    private const array ALLOWED_PORTS = [80, 443, 8096, 8920, 32400];
 
-    private const array ALLOWED_LOCALHOST
-        = [
-            'localhost',
-            '127.0.0.1',
-            '::1',
-        ];
+    private const array ALLOWED_SCHEMES = ['http', 'https'];
 
-    private const array INTERNAL_DNS_PATTERNS
-        = [
-            '.internal',
-            '.local',
-            '.docker',
-            '.corp',
-            '.lan',
-            '.home',
-            '.priv',
-        ];
+    // Non-global ranges not covered by IpUtils::PRIVATE_SUBNETS.
+    private const array NON_GLOBAL_IPV4_CIDRS = [
+        '192.0.0.0/24',
+        '192.88.99.0/24',
+        '224.0.0.0/4',
+    ];
 
-    private const array ALLOWED_PORTS = [80, 443, 8096, 8920]; // 8096 and 8920 are Jellyfin defaults
+    private const array NON_GLOBAL_IPV6_CIDRS = [
+        '2001::/23',
+        '3fff::/20',
+    ];
 
-    public function validateUrlIsSafe(Url $url): void
+    public function __construct(private readonly DnsResolver $dnsResolver)
+    {
+    }
+
+    /** @param array<int, string> $allowlist */
+    public function validateUrlIsSafe(Url $url, array $allowlist = []) : ValidatedUrl
     {
         $parsedUrl = parse_url((string)$url);
 
-        if ($parsedUrl === false || !isset($parsedUrl['host'])) {
+        if ($parsedUrl === false || isset($parsedUrl['host']) === false || isset($parsedUrl['scheme']) === false) {
             throw InvalidSafeUrl::create((string)$url);
         }
 
-        $host = strtolower($parsedUrl['host']);
-        $port = $parsedUrl['port'] ?? (($parsedUrl['scheme'] ?? null) === 'https' ? 443 : 80);
+        $scheme = strtolower($parsedUrl['scheme']);
+        if (in_array($scheme, self::ALLOWED_SCHEMES, true) === false) {
+            throw InvalidSafeUrl::createForDisallowedScheme($scheme);
+        }
 
-        $this->validateHost($host);
-        $this->validatePort($port);
-        $this->validateResolvedIp($host);
-    }
+        $host = $this->normalizeHost($parsedUrl['host']);
+        $port = $parsedUrl['port'] ?? ($scheme === 'https' ? 443 : 80);
+        if (in_array($port, self::ALLOWED_PORTS, true) === false) {
+            throw InvalidSafeUrl::createForDisallowedPort($port);
+        }
 
-    private function validateHost(string $host): void
-    {
-        // Block known internal/metadata endpoints
-        foreach (self::BLOCKED_HOSTS as $blocked) {
-            if (str_contains($host, $blocked)) {
-                throw new InvalidSafeUrl('Blocked internal host: ' . $host);
+        $addresses = filter_var($host, FILTER_VALIDATE_IP) === false
+            ? $this->dnsResolver->resolve($host)
+            : [$host];
+
+        if ($addresses === []) {
+            throw InvalidSafeUrl::createForUnresolvedHostname($host);
+        }
+
+        foreach ($addresses as $address) {
+            if (filter_var($address, FILTER_VALIDATE_IP) === false) {
+                throw InvalidSafeUrl::createForInvalidResolvedAddress($host);
+            }
+
+            if ($this->isPublicIp($address) === false && $this->isAllowed($host, $address, $allowlist) === false) {
+                throw InvalidSafeUrl::createForDisallowedDestination($host, $address);
             }
         }
 
-        // Block localhost
-        if ($this->isAllowedLocalhost($host)) {
-            throw new InvalidSafeUrl('Localhost access not allowed: ' . $host);
-        }
-
-        // Block private IP ranges
-        if ($this->isPrivateIp($host)) {
-            throw new InvalidSafeUrl('Private IP address not allowed: ' . $host);
-        }
-
-        // Block internal DNS patterns
-        if ($this->isInternalDns($host)) {
-            throw new InvalidSafeUrl('Internal DNS name not allowed: ' . $host);
-        }
+        return new ValidatedUrl($scheme, $host, $port, $addresses[0]);
     }
 
-    private function validatePort(int $port): void
+    /** @param array<int, string> $allowlist */
+    private function isAllowed(string $host, string $ip, array $allowlist) : bool
     {
-        // Block suspicious ports (except common web ports)
-        if (!in_array($port, self::ALLOWED_PORTS, true)) {
-            throw new InvalidSafeUrl('Port not allowed: ' . $port);
-        }
-    }
-
-    private function validateResolvedIp(string $host): void
-    {
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            return;
-        }
-
-        // Resolve hostname to IP addresses
-        $ips = gethostbynamel($host);
-
-        if ($ips === false) {
-            throw new InvalidSafeUrl('Could not resolve hostname: ' . $host);
-        }
-
-        foreach ($ips as $ip) {
-            // Check if resolved IP is private (but allow localhost)
-            if ($this->isPrivateIp($ip) && !$this->isAllowedLocalhost($ip)) {
-                throw new InvalidSafeUrl('Hostname resolves to private IP: ' . $host . ' -> ' . $ip);
+        foreach ($allowlist as $entry) {
+            $entry = trim($entry);
+            if ($entry === '') {
+                continue;
             }
-        }
-    }
 
-    private function isAllowedLocalhost(string $host): bool
-    {
-        return in_array($host, self::ALLOWED_LOCALHOST, true);
-    }
+            if (str_contains($entry, '/') === true && $this->ipMatchesCidr($ip, $entry) === true) {
+                return true;
+            }
 
-    private function isPrivateIp(string $host): bool
-    {
-        if (!filter_var($host, FILTER_VALIDATE_IP)) {
-            return false;
-        }
+            $normalizedEntry = $this->normalizeHost($entry);
+            if (filter_var($normalizedEntry, FILTER_VALIDATE_IP) !== false) {
+                if (inet_pton($normalizedEntry) === inet_pton($ip)) {
+                    return true;
+                }
 
-        // Use FILTER_FLAG_NO_PRIV_RANGE and FILTER_FLAG_NO_RES_RANGE to block private and reserved IPs
-        return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
-    }
+                continue;
+            }
 
-    private function isInternalDns(string $host): bool
-    {
-        foreach (self::INTERNAL_DNS_PATTERNS as $pattern) {
-            if (str_ends_with($host, $pattern)) {
+            if (strtolower($normalizedEntry) === strtolower($host)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function isPublicIp(string $ip) : bool
+    {
+        if (IpUtils::isPrivateIp($ip) === true) {
+            return false;
+        }
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+            return IpUtils::checkIp($ip, self::NON_GLOBAL_IPV4_CIDRS) === false && filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE,
+            ) !== false;
+        }
+
+        return IpUtils::checkIp($ip, '2000::/3')
+            && IpUtils::checkIp($ip, self::NON_GLOBAL_IPV6_CIDRS) === false;
+    }
+
+    private function ipMatchesCidr(string $ip, string $cidr) : bool
+    {
+        return IpUtils::checkIp($ip, $cidr);
+    }
+
+    private function normalizeHost(string $host) : string
+    {
+        if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+            return substr($host, 1, -1);
+        }
+
+        return $host;
     }
 }

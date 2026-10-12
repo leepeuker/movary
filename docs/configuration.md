@@ -63,10 +63,12 @@ Required for some third party integrations. Only necessary if the relevant third
 |:-----------------------------|:-------------:|:---------------------------------------------------------------------------------------------------|:------:|
 | `PLEX_IDENTIFIER`            |       -       | Required for Plex Authentication. Generate with e.g. `openssl rand -base64 32`                     |        |
 | `PLEX_APP_NAME`              |   `Movary`    | Used for Plex Authentication                                                                       |        |
-| `PLEX_VALIDATE_URL_SAFE`     |      `0`      | Enable SSRF protection for Plex server URLs (blocks localhost, private IPs, internal DNS)          |        |
+| `PLEX_URL_ALLOWLIST`         |       -       | Comma-separated hostnames, IPs, or CIDRs allowed for private Plex servers                          |        |
 | `JELLYFIN_DEVICE_ID`         |       -       | Required for Jellyfin Authentication. Generate with e.g. `openssl rand -base64 32`                 |        |
 | `JELLYFIN_APP_NAME`          |   `Movary`    | Used for Jellyfin Authentication                                                                   |        |
-| `JELLYFIN_VALIDATE_URL_SAFE` |      `0`      | Enable SSRF protection for Jellyfin server URLs (blocks localhost, private IPs, internal DNS)      |        |
+| `JELLYFIN_URL_ALLOWLIST`     |       -       | Comma-separated hostnames, IPs, or CIDRs allowed for private Jellyfin servers                      |        |
+
+Jellyfin and Plex server URLs are restricted to HTTP(S) destinations on ports 80, 443, 8096, 8920, and 32400. Public destinations are allowed by default. Private, reserved, and loopback destinations must be explicitly listed in the corresponding allowlist. Hostname entries are exact matches; CIDR entries can be used to authorize a private network, for example `jellyfin.home,192.168.1.0/24,fd00::/64`.
 
 ### Email
 

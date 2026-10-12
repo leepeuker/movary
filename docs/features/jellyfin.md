@@ -37,40 +37,36 @@ When an authentication is removed from Movary, the token will be deleted in Mova
 
 ### Overview
 
-Movary can validate Jellyfin server URLs to protect against Server-Side Request Forgery (SSRF) attacks.
+Movary validates Jellyfin server URLs to protect against Server-Side Request Forgery (SSRF) attacks.
 
 ### Security Features
 
-When enabled, URL validation blocks:
+URL validation:
 
-- **Localhost access** (localhost, 127.0.0.1, ::1)
-- **Private IP ranges** (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-- **Internal DNS names** (.internal, .local, .docker, .corp, .lan, .home, .priv)
-- **Cloud metadata endpoints** (169.254.169.254, metadata.google.internal, etc.)
-- **Suspicious ports** (only allows 80, 443, 8096, 8920)
-- **DNS rebinding attacks**
+- allows only HTTP and HTTPS on ports 80, 443, 8096, 8920, and 32400
+- checks every resolved IPv4 and IPv6 address
+- blocks private, reserved, loopback, and cloud metadata destinations by default
+- pins the validated address to the connection to prevent DNS rebinding
+- disables redirects so they cannot bypass destination validation
 
 ### Configuration
 
-Enable SSRF protection by setting the environment variable:
+Protection is always enabled. To use a private Jellyfin server, an administrator must add its exact hostname, IP address, or network in CIDR notation to `JELLYFIN_URL_ALLOWLIST`:
 
-```bash
-JELLYFIN_VALIDATE_URL_SAFE=1
+```dotenv
+JELLYFIN_URL_ALLOWLIST=jellyfin.home,192.168.1.10,fd00::/64
 ```
 
 !!! warning
 
-    Enabling this feature will break existing configurations that use:
-    - Localhost Jellyfin servers
-    - Private network IP addresses
-    - Internal DNS names
-    
-    Ensure your Jellyfin server is accessible via a public domain name before enabling.
+    Add only destinations that Movary should be allowed to contact. A hostname entry is an exact match; IP and CIDR entries authorize only matching addresses.
+
+See [Third party integrations](../configuration.md#third-party-integrations) for all related settings.
 
 ### Recommendations
 
-- **Enable in public environments** for enhanced security
-- **Keep disabled** for development or when using localhost/internal networks
+- Prefer a single exact hostname or IP address over a broad network range.
+- Keep the allowlist empty when the Jellyfin server has a public destination.
 
 ## Sync
 

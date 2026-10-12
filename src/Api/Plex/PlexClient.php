@@ -9,6 +9,7 @@ use Movary\Api\Plex\Exception\PlexAuthenticationInvalid;
 use Movary\Api\Plex\Exception\PlexNotFoundError;
 use Movary\Service\ServerSettings;
 use Movary\Util\Json;
+use Movary\Util\SafeHttpClient;
 use Movary\ValueObject\Url;
 
 abstract class PlexClient
@@ -18,7 +19,7 @@ abstract class PlexClient
     ];
 
     public function __construct(
-        protected readonly HttpClient $httpClient,
+        protected readonly SafeHttpClient $httpClient,
         protected readonly ServerSettings $serverSettings,
     ) {
     }

@@ -11,6 +11,7 @@ use Movary\Service\Jellyfin\JellyfinScrobbler;
 use Movary\Service\WebhookUrlBuilder;
 use Movary\Util\Json;
 use Movary\Util\UrlValidator;
+use Movary\ValueObject\Exception\InvalidSafeUrl;
 use Movary\ValueObject\Exception\InvalidUrl;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -19,6 +20,7 @@ use Psr\Log\LoggerInterface;
 
 class JellyfinController
 {
+    /** @param array<int, string> $serverUrlAllowlist */
     public function __construct(
         private readonly Authentication $authenticationService,
         private readonly UserApi $userApi,
@@ -27,7 +29,7 @@ class JellyfinController
         private readonly LoggerInterface $logger,
         private readonly JellyfinApi $jellyfinApi,
         private readonly UrlValidator $urlValidator,
-        private readonly bool $validateUrlIsSafe = false,
+        private readonly array $serverUrlAllowlist = [],
     ) {
     }
 
@@ -128,16 +130,14 @@ class JellyfinController
             $jellyfinServerUrl = Url::createFromString($jellyfinServerUrlString);
         } catch (InvalidUrl) {
             $this->logger->info('Jellyfin: Provided server url is not a valid url: ' . $jellyfinServerUrlString);
-            return Response::createBadRequest('Provided server url is not a valid url');
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
         }
 
-        if ($this->validateUrlIsSafe === true) {
-            try {
-                $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl);
-            } catch (InvalidUrl $e) {
-                $this->logger->warning('Jellyfin: Could not safe server ur: ' . $e->getMessage());
-                return Response::createBadRequest('Could not safe server url');
-            }
+        try {
+            $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl, $this->serverUrlAllowlist);
+        } catch (InvalidSafeUrl $e) {
+            $this->logger->warning('Jellyfin: Could not validate server url: ' . $e->getMessage());
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $this->userApi->updateJellyfinServerUrl($userId, $jellyfinServerUrl);
@@ -163,16 +163,14 @@ class JellyfinController
             $jellyfinServerUrl = Url::createFromString($jellyfinServerUrlString);
         } catch (InvalidUrl) {
             $this->logger->info('Jellyfin: Provided server url is not a valid url: ' . $jellyfinServerUrlString);
-            return Response::createBadRequest('Provided server url is not a valid url');
+            return Response::createBadRequest('Enter a valid server URL including http:// or https:// and a hostname.');
         }
 
-        if ($this->validateUrlIsSafe === true) {
-            try {
-                $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl);
-            } catch (InvalidUrl $e) {
-                $this->logger->warning('Jellyfin: Could not safe server ur: ' . $e->getMessage());
-                return Response::createBadRequest('Could not safe server url');
-            }
+        try {
+            $this->urlValidator->validateUrlIsSafe($jellyfinServerUrl, $this->serverUrlAllowlist);
+        } catch (InvalidSafeUrl $e) {
+            $this->logger->warning('Jellyfin: Could not validate server url: ' . $e->getMessage());
+            return Response::createBadRequest($e->getUserMessage());
         }
 
         $jellyfinAuthentication = $this->userApi->findJellyfinAuthentication($this->authenticationService->requireWebSession()->getUserId());
