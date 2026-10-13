@@ -10,9 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
     document.getElementById('createJobForm').addEventListener('submit', createJob)
     document.getElementById('createJobType').addEventListener('change', updateCreateJobFields)
-    document.getElementById('createJobFrequency').addEventListener('change', updateCreateJobFrequencyFields)
+    document.getElementById('createJobScheduleMode').addEventListener('change', updateCreateJobScheduleFields)
     updateCreateJobFields()
-    updateCreateJobFrequencyFields()
+    updateCreateJobScheduleFields()
 });
 
 let selectedJobId = null
@@ -38,26 +38,19 @@ function showCreateJobModal() {
     document.getElementById('createJobError').classList.add('d-none')
     document.getElementById('createJobError').textContent = ''
     updateCreateJobFields()
-    updateCreateJobFrequencyFields()
+    updateCreateJobScheduleFields()
     bootstrap.Modal.getOrCreateInstance('#createJobModal').show()
 }
 
-function updateCreateJobFrequencyFields() {
-    const frequency = document.getElementById('createJobFrequency').value
-    const firstRunFields = document.getElementById('createJobFirstRunFields')
-    const firstRunInput = document.getElementById('createJobFirstRunAt')
-    const isRecurring = frequency !== 'once'
+function updateCreateJobScheduleFields() {
+    const isRecurring = document.getElementById('createJobScheduleMode').value === 'recurring'
+    const cronFields = document.getElementById('createJobCronFields')
+    const cronInput = document.getElementById('createJobCronExpression')
 
-    firstRunFields.classList.toggle('d-none', isRecurring === false)
-    firstRunInput.required = isRecurring
-    firstRunInput.disabled = isRecurring === false
-    document.getElementById('createJobFrequencyWarning').classList.toggle('d-none', frequency !== 'minutely')
-
-    if (isRecurring && firstRunInput.value === '') {
-        const firstRun = new Date(Date.now() + 5 * 60 * 1000)
-        const localFirstRun = new Date(firstRun.getTime() - firstRun.getTimezoneOffset() * 60 * 1000)
-        firstRunInput.value = localFirstRun.toISOString().slice(0, 16)
-    }
+    cronFields.classList.toggle('d-none', isRecurring === false)
+    cronInput.required = isRecurring
+    cronInput.disabled = isRecurring === false
+    document.getElementById('createJobCronWarning').classList.toggle('d-none', isRecurring === false)
 }
 
 function updateCreateJobFields() {
@@ -88,10 +81,6 @@ async function createJob(event) {
 
     const formData = new FormData(form)
     formData.delete('jobType')
-    if (formData.get('frequency') !== 'once') {
-        const firstRunAt = new Date(document.getElementById('createJobFirstRunAt').value)
-        formData.set('firstRunAt', Math.floor(firstRunAt.getTime() / 1000).toString())
-    }
     if (
         jobConfiguration.prepareSubmission !== undefined &&
         await jobConfiguration.prepareSubmission(formData, jobConfiguration) === false

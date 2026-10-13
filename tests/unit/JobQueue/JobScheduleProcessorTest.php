@@ -20,7 +20,7 @@ class JobScheduleProcessorTest extends TestCase
         $schedule = JobScheduleEntity::createFromArray([
             'id' => 9,
             'job_type' => 'tmdb_movie_sync',
-            'frequency' => 'minutely',
+            'cron_expression' => '* * * * *',
             'user_id' => 42,
             'parameters' => Json::encode([
                 'ids' => [7, 8],
@@ -29,7 +29,6 @@ class JobScheduleProcessorTest extends TestCase
                 'onlyNeverSynced' => true,
             ]),
             'enabled' => 1,
-            'first_run_at' => '2026-10-13 12:00:00',
             'next_run_at' => '2026-10-13 12:00:00',
         ]);
         $repository = $this->createMock(JobScheduleRepository::class);

@@ -4,7 +4,7 @@ namespace Movary\JobQueue;
 
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\JobScheduleFrequency;
+use Movary\ValueObject\JobScheduleCronExpression;
 use Movary\ValueObject\JobType;
 
 class JobScheduleApi
@@ -15,14 +15,14 @@ class JobScheduleApi
 
     public function addTmdbSyncSchedule(
         JobType $jobType,
-        JobScheduleFrequency $frequency,
+        JobScheduleCronExpression $cronExpression,
         TmdbSyncJobParameters $parameters,
         DateTime $nextRunAt,
         int $userId,
     ) : int {
         return $this->repository->add(
             $jobType,
-            $frequency,
+            $cronExpression,
             [
                 'ids' => $parameters->getIds(),
                 'maxAgeInHours' => $parameters->getMaxAgeInHours(),
@@ -44,7 +44,7 @@ class JobScheduleApi
         return array_map(static fn(array $schedule) : array => [
             'id' => (int)$schedule['id'],
             'type' => $schedule['job_type'],
-            'frequency' => $schedule['frequency'],
+            'cronExpression' => $schedule['cron_expression'],
             'userId' => $schedule['user_id'] === null ? null : (int)$schedule['user_id'],
             'userName' => $schedule['user_name'],
             'parameters' => Json::decode($schedule['parameters']),

@@ -46,11 +46,11 @@ The standard Docker image uses Supervisor to restart the command after it exits,
 
 ## Recurring schedules
 
-Administrators can create recurring TMDB movie and person synchronization schedules under **Settings > Server > Jobs**. Supported frequencies are every minute, hourly, daily, weekly, and monthly. Schedule times are stored and displayed in UTC.
+Administrators can create recurring TMDB movie and person synchronization schedules under **Settings > Server > Jobs**. Schedules use standard five-field cron expressions in UTC: minute, hour, day of month, month, and day of week. For example, `*/15 * * * *` runs every 15 minutes and `0 3 * * 1` runs every Monday at 03:00 UTC.
 
 When a schedule is due, `jobs:process` attempts to add a normal `waiting` job and advances the schedule to its next future occurrence. Missed occurrences do not create catch-up jobs. If the same synchronization type is already waiting or in progress, that occurrence is skipped and the schedule still advances. Failed queue jobs remain in history and do not disable future occurrences.
 
-Every-minute schedules can create sustained TMDB API load. The active-job check prevents overlapping work of the same type, but administrators should normally choose a longer interval.
+Cron expressions have one-minute resolution. A schedule is checked only when `jobs:process` runs, so the worker must run at least once per minute for minute-level accuracy. Every-minute schedules can create sustained TMDB API load. The active-job check prevents overlapping work of the same type, but administrators should normally choose a longer interval.
 
 !!! Warning
 

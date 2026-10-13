@@ -203,8 +203,8 @@ class JobControllerTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->method('getPostParameters')->willReturn([
             'threshold' => '100',
-            'frequency' => 'hourly',
-            'firstRunAt' => (string)(time() + 3600),
+            'scheduleMode' => 'recurring',
+            'cronExpression' => '0 * * * *',
         ]);
         $this->authenticationMock
             ->method('requireWebSession')
@@ -215,7 +215,7 @@ class JobControllerTest extends TestCase
             ->method('addTmdbSyncSchedule')
             ->with(
                 self::callback(static fn($type) => (string)$type === 'tmdb_movie_sync'),
-                self::callback(static fn($frequency) => (string)$frequency === 'hourly'),
+                self::callback(static fn($cronExpression) => (string)$cronExpression === '0 * * * *'),
                 self::anything(),
                 self::anything(),
                 42,

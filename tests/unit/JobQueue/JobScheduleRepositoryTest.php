@@ -5,7 +5,7 @@ namespace Tests\Unit\Movary\JobQueue;
 use Doctrine\DBAL\Connection;
 use Movary\JobQueue\JobScheduleRepository;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\JobScheduleFrequency;
+use Movary\ValueObject\JobScheduleCronExpression;
 use Movary\ValueObject\JobType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,16 +23,15 @@ class JobScheduleRepositoryTest extends TestCase
             ->method('insert')
             ->with('job_schedule', self::callback(static function (array $data) : bool {
                 return $data['job_type'] === 'tmdb_movie_sync'
-                    && $data['frequency'] === 'hourly'
+                    && $data['cron_expression'] === '0 * * * *'
                     && $data['user_id'] === 42
-                    && $data['first_run_at'] === '2026-10-13 13:00:00'
                     && $data['next_run_at'] === '2026-10-13 13:00:00';
             }));
         $connection->method('lastInsertId')->willReturn('9');
 
         self::assertSame(9, (new JobScheduleRepository($connection))->add(
             JobType::createTmdbMovieSync(),
-            JobScheduleFrequency::createFromString('hourly'),
+            JobScheduleCronExpression::createFromString('0 * * * *'),
             ['threshold' => 100],
             DateTime::createFromString('2026-10-13 13:00:00'),
             42,

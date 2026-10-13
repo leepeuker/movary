@@ -18,10 +18,7 @@ class JobScheduleProcessor
 
         foreach ($this->scheduleRepository->fetchDue($currentDateTime) as $schedule) {
             $this->enqueue($schedule);
-            $nextRun = $schedule->getFrequency()->calculateNextRun(
-                $schedule->getFirstRunAt(),
-                $currentDateTime,
-            );
+            $nextRun = $schedule->getCronExpression()->calculateNextRun($currentDateTime);
             $this->scheduleRepository->updateNextRunIfCurrent(
                 $schedule->getId(),
                 $schedule->getNextRunAt(),

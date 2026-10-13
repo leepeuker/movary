@@ -109,7 +109,7 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">User</th>
                                 <th scope="col">Type</th>
-                                <th scope="col">Frequency</th>
+                                <th scope="col">Cron expression (UTC)</th>
                                 <th scope="col">Next run (UTC)</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
@@ -121,7 +121,7 @@
                                     <td>{{ schedule.id }}</td>
                                     <td>{{ schedule.userName|default('-') }}</td>
                                     <td>{{ schedule.type }}</td>
-                                    <td>{{ schedule.frequency }}</td>
+                                    <td class="font-monospace">{{ schedule.cronExpression }}</td>
                                     <td>{{ schedule.nextRunAt }}</td>
                                     <td>{{ schedule.enabled ? 'enabled' : 'disabled' }}</td>
                                     <td>

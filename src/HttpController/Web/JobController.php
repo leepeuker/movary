@@ -245,9 +245,9 @@ class JobController
         if ($scheduleConfiguration !== null) {
             $scheduleId = $this->jobScheduleApi->addTmdbSyncSchedule(
                 $jobType,
-                $scheduleConfiguration->getFrequency(),
+                $scheduleConfiguration->getCronExpression(),
                 $parameters,
-                $scheduleConfiguration->getFirstRunAt(),
+                $scheduleConfiguration->getNextRunAt(),
                 $userId,
             );
 

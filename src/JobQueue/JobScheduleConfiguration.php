@@ -3,23 +3,23 @@
 namespace Movary\JobQueue;
 
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\JobScheduleFrequency;
+use Movary\ValueObject\JobScheduleCronExpression;
 
 class JobScheduleConfiguration
 {
     public function __construct(
-        private readonly JobScheduleFrequency $frequency,
-        private readonly DateTime $firstRunAt,
+        private readonly JobScheduleCronExpression $cronExpression,
+        private readonly DateTime $nextRunAt,
     ) {
     }
 
-    public function getFirstRunAt() : DateTime
+    public function getCronExpression() : JobScheduleCronExpression
     {
-        return $this->firstRunAt;
+        return $this->cronExpression;
     }
 
-    public function getFrequency() : JobScheduleFrequency
+    public function getNextRunAt() : DateTime
     {
-        return $this->frequency;
+        return $this->nextRunAt;
     }
 }

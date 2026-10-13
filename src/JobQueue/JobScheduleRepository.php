@@ -5,7 +5,7 @@ namespace Movary\JobQueue;
 use Doctrine\DBAL\Connection;
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\JobScheduleFrequency;
+use Movary\ValueObject\JobScheduleCronExpression;
 use Movary\ValueObject\JobType;
 use RuntimeException;
 
@@ -17,18 +17,17 @@ class JobScheduleRepository
 
     public function add(
         JobType $jobType,
-        JobScheduleFrequency $frequency,
+        JobScheduleCronExpression $cronExpression,
         array $parameters,
         DateTime $nextRunAt,
         int $userId,
     ) : int {
         $this->dbConnection->insert('job_schedule', [
             'job_type' => (string)$jobType,
-            'frequency' => (string)$frequency,
+            'cron_expression' => (string)$cronExpression,
             'user_id' => $userId,
             'parameters' => Json::encode($parameters),
             'enabled' => 1,
-            'first_run_at' => (string)$nextRunAt,
             'next_run_at' => (string)$nextRunAt,
             'created_at' => (string)DateTime::create(),
         ]);

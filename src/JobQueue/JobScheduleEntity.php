@@ -4,7 +4,7 @@ namespace Movary\JobQueue;
 
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
-use Movary\ValueObject\JobScheduleFrequency;
+use Movary\ValueObject\JobScheduleCronExpression;
 use Movary\ValueObject\JobType;
 
 class JobScheduleEntity
@@ -12,11 +12,10 @@ class JobScheduleEntity
     private function __construct(
         private readonly int $id,
         private readonly JobType $jobType,
-        private readonly JobScheduleFrequency $frequency,
+        private readonly JobScheduleCronExpression $cronExpression,
         private readonly ?int $userId,
         private readonly array $parameters,
         private readonly bool $enabled,
-        private readonly DateTime $firstRunAt,
         private readonly DateTime $nextRunAt,
     ) {
     }
@@ -26,23 +25,17 @@ class JobScheduleEntity
         return new self(
             (int)$data['id'],
             JobType::createFromString($data['job_type']),
-            JobScheduleFrequency::createFromString($data['frequency']),
+            JobScheduleCronExpression::createFromString($data['cron_expression']),
             $data['user_id'] === null ? null : (int)$data['user_id'],
             Json::decode($data['parameters']),
             (bool)$data['enabled'],
-            DateTime::createFromString($data['first_run_at']),
             DateTime::createFromString($data['next_run_at']),
         );
     }
 
-    public function getFrequency() : JobScheduleFrequency
+    public function getCronExpression() : JobScheduleCronExpression
     {
-        return $this->frequency;
-    }
-
-    public function getFirstRunAt() : DateTime
-    {
-        return $this->firstRunAt;
+        return $this->cronExpression;
     }
 
     public function getId() : int

@@ -15,25 +15,25 @@ class JobScheduleRequestMapperTest extends TestCase
     public function testMapReturnsNullForOneTimeJob() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getPostParameters')->willReturn(['frequency' => 'once']);
+        $request->method('getPostParameters')->willReturn(['scheduleMode' => 'once']);
 
         self::assertNull((new JobScheduleRequestMapper())->map($request));
     }
 
     public function testMapReturnsRecurringConfiguration() : void
     {
-        $firstRunAt = time() + 3600;
         $request = $this->createStub(Request::class);
         $request->method('getPostParameters')->willReturn([
-            'frequency' => 'minutely',
-            'firstRunAt' => (string)$firstRunAt,
+            'scheduleMode' => 'recurring',
+            'cronExpression' => '*/15 * * * *',
         ]);
 
         $configuration = (new JobScheduleRequestMapper())->map($request);
 
         self::assertNotNull($configuration);
-        self::assertSame('minutely', (string)$configuration->getFrequency());
-        self::assertSame($firstRunAt, (int)$configuration->getFirstRunAt()->format('U'));
+        self::assertSame('*/15 * * * *', (string)$configuration->getCronExpression());
+        self::assertSame('00', $configuration->getNextRunAt()->format('s'));
+        self::assertContains($configuration->getNextRunAt()->format('i'), ['00', '15', '30', '45']);
     }
 
     #[DataProvider('provideInvalidScheduleData')]
@@ -48,8 +48,9 @@ class JobScheduleRequestMapperTest extends TestCase
 
     public static function provideInvalidScheduleData() : iterable
     {
-        yield 'unknown frequency' => [['frequency' => 'yearly', 'firstRunAt' => (string)(time() + 3600)]];
-        yield 'missing first run' => [['frequency' => 'daily']];
-        yield 'past first run' => [['frequency' => 'daily', 'firstRunAt' => (string)(time() - 60)]];
+        yield 'unknown schedule mode' => [['scheduleMode' => 'yearly']];
+        yield 'missing cron expression' => [['scheduleMode' => 'recurring']];
+        yield 'invalid cron expression' => [['scheduleMode' => 'recurring', 'cronExpression' => '60 * * * *']];
+        yield 'impossible cron expression' => [['scheduleMode' => 'recurring', 'cronExpression' => '0 0 31 2 *']];
     }
 }

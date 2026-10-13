@@ -16,23 +16,26 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="createJobFrequency">Frequency</label>
-                        <select class="form-select" id="createJobFrequency" name="frequency">
+                        <label class="form-label" for="createJobScheduleMode">Schedule</label>
+                        <select class="form-select" id="createJobScheduleMode" name="scheduleMode">
                             <option value="once">Run once</option>
-                            <option value="minutely">Every minute</option>
-                            <option value="hourly">Hourly</option>
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
+                            <option value="recurring">Recurring (cron)</option>
                         </select>
                     </div>
-                    <div class="d-none mb-3" id="createJobFirstRunFields">
-                        <label class="form-label" for="createJobFirstRunAt">First run</label>
-                        <input class="form-control" id="createJobFirstRunAt" type="datetime-local">
-                        <div class="form-text">Entered in your local time and stored as UTC.</div>
+                    <div class="d-none mb-3" id="createJobCronFields">
+                        <label class="form-label" for="createJobCronExpression">Cron expression (UTC)</label>
+                        <input class="form-control font-monospace" id="createJobCronExpression" name="cronExpression" value="0 * * * *" list="createJobCronPresets" autocomplete="off">
+                        <datalist id="createJobCronPresets">
+                            <option value="* * * * *">Every minute</option>
+                            <option value="0 * * * *">Hourly</option>
+                            <option value="0 0 * * *">Daily at midnight</option>
+                            <option value="0 0 * * 0">Weekly on Sunday</option>
+                            <option value="0 0 1 * *">Monthly on the first day</option>
+                        </datalist>
+                        <div class="form-text">Five fields: minute, hour, day of month, month, day of week.</div>
                     </div>
-                    <div class="alert alert-warning d-none" id="createJobFrequencyWarning" role="alert">
-                        Running every minute can create sustained TMDB API load. An occurrence is skipped while the same job type is active.
+                    <div class="alert alert-warning d-none" id="createJobCronWarning" role="alert">
+                        Cron schedules can run as often as once per minute and create sustained TMDB API load. An occurrence is skipped while the same job type is active.
                     </div>
 
                     <div data-job-fields="tmdb_movie_sync">

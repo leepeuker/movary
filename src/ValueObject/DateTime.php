@@ -51,29 +51,6 @@ class DateTime implements JsonSerializable
         return Date::createFromDateTime($this);
     }
 
-    public function add(DateInterval $interval) : self
-    {
-        $dateTime = new \DateTime($this->dateTime);
-        $dateTime->add($interval);
-
-        return new self($dateTime);
-    }
-
-    public function addMonths(int $months) : self
-    {
-        $dateTime = new \DateTime($this->dateTime);
-        $day = (int)$dateTime->format('j');
-        $dateTime->modify('first day of this month');
-        $dateTime->add(new DateInterval('P' . $months . 'M'));
-        $dateTime->setDate(
-            (int)$dateTime->format('Y'),
-            (int)$dateTime->format('n'),
-            min($day, (int)$dateTime->format('t')),
-        );
-
-        return new self($dateTime);
-    }
-
     public function differenceInHours(DateTime $dateTime) : int
     {
         return (int)(((new \DateTime($this->dateTime))->getTimestamp() - (new \DateTime((string)$dateTime))->getTimestamp()) / 60 / 60);
