@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - App
+    Settings - Job Queue
 {% endblock %}
 
 {% block stylesheets %}
@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ asset_url('js/settings-server-jobs.js') }}"></script>
+    <script src="{{ asset_url('js/settings-server-job-queue.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -23,8 +23,11 @@
             {{ include('component/modal-create-job.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5 style="margin-bottom: 1rem">Job Queue Overview</h5>
+                <h5 style="margin-bottom: 1rem">Job Queue</h5>
 
+                <p class="text-muted">
+                    View and manage background jobs. Click a job row to view its details or remove it.
+                </p>
 
                 <div id="alertJobsDiv"></div>
 
@@ -89,7 +92,7 @@
                     </div>
 
                     {{ include('component/pagination.html.twig', {
-                        paginationPath: applicationUrl ~ '/settings/server/jobs',
+                        paginationPath: applicationUrl ~ '/settings/server/job-queue',
                         paginationQuery: paginationQuery,
                     }) }}
                 </div>
@@ -97,46 +100,6 @@
                 {% if jobs|length == 0 %}<p>No jobs in queue</p>{% endif %}
 
                 <button type="button" class="btn btn-primary" style="width: 100%;" onclick="showCreateJobModal()">Create Job</button>
-
-                <hr>
-
-                <div id="jobSchedules">
-                    <h5>Recurring Job Schedules</h5>
-                    <div class="table-responsive" style="text-align: center;">
-                        <table class="table" id="jobSchedulesTable">
-                            <thead>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">User</th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Cron expression (UTC)</th>
-                                <th scope="col">Next run (UTC)</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for schedule in jobSchedules %}
-                                <tr>
-                                    <td>{{ schedule.id }}</td>
-                                    <td>{{ schedule.userName|default('-') }}</td>
-                                    <td>{{ schedule.type }}</td>
-                                    <td class="font-monospace">{{ schedule.cronExpression }}</td>
-                                    <td>{{ schedule.nextRunAt }}</td>
-                                    <td>{{ schedule.enabled ? 'enabled' : 'disabled' }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" type="button" onclick="setJobScheduleEnabled({{ schedule.id }}, {{ schedule.enabled ? 'false' : 'true' }})">
-                                            {{ schedule.enabled ? 'Disable' : 'Enable' }}
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" type="button" onclick="removeJobSchedule({{ schedule.id }})">Delete</button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% if jobSchedules|length == 0 %}<p>No recurring schedules</p>{% endif %}
-                </div>
 
                 <hr> 
                 

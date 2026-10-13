@@ -21,6 +21,7 @@ use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobScheduleApi;
 use Movary\HttpController\Web\Mapper\JobQueueFilterRequestMapper;
+use Movary\HttpController\Web\Mapper\JobScheduleFilterRequestMapper;
 use Movary\HttpController\Web\Mapper\PaginationRequestMapper;
 use Movary\HttpController\Web\Mapper\UserFilterRequestMapper;
 use Movary\Service\ApplicationUrlService;
@@ -83,6 +84,7 @@ class SettingsController
         private readonly PaginationRequestMapper $paginationRequestMapper,
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly JobQueueFilterRequestMapper $jobQueueFilterRequestMapper,
+        private readonly JobScheduleFilterRequestMapper $jobScheduleFilterRequestMapper,
         private readonly Movie\History\Location\MovieHistoryLocationApi $locationApi,
         private readonly UserFilterRequestMapper $userFilterRequestMapper,
         private readonly CurrentWebUser $currentWebUser,
@@ -567,7 +569,7 @@ class SettingsController
         );
     }
 
-    public function renderServerJobsPage(Request $request) : Response
+    public function renderServerJobQueuePage(Request $request) : Response
     {
         $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250], ['jpp']);
         $jobFilter = $this->jobQueueFilterRequestMapper->map($request);
@@ -599,10 +601,9 @@ class SettingsController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render(
-                'page/settings-server-jobs.html.twig',
+                'page/settings-server-job-queue.html.twig',
                 [
                     'jobs' => $jobs,
-                    'jobSchedules' => $this->jobScheduleApi->fetchForStatusPage(),
                     'jobsPerPage' => $paginationRequest->getPerPage(),
                     'paginationElements' => $paginationElements,
                     'paginationQuery' => $paginationQuery,
@@ -615,6 +616,52 @@ class SettingsController
                     'users' => $this->userApi->fetchAll(),
                 ],
             ),
+        );
+    }
+
+    public function renderServerJobSchedulesPage(Request $request) : Response
+    {
+        $paginationRequest = $this->paginationRequestMapper->map($request, 20, [20, 50, 100, 250]);
+        $scheduleFilter = $this->jobScheduleFilterRequestMapper->map($request);
+        $paginationElements = $this->paginationElementsCalculator->createPaginationElements(
+            $this->jobScheduleApi->countSchedules($scheduleFilter),
+            $paginationRequest->getPerPage(),
+            $paginationRequest->getPage(),
+        );
+
+        $paginationQuery = ['perPage' => $paginationRequest->getPerPage()];
+        if ($scheduleFilter->isWithoutUser()) {
+            $paginationQuery['user'] = 'none';
+        } elseif ($scheduleFilter->getUserId() !== null) {
+            $paginationQuery['user'] = $scheduleFilter->getUserId();
+        }
+        if ($scheduleFilter->getType() !== null) {
+            $paginationQuery['type'] = (string)$scheduleFilter->getType();
+        }
+        if ($scheduleFilter->getEnabled() !== null) {
+            $paginationQuery['status'] = $scheduleFilter->getEnabled() ? 'enabled' : 'disabled';
+        }
+
+        return Response::create(
+            StatusCode::createOk(),
+            $this->twig->render('page/settings-server-job-schedules.html.twig', [
+                'jobSchedules' => $this->jobScheduleApi->fetchForStatusPage(
+                    $paginationRequest->getPerPage(),
+                    $paginationElements->getOffset(),
+                    $scheduleFilter,
+                ),
+                'jobSchedulesPerPage' => $paginationRequest->getPerPage(),
+                'paginationElements' => $paginationElements,
+                'paginationQuery' => $paginationQuery,
+                'jobScheduleFilterUser' => $scheduleFilter->isWithoutUser()
+                    ? 'none'
+                    : $scheduleFilter->getUserId(),
+                'jobScheduleFilterType' => $scheduleFilter->getType(),
+                'jobScheduleFilterStatus' => $paginationQuery['status'] ?? null,
+                'jobScheduleFiltersActive' => $scheduleFilter->hasFilters(),
+                'jobScheduleTypes' => [JobType::createTmdbMovieSync(), JobType::createTmdbPersonSync()],
+                'users' => $this->userApi->fetchAll(),
+            ]),
         );
     }
 

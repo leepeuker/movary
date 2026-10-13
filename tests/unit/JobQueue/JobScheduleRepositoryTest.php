@@ -3,6 +3,7 @@
 namespace Tests\Unit\Movary\JobQueue;
 
 use Doctrine\DBAL\Connection;
+use Movary\JobQueue\JobScheduleFilter;
 use Movary\JobQueue\JobScheduleRepository;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\JobScheduleCronExpression;
@@ -14,6 +15,50 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(JobScheduleRepository::class)]
 class JobScheduleRepositoryTest extends TestCase
 {
+    public function testCountSchedulesAppliesFilters() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT COUNT(*) FROM job_schedule schedules WHERE schedules.user_id = ? '
+                . 'AND schedules.job_type = ? AND schedules.enabled = ?',
+                [12, 'tmdb_movie_sync', 0],
+            )
+            ->willReturn('4');
+
+        $filter = JobScheduleFilter::create(12, false, JobType::createTmdbMovieSync(), false);
+
+        self::assertSame(4, (new JobScheduleRepository($connection))->countSchedules($filter));
+    }
+
+    public function testFetchSchedulesAppliesFiltersToPagedQuery() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(static fn(string $query) : bool => str_contains(
+                    $query,
+                    'WHERE schedules.user_id IS NULL AND schedules.job_type = ? AND schedules.enabled = ?',
+                ) && str_contains($query, 'LIMIT 20 OFFSET 40')),
+                ['tmdb_person_sync', 1],
+            )
+            ->willReturn([]);
+
+        $filter = JobScheduleFilter::create(
+            withoutUser: true,
+            type: JobType::createTmdbPersonSync(),
+            enabled: true,
+        );
+
+        self::assertSame([], (new JobScheduleRepository($connection))->fetchSchedules(20, 40, $filter));
+    }
+
     public function testAddPersistsSchedule() : void
     {
         /** @var Connection&MockObject $connection */

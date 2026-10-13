@@ -79,7 +79,10 @@
                     <a class="nav-link {% if requestUrlPath starts with '/settings/server/email' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/email">Email</a>
                 </li>
                 <li class="dropdown-item">
-                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/jobs' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/jobs">Jobs</a>
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/job-queue' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/job-queue">Job Queue</a>
+                </li>
+                <li class="dropdown-item">
+                    <a class="nav-link {% if requestUrlPath starts with '/settings/server/job-schedules' %}active{% endif %}" href="{{ applicationUrl }}/settings/server/job-schedules">Job Schedules</a>
                 </li>
             </ul>
         </li>

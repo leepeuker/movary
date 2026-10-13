@@ -39,7 +39,12 @@ class JobScheduleApi
         return $this->repository->delete($id);
     }
 
-    public function fetchForStatusPage() : array
+    public function countSchedules(?JobScheduleFilter $filter = null) : int
+    {
+        return $this->repository->countSchedules($filter);
+    }
+
+    public function fetchForStatusPage(int $limit, int $offset = 0, ?JobScheduleFilter $filter = null) : array
     {
         return array_map(static fn(array $schedule) : array => [
             'id' => (int)$schedule['id'],
@@ -50,7 +55,7 @@ class JobScheduleApi
             'parameters' => Json::decode($schedule['parameters']),
             'enabled' => (bool)$schedule['enabled'],
             'nextRunAt' => $schedule['next_run_at'],
-        ], $this->repository->fetchAll());
+        ], $this->repository->fetchSchedules($limit, $offset, $filter));
     }
 
     public function setEnabled(int $id, bool $enabled) : bool

@@ -45,15 +45,55 @@ class JobScheduleRepository
         return $this->dbConnection->delete('job_schedule', ['id' => $id]) === 1;
     }
 
-    /** @return list<array<string, mixed>> */
-    public function fetchAll() : array
+    public function countSchedules(?JobScheduleFilter $filter = null) : int
     {
+        [$whereQuery, $parameters] = $this->createStatusPageFilter($filter ?? JobScheduleFilter::create());
+
+        return (int)$this->dbConnection->fetchOne(
+            "SELECT COUNT(*) FROM job_schedule schedules$whereQuery",
+            $parameters,
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function fetchSchedules(int $limit, int $offset = 0, ?JobScheduleFilter $filter = null) : array
+    {
+        [$whereQuery, $parameters] = $this->createStatusPageFilter($filter ?? JobScheduleFilter::create());
+
         return $this->dbConnection->fetchAllAssociative(
             'SELECT schedules.*, users.name AS user_name
             FROM job_schedule schedules
             LEFT JOIN user users ON schedules.user_id = users.id
-            ORDER BY schedules.id',
+            ' . $whereQuery . '
+            ORDER BY schedules.id DESC
+            LIMIT ' . $limit . ' OFFSET ' . $offset,
+            $parameters,
         );
+    }
+
+    /** @return array{string, list<int|string>} */
+    private function createStatusPageFilter(JobScheduleFilter $filter) : array
+    {
+        $conditions = [];
+        $parameters = [];
+        $userId = $filter->getUserId();
+
+        if ($filter->isWithoutUser()) {
+            $conditions[] = 'schedules.user_id IS NULL';
+        } elseif ($userId !== null) {
+            $conditions[] = 'schedules.user_id = ?';
+            $parameters[] = $userId;
+        }
+        if ($filter->getType() !== null) {
+            $conditions[] = 'schedules.job_type = ?';
+            $parameters[] = (string)$filter->getType();
+        }
+        if ($filter->getEnabled() !== null) {
+            $conditions[] = 'schedules.enabled = ?';
+            $parameters[] = $filter->getEnabled() ? 1 : 0;
+        }
+
+        return [count($conditions) === 0 ? '' : ' WHERE ' . implode(' AND ', $conditions), $parameters];
     }
 
     /** @return list<JobScheduleEntity> */

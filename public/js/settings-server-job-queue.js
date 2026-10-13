@@ -1,18 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
     // localStorage here is a "hack" to keep state after page refresh, it would be better to not refresh the page and load the table via AJAX
-    const alertMessageJobs = localStorage.getItem('alertMessageJobs');
+    const alertMessageJobs = localStorage.getItem('alertMessageJobQueue');
     if (alertMessageJobs) {
         addAlert('alertJobsDiv', alertMessageJobs, 'success');
     }
-    localStorage.setItem('alertMessageJobs', '')
+    localStorage.setItem('alertMessageJobQueue', '')
 
     registerJobRowEvents()
     document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
     document.getElementById('createJobForm').addEventListener('submit', createJob)
     document.getElementById('createJobType').addEventListener('change', updateCreateJobFields)
-    document.getElementById('createJobScheduleMode').addEventListener('change', updateCreateJobScheduleFields)
     updateCreateJobFields()
-    updateCreateJobScheduleFields()
 });
 
 let selectedJobId = null
@@ -38,19 +36,7 @@ function showCreateJobModal() {
     document.getElementById('createJobError').classList.add('d-none')
     document.getElementById('createJobError').textContent = ''
     updateCreateJobFields()
-    updateCreateJobScheduleFields()
     bootstrap.Modal.getOrCreateInstance('#createJobModal').show()
-}
-
-function updateCreateJobScheduleFields() {
-    const isRecurring = document.getElementById('createJobScheduleMode').value === 'recurring'
-    const cronFields = document.getElementById('createJobCronFields')
-    const cronInput = document.getElementById('createJobCronExpression')
-
-    cronFields.classList.toggle('d-none', isRecurring === false)
-    cronInput.required = isRecurring
-    cronInput.disabled = isRecurring === false
-    document.getElementById('createJobCronWarning').classList.toggle('d-none', isRecurring === false)
 }
 
 function updateCreateJobFields() {
@@ -108,16 +94,7 @@ async function createJob(event) {
         }
 
         bootstrap.Modal.getOrCreateInstance('#createJobModal').hide()
-        if (responseBody.scheduleId !== undefined) {
-            localStorage.setItem('alertMessageJobs', 'Created recurring schedule (ID ' + responseBody.scheduleId + ')')
-            const url = new URL(window.location.href)
-            url.search = ''
-            url.hash = 'jobSchedules'
-            window.location.href = url.toString()
-            return
-        }
-
-        localStorage.setItem('alertMessageJobs', 'Created Job (ID ' + responseBody.jobId + ')')
+        localStorage.setItem('alertMessageJobQueue', 'Created Job (ID ' + responseBody.jobId + ')')
 
         const url = new URL(window.location.href)
         url.search = ''
@@ -157,53 +134,6 @@ function showCreateJobError(message) {
     errorAlert.textContent = message
     errorAlert.classList.remove('d-none')
     bootstrap.Modal.getOrCreateInstance('#createJobModal').show()
-}
-
-async function setJobScheduleEnabled(scheduleId, enabled) {
-    try {
-        const response = await fetchWithCsrf(APPLICATION_URL + '/job-schedules/' + scheduleId + '/enabled', {
-            method: 'POST',
-            body: new URLSearchParams({enabled: enabled ? '1' : '0'}),
-            signal: AbortSignal.timeout(10000),
-        })
-        if (!response.ok) {
-            throw new Error('Response status: ' + response.status)
-        }
-
-        localStorage.setItem('alertMessageJobs', (enabled ? 'Enabled' : 'Disabled') + ' schedule ' + scheduleId)
-        refreshPage()
-    } catch (error) {
-        console.error(error)
-        addAlert('alertJobsDiv', 'Could not update schedule ' + scheduleId, 'danger')
-    }
-}
-
-async function removeJobSchedule(scheduleId) {
-    const confirmed = await showConfirmationModal({
-        title: 'Delete recurring schedule',
-        message: 'Delete recurring schedule ' + scheduleId + '? Existing queue jobs are not removed.',
-        confirmLabel: 'Delete schedule',
-        confirmClass: 'btn-danger',
-    })
-    if (confirmed === false) {
-        return
-    }
-
-    try {
-        const response = await fetchWithCsrf(APPLICATION_URL + '/job-schedules/' + scheduleId, {
-            method: 'DELETE',
-            signal: AbortSignal.timeout(10000),
-        })
-        if (!response.ok) {
-            throw new Error('Response status: ' + response.status)
-        }
-
-        localStorage.setItem('alertMessageJobs', 'Deleted schedule ' + scheduleId)
-        refreshPage()
-    } catch (error) {
-        console.error(error)
-        addAlert('alertJobsDiv', 'Could not delete schedule ' + scheduleId, 'danger')
-    }
 }
 
 function registerJobRowEvents() {
@@ -330,7 +260,7 @@ async function removeJob() {
         removeButton.disabled = false
     }
 
-    localStorage.setItem('alertMessageJobs', 'Removed job ' + selectedJobId)
+    localStorage.setItem('alertMessageJobQueue', 'Removed job ' + selectedJobId)
     refreshPage()
 }
 
@@ -408,7 +338,7 @@ async function removeAllJobs() {
         return
     }
 
-    localStorage.setItem('alertMessageJobs', 'Removed all jobs')
+    localStorage.setItem('alertMessageJobQueue', 'Removed all jobs')
     refreshPage()
 }
 
@@ -447,6 +377,6 @@ async function removeProcessedJobs() {
         return
     }
 
-    localStorage.setItem('alertMessageJobs', 'Removed processed jobs')
+    localStorage.setItem('alertMessageJobQueue', 'Removed processed jobs')
     refreshPage()
 }

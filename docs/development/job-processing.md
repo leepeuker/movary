@@ -46,7 +46,7 @@ The standard Docker image uses Supervisor to restart the command after it exits,
 
 ## Recurring schedules
 
-Administrators can create recurring TMDB movie and person synchronization schedules under **Settings > Server > Jobs**. Schedules use standard five-field cron expressions in UTC: minute, hour, day of month, month, and day of week. For example, `*/15 * * * *` runs every 15 minutes and `0 3 * * 1` runs every Monday at 03:00 UTC.
+Administrators can create recurring TMDB movie and person synchronization schedules under **Settings > Server > Job Schedules**. Schedules use standard five-field cron expressions in UTC: minute, hour, day of month, month, and day of week. For example, `*/15 * * * *` runs every 15 minutes and `0 3 * * 1` runs every Monday at 03:00 UTC.
 
 When a schedule is due, `jobs:process` attempts to add a normal `waiting` job and advances the schedule to its next future occurrence. Missed occurrences do not create catch-up jobs. If the same synchronization type is already waiting or in progress, that occurrence is skipped and the schedule still advances. Failed queue jobs remain in history and do not disable future occurrences.
 
@@ -58,13 +58,14 @@ Cron expressions have one-minute resolution. A schedule is checked only when `jo
 
 ## Monitoring and cleanup
 
-Administrators can inspect the queue under **Settings > Server > Jobs**. The page supports filtering by user, type, and status. It also allows an administrator to:
+Administrators can inspect the queue under **Settings > Server > Job Queue**. The page supports filtering by user, type, and status. It also allows an administrator to:
 
 - enqueue a TMDB movie or person metadata synchronization;
-- create, enable, disable, and delete recurring TMDB synchronization schedules;
 - delete an individual job;
 - remove all processed jobs (`done` and `failed`);
 - remove all jobs, including `waiting` and `in progress` jobs.
+
+Administrators can create, enable, disable, and delete recurring TMDB synchronization schedules under **Settings > Server > Job Schedules**.
 
 A job that remains `waiting` usually means the worker is not running. Check the worker process and application logs. A job left `in progress` can indicate that the worker stopped during processing. Because jobs are not retried automatically, inspect the logs and confirm that repeating the operation is safe before deleting the record and scheduling the work again.
 
