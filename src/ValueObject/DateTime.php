@@ -51,6 +51,14 @@ class DateTime implements JsonSerializable
         return Date::createFromDateTime($this);
     }
 
+    public function add(DateInterval $interval) : self
+    {
+        $dateTime = new \DateTime($this->dateTime);
+        $dateTime->add($interval);
+
+        return new self($dateTime);
+    }
+
     public function differenceInHours(DateTime $dateTime) : int
     {
         return (int)(((new \DateTime($this->dateTime))->getTimestamp() - (new \DateTime((string)$dateTime))->getTimestamp()) / 60 / 60);

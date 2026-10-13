@@ -19,6 +19,7 @@ use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\JobQueue\JobQueueApi;
+use Movary\JobQueue\JobScheduleApi;
 use Movary\HttpController\Web\Mapper\JobQueueFilterRequestMapper;
 use Movary\HttpController\Web\Mapper\PaginationRequestMapper;
 use Movary\HttpController\Web\Mapper\UserFilterRequestMapper;
@@ -68,6 +69,7 @@ class SettingsController
         private readonly ServerSettings $serverSettings,
         private readonly WebhookUrlBuilder $webhookUrlBuilder,
         private readonly JobQueueApi $jobQueueApi,
+        private readonly JobScheduleApi $jobScheduleApi,
         private readonly DashboardFactory $dashboardFactory,
         private readonly EmailService $emailService,
         private readonly TestEmailRenderer $testEmailRenderer,
@@ -600,6 +602,7 @@ class SettingsController
                 'page/settings-server-jobs.html.twig',
                 [
                     'jobs' => $jobs,
+                    'jobSchedules' => $this->jobScheduleApi->fetchForStatusPage(),
                     'jobsPerPage' => $paginationRequest->getPerPage(),
                     'paginationElements' => $paginationElements,
                     'paginationQuery' => $paginationQuery,

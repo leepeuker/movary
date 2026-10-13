@@ -98,6 +98,46 @@
 
                 <button type="button" class="btn btn-primary" style="width: 100%;" onclick="showCreateJobModal()">Create Job</button>
 
+                <hr>
+
+                <div id="jobSchedules">
+                    <h5>Recurring Job Schedules</h5>
+                    <div class="table-responsive" style="text-align: center;">
+                        <table class="table" id="jobSchedulesTable">
+                            <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">User</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Frequency</th>
+                                <th scope="col">Next run (UTC)</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for schedule in jobSchedules %}
+                                <tr>
+                                    <td>{{ schedule.id }}</td>
+                                    <td>{{ schedule.userName|default('-') }}</td>
+                                    <td>{{ schedule.type }}</td>
+                                    <td>{{ schedule.frequency }}</td>
+                                    <td>{{ schedule.nextRunAt }}</td>
+                                    <td>{{ schedule.enabled ? 'enabled' : 'disabled' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" type="button" onclick="setJobScheduleEnabled({{ schedule.id }}, {{ schedule.enabled ? 'false' : 'true' }})">
+                                            {{ schedule.enabled ? 'Disable' : 'Enable' }}
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" type="button" onclick="removeJobSchedule({{ schedule.id }})">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if jobSchedules|length == 0 %}<p>No recurring schedules</p>{% endif %}
+                </div>
+
                 <hr> 
                 
                 <div>

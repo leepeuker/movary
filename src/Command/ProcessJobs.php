@@ -4,6 +4,7 @@ namespace Movary\Command;
 
 use Exception;
 use Movary\JobQueue;
+use Movary\JobQueue\JobScheduleProcessor;
 use Movary\Service\JobProcessor;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
@@ -25,6 +26,7 @@ class ProcessJobs extends Command
 
     public function __construct(
         private readonly JobQueue\JobQueueApi $jobApi,
+        private readonly JobScheduleProcessor $jobScheduleProcessor,
         private readonly JobProcessor $jobProcessor,
         private readonly LoggerInterface $logger,
         private readonly ?int $minRuntimeInSeconds = null,
@@ -75,6 +77,8 @@ class ProcessJobs extends Command
 
     private function processJob() : ?JobType
     {
+        $this->jobScheduleProcessor->enqueueDueJobs();
+
         $job = $this->jobApi->fetchOldestWaitingJob();
 
         if ($job === null) {

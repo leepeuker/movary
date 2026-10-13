@@ -27,8 +27,11 @@ use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\AuthenticationController;
 use Movary\HttpController\Web\JobController;
+use Movary\HttpController\Web\Mapper\JobScheduleRequestMapper;
 use Movary\HttpController\Web\Mapper\TmdbSyncJobRequestMapper;
 use Movary\JobQueue\JobQueueApi;
+use Movary\JobQueue\JobScheduleApi;
+use Movary\JobQueue\JobScheduleProcessor;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\AssetUrlGenerator;
@@ -328,6 +331,8 @@ class Factory
             $container->get(FlashMessageService::class),
             $container->get(ApplicationUrlService::class),
             $container->get(TmdbSyncJobRequestMapper::class),
+            $container->get(JobScheduleRequestMapper::class),
+            $container->get(JobScheduleApi::class),
             self::createDirectoryStorageApp(),
         );
     }
@@ -633,6 +638,7 @@ class Factory
 
         return new Command\ProcessJobs(
             $container->get(JobQueueApi::class),
+            $container->get(JobScheduleProcessor::class),
             $container->get(JobProcessor::class),
             $container->get(LoggerInterface::class),
             $minRuntimeInSeconds,

@@ -10,7 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
     document.getElementById('createJobForm').addEventListener('submit', createJob)
     document.getElementById('createJobType').addEventListener('change', updateCreateJobFields)
+    document.getElementById('createJobFrequency').addEventListener('change', updateCreateJobFrequencyFields)
     updateCreateJobFields()
+    updateCreateJobFrequencyFields()
 });
 
 let selectedJobId = null
@@ -36,7 +38,26 @@ function showCreateJobModal() {
     document.getElementById('createJobError').classList.add('d-none')
     document.getElementById('createJobError').textContent = ''
     updateCreateJobFields()
+    updateCreateJobFrequencyFields()
     bootstrap.Modal.getOrCreateInstance('#createJobModal').show()
+}
+
+function updateCreateJobFrequencyFields() {
+    const frequency = document.getElementById('createJobFrequency').value
+    const firstRunFields = document.getElementById('createJobFirstRunFields')
+    const firstRunInput = document.getElementById('createJobFirstRunAt')
+    const isRecurring = frequency !== 'once'
+
+    firstRunFields.classList.toggle('d-none', isRecurring === false)
+    firstRunInput.required = isRecurring
+    firstRunInput.disabled = isRecurring === false
+    document.getElementById('createJobFrequencyWarning').classList.toggle('d-none', frequency !== 'minutely')
+
+    if (isRecurring && firstRunInput.value === '') {
+        const firstRun = new Date(Date.now() + 5 * 60 * 1000)
+        const localFirstRun = new Date(firstRun.getTime() - firstRun.getTimezoneOffset() * 60 * 1000)
+        firstRunInput.value = localFirstRun.toISOString().slice(0, 16)
+    }
 }
 
 function updateCreateJobFields() {
@@ -67,6 +88,10 @@ async function createJob(event) {
 
     const formData = new FormData(form)
     formData.delete('jobType')
+    if (formData.get('frequency') !== 'once') {
+        const firstRunAt = new Date(document.getElementById('createJobFirstRunAt').value)
+        formData.set('firstRunAt', Math.floor(firstRunAt.getTime() / 1000).toString())
+    }
     if (
         jobConfiguration.prepareSubmission !== undefined &&
         await jobConfiguration.prepareSubmission(formData, jobConfiguration) === false
@@ -94,6 +119,15 @@ async function createJob(event) {
         }
 
         bootstrap.Modal.getOrCreateInstance('#createJobModal').hide()
+        if (responseBody.scheduleId !== undefined) {
+            localStorage.setItem('alertMessageJobs', 'Created recurring schedule (ID ' + responseBody.scheduleId + ')')
+            const url = new URL(window.location.href)
+            url.search = ''
+            url.hash = 'jobSchedules'
+            window.location.href = url.toString()
+            return
+        }
+
         localStorage.setItem('alertMessageJobs', 'Created Job (ID ' + responseBody.jobId + ')')
 
         const url = new URL(window.location.href)
@@ -134,6 +168,53 @@ function showCreateJobError(message) {
     errorAlert.textContent = message
     errorAlert.classList.remove('d-none')
     bootstrap.Modal.getOrCreateInstance('#createJobModal').show()
+}
+
+async function setJobScheduleEnabled(scheduleId, enabled) {
+    try {
+        const response = await fetchWithCsrf(APPLICATION_URL + '/job-schedules/' + scheduleId + '/enabled', {
+            method: 'POST',
+            body: new URLSearchParams({enabled: enabled ? '1' : '0'}),
+            signal: AbortSignal.timeout(10000),
+        })
+        if (!response.ok) {
+            throw new Error('Response status: ' + response.status)
+        }
+
+        localStorage.setItem('alertMessageJobs', (enabled ? 'Enabled' : 'Disabled') + ' schedule ' + scheduleId)
+        refreshPage()
+    } catch (error) {
+        console.error(error)
+        addAlert('alertJobsDiv', 'Could not update schedule ' + scheduleId, 'danger')
+    }
+}
+
+async function removeJobSchedule(scheduleId) {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete recurring schedule',
+        message: 'Delete recurring schedule ' + scheduleId + '? Existing queue jobs are not removed.',
+        confirmLabel: 'Delete schedule',
+        confirmClass: 'btn-danger',
+    })
+    if (confirmed === false) {
+        return
+    }
+
+    try {
+        const response = await fetchWithCsrf(APPLICATION_URL + '/job-schedules/' + scheduleId, {
+            method: 'DELETE',
+            signal: AbortSignal.timeout(10000),
+        })
+        if (!response.ok) {
+            throw new Error('Response status: ' + response.status)
+        }
+
+        localStorage.setItem('alertMessageJobs', 'Deleted schedule ' + scheduleId)
+        refreshPage()
+    } catch (error) {
+        console.error(error)
+        addAlert('alertJobsDiv', 'Could not delete schedule ' + scheduleId, 'danger')
+    }
 }
 
 function registerJobRowEvents() {
