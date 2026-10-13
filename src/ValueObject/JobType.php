@@ -159,6 +159,11 @@ class JobType implements JsonSerializable
         return $this->type === self::TYPE_JELLYFIN_IMPORT_HISTORY;
     }
 
+    public function isOfTypeImdbSync() : bool
+    {
+        return $this->type === self::TYPE_IMDB_SYNC;
+    }
+
     public function isOfTypeLetterboxdImportHistory() : bool
     {
         return $this->type === self::TYPE_LETTERBOXD_IMPORT_HISTORY;

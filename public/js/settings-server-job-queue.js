@@ -20,14 +20,27 @@ const creatableJobTypes = {
     tmdb_movie_sync: {
         endpoint: 'tmdb-movie-sync',
         filterType: 'tmdb_movie_sync',
-        prepareSubmission: prepareTmdbSyncSubmission,
+        prepareSubmission: prepareUnboundedSyncSubmission,
+        syncName: 'TMDB movie metadata',
         unboundedResourceName: 'movie',
     },
     tmdb_person_sync: {
         endpoint: 'tmdb-person-sync',
         filterType: 'tmdb_person_sync',
-        prepareSubmission: prepareTmdbSyncSubmission,
+        prepareSubmission: prepareUnboundedSyncSubmission,
+        syncName: 'TMDB person metadata',
         unboundedResourceName: 'person',
+    },
+    tmdb_image_cache: {
+        endpoint: 'tmdb-image-cache-refresh',
+        filterType: 'tmdb_image_cache',
+    },
+    imdb_sync: {
+        endpoint: 'imdb-ratings-sync',
+        filterType: 'imdb_sync',
+        prepareSubmission: prepareUnboundedSyncSubmission,
+        syncName: 'IMDb ratings',
+        unboundedResourceName: 'movie',
     },
 }
 
@@ -109,14 +122,14 @@ async function createJob(event) {
     }
 }
 
-async function prepareTmdbSyncSubmission(formData, jobConfiguration) {
+async function prepareUnboundedSyncSubmission(formData, jobConfiguration) {
     if (formData.get('threshold') !== '' || formData.get('ids').trim() !== '') {
         return true
     }
 
     const confirmed = await showConfirmationModal({
-        title: 'Create unbounded TMDB sync job',
-        message: 'This job will attempt to synchronize every eligible ' + jobConfiguration.unboundedResourceName + '. Continue?',
+        title: 'Create unbounded sync job',
+        message: 'This job will synchronize ' + jobConfiguration.syncName + ' for every eligible ' + jobConfiguration.unboundedResourceName + '. Continue?',
         confirmLabel: 'Create job',
         confirmClass: 'btn-warning',
         restoreSourceModalOnConfirm: false,

@@ -58,6 +58,8 @@ php bin/console.php tmdb:imageCache:refresh
 php bin/console.php tmdb:imageCache:delete
 ```
 
+Administrators can refresh movie images, person images, or both under **Settings > Server > Job Queue**. The same refresh can be scheduled under **Settings > Server > Job Schedules**. Replacing files that are already cached is optional and can generate substantial TMDB traffic, so recurring schedules should normally leave that option disabled.
+
 ## Import personal User Ratings
 
 There is no native integration to import the personal movie ratings of a tmdb user at the moment.

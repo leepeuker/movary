@@ -25,7 +25,12 @@ class JobQueueApiTest extends TestCase
                 self::callback(static fn(JobType $type) => (string)$type === 'imdb_sync'),
                 self::callback(static fn(JobStatus $status) => (string)$status === 'in progress'),
                 null,
-                ['movieIds' => [7, 8]],
+                [
+                    'movieIds' => [7, 8],
+                    'maxAgeInHours' => null,
+                    'threshold' => null,
+                    'onlyNeverSynced' => false,
+                ],
             )
             ->willReturn(5);
 

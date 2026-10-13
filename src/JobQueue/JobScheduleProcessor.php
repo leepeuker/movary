@@ -3,6 +3,7 @@
 namespace Movary\JobQueue;
 
 use Movary\ValueObject\DateTime;
+use RuntimeException;
 
 class JobScheduleProcessor
 {
@@ -30,19 +31,56 @@ class JobScheduleProcessor
 
     private function enqueue(JobScheduleEntity $schedule) : void
     {
+        $jobType = $schedule->getJobType();
+
+        match (true) {
+            $jobType->isOfTypeTmdbMovieSync() => $this->enqueueTmdbMovieSync($schedule),
+            $jobType->isOfTypeTmdbPersonSync() => $this->enqueueTmdbPersonSync($schedule),
+            $jobType->isOfTypeImdbSync() => $this->enqueueImdbSync($schedule),
+            $jobType->isOfTypeTmdbImageCache() => $this->enqueueTmdbImageCacheRefresh($schedule),
+            default => throw new RuntimeException('Unsupported recurring job type: ' . $jobType),
+        };
+    }
+
+    private function enqueueImdbSync(JobScheduleEntity $schedule) : void
+    {
         $parameters = $schedule->getParameters();
-        if ($schedule->getJobType()->isOfTypeTmdbMovieSync()) {
-            $this->jobQueueApi->addTmdbMovieSyncJobUnlessActive(
-                movieIds: $parameters['ids'] ?? [],
-                maxAgeInHours: $parameters['maxAgeInHours'] ?? null,
-                threshold: $parameters['threshold'] ?? null,
-                onlyNeverSynced: $parameters['onlyNeverSynced'] ?? false,
-                userId: $schedule->getUserId(),
-            );
+        $this->jobQueueApi->addImdbSyncJobUnlessActive(
+            movieIds: $parameters['ids'] ?? [],
+            maxAgeInHours: $parameters['maxAgeInHours'] ?? null,
+            threshold: $parameters['threshold'] ?? null,
+            onlyNeverSynced: $parameters['onlyNeverSynced'] ?? false,
+            userId: $schedule->getUserId(),
+        );
+    }
 
-            return;
-        }
+    private function enqueueTmdbImageCacheRefresh(JobScheduleEntity $schedule) : void
+    {
+        $parameters = $schedule->getParameters();
+        $this->jobQueueApi->addTmdbImageCacheRefreshJobUnlessActive(
+            TmdbImageCacheJobParameters::create(
+                $parameters['imageType'] ?? TmdbImageCacheJobParameters::IMAGE_TYPE_ALL,
+                $parameters['forceRefresh'] ?? false,
+            ),
+            $schedule->getUserId(),
+        );
+    }
 
+    private function enqueueTmdbMovieSync(JobScheduleEntity $schedule) : void
+    {
+        $parameters = $schedule->getParameters();
+        $this->jobQueueApi->addTmdbMovieSyncJobUnlessActive(
+            movieIds: $parameters['ids'] ?? [],
+            maxAgeInHours: $parameters['maxAgeInHours'] ?? null,
+            threshold: $parameters['threshold'] ?? null,
+            onlyNeverSynced: $parameters['onlyNeverSynced'] ?? false,
+            userId: $schedule->getUserId(),
+        );
+    }
+
+    private function enqueueTmdbPersonSync(JobScheduleEntity $schedule) : void
+    {
+        $parameters = $schedule->getParameters();
         $this->jobQueueApi->addTmdbPersonSyncJobUnlessActive(
             personIds: $parameters['ids'] ?? [],
             maxAgeInHours: $parameters['maxAgeInHours'] ?? null,

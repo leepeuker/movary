@@ -22,6 +22,7 @@ class JobTypeTest extends TestCase
         $subject = JobType::createImdbSync();
 
         self::assertSame('imdb_sync', (string)$subject);
+        self::assertTrue($subject->isOfTypeImdbSync());
     }
 
     public function testCreateLetterboxdImportHistory() : void

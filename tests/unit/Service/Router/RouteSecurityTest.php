@@ -67,12 +67,14 @@ class RouteSecurityTest extends TestCase
             static fn(array $route) : bool => in_array($route['path'], [
                 '/jobs/schedule/tmdb-movie-sync',
                 '/jobs/schedule/tmdb-person-sync',
+                '/jobs/schedule/tmdb-image-cache-refresh',
+                '/jobs/schedule/imdb-ratings-sync',
                 '/job-schedules/{scheduleId:\d+}',
                 '/job-schedules/{scheduleId:\d+}/enabled',
             ], true),
         );
 
-        self::assertCount(4, $routes);
+        self::assertCount(6, $routes);
         foreach ($routes as $route) {
             self::assertContains(UserIsAuthenticated::class, $route['middleware']);
             self::assertContains(UserIsAdmin::class, $route['middleware']);

@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use Movary\Domain\User\Service\Authentication;
 use Movary\HttpController\Web\Mapper\TmdbSyncJobRequestMapper;
 use Movary\HttpController\Web\Mapper\JobScheduleRequestMapper;
+use Movary\HttpController\Web\Mapper\TmdbImageCacheJobRequestMapper;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobScheduleApi;
 use Movary\JobQueue\TmdbSyncJobParameters;
@@ -30,6 +31,7 @@ class JobController
         private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly TmdbSyncJobRequestMapper $tmdbSyncJobRequestMapper,
+        private readonly TmdbImageCacheJobRequestMapper $tmdbImageCacheJobRequestMapper,
         private readonly JobScheduleRequestMapper $jobScheduleRequestMapper,
         private readonly JobScheduleApi $jobScheduleApi,
         private readonly string $appStorageDirectory,
@@ -199,6 +201,84 @@ class JobController
     public function scheduleTmdbMovieSync(Request $request) : Response
     {
         return $this->scheduleTmdbSync($request, JobType::createTmdbMovieSync());
+    }
+
+    public function scheduleImdbRatingsSync(Request $request) : Response
+    {
+        try {
+            $parameters = $this->tmdbSyncJobRequestMapper->map($request);
+            $scheduleConfiguration = $this->jobScheduleRequestMapper->map($request);
+            if ($parameters->requiresUnboundedSyncConfirmation() === true &&
+                $this->tmdbSyncJobRequestMapper->isUnboundedSyncConfirmed($request) === false
+            ) {
+                return $this->createJobJsonResponse(
+                    ['error' => 'Confirmation is required for a sync without IDs or a maximum record count.'],
+                    StatusCode::createBadRequest(),
+                );
+            }
+        } catch (InvalidArgumentException $exception) {
+            return $this->createJobJsonResponse(['error' => $exception->getMessage()], StatusCode::createBadRequest());
+        }
+
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        if ($scheduleConfiguration !== null) {
+            $scheduleId = $this->jobScheduleApi->addImdbSyncSchedule(
+                $scheduleConfiguration->getCronExpression(),
+                $parameters,
+                $scheduleConfiguration->getNextRunAt(),
+                $userId,
+            );
+
+            return $this->createJobJsonResponse(['scheduleId' => $scheduleId, 'userId' => $userId]);
+        }
+
+        $jobId = $this->jobQueueApi->addImdbSyncJobUnlessActive(
+            movieIds: $parameters->getIds(),
+            maxAgeInHours: $parameters->getMaxAgeInHours(),
+            threshold: $parameters->getThreshold(),
+            onlyNeverSynced: $parameters->isOnlyNeverSynced(),
+            userId: $userId,
+        );
+        if ($jobId === null) {
+            return $this->createJobJsonResponse(
+                ['error' => 'A waiting or in-progress job of this type already exists.'],
+                StatusCode::createConflict(),
+            );
+        }
+
+        return $this->createJobJsonResponse(['jobId' => $jobId, 'userId' => $userId]);
+    }
+
+    public function scheduleTmdbImageCacheRefresh(Request $request) : Response
+    {
+        try {
+            $parameters = $this->tmdbImageCacheJobRequestMapper->map($request);
+            $scheduleConfiguration = $this->jobScheduleRequestMapper->map($request);
+        } catch (InvalidArgumentException $exception) {
+            return $this->createJobJsonResponse(['error' => $exception->getMessage()], StatusCode::createBadRequest());
+        }
+
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        if ($scheduleConfiguration !== null) {
+            $scheduleId = $this->jobScheduleApi->addTmdbImageCacheRefreshSchedule(
+                $scheduleConfiguration->getCronExpression(),
+                $parameters,
+                $scheduleConfiguration->getNextRunAt(),
+                $userId,
+            );
+
+            return $this->createJobJsonResponse(['scheduleId' => $scheduleId, 'userId' => $userId]);
+        }
+
+        $jobId = $this->jobQueueApi->addTmdbImageCacheRefreshJobUnlessActive($parameters, $userId);
+        if ($jobId === null) {
+            return $this->createJobJsonResponse(
+                ['error' => 'A waiting or in-progress job of this type already exists.'],
+                StatusCode::createConflict(),
+            );
+        }
+
+        return $this->createJobJsonResponse(['jobId' => $jobId, 'userId' => $userId]);
     }
 
     public function scheduleTmdbPersonSync(Request $request) : Response

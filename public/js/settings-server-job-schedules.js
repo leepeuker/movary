@@ -18,11 +18,24 @@ let selectedJobScheduleEnabled = null
 const schedulableJobTypes = {
     tmdb_movie_sync: {
         endpoint: 'tmdb-movie-sync',
+        prepareSubmission: prepareUnboundedJobScheduleSubmission,
+        syncName: 'TMDB movie metadata',
         unboundedResourceName: 'movie',
     },
     tmdb_person_sync: {
         endpoint: 'tmdb-person-sync',
+        prepareSubmission: prepareUnboundedJobScheduleSubmission,
+        syncName: 'TMDB person metadata',
         unboundedResourceName: 'person',
+    },
+    tmdb_image_cache: {
+        endpoint: 'tmdb-image-cache-refresh',
+    },
+    imdb_sync: {
+        endpoint: 'imdb-ratings-sync',
+        prepareSubmission: prepareUnboundedJobScheduleSubmission,
+        syncName: 'IMDb ratings',
+        unboundedResourceName: 'movie',
     },
 }
 
@@ -176,7 +189,10 @@ async function createJobSchedule(event) {
 
     const formData = new FormData(form)
     formData.delete('jobType')
-    if (await prepareJobScheduleSubmission(formData, jobConfiguration) === false) {
+    if (
+        jobConfiguration.prepareSubmission !== undefined &&
+        await jobConfiguration.prepareSubmission(formData, jobConfiguration) === false
+    ) {
         return
     }
 
@@ -213,14 +229,14 @@ async function createJobSchedule(event) {
     }
 }
 
-async function prepareJobScheduleSubmission(formData, jobConfiguration) {
+async function prepareUnboundedJobScheduleSubmission(formData, jobConfiguration) {
     if (formData.get('threshold') !== '' || formData.get('ids').trim() !== '') {
         return true
     }
 
     const confirmed = await showConfirmationModal({
-        title: 'Create unbounded TMDB sync schedule',
-        message: 'This schedule will synchronize every eligible ' + jobConfiguration.unboundedResourceName + ' on each run. Continue?',
+        title: 'Create unbounded sync schedule',
+        message: 'This schedule will synchronize ' + jobConfiguration.syncName + ' for every eligible ' + jobConfiguration.unboundedResourceName + ' on each run. Continue?',
         confirmLabel: 'Create schedule',
         confirmClass: 'btn-warning',
         restoreSourceModalOnConfirm: false,

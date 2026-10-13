@@ -43,7 +43,12 @@ class JobScheduleFilterRequestMapper
             return null;
         }
 
-        return $jobType->isOfTypeTmdbMovieSync() || $jobType->isOfTypeTmdbPersonSync() ? $jobType : null;
+        return $jobType->isOfTypeTmdbMovieSync()
+            || $jobType->isOfTypeTmdbPersonSync()
+            || $jobType->isOfTypeTmdbImageCache()
+            || $jobType->isOfTypeImdbSync()
+            ? $jobType
+            : null;
     }
 
     private function mapUserId(mixed $user) : ?int

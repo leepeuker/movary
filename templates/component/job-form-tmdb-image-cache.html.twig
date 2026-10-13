@@ -1,0 +1,13 @@
+<div class="mb-3">
+    <label class="form-label" for="{{ idPrefix }}ImageType">Image type</label>
+    <select class="form-select" id="{{ idPrefix }}ImageType" name="imageType">
+        <option value="all">Movie and person images</option>
+        <option value="movies">Movie images</option>
+        <option value="persons">Person images</option>
+    </select>
+</div>
+<div class="form-check mb-3">
+    <input class="form-check-input" id="{{ idPrefix }}ForceRefresh" name="forceRefresh" type="checkbox" value="1">
+    <label class="form-check-label" for="{{ idPrefix }}ForceRefresh">Replace already cached images</label>
+    <div class="form-text">Leave disabled to download only images that are not cached yet.</div>
+</div>

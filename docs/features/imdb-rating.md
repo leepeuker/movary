@@ -9,6 +9,8 @@ Movies without IMDb ratings or updated the longest time ago are prioritized.
     The ratings dataset file is automatically downloaded and cached for 24 hours.
     IMDb is only updating the ratings dataset once a day, so reducing the cache duration would not lead to any benefits.
 
+Administrators can run the synchronization once under **Settings > Server > Job Queue** or create a recurring UTC cron schedule under **Settings > Server > Job Schedules**. Because IMDb updates its ratings dataset once a day, scheduling more than one run per day provides no benefit.
+
 ## Command
 ```shell
 php bin/console.php imdb:sync

@@ -13,6 +13,8 @@
                         <select class="form-select" id="createJobScheduleType" name="jobType">
                             <option value="tmdb_movie_sync">TMDB movie metadata sync</option>
                             <option value="tmdb_person_sync">TMDB person metadata sync</option>
+                            <option value="tmdb_image_cache">TMDB image cache refresh</option>
+                            <option value="imdb_sync">IMDb ratings sync</option>
                         </select>
                     </div>
 
@@ -38,6 +40,17 @@
                         {{ include('component/job-form-tmdb-sync.html.twig', {
                             idPrefix: 'tmdbPersonJobSchedule',
                             resourceName: 'person',
+                        }) }}
+                    </div>
+                    <div class="d-none" data-job-schedule-fields="tmdb_image_cache">
+                        {{ include('component/job-form-tmdb-image-cache.html.twig', {
+                            idPrefix: 'tmdbImageCacheJobSchedule',
+                        }) }}
+                    </div>
+                    <div class="d-none" data-job-schedule-fields="imdb_sync">
+                        {{ include('component/job-form-tmdb-sync.html.twig', {
+                            idPrefix: 'imdbRatingsJobSchedule',
+                            resourceName: 'movie',
                         }) }}
                     </div>
 

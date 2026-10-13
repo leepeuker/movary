@@ -7,6 +7,7 @@ use Movary\JobQueue\JobEntity;
 use Movary\Service\Email\PasswordResetEmailJobProcessor;
 use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
+use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\Service\JobProcessor;
 use Movary\Service\Letterboxd\LetterboxdImportDiary;
 use Movary\Service\Letterboxd\LetterboxdImportRatings;
@@ -48,6 +49,7 @@ class JobProcessorTest extends TestCase
             tmdbSyncMovies: $tmdbSyncMovies,
             tmdbSyncPersons: $this->createStub(SyncPersons::class),
             tmdbImageCache: $this->createStub(TmdbImageCache::class),
+            imdbMovieRatingSync: $this->createStub(ImdbMovieRatingSync::class),
             plexWatchlistImporter: $this->createStub(PlexWatchlistImporter::class),
             jellyfinExporter: $this->createStub(JellyfinMoviesExporter::class),
             jellyfinImporter: $this->createStub(JellyfinMoviesImporter::class),
@@ -83,6 +85,7 @@ class JobProcessorTest extends TestCase
             tmdbSyncMovies: $this->createStub(SyncMovies::class),
             tmdbSyncPersons: $tmdbSyncPersons,
             tmdbImageCache: $this->createStub(TmdbImageCache::class),
+            imdbMovieRatingSync: $this->createStub(ImdbMovieRatingSync::class),
             plexWatchlistImporter: $this->createStub(PlexWatchlistImporter::class),
             jellyfinExporter: $this->createStub(JellyfinMoviesExporter::class),
             jellyfinImporter: $this->createStub(JellyfinMoviesImporter::class),
@@ -118,12 +121,46 @@ class JobProcessorTest extends TestCase
             tmdbSyncMovies: $this->createStub(SyncMovies::class),
             tmdbSyncPersons: $this->createStub(SyncPersons::class),
             tmdbImageCache: $this->createStub(TmdbImageCache::class),
+            imdbMovieRatingSync: $this->createStub(ImdbMovieRatingSync::class),
             plexWatchlistImporter: $this->createStub(PlexWatchlistImporter::class),
             jellyfinExporter: $this->createStub(JellyfinMoviesExporter::class),
             jellyfinImporter: $this->createStub(JellyfinMoviesImporter::class),
             mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
             mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
             passwordResetEmailJobProcessor: $passwordResetEmailJobProcessor,
+        );
+
+        $subject->processJob($job);
+    }
+
+    public function testProcessJobDispatchesImdbSyncJob() : void
+    {
+        $imdbMovieRatingSync = $this->createMock(ImdbMovieRatingSync::class);
+        $job = JobEntity::createFromArray([
+            'id' => 5,
+            'job_type' => 'imdb_sync',
+            'job_status' => 'waiting',
+            'user_id' => 42,
+            'parameters' => Json::encode(['movieIds' => [7, 8]]),
+            'updated_at' => null,
+            'created_at' => '2026-10-13 12:00:00',
+        ]);
+        $imdbMovieRatingSync->expects(self::once())->method('executeJob')->with($job);
+        $subject = new JobProcessor(
+            traktSyncWatchedMovies: $this->createStub(ImportWatchedMovies::class),
+            traktSyncRatings: $this->createStub(TraktImportRatings::class),
+            letterboxdImportRatings: $this->createStub(LetterboxdImportRatings::class),
+            letterboxdImportHistory: $this->createStub(LetterboxdImportDiary::class),
+            tmdbSyncMovies: $this->createStub(SyncMovies::class),
+            tmdbSyncPersons: $this->createStub(SyncPersons::class),
+            tmdbImageCache: $this->createStub(TmdbImageCache::class),
+            imdbMovieRatingSync: $imdbMovieRatingSync,
+            plexWatchlistImporter: $this->createStub(PlexWatchlistImporter::class),
+            jellyfinExporter: $this->createStub(JellyfinMoviesExporter::class),
+            jellyfinImporter: $this->createStub(JellyfinMoviesImporter::class),
+            mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
+            mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
+            passwordResetEmailJobProcessor: $this->createStub(PasswordResetEmailJobProcessor::class),
         );
 
         $subject->processJob($job);
