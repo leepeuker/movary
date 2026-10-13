@@ -59,8 +59,6 @@ class JobScheduleProcessor
         $parameters = $schedule->getParameters();
         $this->jobQueueApi->addTmdbImageCacheRefreshJobUnlessActive(
             TmdbImageCacheJobParameters::create(
-                $parameters['imageType'] ?? TmdbImageCacheJobParameters::IMAGE_TYPE_ALL,
-                $parameters['forceRefresh'] ?? false,
                 $parameters['movieIds'] ?? [],
                 $parameters['personIds'] ?? [],
             ),

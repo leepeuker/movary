@@ -64,8 +64,6 @@ class JobScheduleApi
             JobType::createTmdbImageCache(),
             $cronExpression,
             [
-                'imageType' => $parameters->getImageType(),
-                'forceRefresh' => $parameters->isForceRefresh(),
                 'movieIds' => $parameters->getMovieIds(),
                 'personIds' => $parameters->getPersonIds(),
             ],

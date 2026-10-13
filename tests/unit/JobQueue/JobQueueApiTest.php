@@ -103,7 +103,7 @@ class JobQueueApiTest extends TestCase
             ->willReturn(5);
 
         self::assertSame(5, (new JobQueueApi($repository))->addTmdbImageCacheRefreshJobUnlessActive(
-            TmdbImageCacheJobParameters::create('all', false, [7, 8], [9]),
+            TmdbImageCacheJobParameters::create([7, 8], [9]),
             42,
         ));
     }

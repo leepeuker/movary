@@ -6,11 +6,9 @@ use Doctrine\DBAL\Connection;
 use Exception;
 use Movary\Api\Tmdb\TmdbUrlGenerator;
 use Movary\JobQueue\JobEntity;
-use Movary\JobQueue\TmdbImageCacheJobParameters;
 use Movary\Service\ImageCacheService;
 use Movary\ValueObject\ResourceType;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class TmdbImageCache
 {
@@ -62,38 +60,14 @@ class TmdbImageCache
 
     public function executeJob(JobEntity $job) : void
     {
-        $parameters = $job->getParameters();
-        if (($parameters['refreshAll'] ?? false) === true) {
-            $this->executeRefreshJob($parameters);
-
-            return;
-        }
-
-        foreach ($parameters['movieIds'] ?? [] as $movieId) {
+        foreach ($job->getParameters()['movieIds'] ?? [] as $movieId) {
             $this->cacheAllImagesByMovieId($movieId);
         }
 
-        $personIds = $parameters['personIds'] ?? [];
+        $personIds = $job->getParameters()['personIds'] ?? [];
         if (count($personIds) > 0) {
             $this->cachePersonImagesByIds($personIds);
         }
-    }
-
-    private function executeRefreshJob(array $parameters) : void
-    {
-        $forceRefresh = $parameters['forceRefresh'] ?? false;
-        match ($parameters['imageType'] ?? TmdbImageCacheJobParameters::IMAGE_TYPE_ALL) {
-            TmdbImageCacheJobParameters::IMAGE_TYPE_ALL => $this->refreshAllImages($forceRefresh),
-            TmdbImageCacheJobParameters::IMAGE_TYPE_MOVIES => $this->cacheAllMovieImages($forceRefresh),
-            TmdbImageCacheJobParameters::IMAGE_TYPE_PERSONS => $this->cacheAllPersonImages($forceRefresh),
-            default => throw new RuntimeException('Unsupported TMDB image cache type.'),
-        };
-    }
-
-    private function refreshAllImages(bool $forceRefresh) : void
-    {
-        $this->cacheAllMovieImages($forceRefresh);
-        $this->cacheAllPersonImages($forceRefresh);
     }
 
     private function cacheAllImagesByMovieId(int $movieId) : void

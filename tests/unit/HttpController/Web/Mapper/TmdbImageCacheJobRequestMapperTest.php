@@ -16,19 +16,14 @@ class TmdbImageCacheJobRequestMapperTest extends TestCase
     {
         $request = $this->createStub(Request::class);
         $request->method('getPostParameters')->willReturn([
-            'imageType' => 'movies',
-            'forceRefresh' => '1',
             'movieIds' => '7, 8,7',
             'personIds' => '9',
         ]);
 
         $parameters = (new TmdbImageCacheJobRequestMapper())->map($request);
 
-        self::assertSame('movies', $parameters->getImageType());
-        self::assertTrue($parameters->isForceRefresh());
         self::assertSame([7, 8], $parameters->getMovieIds());
         self::assertSame([9], $parameters->getPersonIds());
-        self::assertFalse($parameters->isFullRefresh());
     }
 
     #[DataProvider('provideInvalidParameters')]
@@ -43,10 +38,8 @@ class TmdbImageCacheJobRequestMapperTest extends TestCase
 
     public static function provideInvalidParameters() : iterable
     {
-        yield 'missing image type' => [[]];
-        yield 'unknown image type' => [['imageType' => 'posters']];
-        yield 'invalid force refresh' => [['imageType' => 'all', 'forceRefresh' => 'yes']];
-        yield 'invalid movie IDs' => [['imageType' => 'all', 'movieIds' => '7,nope']];
-        yield 'invalid person IDs' => [['imageType' => 'all', 'personIds' => '0']];
+        yield 'missing IDs' => [[]];
+        yield 'invalid movie IDs' => [['movieIds' => '7,nope']];
+        yield 'invalid person IDs' => [['personIds' => '0']];
     }
 }

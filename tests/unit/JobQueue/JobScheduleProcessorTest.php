@@ -76,8 +76,6 @@ class JobScheduleProcessorTest extends TestCase
             'cron_expression' => '0 * * * *',
             'user_id' => 42,
             'parameters' => Json::encode([
-                'imageType' => 'persons',
-                'forceRefresh' => true,
                 'movieIds' => [7],
                 'personIds' => [8],
             ]),
@@ -97,9 +95,7 @@ class JobScheduleProcessorTest extends TestCase
             ->method('addTmdbImageCacheRefreshJobUnlessActive')
             ->with(
                 self::callback(static fn(TmdbImageCacheJobParameters $parameters) : bool =>
-                    $parameters->getImageType() === 'persons'
-                    && $parameters->isForceRefresh()
-                    && $parameters->getMovieIds() === [7]
+                    $parameters->getMovieIds() === [7]
                     && $parameters->getPersonIds() === [8]),
                 42,
             );

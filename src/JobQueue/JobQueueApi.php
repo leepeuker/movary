@@ -128,23 +128,15 @@ class JobQueueApi
         TmdbImageCacheJobParameters $parameters,
         ?int $userId = null,
     ) : ?int {
-        $jobParameters = $parameters->isFullRefresh()
-            ? [
-                'refreshAll' => true,
-                'imageType' => $parameters->getImageType(),
-                'forceRefresh' => $parameters->isForceRefresh(),
-            ]
-            : [
-                'movieIds' => $parameters->getMovieIds(),
-                'personIds' => $parameters->getPersonIds(),
-            ];
-
         return $this->repository->addJobUnlessExistsWithStatuses(
             JobType::createTmdbImageCache(),
             JobStatus::createWaiting(),
             [JobStatus::createWaiting(), JobStatus::createInProgress()],
             $userId,
-            $jobParameters,
+            [
+                'movieIds' => $parameters->getMovieIds(),
+                'personIds' => $parameters->getPersonIds(),
+            ],
         );
     }
 
