@@ -61,6 +61,8 @@ class JobScheduleProcessor
             TmdbImageCacheJobParameters::create(
                 $parameters['imageType'] ?? TmdbImageCacheJobParameters::IMAGE_TYPE_ALL,
                 $parameters['forceRefresh'] ?? false,
+                $parameters['movieIds'] ?? [],
+                $parameters['personIds'] ?? [],
             ),
             $schedule->getUserId(),
         );

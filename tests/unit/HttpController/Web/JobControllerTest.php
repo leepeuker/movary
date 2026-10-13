@@ -260,6 +260,8 @@ class JobControllerTest extends TestCase
         $request->method('getPostParameters')->willReturn([
             'imageType' => 'persons',
             'forceRefresh' => '1',
+            'movieIds' => '7, 8',
+            'personIds' => '9',
             'scheduleMode' => 'recurring',
             'cronExpression' => '0 3 * * *',
         ]);
@@ -273,7 +275,9 @@ class JobControllerTest extends TestCase
             ->with(
                 self::callback(static fn($cronExpression) => (string)$cronExpression === '0 3 * * *'),
                 self::callback(static fn($parameters) => $parameters->getImageType() === 'persons'
-                    && $parameters->isForceRefresh()),
+                    && $parameters->isForceRefresh()
+                    && $parameters->getMovieIds() === [7, 8]
+                    && $parameters->getPersonIds() === [9]),
                 self::anything(),
                 42,
             )

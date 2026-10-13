@@ -66,6 +66,8 @@ class JobScheduleApi
             [
                 'imageType' => $parameters->getImageType(),
                 'forceRefresh' => $parameters->isForceRefresh(),
+                'movieIds' => $parameters->getMovieIds(),
+                'personIds' => $parameters->getPersonIds(),
             ],
             $nextRunAt,
             $userId,

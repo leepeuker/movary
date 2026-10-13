@@ -58,7 +58,7 @@ php bin/console.php tmdb:imageCache:refresh
 php bin/console.php tmdb:imageCache:delete
 ```
 
-Administrators can refresh movie images, person images, or both under **Settings > Server > Job Queue**. The same refresh can be scheduled under **Settings > Server > Job Schedules**. Replacing files that are already cached is optional and can generate substantial TMDB traffic, so recurring schedules should normally leave that option disabled.
+Administrators can refresh movie images, person images, or both under **Settings > Server > Job Queue**. Optional local movie and person IDs limit the job to specific records; targeted movie jobs also cache their cast and crew images. The same refresh can be scheduled under **Settings > Server > Job Schedules**. Replacing files that are already cached is optional for full refreshes and can generate substantial TMDB traffic, so recurring schedules should normally leave that option disabled.
 
 ## Import personal User Ratings
 

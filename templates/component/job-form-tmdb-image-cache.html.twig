@@ -6,8 +6,18 @@
         <option value="persons">Person images</option>
     </select>
 </div>
+<div class="mb-3">
+    <label class="form-label" for="{{ idPrefix }}MovieIds">Local movie IDs</label>
+    <input class="form-control" id="{{ idPrefix }}MovieIds" name="movieIds" type="text" inputmode="numeric" placeholder="For example: 12, 34, 56">
+    <div class="form-text">Cache the movie and its cast and crew images. Leave empty for a full refresh.</div>
+</div>
+<div class="mb-3">
+    <label class="form-label" for="{{ idPrefix }}PersonIds">Local person IDs</label>
+    <input class="form-control" id="{{ idPrefix }}PersonIds" name="personIds" type="text" inputmode="numeric" placeholder="For example: 12, 34, 56">
+    <div class="form-text">Cache only these person images. Leave empty for a full refresh.</div>
+</div>
 <div class="form-check mb-3">
     <input class="form-check-input" id="{{ idPrefix }}ForceRefresh" name="forceRefresh" type="checkbox" value="1">
     <label class="form-check-label" for="{{ idPrefix }}ForceRefresh">Replace already cached images</label>
-    <div class="form-text">Leave disabled to download only images that are not cached yet.</div>
+    <div class="form-text">Applies to full refreshes. Leave disabled to download only images that are not cached yet.</div>
 </div>

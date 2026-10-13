@@ -12,10 +12,13 @@ class TmdbImageCacheJobParametersTest extends TestCase
 {
     public function testCreatesParameters() : void
     {
-        $parameters = TmdbImageCacheJobParameters::create('persons', true);
+        $parameters = TmdbImageCacheJobParameters::create('persons', true, [7, 7], [8]);
 
         self::assertSame('persons', $parameters->getImageType());
         self::assertTrue($parameters->isForceRefresh());
+        self::assertSame([7], $parameters->getMovieIds());
+        self::assertSame([8], $parameters->getPersonIds());
+        self::assertFalse($parameters->isFullRefresh());
     }
 
     public function testRejectsUnsupportedImageType() : void
