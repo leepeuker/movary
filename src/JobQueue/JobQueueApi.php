@@ -93,24 +93,44 @@ class JobQueueApi
         );
     }
 
-    public function addTmdbMovieSyncJob(JobStatus $jobStatus, array $movieIds = []) : int
-    {
+    public function addTmdbMovieSyncJob(
+        ?JobStatus $jobStatus = null,
+        array $movieIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : int {
         return $this->repository->addJob(
             JobType::createTmdbMovieSync(),
-            $jobStatus,
+            $jobStatus ?? JobStatus::createWaiting(),
+            $userId,
             parameters: [
                 'movieIds' => $movieIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
             ],
         );
     }
 
-    public function addTmdbPersonSyncJob(JobStatus $jobStatus, array $personIds = []) : int
-    {
+    public function addTmdbPersonSyncJob(
+        ?JobStatus $jobStatus = null,
+        array $personIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : int {
         return $this->repository->addJob(
             JobType::createTmdbPersonSyncJob(),
-            $jobStatus,
+            $jobStatus ?? JobStatus::createWaiting(),
+            $userId,
             parameters: [
                 'personIds' => $personIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
             ],
         );
     }
@@ -166,6 +186,14 @@ class JobQueueApi
     public function find(int $userId, JobType $jobType) : ?JobEntityList
     {
         return $this->repository->find($userId, $jobType);
+    }
+
+    public function hasActiveJob(JobType $jobType) : bool
+    {
+        return $this->repository->hasJobWithStatuses(
+            $jobType,
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+        );
     }
 
     public function purgeAllJobs() : void

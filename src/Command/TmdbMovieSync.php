@@ -54,7 +54,13 @@ class TmdbMovieSync extends Command
         $movieIds = $this->inputMapper->mapOptionToIds($input, self::OPTION_NAME_MOVIE_IDS);
         $onlyNeverSynced = (bool)$input->getOption(self::OPTION_NAME_NEVER_SYNC);
 
-        $jobId = $this->jobQueueApi->addTmdbMovieSyncJob(JobStatus::createInProgress(), $movieIds ?? []);
+        $jobId = $this->jobQueueApi->addTmdbMovieSyncJob(
+            JobStatus::createInProgress(),
+            $movieIds ?? [],
+            $maxAgeInHours,
+            $maxSyncsThreshold,
+            $onlyNeverSynced,
+        );
 
         try {
             $this->generateOutput($output, 'Syncing movie meta data...');

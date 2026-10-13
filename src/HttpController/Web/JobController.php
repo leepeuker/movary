@@ -2,8 +2,11 @@
 
 namespace Movary\HttpController\Web;
 
+use InvalidArgumentException;
 use Movary\Domain\User\Service\Authentication;
+use Movary\HttpController\Web\Mapper\TmdbSyncJobRequestMapper;
 use Movary\JobQueue\JobQueueApi;
+use Movary\JobQueue\TmdbSyncJobParameters;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
@@ -11,6 +14,7 @@ use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
+use Movary\ValueObject\Http\StatusCode;
 use Movary\ValueObject\JobType;
 use Movary\ValueObject\RelativeUrl;
 use RuntimeException;
@@ -23,6 +27,7 @@ class JobController
         private readonly LetterboxdCsvValidator $letterboxdImportHistoryFileValidator,
         private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $applicationUrlService,
+        private readonly TmdbSyncJobRequestMapper $tmdbSyncJobRequestMapper,
         private readonly string $appStorageDirectory,
     ) {
     }
@@ -161,6 +166,16 @@ class JobController
         return Response::createNoContent();
     }
 
+    public function scheduleTmdbMovieSync(Request $request) : Response
+    {
+        return $this->scheduleTmdbSync($request, JobType::createTmdbMovieSync());
+    }
+
+    public function scheduleTmdbPersonSync(Request $request) : Response
+    {
+        return $this->scheduleTmdbSync($request, JobType::createTmdbPersonSync());
+    }
+
     public function scheduleTraktHistorySync() : Response
     {
         $this->jobQueueApi->addTraktImportHistoryJob($this->authenticationService->requireWebSession()->getUserId());
@@ -177,5 +192,60 @@ class JobController
         $this->flashMessageService->add(FlashMessage::TRAKT_RATINGS_IMPORT_SCHEDULED);
 
         return Response::createNoContent();
+    }
+
+    private function scheduleTmdbSync(Request $request, JobType $jobType) : Response
+    {
+        try {
+            $parameters = $this->tmdbSyncJobRequestMapper->map($request);
+            if ($parameters->requiresUnboundedSyncConfirmation() === true &&
+                $this->tmdbSyncJobRequestMapper->isUnboundedSyncConfirmed($request) === false
+            ) {
+                return $this->createJobJsonResponse(
+                    ['error' => 'Confirmation is required for a sync without IDs or a maximum record count.'],
+                    StatusCode::createBadRequest(),
+                );
+            }
+        } catch (InvalidArgumentException $exception) {
+            return $this->createJobJsonResponse(['error' => $exception->getMessage()], StatusCode::createBadRequest());
+        }
+
+        if ($this->jobQueueApi->hasActiveJob($jobType) === true) {
+            return $this->createJobJsonResponse(
+                ['error' => 'A waiting or in-progress job of this type already exists.'],
+                StatusCode::createConflict(),
+            );
+        }
+
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $jobId = $this->enqueueTmdbSync($jobType, $parameters, $userId);
+
+        return $this->createJobJsonResponse(['jobId' => $jobId, 'userId' => $userId]);
+    }
+
+    private function enqueueTmdbSync(JobType $jobType, TmdbSyncJobParameters $parameters, int $userId) : int
+    {
+        if ($jobType->isOfTypeTmdbMovieSync() === true) {
+            return $this->jobQueueApi->addTmdbMovieSyncJob(
+                movieIds: $parameters->getIds(),
+                maxAgeInHours: $parameters->getMaxAgeInHours(),
+                threshold: $parameters->getThreshold(),
+                onlyNeverSynced: $parameters->isOnlyNeverSynced(),
+                userId: $userId,
+            );
+        }
+
+        return $this->jobQueueApi->addTmdbPersonSyncJob(
+            personIds: $parameters->getIds(),
+            maxAgeInHours: $parameters->getMaxAgeInHours(),
+            threshold: $parameters->getThreshold(),
+            onlyNeverSynced: $parameters->isOnlyNeverSynced(),
+            userId: $userId,
+        );
+    }
+
+    private function createJobJsonResponse(array $body, ?StatusCode $statusCode = null) : Response
+    {
+        return Response::createJson(Json::encode($body), $statusCode);
     }
 }

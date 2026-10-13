@@ -121,6 +121,17 @@ class JobQueueRepository
         return JobEntityList::createFromArray($data);
     }
 
+    /** @param non-empty-list<JobStatus> $statuses */
+    public function hasJobWithStatuses(JobType $jobType, array $statuses) : bool
+    {
+        $statusPlaceholders = implode(', ', array_fill(0, count($statuses), '?'));
+
+        return (int)$this->dbConnection->fetchOne(
+            "SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND job_status IN ($statusPlaceholders)",
+            [$jobType, ...$statuses],
+        ) > 0;
+    }
+
     public function purgeNotProcessedJobs() : void
     {
         $this->dbConnection->delete('job_queue', ['job_status' => (string)JobStatus::createWaiting()]);

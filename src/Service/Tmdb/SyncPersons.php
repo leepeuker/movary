@@ -4,6 +4,7 @@ namespace Movary\Service\Tmdb;
 
 use Movary\Domain\Person\PersonApi;
 use Movary\Domain\Person\PersonEntity;
+use Movary\JobQueue\JobEntity;
 use Movary\ValueObject\DateTime;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -15,6 +16,18 @@ class SyncPersons
         private readonly PersonApi $personApi,
         private readonly LoggerInterface $logger,
     ) {
+    }
+
+    public function executeJob(JobEntity $job) : void
+    {
+        $parameters = $job->getParameters();
+
+        $this->syncPersons(
+            $parameters['maxAgeInHours'] ?? null,
+            $parameters['threshold'] ?? null,
+            $parameters['personIds'] ?? [],
+            $parameters['onlyNeverSynced'] ?? false,
+        );
     }
 
     public function syncPersons(

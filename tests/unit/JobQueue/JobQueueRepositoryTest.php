@@ -119,4 +119,29 @@ class JobQueueRepositoryTest extends TestCase
 
         self::assertFalse((new JobQueueRepository($connection))->deleteJob(7));
     }
+
+    public function testHasJobWithStatusesReturnsWhetherMatchingJobExists() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND job_status IN (?, ?)',
+                self::callback(static function (array $parameters) : bool {
+                    return array_map('strval', $parameters) === [
+                        'tmdb_movie_sync',
+                        'waiting',
+                        'in progress',
+                    ];
+                }),
+            )
+            ->willReturn('1');
+
+        self::assertTrue((new JobQueueRepository($connection))->hasJobWithStatuses(
+            JobType::createTmdbMovieSync(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+        ));
+    }
 }

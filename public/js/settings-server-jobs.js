@@ -8,10 +8,134 @@ document.addEventListener("DOMContentLoaded", function () {
 
     registerJobRowEvents()
     document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
+    document.getElementById('createJobForm').addEventListener('submit', createJob)
+    document.getElementById('createJobType').addEventListener('change', updateCreateJobFields)
+    updateCreateJobFields()
 });
 
 let selectedJobId = null
 let selectedJobStatus = null
+
+const creatableJobTypes = {
+    tmdb_movie_sync: {
+        endpoint: 'tmdb-movie-sync',
+        filterType: 'tmdb_movie_sync',
+        prepareSubmission: prepareTmdbSyncSubmission,
+        unboundedResourceName: 'movie',
+    },
+    tmdb_person_sync: {
+        endpoint: 'tmdb-person-sync',
+        filterType: 'tmdb_person_sync',
+        prepareSubmission: prepareTmdbSyncSubmission,
+        unboundedResourceName: 'person',
+    },
+}
+
+function showCreateJobModal() {
+    document.getElementById('createJobForm').reset()
+    document.getElementById('createJobError').classList.add('d-none')
+    document.getElementById('createJobError').textContent = ''
+    updateCreateJobFields()
+    bootstrap.Modal.getOrCreateInstance('#createJobModal').show()
+}
+
+function updateCreateJobFields() {
+    const selectedJobType = document.getElementById('createJobType').value
+
+    document.querySelectorAll('[data-job-fields]').forEach((fields) => {
+        const isSelected = fields.dataset.jobFields === selectedJobType
+        fields.classList.toggle('d-none', isSelected === false)
+        fields.querySelectorAll('input, select, textarea, button').forEach((control) => {
+            control.disabled = isSelected === false
+        })
+    })
+}
+
+async function createJob(event) {
+    event.preventDefault()
+
+    const form = event.currentTarget
+    const jobType = document.getElementById('createJobType').value
+    const jobConfiguration = creatableJobTypes[jobType]
+    if (jobConfiguration === undefined) {
+        showCreateJobError('This job type is not supported.')
+        return
+    }
+    if (form.reportValidity() === false) {
+        return
+    }
+
+    const formData = new FormData(form)
+    formData.delete('jobType')
+    if (
+        jobConfiguration.prepareSubmission !== undefined &&
+        await jobConfiguration.prepareSubmission(formData, jobConfiguration) === false
+    ) {
+        return
+    }
+
+    const createButton = document.getElementById('createJobSubmitButton')
+    const errorAlert = document.getElementById('createJobError')
+    createButton.disabled = true
+    errorAlert.classList.add('d-none')
+    errorAlert.textContent = ''
+
+    try {
+        const response = await fetchWithCsrf(APPLICATION_URL + '/jobs/schedule/' + jobConfiguration.endpoint, {
+            method: 'POST',
+            body: new URLSearchParams(formData),
+            signal: AbortSignal.timeout(10000),
+        })
+        const responseBody = await response.json()
+
+        if (!response.ok) {
+            errorAlert.textContent = responseBody.error ?? 'Could not create job.'
+            errorAlert.classList.remove('d-none')
+            return
+        }
+
+        bootstrap.Modal.getOrCreateInstance('#createJobModal').hide()
+        localStorage.setItem('alertMessageJobs', 'Created job ' + responseBody.jobId)
+
+        const url = new URL(window.location.href)
+        url.search = ''
+        url.searchParams.set('type', jobConfiguration.filterType)
+        url.searchParams.set('user', responseBody.userId)
+        window.location.href = url.toString()
+    } catch (error) {
+        console.error(error)
+        errorAlert.textContent = 'Could not create job.'
+        errorAlert.classList.remove('d-none')
+    } finally {
+        createButton.disabled = false
+    }
+}
+
+async function prepareTmdbSyncSubmission(formData, jobConfiguration) {
+    if (formData.get('threshold') !== '' || formData.get('ids').trim() !== '') {
+        return true
+    }
+
+    const confirmed = await showConfirmationModal({
+        title: 'Create unbounded TMDB sync job',
+        message: 'This job will attempt to synchronize every eligible ' + jobConfiguration.unboundedResourceName + '. Continue?',
+        confirmLabel: 'Create job',
+        confirmClass: 'btn-warning',
+        restoreSourceModalOnConfirm: true,
+    })
+
+    if (confirmed === true) {
+        formData.set('confirmUnbounded', '1')
+    }
+
+    return confirmed
+}
+
+function showCreateJobError(message) {
+    const errorAlert = document.getElementById('createJobError')
+    errorAlert.textContent = message
+    errorAlert.classList.remove('d-none')
+}
 
 function registerJobRowEvents() {
     document.querySelectorAll('#jobsTable tbody tr').forEach((row) => {
@@ -224,7 +348,7 @@ async function removeProcessedJobs() {
         title: 'Remove processed jobs',
         message: 'Are you sure you want to remove all processed jobs? This includes all jobs with status "done" and "failed".',
         confirmLabel: 'Remove processed jobs',
-        confirmClass: 'btn-danger',
+        confirmClass: 'btn-warning',
     })
 
     if (confirmed === false) {

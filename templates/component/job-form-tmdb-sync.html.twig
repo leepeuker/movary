@@ -1,0 +1,22 @@
+<div class="mb-3">
+    <label class="form-label" for="{{ idPrefix }}MaxAge">Maximum age in hours</label>
+    <input class="form-control" id="{{ idPrefix }}MaxAge" name="maxAgeInHours" type="number" min="1" step="1" placeholder="No age filter">
+    <div class="form-text">Skip {{ resourceName }}s updated more recently than this age.</div>
+</div>
+<div class="mb-3">
+    <label class="form-label" for="{{ idPrefix }}Threshold">Maximum records</label>
+    <input class="form-control" id="{{ idPrefix }}Threshold" name="threshold" type="number" min="1" max="10000" step="1" placeholder="No maximum">
+    <div class="form-text">Limit this run to at most 10,000 {{ resourceName }}s.</div>
+</div>
+<div class="mb-3">
+    <label class="form-label" for="{{ idPrefix }}Ids">Local {{ resourceName }} IDs</label>
+    <input class="form-control" id="{{ idPrefix }}Ids" name="ids" type="text" inputmode="numeric" placeholder="For example: 12, 34, 56">
+    <div class="form-text">Comma-separated local IDs. Leave empty for all eligible {{ resourceName }}s.</div>
+</div>
+<div class="form-check mb-3">
+    <input class="form-check-input" id="{{ idPrefix }}OnlyNeverSynced" name="onlyNeverSynced" type="checkbox" value="1">
+    <label class="form-check-label" for="{{ idPrefix }}OnlyNeverSynced">Never synced only</label>
+</div>
+<div class="alert alert-info mb-3" role="status">
+    This job runs through the existing queue worker. A <em>done</em> job may still contain individual {{ resourceName }}s that could not be updated; check the application log for those warnings.
+</div>

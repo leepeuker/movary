@@ -27,6 +27,7 @@ use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\AuthenticationController;
 use Movary\HttpController\Web\JobController;
+use Movary\HttpController\Web\Mapper\TmdbSyncJobRequestMapper;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\Service\ApplicationUrlService;
@@ -326,6 +327,7 @@ class Factory
             $container->get(LetterboxdCsvValidator::class),
             $container->get(FlashMessageService::class),
             $container->get(ApplicationUrlService::class),
+            $container->get(TmdbSyncJobRequestMapper::class),
             self::createDirectoryStorageApp(),
         );
     }

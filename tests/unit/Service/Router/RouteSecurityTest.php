@@ -7,6 +7,8 @@ use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
 use Movary\HttpController\Api\Middleware\IsAuthenticated;
 use Movary\HttpController\Api\Middleware\IsAuthorizedToWriteUserData;
+use Movary\HttpController\Web\Middleware\UserIsAdmin;
+use Movary\HttpController\Web\Middleware\UserIsAuthenticated;
 use Movary\HttpController\Web\Middleware\ValidateCsrfToken;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
@@ -55,6 +57,24 @@ class RouteSecurityTest extends TestCase
 
         foreach ($routes as $route) {
             self::assertNotContains(ValidateCsrfToken::class, $route['middleware']);
+        }
+    }
+
+    public function testTmdbJobRoutesRequireAdministratorAuthentication() : void
+    {
+        $routes = array_filter(
+            $this->collectRoutes(),
+            static fn(array $route) : bool => in_array($route['path'], [
+                '/jobs/schedule/tmdb-movie-sync',
+                '/jobs/schedule/tmdb-person-sync',
+            ], true),
+        );
+
+        self::assertCount(2, $routes);
+        foreach ($routes as $route) {
+            self::assertContains(UserIsAuthenticated::class, $route['middleware']);
+            self::assertContains(UserIsAdmin::class, $route['middleware']);
+            self::assertContains(ValidateCsrfToken::class, $route['middleware']);
         }
     }
 
