@@ -17,6 +17,3 @@
     <input class="form-check-input" id="{{ idPrefix }}OnlyNeverSynced" name="onlyNeverSynced" type="checkbox" value="1">
     <label class="form-check-label" for="{{ idPrefix }}OnlyNeverSynced">Never synced only</label>
 </div>
-<div class="alert alert-info mb-3" role="status">
-    This job runs through the existing queue worker. A <em>done</em> job may still contain individual {{ resourceName }}s that could not be updated; check the application log for those warnings.
-</div>
