@@ -1,0 +1,52 @@
+<div class="modal fade" id="createJobScheduleModal" tabindex="-1" aria-labelledby="createJobScheduleModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="createJobScheduleForm">
+                <input type="hidden" name="scheduleMode" value="recurring">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createJobScheduleModalTitle">Create Job Schedule</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-start">
+                    <div class="mb-3">
+                        <label class="form-label" for="createJobScheduleType">Job type</label>
+                        <select class="form-select" id="createJobScheduleType" name="jobType">
+                            <option value="tmdb_movie_sync">TMDB movie metadata sync</option>
+                            <option value="tmdb_person_sync">TMDB person metadata sync</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="createJobScheduleCronExpression">Cron expression (UTC)</label>
+                        <input class="form-control font-monospace" id="createJobScheduleCronExpression" name="cronExpression" value="0 * * * *" list="createJobScheduleCronPresets" autocomplete="off" required>
+                        <datalist id="createJobScheduleCronPresets">
+                            <option value="* * * * *">Every minute</option>
+                            <option value="0 * * * *">Hourly</option>
+                            <option value="0 0 * * *">Daily at midnight</option>
+                            <option value="0 0 * * 0">Weekly on Sunday</option>
+                            <option value="0 0 1 * *">Monthly on the first day</option>
+                        </datalist>
+                        <div class="form-text">Five fields: minute, hour, day of month, month, day of week.</div>
+                    </div>
+                    <div data-job-schedule-fields="tmdb_movie_sync">
+                        {{ include('component/job-form-tmdb-sync.html.twig', {
+                            idPrefix: 'tmdbMovieJobSchedule',
+                            resourceName: 'movie',
+                        }) }}
+                    </div>
+                    <div class="d-none" data-job-schedule-fields="tmdb_person_sync">
+                        {{ include('component/job-form-tmdb-sync.html.twig', {
+                            idPrefix: 'tmdbPersonJobSchedule',
+                            resourceName: 'person',
+                        }) }}
+                    </div>
+
+                    <div class="alert alert-danger d-none mb-0" role="alert" id="createJobScheduleError"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="createJobScheduleSubmitButton">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

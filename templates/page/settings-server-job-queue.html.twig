@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - App
+    Settings - Job Queue
 {% endblock %}
 
 {% block stylesheets %}
@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ asset_url('js/settings-server-jobs.js') }}"></script>
+    <script src="{{ asset_url('js/settings-server-job-queue.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -23,8 +23,11 @@
             {{ include('component/modal-create-job.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
-                <h5 style="margin-bottom: 1rem">Job Queue Overview</h5>
+                <h5 style="margin-bottom: 1rem">Job Queue</h5>
 
+                <p class="text-muted">
+                    View and manage background jobs. Click a job row to view its details or remove it.
+                </p>
 
                 <div id="alertJobsDiv"></div>
 
@@ -89,7 +92,7 @@
                     </div>
 
                     {{ include('component/pagination.html.twig', {
-                        paginationPath: applicationUrl ~ '/settings/server/jobs',
+                        paginationPath: applicationUrl ~ '/settings/server/job-queue',
                         paginationQuery: paginationQuery,
                     }) }}
                 </div>

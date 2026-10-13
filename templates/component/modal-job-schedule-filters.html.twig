@@ -1,0 +1,43 @@
+<div class="modal fade" id="jobScheduleFiltersModal" tabindex="-1" aria-labelledby="jobScheduleFiltersModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="jobScheduleFiltersModalTitle">Filter job schedules</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="jobScheduleFilterUser">User</label>
+                    <select class="form-select" id="jobScheduleFilterUser">
+                        <option value="" {{ jobScheduleFilterUser is null ? 'selected' }}>All users</option>
+                        <option value="none" {{ jobScheduleFilterUser == 'none' ? 'selected' }}>-</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}" {{ jobScheduleFilterUser == user.id ? 'selected' }}>{{ user.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="jobScheduleFilterType">Type</label>
+                    <select class="form-select" id="jobScheduleFilterType">
+                        <option value="" {{ jobScheduleFilterType is null ? 'selected' }}>All types</option>
+                        {% for jobType in jobScheduleTypes %}
+                            <option value="{{ jobType }}" {{ jobScheduleFilterType == jobType ? 'selected' }}>{{ jobType }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-group-text" for="jobScheduleFilterStatus">Status</label>
+                    <select class="form-select" id="jobScheduleFilterStatus">
+                        <option value="" {{ jobScheduleFilterStatus is null ? 'selected' }}>All statuses</option>
+                        <option value="enabled" {{ jobScheduleFilterStatus == 'enabled' ? 'selected' }}>enabled</option>
+                        <option value="disabled" {{ jobScheduleFilterStatus == 'disabled' ? 'selected' }}>disabled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button class="btn btn-warning" type="button" onclick="resetJobScheduleFilters()">Reset</button>
+                <button class="btn btn-primary" type="button" onclick="applyJobScheduleFilters()">Apply filters</button>
+            </div>
+        </div>
+    </div>
+</div>

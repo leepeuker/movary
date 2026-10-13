@@ -1,0 +1,51 @@
+<div class="modal fade" id="jobScheduleDetailsModal" tabindex="-1" aria-labelledby="jobScheduleDetailsModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="jobScheduleDetailsModalTitle">Job schedule details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="row" class="text-nowrap">ID</th>
+                            <td class="text-break" id="jobScheduleDetailsId"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">User</th>
+                            <td class="text-break" id="jobScheduleDetailsUser"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Type</th>
+                            <td class="text-break" id="jobScheduleDetailsType"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Cron expression (UTC)</th>
+                            <td class="text-break font-monospace" id="jobScheduleDetailsCronExpression"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Next run (UTC)</th>
+                            <td class="text-break" id="jobScheduleDetailsNextRunAt"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap">Status</th>
+                            <td class="text-break" id="jobScheduleDetailsStatus"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-nowrap align-top">Parameters</th>
+                            <td><pre class="bg-body-tertiary border rounded p-2 mb-0 text-body" id="jobScheduleDetailsParameters" style="font-family: inherit; white-space: pre-wrap; overflow-wrap: anywhere;"></pre></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="jobScheduleDetailsAlerts"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="jobScheduleEnabledButton" onclick="toggleSelectedJobSchedule()"></button>
+                <button type="button" class="btn btn-danger" id="jobScheduleDeleteButton" onclick="removeSelectedJobSchedule()">Delete schedule</button>
+            </div>
+        </div>
+    </div>
+</div>

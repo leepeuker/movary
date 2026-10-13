@@ -16,6 +16,7 @@
     "ext-zlib": "*",
     "doctrine/dbal": "^3.10",
     "doctrine/migrations": "^3.9",
+    "dragonmantank/cron-expression": "^3.6",
     "guzzlehttp/guzzle": "^7.15",
     "league/csv": "^9.28",
     "monolog/monolog": "^3.10",

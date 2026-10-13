@@ -6,8 +6,10 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Web\JobController;
+use Movary\HttpController\Web\Mapper\JobScheduleRequestMapper;
 use Movary\HttpController\Web\Mapper\TmdbSyncJobRequestMapper;
 use Movary\JobQueue\JobQueueApi;
+use Movary\JobQueue\JobScheduleApi;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
@@ -33,6 +35,8 @@ class JobControllerTest extends TestCase
 
     private JobQueueApi&MockObject $jobQueueApiMock;
 
+    private JobScheduleApi&MockObject $jobScheduleApiMock;
+
     private LetterboxdCsvValidator&MockObject $letterboxdCsvValidatorMock;
 
     private JobController $subject;
@@ -41,6 +45,7 @@ class JobControllerTest extends TestCase
     {
         $this->authenticationMock = $this->createMock(Authentication::class);
         $this->jobQueueApiMock = $this->createMock(JobQueueApi::class);
+        $this->jobScheduleApiMock = $this->createMock(JobScheduleApi::class);
         $this->letterboxdCsvValidatorMock = $this->createMock(LetterboxdCsvValidator::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
@@ -51,6 +56,8 @@ class JobControllerTest extends TestCase
             $this->flashMessageServiceMock,
             $this->applicationUrlServiceMock,
             new TmdbSyncJobRequestMapper(),
+            new JobScheduleRequestMapper(),
+            $this->jobScheduleApiMock,
             '/tmp/',
         );
     }
@@ -189,6 +196,46 @@ class JobControllerTest extends TestCase
         $response = $this->subject->scheduleTmdbMovieSync($request);
 
         self::assertSame(409, $response->getStatusCode()->getCode());
+    }
+
+    public function testScheduleTmdbSyncCreatesRecurringSchedule() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getPostParameters')->willReturn([
+            'threshold' => '100',
+            'scheduleMode' => 'recurring',
+            'cronExpression' => '0 * * * *',
+        ]);
+        $this->authenticationMock
+            ->method('requireWebSession')
+            ->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
+        $this->jobQueueApiMock->expects(self::never())->method('addTmdbMovieSyncJobUnlessActive');
+        $this->jobScheduleApiMock
+            ->expects(self::once())
+            ->method('addTmdbSyncSchedule')
+            ->with(
+                self::callback(static fn($type) => (string)$type === 'tmdb_movie_sync'),
+                self::callback(static fn($cronExpression) => (string)$cronExpression === '0 * * * *'),
+                self::anything(),
+                self::anything(),
+                42,
+            )
+            ->willReturn(9);
+
+        $response = $this->subject->scheduleTmdbMovieSync($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame('{"scheduleId":9,"userId":42}', $response->getBody());
+    }
+
+    public function testSetJobScheduleEnabledValidatesAndUpdatesSchedule() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getRouteParameters')->willReturn(['scheduleId' => '9']);
+        $request->method('getPostParameters')->willReturn(['enabled' => '0']);
+        $this->jobScheduleApiMock->expects(self::once())->method('setEnabled')->with(9, false)->willReturn(true);
+
+        self::assertSame(204, $this->subject->setJobScheduleEnabled($request)->getStatusCode()->getCode());
     }
 
     /**

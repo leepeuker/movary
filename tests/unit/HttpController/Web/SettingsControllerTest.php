@@ -12,6 +12,9 @@ use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Web\SettingsController;
 use Movary\HttpController\Web\Mapper\PaginationRequestMapper;
+use Movary\HttpController\Web\Mapper\JobScheduleFilterRequestMapper;
+use Movary\JobQueue\JobScheduleFilter;
+use Movary\JobQueue\JobScheduleApi;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
@@ -42,6 +45,8 @@ class SettingsControllerTest extends TestCase
 
     private FlashMessageService|MockObject $flashMessageServiceMock;
 
+    private JobScheduleApi|MockObject $jobScheduleApiMock;
+
     private DashboardFactory|MockObject $dashboardFactoryMock;
 
     private PersonalApiTokenService|MockObject $personalApiTokenServiceMock;
@@ -63,6 +68,7 @@ class SettingsControllerTest extends TestCase
         $this->userApiMock = $this->createMock(UserApi::class);
         $this->currentWebUserMock = $this->createMock(CurrentWebUser::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
+        $this->jobScheduleApiMock = $this->createMock(JobScheduleApi::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->dashboardFactoryMock = $this->createMock(DashboardFactory::class);
         $this->personalApiTokenServiceMock = $this->createMock(PersonalApiTokenService::class);
@@ -71,10 +77,12 @@ class SettingsControllerTest extends TestCase
             'authenticationService' => $this->authenticationMock,
             'userApi' => $this->userApiMock,
             'flashMessageService' => $this->flashMessageServiceMock,
+            'jobScheduleApi' => $this->jobScheduleApiMock,
             'applicationUrlService' => $this->applicationUrlServiceMock,
             'dashboardFactory' => $this->dashboardFactoryMock,
             'personalApiTokenService' => $this->personalApiTokenServiceMock,
             'paginationRequestMapper' => new PaginationRequestMapper(),
+            'jobScheduleFilterRequestMapper' => new JobScheduleFilterRequestMapper(),
             'paginationElementsCalculator' => new PaginationElementsCalculator(),
             'currentWebUser' => $this->currentWebUserMock,
         ]);
@@ -84,6 +92,39 @@ class SettingsControllerTest extends TestCase
         $this->userMock->method('hasCoreAccountChangesDisabled')->willReturn(false);
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->currentWebUserMock->method('requireUser')->willReturn($this->userMock);
+    }
+
+    public function testRenderServerJobSchedulesPageRendersSchedules() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getGetParameters')->willReturn([]);
+        $schedules = [['id' => 9, 'type' => 'tmdb_movie_sync']];
+        $this->jobScheduleApiMock->expects(self::once())->method('countSchedules')->willReturn(1);
+        $this->jobScheduleApiMock
+            ->expects(self::once())
+            ->method('fetchForStatusPage')
+            ->with(
+                20,
+                0,
+                self::callback(static fn(JobScheduleFilter $filter) : bool => $filter->hasFilters() === false),
+            )
+            ->willReturn($schedules);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/settings-server-job-schedules.html.twig',
+                self::callback(static fn(array $data) : bool => $data['jobSchedules'] === $schedules
+                    && $data['jobSchedulesPerPage'] === 20
+                    && $data['paginationQuery'] === ['perPage' => 20]
+                    && $data['jobScheduleFiltersActive'] === false),
+            )
+            ->willReturn('job schedules');
+
+        $response = $this->subject->renderServerJobSchedulesPage($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame('job schedules', $response->getBody());
     }
 
     public function testUpdatePasswordUsesDomainPolicyAndPreservesBadRequestContract() : void

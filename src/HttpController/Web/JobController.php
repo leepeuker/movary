@@ -5,7 +5,9 @@ namespace Movary\HttpController\Web;
 use InvalidArgumentException;
 use Movary\Domain\User\Service\Authentication;
 use Movary\HttpController\Web\Mapper\TmdbSyncJobRequestMapper;
+use Movary\HttpController\Web\Mapper\JobScheduleRequestMapper;
 use Movary\JobQueue\JobQueueApi;
+use Movary\JobQueue\JobScheduleApi;
 use Movary\JobQueue\TmdbSyncJobParameters;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
@@ -28,6 +30,8 @@ class JobController
         private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly TmdbSyncJobRequestMapper $tmdbSyncJobRequestMapper,
+        private readonly JobScheduleRequestMapper $jobScheduleRequestMapper,
+        private readonly JobScheduleApi $jobScheduleApi,
         private readonly string $appStorageDirectory,
     ) {
     }
@@ -52,6 +56,32 @@ class JobController
         }
 
         return Response::createNoContent();
+    }
+
+    public function deleteJobSchedule(Request $request) : Response
+    {
+        $scheduleId = (int)$request->getRouteParameters()['scheduleId'];
+
+        return $this->jobScheduleApi->delete($scheduleId)
+            ? Response::createNoContent()
+            : Response::createNotFound();
+    }
+
+    public function setJobScheduleEnabled(Request $request) : Response
+    {
+        $enabled = $request->getPostParameters()['enabled'] ?? null;
+        if ($enabled !== '0' && $enabled !== '1') {
+            return $this->createJobJsonResponse(
+                ['error' => 'Enabled must be a boolean.'],
+                StatusCode::createBadRequest(),
+            );
+        }
+
+        $scheduleId = (int)$request->getRouteParameters()['scheduleId'];
+
+        return $this->jobScheduleApi->setEnabled($scheduleId, $enabled === '1')
+            ? Response::createNoContent()
+            : Response::createNotFound();
     }
 
     public function purgeAllJobs() : Response
@@ -198,6 +228,7 @@ class JobController
     {
         try {
             $parameters = $this->tmdbSyncJobRequestMapper->map($request);
+            $scheduleConfiguration = $this->jobScheduleRequestMapper->map($request);
             if ($parameters->requiresUnboundedSyncConfirmation() === true &&
                 $this->tmdbSyncJobRequestMapper->isUnboundedSyncConfirmed($request) === false
             ) {
@@ -211,6 +242,18 @@ class JobController
         }
 
         $userId = $this->authenticationService->requireWebSession()->getUserId();
+        if ($scheduleConfiguration !== null) {
+            $scheduleId = $this->jobScheduleApi->addTmdbSyncSchedule(
+                $jobType,
+                $scheduleConfiguration->getCronExpression(),
+                $parameters,
+                $scheduleConfiguration->getNextRunAt(),
+                $userId,
+            );
+
+            return $this->createJobJsonResponse(['scheduleId' => $scheduleId, 'userId' => $userId]);
+        }
+
         $jobId = $this->enqueueTmdbSync($jobType, $parameters, $userId);
         if ($jobId === null) {
             return $this->createJobJsonResponse(

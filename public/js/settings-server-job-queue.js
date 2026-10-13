@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     // localStorage here is a "hack" to keep state after page refresh, it would be better to not refresh the page and load the table via AJAX
-    const alertMessageJobs = localStorage.getItem('alertMessageJobs');
+    const alertMessageJobs = localStorage.getItem('alertMessageJobQueue');
     if (alertMessageJobs) {
         addAlert('alertJobsDiv', alertMessageJobs, 'success');
     }
-    localStorage.setItem('alertMessageJobs', '')
+    localStorage.setItem('alertMessageJobQueue', '')
 
     registerJobRowEvents()
     document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
@@ -94,7 +94,7 @@ async function createJob(event) {
         }
 
         bootstrap.Modal.getOrCreateInstance('#createJobModal').hide()
-        localStorage.setItem('alertMessageJobs', 'Created Job (ID ' + responseBody.jobId + ')')
+        localStorage.setItem('alertMessageJobQueue', 'Created Job (ID ' + responseBody.jobId + ')')
 
         const url = new URL(window.location.href)
         url.search = ''
@@ -260,7 +260,7 @@ async function removeJob() {
         removeButton.disabled = false
     }
 
-    localStorage.setItem('alertMessageJobs', 'Removed job ' + selectedJobId)
+    localStorage.setItem('alertMessageJobQueue', 'Removed job ' + selectedJobId)
     refreshPage()
 }
 
@@ -338,7 +338,7 @@ async function removeAllJobs() {
         return
     }
 
-    localStorage.setItem('alertMessageJobs', 'Removed all jobs')
+    localStorage.setItem('alertMessageJobQueue', 'Removed all jobs')
     refreshPage()
 }
 
@@ -377,6 +377,6 @@ async function removeProcessedJobs() {
         return
     }
 
-    localStorage.setItem('alertMessageJobs', 'Removed processed jobs')
+    localStorage.setItem('alertMessageJobQueue', 'Removed processed jobs')
     refreshPage()
 }
