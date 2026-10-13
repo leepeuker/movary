@@ -89,13 +89,12 @@ async function createJob(event) {
         const responseBody = await response.json()
 
         if (!response.ok) {
-            errorAlert.textContent = responseBody.error ?? 'Could not create job.'
-            errorAlert.classList.remove('d-none')
+            showCreateJobError(responseBody.error ?? 'Could not create job.')
             return
         }
 
         bootstrap.Modal.getOrCreateInstance('#createJobModal').hide()
-        localStorage.setItem('alertMessageJobs', 'Created job ' + responseBody.jobId)
+        localStorage.setItem('alertMessageJobs', 'Created Job (ID ' + responseBody.jobId + ')')
 
         const url = new URL(window.location.href)
         url.search = ''
@@ -104,8 +103,7 @@ async function createJob(event) {
         window.location.href = url.toString()
     } catch (error) {
         console.error(error)
-        errorAlert.textContent = 'Could not create job.'
-        errorAlert.classList.remove('d-none')
+        showCreateJobError('Could not create job.')
     } finally {
         createButton.disabled = false
     }
@@ -121,7 +119,7 @@ async function prepareTmdbSyncSubmission(formData, jobConfiguration) {
         message: 'This job will attempt to synchronize every eligible ' + jobConfiguration.unboundedResourceName + '. Continue?',
         confirmLabel: 'Create job',
         confirmClass: 'btn-warning',
-        restoreSourceModalOnConfirm: true,
+        restoreSourceModalOnConfirm: false,
     })
 
     if (confirmed === true) {
@@ -135,6 +133,7 @@ function showCreateJobError(message) {
     const errorAlert = document.getElementById('createJobError')
     errorAlert.textContent = message
     errorAlert.classList.remove('d-none')
+    bootstrap.Modal.getOrCreateInstance('#createJobModal').show()
 }
 
 function registerJobRowEvents() {

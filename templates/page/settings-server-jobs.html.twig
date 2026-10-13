@@ -54,6 +54,7 @@
                         <table class="table table-hover" id="jobsTable">
                             <thead>
                             <tr>
+                                <th scope="col">ID</th>
                                 <th scope="col">User</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Status</th>
@@ -75,6 +76,7 @@
                                     data-job-updated-at="{{ job.updatedAt|default('-') }}"
                                     data-job-created-at="{{ job.createdAt }}"
                                     style="cursor: pointer;">
+                                    <td>{{ job.id }}</td>
                                     <td>{{ job.userName|default('-') }}</td>
                                     <td>{{ job.type }}</td>
                                     <td>{{ job.status }}</td>

@@ -133,22 +133,68 @@ class JobQueueApiTest extends TestCase
         self::assertSame(5, (new JobQueueApi($repository))->addTmdbMovieSyncJob());
     }
 
-    public function testHasActiveJobChecksWaitingAndInProgressStatuses() : void
+    public function testAddTmdbMovieSyncJobUnlessActiveChecksWaitingAndInProgressStatuses() : void
     {
         /** @var JobQueueRepository&MockObject $repository */
         $repository = $this->createMock(JobQueueRepository::class);
         $repository
             ->expects(self::once())
-            ->method('hasJobWithStatuses')
+            ->method('addJobUnlessExistsWithStatuses')
             ->with(
                 self::callback(static fn(JobType $type) => (string)$type === 'tmdb_movie_sync'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'waiting'),
                 self::callback(static function (array $statuses) : bool {
                     return array_map('strval', $statuses) === ['waiting', 'in progress'];
                 }),
+                42,
+                [
+                    'movieIds' => [7, 8],
+                    'maxAgeInHours' => 48,
+                    'threshold' => 100,
+                    'onlyNeverSynced' => true,
+                ],
             )
-            ->willReturn(true);
+            ->willReturn(5);
 
-        self::assertTrue((new JobQueueApi($repository))->hasActiveJob(JobType::createTmdbMovieSync()));
+        self::assertSame(5, (new JobQueueApi($repository))->addTmdbMovieSyncJobUnlessActive(
+            [7, 8],
+            48,
+            100,
+            true,
+            42,
+        ));
+    }
+
+    public function testAddTmdbPersonSyncJobUnlessActiveUsesPersonJobTypeAndParameters() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJobUnlessExistsWithStatuses')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'tmdb_person_sync'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'waiting'),
+                self::callback(static function (array $statuses) : bool {
+                    return array_map('strval', $statuses) === ['waiting', 'in progress'];
+                }),
+                42,
+                [
+                    'personIds' => [7, 8],
+                    'maxAgeInHours' => 48,
+                    'threshold' => 100,
+                    'onlyNeverSynced' => true,
+                ],
+            )
+            ->willReturn(null);
+
+        self::assertNull((new JobQueueApi($repository))->addTmdbPersonSyncJobUnlessActive(
+            [7, 8],
+            48,
+            100,
+            true,
+            42,
+        ));
     }
 
     public function testFetchJobsForStatusPageMapsJobDetails() : void

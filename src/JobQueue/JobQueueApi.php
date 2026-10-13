@@ -114,6 +114,27 @@ class JobQueueApi
         );
     }
 
+    public function addTmdbMovieSyncJobUnlessActive(
+        array $movieIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : ?int {
+        return $this->repository->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbMovieSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            $userId,
+            [
+                'movieIds' => $movieIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
+            ],
+        );
+    }
+
     public function addTmdbPersonSyncJob(
         ?JobStatus $jobStatus = null,
         array $personIds = [],
@@ -127,6 +148,27 @@ class JobQueueApi
             $jobStatus ?? JobStatus::createWaiting(),
             $userId,
             parameters: [
+                'personIds' => $personIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
+            ],
+        );
+    }
+
+    public function addTmdbPersonSyncJobUnlessActive(
+        array $personIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : ?int {
+        return $this->repository->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbPersonSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            $userId,
+            [
                 'personIds' => $personIds,
                 'maxAgeInHours' => $maxAgeInHours,
                 'threshold' => $threshold,
@@ -186,14 +228,6 @@ class JobQueueApi
     public function find(int $userId, JobType $jobType) : ?JobEntityList
     {
         return $this->repository->find($userId, $jobType);
-    }
-
-    public function hasActiveJob(JobType $jobType) : bool
-    {
-        return $this->repository->hasJobWithStatuses(
-            $jobType,
-            [JobStatus::createWaiting(), JobStatus::createInProgress()],
-        );
     }
 
     public function purgeAllJobs() : void

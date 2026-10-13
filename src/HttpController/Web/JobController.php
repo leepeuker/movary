@@ -210,23 +210,22 @@ class JobController
             return $this->createJobJsonResponse(['error' => $exception->getMessage()], StatusCode::createBadRequest());
         }
 
-        if ($this->jobQueueApi->hasActiveJob($jobType) === true) {
+        $userId = $this->authenticationService->requireWebSession()->getUserId();
+        $jobId = $this->enqueueTmdbSync($jobType, $parameters, $userId);
+        if ($jobId === null) {
             return $this->createJobJsonResponse(
                 ['error' => 'A waiting or in-progress job of this type already exists.'],
                 StatusCode::createConflict(),
             );
         }
 
-        $userId = $this->authenticationService->requireWebSession()->getUserId();
-        $jobId = $this->enqueueTmdbSync($jobType, $parameters, $userId);
-
         return $this->createJobJsonResponse(['jobId' => $jobId, 'userId' => $userId]);
     }
 
-    private function enqueueTmdbSync(JobType $jobType, TmdbSyncJobParameters $parameters, int $userId) : int
+    private function enqueueTmdbSync(JobType $jobType, TmdbSyncJobParameters $parameters, int $userId) : ?int
     {
         if ($jobType->isOfTypeTmdbMovieSync() === true) {
-            return $this->jobQueueApi->addTmdbMovieSyncJob(
+            return $this->jobQueueApi->addTmdbMovieSyncJobUnlessActive(
                 movieIds: $parameters->getIds(),
                 maxAgeInHours: $parameters->getMaxAgeInHours(),
                 threshold: $parameters->getThreshold(),
@@ -235,7 +234,7 @@ class JobController
             );
         }
 
-        return $this->jobQueueApi->addTmdbPersonSyncJob(
+        return $this->jobQueueApi->addTmdbPersonSyncJobUnlessActive(
             personIds: $parameters->getIds(),
             maxAgeInHours: $parameters->getMaxAgeInHours(),
             threshold: $parameters->getThreshold(),

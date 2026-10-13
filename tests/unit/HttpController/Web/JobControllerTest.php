@@ -14,7 +14,6 @@ use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\Letterboxd\Service\LetterboxdCsvValidator;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Movary\ValueObject\JobType;
 use Movary\ValueObject\RelativeUrl;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -112,7 +111,6 @@ class JobControllerTest extends TestCase
     public function testScheduleTmdbSyncCreatesWaitingJob(
         string $controllerMethod,
         string $jobApiMethod,
-        JobType $jobType,
     ) : void {
         $request = $this->createMock(Request::class);
         $request->method('getPostParameters')->willReturn([
@@ -126,13 +124,8 @@ class JobControllerTest extends TestCase
             ->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->jobQueueApiMock
             ->expects(self::once())
-            ->method('hasActiveJob')
-            ->with(self::callback(static fn(JobType $type) => (string)$type === (string)$jobType))
-            ->willReturn(false);
-        $this->jobQueueApiMock
-            ->expects(self::once())
-            ->method($jobApiMethod)
-            ->with(null, [7, 8], 48, 100, true, 42)
+            ->method($jobApiMethod . 'UnlessActive')
+            ->with([7, 8], 48, 100, true, 42)
             ->willReturn(23);
 
         $response = $this->subject->$controllerMethod($request);
@@ -145,8 +138,7 @@ class JobControllerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $request->method('getPostParameters')->willReturn(['ids' => '7,nope']);
-        $this->jobQueueApiMock->expects(self::never())->method('hasActiveJob');
-        $this->jobQueueApiMock->expects(self::never())->method('addTmdbMovieSyncJob');
+        $this->jobQueueApiMock->expects(self::never())->method('addTmdbMovieSyncJobUnlessActive');
 
         $response = $this->subject->scheduleTmdbMovieSync($request);
 
@@ -157,8 +149,7 @@ class JobControllerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $request->method('getPostParameters')->willReturn([]);
-        $this->jobQueueApiMock->expects(self::never())->method('hasActiveJob');
-        $this->jobQueueApiMock->expects(self::never())->method('addTmdbMovieSyncJob');
+        $this->jobQueueApiMock->expects(self::never())->method('addTmdbMovieSyncJobUnlessActive');
 
         $response = $this->subject->scheduleTmdbMovieSync($request);
 
@@ -172,11 +163,10 @@ class JobControllerTest extends TestCase
         $this->authenticationMock
             ->method('requireWebSession')
             ->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
-        $this->jobQueueApiMock->expects(self::once())->method('hasActiveJob')->willReturn(false);
         $this->jobQueueApiMock
             ->expects(self::once())
-            ->method('addTmdbMovieSyncJob')
-            ->with(null, [], null, null, false, 42)
+            ->method('addTmdbMovieSyncJobUnlessActive')
+            ->with([], null, null, false, 42)
             ->willReturn(23);
 
         $response = $this->subject->scheduleTmdbMovieSync($request);
@@ -188,8 +178,13 @@ class JobControllerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $request->method('getPostParameters')->willReturn(['threshold' => '100']);
-        $this->jobQueueApiMock->expects(self::once())->method('hasActiveJob')->willReturn(true);
-        $this->jobQueueApiMock->expects(self::never())->method('addTmdbMovieSyncJob');
+        $this->authenticationMock
+            ->method('requireWebSession')
+            ->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
+        $this->jobQueueApiMock
+            ->expects(self::once())
+            ->method('addTmdbMovieSyncJobUnlessActive')
+            ->willReturn(null);
 
         $response = $this->subject->scheduleTmdbMovieSync($request);
 
@@ -296,11 +291,11 @@ class JobControllerTest extends TestCase
         ];
     }
 
-    /** @return iterable<string, array{non-empty-string, non-empty-string, JobType}> */
+    /** @return iterable<string, array{non-empty-string, non-empty-string}> */
     public static function provideTmdbSyncTypes() : iterable
     {
-        yield 'movie' => ['scheduleTmdbMovieSync', 'addTmdbMovieSyncJob', JobType::createTmdbMovieSync()];
-        yield 'person' => ['scheduleTmdbPersonSync', 'addTmdbPersonSyncJob', JobType::createTmdbPersonSync()];
+        yield 'movie' => ['scheduleTmdbMovieSync', 'addTmdbMovieSyncJob'];
+        yield 'person' => ['scheduleTmdbPersonSync', 'addTmdbPersonSyncJob'];
     }
 
     private function createLetterboxdRequest(string $fileField) : Request&MockObject
