@@ -52,11 +52,14 @@ The standard Docker image uses Supervisor to restart the command after it exits,
 
 Administrators can inspect the queue under **Settings > Server > Jobs**. The page supports filtering by user, type, and status. It also allows an administrator to:
 
+- enqueue a TMDB movie or person metadata synchronization;
 - delete an individual job;
 - remove all processed jobs (`done` and `failed`);
 - remove all jobs, including `waiting` and `in progress` jobs.
 
 A job that remains `waiting` usually means the worker is not running. Check the worker process and application logs. A job left `in progress` can indicate that the worker stopped during processing. Because jobs are not retried automatically, inspect the logs and confirm that repeating the operation is safe before deleting the record and scheduling the work again.
+
+TMDB synchronization requests created from the Jobs page record the administrator who triggered them. CLI and internally generated TMDB jobs remain without a user association. The enqueue endpoint rejects a request when the same sync type already has a `waiting` or `in progress` job. This prevents accidental duplicate full-library work while preserving completed and failed jobs as history.
 
 ## Adding a background job
 

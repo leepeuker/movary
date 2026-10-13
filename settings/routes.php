@@ -80,6 +80,14 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserHasJellyfinToken::class,
     ]);
+    $routes->add('POST', '/jobs/schedule/tmdb-movie-sync', [Web\JobController::class, 'scheduleTmdbMovieSync'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('POST', '/jobs/schedule/tmdb-person-sync', [Web\JobController::class, 'scheduleTmdbPersonSync'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
 
     ############
     # Settings #

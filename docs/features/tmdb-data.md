@@ -19,6 +19,12 @@ php bin/console.php tmdb:movie:sync
 php bin/console.php tmdb:person:sync
 ```
 
+Administrators can also enqueue either synchronization from **Settings > Server > Jobs** by selecting **Create job**. The form supports the same age, record-count, never-synced, and local-ID filters as the commands. These jobs record the administrator who triggered them, start with the `waiting` status, and are executed by the existing `jobs:process` worker.
+
+Movary prevents a second movie or person synchronization from being queued while a job of the same type is waiting or in progress. A run without local IDs or a maximum record count requires confirmation. The web form limits the maximum record count to 10,000.
+
+The `done` status means the queue job completed. Individual records that TMDB could not update are logged as warnings and do not cause the whole job to fail.
+
 #### Important flags
 
 - `--help`

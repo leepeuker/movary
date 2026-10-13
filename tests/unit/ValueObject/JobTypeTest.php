@@ -69,6 +69,7 @@ class JobTypeTest extends TestCase
         $subject = JobType::createTmdbPersonSync();
 
         self::assertSame('tmdb_person_sync', (string)$subject);
+        self::assertTrue($subject->isOfTypeTmdbPersonSync());
     }
 
     public function testCreateTraktImportHistory() : void

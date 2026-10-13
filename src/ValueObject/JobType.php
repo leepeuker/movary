@@ -199,6 +199,11 @@ class JobType implements JsonSerializable
         return $this->type === self::TYPE_TMDB_MOVIE_SYNC;
     }
 
+    public function isOfTypeTmdbPersonSync() : bool
+    {
+        return $this->type === self::TYPE_TMDB_PERSON_SYNC;
+    }
+
     public function isOfTypeTraktImportHistory() : bool
     {
         return $this->type === self::TYPE_TRAKT_IMPORT_HISTORY;

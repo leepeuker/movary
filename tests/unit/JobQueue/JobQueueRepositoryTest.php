@@ -3,6 +3,8 @@
 namespace Tests\Unit\Movary\JobQueue;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Movary\JobQueue\JobQueueFilter;
 use Movary\JobQueue\JobQueueRepository;
 use Movary\ValueObject\JobStatus;
@@ -118,5 +120,120 @@ class JobQueueRepositoryTest extends TestCase
             ->willReturn(0);
 
         self::assertFalse((new JobQueueRepository($connection))->deleteJob(7));
+    }
+
+    public function testHasJobWithStatusesReturnsWhetherMatchingJobExists() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND job_status IN (?, ?)',
+                self::callback(static function (array $parameters) : bool {
+                    return array_map('strval', $parameters) === [
+                        'tmdb_movie_sync',
+                        'waiting',
+                        'in progress',
+                    ];
+                }),
+            )
+            ->willReturn('1');
+
+        self::assertTrue((new JobQueueRepository($connection))->hasJobWithStatuses(
+            JobType::createTmdbMovieSync(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+        ));
+    }
+
+    public function testAddJobUnlessExistsWithStatusesChecksAndInsertsWhileHoldingTypeLock() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new SqlitePlatform());
+        $connection
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(static fn(callable $callback) : mixed => $callback($connection));
+        $connection
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with(
+                'UPDATE job_queue SET job_type = job_type WHERE job_type = ?',
+                self::callback(static fn(array $parameters) => (string)$parameters[0] === 'tmdb_movie_sync'),
+            );
+        $connection->expects(self::once())->method('fetchOne')->willReturn('0');
+        $connection->expects(self::once())->method('insert');
+        $connection->expects(self::once())->method('lastInsertId')->willReturn('5');
+
+        self::assertSame(5, (new JobQueueRepository($connection))->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbMovieSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+        ));
+    }
+
+    public function testAddJobUnlessExistsWithStatusesDoesNotInsertDuplicate() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new SqlitePlatform());
+        $connection
+            ->method('transactional')
+            ->willReturnCallback(static fn(callable $callback) : mixed => $callback($connection));
+        $connection->expects(self::once())->method('executeStatement');
+        $connection->expects(self::once())->method('fetchOne')->willReturn('1');
+        $connection->expects(self::never())->method('insert');
+
+        self::assertNull((new JobQueueRepository($connection))->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbMovieSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+        ));
+    }
+
+    public function testAddJobUnlessExistsWithStatusesUsesMysqlAdvisoryLock() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new MySQLPlatform());
+        $connection
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(static fn(callable $callback) : mixed => $callback($connection));
+        $connection
+            ->expects(self::exactly(3))
+            ->method('fetchOne')
+            ->willReturnCallback(static function (string $query, array $parameters) : string {
+                return match ($query) {
+                    'SELECT GET_LOCK(?, 10)', 'SELECT RELEASE_LOCK(?)' => self::assertLockParameters($parameters),
+                    'SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND job_status IN (?, ?)' =>
+                        self::assertJobStatusParameters($parameters),
+                    default => self::fail('Unexpected query: ' . $query),
+                };
+            });
+        $connection->expects(self::once())->method('insert');
+        $connection->expects(self::once())->method('lastInsertId')->willReturn('5');
+
+        self::assertSame(5, (new JobQueueRepository($connection))->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbMovieSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+        ));
+    }
+
+    private static function assertLockParameters(array $parameters) : string
+    {
+        self::assertSame('movary:job-queue:tmdb_movie_sync', (string)$parameters[0]);
+
+        return '1';
+    }
+
+    private static function assertJobStatusParameters(array $parameters) : string
+    {
+        self::assertSame(['tmdb_movie_sync', 'waiting', 'in progress'], array_map('strval', $parameters));
+
+        return '0';
     }
 }

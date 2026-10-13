@@ -20,7 +20,14 @@ class SyncMovies
 
     public function executeJob(JobEntity $job) : void
     {
-        $this->syncMovies(ids: $job->getParameters()['movieIds'] ?? []);
+        $parameters = $job->getParameters();
+
+        $this->syncMovies(
+            $parameters['maxAgeInHours'] ?? null,
+            $parameters['threshold'] ?? null,
+            $parameters['movieIds'] ?? [],
+            $parameters['onlyNeverSynced'] ?? false,
+        );
     }
 
     public function syncMovies(

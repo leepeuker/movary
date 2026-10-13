@@ -93,24 +93,86 @@ class JobQueueApi
         );
     }
 
-    public function addTmdbMovieSyncJob(JobStatus $jobStatus, array $movieIds = []) : int
-    {
+    public function addTmdbMovieSyncJob(
+        ?JobStatus $jobStatus = null,
+        array $movieIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : int {
         return $this->repository->addJob(
             JobType::createTmdbMovieSync(),
-            $jobStatus,
+            $jobStatus ?? JobStatus::createWaiting(),
+            $userId,
             parameters: [
                 'movieIds' => $movieIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
             ],
         );
     }
 
-    public function addTmdbPersonSyncJob(JobStatus $jobStatus, array $personIds = []) : int
-    {
+    public function addTmdbMovieSyncJobUnlessActive(
+        array $movieIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : ?int {
+        return $this->repository->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbMovieSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            $userId,
+            [
+                'movieIds' => $movieIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
+            ],
+        );
+    }
+
+    public function addTmdbPersonSyncJob(
+        ?JobStatus $jobStatus = null,
+        array $personIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : int {
         return $this->repository->addJob(
             JobType::createTmdbPersonSyncJob(),
-            $jobStatus,
+            $jobStatus ?? JobStatus::createWaiting(),
+            $userId,
             parameters: [
                 'personIds' => $personIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
+            ],
+        );
+    }
+
+    public function addTmdbPersonSyncJobUnlessActive(
+        array $personIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : ?int {
+        return $this->repository->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbPersonSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            $userId,
+            [
+                'personIds' => $personIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
             ],
         );
     }

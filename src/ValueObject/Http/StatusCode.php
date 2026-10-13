@@ -15,6 +15,11 @@ class StatusCode
         return new self(400, 'Bad Request');
     }
 
+    public static function createConflict() : self
+    {
+        return new self(409, 'Conflict');
+    }
+
     public static function createForbidden() : self
     {
         return new self(403, 'Forbidden');

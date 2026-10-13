@@ -11,6 +11,7 @@ use Movary\Service\Mastodon\MastodonPostWatchlistService;
 use Movary\Service\Email\PasswordResetEmailJobProcessor;
 use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\Tmdb\SyncMovies;
+use Movary\Service\Tmdb\SyncPersons;
 use Movary\Service\Trakt\ImportWatchedMovies;
 use RuntimeException;
 
@@ -22,6 +23,7 @@ class JobProcessor
         private readonly Letterboxd\LetterboxdImportRatings $letterboxdImportRatings,
         private readonly Letterboxd\LetterboxdImportDiary $letterboxdImportHistory,
         private readonly SyncMovies $tmdbSyncMovies,
+        private readonly SyncPersons $tmdbSyncPersons,
         private readonly TmdbImageCache $tmdbImageCache,
         private readonly PlexWatchlistImporter $plexWatchlistImporter,
         private readonly JellyfinMoviesExporter $jellyfinExporter,
@@ -42,6 +44,7 @@ class JobProcessor
             $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
             $job->getType()->isOfTypeTmdbMovieSync() => $this->tmdbSyncMovies->executeJob($job),
+            $job->getType()->isOfTypeTmdbPersonSync() => $this->tmdbSyncPersons->executeJob($job),
             $job->getType()->isOfTypePlexImportWatchlist() => $this->plexWatchlistImporter->executeJob($job),
             $job->getType()->isOfTypeJellyfinExportMovies() => $this->jellyfinExporter->executeJob($job),
             $job->getType()->isOfTypeJellyfinImportMovies() => $this->jellyfinImporter->executeJob($job),

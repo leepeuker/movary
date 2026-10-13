@@ -2,29 +2,32 @@
 
 namespace Tests\Unit\Movary\Service\Tmdb;
 
-use ArrayIterator;
-use Movary\Domain\Movie\MovieApi;
 use Movary\JobQueue\JobEntity;
-use Movary\Service\Tmdb\SyncMovie;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\Util\Json;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 
 #[CoversClass(SyncMovies::class)]
 class SyncMoviesTest extends TestCase
 {
     #[DataProvider('provideJobParameters')]
-    public function testExecuteJobPassesMovieIdsToSync(?array $parameters, array $expectedMovieIds) : void
+    public function testExecuteJobPassesParametersToSync(?array $parameters, array $expectedParameters) : void
     {
-        $movieApi = $this->createMock(MovieApi::class);
-        $movieApi
+        $subject = $this->getMockBuilder(SyncMovies::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['syncMovies'])
+            ->getMock();
+        $subject
             ->expects(self::once())
-            ->method('fetchAllOrderedByLastUpdatedAtTmdbAsc')
-            ->with(null, $expectedMovieIds)
-            ->willReturn(new ArrayIterator());
+            ->method('syncMovies')
+            ->with(
+                $expectedParameters['maxAgeInHours'],
+                $expectedParameters['threshold'],
+                $expectedParameters['ids'],
+                $expectedParameters['onlyNeverSynced'],
+            );
         $job = JobEntity::createFromArray([
             'id' => 5,
             'job_type' => 'tmdb_movie_sync',
@@ -34,20 +37,29 @@ class SyncMoviesTest extends TestCase
             'updated_at' => null,
             'created_at' => '2026-09-28 12:00:00',
         ]);
-        $subject = new SyncMovies(
-            $this->createStub(SyncMovie::class),
-            $movieApi,
-            $this->createStub(LoggerInterface::class),
-        );
-
         $subject->executeJob($job);
     }
 
     public static function provideJobParameters() : array
     {
         return [
-            'targeted sync' => [['movieIds' => [7, 8]], [7, 8]],
-            'legacy full-library sync' => [null, []],
+            'all options' => [[
+                'movieIds' => [7, 8],
+                'maxAgeInHours' => 48,
+                'threshold' => 100,
+                'onlyNeverSynced' => true,
+            ], [
+                'ids' => [7, 8],
+                'maxAgeInHours' => 48,
+                'threshold' => 100,
+                'onlyNeverSynced' => true,
+            ]],
+            'legacy full-library sync' => [null, [
+                'ids' => [],
+                'maxAgeInHours' => null,
+                'threshold' => null,
+                'onlyNeverSynced' => false,
+            ]],
         ];
     }
 }

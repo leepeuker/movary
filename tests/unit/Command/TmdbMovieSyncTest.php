@@ -22,7 +22,7 @@ class TmdbMovieSyncTest extends TestCase
         $syncMovies
             ->expects(self::once())
             ->method('syncMovies')
-            ->with(null, null, [7, 8], true);
+            ->with(48, 100, [7, 8], true);
 
         $jobQueueApi = $this->createMock(JobQueueApi::class);
         $jobQueueApi
@@ -31,6 +31,9 @@ class TmdbMovieSyncTest extends TestCase
             ->with(
                 self::callback(static fn (JobStatus $status) : bool => (string)$status === 'in progress'),
                 [7, 8],
+                48,
+                100,
+                true,
             )
             ->willReturn(1);
         $jobQueueApi->expects(self::once())->method('updateJobStatus');
@@ -44,6 +47,8 @@ class TmdbMovieSyncTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $tester->execute([
             '--movieIds' => '7,8',
+            '--hours' => '48',
+            '--threshold' => '100',
             '--never-synced' => true,
         ]));
     }

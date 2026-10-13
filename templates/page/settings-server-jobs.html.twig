@@ -20,9 +20,15 @@
             {{ include('component/settings-nav.html.twig') }}
             {{ include('component/modal-job-details.html.twig') }}
             {{ include('component/modal-job-filters.html.twig') }}
+            {{ include('component/modal-create-job.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 1rem">Job Queue Overview</h5>
+
+
+                <div id="alertJobsDiv"></div>
+
+
                 <div style="text-align: left">
                     <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
                         <div class="d-flex align-items-center gap-2">
@@ -48,6 +54,7 @@
                         <table class="table table-hover" id="jobsTable">
                             <thead>
                             <tr>
+                                <th scope="col">ID</th>
                                 <th scope="col">User</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Status</th>
@@ -69,6 +76,7 @@
                                     data-job-updated-at="{{ job.updatedAt|default('-') }}"
                                     data-job-created-at="{{ job.createdAt }}"
                                     style="cursor: pointer;">
+                                    <td>{{ job.id }}</td>
                                     <td>{{ job.userName|default('-') }}</td>
                                     <td>{{ job.type }}</td>
                                     <td>{{ job.status }}</td>
@@ -88,7 +96,7 @@
 
                 {% if jobs|length == 0 %}<p>No jobs in queue</p>{% endif %}
 
-                <div id="alertJobsDiv"></div>
+                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="showCreateJobModal()">Create Job</button>
 
                 <hr> 
                 
