@@ -12,7 +12,7 @@ Code schedules a job through `JobQueueApi`. The job is stored in the `job_queue`
 - optional JSON-encoded parameters;
 - creation and update timestamps.
 
-New background jobs normally start with the `waiting` status. Every invocation of the worker then:
+New background jobs normally start with the `waiting` status. Every invocation of the worker first materializes due recurring schedules as ordinary queue jobs, then:
 
 1. selects the oldest `waiting` job;
 2. changes its status to `in progress`;
@@ -44,6 +44,14 @@ One invocation processes at most one job. After successfully processing a job, o
 
 The standard Docker image uses Supervisor to restart the command after it exits, creating a continuous worker. A manual installation must configure Supervisor or invoke the command regularly with cron; see [Manual installation](../install/manual.md#job-processing).
 
+## Recurring schedules
+
+Administrators can create recurring TMDB movie and person synchronization schedules under **Settings > Server > Jobs**. Supported frequencies are every minute, hourly, daily, weekly, and monthly. Schedule times are stored and displayed in UTC.
+
+When a schedule is due, `jobs:process` attempts to add a normal `waiting` job and advances the schedule to its next future occurrence. Missed occurrences do not create catch-up jobs. If the same synchronization type is already waiting or in progress, that occurrence is skipped and the schedule still advances. Failed queue jobs remain in history and do not disable future occurrences.
+
+Every-minute schedules can create sustained TMDB API load. The active-job check prevents overlapping work of the same type, but administrators should normally choose a longer interval.
+
 !!! Warning
 
     Run only one worker process. Selecting a waiting job and changing its status are separate database operations, so concurrent workers can select the same job.
@@ -53,6 +61,7 @@ The standard Docker image uses Supervisor to restart the command after it exits,
 Administrators can inspect the queue under **Settings > Server > Jobs**. The page supports filtering by user, type, and status. It also allows an administrator to:
 
 - enqueue a TMDB movie or person metadata synchronization;
+- create, enable, disable, and delete recurring TMDB synchronization schedules;
 - delete an individual job;
 - remove all processed jobs (`done` and `failed`);
 - remove all jobs, including `waiting` and `in progress` jobs.
@@ -66,6 +75,8 @@ The main queue components are:
 - `src/ValueObject/JobType.php`: defines valid job types;
 - `src/JobQueue/JobQueueApi.php`: provides methods that enqueue jobs;
 - `src/JobQueue/JobQueueRepository.php`: persists and retrieves queue records;
+- `src/JobQueue/JobScheduleRepository.php`: persists recurring schedules and their next run times;
+- `src/JobQueue/JobScheduleProcessor.php`: materializes due schedules as queue jobs;
 - `src/Command/ProcessJobs.php`: claims one waiting job and updates its status;
 - `src/Service/JobProcessor.php`: dispatches a claimed job to its processing service.
 

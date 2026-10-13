@@ -29,10 +29,11 @@ class JobScheduleProcessorTest extends TestCase
                 'onlyNeverSynced' => true,
             ]),
             'enabled' => 1,
+            'first_run_at' => '2026-10-13 12:00:00',
             'next_run_at' => '2026-10-13 12:00:00',
         ]);
         $repository = $this->createMock(JobScheduleRepository::class);
-        $repository->method('fetchDue')->with($currentDateTime)->willReturn([$schedule]);
+        $repository->expects(self::once())->method('fetchDue')->with($currentDateTime)->willReturn([$schedule]);
         $repository
             ->expects(self::once())
             ->method('updateNextRunIfCurrent')

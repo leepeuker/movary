@@ -25,6 +25,7 @@ class JobScheduleRepositoryTest extends TestCase
                 return $data['job_type'] === 'tmdb_movie_sync'
                     && $data['frequency'] === 'hourly'
                     && $data['user_id'] === 42
+                    && $data['first_run_at'] === '2026-10-13 13:00:00'
                     && $data['next_run_at'] === '2026-10-13 13:00:00';
             }));
         $connection->method('lastInsertId')->willReturn('9');

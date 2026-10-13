@@ -16,6 +16,7 @@ class JobScheduleEntity
         private readonly ?int $userId,
         private readonly array $parameters,
         private readonly bool $enabled,
+        private readonly DateTime $firstRunAt,
         private readonly DateTime $nextRunAt,
     ) {
     }
@@ -29,6 +30,7 @@ class JobScheduleEntity
             $data['user_id'] === null ? null : (int)$data['user_id'],
             Json::decode($data['parameters']),
             (bool)$data['enabled'],
+            DateTime::createFromString($data['first_run_at']),
             DateTime::createFromString($data['next_run_at']),
         );
     }
@@ -36,6 +38,11 @@ class JobScheduleEntity
     public function getFrequency() : JobScheduleFrequency
     {
         return $this->frequency;
+    }
+
+    public function getFirstRunAt() : DateTime
+    {
+        return $this->firstRunAt;
     }
 
     public function getId() : int

@@ -43,20 +43,35 @@ class JobScheduleFrequency implements JsonSerializable
         return $this->frequency;
     }
 
-    public function calculateNextRun(DateTime $scheduledRun, DateTime $currentDateTime) : DateTime
+    public function calculateNextRun(DateTime $firstRunAt, DateTime $currentDateTime) : DateTime
     {
-        $nextRun = $scheduledRun;
-        $interval = match ($this->frequency) {
-            self::MINUTELY => new DateInterval('PT1M'),
-            self::HOURLY => new DateInterval('PT1H'),
-            self::DAILY => new DateInterval('P1D'),
-            self::WEEKLY => new DateInterval('P1W'),
-            self::MONTHLY => new DateInterval('P1M'),
-        };
+        if ($this->frequency === self::MONTHLY) {
+            return $this->calculateNextMonthlyRun($firstRunAt, $currentDateTime);
+        }
 
-        do {
-            $nextRun = $nextRun->add($interval);
-        } while ($currentDateTime->isAfter($nextRun) || $currentDateTime->isEqual($nextRun));
+        $intervalInSeconds = match ($this->frequency) {
+            self::MINUTELY => 60,
+            self::HOURLY => 60 * 60,
+            self::DAILY => 24 * 60 * 60,
+            self::WEEKLY => 7 * 24 * 60 * 60,
+            default => throw new RuntimeException('Not supported job schedule frequency: ' . $this->frequency),
+        };
+        $secondsSinceFirstRun = (int)$currentDateTime->format('U') - (int)$firstRunAt->format('U');
+        $intervalsSinceFirstRun = max(0, intdiv($secondsSinceFirstRun, $intervalInSeconds)) + 1;
+
+        return $firstRunAt->add(new DateInterval('PT' . ($intervalsSinceFirstRun * $intervalInSeconds) . 'S'));
+    }
+
+    private function calculateNextMonthlyRun(DateTime $firstRunAt, DateTime $currentDateTime) : DateTime
+    {
+        $monthDifference = ((int)$currentDateTime->format('Y') - (int)$firstRunAt->format('Y')) * 12
+            + (int)$currentDateTime->format('n')
+            - (int)$firstRunAt->format('n');
+        $nextRun = $firstRunAt->addMonths(max(0, $monthDifference));
+
+        if ($currentDateTime->isAfter($nextRun) || $currentDateTime->isEqual($nextRun)) {
+            $nextRun = $firstRunAt->addMonths(max(0, $monthDifference) + 1);
+        }
 
         return $nextRun;
     }

@@ -19,7 +19,9 @@ php bin/console.php tmdb:movie:sync
 php bin/console.php tmdb:person:sync
 ```
 
-Administrators can also enqueue either synchronization from **Settings > Server > Jobs** by selecting **Create job**.
+Administrators can also enqueue either synchronization from **Settings > Server > Jobs** by selecting **Create job**. A job can run once or recur every minute, hourly, daily, weekly, or monthly. Recurring schedules use a UTC next-run time and can be enabled, disabled, or deleted from the same page.
+
+Missed schedule occurrences do not create catch-up jobs. An occurrence is skipped when the same TMDB synchronization type is already waiting or in progress. Every-minute schedules should be used carefully because they can create sustained TMDB API load.
 
 The `done` status means the queue job completed. Individual records that TMDB could not update are logged as warnings and do not cause the whole job to fail.
 

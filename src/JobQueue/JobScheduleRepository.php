@@ -28,6 +28,7 @@ class JobScheduleRepository
             'user_id' => $userId,
             'parameters' => Json::encode($parameters),
             'enabled' => 1,
+            'first_run_at' => (string)$nextRunAt,
             'next_run_at' => (string)$nextRunAt,
             'created_at' => (string)DateTime::create(),
         ]);

@@ -10,6 +10,14 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(\Movary\ValueObject\DateTime::class)]
 class DateTimeTest extends TestCase
 {
+    public function testAddMonthsClampsToLastDayOfTargetMonth() : void
+    {
+        $subject = DateTime::createFromString('2026-01-31 12:34:56');
+
+        self::assertSame('2026-02-28 12:34:56', (string)$subject->addMonths(1));
+        self::assertSame('2026-03-31 12:34:56', (string)$subject->addMonths(2));
+    }
+
     public function testDiffInHours() : void
     {
         $subject = DateTime::createFromString('2022-05-02 13:02:50');
