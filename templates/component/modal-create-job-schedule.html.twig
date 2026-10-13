@@ -28,10 +28,6 @@
                         </datalist>
                         <div class="form-text">Five fields: minute, hour, day of month, month, day of week.</div>
                     </div>
-                    <div class="alert alert-warning" role="alert">
-                        Cron schedules can run as often as once per minute and create sustained TMDB API load. An occurrence is skipped while the same job type is active.
-                    </div>
-
                     <div data-job-schedule-fields="tmdb_movie_sync">
                         {{ include('component/job-form-tmdb-sync.html.twig', {
                             idPrefix: 'tmdbMovieJobSchedule',
@@ -48,7 +44,6 @@
                     <div class="alert alert-danger d-none mb-0" role="alert" id="createJobScheduleError"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="createJobScheduleSubmitButton">Create</button>
                 </div>
             </form>
