@@ -14,13 +14,44 @@ class JobQueueApi
     ) {
     }
 
-    public function addImdbSyncJob(JobStatus $jobStatus, array $movieIds = []) : int
-    {
+    public function addImdbSyncJob(
+        ?JobStatus $jobStatus = null,
+        array $movieIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : int {
         return $this->repository->addJob(
             JobType::createImdbSync(),
-            $jobStatus,
+            $jobStatus ?? JobStatus::createWaiting(),
+            $userId,
             parameters: [
                 'movieIds' => $movieIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
+            ],
+        );
+    }
+
+    public function addImdbSyncJobUnlessActive(
+        array $movieIds = [],
+        ?int $maxAgeInHours = null,
+        ?int $threshold = null,
+        bool $onlyNeverSynced = false,
+        ?int $userId = null,
+    ) : ?int {
+        return $this->repository->addJobUnlessExistsWithStatuses(
+            JobType::createImdbSync(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            $userId,
+            [
+                'movieIds' => $movieIds,
+                'maxAgeInHours' => $maxAgeInHours,
+                'threshold' => $threshold,
+                'onlyNeverSynced' => $onlyNeverSynced,
             ],
         );
     }
@@ -89,6 +120,22 @@ class JobQueueApi
             parameters: [
                 'movieIds' => $movieIds,
                 'personIds' => $personIds
+            ],
+        );
+    }
+
+    public function addTmdbImageCacheRefreshJobUnlessActive(
+        TmdbImageCacheJobParameters $parameters,
+        ?int $userId = null,
+    ) : ?int {
+        return $this->repository->addJobUnlessExistsWithStatuses(
+            JobType::createTmdbImageCache(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            $userId,
+            [
+                'movieIds' => $parameters->getMovieIds(),
+                'personIds' => $parameters->getPersonIds(),
             ],
         );
     }

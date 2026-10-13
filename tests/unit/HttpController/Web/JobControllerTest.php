@@ -8,6 +8,7 @@ use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\Mapper\JobScheduleRequestMapper;
 use Movary\HttpController\Web\Mapper\TmdbSyncJobRequestMapper;
+use Movary\HttpController\Web\Mapper\TmdbImageCacheJobRequestMapper;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobScheduleApi;
 use Movary\Service\ApplicationUrlService;
@@ -56,6 +57,7 @@ class JobControllerTest extends TestCase
             $this->flashMessageServiceMock,
             $this->applicationUrlServiceMock,
             new TmdbSyncJobRequestMapper(),
+            new TmdbImageCacheJobRequestMapper(),
             new JobScheduleRequestMapper(),
             $this->jobScheduleApiMock,
             '/tmp/',
@@ -226,6 +228,88 @@ class JobControllerTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode()->getCode());
         self::assertSame('{"scheduleId":9,"userId":42}', $response->getBody());
+    }
+
+    public function testScheduleImdbRatingsSyncCreatesWaitingJob() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getPostParameters')->willReturn([
+            'maxAgeInHours' => '48',
+            'threshold' => '100',
+            'ids' => '7, 8',
+            'onlyNeverSynced' => '1',
+        ]);
+        $this->authenticationMock
+            ->method('requireWebSession')
+            ->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
+        $this->jobQueueApiMock
+            ->expects(self::once())
+            ->method('addImdbSyncJobUnlessActive')
+            ->with([7, 8], 48, 100, true, 42)
+            ->willReturn(23);
+
+        $response = $this->subject->scheduleImdbRatingsSync($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame('{"jobId":23,"userId":42}', $response->getBody());
+    }
+
+    public function testScheduleTmdbImageCacheRefreshCreatesRecurringSchedule() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getPostParameters')->willReturn([
+            'movieIds' => '7, 8',
+            'personIds' => '9',
+            'scheduleMode' => 'recurring',
+            'cronExpression' => '0 3 * * *',
+        ]);
+        $this->authenticationMock
+            ->method('requireWebSession')
+            ->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
+        $this->jobQueueApiMock->expects(self::never())->method('addTmdbImageCacheRefreshJobUnlessActive');
+        $this->jobScheduleApiMock
+            ->expects(self::once())
+            ->method('addTmdbImageCacheRefreshSchedule')
+            ->with(
+                self::callback(static fn($cronExpression) => (string)$cronExpression === '0 3 * * *'),
+                self::callback(static fn($parameters) => $parameters->getMovieIds() === [7, 8]
+                    && $parameters->getPersonIds() === [9]),
+                self::anything(),
+                42,
+            )
+            ->willReturn(9);
+
+        $response = $this->subject->scheduleTmdbImageCacheRefresh($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame('{"scheduleId":9,"userId":42}', $response->getBody());
+    }
+
+    public function testScheduleTmdbImageCacheRefreshCreatesWaitingJob() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getPostParameters')->willReturn([
+            'movieIds' => '7, 8',
+            'personIds' => '9',
+        ]);
+        $this->authenticationMock
+            ->method('requireWebSession')
+            ->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
+        $this->jobScheduleApiMock->expects(self::never())->method('addTmdbImageCacheRefreshSchedule');
+        $this->jobQueueApiMock
+            ->expects(self::once())
+            ->method('addTmdbImageCacheRefreshJobUnlessActive')
+            ->with(
+                self::callback(static fn($parameters) => $parameters->getMovieIds() === [7, 8]
+                    && $parameters->getPersonIds() === [9]),
+                42,
+            )
+            ->willReturn(23);
+
+        $response = $this->subject->scheduleTmdbImageCacheRefresh($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame('{"jobId":23,"userId":42}', $response->getBody());
     }
 
     public function testSetJobScheduleEnabledValidatesAndUpdatesSchedule() : void

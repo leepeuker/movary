@@ -6,6 +6,7 @@ use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\JobQueue\JobEntity;
 use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
+use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\Service\Mastodon\MastodonPostPlayService;
 use Movary\Service\Mastodon\MastodonPostWatchlistService;
 use Movary\Service\Email\PasswordResetEmailJobProcessor;
@@ -25,6 +26,7 @@ class JobProcessor
         private readonly SyncMovies $tmdbSyncMovies,
         private readonly SyncPersons $tmdbSyncPersons,
         private readonly TmdbImageCache $tmdbImageCache,
+        private readonly ImdbMovieRatingSync $imdbMovieRatingSync,
         private readonly PlexWatchlistImporter $plexWatchlistImporter,
         private readonly JellyfinMoviesExporter $jellyfinExporter,
         private readonly JellyfinMoviesImporter $jellyfinImporter,
@@ -41,6 +43,7 @@ class JobProcessor
             $job->getType()->isOfTypeLetterboxdImportRankings() => $this->letterboxdImportRatings->executeJob($job),
             $job->getType()->isOfTypeLetterboxdImportHistory() => $this->letterboxdImportHistory->executeJob($job),
             $job->getType()->isOfTypeTmdbImageCache() => $this->tmdbImageCache->executeJob($job),
+            $job->getType()->isOfTypeImdbSync() => $this->imdbMovieRatingSync->executeJob($job),
             $job->getType()->isOfTypeTraktImportRatings() => $this->traktSyncRatings->executeJob($job),
             $job->getType()->isOfTypeTraktImportHistory() => $this->traktSyncWatchedMovies->executeJob($job),
             $job->getType()->isOfTypeTmdbMovieSync() => $this->tmdbSyncMovies->executeJob($job),

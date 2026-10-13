@@ -34,6 +34,44 @@ class JobScheduleApi
         );
     }
 
+    public function addImdbSyncSchedule(
+        JobScheduleCronExpression $cronExpression,
+        TmdbSyncJobParameters $parameters,
+        DateTime $nextRunAt,
+        int $userId,
+    ) : int {
+        return $this->repository->add(
+            JobType::createImdbSync(),
+            $cronExpression,
+            [
+                'ids' => $parameters->getIds(),
+                'maxAgeInHours' => $parameters->getMaxAgeInHours(),
+                'threshold' => $parameters->getThreshold(),
+                'onlyNeverSynced' => $parameters->isOnlyNeverSynced(),
+            ],
+            $nextRunAt,
+            $userId,
+        );
+    }
+
+    public function addTmdbImageCacheRefreshSchedule(
+        JobScheduleCronExpression $cronExpression,
+        TmdbImageCacheJobParameters $parameters,
+        DateTime $nextRunAt,
+        int $userId,
+    ) : int {
+        return $this->repository->add(
+            JobType::createTmdbImageCache(),
+            $cronExpression,
+            [
+                'movieIds' => $parameters->getMovieIds(),
+                'personIds' => $parameters->getPersonIds(),
+            ],
+            $nextRunAt,
+            $userId,
+        );
+    }
+
     public function delete(int $id) : bool
     {
         return $this->repository->delete($id);

@@ -5,6 +5,7 @@ namespace Tests\Unit\Movary\JobQueue;
 use Movary\JobQueue\JobQueueApi;
 use Movary\JobQueue\JobQueueFilter;
 use Movary\JobQueue\JobQueueRepository;
+use Movary\JobQueue\TmdbImageCacheJobParameters;
 use Movary\ValueObject\JobStatus;
 use Movary\ValueObject\JobType;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,7 +26,12 @@ class JobQueueApiTest extends TestCase
                 self::callback(static fn(JobType $type) => (string)$type === 'imdb_sync'),
                 self::callback(static fn(JobStatus $status) => (string)$status === 'in progress'),
                 null,
-                ['movieIds' => [7, 8]],
+                [
+                    'movieIds' => [7, 8],
+                    'maxAgeInHours' => null,
+                    'threshold' => null,
+                    'onlyNeverSynced' => false,
+                ],
             )
             ->willReturn(5);
 
@@ -78,6 +84,28 @@ class JobQueueApiTest extends TestCase
             true,
             42,
         );
+    }
+
+    public function testAddTargetedTmdbImageCacheRefreshUsesExistingIdParameters() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJobUnlessExistsWithStatuses')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'tmdb_image_cache'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'waiting'),
+                self::anything(),
+                42,
+                ['movieIds' => [7, 8], 'personIds' => [9]],
+            )
+            ->willReturn(5);
+
+        self::assertSame(5, (new JobQueueApi($repository))->addTmdbImageCacheRefreshJobUnlessActive(
+            TmdbImageCacheJobParameters::create([7, 8], [9]),
+            42,
+        ));
     }
 
     public function testAddTmdbPersonSyncJobAddsPersonIdsAsParameters() : void

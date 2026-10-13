@@ -58,6 +58,8 @@ php bin/console.php tmdb:imageCache:refresh
 php bin/console.php tmdb:imageCache:delete
 ```
 
+Administrators can cache images for selected local movie and person IDs under **Settings > Server > Job Queue**. Movie jobs also cache cast and crew images. The same targeted refresh can be scheduled under **Settings > Server > Job Schedules**.
+
 ## Import personal User Ratings
 
 There is no native integration to import the personal movie ratings of a tmdb user at the moment.

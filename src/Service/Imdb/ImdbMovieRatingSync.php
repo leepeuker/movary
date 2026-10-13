@@ -5,6 +5,7 @@ namespace Movary\Service\Imdb;
 use Movary\Api\Imdb\ImdbApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\JobQueue\JobEntity;
 use Psr\Log\LoggerInterface;
 
 class ImdbMovieRatingSync
@@ -83,6 +84,18 @@ class ImdbMovieRatingSync
                 break;
             }
         }
+    }
+
+    public function executeJob(JobEntity $job) : void
+    {
+        $parameters = $job->getParameters();
+
+        $this->syncMultipleMovieRatings(
+            $parameters['maxAgeInHours'] ?? null,
+            $parameters['threshold'] ?? null,
+            $parameters['movieIds'] ?? null,
+            $parameters['onlyNeverSynced'] ?? false,
+        );
     }
 
     private function generateMovieLogData(MovieEntity $movie) : array

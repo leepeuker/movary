@@ -96,6 +96,14 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
     ]);
+    $routes->add('POST', '/jobs/schedule/imdb-ratings-sync', [Web\JobController::class, 'scheduleImdbRatingsSync'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('POST', '/jobs/schedule/tmdb-image-cache-refresh', [Web\JobController::class, 'scheduleTmdbImageCacheRefresh'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
 
     ############
     # Settings #

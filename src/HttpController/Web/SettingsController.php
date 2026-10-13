@@ -659,7 +659,12 @@ class SettingsController
                 'jobScheduleFilterType' => $scheduleFilter->getType(),
                 'jobScheduleFilterStatus' => $paginationQuery['status'] ?? null,
                 'jobScheduleFiltersActive' => $scheduleFilter->hasFilters(),
-                'jobScheduleTypes' => [JobType::createTmdbMovieSync(), JobType::createTmdbPersonSync()],
+                'jobScheduleTypes' => [
+                    JobType::createTmdbMovieSync(),
+                    JobType::createTmdbPersonSync(),
+                    JobType::createTmdbImageCache(),
+                    JobType::createImdbSync(),
+                ],
                 'users' => $this->userApi->fetchAll(),
             ]),
         );
