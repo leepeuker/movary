@@ -21,10 +21,9 @@
 
             <div style="padding-top: 1rem">
                 <h5 class="text-center">Locations</h5>
+                <p>Create and manage locations where you watched movies. Click a location row to edit or delete it.</p>
 
                 <div style="padding-bottom: .8rem">
-                    <p>You can set the location where you have watched a movie.</p>
-
                     {% if locationsEnabled %}
                         <button type="button" class="btn btn-outline-danger" onclick="toggleLocationFeature()" id="toggleLocationsFeatureBtn">Disable locations</button>
                     {% else %}
@@ -34,7 +33,7 @@
 
                 <div id="locationToggleAlerts"></div>
 
-                <hr>
+                <div id="locationAlerts"></div>
 
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-3 text-start">
                     <div class="d-flex align-items-center gap-2">
@@ -81,9 +80,6 @@
                     paginationPath: applicationUrl ~ '/settings/account/locations',
                     paginationQuery: paginationQuery,
                 }) }}
-
-                <div id="locationAlerts"></div>
-
             </div>
         </div>
 
