@@ -37,7 +37,50 @@ function getCsrfToken() {
     return token
 }
 
+function setLocalizedUtcDateTime(element, utcDateTime, includeTimeZone = true) {
+    if (utcDateTime === '-') {
+        element.textContent = '-'
+        element.removeAttribute('title')
+        return
+    }
+
+    const date = new Date(utcDateTime.replace(' ', 'T') + 'Z')
+    if (Number.isNaN(date.getTime())) {
+        element.textContent = utcDateTime + ' UTC'
+        element.removeAttribute('title')
+        return
+    }
+
+    const dateTimeParts = new Intl.DateTimeFormat(undefined, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short',
+        hourCycle: 'h23',
+    }).formatToParts(date)
+    const parts = Object.fromEntries(dateTimeParts.map((part) => [part.type, part.value]))
+
+    element.textContent = parts.year + '-' + parts.month + '-' + parts.day + ' ' +
+        parts.hour + ':' + parts.minute + ':' + parts.second +
+        (includeTimeZone ? ' ' + parts.timeZoneName : '')
+    element.title = utcDateTime + ' UTC'
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    const localTimeZone = new Intl.DateTimeFormat(undefined, {timeZoneName: 'short'})
+        .formatToParts(new Date())
+        .find((part) => part.type === 'timeZoneName').value
+    document.querySelectorAll('[data-local-time-zone-label]').forEach((element) => {
+        element.textContent += ' (' + localTimeZone + ')'
+    })
+
+    document.querySelectorAll('[data-utc-date-time]').forEach((element) => {
+        setLocalizedUtcDateTime(element, element.dataset.utcDateTime, false)
+    })
+
     document.querySelectorAll('.settings-table-action').forEach((button) => {
         bootstrap.Tooltip.getOrCreateInstance(button)
     })

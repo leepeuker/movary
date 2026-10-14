@@ -173,8 +173,8 @@ function showJobDetails(row) {
     document.getElementById('jobDetailsUser').textContent = formatJobUser(row.dataset.jobUserName, row.dataset.jobUserId)
     document.getElementById('jobDetailsType').textContent = row.dataset.jobType
     document.getElementById('jobDetailsStatus').textContent = row.dataset.jobStatus
-    document.getElementById('jobDetailsUpdatedAt').textContent = row.dataset.jobUpdatedAt
-    document.getElementById('jobDetailsCreatedAt').textContent = row.dataset.jobCreatedAt
+    setLocalizedUtcDateTime(document.getElementById('jobDetailsUpdatedAt'), row.dataset.jobUpdatedAt)
+    setLocalizedUtcDateTime(document.getElementById('jobDetailsCreatedAt'), row.dataset.jobCreatedAt)
     document.getElementById('jobDetailsParameters').textContent = formatJobParameters(row.dataset.jobParameters)
     document.getElementById('jobDetailsAlerts').innerHTML = ''
 

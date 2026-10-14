@@ -67,7 +67,7 @@
                             <th scope="col">User</th>
                             <th scope="col">Type</th>
                             <th scope="col">Cron expression (UTC)</th>
-                            <th scope="col">Next run (UTC)</th>
+                            <th scope="col" data-local-time-zone-label>Next run</th>
                             <th scope="col">Status</th>
                         </tr>
                         </thead>
@@ -89,7 +89,7 @@
                                 <td>{{ schedule.userName|default('-') }}</td>
                                 <td>{{ schedule.type }}</td>
                                 <td class="font-monospace">{{ schedule.cronExpression }}</td>
-                                <td>{{ schedule.nextRunAt }}</td>
+                                <td data-utc-date-time="{{ schedule.nextRunAt }}">{{ schedule.nextRunAt }} UTC</td>
                                 <td>{{ schedule.enabled ? 'enabled' : 'disabled' }}</td>
                             </tr>
                         {% endfor %}
