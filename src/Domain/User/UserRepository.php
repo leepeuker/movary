@@ -205,12 +205,19 @@ class UserRepository
         );
     }
 
-    public function createUser(string $email, string $passwordHash, string $name, bool $isAdmin) : void
+    public function createUser(
+        string $email,
+        string $passwordHash,
+        string $name,
+        bool $isAdmin,
+        ?DateTime $emailVerifiedAt,
+    ) : void
     {
         $this->dbConnection->insert(
             'user',
             [
                 'email' => $email,
+                'email_verified_at' => $emailVerifiedAt === null ? null : (string)$emailVerifiedAt,
                 'password' => $passwordHash,
                 'is_admin' => (int)$isAdmin,
                 'name' => $name,

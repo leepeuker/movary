@@ -69,7 +69,13 @@ class CreateUserController
 
         $flashMessage = null;
         try {
-            $this->userApi->createUser($email, $password, $name, $hasUsers === false);
+            $this->userApi->createUser(
+                $email,
+                $password,
+                $name,
+                $hasUsers === false,
+                emailVerified: true,
+            );
 
             $this->authenticationService->loginWebSession($email, $password, false, $userAgent);
         } catch (PasswordTooShort) {

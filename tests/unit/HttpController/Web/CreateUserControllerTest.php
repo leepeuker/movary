@@ -101,7 +101,7 @@ class CreateUserControllerTest extends TestCase
         $this->userApiMock
             ->expects(self::once())
             ->method('createUser')
-            ->with('user@example.com', 'password', 'user', false)
+            ->with('user@example.com', 'password', 'user', false, true)
             ->willThrowException($exception);
         $this->authenticationMock->expects(self::never())->method('loginWebSession');
         $this->flashMessageServiceMock->expects(self::once())->method('add')->with($message);
@@ -136,7 +136,7 @@ class CreateUserControllerTest extends TestCase
         $this->userApiMock
             ->expects(self::once())
             ->method('createUser')
-            ->with('user@example.com', 'password', 'user', false);
+            ->with('user@example.com', 'password', 'user', false, true);
         $this->authenticationMock
             ->expects(self::once())
             ->method('loginWebSession')

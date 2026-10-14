@@ -8,6 +8,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
 use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\Service\Validator;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\Url;
 use Ramsey\Uuid\Uuid;
@@ -22,14 +23,26 @@ class UserApi
     ) {
     }
 
-    public function createUser(string $email, string $password, string $name, bool $isAdmin = false) : void
+    public function createUser(
+        string $email,
+        string $password,
+        string $name,
+        bool $isAdmin,
+        bool $emailVerified,
+    ) : void
     {
         $this->userValidator->ensureEmailIsUnique($email);
         $this->passwordPolicy->ensurePasswordIsValid($password);
         $this->userValidator->ensureNameFormatIsValid($name);
         $this->userValidator->ensureNameIsUnique($name);
 
-        $this->repository->createUser($email, password_hash($password, PASSWORD_DEFAULT), $name, $isAdmin);
+        $this->repository->createUser(
+            $email,
+            password_hash($password, PASSWORD_DEFAULT),
+            $name,
+            $isAdmin,
+            $emailVerified === true ? DateTime::create() : null,
+        );
     }
 
     public function deleteEmbyWebhookId(int $userId) : void

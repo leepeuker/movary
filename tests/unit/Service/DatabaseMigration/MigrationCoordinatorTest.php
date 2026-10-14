@@ -39,7 +39,7 @@ class MigrationCoordinatorTest extends TestCase
                 MigrationState::DOCTRINE,
                 (new MigrationStateDetector($connection, $this->expectedLegacyVersions()))->detect(),
             );
-            self::assertCount(29, $connection->createSchemaManager()->listTableNames());
+            self::assertCount(30, $connection->createSchemaManager()->listTableNames());
         } finally {
             $connection->close();
         }
