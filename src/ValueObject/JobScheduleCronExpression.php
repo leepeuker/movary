@@ -36,7 +36,7 @@ class JobScheduleCronExpression implements JsonSerializable
     public function calculateNextRun(DateTime $currentDateTime) : DateTime
     {
         $nextRun = (new CronExpression($this->expression))->getNextRunDate(
-            (string)$currentDateTime,
+            (string)$currentDateTime . ' ' . DateTime::DEFAULT_TIME_ZONE,
             timeZone: DateTime::DEFAULT_TIME_ZONE,
         );
 
