@@ -49,7 +49,7 @@ class UserApiTest extends TestCase
         self::assertSame([], $subject->fetchAllPaginated(20, 0, true));
     }
 
-    public function testCreateUserValidatesPassword() : void
+    public function testCreateVerifiedUserValidatesPassword() : void
     {
         $repository = $this->createMock(UserRepository::class);
         $validator = $this->createStub(Validator::class);
@@ -63,12 +63,38 @@ class UserApiTest extends TestCase
                 self::callback(static fn(string $hash) => password_verify('a secure password', $hash)),
                 'user',
                 false,
+                self::isInstanceOf(\Movary\ValueObject\DateTime::class),
             );
 
         (new UserApi($repository, $validator, $passwordPolicy))->createUser(
             'user@example.com',
             'a secure password',
             'user',
+            false,
+            true,
+        );
+    }
+
+    public function testCreateUnverifiedUserDoesNotSetVerificationDate() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('createUser')
+            ->with(
+                'user@example.com',
+                self::callback(static fn(string $hash) => password_verify('a secure password', $hash)),
+                'user',
+                false,
+                null,
+            );
+
+        $this->createSubject($repository)->createUser(
+            'user@example.com',
+            'a secure password',
+            'user',
+            false,
+            false,
         );
     }
 

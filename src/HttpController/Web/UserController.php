@@ -37,6 +37,7 @@ class UserController
                 $requestUserData['password'],
                 $requestUserData['name'],
                 $requestUserData['isAdmin'],
+                emailVerified: true,
             );
         } catch (EmailNotUnique) {
             return Response::createBadRequest('Email already in use.');

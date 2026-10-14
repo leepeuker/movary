@@ -33,6 +33,43 @@ class UserRepositoryTest extends TestCase
         self::assertSame(72, $this->subject->countUsers());
     }
 
+    public function testCreateVerifiedUserStoresVerificationDate() : void
+    {
+        $verifiedAt = DateTime::createFromString('2026-10-14 20:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('insert')
+            ->with(
+                'user',
+                self::callback(
+                    static fn(array $data) : bool => $data['email'] === 'alice@example.com'
+                        && $data['email_verified_at'] === '2026-10-14 20:00:00'
+                        && $data['password'] === 'password-hash'
+                        && $data['is_admin'] === 0
+                        && $data['name'] === 'Alice'
+                        && is_string($data['created_at']),
+                ),
+            );
+
+        $this->subject->createUser('alice@example.com', 'password-hash', 'Alice', false, $verifiedAt);
+    }
+
+    public function testCreateUnverifiedUserStoresNullVerificationDate() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('insert')
+            ->with(
+                'user',
+                self::callback(
+                    static fn(array $data) : bool => array_key_exists('email_verified_at', $data)
+                        && $data['email_verified_at'] === null,
+                ),
+            );
+
+        $this->subject->createUser('alice@example.com', 'password-hash', 'Alice', false, null);
+    }
+
     public function testFetchAllPaginatedAppliesLimitAndOffset() : void
     {
         $users = [[

@@ -48,7 +48,7 @@ class UserCreate extends Command
         $isAdmin = (bool)$input->getArgument('isAdmin');
 
         try {
-            $this->userApi->createUser($email, $password, $name, $isAdmin);
+            $this->userApi->createUser($email, $password, $name, $isAdmin, emailVerified: true);
         } catch (EmailNotUnique $e) {
             $this->generateOutput($output, 'Could not create user: Email already in use');
 

@@ -3,6 +3,7 @@
 namespace Movary\Domain\User;
 
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\ValueObject\DateTime;
 use Movary\ValueObject\MovieTitleDisplay;
 use Movary\ValueObject\Url;
 
@@ -12,6 +13,7 @@ class UserEntity
         private readonly int $id,
         private readonly string $name,
         private readonly string $email,
+        private readonly ?DateTime $emailVerifiedAt,
         private readonly string $passwordHash,
         private readonly bool $isAdmin,
         private readonly bool $isEnabled,
@@ -57,6 +59,9 @@ class UserEntity
             (int)$data['id'],
             $data['name'],
             $data['email'],
+            $data['email_verified_at'] === null
+                ? null
+                : DateTime::createFromString($data['email_verified_at']),
             $data['password'],
             (bool)$data['is_admin'],
             (bool)$data['is_enabled'],
@@ -144,6 +149,11 @@ class UserEntity
     public function getEmail() : string
     {
         return $this->email;
+    }
+
+    public function getEmailVerifiedAt() : ?DateTime
+    {
+        return $this->emailVerifiedAt;
     }
 
     public function getEmbyWebhookId() : ?string
@@ -289,5 +299,10 @@ class UserEntity
     public function isEnabled() : bool
     {
         return $this->isEnabled;
+    }
+
+    public function isEmailVerified() : bool
+    {
+        return $this->emailVerifiedAt !== null;
     }
 }
