@@ -46,9 +46,14 @@
                         </select>
                         <label for="locationsPerPage" class="form-label mb-0">per page</label>
                     </div>
-                    <button class="btn btn-primary" type="button" onclick="refreshLocationsPage()" aria-label="Refresh locations" title="Refresh locations" {% if locationsEnabled == false %}disabled{% endif %}>
-                        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-                    </button>
+                    <div class="btn-group" role="group" aria-label="Location table actions">
+                        <button class="btn btn-primary settings-table-action" type="button" onclick="refreshLocationsPage()" data-bs-title="Refresh locations" aria-label="Refresh locations" {% if locationsEnabled == false %}disabled{% endif %}>
+                            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-primary settings-table-action" type="button" onclick="showCreateLocationModal()" id="createLocationBtn" data-bs-title="Add location" aria-label="Add location" style="border-left-color: #aab0b3" {% if locationsEnabled == false %}disabled{% endif %}>
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-responsive">
@@ -79,8 +84,6 @@
 
                 <div id="locationAlerts"></div>
 
-                <button type="button" class="btn btn-primary" style="width: 100%" onclick="showCreateLocationModal()" id="createLocationBtn" {% if locationsEnabled == false %}disabled{% endif %}>Add Location</button>
-                <br>
             </div>
         </div>
 

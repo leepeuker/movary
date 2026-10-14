@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('jobsPerPage').addEventListener('change', () => refreshPage(true))
     document.getElementById('createJobForm').addEventListener('submit', createJob)
     document.getElementById('createJobType').addEventListener('change', updateCreateJobFields)
+    document.getElementById('removeJobsForm').addEventListener('submit', removeJobs)
+    document.getElementById('removeJobsModal').addEventListener('show.bs.modal', resetRemoveJobsForm)
     updateCreateJobFields()
 });
 
@@ -316,23 +318,35 @@ function setOptionalQueryParameter(url, name, value) {
     url.searchParams.set(name, value)
 }
 
-async function removeAllJobs() {
-    const confirmed = await showConfirmationModal({
-        title: 'Remove all jobs',
-        message: 'Are you sure you want to remove all jobs? This will not stop jobs currently in progress.',
-        confirmLabel: 'Remove all jobs',
-        confirmClass: 'btn-danger',
-    })
+async function removeJobs(event) {
+    event.preventDefault()
 
-    if (confirmed === false) {
+    const scope = new FormData(event.currentTarget).get('removeJobsScope')
+    const removalOptions = {
+        processed: {
+            endpoint: '/job-queue/purge-processed',
+            errorMessage: 'Could not remove processed jobs',
+            successMessage: 'Removed processed jobs',
+        },
+        all: {
+            endpoint: '/job-queue/purge-all',
+            errorMessage: 'Could not remove all jobs',
+            successMessage: 'Removed all jobs',
+        },
+    }
+    const removal = removalOptions[scope]
+    if (removal === undefined) {
         return
     }
 
-    addAlert('alertJobsDiv', 'Removing all jobs...', 'info');
+    const removeButton = document.getElementById('removeJobsSubmitButton')
+    const errorElement = document.getElementById('removeJobsError')
+    removeButton.disabled = true
+    errorElement.classList.add('d-none')
 
     try {
         const response = await fetchWithCsrf(
-            APPLICATION_URL + '/job-queue/purge-all', {
+            APPLICATION_URL + removal.endpoint, {
                 method: 'POST',
                 signal: AbortSignal.timeout(10000)
             }
@@ -340,56 +354,26 @@ async function removeAllJobs() {
 
         if (!response.ok) {
             console.error('Response status: ' + response.status)
-            addAlert('alertJobsDiv', 'Could not remove all jobs', 'danger');
+            errorElement.textContent = removal.errorMessage
+            errorElement.classList.remove('d-none')
 
             return
         }
     } catch (error) {
         console.error(error)
-        addAlert('alertJobsDiv', 'Could not remove all jobs', 'danger');
+        errorElement.textContent = removal.errorMessage
+        errorElement.classList.remove('d-none')
 
         return
+    } finally {
+        removeButton.disabled = false
     }
 
-    localStorage.setItem('alertMessageJobQueue', 'Removed all jobs')
+    localStorage.setItem('alertMessageJobQueue', removal.successMessage)
     refreshPage()
 }
 
-async function removeProcessedJobs() {
-    const confirmed = await showConfirmationModal({
-        title: 'Remove processed jobs',
-        message: 'Are you sure you want to remove all processed jobs? This includes all jobs with status "done" and "failed".',
-        confirmLabel: 'Remove processed jobs',
-        confirmClass: 'btn-warning',
-    })
-
-    if (confirmed === false) {
-        return
-    }
-
-    addAlert('alertJobsDiv', 'Removing processed jobs...', 'info');
-
-    try {
-        const response = await fetchWithCsrf(
-            APPLICATION_URL + '/job-queue/purge-processed', {
-                method: 'POST',
-                signal: AbortSignal.timeout(10000)
-            }
-        );
-
-        if (!response.ok) {
-            console.error('Response status: ' + response.status)
-            addAlert('alertJobsDiv', 'Could not remove processed jobs', 'danger');
-
-            return
-        }
-    } catch (error) {
-        console.error(error)
-        addAlert('alertJobsDiv', 'Could not remove processed jobs', 'danger');
-
-        return
-    }
-
-    localStorage.setItem('alertMessageJobQueue', 'Removed processed jobs')
-    refreshPage()
+function resetRemoveJobsForm() {
+    document.getElementById('removeJobsForm').reset()
+    document.getElementById('removeJobsError').classList.add('d-none')
 }

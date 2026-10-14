@@ -39,9 +39,19 @@
                         </select>
                         <label for="apiTokensPerPage" class="form-label mb-0">per page</label>
                     </div>
-                    <button class="btn btn-primary" type="button" onclick="refreshApiTokensPage()" aria-label="Refresh API tokens" title="Refresh API tokens">
-                        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-danger settings-table-action" type="button" onclick="revokeAllApiTokens()" data-bs-title="Revoke all tokens" aria-label="Revoke all tokens" {{ paginationElements.totalCount == 0 ? 'disabled' }}>
+                            <i class="bi bi-trash-fill" aria-hidden="true"></i>
+                        </button>
+                        <div class="btn-group" role="group" aria-label="API token table actions">
+                            <button class="btn btn-primary settings-table-action" type="button" onclick="refreshApiTokensPage()" data-bs-title="Refresh API tokens" aria-label="Refresh API tokens">
+                                <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-primary settings-table-action" type="button" onclick="showCreateApiTokenModal()" data-bs-title="Add token" aria-label="Add token" style="border-left-color: #aab0b3">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="table-responsive">
@@ -87,10 +97,6 @@
                     paginationQuery: paginationQuery,
                 }) }}
 
-                <div class="d-grid gap-2 mt-3">
-                    <button type="button" class="btn btn-primary" onclick="showCreateApiTokenModal()">Add token</button>
-                    <button type="button" class="btn btn-danger" onclick="revokeAllApiTokens()" {{ paginationElements.totalCount == 0 ? 'disabled' }}>Revoke all tokens</button>
-                </div>
             </div>
         </div>
 

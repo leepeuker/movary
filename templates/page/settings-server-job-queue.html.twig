@@ -21,6 +21,7 @@
             {{ include('component/modal-job-details.html.twig') }}
             {{ include('component/modal-job-filters.html.twig') }}
             {{ include('component/modal-create-job.html.twig') }}
+            {{ include('component/modal-remove-jobs.html.twig') }}
 
             <div style="padding-bottom: 1rem;padding-top: 1rem">
                 <h5 style="margin-bottom: 1rem">Job Queue</h5>
@@ -43,13 +44,21 @@
                             </select>
                             <label for="jobsPerPage" class="form-label mb-0">per page</label>
                         </div>
-                        <div class="btn-group" role="group" aria-label="Job table actions">
-                            <button class="btn btn-primary {{ jobFiltersActive ? 'active' }}" type="button" data-bs-toggle="modal" data-bs-target="#jobFiltersModal" aria-label="Filter jobs" title="Filter jobs" aria-pressed="{{ jobFiltersActive ? 'true' : 'false' }}">
-                                <i class="bi bi-filter" aria-hidden="true"></i>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger settings-table-action" type="button" data-bs-toggle="modal" data-bs-target="#removeJobsModal" data-bs-title="Remove jobs" aria-label="Remove jobs">
+                                <i class="bi bi-trash-fill" aria-hidden="true"></i>
                             </button>
-                            <button class="btn btn-primary" type="button" onclick="refreshPage()" aria-label="Refresh jobs" title="Refresh jobs" style="border-left-color: #aab0b3">
-                                <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-                            </button>
+                            <div class="btn-group" role="group" aria-label="Job table actions">
+                                <button class="btn btn-primary settings-table-action {{ jobFiltersActive ? 'active' }}" type="button" data-bs-toggle="modal" data-bs-target="#jobFiltersModal" data-bs-title="Filter jobs" aria-label="Filter jobs" aria-pressed="{{ jobFiltersActive ? 'true' : 'false' }}">
+                                    <i class="bi bi-filter" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-primary settings-table-action" type="button" onclick="refreshPage()" data-bs-title="Refresh jobs" aria-label="Refresh jobs" style="border-left-color: #aab0b3">
+                                    <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-primary settings-table-action" type="button" onclick="showCreateJobModal()" data-bs-title="Create job" aria-label="Create job" style="border-left-color: #aab0b3">
+                                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -99,17 +108,6 @@
 
                 {% if jobs|length == 0 %}<p>No jobs in queue</p>{% endif %}
 
-                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="showCreateJobModal()">Create Job</button>
-
-                <hr> 
-                
-                <div>
-                    <h5>Job Queue Maintenance</h6>
-                    <div style="margin-top:1rem">
-                        <button class="btn btn-outline-warning" type="button" onclick="removeProcessedJobs()">Remove processed jobs</button>
-                        <button class="btn btn-outline-danger" type="button" onclick="removeAllJobs()">Remove all jobs</button>
-                    </div>
-                </div>
             </div>
         </div>
     </main>

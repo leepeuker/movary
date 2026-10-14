@@ -38,6 +38,10 @@ function getCsrfToken() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.settings-table-action').forEach((button) => {
+        bootstrap.Tooltip.getOrCreateInstance(button)
+    })
+
     const theme = document.cookie.split('; ').find((row) => row.startsWith('theme='))?.split('=')[1] ?? 'light';
     const darkModeInput = document.getElementById('darkModeInput');
     if (darkModeInput != null) {
