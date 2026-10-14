@@ -41,6 +41,23 @@ class JobScheduleCronExpressionTest extends TestCase
         self::assertSame('0 12 * * 1', (string)JobScheduleCronExpression::createFromString('  0  12  * *  1 '));
     }
 
+    public function testCalculateNextRunUsesUtcWhenPhpDefaultTimeZoneIsNotUtc() : void
+    {
+        $originalTimeZone = date_default_timezone_get();
+
+        try {
+            date_default_timezone_set('Europe/Berlin');
+
+            $nextRun = JobScheduleCronExpression::createFromString('*/10 * * * *')->calculateNextRun(
+                DateTime::createFromString('2026-10-14 14:04:00'),
+            );
+
+            self::assertSame('2026-10-14 14:10:00', (string)$nextRun);
+        } finally {
+            date_default_timezone_set($originalTimeZone);
+        }
+    }
+
     #[DataProvider('provideInvalidExpressions')]
     public function testRejectsInvalidExpression(string $expression) : void
     {
