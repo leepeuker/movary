@@ -74,4 +74,22 @@ class EmailSupportTest extends TestCase
 
         self::assertTrue($this->subject->isPasswordResetAvailable());
     }
+
+    public function testEmailVerificationIsUnavailableWithoutApplicationUrl() : void
+    {
+        $this->serverSettingsMock->method('isEmailEnabled')->willReturn(true);
+        $this->smtpConfigFactoryMock->method('create')->willReturn($this->createMock(SmtpConfig::class));
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(false);
+
+        self::assertFalse($this->subject->isEmailVerificationAvailable());
+    }
+
+    public function testEmailVerificationIsAvailableWithCompleteConfiguration() : void
+    {
+        $this->serverSettingsMock->method('isEmailEnabled')->willReturn(true);
+        $this->smtpConfigFactoryMock->method('create')->willReturn($this->createMock(SmtpConfig::class));
+        $this->applicationUrlServiceMock->method('hasApplicationUrl')->willReturn(true);
+
+        self::assertTrue($this->subject->isEmailVerificationAvailable());
+    }
 }

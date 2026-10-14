@@ -26,6 +26,13 @@ class EmailSupport
             && $this->applicationUrlService->hasApplicationUrl();
     }
 
+    public function isEmailVerificationAvailable() : bool
+    {
+        return $this->isEnabled()
+            && $this->isSmtpConfigured()
+            && $this->applicationUrlService->hasApplicationUrl();
+    }
+
     public function isSmtpConfigured() : bool
     {
         try {

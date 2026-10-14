@@ -82,6 +82,16 @@ class JobQueueApi
         $this->repository->addJob(JobType::createLetterboxdImportHistory(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);
     }
 
+    public function addEmailVerificationJob(int $userId, bool $ignoreCooldown = false) : void
+    {
+        $this->repository->addJob(
+            JobType::createEmailVerification(),
+            JobStatus::createWaiting(),
+            $userId,
+            ['ignoreCooldown' => $ignoreCooldown],
+        );
+    }
+
     public function addLetterboxdImportRatingsJob(int $userId, string $importFile) : void
     {
         $this->repository->addJob(JobType::createLetterboxdImportRatings(), JobStatus::createWaiting(), $userId, ['importFile' => $importFile]);

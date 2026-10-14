@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Verification email requested
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset_url('css/password-reset.css') }}">
+{% endblock %}
+
+{% block body %}
+    <script>
+        if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
+    </script>
+    <main role="main" class="form-password-reset w-100 m-auto text-center">
+        <h1 class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Check your inbox</h1>
+        <div class="alert alert-success" role="alert">
+            If an unverified account exists for that email address, a verification email has been scheduled.
+        </div>
+        <a href="{{ applicationUrl }}/login">Back to login</a>
+    </main>
+{% endblock %}

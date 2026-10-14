@@ -205,6 +205,120 @@ class UserRepositoryTest extends TestCase
         );
     }
 
+    public function testReplaceEmailVerificationToken() : void
+    {
+        $expirationDate = DateTime::createFromString('2026-10-15 20:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_email_verification_token', ['user_id' => 12]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('insert')
+            ->with(
+                'user_email_verification_token',
+                self::callback(
+                    static fn(array $data) : bool => $data['user_id'] === 12
+                        && $data['email'] === 'alice@example.com'
+                        && $data['token_hash'] === 'token-hash'
+                        && $data['expiration_date'] === '2026-10-15 20:00:00'
+                        && is_string($data['created_at']),
+                ),
+            );
+
+        $this->subject->replaceEmailVerificationToken(
+            12,
+            'alice@example.com',
+            'token-hash',
+            $expirationDate,
+        );
+    }
+
+    public function testVerifyEmailWithTokenConsumesTokenAndSetsTimestamp() : void
+    {
+        $currentDate = DateTime::createFromString('2026-10-14 20:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->willReturn([
+                'user_id' => '12',
+                'email' => 'alice@example.com',
+                'current_email' => 'alice@example.com',
+                'expiration_date' => '2026-10-15 20:00:00',
+            ]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_email_verification_token', ['token_hash' => 'token-hash'])
+            ->willReturn(1);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'user',
+                ['email_verified_at' => '2026-10-14 20:00:00'],
+                ['id' => 12, 'email' => 'alice@example.com'],
+            )
+            ->willReturn(1);
+
+        self::assertTrue($this->subject->verifyEmailWithToken('token-hash', $currentDate));
+    }
+
+    public function testVerifyEmailWithTokenRejectsChangedEmail() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->method('fetchAssociative')
+            ->willReturn([
+                'user_id' => '12',
+                'email' => 'old@example.com',
+                'current_email' => 'new@example.com',
+                'expiration_date' => '2026-10-15 20:00:00',
+            ]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_email_verification_token', ['token_hash' => 'token-hash']);
+        $this->dbConnectionMock->expects(self::never())->method('update');
+
+        self::assertFalse($this->subject->verifyEmailWithToken(
+            'token-hash',
+            DateTime::createFromString('2026-10-14 20:00:00'),
+        ));
+    }
+
+    public function testFindEmailVerificationTokenData() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->with(self::stringContains('user_email_verification_token'), ['token-hash'])
+            ->willReturn([
+                'user_id' => '12',
+                'email' => 'alice@example.com',
+                'current_email' => 'alice@example.com',
+                'expiration_date' => '2026-10-15 20:00:00',
+            ]);
+
+        self::assertEquals([
+            'userId' => 12,
+            'email' => 'alice@example.com',
+            'currentEmail' => 'alice@example.com',
+            'expirationDate' => DateTime::createFromString('2026-10-15 20:00:00'),
+        ], $this->subject->findEmailVerificationTokenData('token-hash'));
+    }
+
     public function testDeleteAllLoginAttempts() : void
     {
         $this->dbConnectionMock

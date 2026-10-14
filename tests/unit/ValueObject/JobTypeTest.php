@@ -14,7 +14,8 @@ class JobTypeTest extends TestCase
     {
         self::assertContains('tmdb_movie_sync', JobType::getSupportedTypes());
         self::assertContains('password_reset_email', JobType::getSupportedTypes());
-        self::assertCount(14, JobType::getSupportedTypes());
+        self::assertContains('email_verification', JobType::getSupportedTypes());
+        self::assertCount(15, JobType::getSupportedTypes());
     }
 
     public function testCreateImdbSync() : void
@@ -94,5 +95,13 @@ class JobTypeTest extends TestCase
 
         self::assertSame('password_reset_email', (string)$subject);
         self::assertTrue($subject->isOfTypePasswordResetEmail());
+    }
+
+    public function testCreateEmailVerification() : void
+    {
+        $subject = JobType::createEmailVerification();
+
+        self::assertSame('email_verification', (string)$subject);
+        self::assertTrue($subject->isOfTypeEmailVerification());
     }
 }

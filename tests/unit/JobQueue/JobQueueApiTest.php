@@ -56,6 +56,24 @@ class JobQueueApiTest extends TestCase
         (new JobQueueApi($repository))->addPasswordResetEmailJob(12, true);
     }
 
+    public function testAddEmailVerificationJobAddsWaitingJobWithoutSensitiveParameters() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJob')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'email_verification'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'waiting'),
+                12,
+                ['ignoreCooldown' => true],
+            )
+            ->willReturn(5);
+
+        (new JobQueueApi($repository))->addEmailVerificationJob(12, true);
+    }
+
     public function testAddTmdbMovieSyncJobAddsMovieIdsAsParameters() : void
     {
         /** @var JobQueueRepository&MockObject $repository */
