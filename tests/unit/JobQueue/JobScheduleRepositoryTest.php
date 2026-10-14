@@ -15,6 +15,18 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(JobScheduleRepository::class)]
 class JobScheduleRepositoryTest extends TestCase
 {
+    public function testDeleteAllRemovesEverySchedule() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with('DELETE FROM job_schedule');
+
+        (new JobScheduleRepository($connection))->deleteAll();
+    }
+
     public function testCountSchedulesAppliesFilters() : void
     {
         /** @var Connection&MockObject $connection */

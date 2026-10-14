@@ -69,12 +69,13 @@ class RouteSecurityTest extends TestCase
                 '/jobs/schedule/tmdb-person-sync',
                 '/jobs/schedule/tmdb-image-cache-refresh',
                 '/jobs/schedule/imdb-ratings-sync',
+                '/job-schedules',
                 '/job-schedules/{scheduleId:\d+}',
                 '/job-schedules/{scheduleId:\d+}/enabled',
             ], true),
         );
 
-        self::assertCount(6, $routes);
+        self::assertCount(7, $routes);
         foreach ($routes as $route) {
             self::assertContains(UserIsAuthenticated::class, $route['middleware']);
             self::assertContains(UserIsAdmin::class, $route['middleware']);

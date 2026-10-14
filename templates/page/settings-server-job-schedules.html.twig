@@ -41,16 +41,21 @@
                         </select>
                         <label for="jobSchedulesPerPage" class="form-label mb-0">per page</label>
                     </div>
-                    <div class="btn-group" role="group" aria-label="Job schedule table actions">
-                        <button class="btn btn-primary settings-table-action {{ jobScheduleFiltersActive ? 'active' }}" type="button" data-bs-toggle="modal" data-bs-target="#jobScheduleFiltersModal" data-bs-title="Filter job schedules" aria-label="Filter job schedules" aria-pressed="{{ jobScheduleFiltersActive ? 'true' : 'false' }}">
-                            <i class="bi bi-filter" aria-hidden="true"></i>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-danger settings-table-action" id="deleteAllJobSchedulesButton" type="button" onclick="deleteAllJobSchedules()" data-bs-title="Delete all job schedules" aria-label="Delete all job schedules">
+                            <i class="bi bi-trash-fill" aria-hidden="true"></i>
                         </button>
-                        <button class="btn btn-primary settings-table-action" type="button" onclick="refreshJobSchedulesPage()" data-bs-title="Refresh job schedules" aria-label="Refresh job schedules" style="border-left-color: #aab0b3">
-                            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-                        </button>
-                        <button class="btn btn-primary settings-table-action" type="button" onclick="showCreateJobScheduleModal()" data-bs-title="Create job schedule" aria-label="Create job schedule" style="border-left-color: #aab0b3">
-                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                        </button>
+                        <div class="btn-group" role="group" aria-label="Job schedule table actions">
+                            <button class="btn btn-primary settings-table-action {{ jobScheduleFiltersActive ? 'active' }}" type="button" data-bs-toggle="modal" data-bs-target="#jobScheduleFiltersModal" data-bs-title="Filter job schedules" aria-label="Filter job schedules" aria-pressed="{{ jobScheduleFiltersActive ? 'true' : 'false' }}">
+                                <i class="bi bi-filter" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-primary settings-table-action" type="button" onclick="refreshJobSchedulesPage()" data-bs-title="Refresh job schedules" aria-label="Refresh job schedules" style="border-left-color: #aab0b3">
+                                <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-primary settings-table-action" type="button" onclick="showCreateJobScheduleModal()" data-bs-title="Create job schedule" aria-label="Create job schedule" style="border-left-color: #aab0b3">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

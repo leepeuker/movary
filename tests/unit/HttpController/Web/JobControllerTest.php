@@ -82,6 +82,13 @@ class JobControllerTest extends TestCase
         self::assertSame($expectedStatus, $this->subject->deleteJob($request)->getStatusCode()->getCode());
     }
 
+    public function testDeleteAllJobSchedulesReturnsNoContent() : void
+    {
+        $this->jobScheduleApiMock->expects(self::once())->method('deleteAll');
+
+        self::assertSame(204, $this->subject->deleteAllJobSchedules()->getStatusCode()->getCode());
+    }
+
     /** @param non-empty-string $jobMethod */
     #[DataProvider('provideTraktImports')]
     public function testScheduleTraktImportAddsMessage(string $jobMethod, FlashMessage $message) : void
