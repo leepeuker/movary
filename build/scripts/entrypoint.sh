@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Allow the file-based secret to be used when Compose provides an empty direct value.
+if [ -z "${APPLICATION_SECRET:-}" ] && [ -n "${APPLICATION_SECRET_FILE:-}" ]; then
+  unset APPLICATION_SECRET
+fi
+
 CONFIG_VALIDATION_ERROR=$(
   /usr/bin/php -r '
     try {
