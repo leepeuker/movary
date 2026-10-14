@@ -84,11 +84,22 @@ class JobQueueApi
 
     public function addEmailVerificationJob(int $userId, bool $ignoreCooldown = false) : void
     {
-        $this->repository->addJob(
-            JobType::createEmailVerification(),
-            JobStatus::createWaiting(),
+        $type = JobType::createEmailVerification();
+        $status = JobStatus::createWaiting();
+        $parameters = ['ignoreCooldown' => $ignoreCooldown];
+
+        if ($ignoreCooldown === true) {
+            $this->repository->addJob($type, $status, $userId, $parameters);
+
+            return;
+        }
+
+        $this->repository->addJobUnlessExistsForUserWithStatuses(
+            $type,
+            $status,
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
             $userId,
-            ['ignoreCooldown' => $ignoreCooldown],
+            $parameters,
         );
     }
 

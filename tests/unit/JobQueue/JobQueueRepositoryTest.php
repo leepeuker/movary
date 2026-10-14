@@ -223,6 +223,95 @@ class JobQueueRepositoryTest extends TestCase
         ));
     }
 
+    public function testAddJobUnlessExistsForUserWithStatusesDoesNotInsertDuplicate() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new SqlitePlatform());
+        $connection
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(static fn(callable $callback) : mixed => $callback($connection));
+        $connection
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with(
+                'UPDATE job_queue SET job_type = job_type WHERE job_type = ? AND user_id = ?',
+                self::callback(
+                    static fn(array $parameters) : bool => (string)$parameters[0] === 'email_verification'
+                        && $parameters[1] === 12,
+                ),
+            );
+        $connection
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with(
+                'SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND user_id = ? '
+                    . 'AND job_status IN (?, ?)',
+                self::callback(
+                    static fn(array $parameters) : bool => array_map('strval', $parameters) === [
+                        'email_verification',
+                        '12',
+                        'waiting',
+                        'in progress',
+                    ],
+                ),
+            )
+            ->willReturn('1');
+        $connection->expects(self::never())->method('insert');
+
+        self::assertNull((new JobQueueRepository($connection))->addJobUnlessExistsForUserWithStatuses(
+            JobType::createEmailVerification(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            12,
+            ['ignoreCooldown' => false],
+        ));
+    }
+
+    public function testAddJobUnlessExistsForUserWithStatusesUsesMysqlUserLock() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new MySQLPlatform());
+        $connection
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(static fn(callable $callback) : mixed => $callback($connection));
+        $connection
+            ->expects(self::exactly(3))
+            ->method('fetchOne')
+            ->willReturnCallback(static function (string $query, array $parameters) : string {
+                if ($query === 'SELECT GET_LOCK(?, 10)' || $query === 'SELECT RELEASE_LOCK(?)') {
+                    self::assertSame('movary:job-queue:email_verification:12', (string)$parameters[0]);
+
+                    return '1';
+                }
+
+                self::assertSame(
+                    'SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND user_id = ? '
+                        . 'AND job_status IN (?, ?)',
+                    $query,
+                );
+                self::assertSame(
+                    ['email_verification', '12', 'waiting', 'in progress'],
+                    array_map('strval', $parameters),
+                );
+
+                return '0';
+            });
+        $connection->expects(self::once())->method('insert');
+        $connection->expects(self::once())->method('lastInsertId')->willReturn('5');
+
+        self::assertSame(5, (new JobQueueRepository($connection))->addJobUnlessExistsForUserWithStatuses(
+            JobType::createEmailVerification(),
+            JobStatus::createWaiting(),
+            [JobStatus::createWaiting(), JobStatus::createInProgress()],
+            12,
+            ['ignoreCooldown' => false],
+        ));
+    }
+
     private static function assertLockParameters(array $parameters) : string
     {
         self::assertSame('movary:job-queue:tmdb_movie_sync', (string)$parameters[0]);

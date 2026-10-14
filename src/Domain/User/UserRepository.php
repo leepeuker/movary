@@ -1105,14 +1105,25 @@ class UserRepository
 
     public function updateEmail(int $userId, string $email) : void
     {
-        $this->dbConnection->update(
-            'user',
-            [
-                'email' => $email,
-            ],
-            [
-                'id' => $userId,
-            ],
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $email) : void {
+                $currentEmail = $connection->fetchOne('SELECT `email` FROM `user` WHERE `id` = ?', [$userId]);
+                if ($currentEmail === false || $currentEmail === $email) {
+                    return;
+                }
+
+                $connection->update(
+                    'user',
+                    [
+                        'email' => $email,
+                        'email_verified_at' => null,
+                    ],
+                    [
+                        'id' => $userId,
+                    ],
+                );
+                $connection->delete('user_email_verification_token', ['user_id' => $userId]);
+            },
         );
     }
 

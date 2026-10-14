@@ -70,6 +70,50 @@ class UserRepositoryTest extends TestCase
         $this->subject->createUser('alice@example.com', 'password-hash', 'Alice', false, null);
     }
 
+    public function testUpdateEmailInvalidatesVerificationAndPendingTokenWhenEmailChanges() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with('SELECT `email` FROM `user` WHERE `id` = ?', [12])
+            ->willReturn('old@example.com');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'user',
+                ['email' => 'new@example.com', 'email_verified_at' => null],
+                ['id' => 12],
+            );
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_email_verification_token', ['user_id' => 12]);
+
+        $this->subject->updateEmail(12, 'new@example.com');
+    }
+
+    public function testUpdateEmailPreservesVerificationAndTokenWhenEmailIsUnchanged() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with('SELECT `email` FROM `user` WHERE `id` = ?', [12])
+            ->willReturn('alice@example.com');
+        $this->dbConnectionMock->expects(self::never())->method('update');
+        $this->dbConnectionMock->expects(self::never())->method('delete');
+
+        $this->subject->updateEmail(12, 'alice@example.com');
+    }
+
     public function testFetchAllPaginatedAppliesLimitAndOffset() : void
     {
         $users = [[
