@@ -209,6 +209,7 @@ class Authentication
             $userAgent,
             $authTokenExpirationDate,
         );
+        $this->repository->updateLastLoginAt($user->getId(), DateTime::create());
 
         $this->setAuthenticationCookie($token, $authTokenExpirationDate);
         $this->authenticatedWebUser = AuthenticatedUser::create(

@@ -35,13 +35,20 @@ class UserRepositoryTest extends TestCase
 
     public function testFetchAllPaginatedAppliesLimitAndOffset() : void
     {
-        $users = [['id' => '7', 'name' => 'Alice', 'email' => 'alice@example.com', 'isAdmin' => '1']];
+        $users = [[
+            'id' => '7',
+            'name' => 'Alice',
+            'email' => 'alice@example.com',
+            'isAdmin' => '1',
+            'lastLoginAt' => '2026-10-14 12:00:00',
+        ]];
         $this->dbConnectionMock
             ->expects(self::once())
             ->method('fetchAllAssociative')
             ->with(
                 self::callback(
                     static fn(string $query) : bool => str_contains($query, 'ORDER BY id')
+                        && str_contains($query, 'last_login_at as lastLoginAt')
                         && str_contains($query, 'LIMIT 20 OFFSET 40'),
                 ),
                 [],
@@ -49,6 +56,21 @@ class UserRepositoryTest extends TestCase
             ->willReturn($users);
 
         self::assertSame($users, $this->subject->fetchAllPaginated(20, 40));
+    }
+
+    public function testUpdateLastLoginAt() : void
+    {
+        $lastLoginAt = DateTime::createFromString('2026-10-14 12:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'user',
+                ['last_login_at' => '2026-10-14 12:00:00'],
+                ['id' => 7],
+            );
+
+        $this->subject->updateLastLoginAt(7, $lastLoginAt);
     }
 
     public function testCountUsersAppliesRoleFilter() : void

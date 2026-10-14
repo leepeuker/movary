@@ -60,6 +60,7 @@
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Role</th>
+                            <th scope="col" data-local-time-zone-label>Last login</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -73,6 +74,7 @@
                                         {{ user.isAdmin == 1 ? 'Admin' : 'User' }}
                                     </span>
                                 </td>
+                                <td data-utc-date-time="{{ user.lastLoginAt|default('-') }}">{{ user.lastLoginAt ? user.lastLoginAt ~ ' UTC' : '-' }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

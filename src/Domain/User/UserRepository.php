@@ -43,6 +43,15 @@ class UserRepository
         return (int)$this->dbConnection->lastInsertId();
     }
 
+    public function updateLastLoginAt(int $userId, DateTime $lastLoginAt) : void
+    {
+        $this->dbConnection->update(
+            'user',
+            ['last_login_at' => (string)$lastLoginAt],
+            ['id' => $userId],
+        );
+    }
+
     public function createPersonalApiToken(
         int $userId,
         string $name,
@@ -289,7 +298,7 @@ class UserRepository
         [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
 
         return $this->dbConnection->fetchAllAssociative(
-            "SELECT id, name, email, is_admin as isAdmin
+            "SELECT id, name, email, is_admin as isAdmin, last_login_at as lastLoginAt
             FROM `user`
             $whereQuery
             ORDER BY id
