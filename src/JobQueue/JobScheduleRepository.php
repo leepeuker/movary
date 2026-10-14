@@ -50,6 +50,28 @@ class JobScheduleRepository
         $this->dbConnection->executeStatement('DELETE FROM job_schedule');
     }
 
+    public function update(
+        int $id,
+        JobType $jobType,
+        JobScheduleCronExpression $cronExpression,
+        array $parameters,
+        bool $enabled,
+        DateTime $nextRunAt,
+    ) : bool {
+        return $this->dbConnection->update(
+            'job_schedule',
+            [
+                'job_type' => (string)$jobType,
+                'cron_expression' => (string)$cronExpression,
+                'parameters' => Json::encode($parameters),
+                'enabled' => $enabled ? 1 : 0,
+                'next_run_at' => (string)$nextRunAt,
+                'updated_at' => (string)DateTime::create(),
+            ],
+            ['id' => $id],
+        ) === 1;
+    }
+
     public function countSchedules(?JobScheduleFilter $filter = null) : int
     {
         [$whereQuery, $parameters] = $this->createStatusPageFilter($filter ?? JobScheduleFilter::create());
@@ -110,15 +132,6 @@ class JobScheduleRepository
         );
 
         return array_map(JobScheduleEntity::createFromArray(...), $rows);
-    }
-
-    public function setEnabled(int $id, bool $enabled) : bool
-    {
-        return $this->dbConnection->update(
-            'job_schedule',
-            ['enabled' => $enabled ? 1 : 0, 'updated_at' => (string)DateTime::create()],
-            ['id' => $id],
-        ) === 1;
     }
 
     public function updateNextRunIfCurrent(

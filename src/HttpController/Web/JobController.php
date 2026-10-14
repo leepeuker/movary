@@ -76,19 +76,25 @@ class JobController
         return Response::createNoContent();
     }
 
-    public function setJobScheduleEnabled(Request $request) : Response
+    public function updateJobSchedule(Request $request) : Response
     {
-        $enabled = $request->getPostParameters()['enabled'] ?? null;
-        if ($enabled !== '0' && $enabled !== '1') {
-            return $this->createJobJsonResponse(
-                ['error' => 'Enabled must be a boolean.'],
-                StatusCode::createBadRequest(),
-            );
+        $requestParameters = $request->getPostParameters();
+
+        try {
+            $jobType = $this->mapSchedulableJobType($requestParameters['jobType'] ?? null);
+            $configuration = $this->jobScheduleRequestMapper->map($request);
+            if ($configuration === null) {
+                throw new InvalidArgumentException('Schedule mode is invalid.');
+            }
+            $parameters = $this->mapJobScheduleParameters($request, $jobType);
+            $enabled = $this->mapJobScheduleEnabled($requestParameters['enabled'] ?? null);
+        } catch (InvalidArgumentException $exception) {
+            return $this->createJobJsonResponse(['error' => $exception->getMessage()], StatusCode::createBadRequest());
         }
 
         $scheduleId = (int)$request->getRouteParameters()['scheduleId'];
 
-        return $this->jobScheduleApi->setEnabled($scheduleId, $enabled === '1')
+        return $this->jobScheduleApi->update($scheduleId, $jobType, $configuration, $parameters, $enabled)
             ? Response::createNoContent()
             : Response::createNotFound();
     }
@@ -371,6 +377,57 @@ class JobController
             onlyNeverSynced: $parameters->isOnlyNeverSynced(),
             userId: $userId,
         );
+    }
+
+    private function mapSchedulableJobType(mixed $value) : JobType
+    {
+        if (is_string($value) === false || in_array($value, [
+            'tmdb_movie_sync',
+            'tmdb_person_sync',
+            'tmdb_image_cache',
+            'imdb_sync',
+        ], true) === false) {
+            throw new InvalidArgumentException('This job type is not supported.');
+        }
+
+        return JobType::createFromString($value);
+    }
+
+    private function mapJobScheduleParameters(Request $request, JobType $jobType) : array
+    {
+        if ($jobType->isOfTypeTmdbImageCache()) {
+            $parameters = $this->tmdbImageCacheJobRequestMapper->map($request);
+
+            return [
+                'movieIds' => $parameters->getMovieIds(),
+                'personIds' => $parameters->getPersonIds(),
+            ];
+        }
+
+        $parameters = $this->tmdbSyncJobRequestMapper->map($request);
+        if ($parameters->requiresUnboundedSyncConfirmation() === true &&
+            $this->tmdbSyncJobRequestMapper->isUnboundedSyncConfirmed($request) === false
+        ) {
+            throw new InvalidArgumentException(
+                'Confirmation is required for a sync without IDs or a maximum record count.',
+            );
+        }
+
+        return [
+            'ids' => $parameters->getIds(),
+            'maxAgeInHours' => $parameters->getMaxAgeInHours(),
+            'threshold' => $parameters->getThreshold(),
+            'onlyNeverSynced' => $parameters->isOnlyNeverSynced(),
+        ];
+    }
+
+    private function mapJobScheduleEnabled(mixed $value) : bool
+    {
+        if ($value !== '0' && $value !== '1') {
+            throw new InvalidArgumentException('Enabled must be a boolean.');
+        }
+
+        return $value === '1';
     }
 
     private function createJobJsonResponse(array $body, ?StatusCode $statusCode = null) : Response

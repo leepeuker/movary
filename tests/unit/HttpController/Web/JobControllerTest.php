@@ -89,6 +89,53 @@ class JobControllerTest extends TestCase
         self::assertSame(204, $this->subject->deleteAllJobSchedules()->getStatusCode()->getCode());
     }
 
+    public function testUpdateJobScheduleValidatesAndPersistsEditableFields() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getRouteParameters')->willReturn(['scheduleId' => '9']);
+        $request->method('getPostParameters')->willReturn([
+            'jobType' => 'tmdb_person_sync',
+            'scheduleMode' => 'recurring',
+            'cronExpression' => '*/5 * * * *',
+            'maxAgeInHours' => '48',
+            'threshold' => '100',
+            'ids' => '7, 8',
+            'onlyNeverSynced' => '1',
+            'enabled' => '0',
+        ]);
+        $this->jobScheduleApiMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                9,
+                self::callback(static fn($jobType) => (string)$jobType === 'tmdb_person_sync'),
+                self::callback(static fn($configuration) =>
+                    (string)$configuration->getCronExpression() === '*/5 * * * *'),
+                [
+                    'ids' => [7, 8],
+                    'maxAgeInHours' => 48,
+                    'threshold' => 100,
+                    'onlyNeverSynced' => true,
+                ],
+                false,
+            )
+            ->willReturn(true);
+
+        self::assertSame(204, $this->subject->updateJobSchedule($request)->getStatusCode()->getCode());
+    }
+
+    public function testUpdateJobScheduleRejectsUnsupportedJobType() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getPostParameters')->willReturn(['jobType' => 'trakt_import_history']);
+        $this->jobScheduleApiMock->expects(self::never())->method('update');
+
+        $response = $this->subject->updateJobSchedule($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        self::assertSame('{"error":"This job type is not supported."}', $response->getBody());
+    }
+
     /** @param non-empty-string $jobMethod */
     #[DataProvider('provideTraktImports')]
     public function testScheduleTraktImportAddsMessage(string $jobMethod, FlashMessage $message) : void
@@ -317,16 +364,6 @@ class JobControllerTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode()->getCode());
         self::assertSame('{"jobId":23,"userId":42}', $response->getBody());
-    }
-
-    public function testSetJobScheduleEnabledValidatesAndUpdatesSchedule() : void
-    {
-        $request = $this->createMock(Request::class);
-        $request->method('getRouteParameters')->willReturn(['scheduleId' => '9']);
-        $request->method('getPostParameters')->willReturn(['enabled' => '0']);
-        $this->jobScheduleApiMock->expects(self::once())->method('setEnabled')->with(9, false)->willReturn(true);
-
-        self::assertSame(204, $this->subject->setJobScheduleEnabled($request)->getStatusCode()->getCode());
     }
 
     /**

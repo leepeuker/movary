@@ -71,7 +71,6 @@ class RouteSecurityTest extends TestCase
                 '/jobs/schedule/imdb-ratings-sync',
                 '/job-schedules',
                 '/job-schedules/{scheduleId:\d+}',
-                '/job-schedules/{scheduleId:\d+}/enabled',
             ], true),
         );
 
