@@ -77,6 +77,11 @@ class JobScheduleApi
         return $this->repository->delete($id);
     }
 
+    public function deleteAll() : void
+    {
+        $this->repository->deleteAll();
+    }
+
     public function countSchedules(?JobScheduleFilter $filter = null) : int
     {
         return $this->repository->countSchedules($filter);

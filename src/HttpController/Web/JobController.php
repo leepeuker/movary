@@ -69,6 +69,13 @@ class JobController
             : Response::createNotFound();
     }
 
+    public function deleteAllJobSchedules() : Response
+    {
+        $this->jobScheduleApi->deleteAll();
+
+        return Response::createNoContent();
+    }
+
     public function setJobScheduleEnabled(Request $request) : Response
     {
         $enabled = $request->getPostParameters()['enabled'] ?? null;

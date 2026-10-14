@@ -314,3 +314,35 @@ async function removeJobSchedule(scheduleId) {
         deleteButton.disabled = false
     }
 }
+
+async function deleteAllJobSchedules() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete all recurring schedules',
+        message: 'Delete all recurring schedules? Existing queue jobs are not removed.',
+        confirmLabel: 'Delete all schedules',
+        confirmClass: 'btn-danger',
+    })
+    if (confirmed === false) {
+        return
+    }
+
+    const deleteButton = document.getElementById('deleteAllJobSchedulesButton')
+    deleteButton.disabled = true
+    try {
+        const response = await fetchWithCsrf(APPLICATION_URL + '/job-schedules', {
+            method: 'DELETE',
+            signal: AbortSignal.timeout(10000),
+        })
+        if (!response.ok) {
+            throw new Error('Response status: ' + response.status)
+        }
+
+        localStorage.setItem('alertMessageJobSchedules', 'Deleted all recurring schedules')
+        window.location.reload()
+    } catch (error) {
+        console.error(error)
+        addAlert('alertJobSchedulesDiv', 'Could not delete all recurring schedules', 'danger')
+    } finally {
+        deleteButton.disabled = false
+    }
+}

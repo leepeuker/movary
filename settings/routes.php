@@ -66,6 +66,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
     ]);
+    $routes->add('DELETE', '/job-schedules', [Web\JobController::class, 'deleteAllJobSchedules'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
     $routes->add('POST', '/job-schedules/{scheduleId:\d+}/enabled', [Web\JobController::class, 'setJobScheduleEnabled'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,

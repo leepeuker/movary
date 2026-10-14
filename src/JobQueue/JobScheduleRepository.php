@@ -45,6 +45,11 @@ class JobScheduleRepository
         return $this->dbConnection->delete('job_schedule', ['id' => $id]) === 1;
     }
 
+    public function deleteAll() : void
+    {
+        $this->dbConnection->executeStatement('DELETE FROM job_schedule');
+    }
+
     public function countSchedules(?JobScheduleFilter $filter = null) : int
     {
         [$whereQuery, $parameters] = $this->createStatusPageFilter($filter ?? JobScheduleFilter::create());
