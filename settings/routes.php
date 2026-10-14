@@ -66,7 +66,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
     ]);
-    $routes->add('PUT', '/job-schedules/{scheduleId:\d+}', [Web\JobController::class, 'updateJobSchedule'], [
+    $routes->add('POST', '/job-schedules/{scheduleId:\d+}', [Web\JobController::class, 'updateJobSchedule'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
     ]);

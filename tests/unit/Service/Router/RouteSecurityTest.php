@@ -100,6 +100,18 @@ class RouteSecurityTest extends TestCase
         }
     }
 
+    public function testJobScheduleFormUpdateUsesPost() : void
+    {
+        $methods = [];
+        foreach ($this->collectRoutes() as $route) {
+            if ($route['path'] === '/job-schedules/{scheduleId:\d+}') {
+                $methods[] = $route['method'];
+            }
+        }
+
+        self::assertSame(['DELETE', 'POST'], $methods);
+    }
+
     public function testUnsafeApiRoutesWithoutAuthenticationMiddlewareAreLimitedToExplicitBoundaries() : void
     {
         $routes = array_filter(

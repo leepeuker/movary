@@ -205,7 +205,7 @@ async function saveJobSchedule(event) {
             ? APPLICATION_URL + '/job-schedules/' + selectedJobScheduleId
             : APPLICATION_URL + '/jobs/schedule/' + jobConfiguration.endpoint
         const response = await fetchWithCsrf(url, {
-            method: editing ? 'PUT' : 'POST',
+            method: 'POST',
             body: new URLSearchParams(formData),
             signal: AbortSignal.timeout(10000),
         })
