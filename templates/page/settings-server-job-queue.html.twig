@@ -70,8 +70,8 @@
                                 <th scope="col">User</th>
                                 <th scope="col">Type</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Updated</th>
-                                <th scope="col">Created</th>
+                                <th scope="col" data-local-time-zone-label>Updated</th>
+                                <th scope="col" data-local-time-zone-label>Created</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -92,8 +92,8 @@
                                     <td>{{ job.userName|default('-') }}</td>
                                     <td>{{ job.type }}</td>
                                     <td>{{ job.status }}</td>
-                                    <td>{{ job.updatedAt|default('-') }}</td>
-                                    <td>{{ job.createdAt }}</td>
+                                    <td data-utc-date-time="{{ job.updatedAt|default('-') }}">{{ job.updatedAt ? job.updatedAt ~ ' UTC' : '-' }}</td>
+                                    <td data-utc-date-time="{{ job.createdAt }}">{{ job.createdAt }} UTC</td>
                                 </tr>
                             {% endfor %}
                             </tbody>

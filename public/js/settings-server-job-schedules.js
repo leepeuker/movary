@@ -102,7 +102,10 @@ function showJobScheduleDetails(row) {
     )
     document.getElementById('jobScheduleDetailsType').textContent = row.dataset.jobScheduleType
     document.getElementById('jobScheduleDetailsCronExpression').textContent = row.dataset.jobScheduleCronExpression
-    document.getElementById('jobScheduleDetailsNextRunAt').textContent = row.dataset.jobScheduleNextRunAt
+    setLocalizedUtcDateTime(
+        document.getElementById('jobScheduleDetailsNextRunAt'),
+        row.dataset.jobScheduleNextRunAt,
+    )
     document.getElementById('jobScheduleDetailsStatus').textContent = selectedJobScheduleEnabled ? 'enabled' : 'disabled'
     document.getElementById('jobScheduleDetailsParameters').textContent = formatJobScheduleParameters(
         row.dataset.jobScheduleParameters,
