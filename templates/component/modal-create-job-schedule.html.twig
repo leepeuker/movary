@@ -1,16 +1,16 @@
-<div class="modal fade" id="createJobScheduleModal" tabindex="-1" aria-labelledby="createJobScheduleModalTitle" aria-hidden="true">
+<div class="modal fade" id="jobScheduleModal" tabindex="-1" aria-labelledby="jobScheduleModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="createJobScheduleForm">
+            <form id="jobScheduleForm">
                 <input type="hidden" name="scheduleMode" value="recurring">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createJobScheduleModalTitle">Create Job Schedule</h5>
+                    <h5 class="modal-title" id="jobScheduleModalTitle"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-start">
                     <div class="mb-3">
-                        <label class="form-label" for="createJobScheduleType">Job type</label>
-                        <select class="form-select" id="createJobScheduleType" name="jobType">
+                        <label class="form-label" for="jobScheduleType">Job type</label>
+                        <select class="form-select" id="jobScheduleType" name="jobType">
                             <option value="tmdb_movie_sync">TMDB movie metadata sync</option>
                             <option value="tmdb_person_sync">TMDB person metadata sync</option>
                             <option value="tmdb_image_cache">TMDB image cache refresh</option>
@@ -18,12 +18,10 @@
                         </select>
                     </div>
 
-                    <hr>
-
                     <div class="mb-3">
-                        <label class="form-label" for="createJobScheduleCronExpression">Cron expression (UTC)</label>
-                        <input class="form-control font-monospace" id="createJobScheduleCronExpression" name="cronExpression" value="0 * * * *" list="createJobScheduleCronPresets" autocomplete="off" required>
-                        <datalist id="createJobScheduleCronPresets">
+                        <label class="form-label" for="jobScheduleCronExpression">Cron expression (UTC)</label>
+                        <input class="form-control font-monospace" id="jobScheduleCronExpression" name="cronExpression" value="0 * * * *" list="jobScheduleCronPresets" autocomplete="off" required>
+                        <datalist id="jobScheduleCronPresets">
                             <option value="* * * * *">Every minute</option>
                             <option value="0 * * * *">Hourly</option>
                             <option value="0 0 * * *">Daily at midnight</option>
@@ -32,6 +30,13 @@
                         </datalist>
                         <div class="form-text">Five fields: minute, hour, day of month, month, day of week.</div>
                     </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" id="jobScheduleEnabled" name="enabled" type="checkbox" value="1" checked>
+                        <label class="form-check-label" for="jobScheduleEnabled">Enabled</label>
+                    </div>
+
+                    <hr>
+
                     <div data-job-schedule-fields="tmdb_movie_sync">
                         {{ include('component/job-form-tmdb-sync.html.twig', {
                             idPrefix: 'tmdbMovieJobSchedule',
@@ -56,10 +61,11 @@
                         }) }}
                     </div>
 
-                    <div class="alert alert-danger d-none mb-0" role="alert" id="createJobScheduleError"></div>
+                    <div class="alert alert-danger d-none mb-0" role="alert" id="jobScheduleModalError"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" id="createJobScheduleSubmitButton">Create</button>
+                    <button type="button" class="btn btn-danger d-none" id="jobScheduleDeleteButton" onclick="removeSelectedJobSchedule()">Delete</button>
+                    <button type="submit" class="btn btn-primary" id="jobScheduleSubmitButton"></button>
                 </div>
             </form>
         </div>

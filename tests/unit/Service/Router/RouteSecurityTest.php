@@ -71,7 +71,6 @@ class RouteSecurityTest extends TestCase
                 '/jobs/schedule/imdb-ratings-sync',
                 '/job-schedules',
                 '/job-schedules/{scheduleId:\d+}',
-                '/job-schedules/{scheduleId:\d+}/enabled',
             ], true),
         );
 
@@ -99,6 +98,18 @@ class RouteSecurityTest extends TestCase
             self::assertContains(UserIsAuthenticated::class, $route['middleware']);
             self::assertContains(UserIsAdmin::class, $route['middleware']);
         }
+    }
+
+    public function testJobScheduleFormUpdateUsesPost() : void
+    {
+        $methods = [];
+        foreach ($this->collectRoutes() as $route) {
+            if ($route['path'] === '/job-schedules/{scheduleId:\d+}') {
+                $methods[] = $route['method'];
+            }
+        }
+
+        self::assertSame(['DELETE', 'POST'], $methods);
     }
 
     public function testUnsafeApiRoutesWithoutAuthenticationMiddlewareAreLimitedToExplicitBoundaries() : void

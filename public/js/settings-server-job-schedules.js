@@ -5,15 +5,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     localStorage.setItem('alertMessageJobSchedules', '')
 
-    document.getElementById('createJobScheduleForm').addEventListener('submit', createJobSchedule)
-    document.getElementById('createJobScheduleType').addEventListener('change', updateCreateJobScheduleFields)
+    document.getElementById('jobScheduleForm').addEventListener('submit', saveJobSchedule)
+    document.getElementById('jobScheduleType').addEventListener('change', updateJobScheduleFields)
     document.getElementById('jobSchedulesPerPage').addEventListener('change', () => refreshJobSchedulesPage(true))
     registerJobScheduleRowEvents()
-    updateCreateJobScheduleFields()
+    updateJobScheduleFields()
 })
 
 let selectedJobScheduleId = null
-let selectedJobScheduleEnabled = null
 
 const schedulableJobTypes = {
     tmdb_movie_sync: {
@@ -79,73 +78,29 @@ function setJobScheduleQueryParameter(url, name, value) {
 
 function registerJobScheduleRowEvents() {
     document.querySelectorAll('#jobSchedulesTable tbody tr').forEach((row) => {
-        row.addEventListener('click', () => showJobScheduleDetails(row))
+        row.addEventListener('click', () => showEditJobScheduleModal(row))
         row.addEventListener('keydown', (event) => {
             if (event.key !== 'Enter' && event.key !== ' ') {
                 return
             }
 
             event.preventDefault()
-            showJobScheduleDetails(row)
+            showEditJobScheduleModal(row)
         })
     })
 }
 
-function showJobScheduleDetails(row) {
+function showEditJobScheduleModal(row) {
     selectedJobScheduleId = row.dataset.jobScheduleId
-    selectedJobScheduleEnabled = row.dataset.jobScheduleEnabled === 'true'
 
-    document.getElementById('jobScheduleDetailsId').textContent = selectedJobScheduleId
-    document.getElementById('jobScheduleDetailsUser').textContent = formatJobScheduleUser(
-        row.dataset.jobScheduleUserName,
-        row.dataset.jobScheduleUserId,
-    )
-    document.getElementById('jobScheduleDetailsType').textContent = row.dataset.jobScheduleType
-    document.getElementById('jobScheduleDetailsCronExpression').textContent = row.dataset.jobScheduleCronExpression
-    setLocalizedUtcDateTime(
-        document.getElementById('jobScheduleDetailsNextRunAt'),
-        row.dataset.jobScheduleNextRunAt,
-    )
-    document.getElementById('jobScheduleDetailsStatus').textContent = selectedJobScheduleEnabled ? 'enabled' : 'disabled'
-    document.getElementById('jobScheduleDetailsParameters').textContent = formatJobScheduleParameters(
-        row.dataset.jobScheduleParameters,
-    )
-    document.getElementById('jobScheduleDetailsAlerts').innerHTML = ''
-
-    const enabledButton = document.getElementById('jobScheduleEnabledButton')
-    enabledButton.textContent = selectedJobScheduleEnabled ? 'Disable schedule' : 'Enable schedule'
-    bootstrap.Modal.getOrCreateInstance('#jobScheduleDetailsModal').show()
-}
-
-function formatJobScheduleUser(userName, userId) {
-    if (userName === '-' && userId === '-') {
-        return '-'
-    }
-
-    return userName + ' (ID ' + userId + ')'
-}
-
-function formatJobScheduleParameters(parameters) {
-    try {
-        const parsedParameters = JSON.parse(parameters)
-
-        if (Object.keys(parsedParameters).length === 0) {
-            return '-'
-        }
-
-        return JSON.stringify(parsedParameters, null, 2)
-    } catch (error) {
-        console.error(error)
-        return parameters
-    }
-}
-
-function toggleSelectedJobSchedule() {
-    if (selectedJobScheduleId === null || selectedJobScheduleEnabled === null) {
-        return
-    }
-
-    setJobScheduleEnabled(selectedJobScheduleId, selectedJobScheduleEnabled === false)
+    prepareJobScheduleModal('Edit Job Schedule', 'Save', false)
+    document.getElementById('jobScheduleType').value = row.dataset.jobScheduleType
+    document.getElementById('jobScheduleCronExpression').value = row.dataset.jobScheduleCronExpression
+    document.getElementById('jobScheduleEnabled').checked = row.dataset.jobScheduleEnabled === 'true'
+    updateJobScheduleFields()
+    populateJobScheduleParameters(row.dataset.jobScheduleParameters)
+    document.getElementById('jobScheduleDeleteButton').classList.remove('d-none')
+    bootstrap.Modal.getOrCreateInstance('#jobScheduleModal').show()
 }
 
 function removeSelectedJobSchedule() {
@@ -157,15 +112,49 @@ function removeSelectedJobSchedule() {
 }
 
 function showCreateJobScheduleModal() {
-    document.getElementById('createJobScheduleForm').reset()
-    document.getElementById('createJobScheduleError').classList.add('d-none')
-    document.getElementById('createJobScheduleError').textContent = ''
-    updateCreateJobScheduleFields()
-    bootstrap.Modal.getOrCreateInstance('#createJobScheduleModal').show()
+    selectedJobScheduleId = null
+    prepareJobScheduleModal('Create Job Schedule', 'Create', true)
+    document.getElementById('jobScheduleDeleteButton').classList.add('d-none')
+    updateJobScheduleFields()
+    bootstrap.Modal.getOrCreateInstance('#jobScheduleModal').show()
 }
 
-function updateCreateJobScheduleFields() {
-    const selectedJobType = document.getElementById('createJobScheduleType').value
+function prepareJobScheduleModal(title, submitLabel, create) {
+    document.getElementById('jobScheduleForm').reset()
+    document.getElementById('jobScheduleModalTitle').textContent = title
+    document.getElementById('jobScheduleSubmitButton').textContent = submitLabel
+    document.getElementById('jobScheduleEnabled').disabled = create
+    document.getElementById('jobScheduleModalError').classList.add('d-none')
+    document.getElementById('jobScheduleModalError').textContent = ''
+}
+
+function populateJobScheduleParameters(serializedParameters) {
+    let parameters
+    try {
+        parameters = JSON.parse(serializedParameters)
+    } catch (error) {
+        console.error(error)
+        showJobScheduleModalError('Could not read the schedule parameters.')
+        return
+    }
+
+    const selectedFields = document.querySelector(
+        '[data-job-schedule-fields="' + document.getElementById('jobScheduleType').value + '"]',
+    )
+    selectedFields.querySelectorAll('[name]').forEach((control) => {
+        const value = parameters[control.name]
+        if (control.type === 'checkbox') {
+            control.checked = value === true
+        } else if (Array.isArray(value)) {
+            control.value = value.join(', ')
+        } else {
+            control.value = value ?? ''
+        }
+    })
+}
+
+function updateJobScheduleFields() {
+    const selectedJobType = document.getElementById('jobScheduleType').value
 
     document.querySelectorAll('[data-job-schedule-fields]').forEach((fields) => {
         const isSelected = fields.dataset.jobScheduleFields === selectedJobType
@@ -176,14 +165,14 @@ function updateCreateJobScheduleFields() {
     })
 }
 
-async function createJobSchedule(event) {
+async function saveJobSchedule(event) {
     event.preventDefault()
 
     const form = event.currentTarget
-    const jobType = document.getElementById('createJobScheduleType').value
+    const jobType = document.getElementById('jobScheduleType').value
     const jobConfiguration = schedulableJobTypes[jobType]
     if (jobConfiguration === undefined) {
-        showCreateJobScheduleError('This job type is not supported.')
+        showJobScheduleModalError('This job type is not supported.')
         return
     }
     if (form.reportValidity() === false) {
@@ -191,7 +180,13 @@ async function createJobSchedule(event) {
     }
 
     const formData = new FormData(form)
-    formData.delete('jobType')
+    const editing = selectedJobScheduleId !== null
+    if (editing) {
+        formData.set('enabled', document.getElementById('jobScheduleEnabled').checked ? '1' : '0')
+    } else {
+        formData.delete('jobType')
+        formData.delete('enabled')
+    }
     if (
         jobConfiguration.prepareSubmission !== undefined &&
         await jobConfiguration.prepareSubmission(formData, jobConfiguration) === false
@@ -199,36 +194,41 @@ async function createJobSchedule(event) {
         return
     }
 
-    const createButton = document.getElementById('createJobScheduleSubmitButton')
-    const errorAlert = document.getElementById('createJobScheduleError')
-    createButton.disabled = true
+    const submitButton = document.getElementById('jobScheduleSubmitButton')
+    const errorAlert = document.getElementById('jobScheduleModalError')
+    submitButton.disabled = true
     errorAlert.classList.add('d-none')
     errorAlert.textContent = ''
 
     try {
-        const response = await fetchWithCsrf(APPLICATION_URL + '/jobs/schedule/' + jobConfiguration.endpoint, {
+        const url = editing
+            ? APPLICATION_URL + '/job-schedules/' + selectedJobScheduleId
+            : APPLICATION_URL + '/jobs/schedule/' + jobConfiguration.endpoint
+        const response = await fetchWithCsrf(url, {
             method: 'POST',
             body: new URLSearchParams(formData),
             signal: AbortSignal.timeout(10000),
         })
-        const responseBody = await response.json()
+        const responseBody = response.status === 204 ? {} : await response.json()
 
         if (!response.ok) {
-            showCreateJobScheduleError(responseBody.error ?? 'Could not create job schedule.')
+            showJobScheduleModalError(responseBody.error ?? 'Could not save job schedule.')
             return
         }
 
-        bootstrap.Modal.getOrCreateInstance('#createJobScheduleModal').hide()
+        bootstrap.Modal.getOrCreateInstance('#jobScheduleModal').hide()
         localStorage.setItem(
             'alertMessageJobSchedules',
-            'Created recurring schedule (ID ' + responseBody.scheduleId + ')',
+            editing
+                ? 'Updated schedule ' + selectedJobScheduleId
+                : 'Created recurring schedule (ID ' + responseBody.scheduleId + ')',
         )
         window.location.reload()
     } catch (error) {
         console.error(error)
-        showCreateJobScheduleError('Could not create job schedule.')
+        showJobScheduleModalError('Could not save job schedule.')
     } finally {
-        createButton.disabled = false
+        submitButton.disabled = false
     }
 }
 
@@ -238,9 +238,9 @@ async function prepareUnboundedJobScheduleSubmission(formData, jobConfiguration)
     }
 
     const confirmed = await showConfirmationModal({
-        title: 'Create unbounded sync schedule',
+        title: selectedJobScheduleId === null ? 'Create unbounded sync schedule' : 'Update unbounded sync schedule',
         message: 'This schedule will synchronize ' + jobConfiguration.syncName + ' for every eligible ' + jobConfiguration.unboundedResourceName + ' on each run. Continue?',
-        confirmLabel: 'Create schedule',
+        confirmLabel: selectedJobScheduleId === null ? 'Create schedule' : 'Update schedule',
         confirmClass: 'btn-warning',
         restoreSourceModalOnConfirm: false,
     })
@@ -252,37 +252,11 @@ async function prepareUnboundedJobScheduleSubmission(formData, jobConfiguration)
     return confirmed
 }
 
-function showCreateJobScheduleError(message) {
-    const errorAlert = document.getElementById('createJobScheduleError')
+function showJobScheduleModalError(message) {
+    const errorAlert = document.getElementById('jobScheduleModalError')
     errorAlert.textContent = message
     errorAlert.classList.remove('d-none')
-    bootstrap.Modal.getOrCreateInstance('#createJobScheduleModal').show()
-}
-
-async function setJobScheduleEnabled(scheduleId, enabled) {
-    const enabledButton = document.getElementById('jobScheduleEnabledButton')
-    enabledButton.disabled = true
-    try {
-        const response = await fetchWithCsrf(APPLICATION_URL + '/job-schedules/' + scheduleId + '/enabled', {
-            method: 'POST',
-            body: new URLSearchParams({enabled: enabled ? '1' : '0'}),
-            signal: AbortSignal.timeout(10000),
-        })
-        if (!response.ok) {
-            throw new Error('Response status: ' + response.status)
-        }
-
-        localStorage.setItem(
-            'alertMessageJobSchedules',
-            (enabled ? 'Enabled' : 'Disabled') + ' schedule ' + scheduleId,
-        )
-        window.location.reload()
-    } catch (error) {
-        console.error(error)
-        addAlert('jobScheduleDetailsAlerts', 'Could not update schedule ' + scheduleId, 'danger')
-    } finally {
-        enabledButton.disabled = false
-    }
+    bootstrap.Modal.getOrCreateInstance('#jobScheduleModal').show()
 }
 
 async function removeJobSchedule(scheduleId) {
@@ -311,8 +285,7 @@ async function removeJobSchedule(scheduleId) {
         window.location.reload()
     } catch (error) {
         console.error(error)
-        addAlert('jobScheduleDetailsAlerts', 'Could not delete schedule ' + scheduleId, 'danger')
-        bootstrap.Modal.getOrCreateInstance('#jobScheduleDetailsModal').show()
+        showJobScheduleModalError('Could not delete schedule ' + scheduleId)
     } finally {
         deleteButton.disabled = false
     }

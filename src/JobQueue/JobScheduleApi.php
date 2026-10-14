@@ -82,6 +82,23 @@ class JobScheduleApi
         $this->repository->deleteAll();
     }
 
+    public function update(
+        int $id,
+        JobType $jobType,
+        JobScheduleConfiguration $configuration,
+        array $parameters,
+        bool $enabled,
+    ) : bool {
+        return $this->repository->update(
+            $id,
+            $jobType,
+            $configuration->getCronExpression(),
+            $parameters,
+            $enabled,
+            $configuration->getNextRunAt(),
+        );
+    }
+
     public function countSchedules(?JobScheduleFilter $filter = null) : int
     {
         return $this->repository->countSchedules($filter);
@@ -99,10 +116,5 @@ class JobScheduleApi
             'enabled' => (bool)$schedule['enabled'],
             'nextRunAt' => $schedule['next_run_at'],
         ], $this->repository->fetchSchedules($limit, $offset, $filter));
-    }
-
-    public function setEnabled(int $id, bool $enabled) : bool
-    {
-        return $this->repository->setEnabled($id, $enabled);
     }
 }

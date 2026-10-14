@@ -95,6 +95,36 @@ class JobScheduleRepositoryTest extends TestCase
         ));
     }
 
+    public function testUpdatePersistsEditableScheduleFields() : void
+    {
+        /** @var Connection&MockObject $connection */
+        $connection = $this->createMock(Connection::class);
+        $connection
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'job_schedule',
+                self::callback(static function (array $data) : bool {
+                    return $data['job_type'] === 'tmdb_person_sync'
+                        && $data['cron_expression'] === '*/5 * * * *'
+                        && $data['parameters'] === '{"threshold":100}'
+                        && $data['enabled'] === 0
+                        && $data['next_run_at'] === '2026-10-13 13:05:00';
+                }),
+                ['id' => 9],
+            )
+            ->willReturn(1);
+
+        self::assertTrue((new JobScheduleRepository($connection))->update(
+            9,
+            JobType::createTmdbPersonSync(),
+            JobScheduleCronExpression::createFromString('*/5 * * * *'),
+            ['threshold' => 100],
+            false,
+            DateTime::createFromString('2026-10-13 13:05:00'),
+        ));
+    }
+
     public function testUpdateNextRunUsesCompareAndSet() : void
     {
         /** @var Connection&MockObject $connection */
