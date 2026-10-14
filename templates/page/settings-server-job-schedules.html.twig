@@ -90,7 +90,11 @@
                                 <td>{{ schedule.type }}</td>
                                 <td class="font-monospace">{{ schedule.cronExpression }}</td>
                                 <td data-utc-date-time="{{ schedule.nextRunAt }}">{{ schedule.nextRunAt }} UTC</td>
-                                <td>{{ schedule.enabled ? 'enabled' : 'disabled' }}</td>
+                                <td>
+                                    <span class="badge rounded-pill text-bg-{{ schedule.enabled ? 'success' : 'secondary' }}">
+                                        {{ schedule.enabled ? 'Enabled' : 'Disabled' }}
+                                    </span>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
