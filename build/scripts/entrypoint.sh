@@ -1,5 +1,22 @@
 #!/bin/bash
 
+CONFIG_VALIDATION_ERROR=$(
+  /usr/bin/php -r '
+    try {
+        $container = require "/app/bootstrap.php";
+        $container->get(\Movary\Service\ApplicationSecret::class);
+    } catch (\Throwable $throwable) {
+        fwrite(STDERR, $throwable->getMessage());
+        exit(1);
+    }
+  ' 2>&1
+)
+
+if [ $? -ne 0 ]; then
+  echo "ALERT: Required application configuration is invalid: $CONFIG_VALIDATION_ERROR"
+  exit 1
+fi
+
 if [ "$DATABASE_DISABLE_AUTO_MIGRATION" != "true" ] && [ "$DATABASE_DISABLE_AUTO_MIGRATION" != "0" ]; then
   RETRY_COUNT=0
   MAX_RETRIES=5
@@ -17,6 +34,7 @@ if [ "$DATABASE_DISABLE_AUTO_MIGRATION" != "true" ] && [ "$DATABASE_DISABLE_AUTO
       echo "ERROR: Automatic database migration failed, attempt $RETRY_COUNT of $MAX_RETRIES"
       if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
         echo "ALERT: Automatic database migration failed after $MAX_RETRIES attempts, exiting..."
+        exit 1
       fi
       echo "INFO: Retrying database migration in 5 seconds..."
       sleep 5
