@@ -8,7 +8,7 @@
                 </div>
                 <div class="modal-body text-start">
                     <div class="mb-3">
-                        <label class="form-label" for="createJobType">Job type</label>
+                        <label class="form-label" for="createJobType"><b>Job type</b></label>
                         <select class="form-select" id="createJobType" name="jobType">
                             <option value="tmdb_movie_sync">TMDB movie metadata sync</option>
                             <option value="tmdb_person_sync">TMDB person metadata sync</option>
@@ -16,6 +16,8 @@
                             <option value="imdb_sync">IMDb ratings sync</option>
                         </select>
                     </div>
+
+                    <hr>
 
                     <div data-job-fields="tmdb_movie_sync">
                         {{ include('component/job-form-tmdb-sync.html.twig', {
