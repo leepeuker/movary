@@ -6,6 +6,7 @@ use Movary\Domain\User\Exception\InvalidCredentials;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\Exception\MissingTotpCode;
+use Movary\Domain\User\Exception\UserDisabled;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Service\Email\EmailSupport;
 use Movary\Util\Json;
@@ -80,6 +81,15 @@ class AuthenticationController
                 Json::encode([
                     'error' => 'InvalidTotpCode',
                     'message' => 'Two-factor authentication code wrong'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        } catch (UserDisabled) {
+            return Response::create(
+                StatusCode::createForbidden(),
+                Json::encode([
+                    'error' => 'UserDisabled',
+                    'message' => 'This account is disabled.'
                 ]),
                 [Header::createContentTypeJson()],
             );

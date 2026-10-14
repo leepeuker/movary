@@ -73,4 +73,69 @@ class UserControllerTest extends TestCase
         self::assertSame(400, $response->getStatusCode()->getCode());
         self::assertSame('Password too short.', $response->getBody());
     }
+
+    public function testAdminCanDisableAnotherUser() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getRouteParameters')->willReturn(['userId' => '7']);
+        $request->method('getBody')->willReturn(Json::encode([
+            'email' => 'user@example.com',
+            'password' => null,
+            'name' => 'user',
+            'isAdmin' => false,
+            'isEnabled' => false,
+        ]));
+        $this->userApiMock->expects(self::once())->method('updateIsEnabled')->with(7, false);
+
+        $response = $this->subject->updateUser($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+    }
+
+    public function testAdminCannotDisableOwnAccount() : void
+    {
+        $currentUser = $this->createStub(UserEntity::class);
+        $currentUser->method('getId')->willReturn(7);
+        $currentUser->method('isAdmin')->willReturn(true);
+        $currentWebUser = $this->createStub(CurrentWebUser::class);
+        $currentWebUser->method('requireUser')->willReturn($currentUser);
+        $request = $this->createStub(Request::class);
+        $request->method('getRouteParameters')->willReturn(['userId' => '7']);
+        $request->method('getBody')->willReturn(Json::encode([
+            'email' => 'admin@example.com',
+            'password' => null,
+            'name' => 'admin',
+            'isAdmin' => true,
+            'isEnabled' => false,
+        ]));
+        $this->userApiMock->expects(self::never())->method('updateIsEnabled');
+
+        $response = (new UserController($this->userApiMock, $currentWebUser))->updateUser($request);
+
+        self::assertSame(400, $response->getStatusCode()->getCode());
+        self::assertSame('You cannot disable your own account.', $response->getBody());
+    }
+
+    public function testNonAdminCannotChangeAccountStatus() : void
+    {
+        $currentUser = $this->createStub(UserEntity::class);
+        $currentUser->method('getId')->willReturn(7);
+        $currentUser->method('isAdmin')->willReturn(false);
+        $currentWebUser = $this->createStub(CurrentWebUser::class);
+        $currentWebUser->method('requireUser')->willReturn($currentUser);
+        $request = $this->createStub(Request::class);
+        $request->method('getRouteParameters')->willReturn(['userId' => '7']);
+        $request->method('getBody')->willReturn(Json::encode([
+            'email' => 'user@example.com',
+            'password' => null,
+            'name' => 'user',
+            'isAdmin' => false,
+            'isEnabled' => true,
+        ]));
+        $this->userApiMock->expects(self::never())->method('updateIsEnabled');
+
+        $response = (new UserController($this->userApiMock, $currentWebUser))->updateUser($request);
+
+        self::assertSame(403, $response->getStatusCode()->getCode());
+    }
 }

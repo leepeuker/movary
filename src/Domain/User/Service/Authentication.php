@@ -6,6 +6,7 @@ use Movary\Domain\User\Exception\EmailNotFound;
 use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
+use Movary\Domain\User\Exception\UserDisabled;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
@@ -197,6 +198,9 @@ class Authentication
         ?string $userTotpInput = null,
     ) : void {
         $user = $this->findUserAndVerifyAuthentication($email, $password, $userTotpInput);
+        if ($user->isEnabled() === false) {
+            throw UserDisabled::create();
+        }
 
         $authTokenExpirationDate = $this->createExpirationDate();
         if ($rememberMe === true) {
