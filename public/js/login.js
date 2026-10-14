@@ -42,9 +42,14 @@ async function submitCredentials() {
     }
 
     if (response.status === 403) {
-        const error = await response.json();
+        let error = null;
+        try {
+            error = await response.json();
+        } catch {
+            // Other 403 responses, such as CSRF failures, may not contain JSON.
+        }
 
-        if (error['error'] === 'UserDisabled') {
+        if (error?.['error'] === 'UserDisabled') {
             addAlert('loginErrors', error['message'], 'danger', false);
             return
         }
