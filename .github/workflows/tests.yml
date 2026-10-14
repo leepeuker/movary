@@ -14,7 +14,7 @@ jobs:
         run: docker build --target development --tag movary -f ./build/Dockerfile .
 
       - name: Run all test tools/suites
-        run: docker run --rm movary composer test
+        run: docker run --rm --entrypoint composer movary test
 
       - name: Verify migration cutover
         run: bash tests/migration/verify-cutover.sh movary

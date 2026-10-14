@@ -13,7 +13,7 @@ CONFIG_VALIDATION_ERROR=$(
 )
 
 if [ $? -ne 0 ]; then
-  echo "ALERT: Required application configuration is invalid: $CONFIG_VALIDATION_ERROR"
+  echo "ALERT: $CONFIG_VALIDATION_ERROR"
   exit 1
 fi
 
