@@ -24,7 +24,7 @@
                 <h5 style="margin-bottom: 1rem;">User Management</h5>
 
                 <p class="text-muted">
-                    Click a user row to edit or delete the user{% if passwordResetAvailable == true %}, or send a password reset email{% endif %}.
+                    Create and manage users. Click a user row to edit or delete it{% if passwordResetAvailable == true %}, or send a password reset email{% endif %}.
                 </p>
 
                 <div id="userManagementAlerts"></div>
@@ -40,11 +40,14 @@
                         <label for="usersPerPage" class="form-label mb-0">per page</label>
                     </div>
                     <div class="btn-group" role="group" aria-label="User table actions">
-                        <button class="btn btn-primary {{ userFiltersActive ? 'active' }}" type="button" data-bs-toggle="modal" data-bs-target="#userFiltersModal" aria-label="Filter users" title="Filter users" aria-pressed="{{ userFiltersActive ? 'true' : 'false' }}">
+                        <button class="btn btn-primary settings-table-action {{ userFiltersActive ? 'active' }}" type="button" data-bs-toggle="modal" data-bs-target="#userFiltersModal" data-bs-title="Filter users" aria-label="Filter users" aria-pressed="{{ userFiltersActive ? 'true' : 'false' }}">
                             <i class="bi bi-filter" aria-hidden="true"></i>
                         </button>
-                        <button class="btn btn-primary" type="button" onclick="refreshUsersPage()" aria-label="Refresh users" title="Refresh users" style="border-left-color: #aab0b3">
+                        <button class="btn btn-primary settings-table-action" type="button" onclick="refreshUsersPage()" data-bs-title="Refresh users" aria-label="Refresh users" style="border-left-color: #aab0b3">
                             <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-primary settings-table-action" type="button" onclick="showCreateUserModal()" data-bs-title="Create user" aria-label="Create user" style="border-left-color: #aab0b3">
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
@@ -81,7 +84,6 @@
                     paginationQuery: paginationQuery,
                 }) }}
 
-                <button type="button" class="btn btn-primary float-end" style="width: 100%;" onclick="showCreateUserModal()">Create User</button>
             </div>
 
         </div>

@@ -14,3 +14,9 @@
 .invalid-input {
     border-color: rgb(220, 53, 69)!important;
 }
+
+.settings-table-action .bi-plus-lg::before {
+    color: #fff;
+    transform: scale(1.125);
+    -webkit-text-stroke: 0.15px currentColor;
+}

@@ -1,0 +1,35 @@
+<div class="modal fade" id="removeJobsModal" tabindex="-1" aria-labelledby="removeJobsModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="removeJobsForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="removeJobsModalTitle">Remove jobs</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-start">
+                    <fieldset>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="removeJobsScope" id="removeProcessedJobsScope" value="processed" checked>
+                            <label class="form-check-label" for="removeProcessedJobsScope">
+                                Processed jobs
+                                <span class="d-block text-muted">Jobs with status “done” or “failed”.</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="removeJobsScope" id="removeAllJobsScope" value="all">
+                            <label class="form-check-label" for="removeAllJobsScope">
+                                All jobs
+                                <span class="d-block text-muted">Removes all queue records, including waiting and in-progress entries. Jobs already running will continue.</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <div class="alert alert-danger d-none mb-0 mt-3" role="alert" id="removeJobsError"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger" id="removeJobsSubmitButton">Remove jobs</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

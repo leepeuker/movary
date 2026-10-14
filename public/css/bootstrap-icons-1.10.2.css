@@ -48,6 +48,7 @@ url("../fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("wo
 .bi-question-lg::before { content: "\f64e"; }
 .bi-filter::before{content:"\f3ca"}
 .bi-pin-map-fill::before{content:"\f64b"}
+.bi-plus-lg::before{content:"\f64d"}
 .bi-eye-fill::before{ content: "\f33e" }
 .bi-grid-fill::before{content:"\f3fb"}
 .bi-table::before{content:"\f5aa"}
