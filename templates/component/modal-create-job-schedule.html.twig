@@ -18,8 +18,6 @@
                         </select>
                     </div>
 
-                    <hr>
-
                     <div class="mb-3">
                         <label class="form-label" for="jobScheduleCronExpression">Cron expression (UTC)</label>
                         <input class="form-control font-monospace" id="jobScheduleCronExpression" name="cronExpression" value="0 * * * *" list="jobScheduleCronPresets" autocomplete="off" required>
@@ -36,6 +34,9 @@
                         <input class="form-check-input" id="jobScheduleEnabled" name="enabled" type="checkbox" value="1" checked>
                         <label class="form-check-label" for="jobScheduleEnabled">Enabled</label>
                     </div>
+
+                    <hr>
+
                     <div data-job-schedule-fields="tmdb_movie_sync">
                         {{ include('component/job-form-tmdb-sync.html.twig', {
                             idPrefix: 'tmdbMovieJobSchedule',
