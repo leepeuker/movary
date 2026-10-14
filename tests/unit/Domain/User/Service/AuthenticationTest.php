@@ -341,6 +341,10 @@ class AuthenticationTest extends TestCase
                 self::assertInstanceOf(DateTime::class, $expirationDate);
                 $storedToken = $tokenHash;
             });
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('updateLastLoginAt')
+            ->with(12, self::isInstanceOf(DateTime::class));
 
         $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
 
@@ -401,6 +405,7 @@ class AuthenticationTest extends TestCase
         $this->loginAttemptLimiterMock
             ->expects(self::never())
             ->method('releaseAttempt');
+        $this->userRepositoryMock->expects(self::never())->method('updateLastLoginAt');
 
         $this->expectException(InvalidPassword::class);
 
@@ -462,6 +467,7 @@ class AuthenticationTest extends TestCase
             ->willReturn('otpauth://totp/example');
         $this->loginAttemptLimiterMock->expects(self::once())->method('reserveAttempt')->willReturn(1);
         $this->loginAttemptLimiterMock->expects(self::once())->method('releaseAttempt')->with(1);
+        $this->userRepositoryMock->expects(self::never())->method('updateLastLoginAt');
 
         $this->expectException(\Movary\Domain\User\Exception\MissingTotpCode::class);
 
