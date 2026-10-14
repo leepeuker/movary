@@ -155,6 +155,72 @@ class UserRepository
         );
     }
 
+    public function replaceEmailVerificationToken(
+        int $userId,
+        string $email,
+        string $tokenHash,
+        DateTime $expirationDate,
+    ) : void {
+        $createdAt = DateTime::create();
+
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $email, $tokenHash, $expirationDate, $createdAt) : void {
+                $connection->delete('user_email_verification_token', ['user_id' => $userId]);
+                $connection->insert(
+                    'user_email_verification_token',
+                    [
+                        'user_id' => $userId,
+                        'email' => $email,
+                        'token_hash' => $tokenHash,
+                        'expiration_date' => (string)$expirationDate,
+                        'created_at' => (string)$createdAt,
+                    ],
+                );
+            },
+        );
+    }
+
+    public function verifyEmailWithToken(string $tokenHash, DateTime $currentDate) : bool
+    {
+        return $this->dbConnection->transactional(
+            static function (Connection $connection) use ($tokenHash, $currentDate) : bool {
+                $tokenData = $connection->fetchAssociative(
+                    'SELECT token.`user_id`, token.`email`, token.`expiration_date`, users.`email` AS `current_email` '
+                    . 'FROM `user_email_verification_token` token '
+                    . 'JOIN `user` users ON users.`id` = token.`user_id` '
+                    . 'WHERE token.`token_hash` = ?',
+                    [$tokenHash],
+                );
+
+                if ($tokenData === false) {
+                    return false;
+                }
+
+                if ($tokenData['email'] !== $tokenData['current_email']
+                    || DateTime::createFromString($tokenData['expiration_date'])->isAfter($currentDate) === false
+                ) {
+                    $connection->delete('user_email_verification_token', ['token_hash' => $tokenHash]);
+
+                    return false;
+                }
+
+                $deletedTokenCount = $connection->delete(
+                    'user_email_verification_token',
+                    ['token_hash' => $tokenHash],
+                );
+                if ($deletedTokenCount !== 1) {
+                    return false;
+                }
+
+                return $connection->update(
+                    'user',
+                    ['email_verified_at' => (string)$currentDate],
+                    ['id' => (int)$tokenData['user_id'], 'email' => $tokenData['email']],
+                ) === 1;
+            },
+        );
+    }
+
     public function resetPasswordWithToken(
         string $tokenHash,
         string $passwordHash,
@@ -249,6 +315,16 @@ class UserRepository
     public function deleteAllPasswordResetTokens() : void
     {
         $this->dbConnection->executeStatement('DELETE FROM `user_password_reset_token`');
+    }
+
+    public function deleteEmailVerificationToken(string $tokenHash) : void
+    {
+        $this->dbConnection->delete('user_email_verification_token', ['token_hash' => $tokenHash]);
+    }
+
+    public function deleteEmailVerificationTokenForUser(int $userId) : void
+    {
+        $this->dbConnection->delete('user_email_verification_token', ['user_id' => $userId]);
     }
 
     public function deletePasswordResetToken(string $tokenHash) : void
@@ -492,6 +568,41 @@ class UserRepository
         );
 
         return $createdAt === false ? null : DateTime::createFromString($createdAt);
+    }
+
+    public function findEmailVerificationTokenCreationDate(int $userId) : ?DateTime
+    {
+        $createdAt = $this->dbConnection->fetchOne(
+            'SELECT `created_at` FROM `user_email_verification_token` WHERE `user_id` = ?',
+            [$userId],
+        );
+
+        return $createdAt === false ? null : DateTime::createFromString($createdAt);
+    }
+
+    /**
+     * @return array{userId: int, email: string, currentEmail: string, expirationDate: DateTime}|null
+     */
+    public function findEmailVerificationTokenData(string $tokenHash) : ?array
+    {
+        $data = $this->dbConnection->fetchAssociative(
+            'SELECT token.`user_id`, token.`email`, token.`expiration_date`, users.`email` AS `current_email` '
+            . 'FROM `user_email_verification_token` token '
+            . 'JOIN `user` users ON users.`id` = token.`user_id` '
+            . 'WHERE token.`token_hash` = ?',
+            [$tokenHash],
+        );
+
+        if ($data === false) {
+            return null;
+        }
+
+        return [
+            'userId' => (int)$data['user_id'],
+            'email' => (string)$data['email'],
+            'currentEmail' => (string)$data['current_email'],
+            'expirationDate' => DateTime::createFromString((string)$data['expiration_date']),
+        ];
     }
 
     /**
@@ -994,14 +1105,25 @@ class UserRepository
 
     public function updateEmail(int $userId, string $email) : void
     {
-        $this->dbConnection->update(
-            'user',
-            [
-                'email' => $email,
-            ],
-            [
-                'id' => $userId,
-            ],
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $email) : void {
+                $currentEmail = $connection->fetchOne('SELECT `email` FROM `user` WHERE `id` = ?', [$userId]);
+                if ($currentEmail === false || $currentEmail === $email) {
+                    return;
+                }
+
+                $connection->update(
+                    'user',
+                    [
+                        'email' => $email,
+                        'email_verified_at' => null,
+                    ],
+                    [
+                        'id' => $userId,
+                    ],
+                );
+                $connection->delete('user_email_verification_token', ['user_id' => $userId]);
+            },
         );
     }
 

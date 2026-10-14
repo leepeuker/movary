@@ -75,6 +75,44 @@ class JobQueueRepository
         }
     }
 
+    /** @param non-empty-list<JobStatus> $statuses */
+    public function addJobUnlessExistsForUserWithStatuses(
+        JobType $type,
+        JobStatus $status,
+        array $statuses,
+        int $userId,
+        ?array $parameters = null,
+    ) : ?int {
+        $addJob = function () use ($type, $status, $statuses, $userId, $parameters) : ?int {
+            return $this->hasJobForUserWithStatuses($type, $statuses, $userId) === true
+                ? null
+                : $this->addJob($type, $status, $userId, $parameters);
+        };
+
+        if ($this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform) {
+            return $this->dbConnection->transactional(function () use ($type, $userId, $addJob) : ?int {
+                // SQLite serializes writes, so this acquires its database write lock before the existence check.
+                $this->dbConnection->executeStatement(
+                    'UPDATE job_queue SET job_type = job_type WHERE job_type = ? AND user_id = ?',
+                    [$type, $userId],
+                );
+
+                return $addJob();
+            });
+        }
+
+        $lockName = 'movary:job-queue:' . $type . ':' . $userId;
+        if ((int)$this->dbConnection->fetchOne('SELECT GET_LOCK(?, 10)', [$lockName]) !== 1) {
+            throw new RuntimeException('Could not acquire job queue lock.');
+        }
+
+        try {
+            return $this->dbConnection->transactional($addJob);
+        } finally {
+            $this->dbConnection->fetchOne('SELECT RELEASE_LOCK(?)', [$lockName]);
+        }
+    }
+
     public function countJobs(?JobQueueFilter $filter = null) : int
     {
         if ($filter === null) {
@@ -168,6 +206,17 @@ class JobQueueRepository
         return (int)$this->dbConnection->fetchOne(
             "SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND job_status IN ($statusPlaceholders)",
             [$jobType, ...$statuses],
+        ) > 0;
+    }
+
+    /** @param non-empty-list<JobStatus> $statuses */
+    public function hasJobForUserWithStatuses(JobType $jobType, array $statuses, int $userId) : bool
+    {
+        $statusPlaceholders = implode(', ', array_fill(0, count($statuses), '?'));
+
+        return (int)$this->dbConnection->fetchOne(
+            "SELECT COUNT(*) FROM job_queue WHERE job_type = ? AND user_id = ? AND job_status IN ($statusPlaceholders)",
+            [$jobType, $userId, ...$statuses],
         ) > 0;
     }
 

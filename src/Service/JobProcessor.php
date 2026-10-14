@@ -10,6 +10,7 @@ use Movary\Service\Imdb\ImdbMovieRatingSync;
 use Movary\Service\Mastodon\MastodonPostPlayService;
 use Movary\Service\Mastodon\MastodonPostWatchlistService;
 use Movary\Service\Email\PasswordResetEmailJobProcessor;
+use Movary\Service\Email\EmailVerificationEmailJobProcessor;
 use Movary\Service\Plex\PlexWatchlistImporter;
 use Movary\Service\Tmdb\SyncMovies;
 use Movary\Service\Tmdb\SyncPersons;
@@ -33,6 +34,7 @@ class JobProcessor
         private readonly MastodonPostPlayService $mastodonPostPlayService,
         private readonly MastodonPostWatchlistService $mastodonPostWatchlistService,
         private readonly PasswordResetEmailJobProcessor $passwordResetEmailJobProcessor,
+        private readonly EmailVerificationEmailJobProcessor $emailVerificationEmailJobProcessor,
     ) {
     }
 
@@ -54,6 +56,7 @@ class JobProcessor
             $job->getType()->isOfTypeMastodonPostPlay() => $this->mastodonPostPlayService->executeJob($job),
             $job->getType()->isOfTypeMastodonPostWatchlist() => $this->mastodonPostWatchlistService->executeJob($job),
             $job->getType()->isOfTypePasswordResetEmail() => $this->passwordResetEmailJobProcessor->executeJob($job),
+            $job->getType()->isOfTypeEmailVerification() => $this->emailVerificationEmailJobProcessor->executeJob($job),
 
             default => throw new RuntimeException('Job type not supported: ' . $job->getType()),
         };

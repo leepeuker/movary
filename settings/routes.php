@@ -33,6 +33,11 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/reset-password', [Web\PasswordResetController::class, 'resetPassword'], [
         Web\Middleware\PasswordResetIsAvailable::class,
     ]);
+    $routes->add('GET', '/verify-email', [Web\EmailVerificationController::class, 'renderVerificationPage']);
+    $routes->add('POST', '/verify-email', [Web\EmailVerificationController::class, 'verifyEmail']);
+    $routes->add('POST', '/verify-email/resend', [Web\EmailVerificationController::class, 'resend'], [
+        Web\Middleware\EmailVerificationIsAvailable::class,
+    ]);
     $routes->add('POST', '/create-user', [Web\CreateUserController::class, 'createUser'], [
         Web\Middleware\UserIsUnauthenticated::class,
         Web\Middleware\ServerHasUsers::class,

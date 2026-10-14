@@ -7,6 +7,8 @@ use RuntimeException;
 
 class JobType implements JsonSerializable
 {
+    private const string TYPE_EMAIL_VERIFICATION = 'email_verification';
+
     private const string TYPE_PASSWORD_RESET_EMAIL = 'password_reset_email';
 
     private const string TYPE_MASTODON_POST_PLAY = 'mastodon_post_play';
@@ -36,6 +38,7 @@ class JobType implements JsonSerializable
     private const string TYPE_PLEX_IMPORT_WATCHLIST = 'plex_import_watchlist';
 
     private const array SUPPORTED_TYPES = [
+        self::TYPE_EMAIL_VERIFICATION,
         self::TYPE_LETTERBOXD_IMPORT_HISTORY,
         self::TYPE_LETTERBOXD_IMPORT_RATINGS,
         self::TYPE_TMDB_IMAGE_CACHE,
@@ -62,6 +65,11 @@ class JobType implements JsonSerializable
     public static function createFromString(string $status) : self
     {
         return new self($status);
+    }
+
+    public static function createEmailVerification() : self
+    {
+        return new self(self::TYPE_EMAIL_VERIFICATION);
     }
 
     public static function createImdbSync() : self
@@ -162,6 +170,11 @@ class JobType implements JsonSerializable
     public function isOfTypeImdbSync() : bool
     {
         return $this->type === self::TYPE_IMDB_SYNC;
+    }
+
+    public function isOfTypeEmailVerification() : bool
+    {
+        return $this->type === self::TYPE_EMAIL_VERIFICATION;
     }
 
     public function isOfTypeLetterboxdImportHistory() : bool

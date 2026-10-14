@@ -4,6 +4,7 @@ namespace Tests\Unit\Movary\Service;
 
 use Movary\Api\Tmdb\Cache\TmdbImageCache;
 use Movary\JobQueue\JobEntity;
+use Movary\Service\Email\EmailVerificationEmailJobProcessor;
 use Movary\Service\Email\PasswordResetEmailJobProcessor;
 use Movary\Service\Jellyfin\JellyfinMoviesExporter;
 use Movary\Service\Jellyfin\JellyfinMoviesImporter;
@@ -56,6 +57,7 @@ class JobProcessorTest extends TestCase
             mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
             mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
             passwordResetEmailJobProcessor: $this->createStub(PasswordResetEmailJobProcessor::class),
+            emailVerificationEmailJobProcessor: $this->createStub(EmailVerificationEmailJobProcessor::class),
         );
 
         $subject->processJob($job);
@@ -92,6 +94,7 @@ class JobProcessorTest extends TestCase
             mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
             mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
             passwordResetEmailJobProcessor: $this->createStub(PasswordResetEmailJobProcessor::class),
+            emailVerificationEmailJobProcessor: $this->createStub(EmailVerificationEmailJobProcessor::class),
         );
 
         $subject->processJob($job);
@@ -128,6 +131,7 @@ class JobProcessorTest extends TestCase
             mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
             mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
             passwordResetEmailJobProcessor: $passwordResetEmailJobProcessor,
+            emailVerificationEmailJobProcessor: $this->createStub(EmailVerificationEmailJobProcessor::class),
         );
 
         $subject->processJob($job);
@@ -161,6 +165,41 @@ class JobProcessorTest extends TestCase
             mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
             mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
             passwordResetEmailJobProcessor: $this->createStub(PasswordResetEmailJobProcessor::class),
+            emailVerificationEmailJobProcessor: $this->createStub(EmailVerificationEmailJobProcessor::class),
+        );
+
+        $subject->processJob($job);
+    }
+
+    public function testProcessJobDispatchesEmailVerificationJob() : void
+    {
+        $emailVerificationJobProcessor = $this->createMock(EmailVerificationEmailJobProcessor::class);
+        $job = JobEntity::createFromArray([
+            'id' => 5,
+            'job_type' => 'email_verification',
+            'job_status' => 'waiting',
+            'user_id' => 12,
+            'parameters' => Json::encode(['ignoreCooldown' => false]),
+            'updated_at' => null,
+            'created_at' => '2026-10-14 12:00:00',
+        ]);
+        $emailVerificationJobProcessor->expects(self::once())->method('executeJob')->with($job);
+        $subject = new JobProcessor(
+            traktSyncWatchedMovies: $this->createStub(ImportWatchedMovies::class),
+            traktSyncRatings: $this->createStub(TraktImportRatings::class),
+            letterboxdImportRatings: $this->createStub(LetterboxdImportRatings::class),
+            letterboxdImportHistory: $this->createStub(LetterboxdImportDiary::class),
+            tmdbSyncMovies: $this->createStub(SyncMovies::class),
+            tmdbSyncPersons: $this->createStub(SyncPersons::class),
+            tmdbImageCache: $this->createStub(TmdbImageCache::class),
+            imdbMovieRatingSync: $this->createStub(ImdbMovieRatingSync::class),
+            plexWatchlistImporter: $this->createStub(PlexWatchlistImporter::class),
+            jellyfinExporter: $this->createStub(JellyfinMoviesExporter::class),
+            jellyfinImporter: $this->createStub(JellyfinMoviesImporter::class),
+            mastodonPostPlayService: $this->createStub(MastodonPostPlayService::class),
+            mastodonPostWatchlistService: $this->createStub(MastodonPostWatchlistService::class),
+            passwordResetEmailJobProcessor: $this->createStub(PasswordResetEmailJobProcessor::class),
+            emailVerificationEmailJobProcessor: $emailVerificationJobProcessor,
         );
 
         $subject->processJob($job);

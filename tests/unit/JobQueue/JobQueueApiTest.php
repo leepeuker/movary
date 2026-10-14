@@ -56,6 +56,46 @@ class JobQueueApiTest extends TestCase
         (new JobQueueApi($repository))->addPasswordResetEmailJob(12, true);
     }
 
+    public function testAddEmailVerificationJobDeduplicatesActiveJobsForUser() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJobUnlessExistsForUserWithStatuses')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'email_verification'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'waiting'),
+                self::callback(
+                    static fn(array $statuses) : bool => array_map('strval', $statuses) === ['waiting', 'in progress'],
+                ),
+                12,
+                ['ignoreCooldown' => false],
+            )
+            ->willReturn(5);
+
+        (new JobQueueApi($repository))->addEmailVerificationJob(12);
+    }
+
+    public function testAddEmailVerificationJobCanForceAnotherJob() : void
+    {
+        /** @var JobQueueRepository&MockObject $repository */
+        $repository = $this->createMock(JobQueueRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('addJob')
+            ->with(
+                self::callback(static fn(JobType $type) => (string)$type === 'email_verification'),
+                self::callback(static fn(JobStatus $status) => (string)$status === 'waiting'),
+                12,
+                ['ignoreCooldown' => true],
+            )
+            ->willReturn(5);
+        $repository->expects(self::never())->method('addJobUnlessExistsForUserWithStatuses');
+
+        (new JobQueueApi($repository))->addEmailVerificationJob(12, true);
+    }
+
     public function testAddTmdbMovieSyncJobAddsMovieIdsAsParameters() : void
     {
         /** @var JobQueueRepository&MockObject $repository */

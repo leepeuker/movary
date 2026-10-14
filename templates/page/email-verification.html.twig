@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Verify email address
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset_url('css/password-reset.css') }}">
+{% endblock %}
+
+{% block body %}
+    <script>
+        if ("{{ theme }}" === 'dark') document.getElementsByTagName('body')[0].classList.add('bg-dark')
+    </script>
+    <main role="main" class="form-password-reset w-100 m-auto text-center">
+        <h1 class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">Verify email address</h1>
+        {% if tokenValid == true %}
+            {% if genericError == true %}
+                <div class="alert alert-danger" role="alert">
+                    The email address could not be verified. Please try again.
+                </div>
+            {% endif %}
+            <form action="{{ applicationUrl }}/verify-email" method="post">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <input type="hidden" name="token" value="{{ token }}">
+                <button class="w-100 btn btn-primary mb-3" type="submit">Verify email address</button>
+            </form>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                This email verification link is invalid or has expired.
+            </div>
+            <form action="{{ applicationUrl }}/verify-email/resend" method="post">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <div class="form-floating mb-3">
+                    <input type="email" name="email" class="form-control" id="emailVerificationEmail"
+                           placeholder="name@example.com" autocomplete="email" required>
+                    <label for="emailVerificationEmail">Email address</label>
+                </div>
+                <button class="w-100 btn btn-primary mb-3" type="submit">Send a new verification link</button>
+            </form>
+        {% endif %}
+        <a href="{{ applicationUrl }}/login">Back to login</a>
+    </main>
+{% endblock %}
