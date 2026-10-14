@@ -387,6 +387,11 @@ class UserApi
         $this->repository->updateIsAdmin($userId, $isAdmin);
     }
 
+    public function updateIsEnabled(int $userId, bool $isEnabled) : void
+    {
+        $this->repository->updateIsEnabledAndRevokeAuthTokens($userId, $isEnabled);
+    }
+
     public function updateJellyfinAuthentication(int $userId, JellyfinAuthenticationData $jellyfinAuthentication) : void
     {
         $this->repository->updateJellyfinAuthentication($userId, $jellyfinAuthentication);

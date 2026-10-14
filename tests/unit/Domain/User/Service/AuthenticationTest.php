@@ -10,6 +10,7 @@ use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
 use Movary\Domain\User\ValueObject\CredentialType;
+use Movary\Domain\User\Exception\UserDisabled;
 use Movary\Service\CookieSecurity;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Cookie;
@@ -313,6 +314,7 @@ class AuthenticationTest extends TestCase
     {
         $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
         $user->method('getId')->willReturn(12);
+        $user->method('isEnabled')->willReturn(true);
         $storedToken = null;
         $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
         $this->userApiMock
@@ -357,6 +359,7 @@ class AuthenticationTest extends TestCase
     {
         $user = $this->createStub(\Movary\Domain\User\UserEntity::class);
         $user->method('getId')->willReturn(12);
+        $user->method('isEnabled')->willReturn(true);
         $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
         $this->userApiMock->method('isValidPassword')->willReturn(true);
         $this->userApiMock->method('findTotpUri')->willReturn(null);
@@ -412,10 +415,27 @@ class AuthenticationTest extends TestCase
         $this->subject->loginWebSession('user@example.com', 'wrong-password', false, 'agent');
     }
 
+    public function testDisabledAccountDoesNotCreateWebSession() : void
+    {
+        $user = $this->createStub(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $user->method('isEnabled')->willReturn(false);
+        $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->willReturn(true);
+        $this->userApiMock->method('findTotpUri')->willReturn(null);
+        $this->userRepositoryMock->expects(self::never())->method('createAuthToken');
+        $this->userRepositoryMock->expects(self::never())->method('updateLastLoginAt');
+
+        $this->expectException(UserDisabled::class);
+
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
+    }
+
     public function testSuccessfulLoginResetsAccountRateLimit() : void
     {
         $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
         $user->method('getId')->willReturn(12);
+        $user->method('isEnabled')->willReturn(true);
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('findUserByEmail')

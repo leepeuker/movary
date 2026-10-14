@@ -40,6 +40,7 @@ class UserRepositoryTest extends TestCase
             'name' => 'Alice',
             'email' => 'alice@example.com',
             'isAdmin' => '1',
+            'isEnabled' => '1',
             'lastLoginAt' => '2026-10-14 12:00:00',
         ]];
         $this->dbConnectionMock
@@ -49,6 +50,7 @@ class UserRepositoryTest extends TestCase
                 self::callback(
                     static fn(string $query) : bool => str_contains($query, 'ORDER BY id')
                         && str_contains($query, 'last_login_at as lastLoginAt')
+                        && str_contains($query, 'is_enabled as isEnabled')
                         && str_contains($query, 'LIMIT 20 OFFSET 40'),
                 ),
                 [],
@@ -182,7 +184,10 @@ class UserRepositoryTest extends TestCase
             ->expects(self::once())
             ->method('fetchAssociative')
             ->with(
-                'SELECT `user_id`, `expiration_date` FROM `user_auth_token` WHERE `token` = ?',
+                'SELECT tokens.`user_id`, tokens.`expiration_date` '
+                . 'FROM `user_auth_token` tokens '
+                . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
+                . 'WHERE tokens.`token` = ? AND users.`is_enabled` = 1',
                 ['authentication-token'],
             )
             ->willReturn([
@@ -225,6 +230,39 @@ class UserRepositoryTest extends TestCase
             ->with('user_auth_token', ['user_id' => 12]);
 
         $this->subject->updatePasswordAndRevokeAuthTokens(12, 'password-hash');
+    }
+
+    public function testDisablingUserRevokesAuthTokens() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with('user', ['is_enabled' => 0], ['id' => 12]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_auth_token', ['user_id' => 12]);
+
+        $this->subject->updateIsEnabledAndRevokeAuthTokens(12, false);
+    }
+
+    public function testEnablingUserDoesNotRevokeAuthTokens() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with('user', ['is_enabled' => 1], ['id' => 12]);
+        $this->dbConnectionMock->expects(self::never())->method('delete');
+
+        $this->subject->updateIsEnabledAndRevokeAuthTokens(12, true);
     }
 
     public function testResetPasswordWithTokenConsumesTokenAndRevokesAccess() : void
@@ -602,8 +640,10 @@ class UserRepositoryTest extends TestCase
             ->expects(self::once())
             ->method('fetchAssociative')
             ->with(
-                'SELECT `id`, `user_id`, `expires_at`, `last_used_at` '
-                . 'FROM `user_api_token` WHERE `token_hash` = ?',
+                'SELECT tokens.`id`, tokens.`user_id`, tokens.`expires_at`, tokens.`last_used_at` '
+                . 'FROM `user_api_token` tokens '
+                . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
+                . 'WHERE tokens.`token_hash` = ? AND users.`is_enabled` = 1',
                 ['token-hash'],
             )
             ->willReturn([

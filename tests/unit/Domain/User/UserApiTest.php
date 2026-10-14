@@ -90,6 +90,17 @@ class UserApiTest extends TestCase
             ->updatePassword(7, 'a secure password');
     }
 
+    public function testUpdateIsEnabledForwardsStatusChange() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('updateIsEnabledAndRevokeAuthTokens')
+            ->with(7, false);
+
+        $this->createSubject($repository)->updateIsEnabled(7, false);
+    }
+
     public function testValidPasswordAcceptsGrandfatheredShortBcryptPassword() : void
     {
         $repository = $this->createStub(UserRepository::class);

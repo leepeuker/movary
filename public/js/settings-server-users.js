@@ -42,7 +42,8 @@ function registerTableRowClickEvent() {
                 this.cells[0].textContent,
                 this.cells[1].textContent,
                 this.cells[2].textContent,
-                this.dataset.isAdmin === 'true'
+                this.dataset.isAdmin === 'true',
+                this.dataset.isEnabled === 'true',
             )
 
             userModal.show()
@@ -72,6 +73,8 @@ function prepareCreateUserModal(name) {
     document.getElementById('userModalPasswordInput').value = ''
     document.getElementById('userModalRepeatPasswordInput').value = ''
     document.getElementById('userModalIsAdminInput').checked = ''
+    document.getElementById('userModalIsEnabledInput').checked = true
+    document.getElementById('userModalIsEnabledInput').disabled = true
 
     document.getElementById('userModalAlerts').innerHTML = ''
 
@@ -79,7 +82,7 @@ function prepareCreateUserModal(name) {
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
 
-function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword) {
+function prepareEditUserModal(id, name, email, isAdmin, isEnabled) {
     document.getElementById('userModalHeaderTitle').innerHTML = 'Edit User'
 
     document.getElementById('userModalPasswordInput').required = false
@@ -94,6 +97,8 @@ function prepareEditUserModal(id, name, email, isAdmin, password, repeatPassword
     document.getElementById('userModalNameInput').value = name
     document.getElementById('userModalEmailInput').value = email
     document.getElementById('userModalIsAdminInput').checked = isAdmin
+    document.getElementById('userModalIsEnabledInput').checked = isEnabled
+    document.getElementById('userModalIsEnabledInput').disabled = name === document.getElementById('currentUserName').value
     document.getElementById('userModalPasswordInput').value = ''
     document.getElementById('userModalRepeatPasswordInput').value = ''
 
@@ -201,6 +206,7 @@ document.getElementById('updateUserButton').addEventListener('click', async () =
             'name': document.getElementById('userModalNameInput').value,
             'email': document.getElementById('userModalEmailInput').value,
             'isAdmin': document.getElementById('userModalIsAdminInput').checked,
+            'isEnabled': document.getElementById('userModalIsEnabledInput').checked,
             'password': password,
         })
     })

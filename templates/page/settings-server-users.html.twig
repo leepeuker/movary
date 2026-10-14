@@ -60,18 +60,26 @@
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Role</th>
+                            <th scope="col">Status</th>
                             <th scope="col" data-local-time-zone-label>Last login</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for user in users %}
-                            <tr data-is-admin="{{ user.isAdmin == 1 ? 'true' : 'false' }}" style="cursor: pointer">
+                            <tr data-is-admin="{{ user.isAdmin == 1 ? 'true' : 'false' }}"
+                                data-is-enabled="{{ user.isEnabled == 1 ? 'true' : 'false' }}"
+                                style="cursor: pointer">
                                 <td>{{ user.id }}</td>
                                 <td>{{ user.name }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>
                                     <span class="badge rounded-pill text-bg-{{ user.isAdmin == 1 ? 'light' : 'dark' }}">
                                         {{ user.isAdmin == 1 ? 'Admin' : 'User' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill text-bg-{{ user.isEnabled == 1 ? 'success' : 'secondary' }}">
+                                        {{ user.isEnabled == 1 ? 'Enabled' : 'Disabled' }}
                                     </span>
                                 </td>
                                 <td data-utc-date-time="{{ user.lastLoginAt|default('-') }}">{{ user.lastLoginAt ? user.lastLoginAt ~ ' UTC' : '-' }}</td>

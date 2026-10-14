@@ -3,6 +3,7 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\LoginAttemptLimitReached;
+use Movary\Domain\User\Exception\UserDisabled;
 use Movary\Domain\User\Service\Authentication;
 use Movary\HttpController\Web\AuthenticationController;
 use Movary\Service\Email\EmailSupport;
@@ -149,6 +150,23 @@ class AuthenticationControllerTest extends TestCase
         self::assertSame(
             ['Content-Type: application/json', 'Retry-After: 60', 'Cache-Control: private, no-cache'],
             array_map(static fn($header) => (string)$header, $response->getHeaders()),
+        );
+    }
+
+    public function testLoginReturnsDisabledAccountError() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn('{"email":"user@example.com","password":"password"}');
+        $this->authenticationMock
+            ->method('loginWebSession')
+            ->willThrowException(UserDisabled::create());
+
+        $response = $this->createSubject()->login($request);
+
+        self::assertEquals(StatusCode::createForbidden(), $response->getStatusCode());
+        self::assertSame(
+            '{"error":"UserDisabled","message":"This account is disabled."}',
+            $response->getBody(),
         );
     }
 

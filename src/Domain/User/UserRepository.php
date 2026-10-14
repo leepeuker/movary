@@ -275,7 +275,9 @@ class UserRepository
 
     public function fetchAll() : array
     {
-        return $this->dbConnection->fetchAllAssociative('SELECT id, name, email, is_admin as isAdmin FROM `user` ORDER BY id');
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT id, name, email, is_admin as isAdmin, is_enabled as isEnabled FROM `user` ORDER BY id',
+        );
     }
 
     public function countUsers(?bool $isAdminFilter = null) : int
@@ -298,7 +300,7 @@ class UserRepository
         [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
 
         return $this->dbConnection->fetchAllAssociative(
-            "SELECT id, name, email, is_admin as isAdmin, last_login_at as lastLoginAt
+            "SELECT id, name, email, is_admin as isAdmin, is_enabled as isEnabled, last_login_at as lastLoginAt
             FROM `user`
             $whereQuery
             ORDER BY id
@@ -458,7 +460,10 @@ class UserRepository
     public function findAuthTokenData(string $token) : ?array
     {
         $data = $this->dbConnection->fetchAssociative(
-            'SELECT `user_id`, `expiration_date` FROM `user_auth_token` WHERE `token` = ?',
+            'SELECT tokens.`user_id`, tokens.`expiration_date` '
+            . 'FROM `user_auth_token` tokens '
+            . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
+            . 'WHERE tokens.`token` = ? AND users.`is_enabled` = 1',
             [$token],
         );
 
@@ -545,8 +550,10 @@ class UserRepository
     public function findPersonalApiTokenData(string $tokenHash) : ?array
     {
         $data = $this->dbConnection->fetchAssociative(
-            'SELECT `id`, `user_id`, `expires_at`, `last_used_at` '
-            . 'FROM `user_api_token` WHERE `token_hash` = ?',
+            'SELECT tokens.`id`, tokens.`user_id`, tokens.`expires_at`, tokens.`last_used_at` '
+            . 'FROM `user_api_token` tokens '
+            . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
+            . 'WHERE tokens.`token_hash` = ? AND users.`is_enabled` = 1',
             [$tokenHash],
         );
 
@@ -1027,6 +1034,23 @@ class UserRepository
             [
                 'id' => $userId,
             ],
+        );
+    }
+
+    public function updateIsEnabledAndRevokeAuthTokens(int $userId, bool $isEnabled) : void
+    {
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $isEnabled) : void {
+                $connection->update(
+                    'user',
+                    ['is_enabled' => (int)$isEnabled],
+                    ['id' => $userId],
+                );
+
+                if ($isEnabled === false) {
+                    $connection->delete('user_auth_token', ['user_id' => $userId]);
+                }
+            },
         );
     }
 

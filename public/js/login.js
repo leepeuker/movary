@@ -41,6 +41,15 @@ async function submitCredentials() {
         }
     }
 
+    if (response.status === 403) {
+        const error = await response.json();
+
+        if (error['error'] === 'UserDisabled') {
+            addAlert('loginErrors', error['message'], 'danger', false);
+            return
+        }
+    }
+
     if (response.status === 429) {
         addAlert('loginErrors', createLoginRateLimitMessage(response.headers.get('Retry-After')), 'danger', false);
         return;

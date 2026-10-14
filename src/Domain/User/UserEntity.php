@@ -14,6 +14,7 @@ class UserEntity
         private readonly string $email,
         private readonly string $passwordHash,
         private readonly bool $isAdmin,
+        private readonly bool $isEnabled,
         private readonly ?string $dashboardVisibleRows,
         private readonly ?string $dashboardExtendedRows,
         private readonly ?string $dashboardOrderRows,
@@ -58,6 +59,7 @@ class UserEntity
             $data['email'],
             $data['password'],
             (bool)$data['is_admin'],
+            (bool)$data['is_enabled'],
             $data['dashboard_visible_rows'],
             $data['dashboard_extended_rows'],
             $data['dashboard_order_rows'],
@@ -282,5 +284,10 @@ class UserEntity
     public function isAdmin() : bool
     {
         return $this->isAdmin;
+    }
+
+    public function isEnabled() : bool
+    {
+        return $this->isEnabled;
     }
 }

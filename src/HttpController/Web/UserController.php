@@ -9,6 +9,7 @@ use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -87,6 +88,11 @@ class UserController
 
         $requestUserData = Json::decode($request->getBody());
 
+        $statusValidationResponse = $this->validateAccountStatusUpdate($currentUser, $userId, $requestUserData);
+        if ($statusValidationResponse !== null) {
+            return $statusValidationResponse;
+        }
+
         try {
             $this->userApi->updateName($userId, $requestUserData['name']);
             $this->userApi->updateEmail($userId, $requestUserData['email']);
@@ -94,6 +100,9 @@ class UserController
 
             if ($requestUserData['password'] !== null) {
                 $this->userApi->updatePassword($userId, $requestUserData['password']);
+            }
+            if (array_key_exists('isEnabled', $requestUserData) === true) {
+                $this->userApi->updateIsEnabled($userId, $requestUserData['isEnabled']);
             }
         } catch (EmailNotUnique) {
             return Response::createBadRequest('Email already in use.');
@@ -108,5 +117,23 @@ class UserController
         }
 
         return Response::createOk();
+    }
+
+    private function validateAccountStatusUpdate(
+        UserEntity $currentUser,
+        int $targetUserId,
+        array $requestUserData,
+    ) : ?Response {
+        if (array_key_exists('isEnabled', $requestUserData) === false) {
+            return null;
+        }
+        if ($currentUser->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+        if ($currentUser->getId() === $targetUserId && $requestUserData['isEnabled'] === false) {
+            return Response::createBadRequest('You cannot disable your own account.');
+        }
+
+        return null;
     }
 }
