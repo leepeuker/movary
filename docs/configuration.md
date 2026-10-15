@@ -74,12 +74,13 @@ Jellyfin and Plex server URLs are restricted to HTTP(S) destinations on ports 80
 
 Outgoing email features are disabled by default. Set `EMAIL_ENABLED=1` or enable them in the Web UI after configuring SMTP.
 
-| NAME                | DEFAULT VALUE | INFO                                                   | Web UI |
-|:--------------------|:-------------:|:-------------------------------------------------------|:------:|
-| `EMAIL_ENABLED`     |      `0`      | `1` enables outgoing email features                     |  yes   |
-| `SMTP_HOST`         |       -       | SMTP server hostname                                   |  yes   |
-| `SMTP_PORT`         |       -       | SMTP server port, from `1` through `65535`             |  yes   |
-| `SMTP_FROM_ADDRESS` |       -       | Valid email address used as the sender                 |  yes   |
+| NAME                          | DEFAULT VALUE | INFO                                                   | Web UI |
+|:------------------------------|:-------------:|:-------------------------------------------------------|:------:|
+| `EMAIL_ENABLED`               |      `0`      | `1` enables outgoing email features                    |  yes   |
+| `EMAIL_VERIFICATION_REQUIRED` |      `0`      | `1` verifies email changes before applying them        |        |
+| `SMTP_HOST`                   |       -       | SMTP server hostname                                   |  yes   |
+| `SMTP_PORT`                   |       -       | SMTP server port, from `1` through `65535`             |  yes   |
+| `SMTP_FROM_ADDRESS`           |       -       | Valid email address used as the sender                 |  yes   |
 | `SMTP_ENCRYPTION`   |       -       | Empty for none; otherwise `ssl` or `tls`               |  yes   |
 | `SMTP_WITH_AUTH`    |      `0`      | `1` enables username/password authentication           |  yes   |
 | `SMTP_USER`         |       -       | Required when authentication is enabled                |  yes   |

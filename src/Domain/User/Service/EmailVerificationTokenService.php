@@ -58,7 +58,11 @@ class EmailVerificationTokenService
             return null;
         }
 
-        if ($tokenData['email'] !== $tokenData['currentEmail']
+        $emailMatchesPendingAddress = $tokenData['pendingEmail'] !== null
+            && $tokenData['email'] === $tokenData['pendingEmail'];
+        $emailMatchesUnverifiedCurrentAddress = $tokenData['pendingEmail'] === null
+            && $tokenData['email'] === $tokenData['currentEmail'];
+        if (($emailMatchesPendingAddress === false && $emailMatchesUnverifiedCurrentAddress === false)
             || $tokenData['expirationDate']->isAfter(DateTime::create()) === false
         ) {
             $this->repository->deleteEmailVerificationToken($tokenHash);

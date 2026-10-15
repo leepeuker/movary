@@ -185,7 +185,8 @@ class UserRepository
         return $this->dbConnection->transactional(
             static function (Connection $connection) use ($tokenHash, $currentDate) : bool {
                 $tokenData = $connection->fetchAssociative(
-                    'SELECT token.`user_id`, token.`email`, token.`expiration_date`, users.`email` AS `current_email` '
+                    'SELECT token.`user_id`, token.`email`, token.`expiration_date`, '
+                    . 'users.`email` AS `current_email`, users.`pending_email` '
                     . 'FROM `user_email_verification_token` token '
                     . 'JOIN `user` users ON users.`id` = token.`user_id` '
                     . 'WHERE token.`token_hash` = ?',
@@ -196,12 +197,28 @@ class UserRepository
                     return false;
                 }
 
-                if ($tokenData['email'] !== $tokenData['current_email']
+                $pendingEmail = $tokenData['pending_email'];
+                $verifiesPendingEmail = $pendingEmail !== null && $tokenData['email'] === $pendingEmail;
+                $verifiesCurrentEmail = $pendingEmail === null && $tokenData['email'] === $tokenData['current_email'];
+                if (($verifiesPendingEmail === false && $verifiesCurrentEmail === false)
                     || DateTime::createFromString($tokenData['expiration_date'])->isAfter($currentDate) === false
                 ) {
                     $connection->delete('user_email_verification_token', ['token_hash' => $tokenHash]);
 
                     return false;
+                }
+
+                $userId = (int)$tokenData['user_id'];
+                if ($verifiesPendingEmail === true) {
+                    $conflictingUserId = $connection->fetchOne(
+                        'SELECT `id` FROM `user` WHERE `email` = ? AND `id` != ?',
+                        [$tokenData['email'], $userId],
+                    );
+                    if ($conflictingUserId !== false) {
+                        $connection->delete('user_email_verification_token', ['token_hash' => $tokenHash]);
+
+                        return false;
+                    }
                 }
 
                 $deletedTokenCount = $connection->delete(
@@ -212,11 +229,31 @@ class UserRepository
                     return false;
                 }
 
-                return $connection->update(
+                if ($verifiesPendingEmail === false) {
+                    return $connection->update(
+                        'user',
+                        ['email_verified_at' => (string)$currentDate],
+                        ['id' => $userId, 'email' => $tokenData['email']],
+                    ) === 1;
+                }
+
+                $updatedUserCount = $connection->update(
                     'user',
-                    ['email_verified_at' => (string)$currentDate],
-                    ['id' => (int)$tokenData['user_id'], 'email' => $tokenData['email']],
-                ) === 1;
+                    [
+                        'email' => $tokenData['email'],
+                        'pending_email' => null,
+                        'email_verified_at' => (string)$currentDate,
+                    ],
+                    ['id' => $userId, 'pending_email' => $tokenData['email']],
+                );
+                if ($updatedUserCount !== 1) {
+                    return false;
+                }
+
+                $connection->delete('user_auth_token', ['user_id' => $userId]);
+                $connection->delete('user_api_token', ['user_id' => $userId]);
+
+                return true;
             },
         );
     }
@@ -359,7 +396,8 @@ class UserRepository
     public function fetchAll() : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT id, name, email, is_admin as isAdmin, is_enabled as isEnabled FROM `user` ORDER BY id',
+            'SELECT id, name, email, pending_email as pendingEmail, '
+            . 'is_admin as isAdmin, is_enabled as isEnabled FROM `user` ORDER BY id',
         );
     }
 
@@ -383,7 +421,8 @@ class UserRepository
         [$whereQuery, $parameters] = $this->createUserFilter($isAdminFilter);
 
         return $this->dbConnection->fetchAllAssociative(
-            "SELECT id, name, email, is_admin as isAdmin, is_enabled as isEnabled, last_login_at as lastLoginAt
+            "SELECT id, name, email, pending_email as pendingEmail, is_admin as isAdmin, is_enabled as isEnabled,
+                last_login_at as lastLoginAt
             FROM `user`
             $whereQuery
             ORDER BY id
@@ -581,12 +620,13 @@ class UserRepository
     }
 
     /**
-     * @return array{userId: int, email: string, currentEmail: string, expirationDate: DateTime}|null
+     * @return array{userId: int, email: string, currentEmail: string, pendingEmail: ?string, expirationDate: DateTime}|null
      */
     public function findEmailVerificationTokenData(string $tokenHash) : ?array
     {
         $data = $this->dbConnection->fetchAssociative(
-            'SELECT token.`user_id`, token.`email`, token.`expiration_date`, users.`email` AS `current_email` '
+            'SELECT token.`user_id`, token.`email`, token.`expiration_date`, '
+            . 'users.`email` AS `current_email`, users.`pending_email` '
             . 'FROM `user_email_verification_token` token '
             . 'JOIN `user` users ON users.`id` = token.`user_id` '
             . 'WHERE token.`token_hash` = ?',
@@ -601,6 +641,7 @@ class UserRepository
             'userId' => (int)$data['user_id'],
             'email' => (string)$data['email'],
             'currentEmail' => (string)$data['current_email'],
+            'pendingEmail' => $data['pending_email'] === null ? null : (string)$data['pending_email'],
             'expirationDate' => DateTime::createFromString((string)$data['expiration_date']),
         ];
     }
@@ -1127,6 +1168,7 @@ class UserRepository
                     'user',
                     [
                         'email' => $email,
+                        'pending_email' => null,
                         'email_verified_at' => null,
                     ],
                     [
@@ -1140,12 +1182,22 @@ class UserRepository
 
     public function updatePendingEmail(int $userId, string $email) : void
     {
-        $this->dbConnection->update('user', ['pending_email' => $email], ['id' => $userId]);
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $email) : void {
+                $connection->update('user', ['pending_email' => $email], ['id' => $userId]);
+                $connection->delete('user_email_verification_token', ['user_id' => $userId]);
+            },
+        );
     }
 
     public function clearPendingEmail(int $userId) : void
     {
-        $this->dbConnection->update('user', ['pending_email' => null], ['id' => $userId]);
+        $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId) : void {
+                $connection->update('user', ['pending_email' => null], ['id' => $userId]);
+                $connection->delete('user_email_verification_token', ['user_id' => $userId]);
+            },
+        );
     }
 
     public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void

@@ -68,10 +68,17 @@
                         {% for user in users %}
                             <tr data-is-admin="{{ user.isAdmin == 1 ? 'true' : 'false' }}"
                                 data-is-enabled="{{ user.isEnabled == 1 ? 'true' : 'false' }}"
+                                data-email="{{ user.email }}"
+                                data-pending-email="{{ user.pendingEmail|default('') }}"
                                 style="cursor: pointer">
                                 <td>{{ user.id }}</td>
                                 <td>{{ user.name }}</td>
-                                <td>{{ user.email }}</td>
+                                <td>
+                                    {{ user.email }}
+                                    {% if user.pendingEmail %}
+                                        <div class="small text-warning">Pending: {{ user.pendingEmail }}</div>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     <span class="badge rounded-pill text-bg-{{ user.isAdmin == 1 ? 'light' : 'dark' }}">
                                         {{ user.isAdmin == 1 ? 'Admin' : 'User' }}

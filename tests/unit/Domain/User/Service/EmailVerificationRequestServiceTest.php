@@ -84,6 +84,18 @@ class EmailVerificationRequestServiceTest extends TestCase
         self::assertTrue($this->subject->request(' alice@example.com '));
     }
 
+    public function testRequestFindsPendingEmailAddress() : void
+    {
+        $user = $this->createMock(UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $user->method('getEmailPendingVerification')->willReturn('new@example.com');
+        $this->userApiMock->method('findUserByEmail')->willReturn(null);
+        $this->userApiMock->expects(self::once())->method('findUserByPendingEmail')->with('new@example.com')->willReturn($user);
+        $this->jobQueueApiMock->expects(self::once())->method('addEmailVerificationJob')->with(12, false);
+
+        self::assertTrue($this->subject->request('new@example.com'));
+    }
+
     public function testRequestForUserCanIgnoreCooldown() : void
     {
         $user = $this->createUser(false);
@@ -119,6 +131,7 @@ class EmailVerificationRequestServiceTest extends TestCase
         $user = $this->createMock(UserEntity::class);
         $user->method('getId')->willReturn(12);
         $user->method('isEmailVerified')->willReturn($verified);
+        $user->method('getEmailPendingVerification')->willReturn($verified ? null : 'alice@example.com');
 
         return $user;
     }

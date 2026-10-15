@@ -158,6 +158,15 @@ class UserEntity
         return $this->pendingEmail;
     }
 
+    public function getEmailPendingVerification() : ?string
+    {
+        if ($this->pendingEmail !== null) {
+            return $this->pendingEmail;
+        }
+
+        return $this->isEmailVerified() === true ? null : $this->email;
+    }
+
     public function getEmailVerifiedAt() : ?DateTime
     {
         return $this->emailVerifiedAt;

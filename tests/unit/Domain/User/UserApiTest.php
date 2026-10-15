@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\Domain\User;
 
+use Movary\Domain\User\Service\EmailVerificationPolicy;
 use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\Service\Validator;
 use Movary\Domain\User\UserApi;
@@ -66,7 +67,7 @@ class UserApiTest extends TestCase
                 self::isInstanceOf(\Movary\ValueObject\DateTime::class),
             );
 
-        (new UserApi($repository, $validator, $passwordPolicy))->createUser(
+        (new UserApi($repository, $validator, $passwordPolicy, $this->createStub(EmailVerificationPolicy::class)))->createUser(
             'user@example.com',
             'a secure password',
             'user',
@@ -112,7 +113,12 @@ class UserApiTest extends TestCase
                 self::callback(static fn(string $hash) => password_verify('a secure password', $hash)),
             );
 
-        (new UserApi($repository, $this->createStub(Validator::class), $passwordPolicy))
+        (new UserApi(
+            $repository,
+            $this->createStub(Validator::class),
+            $passwordPolicy,
+            $this->createStub(EmailVerificationPolicy::class),
+        ))
             ->updatePassword(7, 'a secure password');
     }
 
@@ -137,12 +143,39 @@ class UserApiTest extends TestCase
         self::assertTrue($this->createSubject($repository)->isValidPassword(7, 'short'));
     }
 
-    private function createSubject(UserRepository $repository) : UserApi
+    public function testUpdateEmailImmediatelyWhenVerificationIsOptional() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $repository->expects(self::once())->method('updateEmail')->with(7, 'new@example.com');
+        $repository->expects(self::never())->method('updatePendingEmail');
+
+        self::assertFalse($this->createSubject($repository)->updateEmail(7, 'new@example.com'));
+    }
+
+    public function testUpdateEmailCreatesPendingChangeWhenVerificationIsRequired() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getEmail')->willReturn('old@example.com');
+        $repository->method('findUserById')->willReturn($user);
+        $repository->expects(self::once())->method('updatePendingEmail')->with(7, 'new@example.com');
+        $repository->expects(self::never())->method('updateEmail');
+        $policy = $this->createStub(EmailVerificationPolicy::class);
+        $policy->method('isRequired')->willReturn(true);
+
+        self::assertTrue($this->createSubject($repository, $policy)->updateEmail(7, 'new@example.com'));
+    }
+
+    private function createSubject(
+        UserRepository $repository,
+        ?EmailVerificationPolicy $emailVerificationPolicy = null,
+    ) : UserApi
     {
         return new UserApi(
             $repository,
             $this->createStub(Validator::class),
             $this->createStub(PasswordPolicy::class),
+            $emailVerificationPolicy ?? $this->createStub(EmailVerificationPolicy::class),
         );
     }
 }

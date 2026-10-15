@@ -40,12 +40,18 @@ class EmailVerificationEmailJobProcessorTest extends TestCase
 
     private bool $userIsVerified;
 
+    private ?string $emailPendingVerification;
+
     protected function setUp() : void
     {
         $userApi = $this->createStub(UserApi::class);
         $this->userMock = $this->createMock(UserEntity::class);
         $this->userMock->method('getEmail')->willReturn('alice@example.com');
         $this->userIsVerified = false;
+        $this->emailPendingVerification = 'alice@example.com';
+        $this->userMock
+            ->method('getEmailPendingVerification')
+            ->willReturnCallback(fn() : ?string => $this->userIsVerified ? null : $this->emailPendingVerification);
         $this->userMock
             ->method('isEmailVerified')
             ->willReturnCallback(fn() : bool => $this->userIsVerified);
@@ -95,6 +101,28 @@ class EmailVerificationEmailJobProcessorTest extends TestCase
             ->method('sendEmail')
             ->with(
                 'alice@example.com',
+                'Verify your Movary email address',
+                '<html>Verify email</html>',
+                self::isInstanceOf(SmtpConfig::class),
+            );
+
+        $this->subject->executeJob($this->createJob(false));
+    }
+
+    public function testExecuteJobSendsToPendingEmail() : void
+    {
+        $this->emailPendingVerification = 'new@example.com';
+        $this->tokenServiceMock
+            ->expects(self::once())
+            ->method('createTokenIfAllowed')
+            ->with(12, 'new@example.com')
+            ->willReturn('verification-token');
+        $this->applicationUrlServiceMock->method('createApplicationUrl')->willReturn('https://movary.example/verify-email');
+        $this->emailServiceMock
+            ->expects(self::once())
+            ->method('sendEmail')
+            ->with(
+                'new@example.com',
                 'Verify your Movary email address',
                 '<html>Verify email</html>',
                 self::isInstanceOf(SmtpConfig::class),
