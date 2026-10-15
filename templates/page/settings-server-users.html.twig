@@ -54,7 +54,7 @@
 
                 <div class="table-responsive">
                     <table class="table table-hover" id="usersTable"
-                           data-email-verification-required="{{ emailVerificationRequired ? 'true' : 'false' }}">
+                           data-email-verification-enabled="{{ emailVerificationEnabled ? 'true' : 'false' }}">
                         <thead>
                         <tr>
                             <th scope="col">Id</th>
@@ -78,7 +78,7 @@
                                     {{ user.email }}
                                     {% if user.pendingEmail %}
                                         <div class="small text-warning">
-                                            {{ emailVerificationRequired ? 'Pending' : 'Pending (verification disabled)' }}: {{ user.pendingEmail }}
+                                            {{ emailVerificationEnabled ? 'Pending' : 'Pending (verification unavailable)' }}: {{ user.pendingEmail }}
                                         </div>
                                     {% endif %}
                                 </td>

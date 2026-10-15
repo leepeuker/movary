@@ -701,7 +701,8 @@ class SettingsController
                     ? null
                     : ($isAdminFilter ? 'admin' : 'user'),
                 'userFiltersActive' => $isAdminFilter !== null,
-                'emailVerificationRequired' => $this->emailVerificationPolicy->isRequired(),
+                'emailVerificationEnabled' => $this->emailVerificationPolicy->isRequired()
+                    && $this->emailSupport->isEmailVerificationAvailable(),
             ]),
         );
     }

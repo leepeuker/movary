@@ -5,6 +5,7 @@ namespace Tests\Unit\Movary\HttpController\Web;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
 use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
@@ -13,6 +14,7 @@ use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Web\SettingsController;
 use Movary\HttpController\Web\Mapper\PaginationRequestMapper;
 use Movary\HttpController\Web\Mapper\JobScheduleFilterRequestMapper;
+use Movary\HttpController\Web\Mapper\UserFilterRequestMapper;
 use Movary\JobQueue\JobScheduleFilter;
 use Movary\JobQueue\JobScheduleApi;
 use Movary\Service\ApplicationUrlService;
@@ -20,6 +22,7 @@ use Movary\Service\FlashMessage\FlashMessage;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Dashboard\Dto\DashboardRowList;
+use Movary\Service\Email\EmailSupport;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
@@ -125,6 +128,48 @@ class SettingsControllerTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode()->getCode());
         self::assertSame('job schedules', $response->getBody());
+    }
+
+    #[DataProvider('provideEmailVerificationConfiguration')]
+    public function testRenderServerUsersPageProvidesCompleteEmailVerificationState(
+        bool $verificationRequired,
+        bool $emailVerificationAvailable,
+        bool $expectedEnabled,
+    ) : void {
+        $request = $this->createStub(Request::class);
+        $request->method('getGetParameters')->willReturn([]);
+        $policy = $this->createStub(EmailVerificationPolicy::class);
+        $policy->method('isRequired')->willReturn($verificationRequired);
+        $emailSupport = $this->createStub(EmailSupport::class);
+        $emailSupport->method('isEmailVerificationAvailable')->willReturn($emailVerificationAvailable);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/settings-server-users.html.twig',
+                self::callback(
+                    static fn(array $data) : bool => $data['emailVerificationEnabled'] === $expectedEnabled,
+                ),
+            );
+        $subject = $this->createSubject([
+            'twig' => $this->twigMock,
+            'userApi' => $this->userApiMock,
+            'emailSupport' => $emailSupport,
+            'emailVerificationPolicy' => $policy,
+            'paginationRequestMapper' => new PaginationRequestMapper(),
+            'paginationElementsCalculator' => new PaginationElementsCalculator(),
+            'userFilterRequestMapper' => new UserFilterRequestMapper(),
+        ]);
+
+        $subject->renderServerUsersPage($request);
+    }
+
+    public static function provideEmailVerificationConfiguration() : iterable
+    {
+        yield 'policy and email support enabled' => [true, true, true];
+        yield 'email support unavailable' => [true, false, false];
+        yield 'policy disabled' => [false, true, false];
+        yield 'both disabled' => [false, false, false];
     }
 
     public function testUpdatePasswordUsesDomainPolicyAndPreservesBadRequestContract() : void
