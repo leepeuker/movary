@@ -2,6 +2,8 @@ async function submitCredentials() {
     const urlParams = new URLSearchParams(window.location.search);
     const safeRedirect = getSafeRedirect(urlParams.get('redirect'), APPLICATION_URL);
     const emailVerificationRequiredAlert = document.getElementById('emailVerificationRequiredAlert');
+    document.getElementById('loginErrors').replaceChildren();
+    document.getElementById('totpErrors').replaceChildren();
     emailVerificationRequiredAlert.classList.add('d-none');
 
     const response = await loginRequest();
