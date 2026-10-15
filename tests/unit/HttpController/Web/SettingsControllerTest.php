@@ -130,6 +130,25 @@ class SettingsControllerTest extends TestCase
         self::assertSame('job schedules', $response->getBody());
     }
 
+    public function testRenderSecurityAccountPageProvidesEmailChangeState() : void
+    {
+        $this->userMock->method('getEmail')->willReturn('current@example.com');
+        $this->userMock->method('getPendingEmail')->willReturn('pending@example.com');
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/settings-account-security.html.twig',
+                self::callback(
+                    static fn(array $data) : bool => $data['email'] === 'current@example.com'
+                        && $data['pendingEmail'] === 'pending@example.com'
+                        && $data['emailVerificationEnabled'] === false,
+                ),
+            );
+
+        $this->subject->renderSecurityAccountPage();
+    }
+
     #[DataProvider('provideEmailVerificationConfiguration')]
     public function testRenderServerUsersPageProvidesCompleteEmailVerificationState(
         bool $verificationRequired,

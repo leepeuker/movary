@@ -7,8 +7,10 @@ use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\EmailVerificationRequestService;
+use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Util\Json;
@@ -21,6 +23,8 @@ class UserController
         private readonly UserApi $userApi,
         private readonly CurrentWebUser $currentWebUser,
         private readonly EmailVerificationRequestService $emailVerificationRequestService,
+        private readonly PasswordPolicy $passwordPolicy,
+        private readonly Authentication $authentication,
     ) {
     }
 
@@ -78,6 +82,157 @@ class UserController
         }
 
         return Response::createJson(Json::encode($this->userApi->fetchAll()));
+    }
+
+    public function updateOwnEmail(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->hasCoreAccountChangesDisabled() === true) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+        $email = $requestData['email'] ?? null;
+        $currentPassword = $requestData['currentPassword'] ?? null;
+        if (is_string($email) === false || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            return Response::createBadRequest('Email address is not valid.');
+        }
+        if (is_string($currentPassword) === false
+            || $this->userApi->isValidPassword($currentUser->getId(), $currentPassword) === false
+        ) {
+            return Response::createBadRequest('Current password wrong.');
+        }
+
+        try {
+            $verificationRequested = $this->userApi->updateEmail($currentUser->getId(), $email);
+        } catch (EmailNotUnique) {
+            return Response::createBadRequest('Email already in use.');
+        }
+
+        $response = $this->scheduleEmailVerificationIfRequested($currentUser->getId(), $verificationRequested);
+        if ($response->getStatusCode()->getCode() !== 200) {
+            return $response;
+        }
+
+        return Response::createJson(Json::encode([
+            'verificationPending' => $verificationRequested || $currentUser->getPendingEmail() === $email,
+            'verificationRequested' => $verificationRequested,
+        ]));
+    }
+
+    public function updateOwnCredentials(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->hasCoreAccountChangesDisabled() === true) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+        $email = $requestData['email'] ?? null;
+        $currentPassword = $requestData['currentPassword'] ?? null;
+        $newPassword = $requestData['newPassword'] ?? null;
+
+        $validationResponse = $this->validateOwnCredentialsUpdate(
+            $currentUser,
+            $email,
+            $currentPassword,
+            $newPassword,
+        );
+        if ($validationResponse !== null) {
+            return $validationResponse;
+        }
+        assert(is_string($email));
+        assert($newPassword === null || is_string($newPassword));
+
+        $emailChanged = $email !== $currentUser->getEmail();
+        $verificationRequested = false;
+        if ($emailChanged === true) {
+            try {
+                $verificationRequested = $this->userApi->updateEmail($currentUser->getId(), $email);
+            } catch (EmailNotUnique) {
+                return Response::createBadRequest('Email already in use.');
+            }
+
+            $response = $this->scheduleEmailVerificationIfRequested(
+                $currentUser->getId(),
+                $verificationRequested,
+            );
+            if ($response->getStatusCode()->getCode() !== 200) {
+                return $response;
+            }
+        }
+
+        if ($newPassword !== null) {
+            $this->userApi->updatePassword($currentUser->getId(), $newPassword);
+            $this->authentication->logout();
+        }
+
+        $verificationPending = $verificationRequested || $currentUser->getPendingEmail() === $email;
+
+        return Response::createJson(Json::encode([
+            'emailChanged' => $emailChanged,
+            'verificationPending' => $verificationPending,
+            'verificationRequested' => $verificationRequested,
+            'passwordChanged' => $newPassword !== null,
+        ]));
+    }
+
+    private function validateOwnCredentialsUpdate(
+        UserEntity $currentUser,
+        mixed $email,
+        mixed $currentPassword,
+        mixed $newPassword,
+    ) : ?Response {
+        if (is_string($email) === false || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            return Response::createBadRequest('Email address is not valid.');
+        }
+        if ($newPassword !== null && is_string($newPassword) === false) {
+            return Response::createBadRequest('New password not meeting requirements');
+        }
+        if (is_string($currentPassword) === false
+            || $this->userApi->isValidPassword($currentUser->getId(), $currentPassword) === false
+        ) {
+            return Response::createBadRequest('Current password wrong.');
+        }
+        if ($newPassword === null) {
+            return null;
+        }
+
+        try {
+            $this->passwordPolicy->ensurePasswordIsValid($newPassword);
+        } catch (PasswordTooShort | PasswordInvalidEncoding) {
+            return Response::createBadRequest('New password not meeting requirements');
+        }
+
+        return null;
+    }
+
+    public function resendOwnPendingEmailVerification() : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->hasCoreAccountChangesDisabled() === true) {
+            return Response::createForbidden();
+        }
+        if ($currentUser->getPendingEmail() === null) {
+            return Response::createBadRequest('There is no pending email change for this user.');
+        }
+        if ($this->emailVerificationRequestService->requestForUser($currentUser) === false) {
+            return Response::createBadRequest('The verification email could not be scheduled.');
+        }
+
+        return Response::createOk();
+    }
+
+    public function cancelOwnPendingEmailChange() : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->hasCoreAccountChangesDisabled() === true) {
+            return Response::createForbidden();
+        }
+
+        $this->userApi->cancelPendingEmailChange($currentUser->getId());
+
+        return Response::createOk();
     }
 
     public function updateUser(Request $request) : Response

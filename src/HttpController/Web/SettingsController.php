@@ -514,6 +514,10 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-security.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'email' => $user->getEmail(),
+                'pendingEmail' => $user->getPendingEmail(),
+                'emailVerificationEnabled' => $this->emailVerificationPolicy->isRequired()
+                    && $this->emailSupport->isEmailVerificationAvailable(),
                 'totpEnabled' => $totpEnabled,
                 'twoFactorAuthenticationEnabled' => $this->flashMessageService->consume(
                     FlashMessage::TWO_FACTOR_AUTHENTICATION_ENABLED,
