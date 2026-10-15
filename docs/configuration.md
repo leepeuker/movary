@@ -77,7 +77,7 @@ Outgoing email features are disabled by default. Set `EMAIL_ENABLED=1` or enable
 | NAME                          | DEFAULT VALUE | INFO                                                   | Web UI |
 |:------------------------------|:-------------:|:-------------------------------------------------------|:------:|
 | `EMAIL_ENABLED`               |      `0`      | `1` enables outgoing email features                    |  yes   |
-| `EMAIL_VERIFICATION_REQUIRED` |      `0`      | `1` requires users to verify new email addresses       |        |
+| `EMAIL_VERIFICATION_REQUIRED` |      `0`      | `1` requires users to verify email addresses       |        |
 | `SMTP_HOST`                   |       -       | SMTP server hostname                                   |  yes   |
 | `SMTP_PORT`                   |       -       | SMTP server port, from `1` through `65535`             |  yes   |
 | `SMTP_FROM_ADDRESS`           |       -       | Valid email address used as the sender                 |  yes   |
