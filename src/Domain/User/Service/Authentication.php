@@ -3,6 +3,7 @@
 namespace Movary\Domain\User\Service;
 
 use Movary\Domain\User\Exception\EmailNotFound;
+use Movary\Domain\User\Exception\EmailNotVerified;
 use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\MissingTotpCode;
@@ -40,6 +41,7 @@ class Authentication
         private readonly PersonalApiTokenService $personalApiTokenService,
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationApi,
         private readonly LoginAttemptLimiter $loginAttemptLimiter,
+        private readonly EmailVerificationPolicy $emailVerificationPolicy,
         private readonly Cookie $cookie,
         private readonly FlashMessageService $flashMessageService,
     ) {
@@ -162,6 +164,11 @@ class Authentication
         if ($this->userApi->isValidPassword($user->getId(), $password) === false) {
             throw InvalidPassword::create();
         }
+        if ($this->emailVerificationPolicy->isRequired() === true && $user->isEmailVerified() === false) {
+            $this->loginAttemptLimiter->releaseAttempt($attemptId);
+
+            throw EmailNotVerified::create();
+        }
 
         $totpUri = $this->userApi->findTotpUri($user->getId());
         if ($totpUri === null) {
@@ -255,7 +262,10 @@ class Authentication
     private function findUserIdByValidAuthToken(string $token) : ?int
     {
         $tokenHash = $this->hashToken($token);
-        $tokenData = $this->repository->findAuthTokenData($tokenHash);
+        $tokenData = $this->repository->findAuthTokenData(
+            $tokenHash,
+            $this->emailVerificationPolicy->isRequired(),
+        );
         if ($tokenData === null) {
             return null;
         }

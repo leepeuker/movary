@@ -572,6 +572,24 @@ class UserRepositoryTest extends TestCase
         self::assertNull($this->subject->findAuthTokenData('unknown-token'));
     }
 
+    public function testFindAuthTokenDataRequiresVerifiedEmailWhenRequested() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->with(
+                'SELECT tokens.`user_id`, tokens.`expiration_date` '
+                . 'FROM `user_auth_token` tokens '
+                . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
+                . 'WHERE tokens.`token` = ? AND users.`is_enabled` = 1 '
+                . 'AND users.`email_verified_at` IS NOT NULL',
+                ['authentication-token'],
+            )
+            ->willReturn(false);
+
+        self::assertNull($this->subject->findAuthTokenData('authentication-token', true));
+    }
+
     public function testUpdatePasswordAndRevokeAuthTokens() : void
     {
         $this->dbConnectionMock
@@ -1017,6 +1035,24 @@ class UserRepositoryTest extends TestCase
             'expiresAt' => DateTime::createFromString('2027-10-10 12:00:00'),
             'lastUsedAt' => null,
         ], $this->subject->findPersonalApiTokenData('token-hash'));
+    }
+
+    public function testFindsPersonalApiTokenDataOnlyForVerifiedEmailWhenRequested() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->with(
+                'SELECT tokens.`id`, tokens.`user_id`, tokens.`expires_at`, tokens.`last_used_at` '
+                . 'FROM `user_api_token` tokens '
+                . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
+                . 'WHERE tokens.`token_hash` = ? AND users.`is_enabled` = 1 '
+                . 'AND users.`email_verified_at` IS NOT NULL',
+                ['token-hash'],
+            )
+            ->willReturn(false);
+
+        self::assertNull($this->subject->findPersonalApiTokenData('token-hash', true));
     }
 
     public function testUpdatesPersonalApiTokenLastUsedTimestampWhenStillStale() : void

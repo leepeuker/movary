@@ -38,6 +38,15 @@
 
                 <div id="loginErrors"></div>
 
+                <div class="alert alert-warning d-none" role="alert" id="emailVerificationRequiredAlert">
+                    <p>Verify your email address before signing in.</p>
+                    <form action="{{ applicationUrl }}/verify-email/resend" method="post">
+                        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                        <input type="hidden" name="email" id="emailVerificationEmail">
+                        <button class="btn btn-outline-primary" type="submit">Resend verification</button>
+                    </form>
+                </div>
+
                 {% if passwordChanged == true %}
                     <div class="alert alert-success" role="alert">
                         Your password was changed. Please sign in again.

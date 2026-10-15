@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\HttpController\Web;
 
+use Movary\Domain\User\Exception\EmailNotVerified;
 use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\Exception\UserDisabled;
 use Movary\Domain\User\Service\Authentication;
@@ -169,6 +170,23 @@ class AuthenticationControllerTest extends TestCase
         self::assertEquals(StatusCode::createForbidden(), $response->getStatusCode());
         self::assertSame(
             '{"error":"UserDisabled","message":"This account is disabled."}',
+            $response->getBody(),
+        );
+    }
+
+    public function testLoginReturnsEmailNotVerifiedError() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn('{"email":"user@example.com","password":"password"}');
+        $this->authenticationMock
+            ->method('loginWebSession')
+            ->willThrowException(EmailNotVerified::create());
+
+        $response = $this->createSubject()->login($request);
+
+        self::assertEquals(StatusCode::createForbidden(), $response->getStatusCode());
+        self::assertSame(
+            '{"error":"EmailNotVerified","message":"Verify your email address before signing in."}',
             $response->getBody(),
         );
     }
