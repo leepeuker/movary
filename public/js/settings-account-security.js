@@ -4,87 +4,113 @@ const errorMessageNewPasswordInvalid = 'New password not meeting requirements';
 const currentPassword = document.getElementById('currentPassword')
 const newPassword = document.getElementById('newPassword')
 const newPasswordRepeat = document.getElementById('newPasswordRepeat')
-const accountEmailSettings = document.getElementById('accountEmailSettings')
-const emailChangeForm = document.getElementById('emailChangeForm')
+const accountSecuritySettings = document.getElementById('accountSecuritySettings')
 const emailInput = document.getElementById('emailInput')
-const emailCurrentPasswordInput = document.getElementById('emailCurrentPasswordInput')
 const pendingEmailSummary = document.getElementById('pendingEmailSummary')
 const resendPendingEmailButton = document.getElementById('resendPendingEmailButton')
 const cancelPendingEmailButton = document.getElementById('cancelPendingEmailButton')
 
-document.getElementById('changeEmailButton').addEventListener('click', () => {
-    emailInput.value = accountEmailSettings.dataset.pendingEmail || accountEmailSettings.dataset.currentEmail
-    emailChangeForm.classList.remove('d-none')
-    emailInput.focus()
-})
-
-document.getElementById('cancelEmailEditButton').addEventListener('click', hideEmailChangeForm)
-
-document.getElementById('accountEmailUpdateButton').addEventListener('click', async () => {
+document.getElementById('accountSecurityUpdateButton').addEventListener('click', async () => {
     emailInput.classList.remove('invalid-input')
-    emailCurrentPasswordInput.classList.remove('invalid-input')
+    currentPassword.classList.remove('invalid-input')
+    newPassword.classList.remove('invalid-input')
+    newPasswordRepeat.classList.remove('invalid-input')
+
+    const emailChanged = emailInput.value !== accountSecuritySettings.dataset.currentEmail
+    const passwordChanged = newPassword.value !== '' || newPasswordRepeat.value !== ''
+
+    if (emailChanged === false && passwordChanged === false) {
+        addAlert('alertAccountSecurityDiv', 'There are no changes to save.', 'info')
+        return
+    }
 
     if (emailInput.checkValidity() === false) {
         emailInput.classList.add('invalid-input')
-        addAlert('alertAccountEmailDiv', 'Email address is not valid.', 'danger')
+        addAlert('alertAccountSecurityDiv', 'Email address is not valid.', 'danger')
         return
     }
-    if (emailCurrentPasswordInput.value === '') {
-        emailCurrentPasswordInput.classList.add('invalid-input')
-        addAlert('alertAccountEmailDiv', 'You must enter your current password.', 'danger')
+    if (currentPassword.value === '') {
+        currentPassword.classList.add('invalid-input')
+        addAlert('alertAccountSecurityDiv', 'You must enter your current password.', 'danger')
         return
     }
 
-    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/account/email', {
+    if (passwordChanged === true) {
+        if ([...newPassword.value].length < window.PASSWORD_MIN_LENGTH) {
+            newPassword.classList.add('invalid-input')
+            addAlert('alertAccountSecurityDiv', errorMessageNewPasswordInvalid, 'danger')
+            return
+        }
+        if (newPassword.value !== newPasswordRepeat.value) {
+            newPasswordRepeat.classList.add('invalid-input')
+            addAlert('alertAccountSecurityDiv', 'New passwords do not match', 'danger')
+            return
+        }
+    }
+
+    const response = await updateCredentials(passwordChanged)
+    if (response.ok === false) {
+        const errorMessage = await response.text()
+        if (errorMessage.startsWith(errorMessageCurrentPasswordIncorrect)) {
+            currentPassword.classList.add('invalid-input')
+        } else if (errorMessage === errorMessageNewPasswordInvalid) {
+            newPassword.classList.add('invalid-input')
+        } else {
+            emailInput.classList.add('invalid-input')
+        }
+        addAlert('alertAccountSecurityDiv', errorMessage || 'Could not update the security settings.', 'danger')
+        return
+    }
+
+    const result = await response.json()
+    if (result.emailChanged === true) {
+        updateEmailState(result)
+    }
+    if (result.passwordChanged === true) {
+        window.location.assign(APPLICATION_URL + '/login?password-change=success')
+        return
+    }
+
+    currentPassword.value = ''
+})
+
+function updateCredentials(passwordChanged) {
+    return fetchWithCsrf(APPLICATION_URL + '/settings/account/security', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             'email': emailInput.value,
-            'currentPassword': emailCurrentPasswordInput.value,
+            'currentPassword': currentPassword.value,
+            'newPassword': passwordChanged === true ? newPassword.value : null,
         })
     })
+}
 
-    if (response.ok === false) {
-        const message = await response.text()
-        if (message === 'Current password wrong.') {
-            emailCurrentPasswordInput.classList.add('invalid-input')
-        } else {
-            emailInput.classList.add('invalid-input')
-        }
-        addAlert('alertAccountEmailDiv', message || 'Could not update the email address.', 'danger')
-        return
-    }
-
-    const result = await response.json()
+function updateEmailState(result) {
     if (result.verificationPending === true) {
-        accountEmailSettings.dataset.pendingEmail = emailInput.value
+        accountSecuritySettings.dataset.pendingEmail = emailInput.value
         document.getElementById('pendingEmailAddress').textContent = emailInput.value
-        document.getElementById('pendingEmailDescription').textContent = 'Verify this address before it replaces your current login email.'
         pendingEmailSummary.classList.remove('d-none')
-        cancelPendingEmailButton.classList.remove('d-none')
-        if (accountEmailSettings.dataset.emailVerificationEnabled === 'true') {
+        emailInput.value = accountSecuritySettings.dataset.currentEmail
+        emailInput.disabled = true
+        if (accountSecuritySettings.dataset.emailVerificationEnabled === 'true') {
             resendPendingEmailButton.classList.remove('d-none')
         }
-        hideEmailChangeForm()
 
         const message = result.verificationRequested === true
             ? 'Verification email was scheduled.'
             : 'Email change remains pending. Use Resend to send another verification email.'
-        addAlert('alertAccountEmailDiv', message, 'success')
+        addAlert('alertAccountSecurityDiv', message, 'success')
         return
     }
 
-    accountEmailSettings.dataset.currentEmail = emailInput.value
-    accountEmailSettings.dataset.pendingEmail = ''
-    document.getElementById('currentEmailAddress').textContent = emailInput.value
+    accountSecuritySettings.dataset.currentEmail = emailInput.value
+    accountSecuritySettings.dataset.pendingEmail = ''
     pendingEmailSummary.classList.add('d-none')
-    resendPendingEmailButton.classList.add('d-none')
-    cancelPendingEmailButton.classList.add('d-none')
-    hideEmailChangeForm()
-    addAlert('alertAccountEmailDiv', 'Email address was updated.', 'success')
-})
+    addAlert('alertAccountSecurityDiv', 'Email address was updated.', 'success')
+}
 
 resendPendingEmailButton.addEventListener('click', async () => {
     const response = await fetchWithCsrf(APPLICATION_URL + '/settings/account/email-change/resend', {
@@ -92,11 +118,11 @@ resendPendingEmailButton.addEventListener('click', async () => {
     })
 
     if (response.ok === false) {
-        addAlert('alertAccountEmailDiv', await response.text() || 'Could not schedule the verification email.', 'danger')
+        addAlert('alertAccountSecurityDiv', await response.text() || 'Could not schedule the verification email.', 'danger')
         return
     }
 
-    addAlert('alertAccountEmailDiv', 'Verification email was scheduled.', 'success')
+    addAlert('alertAccountSecurityDiv', 'Verification email was scheduled.', 'success')
 })
 
 cancelPendingEmailButton.addEventListener('click', async () => {
@@ -114,85 +140,15 @@ cancelPendingEmailButton.addEventListener('click', async () => {
         method: 'DELETE'
     })
     if (response.ok === false) {
-        addAlert('alertAccountEmailDiv', await response.text() || 'Could not cancel the email change.', 'danger')
+        addAlert('alertAccountSecurityDiv', await response.text() || 'Could not cancel the email change.', 'danger')
         return
     }
 
-    accountEmailSettings.dataset.pendingEmail = ''
+    accountSecuritySettings.dataset.pendingEmail = ''
     pendingEmailSummary.classList.add('d-none')
-    resendPendingEmailButton.classList.add('d-none')
-    cancelPendingEmailButton.classList.add('d-none')
-    hideEmailChangeForm()
-    addAlert('alertAccountEmailDiv', 'Email change was cancelled.', 'success')
+    emailInput.disabled = false
+    addAlert('alertAccountSecurityDiv', 'Email change was cancelled.', 'success')
 })
-
-function hideEmailChangeForm() {
-    emailChangeForm.classList.add('d-none')
-    emailCurrentPasswordInput.value = ''
-    emailInput.classList.remove('invalid-input')
-    emailCurrentPasswordInput.classList.remove('invalid-input')
-}
-
-document.getElementById('changePasswordUpdateButton').addEventListener('click', async () => {
-    currentPassword.classList.remove('invalid-input');
-    newPassword.classList.remove('invalid-input');
-    newPasswordRepeat.classList.remove('invalid-input');
-
-    if (currentPassword.value === '') {
-        currentPassword.classList.add('invalid-input');
-        addAlert('alertChangePasswordDiv', 'You must enter current password', 'danger')
-        return
-    }
-
-    if ([...newPassword.value].length < window.PASSWORD_MIN_LENGTH) {
-        newPassword.classList.add('invalid-input');
-        addAlert('alertChangePasswordDiv', errorMessageNewPasswordInvalid, 'danger')
-        return
-    }
-
-    if (newPassword.value !== newPasswordRepeat.value) {
-        newPasswordRepeat.classList.add('invalid-input');
-        addAlert('alertChangePasswordDiv', 'New passwords do not match', 'danger')
-        return
-    }
-
-    const response = await updatePassword(currentPassword.value, newPassword.value);
-
-    switch (response.status) {
-        case 200:
-            window.location.assign(APPLICATION_URL + '/login?password-change=success')
-            return
-        case 400:
-            const errorMessage = await response.text();
-
-            if (errorMessage === errorMessageCurrentPasswordIncorrect) {
-                currentPassword.classList.add('invalid-input');
-            }
-
-            if (errorMessage === errorMessageNewPasswordInvalid) {
-                newPassword.classList.add('invalid-input');
-            }
-
-            addAlert('alertChangePasswordDiv', errorMessage, 'danger')
-
-            return
-        default:
-            addAlert('alertChangePasswordDiv', 'Unexpected server error', 'danger')
-    }
-});
-
-function updatePassword(currentPassword, newPassword) {
-    return fetchWithCsrf(APPLICATION_URL + '/settings/account/security/update-password', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'currentPassword': currentPassword,
-            'newPassword': newPassword,
-        })
-    })
-}
 
 async function showAddTwoFactorAuthenticationModal() {
     const request = await fetchWithCsrf(APPLICATION_URL + '/settings/account/security/create-totp-uri', {

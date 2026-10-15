@@ -15,12 +15,6 @@
     border-color: rgb(220, 53, 69)!important;
 }
 
-.account-security-section {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 42rem;
-}
-
 .settings-table-action .bi-plus-lg::before {
     color: #fff;
     transform: scale(1.125);

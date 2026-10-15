@@ -164,6 +164,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAdmin::class
     ]);
     $routes->add('POST', '/settings/account', [Web\SettingsController::class, 'updateGeneral'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('PUT', '/settings/account/security', [Web\UserController::class, 'updateOwnCredentials'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('PUT', '/settings/account/email', [Web\UserController::class, 'updateOwnEmail'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/email-change/resend', [Web\UserController::class, 'resendOwnPendingEmailVerification'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/account/email-change', [Web\UserController::class, 'cancelOwnPendingEmailChange'], [Web\Middleware\UserIsAuthenticated::class]);
