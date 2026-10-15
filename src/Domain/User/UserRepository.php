@@ -850,6 +850,17 @@ class UserRepository
         return UserEntity::createFromArray($data);
     }
 
+    public function findUserByPendingEmail(string $email) : ?UserEntity
+    {
+        $data = $this->dbConnection->fetchAssociative('SELECT * FROM `user` WHERE `pending_email` = ?', [$email]);
+
+        if (empty($data) === true) {
+            return null;
+        }
+
+        return UserEntity::createFromArray($data);
+    }
+
     public function findUserIdByAuthToken(string $token) : ?int
     {
         $id = $this->dbConnection->fetchOne('SELECT `user_id` FROM `user_auth_token` WHERE `token` = ?', [$token]);
@@ -1125,6 +1136,16 @@ class UserRepository
                 $connection->delete('user_email_verification_token', ['user_id' => $userId]);
             },
         );
+    }
+
+    public function updatePendingEmail(int $userId, string $email) : void
+    {
+        $this->dbConnection->update('user', ['pending_email' => $email], ['id' => $userId]);
+    }
+
+    public function clearPendingEmail(int $userId) : void
+    {
+        $this->dbConnection->update('user', ['pending_email' => null], ['id' => $userId]);
     }
 
     public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void

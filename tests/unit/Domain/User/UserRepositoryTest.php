@@ -114,6 +114,37 @@ class UserRepositoryTest extends TestCase
         $this->subject->updateEmail(12, 'alice@example.com');
     }
 
+    public function testFindUserByPendingEmailReturnsNullWhenNotFound() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->with('SELECT * FROM `user` WHERE `pending_email` = ?', ['new@example.com'])
+            ->willReturn(false);
+
+        self::assertNull($this->subject->findUserByPendingEmail('new@example.com'));
+    }
+
+    public function testUpdatePendingEmail() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with('user', ['pending_email' => 'new@example.com'], ['id' => 12]);
+
+        $this->subject->updatePendingEmail(12, 'new@example.com');
+    }
+
+    public function testClearPendingEmail() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with('user', ['pending_email' => null], ['id' => 12]);
+
+        $this->subject->clearPendingEmail(12);
+    }
+
     public function testFetchAllPaginatedAppliesLimitAndOffset() : void
     {
         $users = [[
