@@ -80,6 +80,70 @@ class UserController
         return Response::createJson(Json::encode($this->userApi->fetchAll()));
     }
 
+    public function updateOwnEmail(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->hasCoreAccountChangesDisabled() === true) {
+            return Response::createForbidden();
+        }
+
+        $requestData = Json::decode($request->getBody());
+        $email = $requestData['email'] ?? null;
+        $currentPassword = $requestData['currentPassword'] ?? null;
+        if (is_string($email) === false || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            return Response::createBadRequest('Email address is not valid.');
+        }
+        if (is_string($currentPassword) === false
+            || $this->userApi->isValidPassword($currentUser->getId(), $currentPassword) === false
+        ) {
+            return Response::createBadRequest('Current password wrong.');
+        }
+
+        try {
+            $verificationRequested = $this->userApi->updateEmail($currentUser->getId(), $email);
+        } catch (EmailNotUnique) {
+            return Response::createBadRequest('Email already in use.');
+        }
+
+        $response = $this->scheduleEmailVerificationIfRequested($currentUser->getId(), $verificationRequested);
+        if ($response->getStatusCode()->getCode() !== 200) {
+            return $response;
+        }
+
+        return Response::createJson(Json::encode([
+            'verificationPending' => $verificationRequested || $currentUser->getPendingEmail() === $email,
+            'verificationRequested' => $verificationRequested,
+        ]));
+    }
+
+    public function resendOwnPendingEmailVerification() : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->hasCoreAccountChangesDisabled() === true) {
+            return Response::createForbidden();
+        }
+        if ($currentUser->getPendingEmail() === null) {
+            return Response::createBadRequest('There is no pending email change for this user.');
+        }
+        if ($this->emailVerificationRequestService->requestForUser($currentUser) === false) {
+            return Response::createBadRequest('The verification email could not be scheduled.');
+        }
+
+        return Response::createOk();
+    }
+
+    public function cancelOwnPendingEmailChange() : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->hasCoreAccountChangesDisabled() === true) {
+            return Response::createForbidden();
+        }
+
+        $this->userApi->cancelPendingEmailChange($currentUser->getId());
+
+        return Response::createOk();
+    }
+
     public function updateUser(Request $request) : Response
     {
         $userId = (int)$request->getRouteParameters()['userId'];

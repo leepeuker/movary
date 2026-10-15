@@ -265,6 +265,10 @@ class SettingsController
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'privacyLevel' => $user->getPrivacyLevel(),
                 'username' => $user->getName(),
+                'email' => $user->getEmail(),
+                'pendingEmail' => $user->getPendingEmail(),
+                'emailVerificationEnabled' => $this->emailVerificationPolicy->isRequired()
+                    && $this->emailSupport->isEmailVerificationAvailable(),
                 'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
                 'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'userCountry' => $user->getCountry(),

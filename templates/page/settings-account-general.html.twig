@@ -20,7 +20,71 @@
             {{ include('component/settings-nav.html.twig') }}
 
             <div style="padding-top: 1rem">
-                <h5>General account settings</h5>
+                <h5>General settings</h5>
+
+                <div class="mb-3" id="accountEmailSettings"
+                     data-current-email="{{ email }}">
+                    <label for="emailInput" class="form-label"><b>Email</b> <span class="text-danger">*</span></label>
+                    <input type="email"
+                           class="form-control"
+                           value="{{ pendingEmail|default(email) }}"
+                           required
+                           id="emailInput"
+                           aria-describedby="accountEmailHelp"
+                           {% if coreAccountChangesDisabled == true %}disabled{% endif %}
+                           style="text-align: center;">
+                    <div id="accountEmailHelp" class="form-text">
+                        Current login email: <span id="currentEmailAddress">{{ email }}</span>
+                    </div>
+                    <div class="mt-2 {{ pendingEmail ? '' : 'd-none' }}" id="pendingEmailActions">
+                        <div class="form-text text-warning" id="pendingEmailStatus">
+                            {% if pendingEmail %}
+                                {% if emailVerificationEnabled %}
+                                    The current login email remains {{ email }} until {{ pendingEmail }} is verified.
+                                {% else %}
+                                    A previous email change to {{ pendingEmail }} is pending. Save it to apply it immediately, or cancel the change.
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-center flex-wrap gap-2 mt-2">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary {{ emailVerificationEnabled ? '' : 'd-none' }}"
+                                    id="resendPendingEmailButton"
+                                    {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                                Resend verification
+                            </button>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    id="cancelPendingEmailButton"
+                                    {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                                Cancel change
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="emailCurrentPasswordInput" class="form-label"><b>Current password</b> <span class="text-danger">*</span></label>
+                    <input type="password"
+                           class="form-control"
+                           required
+                           id="emailCurrentPasswordInput"
+                           aria-describedby="emailCurrentPasswordHelp"
+                           {% if coreAccountChangesDisabled == true %}disabled{% endif %}
+                           style="text-align: center;">
+                    <div id="emailCurrentPasswordHelp" class="form-text">Required to change your login email</div>
+                </div>
+
+                <div id="alertAccountEmailDiv"></div>
+
+                <button type="button"
+                        class="btn btn-primary"
+                        id="accountEmailUpdateButton"
+                        {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                    Update email
+                </button>
+
+                <hr>
 
                 <div class="mb-3">
                     <label for="nameInput" class="form-label"><b>Username</b> <span class="text-danger">*</span></label>
