@@ -12,9 +12,10 @@ class UserEntityTest extends TestCase
 {
     public function testCreatesVerifiedUserFromArray() : void
     {
-        $user = UserEntity::createFromArray($this->createUserData('2026-10-14 20:00:00'));
+        $user = UserEntity::createFromArray($this->createUserData('2026-10-14 20:00:00', null));
 
         self::assertTrue($user->isEmailVerified());
+        self::assertNull($user->getPendingEmail());
         self::assertEquals(
             DateTime::createFromString('2026-10-14 20:00:00'),
             $user->getEmailVerifiedAt(),
@@ -23,18 +24,20 @@ class UserEntityTest extends TestCase
 
     public function testCreatesUnverifiedUserFromArray() : void
     {
-        $user = UserEntity::createFromArray($this->createUserData(null));
+        $user = UserEntity::createFromArray($this->createUserData(null, 'new@example.com'));
 
         self::assertFalse($user->isEmailVerified());
         self::assertNull($user->getEmailVerifiedAt());
+        self::assertSame('new@example.com', $user->getPendingEmail());
     }
 
-    private function createUserData(?string $emailVerifiedAt) : array
+    private function createUserData(?string $emailVerifiedAt, ?string $pendingEmail) : array
     {
         return [
             'id' => 7,
             'name' => 'Alice',
             'email' => 'alice@example.com',
+            'pending_email' => $pendingEmail,
             'email_verified_at' => $emailVerifiedAt,
             'password' => 'password-hash',
             'is_admin' => 0,

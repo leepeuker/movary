@@ -13,6 +13,7 @@ class UserEntity
         private readonly int $id,
         private readonly string $name,
         private readonly string $email,
+        private readonly ?string $pendingEmail,
         private readonly ?DateTime $emailVerifiedAt,
         private readonly string $passwordHash,
         private readonly bool $isAdmin,
@@ -59,6 +60,7 @@ class UserEntity
             (int)$data['id'],
             $data['name'],
             $data['email'],
+            $data['pending_email'],
             $data['email_verified_at'] === null
                 ? null
                 : DateTime::createFromString($data['email_verified_at']),
@@ -149,6 +151,11 @@ class UserEntity
     public function getEmail() : string
     {
         return $this->email;
+    }
+
+    public function getPendingEmail() : ?string
+    {
+        return $this->pendingEmail;
     }
 
     public function getEmailVerifiedAt() : ?DateTime

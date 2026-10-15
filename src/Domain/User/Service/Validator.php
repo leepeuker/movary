@@ -16,11 +16,12 @@ class Validator
     public function ensureEmailIsUnique(string $email, ?int $expectUserId = null) : void
     {
         $user = $this->repository->findUserByEmail($email);
-        if ($user === null) {
-            return;
+        if ($user !== null && $user->getId() !== $expectUserId) {
+            throw new EmailNotUnique();
         }
 
-        if ($user->getId() !== $expectUserId) {
+        $user = $this->repository->findUserByPendingEmail($email);
+        if ($user !== null && $user->getId() !== $expectUserId) {
             throw new EmailNotUnique();
         }
     }
