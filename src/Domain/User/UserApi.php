@@ -390,7 +390,14 @@ class UserApi
             if ($user === null) {
                 throw new RuntimeException('There is no user with id: ' . $userId);
             }
-            if ($user->getEmail() === $email || $user->getPendingEmail() === $email) {
+            if ($user->getEmail() === $email) {
+                if ($user->getPendingEmail() !== null) {
+                    $this->repository->clearPendingEmail($userId);
+                }
+
+                return false;
+            }
+            if ($user->getPendingEmail() === $email) {
                 return false;
             }
 

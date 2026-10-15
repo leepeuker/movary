@@ -166,6 +166,21 @@ class UserApiTest extends TestCase
         self::assertTrue($this->createSubject($repository, $policy)->updateEmail(7, 'new@example.com'));
     }
 
+    public function testUpdateEmailBackToActiveAddressCancelsPendingChange() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getEmail')->willReturn('old@example.com');
+        $user->method('getPendingEmail')->willReturn('typo@example.com');
+        $repository->method('findUserById')->willReturn($user);
+        $repository->expects(self::once())->method('clearPendingEmail')->with(7);
+        $repository->expects(self::never())->method('updatePendingEmail');
+        $policy = $this->createStub(EmailVerificationPolicy::class);
+        $policy->method('isRequired')->willReturn(true);
+
+        self::assertFalse($this->createSubject($repository, $policy)->updateEmail(7, 'old@example.com'));
+    }
+
     private function createSubject(
         UserRepository $repository,
         ?EmailVerificationPolicy $emailVerificationPolicy = null,
