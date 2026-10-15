@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Settings - Password
+    Settings - Security
 {% endblock %}
 
 {% block stylesheets %}
@@ -20,7 +20,97 @@
         <div style="text-align: center;">
             {{ include('component/settings-nav.html.twig') }}
 
-            <div style="padding-top: 1rem">
+            <div class="account-security-section" id="accountEmailSettings"
+                 data-current-email="{{ email }}"
+                 data-pending-email="{{ pendingEmail|default('') }}"
+                 data-email-verification-enabled="{{ emailVerificationEnabled ? 'true' : 'false' }}"
+                 style="padding-top: 1rem">
+                <h5>Email address</h5>
+
+                <div class="border rounded p-3 text-start">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                        <div class="text-break">
+                            <div class="fw-bold" id="currentEmailAddress">{{ email }}</div>
+                            <div class="form-text">Current login email</div>
+                            <div class="mt-2 {{ pendingEmail ? '' : 'd-none' }}" id="pendingEmailSummary">
+                                <span class="badge text-bg-warning">Awaiting verification</span>
+                                <span class="ms-1" id="pendingEmailAddress">{{ pendingEmail }}</span>
+                                <div class="form-text" id="pendingEmailDescription">
+                                    {% if pendingEmail %}
+                                        {% if emailVerificationEnabled %}
+                                            Verify this address before it replaces your current login email.
+                                        {% else %}
+                                            Email verification is unavailable. Change the email again to apply it immediately.
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    id="changeEmailButton"
+                                    {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                                Change email
+                            </button>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary {{ pendingEmail and emailVerificationEnabled ? '' : 'd-none' }}"
+                                    id="resendPendingEmailButton"
+                                    {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                                Resend
+                            </button>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger {{ pendingEmail ? '' : 'd-none' }}"
+                                    id="cancelPendingEmailButton"
+                                    {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                                Cancel change
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="border-top mt-3 pt-3 d-none" id="emailChangeForm">
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label"><b>New email address</b> <span class="text-danger">*</span></label>
+                            <input type="email"
+                                   class="form-control"
+                                   value="{{ pendingEmail|default(email) }}"
+                                   required
+                                   id="emailInput"
+                                   autocomplete="email"
+                                   {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="emailCurrentPasswordInput" class="form-label"><b>Current password</b> <span class="text-danger">*</span></label>
+                            <input type="password"
+                                   class="form-control"
+                                   required
+                                   id="emailCurrentPasswordInput"
+                                   autocomplete="current-password"
+                                   aria-describedby="emailCurrentPasswordHelp"
+                                   {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                            <div id="emailCurrentPasswordHelp" class="form-text">Confirm your password to change your login email.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-secondary" id="cancelEmailEditButton">Cancel</button>
+                            <button type="button"
+                                    class="btn btn-primary"
+                                    id="accountEmailUpdateButton"
+                                    {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                                {{ emailVerificationEnabled ? 'Send verification' : 'Update email' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3" id="alertAccountEmailDiv"></div>
+            </div>
+
+            <hr>
+
+            <div class="account-security-section">
                 <h5>Password change</h5>
                 <div class="mb-3">
                     <label for="currentPassword" class="form-label"><b>Current password</b> <span class="text-danger">*</span></label>

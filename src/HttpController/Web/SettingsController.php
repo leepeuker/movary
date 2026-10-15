@@ -265,10 +265,6 @@ class SettingsController
                 'dateFormatSelected' => $user->getDateFormatId(),
                 'privacyLevel' => $user->getPrivacyLevel(),
                 'username' => $user->getName(),
-                'email' => $user->getEmail(),
-                'pendingEmail' => $user->getPendingEmail(),
-                'emailVerificationEnabled' => $this->emailVerificationPolicy->isRequired()
-                    && $this->emailSupport->isEmailVerificationAvailable(),
                 'enableAutomaticWatchlistRemoval' => $user->hasWatchlistAutomaticRemovalEnabled(),
                 'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'userCountry' => $user->getCountry(),
@@ -518,6 +514,10 @@ class SettingsController
             StatusCode::createOk(),
             $this->twig->render('page/settings-account-security.html.twig', [
                 'coreAccountChangesDisabled' => $user->hasCoreAccountChangesDisabled(),
+                'email' => $user->getEmail(),
+                'pendingEmail' => $user->getPendingEmail(),
+                'emailVerificationEnabled' => $this->emailVerificationPolicy->isRequired()
+                    && $this->emailSupport->isEmailVerificationAvailable(),
                 'totpEnabled' => $totpEnabled,
                 'twoFactorAuthenticationEnabled' => $this->flashMessageService->consume(
                     FlashMessage::TWO_FACTOR_AUTHENTICATION_ENABLED,
