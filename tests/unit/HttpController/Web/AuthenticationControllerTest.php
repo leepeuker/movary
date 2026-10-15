@@ -39,6 +39,7 @@ class AuthenticationControllerTest extends TestCase
             'redirect' => '/users/alice',
             'password-change' => 'success',
             'password-reset' => 'success',
+            'email-verification' => 'success',
         ]);
         $this->emailSupportMock->method('isPasswordResetAvailable')->willReturn(true);
         $this->twigMock
@@ -47,6 +48,7 @@ class AuthenticationControllerTest extends TestCase
             ->with('page/login.html.twig', [
                 'redirect' => '/users/alice',
                 'passwordChanged' => true,
+                'emailVerified' => true,
                 'passwordResetAvailable' => true,
                 'registrationEnabled' => true,
                 'defaultEmail' => 'alice@example.com',
@@ -80,6 +82,7 @@ class AuthenticationControllerTest extends TestCase
             ->with('page/login.html.twig', [
                 'redirect' => false,
                 'passwordChanged' => false,
+                'emailVerified' => false,
                 'passwordResetAvailable' => false,
                 'registrationEnabled' => false,
                 'defaultEmail' => null,

@@ -117,12 +117,14 @@ class AuthenticationController
         if (($request->getGetParameters()['password-reset'] ?? null) === 'success') {
             $passwordChanged = true;
         }
+        $emailVerified = ($request->getGetParameters()['email-verification'] ?? null) === 'success';
 
         $renderedTemplate = $this->twig->render(
             'page/login.html.twig',
             [
                 'redirect' => $redirect,
                 'passwordChanged' => $passwordChanged,
+                'emailVerified' => $emailVerified,
                 'passwordResetAvailable' => $this->emailSupport->isPasswordResetAvailable(),
                 'registrationEnabled' => $this->registrationEnabled,
                 'defaultEmail' => $this->defaultEmail,
