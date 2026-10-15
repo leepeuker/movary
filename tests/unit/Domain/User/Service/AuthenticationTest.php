@@ -2,15 +2,17 @@
 
 namespace Tests\Unit\Movary\Domain\User\Service;
 
+use Movary\Domain\User\Exception\EmailNotVerified;
+use Movary\Domain\User\Exception\InvalidPassword;
+use Movary\Domain\User\Exception\UserDisabled;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
 use Movary\Domain\User\Service\LoginAttemptLimiter;
 use Movary\Domain\User\Service\PersonalApiTokenService;
-use Movary\Domain\User\Exception\InvalidPassword;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserRepository;
 use Movary\Domain\User\ValueObject\CredentialType;
-use Movary\Domain\User\Exception\UserDisabled;
 use Movary\Service\CookieSecurity;
 use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Util\Cookie;
@@ -41,6 +43,8 @@ class AuthenticationTest extends TestCase
 
     private MockObject|PersonalApiTokenService $personalApiTokenServiceMock;
 
+    private EmailVerificationPolicy|MockObject $emailVerificationPolicyMock;
+
     protected function setUp() : void
     {
         unset($_COOKIE['id']);
@@ -51,12 +55,14 @@ class AuthenticationTest extends TestCase
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->loginAttemptLimiterMock = $this->createMock(LoginAttemptLimiter::class);
         $this->personalApiTokenServiceMock = $this->createMock(PersonalApiTokenService::class);
+        $this->emailVerificationPolicyMock = $this->createMock(EmailVerificationPolicy::class);
         $this->subject = new Authentication(
             $this->userRepositoryMock,
             $this->userApiMock,
             $this->personalApiTokenServiceMock,
             $this->createMock(TwoFactorAuthenticationApi::class),
             $this->loginAttemptLimiterMock,
+            $this->emailVerificationPolicyMock,
             new Cookie($this->cookieSecurityMock, static fn() => true),
             $this->flashMessageServiceMock,
         );
@@ -225,7 +231,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('findAuthTokenData')
-            ->with(hash('sha256', self::TOKEN))
+            ->with(hash('sha256', self::TOKEN), false)
             ->willReturn([
                 'userId' => 12,
                 'expirationDate' => DateTime::createFromString('+1 hour'),
@@ -245,7 +251,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('findAuthTokenData')
-            ->with(hash('sha256', self::TOKEN))
+            ->with(hash('sha256', self::TOKEN), false)
             ->willReturn([
                 'userId' => 12,
                 'expirationDate' => DateTime::createFromString('-1 hour'),
@@ -267,6 +273,37 @@ class AuthenticationTest extends TestCase
 
         self::assertNull($this->subject->authenticateWebSession());
         self::assertNull($this->subject->authenticateWebSession());
+    }
+
+    public function testAuthenticateWebSessionRequiresVerifiedEmailWhenEnforcementIsEnabled() : void
+    {
+        $_COOKIE['id'] = self::TOKEN;
+        $this->emailVerificationPolicyMock->method('isRequired')->willReturn(true);
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('findAuthTokenData')
+            ->with(hash('sha256', self::TOKEN), true)
+            ->willReturn(null);
+        $this->cookieSecurityMock->expects(self::once())->method('isSecure')->willReturn(true);
+
+        self::assertNull($this->subject->authenticateWebSession());
+        self::assertArrayNotHasKey('id', $_COOKIE);
+    }
+
+    public function testAuthenticateWebSessionAcceptsVerifiedEmailWhenEnforcementIsEnabled() : void
+    {
+        $_COOKIE['id'] = self::TOKEN;
+        $this->emailVerificationPolicyMock->method('isRequired')->willReturn(true);
+        $this->userRepositoryMock
+            ->expects(self::once())
+            ->method('findAuthTokenData')
+            ->with(hash('sha256', self::TOKEN), true)
+            ->willReturn([
+                'userId' => 12,
+                'expirationDate' => DateTime::createFromString('+1 hour'),
+            ]);
+
+        self::assertSame(12, $this->subject->authenticateWebSession()?->getUserId());
     }
 
     public function testRequireWebSessionRejectsMissingCookie() : void
@@ -292,7 +329,7 @@ class AuthenticationTest extends TestCase
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('findAuthTokenData')
-            ->with(hash('sha256', self::TOKEN))
+            ->with(hash('sha256', self::TOKEN), false)
             ->willReturn([
                 'userId' => 12,
                 'expirationDate' => DateTime::createFromString('+1 hour'),
@@ -408,11 +445,64 @@ class AuthenticationTest extends TestCase
         $this->loginAttemptLimiterMock
             ->expects(self::never())
             ->method('releaseAttempt');
+        $this->emailVerificationPolicyMock->expects(self::never())->method('isRequired');
         $this->userRepositoryMock->expects(self::never())->method('updateLastLoginAt');
 
         $this->expectException(InvalidPassword::class);
 
         $this->subject->loginWebSession('user@example.com', 'wrong-password', false, 'agent');
+    }
+
+    public function testRequiredVerificationRejectsUnverifiedEmailBeforeTotp() : void
+    {
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $user->method('isEmailVerified')->willReturn(false);
+        $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->willReturn(true);
+        $this->emailVerificationPolicyMock->method('isRequired')->willReturn(true);
+        $this->loginAttemptLimiterMock->method('reserveAttempt')->willReturn(3);
+        $this->loginAttemptLimiterMock->expects(self::once())->method('releaseAttempt')->with(3);
+        $this->userApiMock->expects(self::never())->method('findTotpUri');
+        $this->userRepositoryMock->expects(self::never())->method('createAuthToken');
+        $this->userRepositoryMock->expects(self::never())->method('updateLastLoginAt');
+
+        $this->expectException(EmailNotVerified::class);
+
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
+    }
+
+    public function testOptionalVerificationAllowsUnverifiedEmail() : void
+    {
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $user->method('isEnabled')->willReturn(true);
+        $user->method('isEmailVerified')->willReturn(false);
+        $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->willReturn(true);
+        $this->emailVerificationPolicyMock->method('isRequired')->willReturn(false);
+        $this->userApiMock->method('findTotpUri')->willReturn(null);
+
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
+
+        self::assertSame(12, $this->subject->requireWebSession()->getUserId());
+    }
+
+    public function testRequiredVerificationAllowsVerifiedEmailWithPendingChange() : void
+    {
+        $user = $this->createMock(\Movary\Domain\User\UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $user->method('isEnabled')->willReturn(true);
+        $user->method('isEmailVerified')->willReturn(true);
+        $user->method('getPendingEmail')->willReturn('new@example.com');
+        $this->userRepositoryMock->method('findUserByEmail')->willReturn($user);
+        $this->userApiMock->method('isValidPassword')->willReturn(true);
+        $this->emailVerificationPolicyMock->method('isRequired')->willReturn(true);
+        $this->userApiMock->method('findTotpUri')->willReturn(null);
+
+        $this->subject->loginWebSession('user@example.com', 'password', false, 'agent');
+
+        self::assertSame(12, $this->subject->requireWebSession()->getUserId());
     }
 
     public function testDisabledAccountDoesNotCreateWebSession() : void

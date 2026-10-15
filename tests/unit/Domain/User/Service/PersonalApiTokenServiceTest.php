@@ -3,12 +3,14 @@
 namespace Tests\Unit\Movary\Domain\User\Service;
 
 use InvalidArgumentException;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
 use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\UserRepository;
 use Movary\ValueObject\DateTime;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(PersonalApiTokenService::class)]
@@ -16,12 +18,18 @@ class PersonalApiTokenServiceTest extends TestCase
 {
     private MockObject|UserRepository $repositoryMock;
 
+    private EmailVerificationPolicy&Stub $emailVerificationPolicyStub;
+
     private PersonalApiTokenService $subject;
 
     protected function setUp() : void
     {
         $this->repositoryMock = $this->createMock(UserRepository::class);
-        $this->subject = new PersonalApiTokenService($this->repositoryMock);
+        $this->emailVerificationPolicyStub = $this->createStub(EmailVerificationPolicy::class);
+        $this->subject = new PersonalApiTokenService(
+            $this->repositoryMock,
+            $this->emailVerificationPolicyStub,
+        );
     }
 
     public function testCreatesNonExpiringTokenAndStoresOnlyItsHash() : void
@@ -123,7 +131,7 @@ class PersonalApiTokenServiceTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('findPersonalApiTokenData')
-            ->with(hash('sha256', $token))
+            ->with(hash('sha256', $token), false)
             ->willReturn([
                 'id' => 4,
                 'userId' => 12,
@@ -161,7 +169,20 @@ class PersonalApiTokenServiceTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('findPersonalApiTokenData')
-            ->with(hash('sha256', $token))
+            ->with(hash('sha256', $token), false)
+            ->willReturn(null);
+
+        self::assertNull($this->subject->findUserIdByToken($token));
+    }
+
+    public function testRequiresVerifiedEmailWhenResolvingTokenIfEnforcementIsEnabled() : void
+    {
+        $token = 'mvy_pat_v1_' . str_repeat('a', 43);
+        $this->emailVerificationPolicyStub->method('isRequired')->willReturn(true);
+        $this->repositoryMock
+            ->expects(self::once())
+            ->method('findPersonalApiTokenData')
+            ->with(hash('sha256', $token), true)
             ->willReturn(null);
 
         self::assertNull($this->subject->findUserIdByToken($token));

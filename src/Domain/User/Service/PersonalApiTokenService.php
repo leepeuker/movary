@@ -20,8 +20,10 @@ class PersonalApiTokenService
 
     private const int TOKEN_SECRET_LENGTH_IN_BYTES = 32;
 
-    public function __construct(private readonly UserRepository $repository)
-    {
+    public function __construct(
+        private readonly UserRepository $repository,
+        private readonly EmailVerificationPolicy $emailVerificationPolicy,
+    ) {
     }
 
     /** @return array{token: string, expiresAt: null|DateTime} */
@@ -59,7 +61,10 @@ class PersonalApiTokenService
             return null;
         }
 
-        $tokenData = $this->repository->findPersonalApiTokenData($this->hashToken($token));
+        $tokenData = $this->repository->findPersonalApiTokenData(
+            $this->hashToken($token),
+            $this->emailVerificationPolicy->isRequired(),
+        );
         if ($tokenData === null) {
             return null;
         }

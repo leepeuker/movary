@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Web;
 
 use Movary\Domain\User\Exception\InvalidCredentials;
+use Movary\Domain\User\Exception\EmailNotVerified;
 use Movary\Domain\User\Exception\InvalidTotpCode;
 use Movary\Domain\User\Exception\LoginAttemptLimitReached;
 use Movary\Domain\User\Exception\MissingTotpCode;
@@ -28,6 +29,7 @@ class AuthenticationController
     ) {
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function login(Request $request) : Response
     {
         $requestBody = Json::decode($request->getBody());
@@ -90,6 +92,15 @@ class AuthenticationController
                 Json::encode([
                     'error' => 'UserDisabled',
                     'message' => 'This account is disabled.'
+                ]),
+                [Header::createContentTypeJson()],
+            );
+        } catch (EmailNotVerified) {
+            return Response::create(
+                StatusCode::createForbidden(),
+                Json::encode([
+                    'error' => 'EmailNotVerified',
+                    'message' => 'Verify your email address before signing in.'
                 ]),
                 [Header::createContentTypeJson()],
             );

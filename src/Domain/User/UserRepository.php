@@ -623,13 +623,14 @@ class UserRepository
     /**
      * @return array{userId: int, expirationDate: DateTime}|null
      */
-    public function findAuthTokenData(string $token) : ?array
+    public function findAuthTokenData(string $token, bool $emailVerificationRequired = false) : ?array
     {
         $data = $this->dbConnection->fetchAssociative(
             'SELECT tokens.`user_id`, tokens.`expiration_date` '
             . 'FROM `user_auth_token` tokens '
             . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
-            . 'WHERE tokens.`token` = ? AND users.`is_enabled` = 1',
+            . 'WHERE tokens.`token` = ? AND users.`is_enabled` = 1'
+            . ($emailVerificationRequired === true ? ' AND users.`email_verified_at` IS NOT NULL' : ''),
             [$token],
         );
 
@@ -750,13 +751,14 @@ class UserRepository
     /**
      * @return null|array{id: int, userId: int, expiresAt: null|DateTime, lastUsedAt: null|DateTime}
      */
-    public function findPersonalApiTokenData(string $tokenHash) : ?array
+    public function findPersonalApiTokenData(string $tokenHash, bool $emailVerificationRequired = false) : ?array
     {
         $data = $this->dbConnection->fetchAssociative(
             'SELECT tokens.`id`, tokens.`user_id`, tokens.`expires_at`, tokens.`last_used_at` '
             . 'FROM `user_api_token` tokens '
             . 'JOIN `user` users ON users.`id` = tokens.`user_id` '
-            . 'WHERE tokens.`token_hash` = ? AND users.`is_enabled` = 1',
+            . 'WHERE tokens.`token_hash` = ? AND users.`is_enabled` = 1'
+            . ($emailVerificationRequired === true ? ' AND users.`email_verified_at` IS NOT NULL' : ''),
             [$tokenHash],
         );
 
