@@ -406,6 +406,13 @@ class UserApi
             return true;
         }
 
+        $user = $this->repository->findUserById($userId);
+        if ($user !== null && $user->getEmail() === $email && $user->getPendingEmail() !== null) {
+            $this->repository->clearPendingEmail($userId);
+
+            return false;
+        }
+
         $this->repository->updateEmail($userId, $email);
 
         return false;

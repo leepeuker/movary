@@ -147,6 +147,10 @@ class UserApiTest extends TestCase
     public function testUpdateEmailImmediatelyWhenVerificationIsOptional() : void
     {
         $repository = $this->createMock(UserRepository::class);
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getEmail')->willReturn('old@example.com');
+        $user->method('getPendingEmail')->willReturn('typo@example.com');
+        $repository->method('findUserById')->willReturn($user);
         $repository->expects(self::once())->method('updateEmail')->with(7, 'new@example.com');
         $repository->expects(self::never())->method('updatePendingEmail');
 
@@ -180,6 +184,19 @@ class UserApiTest extends TestCase
         $policy->method('isRequired')->willReturn(true);
 
         self::assertFalse($this->createSubject($repository, $policy)->updateEmail(7, 'old@example.com'));
+    }
+
+    public function testOptionalEmailUpdateBackToActiveAddressCancelsPendingChange() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getEmail')->willReturn('old@example.com');
+        $user->method('getPendingEmail')->willReturn('typo@example.com');
+        $repository->method('findUserById')->willReturn($user);
+        $repository->expects(self::once())->method('clearPendingEmail')->with(7);
+        $repository->expects(self::never())->method('updateEmail');
+
+        self::assertFalse($this->createSubject($repository)->updateEmail(7, 'old@example.com'));
     }
 
     public function testApprovePendingEmailChangeForwardsCurrentDate() : void

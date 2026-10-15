@@ -2,6 +2,7 @@ const userModal = new bootstrap.Modal('#userModal', {keyboard: false})
 
 const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');
+const emailVerificationRequired = table.dataset.emailVerificationRequired === 'true';
 const passwordResetUserButton = document.getElementById('passwordResetUserButton');
 const resendPendingEmailButton = document.getElementById('resendPendingEmailButton');
 const approvePendingEmailButton = document.getElementById('approvePendingEmailButton');
@@ -113,9 +114,12 @@ function prepareEditUserModal(id, name, email, pendingEmail, isAdmin, isEnabled)
 
     const pendingEmailActions = document.getElementById('userModalPendingEmailActions')
     pendingEmailActions.classList.toggle('d-none', pendingEmail === '')
+    resendPendingEmailButton.classList.toggle('d-none', emailVerificationRequired === false)
     document.getElementById('userModalPendingEmailStatus').textContent = pendingEmail === ''
         ? ''
-        : 'The current login email remains ' + email + ' until ' + pendingEmail + ' is verified.'
+        : emailVerificationRequired
+            ? 'The current login email remains ' + email + ' until ' + pendingEmail + ' is verified.'
+            : 'Email verification is disabled. Approve to apply ' + pendingEmail + ', or cancel the change.'
 
     document.getElementById('userModalAlerts').innerHTML = ''
 
