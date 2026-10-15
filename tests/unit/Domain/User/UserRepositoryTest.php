@@ -414,11 +414,12 @@ class UserRepositoryTest extends TestCase
             ->with('SELECT `id` FROM `user` WHERE `email` = ? AND `id` != ?', ['new@example.com', 12])
             ->willReturn(false);
         $this->dbConnectionMock
-            ->expects(self::exactly(3))
+            ->expects(self::exactly(4))
             ->method('delete')
             ->willReturnCallback(static function (string $table, array $criteria) : int {
                 self::assertContains($table, [
                     'user_email_verification_token',
+                    'user_password_reset_token',
                     'user_auth_token',
                     'user_api_token',
                 ]);
@@ -485,11 +486,12 @@ class UserRepositoryTest extends TestCase
             )
             ->willReturn(1);
         $this->dbConnectionMock
-            ->expects(self::exactly(3))
+            ->expects(self::exactly(4))
             ->method('delete')
             ->willReturnCallback(static function (string $table, array $criteria) : int {
                 self::assertContains($table, [
                     'user_email_verification_token',
+                    'user_password_reset_token',
                     'user_auth_token',
                     'user_api_token',
                 ]);

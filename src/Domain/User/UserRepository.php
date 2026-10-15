@@ -250,6 +250,7 @@ class UserRepository
                     return false;
                 }
 
+                $connection->delete('user_password_reset_token', ['user_id' => $userId]);
                 $connection->delete('user_auth_token', ['user_id' => $userId]);
                 $connection->delete('user_api_token', ['user_id' => $userId]);
 
@@ -292,6 +293,7 @@ class UserRepository
                 }
 
                 $connection->delete('user_email_verification_token', ['user_id' => $userId]);
+                $connection->delete('user_password_reset_token', ['user_id' => $userId]);
                 $connection->delete('user_auth_token', ['user_id' => $userId]);
                 $connection->delete('user_api_token', ['user_id' => $userId]);
 
