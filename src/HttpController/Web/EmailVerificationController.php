@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController\Web;
 
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\Service\EmailVerificationTokenService;
 use Movary\Service\ApplicationUrlService;
@@ -22,6 +23,7 @@ class EmailVerificationController
         private readonly EmailVerificationTokenService $tokenService,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly LoggerInterface $logger,
+        private readonly Authentication $authentication,
     ) {
     }
 
@@ -35,9 +37,12 @@ class EmailVerificationController
     public function verifyEmail(Request $request) : Response
     {
         $token = $this->getStringParameter($request->getPostParameters(), 'token');
-        if ($this->isTokenValid($token) === false) {
+        $userId = $token === '' ? null : $this->tokenService->findUserIdByToken($token);
+        if ($userId === null) {
             return $this->renderVerificationForm('', false);
         }
+
+        $authenticatedUser = $this->authentication->authenticateWebSession();
 
         try {
             if ($this->tokenService->verifyEmail($token) === false) {
@@ -47,6 +52,10 @@ class EmailVerificationController
             $this->logger->error('Could not verify email address.', ['exception' => $exception]);
 
             return $this->renderVerificationForm($token, true, true);
+        }
+
+        if ($authenticatedUser?->getUserId() === $userId) {
+            $this->authentication->logout();
         }
 
         return Response::createSensitiveSeeOther(

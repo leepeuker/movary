@@ -2,8 +2,11 @@
 
 namespace Tests\Unit\Movary\HttpController\Web;
 
+use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\Service\EmailVerificationTokenService;
+use Movary\Domain\User\ValueObject\AuthenticatedUser;
+use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Web\EmailVerificationController;
 use Movary\Service\ApplicationUrlService;
 use Movary\ValueObject\Http\Request;
@@ -23,6 +26,8 @@ class EmailVerificationControllerTest extends TestCase
 {
     private ApplicationUrlService&MockObject $applicationUrlServiceMock;
 
+    private Authentication&MockObject $authenticationMock;
+
     private EmailVerificationRequestService&MockObject $requestServiceMock;
 
     private EmailVerificationController $subject;
@@ -37,12 +42,14 @@ class EmailVerificationControllerTest extends TestCase
         $this->requestServiceMock = $this->createMock(EmailVerificationRequestService::class);
         $this->tokenServiceMock = $this->createMock(EmailVerificationTokenService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
+        $this->authenticationMock = $this->createMock(Authentication::class);
         $this->subject = new EmailVerificationController(
             $this->twigMock,
             $this->requestServiceMock,
             $this->tokenServiceMock,
             $this->applicationUrlServiceMock,
             $this->createStub(LoggerInterface::class),
+            $this->authenticationMock,
         );
     }
 
@@ -94,6 +101,10 @@ class EmailVerificationControllerTest extends TestCase
             ->method('verifyEmail')
             ->with('verification-token')
             ->willReturn(true);
+        $this->authenticationMock
+            ->method('authenticateWebSession')
+            ->willReturn(AuthenticatedUser::create(12, CredentialType::WEB_SESSION));
+        $this->authenticationMock->expects(self::once())->method('logout');
         $this->applicationUrlServiceMock
             ->expects(self::once())
             ->method('createApplicationUrl')
