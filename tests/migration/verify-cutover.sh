@@ -74,6 +74,34 @@ run_mysql_app_command() {
         bin/console.php "$@" --no-interaction
 }
 
+run_sqlite_email_promotion_test() {
+    local database_file=$1
+
+    docker run --rm --entrypoint php \
+        --env "APPLICATION_SECRET=$application_secret" \
+        --env DATABASE_MODE=sqlite \
+        --env "DATABASE_SQLITE=../audit/$database_file" \
+        --volume "$audit_directory:/audit" \
+        "$image_name" \
+        tests/migration/verify-email-promotion.php
+}
+
+run_mysql_email_promotion_test() {
+    local database_name=$1
+
+    docker run --rm --entrypoint php \
+        --env "APPLICATION_SECRET=$application_secret" \
+        --network "$network_name" \
+        --env DATABASE_MODE=mysql \
+        --env DATABASE_MYSQL_HOST="$mysql_container" \
+        --env DATABASE_MYSQL_NAME="$database_name" \
+        --env DATABASE_MYSQL_USER=movary \
+        --env DATABASE_MYSQL_PASSWORD=movary \
+        --env DATABASE_MYSQL_PORT=3306 \
+        "$image_name" \
+        tests/migration/verify-email-promotion.php
+}
+
 query_sqlite() {
     local database_file=$1
     local query=$2
@@ -685,3 +713,6 @@ assert_equal uniqueTraktId "$(mysql_query movary_drift "SELECT INDEX_NAME FROM i
     'MySQL changed the legacy watched-cache index before rejecting drift'
 assert_equal "NO ACTION" "$(mysql_query movary_drift "SELECT DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'movary_drift' AND TABLE_NAME = 'job_queue' AND CONSTRAINT_NAME = 'job_queue_ibfk_1'")" \
     'MySQL changed the job-queue foreign key before rejecting drift'
+
+run_sqlite_email_promotion_test doctrine-fresh.sqlite
+run_mysql_email_promotion_test doctrine_fresh

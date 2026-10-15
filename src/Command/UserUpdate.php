@@ -7,6 +7,7 @@ use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
+use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\UserApi;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -28,6 +29,7 @@ class UserUpdate extends Command
     public function __construct(
         private readonly UserApi $userApi,
         private readonly LoggerInterface $logger,
+        private readonly EmailVerificationRequestService $emailVerificationRequestService,
     ) {
         parent::__construct();
     }
@@ -60,9 +62,10 @@ class UserUpdate extends Command
         }
 
         try {
+            $verificationRequested = false;
             $email = $input->getOption('email');
             if ($email !== null) {
-                $this->userApi->updateEmail($userId, $email);
+                $verificationRequested = $this->userApi->updateEmail($userId, $email);
             }
 
             $name = $input->getOption('name');
@@ -99,6 +102,19 @@ class UserUpdate extends Command
             $coreAccountChangesDisabled = $input->getOption('coreAccountChangesDisabled');
             if ($coreAccountChangesDisabled !== null) {
                 $this->userApi->updateCoreAccountChangesDisabled($userId, (bool)$coreAccountChangesDisabled);
+            }
+
+            if ($verificationRequested === true) {
+                $user = $this->userApi->findUserById($userId);
+                if ($user === null || $this->emailVerificationRequestService->requestForUser($user) === false) {
+                    $this->generateOutput(
+                        $output,
+                        'Email change is pending, but the verification email could not be scheduled. '
+                        . 'The current email remains active.',
+                    );
+
+                    return Command::FAILURE;
+                }
             }
         } catch (EmailNotUnique $e) {
             $this->generateOutput($output, 'Could not update user: Email already in use');

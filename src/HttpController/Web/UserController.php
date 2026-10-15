@@ -8,6 +8,7 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Util\Json;
@@ -19,6 +20,7 @@ class UserController
     public function __construct(
         private readonly UserApi $userApi,
         private readonly CurrentWebUser $currentWebUser,
+        private readonly EmailVerificationRequestService $emailVerificationRequestService,
     ) {
     }
 
@@ -96,7 +98,7 @@ class UserController
 
         try {
             $this->userApi->updateName($userId, $requestUserData['name']);
-            $this->userApi->updateEmail($userId, $requestUserData['email']);
+            $verificationRequested = $this->userApi->updateEmail($userId, $requestUserData['email']);
             $this->userApi->updateIsAdmin($userId, $requestUserData['isAdmin']);
 
             if ($requestUserData['password'] !== null) {
@@ -115,6 +117,52 @@ class UserController
             return Response::createBadRequest('Password must contain valid Unicode text.');
         } catch (UsernameInvalidFormat) {
             return Response::createBadRequest('Name is not in a valid format.');
+        }
+
+        return $this->scheduleEmailVerificationIfRequested($userId, $verificationRequested);
+    }
+
+    public function resendPendingEmailVerification(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $user = $this->userApi->findUserById((int)$request->getRouteParameters()['userId']);
+        if ($user === null || $user->getPendingEmail() === null) {
+            return Response::createBadRequest('There is no pending email change for this user.');
+        }
+        if ($this->emailVerificationRequestService->requestForUser($user) === false) {
+            return Response::createBadRequest('The verification email could not be scheduled.');
+        }
+
+        return Response::createOk();
+    }
+
+    public function cancelPendingEmailChange(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        $this->userApi->cancelPendingEmailChange((int)$request->getRouteParameters()['userId']);
+
+        return Response::createOk();
+    }
+
+    public function approvePendingEmailChange(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        if ($this->userApi->approvePendingEmailChange(
+            (int)$request->getRouteParameters()['userId'],
+        ) === false) {
+            return Response::createBadRequest('The pending email change could not be approved.');
         }
 
         return Response::createOk();
@@ -136,5 +184,22 @@ class UserController
         }
 
         return null;
+    }
+
+    private function scheduleEmailVerificationIfRequested(int $userId, bool $verificationRequested) : Response
+    {
+        if ($verificationRequested === false) {
+            return Response::createOk();
+        }
+
+        $user = $this->userApi->findUserById($userId);
+        if ($user === null || $this->emailVerificationRequestService->requestForUser($user) === false) {
+            return Response::createBadRequest(
+                'Email change is pending, but the verification email could not be scheduled. '
+                . 'The current email remains active.',
+            );
+        }
+
+        return Response::createOk();
     }
 }

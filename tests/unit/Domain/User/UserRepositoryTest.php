@@ -86,7 +86,7 @@ class UserRepositoryTest extends TestCase
             ->method('update')
             ->with(
                 'user',
-                ['email' => 'new@example.com', 'email_verified_at' => null],
+                ['email' => 'new@example.com', 'pending_email' => null, 'email_verified_at' => null],
                 ['id' => 12],
             );
         $this->dbConnectionMock
@@ -129,8 +129,16 @@ class UserRepositoryTest extends TestCase
     {
         $this->dbConnectionMock
             ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
             ->method('update')
             ->with('user', ['pending_email' => 'new@example.com'], ['id' => 12]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_email_verification_token', ['user_id' => 12]);
 
         $this->subject->updatePendingEmail(12, 'new@example.com');
     }
@@ -139,8 +147,16 @@ class UserRepositoryTest extends TestCase
     {
         $this->dbConnectionMock
             ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
             ->method('update')
             ->with('user', ['pending_email' => null], ['id' => 12]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with('user_email_verification_token', ['user_id' => 12]);
 
         $this->subject->clearPendingEmail(12);
     }
@@ -327,6 +343,7 @@ class UserRepositoryTest extends TestCase
                 'user_id' => '12',
                 'email' => 'alice@example.com',
                 'current_email' => 'alice@example.com',
+                'pending_email' => null,
                 'expiration_date' => '2026-10-15 20:00:00',
             ]);
         $this->dbConnectionMock
@@ -359,6 +376,7 @@ class UserRepositoryTest extends TestCase
                 'user_id' => '12',
                 'email' => 'old@example.com',
                 'current_email' => 'new@example.com',
+                'pending_email' => null,
                 'expiration_date' => '2026-10-15 20:00:00',
             ]);
         $this->dbConnectionMock
@@ -373,6 +391,118 @@ class UserRepositoryTest extends TestCase
         ));
     }
 
+    public function testVerifyEmailWithTokenPromotesPendingEmailAndRevokesCredentials() : void
+    {
+        $currentDate = DateTime::createFromString('2026-10-14 20:00:00');
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAssociative')
+            ->willReturn([
+                'user_id' => '12',
+                'email' => 'new@example.com',
+                'current_email' => 'old@example.com',
+                'pending_email' => 'new@example.com',
+                'expiration_date' => '2026-10-15 20:00:00',
+            ]);
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchOne')
+            ->with('SELECT `id` FROM `user` WHERE `email` = ? AND `id` != ?', ['new@example.com', 12])
+            ->willReturn(false);
+        $this->dbConnectionMock
+            ->expects(self::exactly(4))
+            ->method('delete')
+            ->willReturnCallback(static function (string $table, array $criteria) : int {
+                self::assertContains($table, [
+                    'user_email_verification_token',
+                    'user_password_reset_token',
+                    'user_auth_token',
+                    'user_api_token',
+                ]);
+                self::assertSame(
+                    $table === 'user_email_verification_token' ? ['token_hash' => 'token-hash'] : ['user_id' => 12],
+                    $criteria,
+                );
+
+                return 1;
+            });
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'user',
+                [
+                    'email' => 'new@example.com',
+                    'pending_email' => null,
+                    'email_verified_at' => '2026-10-14 20:00:00',
+                ],
+                ['id' => 12, 'pending_email' => 'new@example.com'],
+            )
+            ->willReturn(1);
+
+        self::assertTrue($this->subject->verifyEmailWithToken('token-hash', $currentDate));
+    }
+
+    public function testApprovePendingEmailPromotesAddressAndRevokesCredentials() : void
+    {
+        $currentDate = DateTime::createFromString('2026-10-14 20:00:00');
+        $fetchOneCall = 0;
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::exactly(2))
+            ->method('fetchOne')
+            ->willReturnCallback(static function (string $query, array $parameters) use (&$fetchOneCall) : mixed {
+                $fetchOneCall++;
+                if ($fetchOneCall === 1) {
+                    self::assertSame('SELECT `pending_email` FROM `user` WHERE `id` = ?', $query);
+                    self::assertSame([12], $parameters);
+
+                    return 'new@example.com';
+                }
+
+                self::assertSame('SELECT `id` FROM `user` WHERE `email` = ? AND `id` != ?', $query);
+                self::assertSame(['new@example.com', 12], $parameters);
+
+                return false;
+            });
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'user',
+                [
+                    'email' => 'new@example.com',
+                    'pending_email' => null,
+                    'email_verified_at' => '2026-10-14 20:00:00',
+                ],
+                ['id' => 12, 'pending_email' => 'new@example.com'],
+            )
+            ->willReturn(1);
+        $this->dbConnectionMock
+            ->expects(self::exactly(4))
+            ->method('delete')
+            ->willReturnCallback(static function (string $table, array $criteria) : int {
+                self::assertContains($table, [
+                    'user_email_verification_token',
+                    'user_password_reset_token',
+                    'user_auth_token',
+                    'user_api_token',
+                ]);
+                self::assertSame(['user_id' => 12], $criteria);
+
+                return 1;
+            });
+
+        self::assertTrue($this->subject->approvePendingEmail(12, $currentDate));
+    }
+
     public function testFindEmailVerificationTokenData() : void
     {
         $this->dbConnectionMock
@@ -383,6 +513,7 @@ class UserRepositoryTest extends TestCase
                 'user_id' => '12',
                 'email' => 'alice@example.com',
                 'current_email' => 'alice@example.com',
+                'pending_email' => null,
                 'expiration_date' => '2026-10-15 20:00:00',
             ]);
 
@@ -390,6 +521,7 @@ class UserRepositoryTest extends TestCase
             'userId' => 12,
             'email' => 'alice@example.com',
             'currentEmail' => 'alice@example.com',
+            'pendingEmail' => null,
             'expirationDate' => DateTime::createFromString('2026-10-15 20:00:00'),
         ], $this->subject->findEmailVerificationTokenData('token-hash'));
     }

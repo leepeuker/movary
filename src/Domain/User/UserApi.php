@@ -6,6 +6,7 @@ use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
 use Movary\Api\Plex\Dto\PlexAccessToken;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
 use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\Service\Validator;
 use Movary\ValueObject\DateTime;
@@ -20,6 +21,7 @@ class UserApi
         private readonly UserRepository $repository,
         private readonly Validator $userValidator,
         private readonly PasswordPolicy $passwordPolicy,
+        private readonly EmailVerificationPolicy $emailVerificationPolicy,
     ) {
     }
 
@@ -233,6 +235,11 @@ class UserApi
         return $this->repository->findUserByEmail($email);
     }
 
+    public function findUserByPendingEmail(string $email) : ?UserEntity
+    {
+        return $this->repository->findUserByPendingEmail($email);
+    }
+
     public function findUserById(int $userId) : ?UserEntity
     {
         return $this->repository->findUserById($userId);
@@ -374,11 +381,51 @@ class UserApi
         $this->repository->updateMovieTitleDisplay($userId, $movieTitleDisplay);
     }
 
-    public function updateEmail(int $userId, string $email) : void
+    public function updateEmail(int $userId, string $email) : bool
     {
         $this->userValidator->ensureEmailIsUnique($email, $userId);
 
+        if ($this->emailVerificationPolicy->isRequired() === true) {
+            $user = $this->repository->findUserById($userId);
+            if ($user === null) {
+                throw new RuntimeException('There is no user with id: ' . $userId);
+            }
+            if ($user->getEmail() === $email) {
+                if ($user->getPendingEmail() !== null) {
+                    $this->repository->clearPendingEmail($userId);
+                }
+
+                return false;
+            }
+            if ($user->getPendingEmail() === $email) {
+                return false;
+            }
+
+            $this->repository->updatePendingEmail($userId, $email);
+
+            return true;
+        }
+
+        $user = $this->repository->findUserById($userId);
+        if ($user !== null && $user->getEmail() === $email && $user->getPendingEmail() !== null) {
+            $this->repository->clearPendingEmail($userId);
+
+            return false;
+        }
+
         $this->repository->updateEmail($userId, $email);
+
+        return false;
+    }
+
+    public function cancelPendingEmailChange(int $userId) : void
+    {
+        $this->repository->clearPendingEmail($userId);
+    }
+
+    public function approvePendingEmailChange(int $userId) : bool
+    {
+        return $this->repository->approvePendingEmail($userId, DateTime::create());
     }
 
     public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void

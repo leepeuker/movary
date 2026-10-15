@@ -32,7 +32,8 @@ class EmailVerificationEmailJobProcessor
         $ignoreCooldown = $this->getIgnoreCooldown($job);
         $this->ensureEmailCanBeSent();
         $user = $this->getUser($userId);
-        if ($user->isEmailVerified() === true) {
+        $email = $user->getEmailPendingVerification();
+        if ($email === null) {
             $this->logger->info('Email verification not sent because the address is already verified.', ['userId' => $userId]);
 
             return;
@@ -43,15 +44,15 @@ class EmailVerificationEmailJobProcessor
 
         try {
             $token = $ignoreCooldown === true
-                ? $this->tokenService->createToken($userId, $user->getEmail())
-                : $this->tokenService->createTokenIfAllowed($userId, $user->getEmail());
+                ? $this->tokenService->createToken($userId, $email)
+                : $this->tokenService->createTokenIfAllowed($userId, $email);
             if ($token === null) {
                 $this->logger->info('Email verification not sent because token creation is in cooldown.', ['userId' => $userId]);
 
                 return;
             }
 
-            $this->sendEmail($user, $token, $smtpConfig);
+            $this->sendEmail($email, $token, $smtpConfig);
             $this->logger->info('Email verification sent.', ['userId' => $userId]);
         } catch (Throwable $exception) {
             if ($token !== null) {
@@ -111,7 +112,7 @@ class EmailVerificationEmailJobProcessor
         return $userId;
     }
 
-    private function sendEmail(UserEntity $user, string $token, SmtpConfig $smtpConfig) : void
+    private function sendEmail(string $email, string $token, SmtpConfig $smtpConfig) : void
     {
         $verificationUrl = $this->applicationUrlService->createApplicationUrl(
             RelativeUrl::create('/verify-email?token=' . rawurlencode($token)),
@@ -121,6 +122,6 @@ class EmailVerificationEmailJobProcessor
             EmailVerificationTokenService::EXPIRATION_TIME_IN_HOURS,
         );
 
-        $this->emailService->sendEmail($user->getEmail(), 'Verify your Movary email address', $message, $smtpConfig);
+        $this->emailService->sendEmail($email, 'Verify your Movary email address', $message, $smtpConfig);
     }
 }

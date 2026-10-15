@@ -16,6 +16,7 @@ class UserEntityTest extends TestCase
 
         self::assertTrue($user->isEmailVerified());
         self::assertNull($user->getPendingEmail());
+        self::assertNull($user->getEmailPendingVerification());
         self::assertEquals(
             DateTime::createFromString('2026-10-14 20:00:00'),
             $user->getEmailVerifiedAt(),
@@ -29,6 +30,14 @@ class UserEntityTest extends TestCase
         self::assertFalse($user->isEmailVerified());
         self::assertNull($user->getEmailVerifiedAt());
         self::assertSame('new@example.com', $user->getPendingEmail());
+        self::assertSame('new@example.com', $user->getEmailPendingVerification());
+    }
+
+    public function testUnverifiedActiveEmailIsPendingVerificationWithoutPendingChange() : void
+    {
+        $user = UserEntity::createFromArray($this->createUserData(null, null));
+
+        self::assertSame('alice@example.com', $user->getEmailPendingVerification());
     }
 
     private function createUserData(?string $emailVerifiedAt, ?string $pendingEmail) : array

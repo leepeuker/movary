@@ -2,7 +2,11 @@ const userModal = new bootstrap.Modal('#userModal', {keyboard: false})
 
 const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');
+const emailVerificationEnabled = table.dataset.emailVerificationEnabled === 'true';
 const passwordResetUserButton = document.getElementById('passwordResetUserButton');
+const resendPendingEmailButton = document.getElementById('resendPendingEmailButton');
+const approvePendingEmailButton = document.getElementById('approvePendingEmailButton');
+const cancelPendingEmailButton = document.getElementById('cancelPendingEmailButton');
 
 registerTableRowClickEvent()
 document.getElementById('usersPerPage').addEventListener('change', updateUsersPerPage)
@@ -33,6 +37,10 @@ if (passwordResetUserButton !== null) {
     })
 }
 
+resendPendingEmailButton.addEventListener('click', resendPendingEmailVerification)
+approvePendingEmailButton.addEventListener('click', approvePendingEmailChange)
+cancelPendingEmailButton.addEventListener('click', cancelPendingEmailChange)
+
 function registerTableRowClickEvent() {
     for (let i = 0; i < rows.length; i++) {
         if (i === 0) continue
@@ -41,7 +49,8 @@ function registerTableRowClickEvent() {
             prepareEditUserModal(
                 this.cells[0].textContent,
                 this.cells[1].textContent,
-                this.cells[2].textContent,
+                this.dataset.email,
+                this.dataset.pendingEmail,
                 this.dataset.isAdmin === 'true',
                 this.dataset.isEnabled === 'true',
             )
@@ -75,6 +84,7 @@ function prepareCreateUserModal(name) {
     document.getElementById('userModalIsAdminInput').checked = ''
     document.getElementById('userModalIsEnabledInput').checked = true
     document.getElementById('userModalIsEnabledInput').disabled = true
+    document.getElementById('userModalPendingEmailActions').classList.add('d-none')
 
     document.getElementById('userModalAlerts').innerHTML = ''
 
@@ -82,7 +92,7 @@ function prepareCreateUserModal(name) {
     Array.from(document.querySelectorAll('.invalid-input')).forEach((el) => el.classList.remove('invalid-input'));
 }
 
-function prepareEditUserModal(id, name, email, isAdmin, isEnabled) {
+function prepareEditUserModal(id, name, email, pendingEmail, isAdmin, isEnabled) {
     document.getElementById('userModalHeaderTitle').innerHTML = 'Edit User'
 
     document.getElementById('userModalPasswordInput').required = false
@@ -95,12 +105,21 @@ function prepareEditUserModal(id, name, email, isAdmin, isEnabled) {
 
     document.getElementById('userModalIdInput').value = id
     document.getElementById('userModalNameInput').value = name
-    document.getElementById('userModalEmailInput').value = email
+    document.getElementById('userModalEmailInput').value = pendingEmail || email
     document.getElementById('userModalIsAdminInput').checked = isAdmin
     document.getElementById('userModalIsEnabledInput').checked = isEnabled
     document.getElementById('userModalIsEnabledInput').disabled = name === document.getElementById('currentUserName').value
     document.getElementById('userModalPasswordInput').value = ''
     document.getElementById('userModalRepeatPasswordInput').value = ''
+
+    const pendingEmailActions = document.getElementById('userModalPendingEmailActions')
+    pendingEmailActions.classList.toggle('d-none', pendingEmail === '')
+    resendPendingEmailButton.classList.toggle('d-none', emailVerificationEnabled === false)
+    document.getElementById('userModalPendingEmailStatus').textContent = pendingEmail === ''
+        ? ''
+        : emailVerificationEnabled
+            ? 'The current login email remains ' + email + ' until ' + pendingEmail + ' is verified.'
+            : 'Email verification is unavailable. Approve to apply ' + pendingEmail + ', or cancel the change.'
 
     document.getElementById('userModalAlerts').innerHTML = ''
 
@@ -337,4 +356,69 @@ async function sendPasswordReset(userId, userName) {
     }
 
     setUserManagementAlert('Password reset email was scheduled for ' + userName)
+}
+
+async function resendPendingEmailVerification() {
+    const userId = document.getElementById('userModalIdInput').value
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + userId + '/email-change/resend', {
+        method: 'POST'
+    })
+
+    if (response.ok === false) {
+        setUserModalAlertServerError(await response.text() || 'Could not schedule the verification email.')
+        return
+    }
+
+    setUserManagementAlert('Verification email was scheduled.')
+    userModal.hide()
+}
+
+async function cancelPendingEmailChange() {
+    const confirmed = await showConfirmationModal({
+        title: 'Cancel email change',
+        message: 'Cancel this pending email change?',
+        confirmLabel: 'Cancel email change',
+        confirmClass: 'btn-danger',
+    })
+    if (confirmed === false) {
+        return
+    }
+
+    const userId = document.getElementById('userModalIdInput').value
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + userId + '/email-change', {
+        method: 'DELETE'
+    })
+
+    if (response.ok === false) {
+        setUserModalAlertServerError(await response.text() || 'Could not cancel the email change.')
+        userModal.show()
+        return
+    }
+
+    window.location.reload()
+}
+
+async function approvePendingEmailChange() {
+    const confirmed = await showConfirmationModal({
+        title: 'Approve email change',
+        message: 'Approve this address without confirming that the user controls it? The user will be signed out and all personal API tokens will be revoked.',
+        confirmLabel: 'Approve email change',
+        confirmClass: 'btn-success',
+    })
+    if (confirmed === false) {
+        return
+    }
+
+    const userId = document.getElementById('userModalIdInput').value
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + userId + '/email-change/approve', {
+        method: 'POST'
+    })
+
+    if (response.ok === false) {
+        setUserModalAlertServerError(await response.text() || 'Could not approve the email change.')
+        userModal.show()
+        return
+    }
+
+    window.location.reload()
 }

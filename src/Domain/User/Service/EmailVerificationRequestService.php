@@ -26,7 +26,9 @@ class EmailVerificationRequestService
             return false;
         }
 
-        return $this->schedule($this->userApi->findUserByEmail($email));
+        $user = $this->userApi->findUserByEmail($email) ?? $this->userApi->findUserByPendingEmail($email);
+
+        return $this->schedule($user);
     }
 
     public function requestForUser(UserEntity $user, bool $ignoreCooldown = false) : bool
@@ -42,7 +44,7 @@ class EmailVerificationRequestService
             return false;
         }
 
-        if ($user === null || $user->isEmailVerified() === true) {
+        if ($user === null || $user->getEmailPendingVerification() === null) {
             $this->logger->debug('Email verification not scheduled because the account does not require it.');
 
             return false;

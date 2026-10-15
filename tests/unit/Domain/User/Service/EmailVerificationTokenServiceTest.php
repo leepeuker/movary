@@ -72,6 +72,23 @@ class EmailVerificationTokenServiceTest extends TestCase
                 'userId' => 12,
                 'email' => 'alice@example.com',
                 'currentEmail' => 'alice@example.com',
+                'pendingEmail' => null,
+                'expirationDate' => DateTime::createFromString('+1 hour'),
+            ]);
+        $this->repositoryMock->expects(self::never())->method('deleteEmailVerificationToken');
+
+        self::assertSame(12, $this->subject->findUserIdByToken('verification-token'));
+    }
+
+    public function testFindUserIdByTokenReturnsUserForValidPendingEmail() : void
+    {
+        $this->repositoryMock
+            ->method('findEmailVerificationTokenData')
+            ->willReturn([
+                'userId' => 12,
+                'email' => 'new@example.com',
+                'currentEmail' => 'alice@example.com',
+                'pendingEmail' => 'new@example.com',
                 'expirationDate' => DateTime::createFromString('+1 hour'),
             ]);
         $this->repositoryMock->expects(self::never())->method('deleteEmailVerificationToken');
@@ -88,6 +105,7 @@ class EmailVerificationTokenServiceTest extends TestCase
                 'userId' => 12,
                 'email' => 'alice@example.com',
                 'currentEmail' => 'alice@example.com',
+                'pendingEmail' => null,
                 'expirationDate' => DateTime::createFromString('-1 hour'),
             ]);
         $this->repositoryMock
@@ -106,6 +124,7 @@ class EmailVerificationTokenServiceTest extends TestCase
                 'userId' => 12,
                 'email' => 'old@example.com',
                 'currentEmail' => 'new@example.com',
+                'pendingEmail' => null,
                 'expirationDate' => DateTime::createFromString('+1 hour'),
             ]);
         $this->repositoryMock->expects(self::once())->method('deleteEmailVerificationToken');

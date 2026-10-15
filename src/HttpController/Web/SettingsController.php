@@ -14,6 +14,7 @@ use Movary\Domain\User\Exception\PasswordInvalidEncoding;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
 use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\Service\TwoFactorAuthenticationApi;
@@ -88,6 +89,7 @@ class SettingsController
         private readonly Movie\History\Location\MovieHistoryLocationApi $locationApi,
         private readonly UserFilterRequestMapper $userFilterRequestMapper,
         private readonly CurrentWebUser $currentWebUser,
+        private readonly EmailVerificationPolicy $emailVerificationPolicy,
     ) {
     }
 
@@ -699,6 +701,8 @@ class SettingsController
                     ? null
                     : ($isAdminFilter ? 'admin' : 'user'),
                 'userFiltersActive' => $isAdminFilter !== null,
+                'emailVerificationEnabled' => $this->emailVerificationPolicy->isRequired()
+                    && $this->emailSupport->isEmailVerificationAvailable(),
             ]),
         );
     }
