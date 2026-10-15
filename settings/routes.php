@@ -240,6 +240,10 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,
     ]);
+    $routes->add('POST', '/settings/users/{userId:\d+}/email-change/approve', [Web\UserController::class, 'approvePendingEmailChange'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
     $routes->add('GET', '/settings/password-resets', [Web\PasswordResetAdminController::class, 'fetchPendingResets'], [
         Web\Middleware\UserIsAuthenticated::class,
         Web\Middleware\UserIsAdmin::class,

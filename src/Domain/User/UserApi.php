@@ -416,6 +416,11 @@ class UserApi
         $this->repository->clearPendingEmail($userId);
     }
 
+    public function approvePendingEmailChange(int $userId) : bool
+    {
+        return $this->repository->approvePendingEmail($userId, DateTime::create());
+    }
+
     public function updateEmbyScrobblerOptions(int $userId, bool $scrobbleWatches) : void
     {
         $this->repository->updateEmbyScrobblerOptions($userId, $scrobbleWatches);

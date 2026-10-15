@@ -226,4 +226,13 @@ class UserControllerTest extends TestCase
 
         self::assertSame(200, $this->subject->cancelPendingEmailChange($request)->getStatusCode()->getCode());
     }
+
+    public function testApprovePendingEmailChangePromotesAddress() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getRouteParameters')->willReturn(['userId' => '7']);
+        $this->userApiMock->expects(self::once())->method('approvePendingEmailChange')->with(7)->willReturn(true);
+
+        self::assertSame(200, $this->subject->approvePendingEmailChange($request)->getStatusCode()->getCode());
+    }
 }

@@ -8,6 +8,7 @@ use Movary\Domain\User\Service\Validator;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\UserRepository;
+use Movary\ValueObject\DateTime;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -179,6 +180,18 @@ class UserApiTest extends TestCase
         $policy->method('isRequired')->willReturn(true);
 
         self::assertFalse($this->createSubject($repository, $policy)->updateEmail(7, 'old@example.com'));
+    }
+
+    public function testApprovePendingEmailChangeForwardsCurrentDate() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $repository
+            ->expects(self::once())
+            ->method('approvePendingEmail')
+            ->with(7, self::isInstanceOf(DateTime::class))
+            ->willReturn(true);
+
+        self::assertTrue($this->createSubject($repository)->approvePendingEmailChange(7));
     }
 
     private function createSubject(

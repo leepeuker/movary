@@ -152,6 +152,22 @@ class UserController
         return Response::createOk();
     }
 
+    public function approvePendingEmailChange(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        if ($currentUser->isAdmin() === false) {
+            return Response::createForbidden();
+        }
+
+        if ($this->userApi->approvePendingEmailChange(
+            (int)$request->getRouteParameters()['userId'],
+        ) === false) {
+            return Response::createBadRequest('The pending email change could not be approved.');
+        }
+
+        return Response::createOk();
+    }
+
     private function validateAccountStatusUpdate(
         UserEntity $currentUser,
         int $targetUserId,

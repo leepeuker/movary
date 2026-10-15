@@ -4,6 +4,7 @@ const table = document.getElementById('usersTable');
 const rows = table.getElementsByTagName('tr');
 const passwordResetUserButton = document.getElementById('passwordResetUserButton');
 const resendPendingEmailButton = document.getElementById('resendPendingEmailButton');
+const approvePendingEmailButton = document.getElementById('approvePendingEmailButton');
 const cancelPendingEmailButton = document.getElementById('cancelPendingEmailButton');
 
 registerTableRowClickEvent()
@@ -36,6 +37,7 @@ if (passwordResetUserButton !== null) {
 }
 
 resendPendingEmailButton.addEventListener('click', resendPendingEmailVerification)
+approvePendingEmailButton.addEventListener('click', approvePendingEmailChange)
 cancelPendingEmailButton.addEventListener('click', cancelPendingEmailChange)
 
 function registerTableRowClickEvent() {
@@ -385,6 +387,31 @@ async function cancelPendingEmailChange() {
 
     if (response.ok === false) {
         setUserModalAlertServerError(await response.text() || 'Could not cancel the email change.')
+        userModal.show()
+        return
+    }
+
+    window.location.reload()
+}
+
+async function approvePendingEmailChange() {
+    const confirmed = await showConfirmationModal({
+        title: 'Approve email change',
+        message: 'Approve this address without confirming that the user controls it? The user will be signed out and all personal API tokens will be revoked.',
+        confirmLabel: 'Approve email change',
+        confirmClass: 'btn-success',
+    })
+    if (confirmed === false) {
+        return
+    }
+
+    const userId = document.getElementById('userModalIdInput').value
+    const response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + userId + '/email-change/approve', {
+        method: 'POST'
+    })
+
+    if (response.ok === false) {
+        setUserModalAlertServerError(await response.text() || 'Could not approve the email change.')
         userModal.show()
         return
     }

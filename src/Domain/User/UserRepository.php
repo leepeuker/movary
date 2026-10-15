@@ -258,6 +258,48 @@ class UserRepository
         );
     }
 
+    public function approvePendingEmail(int $userId, DateTime $currentDate) : bool
+    {
+        return $this->dbConnection->transactional(
+            static function (Connection $connection) use ($userId, $currentDate) : bool {
+                $pendingEmail = $connection->fetchOne(
+                    'SELECT `pending_email` FROM `user` WHERE `id` = ?',
+                    [$userId],
+                );
+                if ($pendingEmail === false || $pendingEmail === null) {
+                    return false;
+                }
+
+                $conflictingUserId = $connection->fetchOne(
+                    'SELECT `id` FROM `user` WHERE `email` = ? AND `id` != ?',
+                    [$pendingEmail, $userId],
+                );
+                if ($conflictingUserId !== false) {
+                    return false;
+                }
+
+                $updatedUserCount = $connection->update(
+                    'user',
+                    [
+                        'email' => $pendingEmail,
+                        'pending_email' => null,
+                        'email_verified_at' => (string)$currentDate,
+                    ],
+                    ['id' => $userId, 'pending_email' => $pendingEmail],
+                );
+                if ($updatedUserCount !== 1) {
+                    return false;
+                }
+
+                $connection->delete('user_email_verification_token', ['user_id' => $userId]);
+                $connection->delete('user_auth_token', ['user_id' => $userId]);
+                $connection->delete('user_api_token', ['user_id' => $userId]);
+
+                return true;
+            },
+        );
+    }
+
     public function resetPasswordWithToken(
         string $tokenHash,
         string $passwordHash,

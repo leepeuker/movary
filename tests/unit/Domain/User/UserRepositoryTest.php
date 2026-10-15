@@ -446,6 +446,61 @@ class UserRepositoryTest extends TestCase
         self::assertTrue($this->subject->verifyEmailWithToken('token-hash', $currentDate));
     }
 
+    public function testApprovePendingEmailPromotesAddressAndRevokesCredentials() : void
+    {
+        $currentDate = DateTime::createFromString('2026-10-14 20:00:00');
+        $fetchOneCall = 0;
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('transactional')
+            ->willReturnCallback(fn(callable $callback) : mixed => $callback($this->dbConnectionMock));
+        $this->dbConnectionMock
+            ->expects(self::exactly(2))
+            ->method('fetchOne')
+            ->willReturnCallback(static function (string $query, array $parameters) use (&$fetchOneCall) : mixed {
+                $fetchOneCall++;
+                if ($fetchOneCall === 1) {
+                    self::assertSame('SELECT `pending_email` FROM `user` WHERE `id` = ?', $query);
+                    self::assertSame([12], $parameters);
+
+                    return 'new@example.com';
+                }
+
+                self::assertSame('SELECT `id` FROM `user` WHERE `email` = ? AND `id` != ?', $query);
+                self::assertSame(['new@example.com', 12], $parameters);
+
+                return false;
+            });
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'user',
+                [
+                    'email' => 'new@example.com',
+                    'pending_email' => null,
+                    'email_verified_at' => '2026-10-14 20:00:00',
+                ],
+                ['id' => 12, 'pending_email' => 'new@example.com'],
+            )
+            ->willReturn(1);
+        $this->dbConnectionMock
+            ->expects(self::exactly(3))
+            ->method('delete')
+            ->willReturnCallback(static function (string $table, array $criteria) : int {
+                self::assertContains($table, [
+                    'user_email_verification_token',
+                    'user_auth_token',
+                    'user_api_token',
+                ]);
+                self::assertSame(['user_id' => 12], $criteria);
+
+                return 1;
+            });
+
+        self::assertTrue($this->subject->approvePendingEmail(12, $currentDate));
+    }
+
     public function testFindEmailVerificationTokenData() : void
     {
         $this->dbConnectionMock
