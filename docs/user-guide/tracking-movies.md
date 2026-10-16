@@ -1,4 +1,4 @@
-# Tracking movies, ratings, and watchlists
+# Movie tracking
 
 Movary keeps three related kinds of personal movie data:
 

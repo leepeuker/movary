@@ -46,7 +46,7 @@ nav:
       - Backup and restore: 'backup-and-restore.md'
   - User guide:
       - Overview: 'user-guide/index.md'
-      - Tracking movies, ratings, and watchlists: 'user-guide/tracking-movies.md'
+      - Movie tracking: 'user-guide/tracking-movies.md'
       - Dashboard and statistics: 'user-guide/dashboard-and-statistics.md'
       - Account and security: 'user-guide/account-and-security.md'
       - Privacy and sharing: 'user-guide/privacy-and-sharing.md'

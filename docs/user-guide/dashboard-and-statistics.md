@@ -13,7 +13,7 @@ The overview at the top of the dashboard always shows:
 - average movie runtime;
 - average personal rating.
 
-These values update as your history and ratings change. See [Tracking movies, ratings, and watchlists](tracking-movies.md) for managing the underlying data.
+These values update as your history and ratings change. See [Movie tracking](tracking-movies.md) for managing the underlying data.
 
 ## Statistic rows
 
