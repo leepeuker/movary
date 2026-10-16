@@ -36,17 +36,17 @@ nav:
       - Docker (recommended): install/docker.md
       - Manual: install/manual.md
   - Getting started: 'getting-started.md'
+  - Administration:
+      - Configuration: 'configuration.md'
+      - User management: 'user-management.md'
+      - Email operations: 'email-operations.md'
+      - Backup and restore: 'backup-and-restore.md'
   - User guide:
       - Overview: 'user-guide/index.md'
       - Account and security: 'user-guide/account-and-security.md'
       - Privacy and sharing: 'user-guide/privacy-and-sharing.md'
       - Personal data: 'user-guide/personal-data.md'
       - API authentication: 'user-guide/api-authentication.md'
-  - Administration:
-      - Configuration: 'configuration.md'
-      - User management: 'user-management.md'
-      - Email operations: 'email-operations.md'
-      - Backup and restore: 'backup-and-restore.md'
   - Features:
       - TMDB Data: features/tmdb-data.md
       - IMDb Rating: features/imdb-rating.md
