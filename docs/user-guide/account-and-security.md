@@ -6,7 +6,7 @@ Movary separates general account preferences from sign-in and security settings.
 
 Open **Settings → Account → General**, edit **Username**, and select **Submit**. Usernames must contain only letters and numbers and must be unique within the Movary installation.
 
-Your username is part of the URL for your dashboard, history, watchlist, and other user pages. Changing it also changes those URLs.
+Your username is part of the URL for your dashboard, history, watchlist, and other user pages. Changing it also changes those URLs. Review [Privacy and sharing](privacy-and-sharing.md) before sharing a user-page link.
 
 ## Change your email address
 

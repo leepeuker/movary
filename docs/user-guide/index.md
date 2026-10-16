@@ -11,7 +11,9 @@ The **Account** menu contains settings that apply only to your account:
 - **API tokens** provides credentials for trusted API clients and automation. See [API authentication](api-authentication.md).
 - **Locations** manages the places where you watch movies. See [Locations](../features/locations.md).
 - **Dashboard** controls which statistics appear and how they are ordered.
-- **Personal data** provides CSV import, export, and deletion actions.
+- **Personal data** provides CSV import, export, and deletion actions. See [Personal data](personal-data.md).
+
+Your privacy level determines who can see the movie data on your user pages. See [Privacy and sharing](privacy-and-sharing.md).
 
 The **Integrations** menu connects Movary to services such as [Plex](../features/plex.md), [Jellyfin](../features/jellyfin.md), [Emby](../features/emby.md), [Kodi](../features/kodi.md), [Trakt](../features/trakt.md), and [Letterboxd](../features/letterboxd.md).
 

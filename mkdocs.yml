@@ -39,6 +39,8 @@ nav:
   - User guide:
       - Overview: 'user-guide/index.md'
       - Account and security: 'user-guide/account-and-security.md'
+      - Privacy and sharing: 'user-guide/privacy-and-sharing.md'
+      - Personal data: 'user-guide/personal-data.md'
       - API authentication: 'user-guide/api-authentication.md'
   - Administration:
       - Configuration: 'configuration.md'
