@@ -9,7 +9,7 @@ The **Account** menu contains settings that apply only to your account:
 - **General** controls your username, privacy, date format, movie-title display, and other preferences.
 - **Security** controls your sign-in email, password, and two-factor authentication. See [Account and security](account-and-security.md).
 - **API tokens** provides credentials for trusted API clients and automation. See [API authentication](api-authentication.md).
-- **Locations** manages the places where you watch movies. See [Locations](../features/locations.md).
+- **Locations** manages the places where you watch movies. See [Locations](locations.md).
 - **Dashboard** controls which statistics appear and how they are ordered.
 - **Personal data** provides CSV import, export, and deletion actions. See [Personal data](personal-data.md).
 
