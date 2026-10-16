@@ -36,6 +36,8 @@ Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Movary uses it as the
 
 When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication and CSRF cookies as secure.
 
+See [User management](user-management.md#public-registration) for the public registration workflow and the interaction between account approval and email verification.
+
 ### Database
 
 Required to run the application
@@ -88,6 +90,7 @@ Outgoing email features are disabled by default. Set `EMAIL_ENABLED=1` or enable
 | `SMTP_PASSWORD`               |       -       | Required when authentication is enabled                |  yes   |
 
 Email verification enforcement requires outgoing email to be enabled, valid SMTP settings, and `APPLICATION_URL`.
+See [Email operations](email-operations.md) for setup, testing, verification, password resets, and troubleshooting.
 
 ### Logging
 

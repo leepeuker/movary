@@ -1,9 +1,44 @@
-You can run movary commands via `php bin/console.php` (executing this will list all available commands).
+# Getting started
 
-1. Create initial user
-    - via web UI by visiting the movary lading page for the first time
-    - via cli `php bin/console.php user:create email@example.com password username`
-      Use `--isEnabled=0` or `--emailVerified=0` to create a disabled or unverified account.
-2. Check the `/settings` page to customize movary like you want
+After installing Movary, open its configured URL and complete the following steps.
 
-It is recommended to enable tmdb image caching (set env variable `TMDB_ENABLE_IMAGE_CACHING=1`).
+## Create the initial administrator
+
+When no users exist, Movary opens the initial setup page automatically. Enter an email address, username, and password to create the first administrator.
+
+The account can alternatively be created from the server command line:
+
+```bash
+php bin/console.php user:create admin@example.com 'replace-with-secure-password' admin 1
+```
+
+The final `1` grants the Admin role. Passwords must contain at least 15 characters. CLI-created users are enabled and email-verified by default; use `--isEnabled=0` or `--emailVerified=0` to override either state.
+
+Run `php bin/console.php` without a command to list all available CLI commands.
+
+## Review the settings
+
+Open **Settings** after signing in:
+
+- **Account** contains personal preferences, security, integrations, and data-management options.
+- **Server** contains installation-wide settings, user management, email configuration, and background jobs. These pages require the Admin role.
+
+Environment variables override values stored through the web UI. See [Configuration](configuration.md) for the complete reference.
+
+## Configure email (optional)
+
+Outgoing email enables password resets and optional email verification. Follow [Email operations](email-operations.md) to configure and test SMTP before enabling verification.
+
+## Add users
+
+Administrators can create accounts under **Settings → Server → Users** or through the CLI. An installation can also allow users to create their own accounts through public registration.
+
+See [User management](user-management.md) for roles, account states, registration approval, and email-verification behavior.
+
+## Verify background processing
+
+Movary uses the `jobs:process` worker for background work, including verification and password reset emails. The standard Docker image runs the worker by default. Manual installations must configure Supervisor or cron as described in [Manual installation](install/manual.md#job-processing).
+
+## Recommended image caching
+
+Set `TMDB_ENABLE_IMAGE_CACHING=1` to store TMDB images locally. See [TMDB data](features/tmdb-data.md#image-cache) for configuration and synchronization details.
