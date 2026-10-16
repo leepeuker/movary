@@ -1,66 +1,76 @@
-## Introduction
+# TMDB data
 
-The primary source for information about movies, persons etc. is [TMDB](https://www.themoviedb.org/).
-Make sure you have set a valid TMDB api key, e.g. via environment variable (`TMDB_API_KEY`) or in the admin server settings UI.
+Movary uses [TMDB](https://www.themoviedb.org/) as its primary source for movie and person metadata. Administrators need to configure a valid TMDB API key before Movary can retrieve this data.
 
+Set the key under **Settings → Server → General** or with the `TMDB_API_KEY` environment variable. Environment variables take precedence over values saved through the web interface. See [Configuration](../configuration.md) for the complete settings reference.
 
-!!! tip
+## Synchronize movie and person metadata
 
-    Execute the metadata sync and image cache commands regularly, e.g. via cronjobs, to keep your application data up to date.
+Open **Settings → Server → Job Queue**, select **Create Job**, and choose either **TMDB movie metadata sync** or **TMDB person metadata sync**.
 
-## Movie & Person data
+The optional job fields let you:
 
-### Description
-Update local movie or person information with the latest data from TMDB.
+- skip records updated more recently than a specified number of hours;
+- limit the maximum number of records processed;
+- target comma-separated local movie or person IDs;
+- process only records that have never been synchronized.
 
-### Commands
+Leaving both the record limit and local IDs empty creates an unbounded job for every eligible record, which requires confirmation. A job with the `done` status completed, but individual records that TMDB could not update may still be reported as warnings in the application log.
+
+### Schedule recurring synchronization
+
+Open **Settings → Server → Job Schedules** to run the same synchronization automatically. Select a job type, enter a five-field cron expression evaluated in UTC, configure its filters, and create the schedule.
+
+The background worker must be running for schedules to create jobs. Missed occurrences do not create catch-up jobs, and an occurrence is skipped when a job of the same synchronization type is already waiting or in progress. See [Job processing](../development/job-processing.md) for worker setup, scheduling behavior, and troubleshooting.
+
+Avoid every-minute metadata schedules because they can create sustained TMDB API load.
+
+### Command-line alternative
+
+Administrators with command-line access can run:
+
 ```shell
 php bin/console.php tmdb:movie:sync
 php bin/console.php tmdb:person:sync
 ```
 
-Administrators can enqueue either synchronization from **Settings > Server > Job Queue** by selecting **Create Job**. Recurring synchronizations are configured under **Settings > Server > Job Schedules** using a standard five-field cron expression evaluated in UTC. For example, `0 * * * *` runs hourly and `0 3 * * 1` runs every Monday at 03:00 UTC. Recurring schedules can be enabled, disabled, or deleted from that page.
+Both commands support:
 
-Missed schedule occurrences do not create catch-up jobs. An occurrence is skipped when the same TMDB synchronization type is already waiting or in progress. Every-minute schedules should be used carefully because they can create sustained TMDB API load.
+- `--hours`: skip records updated more recently than this number of hours;
+- `--threshold`: limit the maximum number of records processed;
+- `--never-synced`: process only records that have never been synchronized.
 
-The `done` status means the queue job completed. Individual records that TMDB could not update are logged as warnings and do not cause the whole job to fail.
+Use `--movieIds` with the movie command or `--personIds` with the person command to target comma-separated local IDs.
 
-#### Important flags
+For example, synchronize at most 50 movies that have not been updated during the last 48 hours:
 
-- `--help`
-  Detailed information about the command
-- `--hours`
-  Only update movies/persons which were last synced X hours or longer ago
-- `--never-synced`
-  Only update movies/persons which have never been synced before
-- `--threshold`
-  Maximum number of movies/person to sync for this run
-
-#### Example
-
-Update information for the first 50 movies which were updated at least 48 hours ago. 
 ```shell
-php bin/console.php tmdb:movie:sync` --hours 48 --threshold 50
+php bin/console.php tmdb:movie:sync --hours 48 --threshold 50
 ```
 
-## Image Cache
+## Image cache
 
-### Description
-Enable by setting environment variable `TMDB_ENABLE_IMAGE_CACHING` to `1`.
+Set `TMDB_ENABLE_IMAGE_CACHING=1` to store local copies of TMDB images instead of loading them from TMDB for every request. Persist the `storage` directory so cached images survive container recreation or application upgrades.
 
-To prevent rate limit issues with the TMDB api you should cache TMDB images.
-This will store a local copy of the images in the `storage` directory and use this image instead of the original one from TMDB.
-Make sure you persist the content of the `storage` directory to keep data e.g. when restarting docker container.
+To cache selected images, open **Settings → Server → Job Queue**, create a **TMDB image cache refresh** job, and enter at least one local movie or person ID. A movie job also caches images for its cast and crew. Targeted image-cache jobs can also be configured under **Settings → Server → Job Schedules**.
 
-### Commands
+Command-line access additionally supports refreshing the complete cache:
+
 ```shell
 php bin/console.php tmdb:imageCache:refresh
+```
+
+Use `--type movies` or `--type persons` to restrict the refresh, and `--force` to overwrite existing cached images.
+
+Two maintenance commands are also available:
+
+```shell
+php bin/console.php tmdb:imageCache:cleanup
 php bin/console.php tmdb:imageCache:delete
 ```
 
-Administrators can cache images for selected local movie and person IDs under **Settings > Server > Job Queue**. Movie jobs also cache cast and crew images. The same targeted refresh can be scheduled under **Settings > Server > Job Schedules**.
+`cleanup` removes cached images that are no longer referenced. `delete` removes the complete image cache.
 
-## Import personal User Ratings
+## Personal TMDB ratings
 
-There is no native integration to import the personal movie ratings of a tmdb user at the moment.
-However, you can use third party tools like [TMDBToMovary](https://github.com/SirMartin/TMDBToMovary) to work around this limitation. 
+Movary does not provide a native integration for importing a TMDB user's personal ratings. A third-party tool such as [TMDBToMovary](https://github.com/SirMartin/TMDBToMovary) can provide this separately from server metadata synchronization.

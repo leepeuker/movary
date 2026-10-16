@@ -36,6 +36,8 @@ Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Movary uses it as the
 
 When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `https://` URL so Movary marks authentication and CSRF cookies as secure.
 
+See [TMDB data](features/tmdb-data.md) for API-key setup, metadata synchronization, and image caching.
+
 See [User management](user-management.md#public-registration) for the public registration workflow and the interaction between account approval and email verification.
 
 ### Database

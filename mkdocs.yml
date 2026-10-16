@@ -38,19 +38,22 @@ nav:
   - Getting started: 'getting-started.md'
   - Administration:
       - Configuration: 'configuration.md'
+      - Metadata:
+          - TMDB data: features/tmdb-data.md
+          - IMDb ratings: features/imdb-rating.md
       - User management: 'user-management.md'
       - Email operations: 'email-operations.md'
       - Backup and restore: 'backup-and-restore.md'
   - User guide:
       - Overview: 'user-guide/index.md'
+      - Movie tracking: 'user-guide/tracking-movies.md'
+      - Dashboard and statistics: 'user-guide/dashboard-and-statistics.md'
       - Account and security: 'user-guide/account-and-security.md'
       - Privacy and sharing: 'user-guide/privacy-and-sharing.md'
+      - Locations: 'user-guide/locations.md'
       - Personal data: 'user-guide/personal-data.md'
       - API authentication: 'user-guide/api-authentication.md'
-  - Features:
-      - TMDB Data: features/tmdb-data.md
-      - IMDb Rating: features/imdb-rating.md
-      - Locations: features/locations.md
+  - Integrations:
       - Plex: features/plex.md
       - Jellyfin: features/jellyfin.md
       - Emby: features/emby.md

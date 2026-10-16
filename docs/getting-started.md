@@ -41,6 +41,8 @@ See [User management](user-management.md) for roles, account states, registratio
 
 Movary uses the `jobs:process` worker for background work, including verification and password reset emails. The standard Docker image runs the worker by default. Manual installations must configure Supervisor or cron as described in [Manual installation](install/manual.md#job-processing).
 
-## Recommended image caching
+## Maintain metadata
+
+Administrators can schedule recurring TMDB metadata and IMDb rating updates under **Settings → Server → Job Schedules**. See [TMDB data](features/tmdb-data.md) and [IMDb ratings](features/imdb-rating.md) for the available jobs and filters.
 
 Set `TMDB_ENABLE_IMAGE_CACHING=1` to store TMDB images locally. See [TMDB data](features/tmdb-data.md#image-cache) for configuration and synchronization details.
