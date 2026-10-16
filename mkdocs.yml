@@ -41,6 +41,9 @@ nav:
       - User management: 'user-management.md'
       - Email operations: 'email-operations.md'
       - Backup and restore: 'backup-and-restore.md'
+      - Metadata:
+          - TMDB Data: features/tmdb-data.md
+          - IMDb Rating: features/imdb-rating.md
   - User guide:
       - Overview: 'user-guide/index.md'
       - Account and security: 'user-guide/account-and-security.md'
@@ -48,9 +51,7 @@ nav:
       - Locations: 'user-guide/locations.md'
       - Personal data: 'user-guide/personal-data.md'
       - API authentication: 'user-guide/api-authentication.md'
-  - Features:
-      - TMDB Data: features/tmdb-data.md
-      - IMDb Rating: features/imdb-rating.md
+  - Integrations:
       - Plex: features/plex.md
       - Jellyfin: features/jellyfin.md
       - Emby: features/emby.md
