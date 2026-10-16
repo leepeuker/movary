@@ -35,6 +35,8 @@ php bin/console.php user:email:request-verification USER_ID
 
 When verification is required and a user changes their email address, Movary keeps the current address active and stores the new address as pending. The new address becomes active after verification. An administrator may instead approve or cancel the pending change from user management.
 
+Users can resend or cancel their own pending change under **Settings → Account → Security**. See [Account and security](user-guide/account-and-security.md#change-your-email-address).
+
 ## Password resets
 
 When email support is available, the login page shows **Forgot password?**. Password reset links expire after 15 minutes.
