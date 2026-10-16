@@ -42,8 +42,8 @@ nav:
       - Email operations: 'email-operations.md'
       - Backup and restore: 'backup-and-restore.md'
       - Metadata:
-          - TMDB Data: features/tmdb-data.md
-          - IMDb Rating: features/imdb-rating.md
+          - TMDB data: features/tmdb-data.md
+          - IMDb ratings: features/imdb-rating.md
   - User guide:
       - Overview: 'user-guide/index.md'
       - Account and security: 'user-guide/account-and-security.md'
