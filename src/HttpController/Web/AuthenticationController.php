@@ -129,6 +129,7 @@ class AuthenticationController
             $passwordChanged = true;
         }
         $emailVerified = ($request->getGetParameters()['email-verification'] ?? null) === 'success';
+        $registrationStatus = $request->getGetParameters()['registration'] ?? null;
 
         $renderedTemplate = $this->twig->render(
             'page/login.html.twig',
@@ -136,6 +137,16 @@ class AuthenticationController
                 'redirect' => $redirect,
                 'passwordChanged' => $passwordChanged,
                 'emailVerified' => $emailVerified,
+                'registrationPendingApproval' => in_array(
+                    $registrationStatus,
+                    ['pending-approval', 'pending-approval-and-email-verification'],
+                    true,
+                ),
+                'registrationEmailVerificationRequired' => in_array(
+                    $registrationStatus,
+                    ['email-verification-required', 'pending-approval-and-email-verification'],
+                    true,
+                ),
                 'passwordResetAvailable' => $this->emailSupport->isPasswordResetAvailable(),
                 'registrationEnabled' => $this->registrationEnabled,
                 'defaultEmail' => $this->defaultEmail,

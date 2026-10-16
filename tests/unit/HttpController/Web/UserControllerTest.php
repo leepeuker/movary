@@ -71,6 +71,7 @@ class UserControllerTest extends TestCase
         $this->userApiMock
             ->expects(self::once())
             ->method('createUser')
+            ->with('user@example.com', 'short', 'user', false, true, true)
             ->willThrowException(new PasswordTooShort(15));
 
         $response = $this->subject->createUser($request);

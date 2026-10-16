@@ -65,6 +65,7 @@ class UserApiTest extends TestCase
                 self::callback(static fn(string $hash) => password_verify('a secure password', $hash)),
                 'user',
                 false,
+                true,
                 self::isInstanceOf(\Movary\ValueObject\DateTime::class),
             );
 
@@ -73,6 +74,7 @@ class UserApiTest extends TestCase
             'a secure password',
             'user',
             false,
+            true,
             true,
         );
     }
@@ -88,6 +90,7 @@ class UserApiTest extends TestCase
                 self::callback(static fn(string $hash) => password_verify('a secure password', $hash)),
                 'user',
                 false,
+                false,
                 null,
             );
 
@@ -95,6 +98,7 @@ class UserApiTest extends TestCase
             'user@example.com',
             'a secure password',
             'user',
+            false,
             false,
             false,
         );

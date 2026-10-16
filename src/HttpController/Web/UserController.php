@@ -43,6 +43,7 @@ class UserController
                 $requestUserData['password'],
                 $requestUserData['name'],
                 $requestUserData['isAdmin'],
+                isEnabled: true,
                 emailVerified: true,
             );
         } catch (EmailNotUnique) {

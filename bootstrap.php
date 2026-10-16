@@ -24,6 +24,7 @@ $builder->addDefinitions(
         \Movary\Service\Export\ExportService::class => DI\factory([Factory::class, 'createExportService']),
         \Movary\HttpController\Api\OpenApiController::class => DI\factory([Factory::class, 'createOpenApiController']),
         \Movary\HttpController\Web\AuthenticationController::class => DI\factory([Factory::class, 'createAuthenticationController']),
+        \Movary\HttpController\Web\CreateUserController::class => DI\factory([Factory::class, 'createCreateUserController']),
         \Movary\HttpController\Web\JobController::class => DI\factory([Factory::class, 'createJobController']),
         \Movary\HttpController\Web\JellyfinController::class => DI\factory([Factory::class, 'createJellyfinController']),
         \Movary\HttpController\Web\PlexController::class => DI\factory([Factory::class, 'createPlexController']),

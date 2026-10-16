@@ -8,6 +8,8 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
+use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\CreateUserController;
 use Movary\Service\ApplicationUrlService;
@@ -29,17 +31,21 @@ use Twig\Environment;
 #[AllowMockObjectsWithoutExpectations]
 class CreateUserControllerTest extends TestCase
 {
-    private ApplicationUrlService|MockObject $applicationUrlServiceMock;
+    private ApplicationUrlService&MockObject $applicationUrlServiceMock;
 
-    private Authentication|MockObject $authenticationMock;
+    private Authentication&MockObject $authenticationMock;
 
-    private FlashMessageService|MockObject $flashMessageServiceMock;
+    private FlashMessageService&MockObject $flashMessageServiceMock;
+
+    private EmailVerificationPolicy&MockObject $emailVerificationPolicyMock;
+
+    private EmailVerificationRequestService&MockObject $emailVerificationRequestServiceMock;
 
     private CreateUserController $subject;
 
-    private Environment|MockObject $twigMock;
+    private Environment&MockObject $twigMock;
 
-    private UserApi|MockObject $userApiMock;
+    private UserApi&MockObject $userApiMock;
 
     protected function setUp() : void
     {
@@ -48,12 +54,22 @@ class CreateUserControllerTest extends TestCase
         $this->userApiMock = $this->createMock(UserApi::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
-        $this->subject = new CreateUserController(
+        $this->emailVerificationPolicyMock = $this->createMock(EmailVerificationPolicy::class);
+        $this->emailVerificationRequestServiceMock = $this->createMock(EmailVerificationRequestService::class);
+        $this->subject = $this->createSubject(false);
+    }
+
+    private function createSubject(bool $registeredUsersEnabled) : CreateUserController
+    {
+        return new CreateUserController(
             $this->twigMock,
             $this->authenticationMock,
             $this->userApiMock,
             $this->flashMessageServiceMock,
             $this->applicationUrlServiceMock,
+            $this->emailVerificationPolicyMock,
+            $this->emailVerificationRequestServiceMock,
+            $registeredUsersEnabled,
         );
     }
 
@@ -101,16 +117,16 @@ class CreateUserControllerTest extends TestCase
         $this->userApiMock
             ->expects(self::once())
             ->method('createUser')
-            ->with('user@example.com', 'password', 'user', false, true)
+            ->with('user@example.com', 'password', 'user', false, false, true)
             ->willThrowException($exception);
         $this->authenticationMock->expects(self::never())->method('loginWebSession');
         $this->flashMessageServiceMock->expects(self::once())->method('add')->with($message);
-        $this->applicationUrlServiceMock->method('createApplicationUrl')->willReturn('/movary');
+        $this->expectCreateUserRedirect();
 
         $response = $this->subject->createUser($request);
 
         self::assertEquals(StatusCode::createSeeOther(), $response->getStatusCode());
-        self::assertSame('Location: /movary', (string)$response->getHeaders()[0]);
+        self::assertSame('Location: /movary/create-user', (string)$response->getHeaders()[0]);
     }
 
     public function testCreateUserAddsGenericError() : void
@@ -121,22 +137,23 @@ class CreateUserControllerTest extends TestCase
             ->expects(self::once())
             ->method('add')
             ->with(FlashMessage::CREATE_USER_GENERIC_ERROR);
-        $this->applicationUrlServiceMock->method('createApplicationUrl')->willReturn('/movary');
+        $this->expectCreateUserRedirect();
 
         $response = $this->subject->createUser($request);
 
         self::assertEquals(StatusCode::createSeeOther(), $response->getStatusCode());
-        self::assertSame('Location: /movary', (string)$response->getHeaders()[0]);
+        self::assertSame('Location: /movary/create-user', (string)$response->getHeaders()[0]);
     }
 
-    public function testCreateUserStartsWebSession() : void
+    public function testCreateInitialAdminStartsWebSession() : void
     {
         $request = $this->createRequest($this->createValidParameters());
-        $this->userApiMock->method('hasUsers')->willReturn(true);
+        $this->userApiMock->method('hasUsers')->willReturn(false);
+        $this->emailVerificationPolicyMock->expects(self::never())->method('isRequired');
         $this->userApiMock
             ->expects(self::once())
             ->method('createUser')
-            ->with('user@example.com', 'password', 'user', false, true);
+            ->with('user@example.com', 'password', 'user', true, true, true);
         $this->authenticationMock
             ->expects(self::once())
             ->method('loginWebSession')
@@ -149,11 +166,79 @@ class CreateUserControllerTest extends TestCase
         self::assertSame('Location: /movary', (string)$response->getHeaders()[0]);
     }
 
+    #[DataProvider('providePublicRegistrationConfiguration')]
+    public function testCreatesPublicUserAccordingToRegistrationConfiguration(
+        bool $registeredUsersEnabled,
+        bool $emailVerificationRequired,
+        bool $expectedEnabled,
+        bool $expectedVerified,
+        bool $expectedLogin,
+        string $expectedRedirect,
+    ) : void {
+        $this->subject = $this->createSubject($registeredUsersEnabled);
+        $request = $this->createRequest($this->createValidParameters());
+        $this->userApiMock->method('hasUsers')->willReturn(true);
+        $this->emailVerificationPolicyMock->method('isRequired')->willReturn($emailVerificationRequired);
+        $this->userApiMock
+            ->expects(self::once())
+            ->method('createUser')
+            ->with('user@example.com', 'password', 'user', false, $expectedEnabled, $expectedVerified);
+        $this->emailVerificationRequestServiceMock
+            ->expects($emailVerificationRequired ? self::once() : self::never())
+            ->method('request')
+            ->with('user@example.com');
+        $this->authenticationMock
+            ->expects($expectedLogin ? self::once() : self::never())
+            ->method('loginWebSession')
+            ->with('user@example.com', 'password', false, 'user agent');
+        $this->applicationUrlServiceMock
+            ->method('createApplicationUrl')
+            ->willReturnCallback(static fn(?RelativeUrl $url = null) : string => $url === null
+                ? '/movary'
+                : '/movary' . $url);
+
+        $response = $this->subject->createUser($request);
+
+        self::assertEquals(StatusCode::createSeeOther(), $response->getStatusCode());
+        self::assertSame('Location: ' . $expectedRedirect, (string)$response->getHeaders()[0]);
+    }
+
+    /** @return iterable<string, array{bool, bool, bool, bool, bool, string}> */
+    public static function providePublicRegistrationConfiguration() : iterable
+    {
+        yield 'admin approval required' => [
+            false,
+            false,
+            false,
+            true,
+            false,
+            '/movary/login?registration=pending-approval',
+        ];
+        yield 'immediately available' => [true, false, true, true, true, '/movary'];
+        yield 'admin approval and email verification required' => [
+            false,
+            true,
+            false,
+            false,
+            false,
+            '/movary/login?registration=pending-approval-and-email-verification',
+        ];
+        yield 'email verification required' => [
+            true,
+            true,
+            true,
+            false,
+            false,
+            '/movary/login?registration=email-verification-required',
+        ];
+    }
+
     #[DataProvider('provideRenderedMessages')]
     public function testRenderPageConsumesMessageOnce(FlashMessage $message, string $variable) : void
     {
         $messageConsumed = false;
         $this->userApiMock->method('hasUsers')->willReturn(false);
+        $this->emailVerificationPolicyMock->expects(self::never())->method('isRequired');
         $this->flashMessageServiceMock
             ->expects(self::exactly(16))
             ->method('consume')
@@ -173,7 +258,9 @@ class CreateUserControllerTest extends TestCase
             ->method('render')
             ->willReturnCallback(static function (string $template, array $data) use ($variable, &$renderCount) : string {
                 self::assertSame('page/create-user.html.twig', $template);
-                self::assertSame('Create initial admin user', $data['subtitle']);
+                self::assertTrue($data['isInitialAdmin']);
+                self::assertFalse($data['registrationRequiresApproval']);
+                self::assertFalse($data['registrationRequiresEmailVerification']);
                 self::assertSame($renderCount === 0, $data[$variable]);
 
                 foreach (self::getRenderedVariables() as $renderedVariable) {
@@ -192,6 +279,50 @@ class CreateUserControllerTest extends TestCase
 
         self::assertSame('create user', $firstResponse->getBody());
         self::assertSame('create user', $secondResponse->getBody());
+    }
+
+    #[DataProvider('providePublicRegistrationPageConfiguration')]
+    public function testRenderPageDescribesPublicRegistrationRequirements(
+        bool $registeredUsersEnabled,
+        bool $emailVerificationRequired,
+    ) : void {
+        $this->subject = $this->createSubject($registeredUsersEnabled);
+        $this->userApiMock->method('hasUsers')->willReturn(true);
+        $this->emailVerificationPolicyMock
+            ->expects(self::once())
+            ->method('isRequired')
+            ->willReturn($emailVerificationRequired);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/create-user.html.twig',
+                self::callback(static function (array $data) use (
+                    $registeredUsersEnabled,
+                    $emailVerificationRequired,
+                ) : bool {
+                    self::assertFalse($data['isInitialAdmin']);
+                    self::assertSame(!$registeredUsersEnabled, $data['registrationRequiresApproval']);
+                    self::assertSame(
+                        $emailVerificationRequired,
+                        $data['registrationRequiresEmailVerification'],
+                    );
+
+                    return true;
+                }),
+            )
+            ->willReturn('create user');
+
+        $response = $this->subject->renderPage();
+
+        self::assertSame('create user', $response->getBody());
+    }
+
+    /** @return iterable<string, array{bool, bool}> */
+    public static function providePublicRegistrationPageConfiguration() : iterable
+    {
+        yield 'approval and verification required' => [false, true];
+        yield 'account immediately available' => [true, false];
     }
 
     /** @return iterable<string, array{Throwable, FlashMessage}> */

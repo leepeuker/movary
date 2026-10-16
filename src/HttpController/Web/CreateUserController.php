@@ -8,6 +8,8 @@ use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Exception\UsernameInvalidFormat;
 use Movary\Domain\User\Exception\UsernameNotUnique;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
+use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\UserApi;
 use Movary\Service\ApplicationUrlService;
 use Movary\Service\FlashMessage\FlashMessage;
@@ -28,6 +30,9 @@ class CreateUserController
         private readonly UserApi $userApi,
         private readonly FlashMessageService $flashMessageService,
         private readonly ApplicationUrlService $applicationUrlService,
+        private readonly EmailVerificationPolicy $emailVerificationPolicy,
+        private readonly EmailVerificationRequestService $emailVerificationRequestService,
+        private readonly bool $registeredUsersEnabled,
     ) {
     }
 
@@ -41,7 +46,9 @@ class CreateUserController
         $email = empty($postParameters['email']) === true ? null : (string)$postParameters['email'];
         $name = empty($postParameters['name']) === true ? null : (string)$postParameters['name'];
         $password = empty($postParameters['password']) === true ? null : (string)$postParameters['password'];
-        $repeatPassword = empty($postParameters['password']) === true ? null : (string)$postParameters['repeatPassword'];
+        $repeatPassword = empty($postParameters['repeatPassword']) === true
+            ? null
+            : (string)$postParameters['repeatPassword'];
 
         if ($email === null || $name === null || $password === null || $repeatPassword === null) {
             $this->flashMessageService->add(FlashMessage::CREATE_USER_MISSING_FORM_DATA);
@@ -68,16 +75,35 @@ class CreateUserController
         }
 
         $flashMessage = null;
+        $registrationRedirect = null;
         try {
+            $isInitialAdmin = $hasUsers === false;
+            $emailVerificationRequired = $isInitialAdmin === false
+                && $this->emailVerificationPolicy->isRequired();
+            $isEnabled = $isInitialAdmin === true || $this->registeredUsersEnabled;
+
             $this->userApi->createUser(
                 $email,
                 $password,
                 $name,
-                $hasUsers === false,
-                emailVerified: true,
+                $isInitialAdmin,
+                $isEnabled,
+                emailVerified: $emailVerificationRequired === false,
             );
 
-            $this->authenticationService->loginWebSession($email, $password, false, $userAgent);
+            if ($emailVerificationRequired === true) {
+                $this->emailVerificationRequestService->request($email);
+            }
+
+            if ($isEnabled === true && $emailVerificationRequired === false) {
+                $this->authenticationService->loginWebSession($email, $password, false, $userAgent);
+            } elseif ($isEnabled === false && $emailVerificationRequired === true) {
+                $registrationRedirect = '/login?registration=pending-approval-and-email-verification';
+            } elseif ($isEnabled === false) {
+                $registrationRedirect = '/login?registration=pending-approval';
+            } else {
+                $registrationRedirect = '/login?registration=email-verification-required';
+            }
         } catch (PasswordTooShort) {
             $flashMessage = FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT;
         } catch (PasswordInvalidEncoding) {
@@ -94,6 +120,16 @@ class CreateUserController
 
         if ($flashMessage !== null) {
             $this->flashMessageService->add($flashMessage);
+
+            return Response::createSeeOther(
+                $this->applicationUrlService->createApplicationUrl(RelativeUrl::create('/create-user')),
+            );
+        }
+
+        if ($registrationRedirect !== null) {
+            return Response::createSeeOther(
+                $this->applicationUrlService->createApplicationUrl(RelativeUrl::create($registrationRedirect)),
+            );
         }
 
         return Response::create(
@@ -106,11 +142,15 @@ class CreateUserController
     public function renderPage() : Response
     {
         $hasUsers = $this->userApi->hasUsers();
+        $isInitialAdmin = $hasUsers === false;
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/create-user.html.twig', [
-                'subtitle' => $hasUsers === false ? 'Create initial admin user' : 'Create new user',
+                'isInitialAdmin' => $isInitialAdmin,
+                'registrationRequiresApproval' => $isInitialAdmin === false && $this->registeredUsersEnabled === false,
+                'registrationRequiresEmailVerification' => $isInitialAdmin === false
+                    && $this->emailVerificationPolicy->isRequired(),
                 'errorPasswordTooShort' => $this->flashMessageService->consume(
                     FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT,
                 ),

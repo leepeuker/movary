@@ -21,6 +21,7 @@ class UserCreateTest extends TestCase
         $userApi
             ->expects(self::once())
             ->method('createUser')
+            ->with('user@example.com', 'short', 'user', false, true, true)
             ->willThrowException(new PasswordTooShort(15));
         $command = new UserCreate($userApi, $this->createStub(LoggerInterface::class));
         (new Application())->add($command);
@@ -35,6 +36,51 @@ class UserCreateTest extends TestCase
         self::assertSame(Command::FAILURE, $result);
         self::assertStringContainsString(
             'Password must contain at least 15 characters',
+            $tester->getDisplay(),
+        );
+    }
+
+    public function testCreatesUserWithConfiguredAccountStatus() : void
+    {
+        $userApi = $this->createMock(UserApi::class);
+        $userApi
+            ->expects(self::once())
+            ->method('createUser')
+            ->with('user@example.com', 'password', 'user', false, false, false);
+        $command = new UserCreate($userApi, $this->createStub(LoggerInterface::class));
+        (new Application())->add($command);
+        $tester = new CommandTester($command);
+
+        $result = $tester->execute([
+            'email' => 'user@example.com',
+            'password' => 'password',
+            'name' => 'user',
+            '--isEnabled' => '0',
+            '--emailVerified' => '0',
+        ]);
+
+        self::assertSame(Command::SUCCESS, $result);
+        self::assertStringContainsString('User created.', $tester->getDisplay());
+    }
+
+    public function testRejectsInvalidBooleanOptions() : void
+    {
+        $userApi = $this->createMock(UserApi::class);
+        $userApi->expects(self::never())->method('createUser');
+        $command = new UserCreate($userApi, $this->createStub(LoggerInterface::class));
+        (new Application())->add($command);
+        $tester = new CommandTester($command);
+
+        $result = $tester->execute([
+            'email' => 'user@example.com',
+            'password' => 'password',
+            'name' => 'user',
+            '--isEnabled' => 'invalid',
+        ]);
+
+        self::assertSame(Command::FAILURE, $result);
+        self::assertStringContainsString(
+            'isEnabled and emailVerified must be boolean values.',
             $tester->getDisplay(),
         );
     }

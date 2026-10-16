@@ -46,12 +46,13 @@ class UserRepositoryTest extends TestCase
                         && $data['email_verified_at'] === '2026-10-14 20:00:00'
                         && $data['password'] === 'password-hash'
                         && $data['is_admin'] === 0
+                        && $data['is_enabled'] === 1
                         && $data['name'] === 'Alice'
                         && is_string($data['created_at']),
                 ),
             );
 
-        $this->subject->createUser('alice@example.com', 'password-hash', 'Alice', false, $verifiedAt);
+        $this->subject->createUser('alice@example.com', 'password-hash', 'Alice', false, true, $verifiedAt);
     }
 
     public function testCreateUnverifiedUserStoresNullVerificationDate() : void
@@ -63,11 +64,12 @@ class UserRepositoryTest extends TestCase
                 'user',
                 self::callback(
                     static fn(array $data) : bool => array_key_exists('email_verified_at', $data)
-                        && $data['email_verified_at'] === null,
+                        && $data['email_verified_at'] === null
+                        && $data['is_enabled'] === 0,
                 ),
             );
 
-        $this->subject->createUser('alice@example.com', 'password-hash', 'Alice', false, null);
+        $this->subject->createUser('alice@example.com', 'password-hash', 'Alice', false, false, null);
     }
 
     public function testUpdateEmailInvalidatesVerificationAndPendingTokenWhenEmailChanges() : void

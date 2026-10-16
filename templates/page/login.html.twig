@@ -30,10 +30,16 @@
                     <label for="password">Password</label>
                 </div>
 
-                <div class="checkbox mb-3" style="margin-bottom: 0.7rem!important;">
-                    <label class="text-{{ theme == 'dark' ? 'light' : 'dark' }}">
-                        <input type="checkbox" id="rememberMe" value="true" {{ defaultRememberMe == 'true' ? 'checked' : '' }}> Remember me
-                    </label>
+                <div class="d-flex align-items-center justify-content-between my-3">
+                    <div class="form-check mb-0 text-start">
+                        <input class="form-check-input" type="checkbox" id="rememberMe" value="true" {{ defaultRememberMe == 'true' ? 'checked' : '' }}>
+                        <label class="form-check-label small text-{{ theme == 'dark' ? 'light' : 'dark' }}" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    {% if passwordResetAvailable == true %}
+                        <a class="small" href="{{ applicationUrl }}/forgot-password">Forgot password?</a>
+                    {% endif %}
                 </div>
 
                 <div id="loginErrors"></div>
@@ -59,18 +65,29 @@
                     </div>
                 {% endif %}
 
+                {% if registrationPendingApproval == true or registrationEmailVerificationRequired == true %}
+                    <div class="alert alert-success" role="alert">
+                        Your account was created.
+                        {% if registrationEmailVerificationRequired == true %}
+                            Verify your email address before signing in.
+                        {% endif %}
+                        {% if registrationPendingApproval == true %}
+                            An administrator must enable your account before you can sign in.
+                        {% endif %}
+                    </div>
+                {% endif %}
+
                 {% if redirect != false %}
                     <div class="alert alert-danger" role="alert" id="forbiddenPageAlert">
                         Sign in to access page
                     </div>
                     <input type="hidden" value="{{ redirect }}" name="redirect" />
                 {% endif %}
-                <button class="w-100 btn btn-lg btn-primary mb-3" type="button" onclick="submitCredentials()">Sign in</button>
-                {% if passwordResetAvailable == true %}
-                    <a class="d-block mb-3" href="{{ applicationUrl }}/forgot-password">Forgot password?</a>
-                {% endif %}
+                <button class="w-100 btn btn-lg btn-primary" type="button" onclick="submitCredentials()">Sign in</button>
                 {% if registrationEnabled == true %}
-                    <a href="{{ applicationUrl }}/create-user">Create new user</a>
+                    <p class="small mt-3 mb-0">
+                        <a href="{{ applicationUrl }}/create-user">Create account</a>
+                    </p>
                 {% endif %}
             </div>
             <div id="totpForm" class="d-none">
