@@ -18,12 +18,9 @@
             <h1 class="mb-2">Movary</h1>
             {% if isInitialAdmin == true %}
                 <p class="account-flow-label mb-2">Initial setup</p>
-                <h2 class="h4 mb-2">Create the administrator</h2>
-                <p class="text-body-secondary mb-4">
-                    This first account can manage users and server settings.
-                </p>
+                <h2 class="h4 mb-3">Create the administrator</h2>
             {% else %}
-                <h2 class="h4 {{ registrationRequiresApproval ? 'mb-2' : 'mb-4' }}">Create your account</h2>
+                <h2 class="h4 {{ registrationRequiresApproval ? 'mb-2' : 'mb-3' }}">Create your account</h2>
                 {% if registrationRequiresApproval == true %}
                     <p class="form-text mb-3">Administrator approval is required.</p>
                 {% endif %}
