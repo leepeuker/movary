@@ -30,6 +30,7 @@ class UserApi
         string $password,
         string $name,
         bool $isAdmin,
+        bool $isEnabled,
         bool $emailVerified,
     ) : void
     {
@@ -43,6 +44,7 @@ class UserApi
             password_hash($password, PASSWORD_DEFAULT),
             $name,
             $isAdmin,
+            $isEnabled,
             $emailVerified === true ? DateTime::create() : null,
         );
     }

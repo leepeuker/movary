@@ -23,6 +23,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `APPLICATION_NAME`                          |   `Movary`    | Application name, displayed e.g. as brand name in the navbar                   |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |      `0`      | More info [here](features/tmdb-data.md#image-cache)                            |        |
 | `ENABLE_REGISTRATION`                       |      `0`      | Enables public user registration                                               |        |
+| `REGISTRATION_DEFAULT_USER_ENABLED`         |      `0`      | Enables publicly registered users immediately instead of requiring admin approval |     |
 | `MIN_RUNTIME_IN_SECONDS_FOR_JOB_PROCESSING` |     `15`      | Minimum time between background jobs processing                                |        |
 | `TIMEZONE`                                  |     `UTC`     | Supported timezones [here](https://www.php.net/manual/en/timezones.php)        |  yes   |
 | `LOGIN_ATTEMPT_LIMIT`                       |      `5`      | Positive number of failed attempts allowed before login is temporarily blocked |        |

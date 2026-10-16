@@ -357,6 +357,7 @@ class UserRepository
         string $passwordHash,
         string $name,
         bool $isAdmin,
+        bool $isEnabled,
         ?DateTime $emailVerifiedAt,
     ) : void
     {
@@ -367,6 +368,7 @@ class UserRepository
                 'email_verified_at' => $emailVerifiedAt === null ? null : (string)$emailVerifiedAt,
                 'password' => $passwordHash,
                 'is_admin' => (int)$isAdmin,
+                'is_enabled' => (int)$isEnabled,
                 'name' => $name,
                 'created_at' => (string)DateTime::create(),
             ],

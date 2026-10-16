@@ -2,12 +2,14 @@
 
 namespace Movary\HttpController\Web\Middleware;
 
+use Movary\Domain\User\UserApi;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
 class ServerHasRegistrationEnabled implements MiddlewareInterface
 {
     public function __construct(
+        private readonly UserApi $userApi,
         private readonly bool $registrationEnabled,
     ) {
     }
@@ -15,7 +17,7 @@ class ServerHasRegistrationEnabled implements MiddlewareInterface
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
     public function __invoke(Request $request) : ?Response
     {
-        if ($this->registrationEnabled === false) {
+        if ($this->userApi->hasUsers() === false || $this->registrationEnabled === true) {
             return null;
         }
 

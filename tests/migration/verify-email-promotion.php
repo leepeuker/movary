@@ -14,6 +14,7 @@ $repository->createUser(
     'password-hash',
     'EmailPromotionAudit',
     false,
+    true,
     DateTime::createFromString('2026-10-14 12:00:00'),
 );
 $userId = (int)$connection->lastInsertId();
@@ -67,6 +68,7 @@ $repository->createUser(
     'password-hash',
     'AdminApprovalAudit',
     false,
+    true,
     DateTime::createFromString('2026-10-14 12:00:00'),
 );
 $approvedUserId = (int)$connection->lastInsertId();

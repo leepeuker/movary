@@ -59,6 +59,18 @@
                     </div>
                 {% endif %}
 
+                {% if registrationPendingApproval == true or registrationEmailVerificationRequired == true %}
+                    <div class="alert alert-success" role="alert">
+                        Your account was created.
+                        {% if registrationEmailVerificationRequired == true %}
+                            Verify your email address before signing in.
+                        {% endif %}
+                        {% if registrationPendingApproval == true %}
+                            An administrator must enable your account before you can sign in.
+                        {% endif %}
+                    </div>
+                {% endif %}
+
                 {% if redirect != false %}
                     <div class="alert alert-danger" role="alert" id="forbiddenPageAlert">
                         Sign in to access page

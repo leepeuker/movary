@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
@@ -36,7 +37,9 @@ class UserCreate extends Command
             ->addArgument('email', InputArgument::REQUIRED, 'Email address for user')
             ->addArgument('password', InputArgument::REQUIRED, 'Password for user')
             ->addArgument('name', InputArgument::REQUIRED, 'Name for user')
-            ->addArgument('isAdmin', InputArgument::OPTIONAL, 'Set user as admin', false);
+            ->addArgument('isAdmin', InputArgument::OPTIONAL, 'Set user as admin', false)
+            ->addOption('isEnabled', [], InputOption::VALUE_REQUIRED, 'Enable user account (1 or 0)', '1')
+            ->addOption('emailVerified', [], InputOption::VALUE_REQUIRED, 'Mark email as verified (1 or 0)', '1');
     }
 
     // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
@@ -46,9 +49,24 @@ class UserCreate extends Command
         $password = $input->getArgument('password');
         $name = $input->getArgument('name');
         $isAdmin = (bool)$input->getArgument('isAdmin');
+        $isEnabled = $this->parseBoolean($input->getOption('isEnabled'));
+        $emailVerified = $this->parseBoolean($input->getOption('emailVerified'));
+
+        if ($isEnabled === null || $emailVerified === null) {
+            $this->generateOutput($output, 'isEnabled and emailVerified must be boolean values.');
+
+            return Command::FAILURE;
+        }
 
         try {
-            $this->userApi->createUser($email, $password, $name, $isAdmin, emailVerified: true);
+            $this->userApi->createUser(
+                $email,
+                $password,
+                $name,
+                $isAdmin,
+                $isEnabled,
+                $emailVerified,
+            );
         } catch (EmailNotUnique $e) {
             $this->generateOutput($output, 'Could not create user: Email already in use');
 
@@ -83,5 +101,10 @@ class UserCreate extends Command
         $this->generateOutput($output, 'User created.');
 
         return Command::SUCCESS;
+    }
+
+    private function parseBoolean(mixed $value) : ?bool
+    {
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 }

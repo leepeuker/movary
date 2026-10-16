@@ -41,6 +41,7 @@ class AuthenticationControllerTest extends TestCase
             'password-change' => 'success',
             'password-reset' => 'success',
             'email-verification' => 'success',
+            'registration' => 'pending-approval-and-email-verification',
         ]);
         $this->emailSupportMock->method('isPasswordResetAvailable')->willReturn(true);
         $this->twigMock
@@ -50,6 +51,8 @@ class AuthenticationControllerTest extends TestCase
                 'redirect' => '/users/alice',
                 'passwordChanged' => true,
                 'emailVerified' => true,
+                'registrationPendingApproval' => true,
+                'registrationEmailVerificationRequired' => true,
                 'passwordResetAvailable' => true,
                 'registrationEnabled' => true,
                 'defaultEmail' => 'alice@example.com',
@@ -84,6 +87,8 @@ class AuthenticationControllerTest extends TestCase
                 'redirect' => false,
                 'passwordChanged' => false,
                 'emailVerified' => false,
+                'registrationPendingApproval' => false,
+                'registrationEmailVerificationRequired' => false,
                 'passwordResetAvailable' => false,
                 'registrationEnabled' => false,
                 'defaultEmail' => null,

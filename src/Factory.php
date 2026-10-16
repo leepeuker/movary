@@ -22,10 +22,13 @@ use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Domain\User\Service\EmailVerificationPolicy;
+use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\Service\PasswordPolicy;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\OpenApiController;
 use Movary\HttpController\Web\AuthenticationController;
+use Movary\HttpController\Web\CreateUserController;
 use Movary\HttpController\Web\JobController;
 use Movary\HttpController\Web\Mapper\JobScheduleRequestMapper;
 use Movary\HttpController\Web\Mapper\TmdbImageCacheJobRequestMapper;
@@ -359,6 +362,20 @@ class Factory
         );
     }
 
+    public static function createCreateUserController(ContainerInterface $container, Config $config) : CreateUserController
+    {
+        return new CreateUserController(
+            $container->get(Twig\Environment::class),
+            $container->get(Authentication::class),
+            $container->get(UserApi::class),
+            $container->get(FlashMessageService::class),
+            $container->get(ApplicationUrlService::class),
+            $container->get(EmailVerificationPolicy::class),
+            $container->get(EmailVerificationRequestService::class),
+            $config->getAsBool('REGISTRATION_DEFAULT_USER_ENABLED', false),
+        );
+    }
+
     public static function createLineFormatter(Config $config) : LineFormatter
     {
         $formatter = new LineFormatter(LineFormatter::SIMPLE_FORMAT, LineFormatter::SIMPLE_DATE);
@@ -385,9 +402,12 @@ class Factory
         return $logger;
     }
 
-    public static function createMiddlewareServerHasRegistrationEnabled(Config $config) : HttpController\Web\Middleware\ServerHasRegistrationEnabled
-    {
+    public static function createMiddlewareServerHasRegistrationEnabled(
+        ContainerInterface $container,
+        Config $config,
+    ) : HttpController\Web\Middleware\ServerHasRegistrationEnabled {
         return new HttpController\Web\Middleware\ServerHasRegistrationEnabled(
+            $container->get(UserApi::class),
             $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
