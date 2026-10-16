@@ -1,73 +1,107 @@
+# Manual installation
+
+A manual installation runs Movary directly on a server. The [Docker installation](docker.md) is recommended unless you need to manage the web server, PHP runtime, and background worker yourself.
+
 ## System requirements
 
-- PHP 8.5 (FPM) + extensions:
-    - php85-pdo
-    - php85-pdo_mysql
-    - php85-pdo_sqlite
-    - php85-mbstring
-    - php85-sqlite3
-    - php85-simplexml
-    - php85-pecl-imagick
-- git
-- [composer](https://getcomposer.org)
-- web server (e.g. nginx)
-- supervisor or cron for job processing
+- PHP 8.5 with PHP-FPM and these extensions:
+    - JSON
+    - mbstring
+    - PDO and either the MySQL or SQLite PDO driver
+    - SimpleXML
+    - ZIP
+    - zlib
+    - Imagick
+- Git
+- [Composer](https://getcomposer.org)
+- A web server such as nginx
+- Supervisor or cron for background job processing
 
-## Setup
+Package names vary by operating system. On Alpine Linux, the PHP packages include `php85-mbstring`, `php85-pdo`, `php85-pdo_mysql` or `php85-pdo_sqlite`, `php85-simplexml`, `php85-zip`, and `php85-pecl-imagick`; JSON and zlib are included in PHP itself.
 
-### Application
+## Required configuration
 
-1. Clone the repository
-```
-git clone https://github.com/leepeuker/movary.git .
-```
+Prepare these settings before starting Movary:
 
-2. Install composer dependencies (recommended to install after every update)
-```
-composer install --no-dev
-```
+| Setting | Requirement |
+|:--------|:------------|
+| `APPLICATION_SECRET` | Required. Generate it with `openssl rand -hex 32`, then keep it stable across restarts and identical across all Movary instances. |
+| `TMDB_API_KEY` | Required for movie metadata. Get a key from [TMDB](https://www.themoviedb.org/settings/api). It can also be configured in the Web UI after startup. |
+| `APPLICATION_URL` | Recommended. Set it to the public URL, such as `https://movary.example.com`. It is required for email verification and password resets. |
+| `TIMEZONE` | Optional. Defaults to `UTC`; use a [supported PHP timezone](https://www.php.net/manual/en/timezones.php). |
 
-3. Create (and edit) your environment configuration
-```
-cp .env.example .env
-```
+SQLite is used by default. MySQL additionally requires `DATABASE_MODE=mysql`, `DATABASE_MYSQL_HOST`, `DATABASE_MYSQL_NAME`, `DATABASE_MYSQL_USER`, and `DATABASE_MYSQL_PASSWORD`. See [Configuration](../configuration.md) for every available setting.
 
-4. Create necessary symlink between the storage and public/storage
-```
-php bin/console.php storage:link
-```
+!!! warning
 
-5. Run the database migrations
-```
-php bin/console.php database:migration:migrate
-```
+    Do not change `APPLICATION_SECRET` after setup. Movary uses it to derive cryptographic keys.
 
-!!! Info
+## Install Movary
 
-    Make sure that the permissions on the `storage` directory are correct and set to writable for the php (fpm) user
+The commands below use `/var/www/movary` as the installation directory. Adjust the path and service user for your server.
 
-### Web server
+1. Clone the repository:
 
-See `build/config/conf.d/default.conf` as an example nginx server configuration.
+    ```shell
+    git clone https://github.com/leepeuker/movary.git /var/www/movary
+    cd /var/www/movary
+    ```
 
-Use the `public` directory as the document root of the web server.
+2. Install the PHP dependencies:
 
-### Job processing
+    ```shell
+    composer install --no-dev
+    ```
 
-The `jobs:process` cli command has to be executed to keep the Movary data up to date and process all background jobs.
+3. Create the environment file and application secret:
 
-Here are two recommended ways.
+    ```shell
+    cp .env.example .env
+    openssl rand -hex 32
+    ```
 
-#### Supervisor
-Supervisor manages a process to execute the cli command contentiously.  
+    Edit `.env`, set the generated value as `APPLICATION_SECRET`, and add the other required configuration described above.
 
-Example config:
+4. Give the PHP-FPM user read and write access to `storage`. For example, when PHP-FPM runs as `www-data`:
 
-```
+    ```shell
+    chown -R www-data:www-data storage
+    ```
+
+5. Create the public storage link:
+
+    ```shell
+    php bin/console.php storage:link
+    ```
+
+6. Run the database migrations:
+
+    ```shell
+    php bin/console.php database:migration:migrate
+    ```
+
+Run `composer install --no-dev` and the migration command again after every update. Back up the database and `storage` directory before updating Movary.
+
+## Configure the web server
+
+Set Movary's `public` directory as the web server document root. The repository's `build/config/conf.d/default.conf` file provides an example nginx configuration.
+
+Use HTTPS for an internet-facing installation and set `APPLICATION_URL` to the matching public `https://` URL.
+
+## Job processing
+
+The `jobs:process` command keeps Movary data up to date and processes background work, including verification and password reset emails. Run it continuously with Supervisor or at least once per minute with cron.
+
+### Supervisor
+
+This example assumes Movary is installed in `/var/www/movary` and PHP-FPM runs as `www-data`:
+
+```ini
 [program:movary]
-command=/usr/local/bin/php /app/bin/console.php jobs:process
+command=/usr/local/bin/php /var/www/movary/bin/console.php jobs:process
+directory=/var/www/movary
 numprocs=1
-user=movary
+user=www-data
 autostart=true
 autorestart=true
 startsecs=1
@@ -78,11 +112,23 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 ```
 
-#### Cron
-Use a cronjob to process jobs in at least 1 minute intervals.
+Adjust the PHP binary, installation directory, and user for your server.
 
-Example config:
+### Cron
 
+Run the worker once per minute:
+
+```cron
+* * * * * cd /var/www/movary && /usr/local/bin/php bin/console.php jobs:process
 ```
-* * * * * usr/local/bin/php /app/bin/console.php jobs:process
+
+## Verify the installation
+
+Check the migration status and run the worker once:
+
+```shell
+php bin/console.php database:migration:status
+php bin/console.php jobs:process
 ```
+
+Open `APPLICATION_URL` in a browser and continue with [Getting started](../getting-started.md).
