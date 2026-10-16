@@ -36,7 +36,11 @@ nav:
       - Docker (recommended): install/docker.md
       - Manual: install/manual.md
   - Getting started: 'getting-started.md'
-  - Configuration: 'configuration.md'
+  - Administration:
+      - Configuration: 'configuration.md'
+      - User management: 'user-management.md'
+      - Email operations: 'email-operations.md'
+      - Backup and restore: 'backup-and-restore.md'
   - API authentication: 'api-authentication.md'
   - Features:
       - TMDB Data: features/tmdb-data.md
@@ -51,7 +55,6 @@ nav:
       - Netflix: features/netflix.md
       - Radarr: features/radarr.md
       - Mastodon: features/mastodon.md
-  - Backup and restore: 'backup-and-restore.md'
   - Development:
       - Setup: development/setup.md
       - Directory structure: development/file-structure.md
