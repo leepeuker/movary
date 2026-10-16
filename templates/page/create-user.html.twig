@@ -23,7 +23,10 @@
                     This first account can manage users and server settings.
                 </p>
             {% else %}
-                <h2 class="h4 mb-4">Create your account</h2>
+                <h2 class="h4 {{ registrationRequiresApproval ? 'mb-2' : 'mb-4' }}">Create your account</h2>
+                {% if registrationRequiresApproval == true %}
+                    <p class="form-text mb-3">Administrator approval is required.</p>
+                {% endif %}
             {% endif %}
             <div class="account-field">
                 <div class="form-floating">
@@ -98,9 +101,6 @@
             <button class="w-100 btn btn-lg btn-primary" type="submit">
                 {{ isInitialAdmin ? 'Create administrator' : 'Create account' }}
             </button>
-            {% if registrationRequiresApproval == true %}
-                <p class="form-text mt-1 mb-0">Your account will require administrator approval.</p>
-            {% endif %}
             {% if isInitialAdmin == false %}
                 <p class="small text-body-secondary mt-3 mb-0">
                     Already have an account? <a href="{{ applicationUrl }}/login">Sign in</a>
