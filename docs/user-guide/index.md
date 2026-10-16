@@ -2,6 +2,11 @@
 
 The User guide explains how to use and manage your own Movary account. Open **Settings** from the navigation menu to find account preferences, integrations, and application options.
 
+## Using Movary
+
+- [Tracking movies, ratings, and watchlists](tracking-movies.md) explains how to record and manage your personal movie data.
+- [Dashboard and statistics](dashboard-and-statistics.md) explains the activity overview and dashboard customization.
+
 ## Account settings
 
 The **Account** menu contains settings that apply only to your account:

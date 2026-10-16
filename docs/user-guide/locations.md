@@ -29,7 +29,7 @@ The settings button beside the location field opens the location-management page
 
 An individual play displayed on a movie page shows that a location is assigned, but does not show the location name to other viewers.
 
-The **Top Locations** dashboard row does display location names and play totals. The **Last Plays Cinema** row displays movies watched at locations marked as cinemas. Anyone permitted to view your dashboard by your [privacy setting](privacy-and-sharing.md) can see enabled dashboard rows. You can hide either row under **Settings → Account → Dashboard**.
+The **Top Locations** dashboard row does display location names and play totals. The **Last Plays Cinema** row displays movies watched at locations marked as cinemas. Anyone permitted to view your dashboard by your [privacy setting](privacy-and-sharing.md) can see enabled dashboard rows. You can hide either row under **Settings → Account → Dashboard**; see [Dashboard and statistics](dashboard-and-statistics.md#customize-the-dashboard).
 
 ## Disable locations
 

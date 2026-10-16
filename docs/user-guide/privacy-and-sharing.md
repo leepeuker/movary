@@ -18,7 +18,7 @@ The Admin role does not override **Not visible**; another administrator cannot v
 
 The privacy check applies to pages below `/users/<username>/`, including:
 
-- Your dashboard and statistics.
+- Your [dashboard and statistics](dashboard-and-statistics.md).
 - History and watchlist pages.
 - Movie, actor, and director lists.
 - Movie and person detail pages shown in your user context.

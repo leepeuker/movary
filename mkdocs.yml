@@ -38,14 +38,16 @@ nav:
   - Getting started: 'getting-started.md'
   - Administration:
       - Configuration: 'configuration.md'
-      - User management: 'user-management.md'
-      - Email operations: 'email-operations.md'
-      - Backup and restore: 'backup-and-restore.md'
       - Metadata:
           - TMDB data: features/tmdb-data.md
           - IMDb ratings: features/imdb-rating.md
+      - User management: 'user-management.md'
+      - Email operations: 'email-operations.md'
+      - Backup and restore: 'backup-and-restore.md'
   - User guide:
       - Overview: 'user-guide/index.md'
+      - Tracking movies, ratings, and watchlists: 'user-guide/tracking-movies.md'
+      - Dashboard and statistics: 'user-guide/dashboard-and-statistics.md'
       - Account and security: 'user-guide/account-and-security.md'
       - Privacy and sharing: 'user-guide/privacy-and-sharing.md'
       - Locations: 'user-guide/locations.md'
