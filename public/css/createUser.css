@@ -12,8 +12,20 @@ body {
 }
 
 .form-signin {
-    max-width: 330px;
+    max-width: 390px;
     padding: 15px;
+}
+
+.account-field {
+    margin-bottom: .75rem;
+}
+
+.account-flow-label {
+    color: var(--bs-primary);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
 }
 
 @media (min-width: 768px) {

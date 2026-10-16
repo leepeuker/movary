@@ -85,12 +85,9 @@
                 {% endif %}
                 <button class="w-100 btn btn-lg btn-primary" type="button" onclick="submitCredentials()">Sign in</button>
                 {% if registrationEnabled == true %}
-                    <div class="d-flex align-items-center gap-3 my-3 text-body-secondary" role="separator">
-                        <hr class="flex-grow-1 m-0">
-                        <span class="small">or</span>
-                        <hr class="flex-grow-1 m-0">
-                    </div>
-                    <a class="w-100 btn btn-outline-primary" href="{{ applicationUrl }}/create-user">Create account</a>
+                    <p class="small mt-3 mb-0">
+                        <a href="{{ applicationUrl }}/create-user">Create account</a>
+                    </p>
                 {% endif %}
             </div>
             <div id="totpForm" class="d-none">

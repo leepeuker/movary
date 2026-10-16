@@ -238,6 +238,7 @@ class CreateUserControllerTest extends TestCase
     {
         $messageConsumed = false;
         $this->userApiMock->method('hasUsers')->willReturn(false);
+        $this->emailVerificationPolicyMock->expects(self::never())->method('isRequired');
         $this->flashMessageServiceMock
             ->expects(self::exactly(16))
             ->method('consume')
@@ -257,7 +258,9 @@ class CreateUserControllerTest extends TestCase
             ->method('render')
             ->willReturnCallback(static function (string $template, array $data) use ($variable, &$renderCount) : string {
                 self::assertSame('page/create-user.html.twig', $template);
-                self::assertSame('Create initial admin user', $data['subtitle']);
+                self::assertTrue($data['isInitialAdmin']);
+                self::assertFalse($data['registrationRequiresApproval']);
+                self::assertFalse($data['registrationRequiresEmailVerification']);
                 self::assertSame($renderCount === 0, $data[$variable]);
 
                 foreach (self::getRenderedVariables() as $renderedVariable) {
@@ -276,6 +279,50 @@ class CreateUserControllerTest extends TestCase
 
         self::assertSame('create user', $firstResponse->getBody());
         self::assertSame('create user', $secondResponse->getBody());
+    }
+
+    #[DataProvider('providePublicRegistrationPageConfiguration')]
+    public function testRenderPageDescribesPublicRegistrationRequirements(
+        bool $registeredUsersEnabled,
+        bool $emailVerificationRequired,
+    ) : void {
+        $this->subject = $this->createSubject($registeredUsersEnabled);
+        $this->userApiMock->method('hasUsers')->willReturn(true);
+        $this->emailVerificationPolicyMock
+            ->expects(self::once())
+            ->method('isRequired')
+            ->willReturn($emailVerificationRequired);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/create-user.html.twig',
+                self::callback(static function (array $data) use (
+                    $registeredUsersEnabled,
+                    $emailVerificationRequired,
+                ) : bool {
+                    self::assertFalse($data['isInitialAdmin']);
+                    self::assertSame(!$registeredUsersEnabled, $data['registrationRequiresApproval']);
+                    self::assertSame(
+                        $emailVerificationRequired,
+                        $data['registrationRequiresEmailVerification'],
+                    );
+
+                    return true;
+                }),
+            )
+            ->willReturn('create user');
+
+        $response = $this->subject->renderPage();
+
+        self::assertSame('create user', $response->getBody());
+    }
+
+    /** @return iterable<string, array{bool, bool}> */
+    public static function providePublicRegistrationPageConfiguration() : iterable
+    {
+        yield 'approval and verification required' => [false, true];
+        yield 'account immediately available' => [true, false];
     }
 
     /** @return iterable<string, array{Throwable, FlashMessage}> */

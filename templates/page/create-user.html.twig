@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Create user
+    {{ isInitialAdmin ? 'Set up Movary' : 'Create account' }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -15,23 +15,45 @@
     <main role="main" class="form-signin w-100 m-auto text-center">
         <form action="{{ applicationUrl }}/create-user" method="post" enctype="multipart/form-data">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-            <h1 class="">Movary</h1>
-            <p>{{ subtitle }}</p>
-            <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="email" name="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required>
-                <label for="floatingEmail">Email address <span class="text-danger">*</span></label>
+            <h1 class="mb-2">Movary</h1>
+            {% if isInitialAdmin == true %}
+                <p class="account-flow-label mb-2">Initial setup</p>
+                <h2 class="h4 mb-2">Create the administrator</h2>
+                <p class="text-body-secondary mb-4">
+                    This first account can manage users and server settings.
+                </p>
+            {% else %}
+                <h2 class="h4 mb-4">Create your account</h2>
+            {% endif %}
+            <div class="account-field">
+                <div class="form-floating">
+                    <input type="email" name="email" class="form-control" id="floatingEmail" placeholder="name@example.com" aria-describedby="emailHelp" required>
+                    <label for="floatingEmail">Email address <span class="text-danger">*</span></label>
+                </div>
+                <div class="form-text text-start" id="emailHelp">
+                    {{ registrationRequiresEmailVerification ? 'A valid email and verification are required.' : 'A valid email is required.' }}
+                </div>
             </div>
-            <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="text" name="name" class="form-control" id="floatingName" placeholder="name" required>
-                <label for="floatingName">Username <span class="text-danger">*</span></label>
+            <div class="account-field">
+                <div class="form-floating">
+                    <input type="text" name="name" class="form-control" id="floatingName" placeholder="name" aria-describedby="usernameHelp" required>
+                    <label for="floatingName">Username <span class="text-danger">*</span></label>
+                </div>
+                <div class="form-text text-start" id="usernameHelp">Letters and numbers only.</div>
             </div>
-            <div class="form-floating" style="margin-bottom: 0.3rem">
-                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="{{ passwordMinimumLength }}" required>
-                <label for="floatingPassword">Password <span class="text-danger">*</span></label>
+            <div class="account-field">
+                <div class="form-floating">
+                    <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password" minlength="{{ passwordMinimumLength }}" aria-describedby="passwordHelp" required>
+                    <label for="floatingPassword">Password <span class="text-danger">*</span></label>
+                </div>
+                <div class="form-text text-start" id="passwordHelp">At least {{ passwordMinimumLength }} characters.</div>
             </div>
-            <div class="form-floating" style="margin-bottom: 1rem">
-                <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Repeat password" minlength="{{ passwordMinimumLength }}" required>
-                <label for="floatingRepeatPassword">Repeat password <span class="text-danger">*</span></label>
+            <div class="account-field">
+                <div class="form-floating">
+                    <input type="password" name="repeatPassword" class="form-control" id="floatingRepeatPassword" placeholder="Confirm password" minlength="{{ passwordMinimumLength }}" aria-describedby="confirmPasswordHelp" required>
+                    <label for="floatingRepeatPassword">Confirm password <span class="text-danger">*</span></label>
+                </div>
+                <div class="form-text text-start" id="confirmPasswordHelp">Enter the same password again.</div>
             </div>
             {% if errorPasswordNotEqual == true %}
                 <div class="alert alert-danger" role="alert">
@@ -73,7 +95,17 @@
                     Please fill out all fields
                 </div>
             {% endif %}
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Create</button>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">
+                {{ isInitialAdmin ? 'Create administrator' : 'Create account' }}
+            </button>
+            {% if registrationRequiresApproval == true %}
+                <p class="form-text mt-1 mb-0">Your account will require administrator approval.</p>
+            {% endif %}
+            {% if isInitialAdmin == false %}
+                <p class="small text-body-secondary mt-3 mb-0">
+                    Already have an account? <a href="{{ applicationUrl }}/login">Sign in</a>
+                </p>
+            {% endif %}
         </form>
     </main>
 {% endblock %}

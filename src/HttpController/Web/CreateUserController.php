@@ -142,11 +142,15 @@ class CreateUserController
     public function renderPage() : Response
     {
         $hasUsers = $this->userApi->hasUsers();
+        $isInitialAdmin = $hasUsers === false;
 
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/create-user.html.twig', [
-                'subtitle' => $hasUsers === false ? 'Create initial admin user' : 'Create new user',
+                'isInitialAdmin' => $isInitialAdmin,
+                'registrationRequiresApproval' => $isInitialAdmin === false && $this->registeredUsersEnabled === false,
+                'registrationRequiresEmailVerification' => $isInitialAdmin === false
+                    && $this->emailVerificationPolicy->isRequired(),
                 'errorPasswordTooShort' => $this->flashMessageService->consume(
                     FlashMessage::CREATE_USER_PASSWORD_TOO_SHORT,
                 ),
