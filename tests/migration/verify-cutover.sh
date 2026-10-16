@@ -135,6 +135,43 @@ assert_equal() {
     fi
 }
 
+assert_contains() {
+    local expected=$1
+    local actual=$2
+    local message=$3
+
+    if [[ "$actual" != *"$expected"* ]]; then
+        echo "$message: expected output to contain '$expected'" >&2
+        exit 1
+    fi
+}
+
+run_entrypoint_with_auto_migration_setting() {
+    local value=$1
+    local database_file=$2
+
+    docker run --rm \
+        --env "APPLICATION_SECRET=$application_secret" \
+        --env DATABASE_MODE=sqlite \
+        --env "DATABASE_SQLITE=../audit/$database_file" \
+        --env "DATABASE_DISABLE_AUTO_MIGRATION=$value" \
+        --volume "$audit_directory:/audit" \
+        "$image_name" true 2>&1
+}
+
+assert_contains 'Automatic database migration is enabled' \
+    "$(run_entrypoint_with_auto_migration_setting 0 entrypoint-zero.sqlite)" \
+    'DATABASE_DISABLE_AUTO_MIGRATION=0 did not enable automatic migrations'
+assert_contains 'Automatic database migration is enabled' \
+    "$(run_entrypoint_with_auto_migration_setting false entrypoint-false.sqlite)" \
+    'DATABASE_DISABLE_AUTO_MIGRATION=false did not enable automatic migrations'
+assert_contains 'Automatic database migration is disabled' \
+    "$(run_entrypoint_with_auto_migration_setting 1 entrypoint-one.sqlite)" \
+    'DATABASE_DISABLE_AUTO_MIGRATION=1 did not disable automatic migrations'
+assert_contains 'Automatic database migration is disabled' \
+    "$(run_entrypoint_with_auto_migration_setting true entrypoint-true.sqlite)" \
+    'DATABASE_DISABLE_AUTO_MIGRATION=true did not disable automatic migrations'
+
 run_sqlite_migrations before.sqlite --target 20260927143000
 cp "$audit_directory/before.sqlite" "$audit_directory/release-0.73.1.sqlite"
 cp "$audit_directory/before.sqlite" "$audit_directory/null-genre.sqlite"

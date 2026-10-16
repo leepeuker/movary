@@ -22,7 +22,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-if [ "$DATABASE_DISABLE_AUTO_MIGRATION" != "true" ] && [ "$DATABASE_DISABLE_AUTO_MIGRATION" != "0" ]; then
+if [ "${DATABASE_DISABLE_AUTO_MIGRATION:-0}" != "true" ] && [ "${DATABASE_DISABLE_AUTO_MIGRATION:-0}" != "1" ]; then
   RETRY_COUNT=0
   MAX_RETRIES=5
 
