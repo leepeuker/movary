@@ -23,6 +23,8 @@ Open **Settings** after signing in:
 - **Account** contains personal preferences, security, integrations, and data-management options.
 - **Server** contains installation-wide settings, user management, email configuration, and background jobs. These pages require the Admin role.
 
+See the [User guide](user-guide/index.md) for an overview of the account settings available to every user.
+
 Environment variables override values stored through the web UI. See [Configuration](configuration.md) for the complete reference.
 
 ## Configure email (optional)
