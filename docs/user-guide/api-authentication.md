@@ -16,6 +16,8 @@ Select a token row under **Settings → Account → API tokens** to review its d
 
 Revocation takes effect immediately. Any client using a revoked token must be configured with a newly created token before it can access the API again.
 
+A normal password change leaves personal API tokens active. A password reset made through **Forgot password?** revokes them as a security precaution. See [Account and security](account-and-security.md) for the complete password workflows.
+
 ## Authentication headers
 
 Bearer authentication is supported:

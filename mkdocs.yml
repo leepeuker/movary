@@ -38,6 +38,7 @@ nav:
   - Getting started: 'getting-started.md'
   - User guide:
       - Overview: 'user-guide/index.md'
+      - Account and security: 'user-guide/account-and-security.md'
       - API authentication: 'user-guide/api-authentication.md'
   - Administration:
       - Configuration: 'configuration.md'
