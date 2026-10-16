@@ -4,7 +4,9 @@ namespace Tests\Unit\Movary\HttpController\Web\Middleware;
 
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Middleware\ServerHasRegistrationEnabled;
+use Movary\Service\ApplicationUrlService;
 use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\RelativeUrl;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,7 +24,13 @@ class ServerHasRegistrationEnabledTest extends TestCase
     ) : void {
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('hasUsers')->willReturn($hasUsers);
-        $subject = new ServerHasRegistrationEnabled($userApi, $registrationEnabled);
+        $urlService = $this->createMock(ApplicationUrlService::class);
+        $urlService
+            ->expects($requestAllowed ? self::never() : self::once())
+            ->method('createApplicationUrl')
+            ->with(self::callback(static fn(RelativeUrl $url) => (string)$url === '/login'))
+            ->willReturn('/movary/login');
+        $subject = new ServerHasRegistrationEnabled($userApi, $urlService, $registrationEnabled);
 
         $response = $subject($this->createStub(Request::class));
 
@@ -33,7 +41,8 @@ class ServerHasRegistrationEnabledTest extends TestCase
         }
 
         self::assertNotNull($response);
-        self::assertSame(403, $response->getStatusCode()->getCode());
+        self::assertSame(303, $response->getStatusCode()->getCode());
+        self::assertSame('Location: /movary/login', (string)$response->getHeaders()[0]);
     }
 
     /** @return iterable<string, array{bool, bool, bool}> */

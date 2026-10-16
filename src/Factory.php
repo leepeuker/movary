@@ -408,6 +408,7 @@ class Factory
     ) : HttpController\Web\Middleware\ServerHasRegistrationEnabled {
         return new HttpController\Web\Middleware\ServerHasRegistrationEnabled(
             $container->get(UserApi::class),
+            $container->get(ApplicationUrlService::class),
             $config->getAsBool('ENABLE_REGISTRATION', false),
         );
     }
