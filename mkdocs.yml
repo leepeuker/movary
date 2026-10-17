@@ -44,6 +44,7 @@ nav:
           - IMDb ratings: features/imdb-rating.md
       - User management: 'user-management.md'
       - Email operations: 'email-operations.md'
+      - Job processing: 'job-processing.md'
       - Backup and restore: 'backup-and-restore.md'
   - User guide:
       - Overview: 'user-guide/index.md'
@@ -68,6 +69,6 @@ nav:
       - Setup: development/setup.md
       - Directory structure: development/file-structure.md
       - How does the backend work?: development/structure.md
-      - Job processing: development/job-processing.md
+      - Job processing internals: development/job-processing.md
       - Database migrations: development/database-migrations.md
   - FAQ: 'faq.md'

@@ -21,7 +21,7 @@ Leaving both the record limit and local IDs empty creates an unbounded job for e
 
 Open **Settings → Server → Job Schedules** to run the same synchronization automatically. Select a job type, enter a five-field cron expression evaluated in UTC, configure its filters, and create the schedule.
 
-The background worker must be running for schedules to create jobs. Missed occurrences do not create catch-up jobs, and an occurrence is skipped when a job of the same synchronization type is already waiting or in progress. See [Job processing](../development/job-processing.md) for worker setup, scheduling behavior, and troubleshooting.
+The background worker must be running for schedules to create jobs. Missed occurrences do not create catch-up jobs, and an occurrence is skipped when a job of the same synchronization type is already waiting or in progress. See [Job processing](../job-processing.md) for worker setup, scheduling behavior, and troubleshooting.
 
 Avoid every-minute metadata schedules because they can create sustained TMDB API load.
 

@@ -15,7 +15,7 @@ Open **Settings → Server** to manage installation-wide settings. Environment v
 - [Email operations](email-operations.md) covers SMTP configuration, verification messages, password resets, and delivery troubleshooting.
 - [TMDB data](features/tmdb-data.md) explains metadata synchronization and the optional local image cache.
 - [IMDb ratings](features/imdb-rating.md) explains how to update public IMDb ratings for local movies.
-- [Job processing](development/job-processing.md) explains the background worker, recurring schedules, queue statuses, and failed-job troubleshooting.
+- [Job processing](job-processing.md) explains the background worker, recurring schedules, queue statuses, and failed-job troubleshooting.
 - [Backup and restore](backup-and-restore.md) describes what a complete backup contains and how to verify a restored installation.
 
 ## Installation methods
