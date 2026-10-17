@@ -1,17 +1,18 @@
-## Webhook (Scrobbler)
+# Kodi
 
-### Description
+The Kodi integration automatically records completed movie plays in Movary through the official [Movary Kodi add-on](https://github.com/leepeuker/movary-kodi-addon).
 
-Automatically add new [Kodi](https://kodi.tv/) movie plays to Movary.
+## Configure play scrobbling
 
+1. Open **Settings → Integrations → Kodi** in Movary.
+2. Select **Regenerate url** to create a personal webhook URL.
+3. Enable **Scrobble completed watches** and select **Save**.
+4. Install the Movary add-on from a ZIP as described in its repository.
+5. Open **Settings → My add-ons → Services → Movary → Configure** in Kodi.
+6. Enter the generated webhook URL and enable the add-on.
 
-!!! Info
+The add-on reports a movie when playback finishes, or when playback is stopped after at least 90 percent of its runtime and at least 10 seconds. The Kodi movie must have a TMDB identifier so Movary can match or create it.
 
-    Only Kodi movies with tmdb ids can be logged to Movary.
+The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.
 
-### Instruction
-
-- Generate a webhook url in Movary for your user on the Kodi integration settings page (`/settings/integrations/kodi`)
-- Install the [Movary Addon](https://github.com/leepeuker/movary-kodi-addon) in Kodi
-- Enter the generated Movary webhook url in the Kodi Addon settings
-- Enable the Addon in the Kodi Addon settings
+Keep the webhook URL private because it is connected to your account. Regenerating or deleting it immediately invalidates the previous URL, which must then be replaced in Kodi.

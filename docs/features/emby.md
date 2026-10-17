@@ -1,17 +1,16 @@
-## Webhook (Scrobbler)
+# Emby
 
-### Description
+The Emby integration automatically records completed movie plays in Movary through an Emby webhook. Emby webhooks require an active [Emby Premiere](https://emby.media/support/articles/Webhooks.html) license on the server.
 
-Automatically add new [Emby](https://emby.media/) movie plays to Movary. This uses the Emby webhook feature.
+## Configure play scrobbling
 
-!!! Info
+1. Open **Settings → Integrations → Emby** in Movary.
+2. Select **Regenerate url** to create a personal webhook URL.
+3. Enable **Scrobble completed watches** and select **Save**.
+4. Add the generated URL as a webhook in the Emby server and configure it for playback-stop events for the matching user.
 
-    To use webhooks in Emby an active [Emby Premiere](https://emby.media/premiere.html) license is required.
+Movary records only movie playback-stop events that Emby reports as played to completion. The movie must have a TMDB identifier so Movary can match or create it.
 
-### Instruction
-- Generate a webhook url in Movary for your user on the Emby integration settings page (`/settings/integrations/emby`)
-- Add the generated url as a [webhook to your Emby server](https://emby.media/support/articles/Webhooks.html) to start scrobbling
+The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.
 
-!!! tip
-
-    Keep your webhook url private to prevent abuse.
+Keep the webhook URL private because it is connected to your account. Regenerating or deleting it immediately invalidates the previous URL, which must then be replaced or removed in Emby.
