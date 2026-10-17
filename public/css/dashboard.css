@@ -15,11 +15,6 @@
     padding: 1rem 0.4rem 0;
 }
 
-.dashboard-poster-row .poster-grid {
-    --bs-gutter-x: 0.75rem;
-    --bs-gutter-y: 0.75rem;
-}
-
 .dashboard-person-card-header {
     padding: 0.2rem;
 }
@@ -33,9 +28,21 @@
 }
 
 .dashboard-row-more {
-    width: 100%;
-    margin-bottom: 1rem;
-    border-color: lightgrey;
+    display: block;
+    margin: 0.75rem 0;
+    padding: 0.4rem;
+    background: rgba(var(--bs-secondary-bg-rgb), 0.4);
+    border-radius: var(--bs-border-radius-sm);
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.dashboard-row-more:hover,
+.dashboard-row-more:focus-visible {
+    background: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
 }
 
 .activeItemButton {
