@@ -3,8 +3,8 @@
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
     {{ rowItemToggle.create(dashboardRow) }}
 
-    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
-        <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6">
+    <li class="dashboard-poster-row list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}">
+        <div class="poster-grid row row-cols-3 row-cols-lg-6">
             {% for lastPlay in lastPlays %}
                 <div class="col">
                     <div class="card h-100">
@@ -20,12 +20,12 @@
                             {% endif %}
                         </a>
                         <div class="poster-footer card-footer">
-                            <small class="text-muted" style="font-size: 0.8rem;">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>
+                            <small class="dashboard-play-date text-muted">{{ lastPlay.watched_at|date(dateFormatPhp) }}</small>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm mt-3" href="{{ applicationUrl }}/users/{{ routeUsername }}/history" style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+        <a class="dashboard-row-more btn btn-outline-secondary btn-sm mt-3" href="{{ applicationUrl }}/users/{{ routeUsername }}/history">more</a>
     </li>
 {% endmacro %}

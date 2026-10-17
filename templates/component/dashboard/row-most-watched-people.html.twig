@@ -1,0 +1,26 @@
+{% macro create(dashboardRow, people, routeUsername, morePath) %}
+
+    {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
+    {{ rowItemToggle.create(dashboardRow) }}
+
+    <li class="dashboard-poster-row list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}">
+        <div class="poster-grid row row-cols-3 row-cols-lg-6">
+            {% for person in people %}
+                <div class="col">
+                    <div class="card h-100 position-relative">
+                        <div class="dashboard-person-card-header card-header text-truncate">
+                            <small class="dashboard-card-text text-muted">{{ person.name }}</small>
+                        </div>
+                        <a class="poster-link d-block" href="{{ applicationUrl }}/users/{{ routeUsername }}/persons/{{ person.id }}-{{ person.name|slugify }}">
+                            <img class="mw-100" src="{{ person.poster_path }}" alt="{{ person.name }} Poster">
+                        </a>
+                        <div class="poster-footer card-footer">
+                            <small class="dashboard-card-text text-muted">{{ person.uniqueCount }}x</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <a class="dashboard-row-more btn btn-outline-secondary btn-sm mt-3" href="{{ applicationUrl }}/users/{{ routeUsername }}/{{ morePath }}">more</a>
+    </li>
+{% endmacro %}

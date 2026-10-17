@@ -11,6 +11,33 @@
     font-size: 1.2rem;
 }
 
+.dashboard-poster-row {
+    padding: 1rem 0.4rem 0;
+}
+
+.dashboard-poster-row .poster-grid {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+}
+
+.dashboard-person-card-header {
+    padding: 0.2rem;
+}
+
+.dashboard-card-text {
+    font-size: 0.9rem;
+}
+
+.dashboard-play-date {
+    font-size: 0.8rem;
+}
+
+.dashboard-row-more {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-color: lightgrey;
+}
+
 .activeItemButton {
     cursor: pointer;
 }
