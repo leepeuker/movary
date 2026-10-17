@@ -11,6 +11,40 @@
     font-size: 1.2rem;
 }
 
+.dashboard-poster-row {
+    padding: 1rem 0.4rem 0;
+}
+
+.dashboard-person-card-header {
+    padding: 0.2rem;
+}
+
+.dashboard-card-text {
+    font-size: 0.9rem;
+}
+
+.dashboard-play-date {
+    font-size: 0.8rem;
+}
+
+.dashboard-row-more {
+    display: block;
+    margin: 0.75rem 0;
+    padding: 0.4rem;
+    background: rgba(var(--bs-secondary-bg-rgb), 0.4);
+    border-radius: var(--bs-border-radius-sm);
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.dashboard-row-more:hover,
+.dashboard-row-more:focus-visible {
+    background: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+}
+
 .activeItemButton {
     cursor: pointer;
 }

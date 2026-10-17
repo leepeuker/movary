@@ -2,14 +2,14 @@
     {% import 'component/dashboard/row-last-plays.html.twig' as dashboardLastPlays %}
     {{ dashboardLastPlays.create(dashboardRow, lastPlays, routeUsername) }}
 {% elseif dashboardRow.isMostWatchedActors %}
-    {% import 'component/dashboard/row-most-watched-actors.html.twig' as dashboardMostWatchedActors %}
-    {{ dashboardMostWatchedActors.create(dashboardRow, mostWatchedActors, routeUsername) }}
+    {% import 'component/dashboard/row-most-watched-people.html.twig' as dashboardMostWatchedPeople %}
+    {{ dashboardMostWatchedPeople.create(dashboardRow, mostWatchedActors, routeUsername, 'actors?s=&sb=uniqueAppearances&so=desc&ge=2&pp=24') }}
 {% elseif dashboardRow.isMostWatchedActresses %}
-    {% import 'component/dashboard/row-most-watched-actresses.html.twig' as dashboardMostWatchedActresses %}
-    {{ dashboardMostWatchedActresses.create(dashboardRow, mostWatchedActresses, routeUsername) }}
+    {% import 'component/dashboard/row-most-watched-people.html.twig' as dashboardMostWatchedPeople %}
+    {{ dashboardMostWatchedPeople.create(dashboardRow, mostWatchedActresses, routeUsername, 'actors?s=&sb=uniqueAppearances&so=desc&ge=1&pp=24') }}
 {% elseif dashboardRow.isMostWatchedDirectors %}
-    {% import 'component/dashboard/row-most-watched-directors.html.twig' as dashboardMostWatchedDirectors %}
-    {{ dashboardMostWatchedDirectors.create(dashboardRow, mostWatchedDirectors, routeUsername) }}
+    {% import 'component/dashboard/row-most-watched-people.html.twig' as dashboardMostWatchedPeople %}
+    {{ dashboardMostWatchedPeople.create(dashboardRow, mostWatchedDirectors, routeUsername, 'directors') }}
 {% elseif dashboardRow.isMostWatchedGenres %}
     {% import 'component/dashboard/row-most-watched-genres.html.twig' as dashboardMostWatchedGenres %}
     {{ dashboardMostWatchedGenres.create(dashboardRow, mostWatchedGenres, routeUsername) }}
@@ -29,8 +29,8 @@
     {% import 'component/dashboard/row-top-locations.html.twig' as dashboardTopLocations %}
     {{ dashboardTopLocations.create(dashboardRow, topLocations, routeUsername) }}
 {% elseif dashboardRow.isLastPlaysCinema %}
-    {% import 'component/dashboard/row-last-plays-cinema.html.twig' as dashboardLastPlaysCinema %}
-    {{ dashboardLastPlaysCinema.create(dashboardRow, lastPlaysCinema, routeUsername) }}
+    {% import 'component/dashboard/row-last-plays.html.twig' as dashboardLastPlays %}
+    {{ dashboardLastPlays.create(dashboardRow, lastPlaysCinema, routeUsername) }}
 {% elseif dashboardRow.isMostWatchedProductionCountries %}
     {% import 'component/dashboard/row-most-watched-production-countries.html.twig' as dashboardMostWatchedProductionCountries %}
     {{ dashboardMostWatchedProductionCountries.create(dashboardRow, mostWatchedProductionCountries, routeUsername) }}

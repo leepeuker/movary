@@ -3,25 +3,23 @@
     {% import 'component/dashboard/row-item-toggle.html.twig' as rowItemToggle %}
     {{ rowItemToggle.create(dashboardRow) }}
 
-    <li class="list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}" style="padding: 1rem 0.4rem 0 0.4rem;">
-        <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6">
+    <li class="dashboard-poster-row list-group-item {{ dashboardRow.isExtended ? 'activeItem' : 'inactiveItem' }}">
+        <div class="poster-grid row row-cols-3 row-cols-lg-6">
             {% for watchlistItem in watchlistItems %}
                 <div class="col">
                     <div class="card h-100 position-relative">
-                        <input id="watchlistTitle_{{ watchlistItem.id }}" value="{{ watchlistItem.title|movie_title(watchlistItem.original_title) }}" type="hidden">
                         <a class="poster-link d-block h-100" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ watchlistItem.id }}-{{ watchlistItem.title|slugify }}">
                             <img src="{{ watchlistItem.poster_path }}"
                                  class="card-img-top object-fit-cover h-100"
                                  alt="{{ watchlistItem.title|movie_title(watchlistItem.original_title) }} Poster">
                         </a>
                         <div class="poster-footer card-footer">
-                            <small class="text-muted" style="font-size: 0.9rem;">{{ watchlistItem.created_at|date(dateFormatPhp) }}</small>
+                            <small class="dashboard-card-text text-muted">{{ watchlistItem.created_at|date(dateFormatPhp) }}</small>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
-        <a class="btn btn-outline-secondary btn-sm mt-3" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist"
-           style="margin-bottom: 1rem;width: 100%;border-color: lightgrey">more</a>
+        <a class="dashboard-row-more" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist">View all</a>
     </li>
 {% endmacro %}
