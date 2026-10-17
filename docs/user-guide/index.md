@@ -12,7 +12,7 @@ The User guide explains how to use and manage your own Movary account. Open **Se
 
 The **Account** menu contains settings that apply only to your account:
 
-- **General** controls your username, privacy, date format, movie-title display, and other preferences.
+- **General** controls your username, privacy, date format, movie-title display, and other preferences. See [Preferences](preferences.md).
 - **Security** controls your sign-in email, password, and two-factor authentication. See [Account and security](account-and-security.md).
 - **API tokens** provides credentials for trusted API clients and automation. See [API authentication](api-authentication.md).
 - **Locations** manages the places where you watch movies. See [Locations](locations.md).
