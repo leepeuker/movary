@@ -1,4 +1,4 @@
-## Introduction
+# Configuration
 
 There are two main ways how to set your server configuration:
 
@@ -19,7 +19,7 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 |:--------------------------------------------|:-------------:|:-------------------------------------------------------------------------------|:------:|
 | `TMDB_API_KEY`                              |       -       | **Required** (get key [here](https://www.themoviedb.org/settings/api))         |  yes   |
 | `APPLICATION_SECRET`                        |       -       | **Required**, stable application secret; 64 hexadecimal characters              |        |
-| `APPLICATION_URL`                           |       -       | Public base url of the application (e.g. `htttp://localhost`)                  |  yes   |
+| `APPLICATION_URL`                           |       -       | Public base url of the application (e.g. `http://localhost`)                   |  yes   |
 | `APPLICATION_NAME`                          |   `Movary`    | Application name, displayed e.g. as brand name in the navbar                   |  yes   |
 | `TMDB_ENABLE_IMAGE_CACHING`                 |      `0`      | More info [here](features/tmdb-data.md#image-cache)                            |        |
 | `ENABLE_REGISTRATION`                       |      `0`      | Enables public user registration                                               |        |
