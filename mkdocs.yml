@@ -37,6 +37,7 @@ nav:
       - Manual: install/manual.md
   - Getting started: 'getting-started.md'
   - Administration:
+      - Overview: 'administration.md'
       - Configuration: 'configuration.md'
       - Metadata:
           - TMDB data: features/tmdb-data.md

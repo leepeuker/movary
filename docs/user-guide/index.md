@@ -24,4 +24,4 @@ The **Integrations** menu connects Movary to services such as [Plex](../features
 
 ## Administrator settings
 
-Users with the Admin role also see the **Server** menu. These settings affect the entire Movary installation and are documented under [Administration](../configuration.md). Regular users do not need access to server configuration to manage their own account.
+Users with the Admin role also see the **Server** menu. These settings affect the entire Movary installation and are documented under [Administration](../administration.md). Regular users do not need access to server configuration to manage their own account.

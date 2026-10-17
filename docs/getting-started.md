@@ -25,6 +25,8 @@ Open **Settings** after signing in:
 
 See the [User guide](user-guide/index.md) for an overview of the account settings available to every user.
 
+See [Administration](administration.md) for an overview of installation-wide configuration and maintenance tasks.
+
 Environment variables override values stored through the web UI. See [Configuration](configuration.md) for the complete reference.
 
 ## Configure email (optional)
