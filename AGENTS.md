@@ -83,7 +83,16 @@ Or all at once: `composer test` (inside the container: `make composer_test`).
 - If you changed the REST API, update `docs/openapi.json` accordingly (see
   `docs/development/setup.md`).
 
-## 4. Code style
+## 4. Documentation
+
+- Update the relevant files under `docs/` whenever a change affects documented behavior,
+  configuration, setup, CLI commands, routes, or integrations.
+- Verify documentation against the implementation and primary third-party sources. Keep
+  `mkdocs.yml`, links, and images current when pages change.
+- Run and report `mkdocs build --strict` for documentation changes, or explain why it
+  could not be run.
+
+## 5. Code style
 
 - Follow the existing style in the file/module you're editing; don't introduce a new style.
 - PHP code style is enforced by `settings/phpcs.xml`/`settings/phpstorm.xml` — run
@@ -98,7 +107,7 @@ Or all at once: `composer test` (inside the container: `make composer_test`).
   `$this->dbConnection->getDatabasePlatform() instanceof SqlitePlatform` like the existing
   repositories do. Passing tests on the default SQLite setup does not prove MySQL works.
 
-## 5. What AI agents should and should not do autonomously
+## 6. What AI agents should and should not do autonomously
 
 **Good fits for agent work (small, verifiable, low blast radius):**
 
@@ -123,7 +132,7 @@ Or all at once: `composer test` (inside the container: `make composer_test`).
 If a request falls in the second bucket, propose a short plan/diff for review instead of
 implementing it outright.
 
-## 6. PR / commit expectations
+## 7. PR / commit expectations
 
 - Keep commits/PRs focused on one logical change.
 - Use short, descriptive branch names (e.g. `fix-user-selection`, `update-dependencies`) and
@@ -135,7 +144,7 @@ implementing it outright.
   confirm").
 - Link to the relevant Github issue/discussion when one exists.
 
-## 7. Getting help / escalation
+## 8. Getting help / escalation
 
 - If requirements are ambiguous, open a Github discussion or ask in the PR rather than
   guessing (see `README.md` Support section for community channels).
