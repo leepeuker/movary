@@ -49,6 +49,7 @@ nav:
   - User guide:
       - Overview: 'user-guide/index.md'
       - Movie tracking: 'user-guide/tracking-movies.md'
+      - Browsing movies and people: 'user-guide/browsing-movies-and-people.md'
       - Dashboard and statistics: 'user-guide/dashboard-and-statistics.md'
       - Account and security: 'user-guide/account-and-security.md'
       - Privacy and sharing: 'user-guide/privacy-and-sharing.md'

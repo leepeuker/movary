@@ -5,6 +5,7 @@ The User guide explains how to use and manage your own Movary account. Open **Se
 ## Using Movary
 
 - [Movie tracking](tracking-movies.md) explains how to manage your history, ratings, and watchlist.
+- [Browsing movies and people](browsing-movies-and-people.md) explains how to explore history, movie lists, actors, and directors.
 - [Dashboard and statistics](dashboard-and-statistics.md) explains the activity overview and dashboard customization.
 
 ## Account settings
