@@ -37,17 +37,21 @@ nav:
       - Manual: install/manual.md
   - Getting started: 'getting-started.md'
   - Administration:
+      - Overview: 'administration.md'
       - Configuration: 'configuration.md'
       - Metadata:
           - TMDB data: features/tmdb-data.md
           - IMDb ratings: features/imdb-rating.md
       - User management: 'user-management.md'
       - Email operations: 'email-operations.md'
+      - Job processing: 'job-processing.md'
       - Backup and restore: 'backup-and-restore.md'
   - User guide:
       - Overview: 'user-guide/index.md'
       - Movie tracking: 'user-guide/tracking-movies.md'
+      - Browsing movies and people: 'user-guide/browsing-movies-and-people.md'
       - Dashboard and statistics: 'user-guide/dashboard-and-statistics.md'
+      - Preferences: 'user-guide/preferences.md'
       - Account and security: 'user-guide/account-and-security.md'
       - Privacy and sharing: 'user-guide/privacy-and-sharing.md'
       - Locations: 'user-guide/locations.md'
@@ -67,6 +71,6 @@ nav:
       - Setup: development/setup.md
       - Directory structure: development/file-structure.md
       - How does the backend work?: development/structure.md
-      - Job processing: development/job-processing.md
+      - Job processing internals: development/job-processing.md
       - Database migrations: development/database-migrations.md
   - FAQ: 'faq.md'

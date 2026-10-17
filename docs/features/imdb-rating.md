@@ -21,7 +21,7 @@ Without local IDs, Movary prioritizes movies whose ratings have never been synch
 
 Open **Settings → Server → Job Schedules**, create an **IMDb ratings sync** schedule, and enter a five-field cron expression evaluated in UTC. A daily schedule is sufficient because the source dataset updates once per day.
 
-The background worker must be running for schedules to create jobs. See [Job processing](../development/job-processing.md) for worker setup, scheduling behavior, job statuses, and troubleshooting.
+The background worker must be running for schedules to create jobs. See [Job processing](../job-processing.md) for worker setup, scheduling behavior, job statuses, and troubleshooting.
 
 ## Command-line alternative
 

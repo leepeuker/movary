@@ -25,6 +25,8 @@ Open **Settings** after signing in:
 
 See the [User guide](user-guide/index.md) for an overview of the account settings available to every user.
 
+See [Administration](administration.md) for an overview of installation-wide configuration and maintenance tasks.
+
 Environment variables override values stored through the web UI. See [Configuration](configuration.md) for the complete reference.
 
 ## Configure email (optional)
@@ -39,7 +41,7 @@ See [User management](user-management.md) for roles, account states, registratio
 
 ## Verify background processing
 
-Movary uses the `jobs:process` worker for background work, including verification and password reset emails. The standard Docker image runs the worker by default. Manual installations must configure Supervisor or cron as described in [Manual installation](install/manual.md#job-processing).
+Movary uses the `jobs:process` worker for background work, including verification and password reset emails. The standard Docker image runs the worker by default. Manual installations must configure Supervisor or cron as described in [Manual installation](install/manual.md#job-processing). See [Job processing](job-processing.md) for queue monitoring, recurring schedules, and troubleshooting.
 
 ## Maintain metadata
 

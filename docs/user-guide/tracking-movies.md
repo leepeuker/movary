@@ -24,6 +24,17 @@ The new play appears in **History**. Adding the same movie again with the same w
 
 You can also open an existing movie page and select **Add play** to record another viewing without searching again.
 
+## Track plays automatically
+
+Movary can automatically add plays from supported media servers and players through webhooks, also called scrobbling:
+
+- [Plex](../features/plex.md) can add movie plays and, optionally, ratings.
+- [Jellyfin](../features/jellyfin.md), [Emby](../features/emby.md), and [Kodi](../features/kodi.md) can add movie plays.
+
+Open **Settings → Integrations**, select the service, and follow its guide to generate and configure a personal webhook URL. Keep this URL private because it is connected to your account.
+
+Scrobbled plays appear in **History** alongside plays added manually. Some integrations also provide separate import, export, or synchronization features; their guides explain the available options and any server-side requirements.
+
 ## View and edit history
 
 Open the navigation menu and select **History**. You can search the history and switch between poster and table views. Select a movie to open its detail page.
