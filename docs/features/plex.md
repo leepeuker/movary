@@ -1,99 +1,52 @@
-## Webhook (Scrobbler)
+# Plex
 
-### Description
+The Plex integration can automatically record completed movie plays and rating changes in Movary. After authenticating a Plex account, it can also import missing movies from the Plex watchlist.
 
-Automatically add new [Plex](https://www.plex.tv/) movie plays and ratings to Movary.
+## Scrobble plays and ratings
 
-!!! Info
+Plex sends playback and rating events to a personal Movary webhook URL. Plex webhooks require an active [Plex Pass](https://support.plex.tv/articles/115002267687-webhooks/) for the server owner.
 
-    To use the required webhooks feature in Plex an active [Plex Pass](https://www.plex.tv/plex-pass/) subscription is neceessary.
+To configure scrobbling:
 
-### Instruction
-- Generate a webhook url in Movary for your user on the Plex integration settings page (`/settings/integrations/plex`)
-- Add the generated url as a [webhook to your Plex server](https://support.plex.tv/articles/115002267687-webhooks/) to start scrobbling
+1. Open **Settings → Integrations → Plex**.
+2. Select **Regenerate url** to create a webhook URL.
+3. Enable **Scrobble completed watches**, **Scrobble rating updates**, or both, then select **Save**.
+4. Add the generated URL under the Plex account's **Webhooks** settings.
 
-You can select what you want to scrobble (movie plays and/or ratings) via the "Scrobble Options" checkboxes on the settings page.
+Plex sends a `media.scrobble` event when it considers a movie watched and a `media.rate` event when its rating changes. Movary ignores other media types and events. A movie must have a TMDB identifier in Plex so Movary can match or create it.
 
-!!! tip
+The webhook URL is connected to your Movary account. Keep it private. Regenerating or deleting it immediately invalidates the previous URL, which must then be removed or replaced in Plex.
 
-    Keep your webhook url private to prevent abuse.
+The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.
 
-## Authentication
+## Authenticate a Plex account
 
-Some features require access to protected personal Plex data.
-You can authenticate Movary against Plex on the Plex integration settings page (`/settings/integrations/plex`).
+Authentication is required for the watchlist import but not for webhook scrobbling. An administrator must first configure the public `APPLICATION_URL` and `PLEX_IDENTIFIER`; see [Configuration](../configuration.md).
 
-!!! Info
+Open **Settings → Integrations → Plex**, select **Authenticate**, and complete the Plex sign-in flow. Movary stores the resulting access token for later Plex requests.
 
-    Requires the server configuration [PLEX_IDENTIFIER](../configuration.md#third-party-integrations) to be set.
+Removing authentication from Movary deletes its stored token but does not revoke that token in Plex. To revoke it there, open the Plex account settings, find **Authorized Devices**, and remove the Movary entry.
 
-During the authentication process a Plex access token is generated and stored in Movary. 
-This token will be used in all further Plex API requests.
-When an authentication is removed from Movary, the token will be deleted only in Movary.
+## Configure a Plex server URL
 
-!!! Info
+Authenticated features can use the Plex server URL saved on the integration page. Select **Test** to verify the address before saving it.
 
-    Removing the authentication only deletes the token stored in Movary itself. The token still exists in Plex.
-    To invalidate the access token in Plex, go to your Plex settings at: Account -> Authorized devices -> Click on the red cross for the entry "Movary"
-
-## URL Validation and SSRF Protection
-
-### Overview
-
-Movary validates Plex server URLs to protect against Server-Side Request Forgery (SSRF) attacks.
-
-### Security Features
-
-URL validation:
-
-- allows only HTTP and HTTPS on ports 80, 443, 8096, 8920, and 32400
-- checks every resolved IPv4 and IPv6 address
-- blocks private, reserved, loopback, and cloud metadata destinations by default
-- pins the validated address to the connection to prevent DNS rebinding
-- disables redirects so they cannot bypass destination validation
-
-### Configuration
-
-Protection is always enabled. To use a private Plex server, an administrator must add its exact hostname, IP address, or network in CIDR notation to `PLEX_URL_ALLOWLIST`:
+Movary allows HTTP or HTTPS destinations on ports 80, 443, 8096, 8920, and 32400. Public destinations are allowed by default. An administrator must explicitly authorize a private, reserved, or loopback destination with `PLEX_URL_ALLOWLIST`, for example:
 
 ```dotenv
 PLEX_URL_ALLOWLIST=plex.home,192.168.1.20,fd00::/64
 ```
 
-!!! warning
+Hostname entries are exact matches; IP and CIDR entries authorize matching addresses. Prefer a single hostname or IP address over a broad network range.
 
-    Add only destinations that Movary should be allowed to contact. A hostname entry is an exact match; IP and CIDR entries authorize only matching addresses.
+## Import the Plex watchlist
 
-See [Third party integrations](../configuration.md#third-party-integrations) for all related settings.
+After authenticating, select **Import watchlist** under **Settings → Integrations → Plex**. The import runs as a background job; select **Show imports** to review its status.
 
-### Recommendations
+Movary adds missing Plex watchlist movies to the Movary watchlist without removing existing entries. Movies are matched through their TMDB identifiers.
 
-- Prefer a single exact hostname or IP address over a broad network range.
-- Keep the allowlist empty when the Plex server has a public destination.
-
-## Watchlist import
-
-### Description
-
-Import missing movies from your Plex Watchlist to your Movary Watchlist.
-Missing movies imported to the Movary Watchlist are put at the beginning of the list in the same order as they are in Plex.
-
-!!! Info
-
-    Plex [authentication](#authentication) is required.
-
-### Instruction
-
-#### Web UI
-You can schedule import jobs and see the status/history of past jobs on the Plex integration settings page (`/settings/integrations/plex`).
-
-#### Command
-You can directly trigger an import via CLI
+Administrators with command-line access can run the same import directly:
 
 ```shell
-php bin/console.php plex:watchlist:import --userId=<id>
+php bin/console.php plex:watchlist:import --userId=USER_ID
 ```
-
-!!! tip
-
-    You could create a cronjob to regularly import your watchlist to keep up to date automatically. 

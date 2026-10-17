@@ -21,7 +21,7 @@ The **Account** menu contains settings that apply only to your account:
 
 Your privacy level determines who can see the movie data on your user pages. See [Privacy and sharing](privacy-and-sharing.md).
 
-The **Integrations** menu connects Movary to services such as [Plex](../features/plex.md), [Jellyfin](../features/jellyfin.md), [Emby](../features/emby.md), [Kodi](../features/kodi.md), [Trakt](../features/trakt.md), and [Letterboxd](../features/letterboxd.md).
+The **Integrations** menu connects Movary to media servers, players, movie services, and social platforms. See [Integrations](../features/integrations.md) to compare the available connections and open their setup guides.
 
 ## Administrator settings
 

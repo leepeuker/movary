@@ -1,23 +1,31 @@
-## Import
-You can import your watch history and ratings from Letterboxd to Movary.
+# Letterboxd
 
-Export your data from Letterboxd [here](https://letterboxd.com/settings/data/).
-You will receive a ZIP archive containing multiple CSV files.
-The `diary.csv` contains your watch dates and the and the `ratings.csv` your ratings.
-Visit the movary settings page `/settings/integrations/letterboxd` to import these files to Movary.
+The Letterboxd integration can import watch history and ratings into Movary or generate an export that Letterboxd can import. It is a manual file transfer, not an automatic synchronization.
 
-!!! Info
+## Import data into Movary
 
-    - Ratings are only imported for movies already existing in Movary (**import the diary.csv first**).
-    - The import only adds watch dates or ratings missing in Movary and it will not overwrite existing data.
-    - Importing hundreds or thousands of movies for the first time can take a few minutes.
+1. Open [Letterboxd's data export page](https://letterboxd.com/settings/data/) and request an export.
+2. Extract the downloaded ZIP archive.
+3. Open **Settings → Integrations → Letterboxd** in Movary.
+4. Upload `diary.csv` under **Import History**.
+5. After the history import finishes, upload `ratings.csv` under **Import Ratings**.
+6. Select **Show imports** beside either action to review the background job status.
 
-## Export
-You can export your watch dates and ratings from Movary to Letterboxd. 
+Import the diary first because the ratings importer only matches movies that already exist in Movary. Diary entries can add missing movies; the ratings file cannot.
 
-Visit `/settings/integrations/letterboxd` to export your watch dates and ratings.
-The export will generate a ZIP archive containing one or multiple CSV files. 
-You have to upload all CSV file on [Letterboxd](https://letterboxd.com/import/) to completely import your data.
-Letterboxd enforces a max file size limit which can make it necessary for Movary to split your data into multiple files. 
+The import is additive:
 
-More info about how the Letterbox import works can be found [here](https://letterboxd.com/about/importing-data/).
+- an existing watch date for the same movie is left unchanged;
+- an existing Movary rating is not overwritten; and
+- Letterboxd's five-star ratings are converted to Movary's 1–10 scale.
+
+Large first-time imports may take several minutes. If a completed import is missing movies, ask the Movary administrator to check the application logs for entries that could not be matched or imported.
+
+## Export data to Letterboxd
+
+1. Open **Settings → Integrations → Letterboxd**.
+2. Select **Generate export data** to download a ZIP archive.
+3. Extract the archive and upload every included CSV file to [Letterboxd's importer](https://letterboxd.com/import/).
+4. Review Letterboxd's matches before confirming the import.
+
+The export contains Movary watch dates and ratings. Movary splits it into files of at most 1,000 records so that large libraries are easier to import. See [Letterboxd's import documentation](https://letterboxd.com/about/importing-data/) for its current format and upload requirements.

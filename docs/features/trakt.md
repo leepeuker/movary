@@ -1,58 +1,49 @@
-## Trakt.tv API Access
+# Trakt
 
-Movary needs a Trakt **username** and **Client ID** to access its api. 
-You can configure them in Movary via the user settings page at `/settings/integrations/trakt` or via cli (user update command).
+The Trakt integration imports movie watch history and ratings into Movary. It currently reads data from a public Trakt profile; it does not export Movary changes to Trakt or keep the services synchronized.
 
-#### How to get a Client ID
-Go to your trakt.tv <a href="https://trakt.tv/oauth/applications" target="_blank">application settings</a> and create an application for Movary.
-Trakt requires a redirect uri which is not used by Movary, you can enter a placeholder like `http://movary`:
-<img src="/assets/trakt-new-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/>
+## Create Trakt API credentials
 
-You should be able to see your Client ID now on your applications page:
-<img src="/assets/trakt-view-application-page.png" alt="Trakt application seeting page with client ID" width="70%"/>
+Movary needs the Trakt username whose data will be imported and a Client ID for a Trakt API application.
 
-Enter the Client ID and your username in Movary, verify the access and save your changes. 
+1. Open [Trakt's application settings](https://trakt.tv/oauth/applications) and create an application.
+2. Enter a redirect URI when Trakt requests one. Movary does not use it, so a placeholder such as `http://movary` is sufficient.
+3. Copy the generated **Client ID**. Movary does not need the Client Secret.
 
-## Import
+<img src="/assets/trakt-new-application-page.png" alt="Creating a Trakt application" width="70%"/>
 
-### Description
+<img src="/assets/trakt-view-application-page.png" alt="Trakt application page showing the Client ID" width="70%"/>
 
-You can import your watch history and ratings from Trakt.
+## Configure and run an import
 
-The import will only add data missing in Movary on default, it will not overwrite or remove existing data.
+1. Make sure the Trakt profile is public for the duration of the import.
+2. Open **Settings → Integrations → Trakt**.
+3. Enter the Trakt username and Client ID.
+4. Select **Verify**, then **Save**.
+5. Select **Import history** or **Import ratings**.
+6. Select **Show imports** beside either action to review the background job status.
 
-The import can be triggered via the user settings page at `/settings/integrations/trakt` or via cli.
+Imports started from the web interface are additive. History entries and ratings already present in Movary are left unchanged. A large first import may take several minutes.
 
-!!! Info
+## Import from the command line
 
-    Importing hundreds or thousands of movies for the first time can take a few minutes.
-
-!!! Warning
-
-    Currently Movary only supports import from public Trakt accounts. Make sure your account is not set to private during the import.
-
-### CLI Command
+Administrators can run the same import from the command line:
 
 ```shell
-php bin/console.php trakt:import
+php bin/console.php trakt:import --userId=USER_ID
 ```
 
-#### Interesting flags
+Without `--history` or `--ratings`, the command imports both. Available options are:
 
-- `--userId`
-  User to import data to
-- `--ratings`
-  Import Trakt ratings
-- `--history`
-  Import Trakt watch history (plays)
-- `--overwrite`
-  Use if you want to overwrite the local data with the data coming from Trakt
-- `--ignore-cache`
-  Use if you want to force import everything regardless if there was a change since the last import
+- `--history` imports watch history only;
+- `--ratings` imports ratings only;
+- `--overwrite` makes Trakt authoritative for the selected data, allowing existing local values to be replaced and local history absent from Trakt to be removed; and
+- `--ignore-cache` forces the history import to check every Trakt movie instead of skipping entries unchanged since the previous import.
 
-#### Example
-Import history and ratings for user with id 1 and overwrite locally existing data
+For example, to import both history and ratings for user 1 and replace conflicting local data:
 
 ```shell
-php bin/console.php trakt:import --userId=1 --ratings --history --overwrite
-``` 
+php bin/console.php trakt:import --userId=1 --history --ratings --overwrite
+```
+
+Use `--overwrite` carefully. Unlike the default import, it can change or remove existing Movary data.
