@@ -58,6 +58,7 @@ nav:
       - Personal data: 'user-guide/personal-data.md'
       - API authentication: 'user-guide/api-authentication.md'
   - Integrations:
+      - Overview: features/integrations.md
       - Plex: features/plex.md
       - Jellyfin: features/jellyfin.md
       - Emby: features/emby.md
