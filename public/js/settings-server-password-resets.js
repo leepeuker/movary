@@ -1,6 +1,7 @@
 const revokeAllPasswordResetsButton = document.getElementById('revokeAllPasswordResetsButton');
 
 document.getElementById('passwordResetsPerPage').addEventListener('change', updatePasswordResetsPerPage)
+document.getElementById('passwordResetForm').addEventListener('submit', createPasswordReset)
 
 document.querySelectorAll('.password-reset-revoke-button').forEach((button) => {
     button.addEventListener('click', () => revokePasswordReset(button))
@@ -16,6 +17,11 @@ if (urlParams.get('allResetsRevoked')) {
     setPasswordResetManagementAlert('All password reset links were revoked.')
     removeQueryParameter('allResetsRevoked')
 }
+const createdUserName = urlParams.get('resetCreated')
+if (createdUserName) {
+    setPasswordResetManagementAlert('Password reset email was scheduled for ' + createdUserName)
+    removeQueryParameter('resetCreated')
+}
 
 function updatePasswordResetsPerPage() {
     const url = new URL(window.location.href)
@@ -27,6 +33,50 @@ function updatePasswordResetsPerPage() {
 
 function refreshPasswordResetsPage() {
     window.location.reload()
+}
+
+function showCreatePasswordResetModal() {
+    document.getElementById('passwordResetForm').reset()
+    const errorAlert = document.getElementById('passwordResetModalError')
+    errorAlert.classList.add('d-none')
+    errorAlert.textContent = ''
+    bootstrap.Modal.getOrCreateInstance('#passwordResetModal').show()
+}
+
+async function createPasswordReset(event) {
+    event.preventDefault()
+
+    const userSelect = document.getElementById('passwordResetUser')
+    if (event.currentTarget.reportValidity() === false) {
+        return
+    }
+
+    const submitButton = document.getElementById('createPasswordResetButton')
+    const errorAlert = document.getElementById('passwordResetModalError')
+    submitButton.disabled = true
+    errorAlert.classList.add('d-none')
+    errorAlert.textContent = ''
+
+    try {
+        const response = await fetchWithCsrf(
+            APPLICATION_URL + '/settings/users/' + userSelect.value + '/password-reset',
+            {method: 'POST'},
+        )
+
+        if (response.ok === false) {
+            errorAlert.textContent = await response.text() || 'Could not schedule password reset email.'
+            errorAlert.classList.remove('d-none')
+            return
+        }
+
+        const userName = userSelect.options[userSelect.selectedIndex].dataset.userName
+        redirectWithNotification('resetCreated', userName)
+    } catch (error) {
+        errorAlert.textContent = 'Could not schedule password reset email.'
+        errorAlert.classList.remove('d-none')
+    } finally {
+        submitButton.disabled = false
+    }
 }
 
 function removeQueryParameter(name) {

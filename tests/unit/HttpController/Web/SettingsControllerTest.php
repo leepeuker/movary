@@ -7,6 +7,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\EmailVerificationPolicy;
 use Movary\Domain\User\Service\PersonalApiTokenService;
+use Movary\Domain\User\Service\PasswordResetTokenService;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\Domain\User\UserApi;
@@ -54,6 +55,8 @@ class SettingsControllerTest extends TestCase
 
     private PersonalApiTokenService|MockObject $personalApiTokenServiceMock;
 
+    private PasswordResetTokenService|MockObject $passwordResetTokenServiceMock;
+
     private SettingsController $subject;
 
     private Environment|MockObject $twigMock;
@@ -75,6 +78,7 @@ class SettingsControllerTest extends TestCase
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->dashboardFactoryMock = $this->createMock(DashboardFactory::class);
         $this->personalApiTokenServiceMock = $this->createMock(PersonalApiTokenService::class);
+        $this->passwordResetTokenServiceMock = $this->createMock(PasswordResetTokenService::class);
         $this->subject = $this->createSubject([
             'twig' => $this->twigMock,
             'authenticationService' => $this->authenticationMock,
@@ -84,6 +88,7 @@ class SettingsControllerTest extends TestCase
             'applicationUrlService' => $this->applicationUrlServiceMock,
             'dashboardFactory' => $this->dashboardFactoryMock,
             'personalApiTokenService' => $this->personalApiTokenServiceMock,
+            'passwordResetTokenService' => $this->passwordResetTokenServiceMock,
             'paginationRequestMapper' => new PaginationRequestMapper(),
             'jobScheduleFilterRequestMapper' => new JobScheduleFilterRequestMapper(),
             'paginationElementsCalculator' => new PaginationElementsCalculator(),
@@ -365,6 +370,29 @@ class SettingsControllerTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode()->getCode());
         self::assertSame('api tokens', $response->getBody());
+    }
+
+    public function testRendersPasswordResetUsers() : void
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getGetParameters')->willReturn([]);
+        $users = [['id' => 12, 'name' => 'Alice', 'email' => 'alice@example.com']];
+        $this->passwordResetTokenServiceMock->method('countPendingTokens')->willReturn(0);
+        $this->passwordResetTokenServiceMock->method('fetchPendingTokensPaginated')->willReturn([]);
+        $this->userApiMock->expects(self::once())->method('fetchAll')->willReturn($users);
+        $this->twigMock
+            ->expects(self::once())
+            ->method('render')
+            ->with(
+                'page/settings-server-password-resets.html.twig',
+                self::callback(static fn(array $data) : bool => $data['users'] === $users),
+            )
+            ->willReturn('password resets');
+
+        $response = $this->subject->renderServerPasswordResetsPage($request);
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertSame('password resets', $response->getBody());
     }
 
     #[DataProvider('provideSuccessMessages')]
