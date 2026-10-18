@@ -567,10 +567,12 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
  * Watch date logic starting here
  */
 function validateWatchDate(context, watchDate) {
-    if (isValidDate(watchDate) === false) {
+    const dateFormat = document.getElementById('dateFormatJavascript').value
+
+    if (isValidDate(watchDate, dateFormat) === false) {
         document.getElementById(context + 'WatchDateInput').style.borderStyle = 'solid'
         document.getElementById(context + 'WatchDateInput').style.borderColor = '#dc3545'
-        document.getElementById(context + 'ratingStars').style.marginTop = '0'
+        document.getElementById(context + 'RatingStars').style.marginTop = '0'
 
         return false
     }
@@ -582,29 +584,54 @@ function validateWatchDate(context, watchDate) {
     return true
 }
 
-function isValidDate(dateString) {
-    return true
-
-    // First check for the pattern
-    if (!/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(dateString)) {
+function isValidDate(dateString, dateFormat) {
+    if (typeof dateString !== 'string') {
         return false
     }
 
-    // Parse the date parts to integers
-    var parts = dateString.split('.')
-    var day = parseInt(parts[0], 10)
-    var month = parseInt(parts[1], 10)
-    var year = parseInt(parts[2], 10)
+    let match
+    let day
+    let month
+    let year
 
-    // Check the ranges of month and year
-    if (year < 1000 || year > 3000 || month == 0 || month > 12) return false
+    if (dateFormat === 'yyyy-mm-dd' || dateFormat === 'yy-mm-dd') {
+        const yearLength = dateFormat === 'yyyy-mm-dd' ? 4 : 2
+        match = dateString.match(new RegExp('^(\\d{' + yearLength + '})-(\\d{1,2})-(\\d{1,2})$'))
+        if (match === null) {
+            return false
+        }
 
-    var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        year = Number.parseInt(match[1], 10)
+        month = Number.parseInt(match[2], 10)
+        day = Number.parseInt(match[3], 10)
+    } else if (dateFormat === 'dd.mm.yyyy' || dateFormat === 'dd.mm.yy') {
+        const yearLength = dateFormat === 'dd.mm.yyyy' ? 4 : 2
+        match = dateString.match(new RegExp('^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{' + yearLength + '})$'))
+        if (match === null) {
+            return false
+        }
 
-    // Adjust for leap years
-    if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) monthLength[1] = 29
+        day = Number.parseInt(match[1], 10)
+        month = Number.parseInt(match[2], 10)
+        year = Number.parseInt(match[3], 10)
+    } else {
+        return false
+    }
 
-    // Check the range of the day
+    if (dateFormat === 'yy-mm-dd' || dateFormat === 'dd.mm.yy') {
+        year += year >= 70 ? 1900 : 2000
+    }
+
+    if (year < 1000 || year > 3000 || month === 0 || month > 12) {
+        return false
+    }
+
+    const monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
+        monthLength[1] = 29
+    }
+
     return day > 0 && day <= monthLength[month - 1]
 }
 
