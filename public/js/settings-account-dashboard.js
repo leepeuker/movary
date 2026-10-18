@@ -90,14 +90,14 @@ async function updateDashboardRows() {
     }).then(response => {
         if (!response.ok) {
             console.error(response);
-            addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+            addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error on GitHub: https://github.com/leepeuker/movary/issues', 'danger');
 
             return false;
         } else {
             addAlert('accountDashboardSettingsLog', 'Dashboard rows successfully updated.', 'success');
         }
     }).catch(function (error) {
-        addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+        addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error on GitHub: https://github.com/leepeuker/movary/issues', 'danger');
         console.error(error);
     });
 }
@@ -111,14 +111,14 @@ async function resetDashboardRows() {
     }).then(response => {
         if (!response.ok) {
             console.error(response);
-            addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+            addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error on GitHub: https://github.com/leepeuker/movary/issues', 'danger');
 
             return false;
         } else {
             location.reload()
         }
     }).catch(function (error) {
-        addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error via <a href="https://github.com/leepeuker/movary/issues" target="_blank">Github</a>.', 'danger');
+        addAlert('accountDashboardSettingsLog', 'Something went wrong. Check the logs and report the error on GitHub: https://github.com/leepeuker/movary/issues', 'danger');
         console.error(error);
     });
 }
