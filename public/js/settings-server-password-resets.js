@@ -3,8 +3,16 @@ const revokeAllPasswordResetsButton = document.getElementById('revokeAllPassword
 document.getElementById('passwordResetsPerPage').addEventListener('change', updatePasswordResetsPerPage)
 document.getElementById('passwordResetForm').addEventListener('submit', createPasswordReset)
 
-document.querySelectorAll('.password-reset-revoke-button').forEach((button) => {
-    button.addEventListener('click', () => revokePasswordReset(button))
+document.querySelectorAll('.password-reset-row').forEach((row) => {
+    row.addEventListener('click', () => showPasswordResetDetailsModal(row))
+    row.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') {
+            return
+        }
+
+        event.preventDefault()
+        showPasswordResetDetailsModal(row)
+    })
 })
 
 const urlParams = new URLSearchParams(window.location.search)
@@ -22,6 +30,11 @@ if (createdUserName) {
     setPasswordResetManagementAlert('Password reset email was scheduled for ' + createdUserName)
     removeQueryParameter('resetCreated')
 }
+const resentUserName = urlParams.get('resetResent')
+if (resentUserName) {
+    setPasswordResetManagementAlert('Password reset email was resent to ' + resentUserName)
+    removeQueryParameter('resetResent')
+}
 
 function updatePasswordResetsPerPage() {
     const url = new URL(window.location.href)
@@ -37,9 +50,49 @@ function refreshPasswordResetsPage() {
 
 function showCreatePasswordResetModal() {
     document.getElementById('passwordResetForm').reset()
+    document.getElementById('passwordResetModalTitle').textContent = 'Create password reset'
+    document.getElementById('passwordResetCreationForm').classList.remove('d-none')
+    document.getElementById('passwordResetDetails').classList.add('d-none')
+    document.getElementById('createPasswordResetButton').classList.remove('d-none')
+    document.getElementById('revokePasswordResetButton').classList.add('d-none')
+    document.getElementById('resendPasswordResetButton').classList.add('d-none')
+    clearPasswordResetModalError()
+    bootstrap.Modal.getOrCreateInstance('#passwordResetModal').show()
+}
+
+function showPasswordResetDetailsModal(row) {
+    document.getElementById('passwordResetModalTitle').textContent = 'Password reset'
+    document.getElementById('passwordResetDetailsUser').textContent = row.dataset.userName
+    document.getElementById('passwordResetDetailsEmail').textContent = row.dataset.userEmail
+    document.getElementById('passwordResetDetailsCreatedAt').textContent = row.dataset.createdAt
+    document.getElementById('passwordResetDetailsExpiresAt').textContent = row.dataset.expiresAt
+    document.getElementById('passwordResetCreationForm').classList.add('d-none')
+    document.getElementById('passwordResetDetails').classList.remove('d-none')
+    document.getElementById('createPasswordResetButton').classList.add('d-none')
+    clearPasswordResetModalError()
+
+    const revokeButton = document.getElementById('revokePasswordResetButton')
+    const resendButton = document.getElementById('resendPasswordResetButton')
+    revokeButton.dataset.userId = row.dataset.userId
+    revokeButton.dataset.userName = row.dataset.userName
+    resendButton.dataset.userId = row.dataset.userId
+    resendButton.dataset.userName = row.dataset.userName
+    revokeButton.classList.remove('d-none')
+    resendButton.classList.remove('d-none')
+
+    bootstrap.Modal.getOrCreateInstance('#passwordResetModal').show()
+}
+
+function clearPasswordResetModalError() {
     const errorAlert = document.getElementById('passwordResetModalError')
     errorAlert.classList.add('d-none')
     errorAlert.textContent = ''
+}
+
+function showPasswordResetModalError(message) {
+    const errorAlert = document.getElementById('passwordResetModalError')
+    errorAlert.textContent = message
+    errorAlert.classList.remove('d-none')
     bootstrap.Modal.getOrCreateInstance('#passwordResetModal').show()
 }
 
@@ -139,7 +192,8 @@ async function revokeAllPasswordResets() {
     redirectWithNotification('allResetsRevoked')
 }
 
-async function revokePasswordReset(button) {
+async function revokePasswordReset() {
+    const button = document.getElementById('revokePasswordResetButton')
     const userId = button.dataset.userId
     const userName = button.dataset.userName
 
@@ -162,7 +216,7 @@ async function revokePasswordReset(button) {
             method: 'DELETE'
         })
     } catch (error) {
-        setPasswordResetManagementAlert('Could not revoke password reset.', 'danger')
+        showPasswordResetModalError('Could not revoke password reset.')
 
         return
     } finally {
@@ -170,9 +224,46 @@ async function revokePasswordReset(button) {
     }
 
     if (response.ok === false) {
-        setPasswordResetManagementAlert('Could not revoke password reset.', 'danger')
+        showPasswordResetModalError('Could not revoke password reset.')
         return
     }
 
     redirectWithNotification('resetRevoked', userName)
+}
+
+async function resendPasswordReset() {
+    const button = document.getElementById('resendPasswordResetButton')
+    const userId = button.dataset.userId
+    const userName = button.dataset.userName
+    const confirmed = await showConfirmationModal({
+        title: 'Resend password reset email',
+        message: 'Send a new password reset email to "' + userName + '"? The existing reset link will be replaced.',
+        confirmLabel: 'Resend email',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
+    button.disabled = true
+
+    let response
+    try {
+        response = await fetchWithCsrf(APPLICATION_URL + '/settings/users/' + userId + '/password-reset', {
+            method: 'POST'
+        })
+    } catch (error) {
+        showPasswordResetModalError('Could not resend password reset email.')
+
+        return
+    } finally {
+        button.disabled = false
+    }
+
+    if (response.ok === false) {
+        showPasswordResetModalError(await response.text() || 'Could not resend password reset email.')
+        return
+    }
+
+    redirectWithNotification('resetResent', userName)
 }
