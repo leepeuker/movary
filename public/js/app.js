@@ -200,8 +200,11 @@ async function searchTmdbWithLogModalSearchInput() {
     setLogPlayModalSearchSpinner(true)
 
     let targetModalVersion = currentModalVersion
+    const searchParameters = new URLSearchParams({
+        search: document.getElementById('logPlayModalSearchInput').value,
+    })
 
-    const data = await fetch(APPLICATION_URL + '/movies/search?search=' + document.getElementById('logPlayModalSearchInput').value, {
+    const data = await fetch(APPLICATION_URL + '/movies/search?' + searchParameters.toString(), {
         signal: AbortSignal.timeout(4000),
         method: 'GET',
         headers: {
