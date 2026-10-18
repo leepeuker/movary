@@ -730,6 +730,7 @@ class SettingsController
                 'passwordResetsPerPage' => $paginationRequest->getPerPage(),
                 'paginationElements' => $paginationElements,
                 'paginationQuery' => ['perPage' => $paginationRequest->getPerPage()],
+                'users' => $this->userApi->fetchAll(),
             ]),
         );
     }
