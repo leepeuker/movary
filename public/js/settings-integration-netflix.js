@@ -78,9 +78,10 @@ async function uploadNetflixHistory() {
 
 async function searchTMDB() {
     let searchQuery = document.getElementById('tmdbSearchModalInput').value;
+    const searchParameters = new URLSearchParams({search: searchQuery});
 
     await createSpinner(document.getElementById('tmdbSearchResultsDiv'), 'tmdb');
-    await fetch(APPLICATION_URL + '/movies/search?search=' + searchQuery, {
+    await fetch(APPLICATION_URL + '/movies/search?' + searchParameters.toString(), {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
