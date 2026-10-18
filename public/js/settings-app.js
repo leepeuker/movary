@@ -84,7 +84,7 @@ function addReleaseToList(latestRelease) {
     releaseListItem.style.cursor = 'pointer'
     releaseListItem.setAttribute('onclick', "showReleaseModal(this)");
 
-    releasesList.appendChild(releaseListItem);
+    releasesList.insertBefore(releaseListItem, document.getElementById('latestReleasesViewMore'));
 }
 
 function showReleaseModal(element) {
