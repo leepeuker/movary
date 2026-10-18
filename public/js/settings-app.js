@@ -128,8 +128,34 @@ function createSanitizedMarkdownFragment(markdown) {
     const fragment = document.createDocumentFragment()
 
     parsedDocument.body.childNodes.forEach((node) => appendSanitizedNode(node, fragment))
+    compactReleaseLinks(fragment)
 
     return fragment
+}
+
+function compactReleaseLinks(fragment) {
+    fragment.querySelectorAll('a').forEach((link) => {
+        const url = new URL(link.href)
+        if (url.hostname !== 'github.com') {
+            return
+        }
+
+        const pullRequestMatch = url.pathname.match(/^\/leepeuker\/movary\/pull\/\d+$/)
+        const precedingText = link.previousSibling
+        const contributorMatch = precedingText?.nodeType === Node.TEXT_NODE
+            ? precedingText.textContent.match(/(@[a-zA-Z0-9-]+) in $/)
+            : null
+        if (pullRequestMatch !== null && contributorMatch !== null) {
+            precedingText.textContent = precedingText.textContent.slice(0, -contributorMatch[0].length)
+            link.textContent = contributorMatch[1]
+            return
+        }
+
+        const changelogMatch = url.pathname.match(/^\/leepeuker\/movary\/compare\/(.+)$/)
+        if (changelogMatch !== null) {
+            link.textContent = decodeURIComponent(changelogMatch[1])
+        }
+    })
 }
 
 function appendSanitizedNode(source, parent) {
