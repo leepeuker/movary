@@ -176,11 +176,7 @@ jobs:
           done
 
           for promoted_tag in "${immutable_tags[@]}" "${moving_tags[@]}"; do
-            promoted_digest=$(resolve_digest "$promoted_tag")
-            if [[ "$promoted_digest" != "$CANDIDATE_DIGEST" ]]; then
-              echo "$promoted_tag resolves to $promoted_digest instead of $CANDIDATE_DIGEST" >&2
-              exit 1
-            fi
+            bash tests/container/verify-promoted-image.sh "$promoted_tag" "$CANDIDATE_DIGEST"
           done
 
           {
