@@ -2,15 +2,74 @@ name: Build and publish docker image to docker hub
 
 on:
   release:
-    types: [published]
+    types:
+      - published
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: leepeuker/movary
 
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
+  validate_release:
+    name: Validate release source and tag
     runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.release.outputs.tag }}
+      release_commit: ${{ steps.release.outputs.commit }}
     steps:
-      - name: Check out the repo
+      - name: Check out the release tag
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Validate release tag and commit
+        id: release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_IS_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          set -euo pipefail
+
+          bash tests/container/validate-release-tag.sh "$RELEASE_TAG" "$RELEASE_IS_PRERELEASE"
+
+          release_commit=$(git rev-list -n 1 "$RELEASE_TAG^{commit}")
+          checked_out_commit=$(git rev-parse HEAD)
+
+          if [[ "$release_commit" != "$checked_out_commit" || "$release_commit" != "$GITHUB_SHA" ]]; then
+            echo "Release tag, checkout, and event do not identify the same commit" >&2
+            exit 1
+          fi
+
+          echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "commit=$release_commit" >> "$GITHUB_OUTPUT"
+          echo "Validated $RELEASE_TAG at $release_commit"
+
+  run_tests:
+    name: Run release validation
+    needs: validate_release
+    uses: ./.github/workflows/tests.yml
+
+  push_to_registry:
+    name: Validate and publish Docker image
+    needs:
+      - validate_release
+      - run_tests
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: dockerhub-release-publication
+      cancel-in-progress: false
+    steps:
+      - name: Check out the validated release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate_release.outputs.release_commit }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -21,16 +80,25 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Create candidate metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: leepeuker/movary
+          images: ${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=candidate-release-${{ github.run_id }}-${{ github.run_attempt }}
+          labels: |
+            org.opencontainers.image.title=Movary
+            org.opencontainers.image.description=Movary is a self hosted web app to track and rate your watched movies
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ needs.validate_release.outputs.release_commit }}
+            org.opencontainers.image.version=${{ needs.validate_release.outputs.release_tag }}
+            org.opencontainers.image.licenses=MIT
 
-      - uses: olegtarasov/get-tag@v2.1
-        id: tagName
-
-      - name: Build and push Docker image
+      - name: Build and push candidate image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -41,4 +109,84 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            APPLICATION_VERSION=${{ steps.tagName.outputs.tag }}
+            APPLICATION_VERSION=${{ needs.validate_release.outputs.release_tag }}
+
+      - name: Verify candidate image index
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: bash tests/container/verify-image-index.sh "$IMAGE_NAME@$CANDIDATE_DIGEST"
+
+      - name: Smoke-test amd64 candidate
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: bash tests/container/smoke-production.sh "$IMAGE_NAME@$CANDIDATE_DIGEST" linux/amd64
+
+      - name: Smoke-test arm64 candidate
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+          SMOKE_TIMEOUT_SECONDS: 300
+        run: bash tests/container/smoke-production.sh "$IMAGE_NAME@$CANDIDATE_DIGEST" linux/arm64
+
+      - name: Promote validated release image
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+          RELEASE_COMMIT: ${{ needs.validate_release.outputs.release_commit }}
+          RELEASE_IS_PRERELEASE: ${{ github.event.release.prerelease }}
+          RELEASE_TAG: ${{ needs.validate_release.outputs.release_tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          source_reference="$IMAGE_NAME@$CANDIDATE_DIGEST"
+          identity_tag="$IMAGE_NAME:sha-$RELEASE_COMMIT-$RELEASE_TAG"
+          immutable_tags=("$IMAGE_NAME:$RELEASE_TAG" "$identity_tag")
+          moving_tags=()
+
+          if [[ "$RELEASE_IS_PRERELEASE" == false ]]; then
+            published_stable_tags=$(gh api --paginate \
+              "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+              --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name')
+            moving_tag_suffixes=$(printf '%s\n' "$published_stable_tags" \
+              | bash tests/container/select-release-aliases.sh "$RELEASE_TAG")
+
+            while IFS= read -r moving_tag_suffix; do
+              if [[ -n "$moving_tag_suffix" ]]; then
+                moving_tags+=("$IMAGE_NAME:$moving_tag_suffix")
+              fi
+            done <<<"$moving_tag_suffixes"
+          fi
+
+          resolve_digest() {
+            docker buildx imagetools inspect "$1" | awk '$1 == "Digest:" { print $2; exit }'
+          }
+
+          for immutable_tag in "${immutable_tags[@]}"; do
+            if existing_digest=$(resolve_digest "$immutable_tag" 2>/dev/null); then
+              if [[ "$existing_digest" != "$CANDIDATE_DIGEST" ]]; then
+                echo "Immutable tag $immutable_tag already points to $existing_digest" >&2
+                exit 1
+              fi
+            else
+              docker buildx imagetools create --tag "$immutable_tag" "$source_reference"
+            fi
+          done
+
+          for moving_tag in "${moving_tags[@]}"; do
+            docker buildx imagetools create --tag "$moving_tag" "$source_reference"
+          done
+
+          for promoted_tag in "${immutable_tags[@]}" "${moving_tags[@]}"; do
+            promoted_digest=$(resolve_digest "$promoted_tag")
+            if [[ "$promoted_digest" != "$CANDIDATE_DIGEST" ]]; then
+              echo "$promoted_tag resolves to $promoted_digest instead of $CANDIDATE_DIGEST" >&2
+              exit 1
+            fi
+          done
+
+          {
+            echo "### Published Movary $RELEASE_TAG"
+            echo
+            echo "- Commit: \`$RELEASE_COMMIT\`"
+            echo "- Digest: \`$CANDIDATE_DIGEST\`"
+            echo '- Copy this digest into the GitHub release notes.'
+          } >> "$GITHUB_STEP_SUMMARY"

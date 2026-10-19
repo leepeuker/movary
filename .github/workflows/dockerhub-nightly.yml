@@ -1,17 +1,40 @@
 name: Build and publish nightly docker image to docker hub
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Run tests
+    types:
+      - completed
     branches:
       - main
 
+permissions:
+  contents: read
+
+concurrency:
+  group: dockerhub-nightly-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: leepeuker/movary
+
 jobs:
   push_to_registry:
-    name: Push Nightly Docker image to Docker Hub
+    name: Validate and publish nightly Docker image
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
+      - name: Check out the validated commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -22,7 +45,25 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
+      - name: Create candidate metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=candidate-nightly-${{ github.run_id }}-${{ github.run_attempt }}
+          labels: |
+            org.opencontainers.image.title=Movary
+            org.opencontainers.image.description=Movary is a self hosted web app to track and rate your watched movies
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
+            org.opencontainers.image.version=nightly
+            org.opencontainers.image.licenses=MIT
+
+      - name: Build and push candidate image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -30,6 +71,70 @@ jobs:
           target: production
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: leepeuker/movary:nightly
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APPLICATION_VERSION=nightly
+
+      - name: Verify candidate image index
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: bash tests/container/verify-image-index.sh "$IMAGE_NAME@$CANDIDATE_DIGEST"
+
+      - name: Smoke-test amd64 candidate
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: bash tests/container/smoke-production.sh "$IMAGE_NAME@$CANDIDATE_DIGEST" linux/amd64
+
+      - name: Promote validated nightly image
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+          VALIDATED_COMMIT: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+
+          source_reference="$IMAGE_NAME@$CANDIDATE_DIGEST"
+          identity_tag="$IMAGE_NAME:sha-$VALIDATED_COMMIT-nightly"
+
+          assert_current_main_head() {
+            local remote_main
+            remote_main=$(git ls-remote origin refs/heads/main | cut -f1)
+            if [[ "$remote_main" != "$VALIDATED_COMMIT" ]]; then
+              echo "Validated commit $VALIDATED_COMMIT is no longer the main branch head ($remote_main)" >&2
+              exit 1
+            fi
+          }
+
+          resolve_digest() {
+            docker buildx imagetools inspect "$1" | awk '$1 == "Digest:" { print $2; exit }'
+          }
+
+          assert_current_main_head
+
+          if existing_digest=$(resolve_digest "$identity_tag" 2>/dev/null); then
+            if [[ "$existing_digest" != "$CANDIDATE_DIGEST" ]]; then
+              echo "Immutable identity tag already points to $existing_digest" >&2
+              exit 1
+            fi
+          else
+            docker buildx imagetools create --tag "$identity_tag" "$source_reference"
+          fi
+
+          assert_current_main_head
+          docker buildx imagetools create --tag "$IMAGE_NAME:nightly" "$source_reference"
+
+          for promoted_tag in "$identity_tag" "$IMAGE_NAME:nightly"; do
+            promoted_digest=$(resolve_digest "$promoted_tag")
+            if [[ "$promoted_digest" != "$CANDIDATE_DIGEST" ]]; then
+              echo "$promoted_tag resolves to $promoted_digest instead of $CANDIDATE_DIGEST" >&2
+              exit 1
+            fi
+          done
+
+          {
+            echo '### Published nightly image'
+            echo
+            echo "- Commit: \`$VALIDATED_COMMIT\`"
+            echo "- Digest: \`$CANDIDATE_DIGEST\`"
+            echo "- Tags: \`nightly\`, \`sha-$VALIDATED_COMMIT-nightly\`"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,6 +1,14 @@
 name: Run tests
 
-on: [ pull_request ]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   run_tests:
@@ -10,11 +18,30 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Build docker development image
-        run: docker build --target development --tag movary -f ./build/Dockerfile .
+      - name: Validate release tag rules
+        run: bash tests/container/validate-release-tag.sh --self-test
 
-      - name: Run all test tools/suites
-        run: docker run --rm --entrypoint composer movary test
+      - name: Validate release alias selection
+        run: bash tests/container/select-release-aliases.sh --self-test
+
+      - name: Build Docker development image
+        run: docker build --target development --tag movary-development -f ./build/Dockerfile .
+
+      - name: Run all test tools and suites
+        run: docker run --rm --entrypoint composer movary-development test
 
       - name: Verify migration cutover
-        run: bash tests/migration/verify-cutover.sh movary
+        run: bash tests/migration/verify-cutover.sh movary-development
+
+      - name: Build Docker production image
+        run: >-
+          docker build
+          --platform linux/amd64
+          --target production
+          --tag movary-production
+          --build-arg APPLICATION_VERSION=ci
+          -f ./build/Dockerfile
+          .
+
+      - name: Smoke-test Docker production image
+        run: bash tests/container/smoke-production.sh movary-production linux/amd64
