@@ -1,6 +1,6 @@
 FROM composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac AS composer
 
-FROM trafex/php-nginx:3.11@sha256:bd6c714fa8d9019db72428eb89fca8cb148eaba5afe3ba23b312a8cce7b34b6c AS base
+FROM alpine:3.23@sha256:85fe1e81d6758c208f3e1eed4338a1997e19d4be002d4dd32d3100c9a8c010a0 AS base
 
 LABEL Description="Movary is a self hosted web app to track and rate your watched movies"
 LABEL Maintainer="Lee Peuker"
@@ -8,22 +8,41 @@ LABEL Maintainer="Lee Peuker"
 ARG USER_ID=3000
 ARG GROUP_ID=3000
 
-USER root
+ENV PHP_INI_DIR=/etc/php85
 
 RUN apk upgrade --no-cache \
     && apk add --no-cache \
     bash \
+    curl \
+    nginx \
+    php85 \
+    php85-ctype \
+    php85-curl \
+    php85-dom \
+    php85-fileinfo \
+    php85-fpm \
+    php85-gd \
+    php85-intl \
+    php85-mbstring \
+    php85-mysqli \
+    php85-openssl \
     php85-pdo \
     php85-pdo_mysql \
     php85-pdo_sqlite \
-    php85-mbstring \
-    php85-sqlite3 \
+    php85-phar \
+    php85-session \
     php85-simplexml \
+    php85-sqlite3 \
+    php85-tokenizer \
+    php85-xml \
+    php85-xmlreader \
+    php85-xmlwriter \
     php85-zip \
-    php85-pecl-imagick
+    php85-pecl-imagick \
+    supervisor
 
-# Create standard binary for php
-RUN cp /usr/bin/php85 /usr/bin/php
+# Create standard binary name without duplicating the PHP executable
+RUN ln -s /usr/bin/php85 /usr/bin/php
 
 # Create entrypoint script (for automatic database migrations)
 COPY ./build/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -35,6 +54,9 @@ RUN chmod +x /usr/local/bin/stop_supervisor_on_process_failure.sh
 
 # Create runtime configuration
 COPY ./build/config/conf.d /etc/nginx/conf.d
+COPY ./build/config/nginx.conf /etc/nginx/nginx.conf
+COPY ./build/config/fpm-pool.conf $PHP_INI_DIR/php-fpm.d/www.conf
+COPY ./build/config/php.ini $PHP_INI_DIR/conf.d/custom.ini
 COPY ./build/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Create non root user
@@ -48,6 +70,8 @@ USER application
 
 # Set app directory as working directory
 WORKDIR /app
+
+EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
