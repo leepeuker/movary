@@ -106,6 +106,8 @@ jobs:
           target: production
           push: true
           platforms: linux/amd64,linux/arm64
+          provenance: mode=max
+          sbom: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
@@ -117,6 +119,11 @@ jobs:
         env:
           CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
         run: bash tests/container/verify-image-index.sh "$IMAGE_NAME@$CANDIDATE_DIGEST"
+
+      - name: Verify candidate image attestations
+        env:
+          CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: bash tests/container/verify-image-attestations.sh "$IMAGE_NAME@$CANDIDATE_DIGEST"
 
       - name: Smoke-test amd64 candidate
         env:
