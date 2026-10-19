@@ -69,12 +69,67 @@ if [[ $(docker exec "$container_name" curl --silent --fail http://127.0.0.1:8080
     exit 1
 fi
 
+docker exec "$container_name" curl --silent --fail --output /dev/null http://127.0.0.1:8080/
+docker exec "$container_name" curl --silent --fail --output /dev/null http://127.0.0.1:8080/api/openapi
+
 if ! docker logs "$container_name" 2>&1 | grep --quiet 'SUCCESS: Automatic database migration succeeded'; then
     echo 'The entrypoint did not report a successful automatic database migration' >&2
     exit 1
 fi
 
 docker exec "$container_name" php bin/console.php database:migration:status --no-interaction >/dev/null
+
+expected_user_id=${EXPECTED_USER_ID:-3000}
+expected_group_id=${EXPECTED_GROUP_ID:-3000}
+actual_user_id=$(docker exec "$container_name" id -u)
+actual_group_id=$(docker exec "$container_name" id -g)
+
+if [[ $actual_user_id != "$expected_user_id" || $actual_group_id != "$expected_group_id" ]]; then
+    echo "Container runs as $actual_user_id:$actual_group_id instead of $expected_user_id:$expected_group_id" >&2
+    exit 1
+fi
+
+docker exec "$container_name" sh -c 'touch /app/storage/.write-test && rm /app/storage/.write-test'
+
+expected_entries=$'bin\nbootstrap.php\ndb\ndocs\npublic\nsettings\nsrc\nstorage\ntemplates\nvendor'
+actual_entries=$(docker exec "$container_name" sh -c \
+    'for path in /app/*; do basename "$path"; done' | sort)
+
+if [[ $actual_entries != "$expected_entries" ]]; then
+    echo 'Production image contains an unexpected /app inventory' >&2
+    echo "$actual_entries" >&2
+    exit 1
+fi
+
+for excluded_path in \
+    /app/.aws \
+    /app/.codex \
+    /app/.env \
+    /app/.git \
+    /app/.github \
+    /app/.idea \
+    /app/.vscode \
+    /app/AGENTS.md \
+    /app/Makefile \
+    /app/composer.json \
+    /app/composer.lock \
+    /app/docker-compose.yml \
+    /app/tests \
+    /app/tmp \
+    /usr/bin/composer; do
+    if docker exec "$container_name" test -e "$excluded_path"; then
+        echo "Production image contains excluded path: $excluded_path" >&2
+        exit 1
+    fi
+done
+
+docs_inventory=$(docker exec "$container_name" sh -c \
+    'for path in /app/docs/*; do basename "$path"; done' | sort)
+if [[ $docs_inventory != openapi.json ]]; then
+    echo 'Production image contains unexpected documentation files' >&2
+    echo "$docs_inventory" >&2
+    exit 1
+fi
 
 processes=$(docker top "$container_name")
 for expected_process in supervisord 'php-fpm: master process' 'nginx: master process' 'jobs:process'; do
