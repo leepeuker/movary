@@ -2,11 +2,24 @@
 
 set -euo pipefail
 
+parse_image_digest() {
+    awk '
+        $1 == "Digest:" && digest == "" { digest = $2 }
+        END {
+            if (digest == "") {
+                exit 1
+            }
+
+            sub(/\r$/, "", digest)
+            print digest
+        }
+    '
+}
+
 resolve_image_digest() {
     local image_reference=$1
 
-    docker buildx imagetools inspect "$image_reference" \
-        | awk '$1 == "Digest:" { print $2; exit }'
+    docker buildx imagetools inspect "$image_reference" | parse_image_digest
 }
 
 verify_promoted_image() {
@@ -50,6 +63,22 @@ verify_promoted_image() {
 
 run_self_test() {
     local failures=0
+    local parsed_digest
+
+    produce_inspect_output() {
+        local line
+
+        echo 'Digest: sha256:expected'
+        for ((line = 0; line < 4096; line++)); do
+            echo 'Manifest output that must be consumed to avoid a broken pipe'
+        done
+    }
+
+    if ! parsed_digest=$(produce_inspect_output | parse_image_digest) \
+        || [[ $parsed_digest != sha256:expected ]]; then
+        echo 'Expected digest parsing to consume the complete inspect output' >&2
+        failures=$((failures + 1))
+    fi
 
     resolve_image_digest() {
         case $2 in
