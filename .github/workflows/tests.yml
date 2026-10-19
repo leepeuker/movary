@@ -11,6 +11,22 @@ permissions:
   contents: read
 
 jobs:
+  audit_composer_dependencies:
+    name: Audit Composer dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check locked production dependencies for security advisories
+        run: >-
+          docker run --rm
+          --mount type=bind,src=${{ github.workspace }}/composer.json,dst=/app/composer.json,readonly
+          --mount type=bind,src=${{ github.workspace }}/composer.lock,dst=/app/composer.lock,readonly
+          --workdir /app
+          composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac
+          audit --locked --no-dev --no-interaction
+
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
