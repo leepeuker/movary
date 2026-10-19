@@ -49,6 +49,9 @@ jobs:
       - name: Validate image vulnerability scan policy
         run: bash tests/container/check-vulnerability-scan.sh --self-test
 
+      - name: Validate image attestation policy
+        run: bash tests/container/verify-image-attestations.sh --self-test
+
       - name: Build Docker development image
         run: >-
           docker buildx build
