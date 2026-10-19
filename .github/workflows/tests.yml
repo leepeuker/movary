@@ -21,6 +21,9 @@ jobs:
       - name: Validate release tag rules
         run: bash tests/container/validate-release-tag.sh --self-test
 
+      - name: Validate release alias selection
+        run: bash tests/container/select-release-aliases.sh --self-test
+
       - name: Build Docker development image
         run: docker build --target development --tag movary-development -f ./build/Dockerfile .
 

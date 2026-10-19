@@ -59,6 +59,9 @@ jobs:
       - run_tests
     runs-on: ubuntu-latest
     environment: production
+    concurrency:
+      group: dockerhub-release-publication
+      cancel-in-progress: false
     steps:
       - name: Check out the validated release commit
         uses: actions/checkout@v4
@@ -130,6 +133,7 @@ jobs:
           RELEASE_COMMIT: ${{ needs.validate_release.outputs.release_commit }}
           RELEASE_IS_PRERELEASE: ${{ github.event.release.prerelease }}
           RELEASE_TAG: ${{ needs.validate_release.outputs.release_tag }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
@@ -139,8 +143,17 @@ jobs:
           moving_tags=()
 
           if [[ "$RELEASE_IS_PRERELEASE" == false ]]; then
-            IFS='.' read -r major minor _patch <<<"$RELEASE_TAG"
-            moving_tags+=("$IMAGE_NAME:$major" "$IMAGE_NAME:$major.$minor" "$IMAGE_NAME:latest")
+            published_stable_tags=$(gh api --paginate \
+              "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+              --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name')
+            moving_tag_suffixes=$(printf '%s\n' "$published_stable_tags" \
+              | bash tests/container/select-release-aliases.sh "$RELEASE_TAG")
+
+            while IFS= read -r moving_tag_suffix; do
+              if [[ -n "$moving_tag_suffix" ]]; then
+                moving_tags+=("$IMAGE_NAME:$moving_tag_suffix")
+              fi
+            done <<<"$moving_tag_suffixes"
           fi
 
           resolve_digest() {
