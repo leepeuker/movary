@@ -18,6 +18,9 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Validate release tag rules
         run: bash tests/container/validate-release-tag.sh --self-test
 
@@ -28,7 +31,15 @@ jobs:
         run: bash tests/container/verify-promoted-image.sh --self-test
 
       - name: Build Docker development image
-        run: docker build --target development --tag movary-development -f ./build/Dockerfile .
+        run: >-
+          docker buildx build
+          --load
+          --target development
+          --tag movary-development
+          --cache-from type=gha,scope=development
+          --cache-to type=gha,mode=max,scope=development
+          -f ./build/Dockerfile
+          .
 
       - name: Run all test tools and suites
         run: docker run --rm --entrypoint composer movary-development test
@@ -38,11 +49,14 @@ jobs:
 
       - name: Build Docker production image
         run: >-
-          docker build
+          docker buildx build
+          --load
           --platform linux/amd64
           --target production
           --tag movary-production
           --build-arg APPLICATION_VERSION=ci
+          --cache-from type=gha,scope=production
+          --cache-to type=gha,mode=max,scope=production
           -f ./build/Dockerfile
           .
 

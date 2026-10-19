@@ -4,7 +4,8 @@ First steps for local development setup:
 
 - Clone the repository
 - Copy the file `.env.example` to `.env` and customize it for your local environment
-    - Set `USER_ID` to the UID owning the local files (`echo $UID`)
+    - Set `USER_ID` and `GROUP_ID` to the UID and GID owning the local files
+      (`id -u` and `id -g`)
     - Add your `TMDB_API_KEY`
     - Generate `APPLICATION_SECRET` with `openssl rand -hex 32`
 - Run `make build_development` to create your local development environment 
