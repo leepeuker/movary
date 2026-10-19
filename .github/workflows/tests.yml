@@ -24,6 +24,9 @@ jobs:
       - name: Validate release alias selection
         run: bash tests/container/select-release-aliases.sh --self-test
 
+      - name: Validate promoted image verification
+        run: bash tests/container/verify-promoted-image.sh --self-test
+
       - name: Build Docker development image
         run: docker build --target development --tag movary-development -f ./build/Dockerfile .
 
