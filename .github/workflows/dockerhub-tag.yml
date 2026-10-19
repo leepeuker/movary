@@ -129,6 +129,42 @@ jobs:
           SMOKE_TIMEOUT_SECONDS: 300
         run: bash tests/container/smoke-production.sh "$IMAGE_NAME@$CANDIDATE_DIGEST" linux/arm64
 
+      - name: Scan amd64 candidate for vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_PLATFORM: linux/amd64
+        with:
+          version: v0.76.0
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: json
+          output: trivy-amd64.json
+          scanners: vuln
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0
+
+      - name: Enforce amd64 vulnerability policy
+        run: bash tests/container/check-vulnerability-scan.sh trivy-amd64.json
+
+      - name: Scan arm64 candidate for vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_PLATFORM: linux/arm64
+        with:
+          version: v0.76.0
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: json
+          output: trivy-arm64.json
+          scanners: vuln
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 0
+
+      - name: Enforce arm64 vulnerability policy
+        run: bash tests/container/check-vulnerability-scan.sh trivy-arm64.json
+
       - name: Promote validated release image
         env:
           CANDIDATE_DIGEST: ${{ steps.build.outputs.digest }}
