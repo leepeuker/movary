@@ -18,7 +18,7 @@ class AssetUrlGenerator
     ) {
     }
 
-    public function generate(string $relativePath) : string
+    private function generate(string $relativePath) : string
     {
         $this->validateRelativePath($relativePath);
 
@@ -37,6 +37,21 @@ class AssetUrlGenerator
 
         return rtrim($this->applicationUrl, '/') . '/' . $relativePath . '?v='
             . rawurlencode($this->versions[$relativePath]);
+    }
+
+    public function generateJavascript(string $relativePath) : string
+    {
+        return $this->generate('js/' . $relativePath);
+    }
+
+    public function generateStylesheet(string $relativePath) : string
+    {
+        return $this->generate('css/' . $relativePath);
+    }
+
+    public function generateVendor(string $relativePath) : string
+    {
+        return $this->generate('vendor/' . $relativePath);
     }
 
     private function validateRelativePath(string $relativePath) : void

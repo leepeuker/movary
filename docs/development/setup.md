@@ -34,6 +34,8 @@ Third-party CSS, JavaScript, fonts, source maps, and licenses are managed with n
 
 Application-owned files remain in `public/css` and `public/js`. Generated third-party files are committed under `public/vendor` and must not be edited manually. The production image uses these committed files and does not install Node.js or download npm packages.
 
+Twig templates reference these directories with `css_url()`, `js_url()`, and `vendor_url()`. All three helpers add the same content-based cache version. Files stored directly in `public`, such as `serviceWorker.js`, use `applicationUrl` without an asset helper.
+
 Use the following commands:
 
 - `make frontend_install` installs the exact versions from `package-lock.json`
