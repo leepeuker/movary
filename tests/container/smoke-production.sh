@@ -138,9 +138,11 @@ if [[ $docs_inventory != openapi.json ]]; then
 fi
 
 processes=$(docker top "$container_name")
-for expected_process in supervisord 'php-fpm: master process' 'nginx: master process' 'jobs:process'; do
+# PHP-FPM and nginx are verified through HTTP because their process titles can differ under QEMU.
+for expected_process in supervisord 'jobs:process'; do
     if ! grep --fixed-strings --quiet "$expected_process" <<<"$processes"; then
         echo "Expected process is not running: $expected_process" >&2
+        echo "$processes" >&2
         exit 1
     fi
 done
