@@ -19,6 +19,7 @@ docs/*
 mkdocs.yml
 tmp
 vendor
+node_modules
 
 public/images/cached/*
 

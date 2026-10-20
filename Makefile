@@ -1,6 +1,9 @@
 .PHONY:build
+.PHONY: frontend_install frontend_sync frontend_check
 
 include .env
+
+FRONTEND_COMPOSE = docker compose -f docker-compose.frontend.yml
 
 # Container management
 ######################
@@ -60,6 +63,17 @@ composer_update:
 
 composer_test:
 	make exec_app_cmd CMD="composer test"
+
+# Frontend dependencies
+#######################
+frontend_install:
+	$(FRONTEND_COMPOSE) run --rm frontend npm ci --ignore-scripts
+
+frontend_sync: frontend_install
+	$(FRONTEND_COMPOSE) run --rm frontend npm run assets:sync
+
+frontend_check: frontend_install
+	$(FRONTEND_COMPOSE) run --rm frontend npm run assets:check
 
 # Database
 ##########

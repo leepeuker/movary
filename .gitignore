@@ -2,6 +2,7 @@
 .phpunit.result.cache
 .env
 /vendor
+/node_modules
 /public/storage
 docker-compose.override.yml
 tmp/*
