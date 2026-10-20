@@ -11,6 +11,81 @@ use SplFileInfo;
 #[CoversNothing]
 class FrontendAssetReferenceTest extends TestCase
 {
+    public function testBaseTemplateIncludesMobileAppMetadata() : void
+    {
+        $templateContents = file_get_contents(__DIR__ . '/../../templates/base.html.twig');
+        self::assertNotFalse($templateContents);
+
+        self::assertStringContainsString('rel="apple-touch-icon"', $templateContents);
+        self::assertStringContainsString('/manifest.webmanifest', $templateContents);
+        self::assertStringContainsString('name="apple-mobile-web-app-capable" content="yes"', $templateContents);
+        self::assertStringContainsString(
+            'name="apple-mobile-web-app-title" content="{{ applicationName }}"',
+            $templateContents,
+        );
+        self::assertStringContainsString("theme == 'dark'", $templateContents);
+    }
+
+    public function testPwaManifestIncludesPlatformMetadata() : void
+    {
+        $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
+        self::assertNotFalse($manifestContents);
+
+        $manifest = json_decode($manifestContents, true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($manifest);
+        self::assertSame('./', $manifest['id']);
+        self::assertSame('./', $manifest['scope']);
+        self::assertIsArray($manifest['icons']);
+
+        $maskableIcons = array_filter(
+            $manifest['icons'],
+            static fn (mixed $icon) : bool => is_array($icon)
+                && isset($icon['purpose'])
+                && is_string($icon['purpose'])
+                && in_array('maskable', explode(' ', $icon['purpose']), true),
+        );
+        self::assertNotEmpty($maskableIcons);
+    }
+
+    public function testPwaManifestIconSizesMatchFiles() : void
+    {
+        $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
+        self::assertNotFalse($manifestContents);
+
+        $manifest = json_decode($manifestContents, true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($manifest);
+        self::assertIsArray($manifest['icons']);
+
+        foreach ($manifest['icons'] as $icon) {
+            self::assertIsArray($icon);
+            self::assertIsString($icon['src']);
+            self::assertIsString($icon['sizes']);
+            $imageContents = file_get_contents(__DIR__ . '/../../public/' . $icon['src']);
+            self::assertNotFalse($imageContents);
+
+            $dimensions = unpack('Nwidth/Nheight', substr($imageContents, 16, 8));
+            self::assertNotFalse($dimensions);
+            self::assertSame($dimensions['width'] . 'x' . $dimensions['height'], $icon['sizes']);
+        }
+    }
+
+    public function testPwaManifestUrlsAreRelativeToApplicationPath() : void
+    {
+        $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
+        self::assertNotFalse($manifestContents);
+
+        $manifest = json_decode($manifestContents, true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($manifest);
+        self::assertSame('./', $manifest['start_url']);
+
+        self::assertIsArray($manifest['icons']);
+        foreach ($manifest['icons'] as $icon) {
+            self::assertIsArray($icon);
+            self::assertIsString($icon['src']);
+            self::assertStringStartsNotWith('/', $icon['src']);
+        }
+    }
+
     public function testLocalJavascriptAndStylesheetReferencesUseDirectorySpecificUrlGenerator() : void
     {
         $templateDirectory = __DIR__ . '/../../templates';

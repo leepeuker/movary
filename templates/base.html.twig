@@ -8,6 +8,9 @@
 
     <title>{% apply trim %}{% block title %}Movary{% endblock %}{% endapply %} | {{ applicationName }}</title>
     <link rel="shortcut icon" href="{{ applicationUrl }}/images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ applicationUrl }}/images/movary-logo-180x180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="{{ applicationName }}">
 
     <meta property="og:title" content="{{ block('title')|trim }} | {{ applicationName }}" />
     <meta property="og:type" content="website" />
@@ -16,11 +19,11 @@
     <meta property="og:description" content="Self hosted web app to track and rate your watched movies" />
 
     <link href="{{ vendor_url('bootstrap/bootstrap.min.css') }}" rel="stylesheet">
-    <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
+    <link rel="manifest" href="{{ applicationUrl }}/manifest.webmanifest">
 
     <script src="{{ js_url('movie-list-view-preference.js') }}"></script>
 
-    <meta name="theme-color" content="white">
+    <meta name="theme-color" content="{{ theme == 'dark' ? '#212529' : '#ffffff' }}">
     <link rel="stylesheet" href="{{ vendor_url('bootstrap-icons/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ vendor_url('datepicker/datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ css_url('global.css') }}">

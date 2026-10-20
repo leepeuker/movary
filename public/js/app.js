@@ -143,6 +143,10 @@ function setTheme(theme, force = false) {
     document.cookie = 'theme=' + theme + ';path=/;expires=' + cookieDate.toUTCString() + ';'
 
     htmlTag.dataset.bsTheme = theme
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+        'content',
+        theme === 'dark' ? '#212529' : '#ffffff',
+    )
 
     if (theme === 'light') {
         updateHtmlThemeColors('light', 'dark')
