@@ -77,8 +77,7 @@ administration. Please report anything that is missing or incorrect.
 ## Contributing
 
 Contributions are welcome. Start with the [development setup](https://docs.movary.org/development/setup/) and keep
-changes focused on one concern. Run `composer test` before proposing application changes and `mkdocs build --strict`
-for documentation changes.
+changes focused on one concern.
 
 For substantial features or architectural changes, please open a
 [GitHub discussion](https://github.com/leepeuker/movary/discussions) first so the approach can be agreed on before
