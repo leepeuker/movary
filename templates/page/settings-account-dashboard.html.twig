@@ -53,14 +53,14 @@
                         {% endif %}
                     </div>
 
-                    <button type="button" class="btn btn-danger float-start" onclick="resetDashboardRows()">Reset</button>
-                    <button type="button" class="btn btn-primary float-end" onclick="updateDashboardRows()">Update</button>
+                    <div class="d-flex justify-content-between pb-3">
+                        <button type="button" class="btn btn-danger" onclick="resetDashboardRows()">Reset</button>
+                        <button type="button" class="btn btn-primary" onclick="updateDashboardRows()">Update</button>
+                    </div>
 
                 </div>
             </div>
         </div>
-
-        <br><br>
 
         {{ include('component/dashboard/row-help-modal.twig') }}
     </main>

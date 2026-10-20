@@ -263,12 +263,10 @@
 
             <div id="alertJellyfinSyncOptionsDiv"></div>
 
-            <button type="submit" class="btn btn-primary" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save
+            <button type="submit" class="btn btn-primary mb-3" {% if jellyfinIsAuthenticated == false %}disabled{% endif %} id="syncSaveButton" onclick="updateSyncOptions()">Save
             </button>
         </div>
 
         {{ include('component/modal-job.html.twig') }}
-
-        <br>
     </main>
 {% endblock %}

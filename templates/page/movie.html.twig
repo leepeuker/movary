@@ -321,7 +321,7 @@
         {# --- Production countries --- #}
 
         <h6 style="margin-bottom: 0.4rem;margin-top: 1rem">Production countries</h6>
-        <div class="carousel">
+        <div class="carousel" style="margin-bottom: 1rem">
             <p style="margin-bottom: 0">
                 {% if movieProductionCountries|length == 0 %} - {% endif %}
                 {% for movieProductionCountry in movieProductionCountries %}{{ movieProductionCountry }}{% if not loop.last %}, {% endif %}
