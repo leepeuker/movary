@@ -25,14 +25,27 @@ class ApiResponse
         return $this;
     }
 
+    public function assertBodySame(string $expectedBody) : self
+    {
+        Assert::assertSame($expectedBody, (string)$this->response->getBody());
+
+        return $this;
+    }
+
     /** @param array<string, mixed> $expectedBody */
     public function assertJsonSame(array $expectedBody) : self
     {
-        Assert::assertSame(
-            $expectedBody,
-            json_decode((string)$this->response->getBody(), true, flags: JSON_THROW_ON_ERROR),
-        );
+        Assert::assertSame($expectedBody, $this->json());
 
         return $this;
+    }
+
+    /** @return array<array-key, mixed> */
+    public function json() : array
+    {
+        $body = json_decode((string)$this->response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        Assert::assertIsArray($body);
+
+        return $body;
     }
 }
