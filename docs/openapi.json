@@ -75,7 +75,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "watchlist": {
+                    "history": {
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -677,7 +677,7 @@
                           "movie": {
                             "$ref": "#/components/schemas/movie"
                           },
-                          "watchedDates": {
+                          "watchDates": {
                             "type": "array",
                             "items": {
                               "type": "object",
