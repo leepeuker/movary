@@ -139,12 +139,17 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId",
+                    "watchedAt"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -170,6 +175,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -208,12 +216,20 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId",
+                    "watchedAt",
+                    "plays",
+                    "comment",
+                    "position"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -239,6 +255,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -277,12 +296,17 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId",
+                    "watchedAt"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -299,6 +323,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -1387,6 +1414,7 @@
       },
       "id": {
         "type": "integer",
+        "minimum": 1,
         "example": 42
       },
       "idNullable": {
@@ -1396,10 +1424,12 @@
       },
       "plays": {
         "type": "integer",
+        "minimum": 1,
         "example": 1
       },
       "playsOptional": {
         "type": "integer",
+        "minimum": 1,
         "example": 1,
         "default": 1
       },
@@ -1429,22 +1459,26 @@
         "default": null
       },
       "position": {
-        "type": "number",
+        "type": "integer",
+        "minimum": 1,
         "example": 1,
         "nullable": false
       },
       "positionOptional": {
-        "type": "number",
+        "type": "integer",
+        "minimum": 1,
         "example": 1,
         "nullable": true,
         "default": 1
       },
       "date": {
         "type": "string",
+        "format": "date",
         "example": "2023-07-02"
       },
       "dateNullable": {
         "type": "string",
+        "format": "date",
         "nullable": true,
         "example": "2023-07-02"
       }
