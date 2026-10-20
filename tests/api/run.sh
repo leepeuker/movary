@@ -3,7 +3,6 @@
 set -euo pipefail
 
 image_reference=${1:-movary-api-test}
-composer_script=${2:-test-api}
 timeout_seconds=${API_TEST_TIMEOUT_SECONDS:-120}
 database_directory=$(mktemp -d)
 container_name="movary-api-test-$$-$RANDOM"
@@ -64,4 +63,4 @@ fi
 docker exec \
     --env API_BASE_URL=http://127.0.0.1:8080 \
     "$container_name" \
-    composer "$composer_script"
+    composer test-api

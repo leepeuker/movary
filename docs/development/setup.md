@@ -36,7 +36,7 @@ Run all standard checks and test suites, including the API tests, with:
 make test
 ```
 
-This runs the full Composer test aggregate in a disposable application container with a temporary SQLite database.
+This runs the Composer checks and unit tests first, then runs the API tests in their disposable application container.
 
 Run the real-HTTP API test suite with:
 
