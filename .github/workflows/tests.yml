@@ -21,6 +21,22 @@ jobs:
       - name: Verify generated frontend assets
         run: USER_ID="$(id -u)" GROUP_ID="$(id -g)" make frontend_check
 
+  audit_frontend_dependencies:
+    name: Audit frontend dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check locked production dependencies for security advisories
+        run: >-
+          docker run --rm
+          --mount type=bind,src=${{ github.workspace }}/package.json,dst=/app/package.json,readonly
+          --mount type=bind,src=${{ github.workspace }}/package-lock.json,dst=/app/package-lock.json,readonly
+          --workdir /app
+          node:24.22.0-alpine3.23@sha256:e44c87c7dd212720eb00469aeac89504ca2be77b8f0d6dbffb30665d5fcc59e1
+          npm audit --package-lock-only --ignore-scripts --omit=dev --audit-level=high
+
   audit_composer_dependencies:
     name: Audit Composer dependencies
     runs-on: ubuntu-latest

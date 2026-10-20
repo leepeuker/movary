@@ -42,7 +42,7 @@ Use the following commands:
 - `make frontend_sync` installs the locked dependencies and regenerates `public/vendor`
 - `make frontend_check` installs the locked dependencies and verifies that `public/vendor` is current without modifying it
 
-CI runs `make frontend_check` from a clean checkout. Changes to `package.json`, `package-lock.json`, the asset copy manifest, and `public/vendor` must therefore remain synchronized.
+CI runs `make frontend_check` from a clean checkout and audits the locked production dependencies for known security advisories. Changes to `package.json`, `package-lock.json`, the asset copy manifest, and `public/vendor` must therefore remain synchronized.
 
 To update a dependency, install an explicit version through the frontend container. For example:
 
