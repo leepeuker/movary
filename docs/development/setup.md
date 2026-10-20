@@ -28,6 +28,28 @@ Use the following cli commands to manage your local environment:
 - `make app_database_migrate` execute the database migrations
 - `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
 
+### Frontend dependencies
+
+Third-party CSS, JavaScript, fonts, source maps, and licenses are managed with npm. npm always runs in the dedicated frontend Docker container, so Node.js and npm do not need to be installed on the host.
+
+Application-owned files remain in `public/css` and `public/js`. Generated third-party files are committed under `public/vendor` and must not be edited manually. The production image uses these committed files and does not install Node.js or download npm packages.
+
+Use the following commands:
+
+- `make frontend_install` installs the exact versions from `package-lock.json`
+- `make frontend_sync` installs the locked dependencies and regenerates `public/vendor`
+- `make frontend_check` installs the locked dependencies and verifies that `public/vendor` is current without modifying it
+
+To update a dependency, install an explicit version through the frontend container. For example:
+
+```bash
+docker compose -f docker-compose.frontend.yml run --rm frontend npm install --ignore-scripts --save-exact bootstrap@5.3.1
+make frontend_sync
+make frontend_check
+```
+
+Commit `package.json`, `package-lock.json`, and the regenerated `public/vendor` files together. Dependency updates should remain separate from unrelated application changes.
+
 ### Xdebug
 
 You can change `XDEBUG_MODE` to `debug` in the `.env` file to enable debugging using [Xdebug](https://xdebug.org/) in the development docker container.

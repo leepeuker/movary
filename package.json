@@ -1,0 +1,16 @@
+{
+  "name": "movary-frontend-dependencies",
+  "private": true,
+  "scripts": {
+    "assets:check": "node scripts/sync-frontend-assets.cjs --check",
+    "assets:sync": "node scripts/sync-frontend-assets.cjs"
+  },
+  "dependencies": {
+    "bootstrap": "5.3.0",
+    "bootstrap-icons": "1.10.2",
+    "marked": "5.0.2",
+    "qrcodejs": "1.0.0",
+    "swagger-ui-dist": "5.12.0",
+    "vanillajs-datepicker": "1.2.0"
+  }
+}
