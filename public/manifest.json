@@ -2,7 +2,9 @@
   "name": "Movary",
   "short_name": "Movary",
   "lang": "en-US",
+  "id": "./",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "white",
   "theme_color": "white",
@@ -50,7 +52,8 @@
     {
       "src": "images/movary-logo-512x512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -69,6 +69,11 @@ class Response
         return new self($statusCode ?? StatusCode::createOk(), $body, [Header::createContentTypeJson()]);
     }
 
+    public static function createWebManifest(string $body) : self
+    {
+        return new self(StatusCode::createOk(), $body, [Header::createContentTypeWebManifest()]);
+    }
+
     public static function createSensitiveJson(
         string $body,
         ?StatusCode $statusCode = null,

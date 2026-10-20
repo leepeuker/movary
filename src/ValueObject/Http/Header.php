@@ -22,6 +22,11 @@ class Header
         return new self('Content-Type', 'application/json');
     }
 
+    public static function createContentTypeWebManifest() : self
+    {
+        return new self('Content-Type', 'application/manifest+json');
+    }
+
     public static function createContentTypeZip() : self
     {
         return new self('Content-Type', 'application/zip');

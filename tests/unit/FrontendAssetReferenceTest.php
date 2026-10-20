@@ -11,6 +11,42 @@ use SplFileInfo;
 #[CoversNothing]
 class FrontendAssetReferenceTest extends TestCase
 {
+    public function testBaseTemplateIncludesMobileAppMetadata() : void
+    {
+        $templateContents = file_get_contents(__DIR__ . '/../../templates/base.html.twig');
+        self::assertNotFalse($templateContents);
+
+        self::assertStringContainsString('rel="apple-touch-icon"', $templateContents);
+        self::assertStringContainsString('/manifest.webmanifest', $templateContents);
+        self::assertStringContainsString('name="apple-mobile-web-app-capable" content="yes"', $templateContents);
+        self::assertStringContainsString(
+            'name="apple-mobile-web-app-title" content="{{ applicationName }}"',
+            $templateContents,
+        );
+        self::assertStringContainsString("theme == 'dark'", $templateContents);
+    }
+
+    public function testPwaManifestIncludesPlatformMetadata() : void
+    {
+        $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
+        self::assertNotFalse($manifestContents);
+
+        $manifest = json_decode($manifestContents, true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($manifest);
+        self::assertSame('./', $manifest['id']);
+        self::assertSame('./', $manifest['scope']);
+        self::assertIsArray($manifest['icons']);
+
+        $maskableIcons = array_filter(
+            $manifest['icons'],
+            static fn (mixed $icon) : bool => is_array($icon)
+                && isset($icon['purpose'])
+                && is_string($icon['purpose'])
+                && in_array('maskable', explode(' ', $icon['purpose']), true),
+        );
+        self::assertNotEmpty($maskableIcons);
+    }
+
     public function testPwaManifestIconSizesMatchFiles() : void
     {
         $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
