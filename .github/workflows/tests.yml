@@ -102,8 +102,17 @@ jobs:
           -f ./build/Dockerfile
           .
 
-      - name: Run all test tools and suites
-        run: docker run --rm --entrypoint composer movary-development test
+      - name: Check code style
+        run: docker run --rm --entrypoint composer movary-development test-cs
+
+      - name: Run PHPStan
+        run: docker run --rm --entrypoint composer movary-development test-phpstan
+
+      - name: Run Psalm
+        run: docker run --rm --entrypoint composer movary-development test-psalm
+
+      - name: Run unit tests
+        run: docker run --rm --entrypoint composer movary-development test-unit
 
       - name: Verify migration cutover
         run: bash tests/migration/verify-cutover.sh movary-development
