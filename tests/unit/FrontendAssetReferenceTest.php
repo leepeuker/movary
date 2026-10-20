@@ -11,6 +11,28 @@ use SplFileInfo;
 #[CoversNothing]
 class FrontendAssetReferenceTest extends TestCase
 {
+    public function testPwaManifestIconSizesMatchFiles() : void
+    {
+        $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
+        self::assertNotFalse($manifestContents);
+
+        $manifest = json_decode($manifestContents, true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($manifest);
+        self::assertIsArray($manifest['icons']);
+
+        foreach ($manifest['icons'] as $icon) {
+            self::assertIsArray($icon);
+            self::assertIsString($icon['src']);
+            self::assertIsString($icon['sizes']);
+            $imageContents = file_get_contents(__DIR__ . '/../../public/' . $icon['src']);
+            self::assertNotFalse($imageContents);
+
+            $dimensions = unpack('Nwidth/Nheight', substr($imageContents, 16, 8));
+            self::assertNotFalse($dimensions);
+            self::assertSame($dimensions['width'] . 'x' . $dimensions['height'], $icon['sizes']);
+        }
+    }
+
     public function testPwaManifestUrlsAreRelativeToApplicationPath() : void
     {
         $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
@@ -23,6 +45,7 @@ class FrontendAssetReferenceTest extends TestCase
         self::assertIsArray($manifest['icons']);
         foreach ($manifest['icons'] as $icon) {
             self::assertIsArray($icon);
+            self::assertIsString($icon['src']);
             self::assertStringStartsNotWith('/', $icon['src']);
         }
     }
