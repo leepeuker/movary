@@ -8,6 +8,7 @@ timeout_seconds=${SMOKE_TIMEOUT_SECONDS:-180}
 application_secret='0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
 database_directory=$(mktemp -d)
 container_name="movary-production-smoke-$$-$RANDOM"
+remove_pulled_image=false
 
 cleanup() {
     local exit_code=$?
@@ -17,6 +18,9 @@ cleanup() {
     fi
 
     docker rm --force "$container_name" >/dev/null 2>&1 || true
+    if [[ $remove_pulled_image == true ]]; then
+        docker image rm "$image_reference" >/dev/null 2>&1 || true
+    fi
     rm -rf "$database_directory"
 }
 trap cleanup EXIT
@@ -25,6 +29,7 @@ chmod 0777 "$database_directory"
 
 if [[ $image_reference == *@sha256:* ]]; then
     docker pull --platform "$platform" "$image_reference"
+    remove_pulled_image=true
 elif ! docker image inspect "$image_reference" >/dev/null 2>&1; then
     docker pull --platform "$platform" "$image_reference"
 fi
