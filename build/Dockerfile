@@ -18,27 +18,14 @@ RUN apk upgrade --no-cache \
     php85 \
     php85-ctype \
     php85-curl \
-    php85-dom \
-    php85-fileinfo \
     php85-fpm \
-    php85-gd \
-    php85-intl \
     php85-mbstring \
-    php85-mysqli \
     php85-openssl \
     php85-pdo \
     php85-pdo_mysql \
     php85-pdo_sqlite \
-    php85-phar \
-    php85-session \
-    php85-simplexml \
     php85-sqlite3 \
-    php85-tokenizer \
-    php85-xml \
-    php85-xmlreader \
-    php85-xmlwriter \
     php85-zip \
-    php85-pecl-imagick \
     supervisor
 
 # Create standard binary name without duplicating the PHP executable
@@ -82,6 +69,12 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 
 FROM base AS production-dependencies
 
+USER root
+
+RUN apk add --no-cache php85-phar
+
+USER application
+
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY --chown=application:application ./composer.json ./composer.lock /app/
 
@@ -117,7 +110,13 @@ FROM base AS development
 
 USER root
 
-RUN apk add --no-cache php85-pecl-xdebug
+RUN apk add --no-cache \
+    php85-dom \
+    php85-phar \
+    php85-simplexml \
+    php85-tokenizer \
+    php85-xmlwriter \
+    php85-pecl-xdebug
 
 ARG XDEBUG_INI="$PHP_INI_DIR/conf.d/xdebug.ini"
 RUN echo 'zend_extension=xdebug.so' > "$XDEBUG_INI" \

@@ -5,19 +5,21 @@ A manual installation runs Movary directly on a server. The [Docker installation
 ## System requirements
 
 - PHP 8.5 with PHP-FPM and these extensions:
+    - ctype
+    - cURL
     - JSON
     - mbstring
+    - OpenSSL
     - PDO and either the MySQL or SQLite PDO driver
-    - SimpleXML
+    - SQLite3 when using SQLite
     - ZIP
     - zlib
-    - Imagick
 - Git
 - [Composer](https://getcomposer.org)
 - A web server such as nginx
 - Supervisor or cron for background job processing
 
-Package names vary by operating system. On Alpine Linux, the PHP packages include `php85-mbstring`, `php85-pdo`, `php85-pdo_mysql` or `php85-pdo_sqlite`, `php85-simplexml`, `php85-zip`, and `php85-pecl-imagick`; JSON and zlib are included in PHP itself.
+Package names vary by operating system. On Alpine Linux, the PHP packages include `php85-ctype`, `php85-curl`, `php85-mbstring`, `php85-openssl`, `php85-pdo`, `php85-pdo_mysql` or `php85-pdo_sqlite`, `php85-sqlite3` when using SQLite, and `php85-zip`; JSON and zlib are included in PHP itself.
 
 ## Required configuration
 
