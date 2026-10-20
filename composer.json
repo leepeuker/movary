@@ -52,7 +52,8 @@
 
     "test-phpstan": "phpstan analyse --memory-limit 512M -c ./settings/phpstan.neon",
     "test-psalm": "psalm -c ./settings/psalm.xml --show-info=false",
-    "test-unit": "phpunit -c ./settings/phpunit.xml --testsuite unit"
+    "test-unit": "phpunit -c ./settings/phpunit.xml --testsuite unit",
+    "test-api": "phpunit -c ./settings/phpunit.xml --testsuite api"
   },
   "autoload": {
     "psr-4": {
@@ -62,6 +63,7 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "Tests\\Api\\Movary\\": "tests/api/",
       "Tests\\Unit\\Movary\\": "tests/unit/"
     }
   },

@@ -28,6 +28,18 @@ Use the following cli commands to manage your local environment:
 - `make app_database_migrate` execute the database migrations
 - `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
 
+### API tests
+
+Run the real-HTTP API test suite with:
+
+```bash
+make api_test
+```
+
+This builds and starts one disposable development image containing both the application and the PHPUnit runner. The container uses a temporary SQLite database, publishes no host ports, has no external network access, and is removed after the test run. It does not use or modify the developer's running Movary containers or database.
+
+The tests create fixtures through Movary's domain services and send API requests through Nginx and PHP-FPM. Add API tests under `tests/api/`; keep fast isolated tests under `tests/unit/`.
+
 ### Frontend dependencies
 
 Third-party CSS, JavaScript, fonts, source maps, and licenses are managed with npm. npm always runs in the dedicated frontend Docker container, so Node.js and npm do not need to be installed on the host.
