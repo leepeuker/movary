@@ -45,12 +45,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Validate OpenAPI specification
-        run: >-
-          docker run --rm
-          --env REDOCLY_TELEMETRY=off
-          --mount type=bind,src=${{ github.workspace }}/docs,dst=/spec,readonly
-          redocly/cli:2.64.1@sha256:b9b4585a3bda40f77b58f5fa4535ad5ce7b7d1e4d6f8ed98ebc2c7694dbf3f5b
-          lint --extends spec --format github-actions openapi.json
+        run: make openapi_validate OPENAPI_OUTPUT_FORMAT=github-actions
 
   run_tests:
     name: Run tests

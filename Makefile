@@ -1,9 +1,11 @@
 .PHONY:build
-.PHONY: frontend_install frontend_sync frontend_check
+.PHONY: frontend_install frontend_sync frontend_check openapi_validate
 
 -include .env
 
 FRONTEND_COMPOSE = docker compose -f docker-compose.frontend.yml
+OPENAPI_VALIDATOR_IMAGE = redocly/cli:2.64.1@sha256:b9b4585a3bda40f77b58f5fa4535ad5ce7b7d1e4d6f8ed98ebc2c7694dbf3f5b
+OPENAPI_OUTPUT_FORMAT ?= stylish
 
 # Container management
 ######################
@@ -74,6 +76,15 @@ frontend_sync: frontend_install
 
 frontend_check: frontend_install
 	$(FRONTEND_COMPOSE) run --rm frontend npm run assets:check
+
+# OpenAPI
+#########
+openapi_validate:
+	docker run --rm \
+	 --env REDOCLY_TELEMETRY=off \
+	 --mount "type=bind,src=$(CURDIR)/docs,dst=/spec,readonly" \
+	 $(OPENAPI_VALIDATOR_IMAGE) \
+	 lint --extends spec --format $(OPENAPI_OUTPUT_FORMAT) openapi.json
 
 # Database
 ##########

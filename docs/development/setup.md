@@ -116,6 +116,8 @@ Checkout the API docs via the url `http://127.0.0.1/docs/api`.
 
 This uses the schema defined in the file `/docs/openapi.json`. Please adjust openapi schema if you change the API.
 
+Validate the OpenAPI schema locally with `make openapi_validate`. This requires Docker.
+
 #### Useful links
 
 - [Trakt API docs](https://trakt.docs.apiary.io/)
