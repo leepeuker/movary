@@ -25,4 +25,10 @@ abstract class ApiTestCase extends TestCase
         $this->api = new ApiClient($baseUrl);
         $this->fixture = new ApiFixture($container);
     }
+
+    /** @return array{Authorization: string} */
+    protected function createAuthorizationHeader(string $token) : array
+    {
+        return ['Authorization' => 'Bearer ' . $token];
+    }
 }

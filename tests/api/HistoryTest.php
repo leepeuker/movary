@@ -178,12 +178,6 @@ class HistoryTest extends ApiTestCase
         yield 'delete' => ['DELETE'];
     }
 
-    /** @return array{Authorization: string} */
-    private function createAuthorizationHeader(string $token) : array
-    {
-        return ['Authorization' => 'Bearer ' . $token];
-    }
-
     private function createPath(string $username) : string
     {
         return '/api/users/' . $username . '/history/movies';

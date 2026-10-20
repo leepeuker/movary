@@ -61,7 +61,7 @@ class ApiFixture
     public function findHistoryEntry(
         int $movieId,
         int $userId,
-        string $watchedAt,
+        ?string $watchedAt,
     ) : ?MovieHistoryEntity {
         /** @var MovieApi $movieApi */
         $movieApi = $this->container->get(MovieApi::class);
@@ -69,7 +69,7 @@ class ApiFixture
         return $movieApi->findHistoryEntryForMovieByUserOnDate(
             $movieId,
             $userId,
-            Date::createFromString($watchedAt),
+            $watchedAt === null ? null : Date::createFromString($watchedAt),
         );
     }
 }
