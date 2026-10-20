@@ -170,6 +170,111 @@ class HistoryTest extends ApiTestCase
             ->assertStatus(404);
     }
 
+    public function testRejectsMalformedJson() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+
+        $this->api
+            ->requestRaw(
+                'POST',
+                $this->createPath($fixture['user']->getName()),
+                '{',
+                [...$this->createAuthorizationHeader($fixture['token']), 'Content-Type' => 'application/json'],
+            )
+            ->assertStatus(400)
+            ->assertHeaderSame('Content-Type', 'application/json')
+            ->assertJsonSame([
+                'error' => 'InvalidJson',
+                'message' => 'Request body must contain a valid JSON array.',
+            ]);
+    }
+
+    public function testRejectsInvalidAdditionFields() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [['movaryId' => $movie->getId(), 'watchedAt' => 'not-a-date']],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchedAt" must be a date in YYYY-MM-DD format.',
+            ]);
+    }
+
+    public function testRejectsInvalidUpdateFields() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->put(
+                $this->createPath($fixture['user']->getName()),
+                [[
+                    'movaryId' => $movie->getId(),
+                    'watchedAt' => self::WATCHED_AT,
+                    'plays' => 1,
+                    'position' => 1,
+                ]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].comment" is required and must be a string or null.',
+            ]);
+    }
+
+    public function testRejectsInvalidDeletionFields() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->delete(
+                $this->createPath($fixture['user']->getName()),
+                [['movaryId' => $movie->getId()]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchedAt" must be a date in YYYY-MM-DD format.',
+            ]);
+    }
+
+    public function testRejectsUnknownMovieWithoutPartiallyApplyingRequest() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [
+                    ['movaryId' => $movie->getId(), 'watchedAt' => self::WATCHED_AT],
+                    ['movaryId' => 2_147_483_647, 'watchedAt' => self::WATCHED_AT],
+                ],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'MovieNotFound',
+                'message' => 'Movie with id 2147483647 does not exist.',
+            ]);
+
+        self::assertNull($this->fixture->findHistoryEntry(
+            $movie->getId(),
+            $fixture['user']->getId(),
+            self::WATCHED_AT,
+        ));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function writeMethodProvider() : iterable
     {
