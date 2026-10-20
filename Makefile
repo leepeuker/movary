@@ -8,6 +8,7 @@ OPENAPI_VALIDATOR_IMAGE = redocly/cli:2.64.1@sha256:b9b4585a3bda40f77b58f5fa4535
 OPENAPI_OUTPUT_FORMAT ?= stylish
 API_TEST_IMAGE ?= movary-api-test
 API_TEST_TIMEOUT_SECONDS ?= 120
+API_TEST_COMPOSER_SCRIPT ?= test-api
 
 # Container management
 ######################
@@ -72,7 +73,7 @@ composer_test:
 ###########
 api_test:
 	docker build --target development --tag "$(API_TEST_IMAGE)" --file ./build/Dockerfile .
-	API_TEST_TIMEOUT_SECONDS="$(API_TEST_TIMEOUT_SECONDS)" ./tests/api/run.sh "$(API_TEST_IMAGE)"
+	API_TEST_TIMEOUT_SECONDS="$(API_TEST_TIMEOUT_SECONDS)" ./tests/api/run.sh "$(API_TEST_IMAGE)" "$(API_TEST_COMPOSER_SCRIPT)"
 
 # Frontend dependencies
 #######################
@@ -153,4 +154,5 @@ app_mastodon_post_watchlist:
 
 # Shortcuts
 php: exec_app_bash
-test: composer_test
+test:
+	make api_test API_TEST_COMPOSER_SCRIPT=test
