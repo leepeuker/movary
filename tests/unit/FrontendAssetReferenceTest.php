@@ -28,6 +28,7 @@ class FrontendAssetReferenceTest extends TestCase
             foreach ($matches[1] as $assetReference) {
                 if (str_contains($assetReference, 'js/') === false
                     && str_contains($assetReference, 'css/') === false
+                    && str_contains($assetReference, 'vendor/') === false
                 ) {
                     continue;
                 }

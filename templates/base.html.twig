@@ -15,14 +15,14 @@
     <meta property="og:image" content="{% block ogImage %}{{ applicationUrl }}/images/movary-logo-512x512.png{% endblock %}" />
     <meta property="og:description" content="Self hosted web app to track and rate your watched movies" />
 
-    <link href="{{ asset_url('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset_url('vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
 
     <script src="{{ asset_url('js/movie-list-view-preference.js') }}"></script>
 
     <meta name="theme-color" content="white">
-    <link rel="stylesheet" href="{{ asset_url('css/bootstrap-icons-1.10.2.css') }}">
-    <link rel="stylesheet" href="{{ asset_url('css/datepicker-1.2.0.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('vendor/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('vendor/datepicker/datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset_url('css/global.css') }}">
 {% block stylesheets %}{% endblock %}
 </head>
@@ -43,8 +43,8 @@
     window.SERVICE_WORKER_URL = "{{ asset_url('serviceWorker.js') }}";
     window.PASSWORD_MIN_LENGTH = {{ passwordMinimumLength }};
 </script>
-<script src="{{ asset_url('js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset_url('js/datepicker-full-1.2.0.min.js') }}"></script>
+<script src="{{ asset_url('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset_url('vendor/datepicker/datepicker-full.min.js') }}"></script>
 <script src="{{ asset_url('js/app.js') }}"></script>
 
 {% block scripts %}{% endblock %}
