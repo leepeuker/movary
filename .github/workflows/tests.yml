@@ -37,6 +37,21 @@ jobs:
           composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac
           audit --locked --no-dev --no-interaction
 
+  validate_openapi:
+    name: Validate OpenAPI specification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate OpenAPI specification
+        run: >-
+          docker run --rm
+          --env REDOCLY_TELEMETRY=off
+          --mount type=bind,src=${{ github.workspace }}/docs,dst=/spec,readonly
+          redocly/cli:2.64.1@sha256:b9b4585a3bda40f77b58f5fa4535ad5ce7b7d1e4d6f8ed98ebc2c7694dbf3f5b
+          lint --extends spec --format github-actions openapi.json
+
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
