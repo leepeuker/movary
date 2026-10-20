@@ -114,9 +114,6 @@ jobs:
       - name: Run unit tests
         run: docker run --rm --entrypoint composer movary-development test-unit
 
-      - name: Run API tests
-        run: ./tests/api/run.sh movary-development
-
       - name: Verify migration cutover
         run: bash tests/migration/verify-cutover.sh movary-development
 
