@@ -3,6 +3,9 @@
 /** @var DI\Container $container */
 
 use Movary\HttpController\Web\ErrorController;
+use Movary\HttpController\Api\Exception\InvalidApiRequest;
+use Movary\Util\Json;
+use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Psr\Log\LoggerInterface;
@@ -56,6 +59,14 @@ try {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
 
+} catch (InvalidApiRequest $exception) {
+    $response = Response::createBadRequest(
+        Json::encode([
+            'error' => $exception->getErrorType(),
+            'message' => $exception->getMessage(),
+        ]),
+        [Header::createContentTypeJson()],
+    );
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
