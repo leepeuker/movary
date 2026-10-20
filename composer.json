@@ -46,7 +46,8 @@
       "@test-cs",
       "@test-phpstan",
       "@test-psalm",
-      "@test-unit"
+      "@test-unit",
+      "@test-api"
     ],
     "test-cs": "phpcs --standard=./settings/phpcs.xml",
 
