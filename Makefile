@@ -1,7 +1,7 @@
 .PHONY:build
 .PHONY: frontend_install frontend_sync frontend_check
 
-include .env
+-include .env
 
 FRONTEND_COMPOSE = docker compose -f docker-compose.frontend.yml
 

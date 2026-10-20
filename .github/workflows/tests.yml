@@ -11,6 +11,16 @@ permissions:
   contents: read
 
 jobs:
+  verify_frontend_assets:
+    name: Verify frontend assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify generated frontend assets
+        run: USER_ID="$(id -u)" GROUP_ID="$(id -g)" make frontend_check
+
   audit_composer_dependencies:
     name: Audit Composer dependencies
     runs-on: ubuntu-latest
