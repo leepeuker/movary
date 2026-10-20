@@ -8,6 +8,8 @@ use Movary\ValueObject\Http\Request;
 
 class HistoryRequestMapper
 {
+    private const int MAX_SMALLINT = 32767;
+
     private const string DEFAULT_SORT_BY = 'watchedAt';
 
     private const string DEFAULT_SORT_ORDER = 'desc';
@@ -37,8 +39,20 @@ class HistoryRequestMapper
             $result[] = [
                 'movieId' => $this->requestMapper->mapExistingMovieId($addition, $path),
                 'watchedAt' => $this->requestMapper->mapRequiredDate($addition, 'watchedAt', $path . '.watchedAt'),
-                'plays' => $this->requestMapper->mapOptionalPositiveInteger($addition, 'plays', $path . '.plays', 1),
-                'position' => $this->requestMapper->mapOptionalPositiveInteger($addition, 'position', $path . '.position', 1),
+                'plays' => $this->requestMapper->mapOptionalPositiveInteger(
+                    $addition,
+                    'plays',
+                    $path . '.plays',
+                    1,
+                    self::MAX_SMALLINT,
+                ),
+                'position' => $this->requestMapper->mapOptionalPositiveInteger(
+                    $addition,
+                    'position',
+                    $path . '.position',
+                    1,
+                    self::MAX_SMALLINT,
+                ),
                 'comment' => $this->requestMapper->mapOptionalNullableString($addition, 'comment', $path . '.comment'),
             ];
         }
@@ -61,7 +75,7 @@ class HistoryRequestMapper
         return $result;
     }
 
-    /** @return list<array{movieId: int, watchedAt: Date, plays: int, position: int, comment: null|string}> */
+    /** @return list<array{movieId: int, watchedAt: Date, plays: int, position: null|int, comment: null|string}> */
     public function mapUpdates(Request $request) : array
     {
         $result = [];
@@ -70,9 +84,19 @@ class HistoryRequestMapper
             $result[] = [
                 'movieId' => $this->requestMapper->mapExistingMovieId($update, $path),
                 'watchedAt' => $this->requestMapper->mapRequiredDate($update, 'watchedAt', $path . '.watchedAt'),
-                'plays' => $this->requestMapper->mapRequiredPositiveInteger($update, 'plays', $path . '.plays'),
-                'position' => $this->requestMapper->mapRequiredPositiveInteger($update, 'position', $path . '.position'),
-                'comment' => $this->requestMapper->mapRequiredNullableString($update, 'comment', $path . '.comment'),
+                'plays' => $this->requestMapper->mapRequiredPositiveInteger(
+                    $update,
+                    'plays',
+                    $path . '.plays',
+                    self::MAX_SMALLINT,
+                ),
+                'position' => $this->requestMapper->mapOptionalNullablePositiveInteger(
+                    $update,
+                    'position',
+                    $path . '.position',
+                    self::MAX_SMALLINT,
+                ),
+                'comment' => $this->requestMapper->mapOptionalNullableString($update, 'comment', $path . '.comment'),
             ];
         }
 

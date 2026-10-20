@@ -94,6 +94,21 @@ class RequestMapperTest extends TestCase
         );
     }
 
+    public function testRejectsPositiveIntegerAboveMaximum() : void
+    {
+        $this->expectExceptionObject(InvalidApiRequest::invalidField('items[0].plays', 'must be at most 32767'));
+
+        $this->subject->mapRequiredPositiveInteger(['plays' => 32768], 'plays', 'items[0].plays', 32767);
+    }
+
+    public function testMapsOptionalNullIntegerToDefault() : void
+    {
+        self::assertSame(
+            1,
+            $this->subject->mapOptionalPositiveInteger(['position' => null], 'position', 'items[0].position', 1),
+        );
+    }
+
     private function createRequest(string $body) : Request
     {
         $request = $this->createStub(Request::class);

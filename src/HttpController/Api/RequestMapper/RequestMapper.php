@@ -99,39 +99,51 @@ class RequestMapper
     }
 
     /** @param array<string, mixed> $data */
-    public function mapRequiredPositiveInteger(array $data, string $field, string $path) : int
+    public function mapRequiredPositiveInteger(
+        array $data,
+        string $field,
+        string $path,
+        ?int $maximum = null,
+    ) : int
     {
         $value = $data[$field] ?? null;
         if (is_int($value) === false || $value < 1) {
             throw InvalidApiRequest::invalidField($path, 'must be a positive integer');
         }
+        if ($maximum !== null && $value > $maximum) {
+            throw InvalidApiRequest::invalidField($path, 'must be at most ' . $maximum);
+        }
 
         return $value;
     }
 
     /** @param array<string, mixed> $data */
-    public function mapOptionalPositiveInteger(array $data, string $field, string $path, int $default) : int
-    {
-        if (array_key_exists($field, $data) === false) {
+    public function mapOptionalPositiveInteger(
+        array $data,
+        string $field,
+        string $path,
+        int $default,
+        ?int $maximum = null,
+    ) : int {
+        if (array_key_exists($field, $data) === false || $data[$field] === null) {
             return $default;
         }
 
-        return $this->mapRequiredPositiveInteger($data, $field, $path);
+        return $this->mapRequiredPositiveInteger($data, $field, $path, $maximum);
     }
 
     /** @param array<string, mixed> $data */
-    public function mapRequiredNullableString(array $data, string $field, string $path) : ?string
-    {
-        if (array_key_exists($field, $data) === false) {
-            throw InvalidApiRequest::invalidField($path, 'is required and must be a string or null');
+    public function mapOptionalNullablePositiveInteger(
+        array $data,
+        string $field,
+        string $path,
+        ?int $maximum = null,
+    ) : ?int {
+        if (array_key_exists($field, $data) === false || $data[$field] === null) {
+            return null;
         }
 
-        $value = $data[$field];
-        if ($value !== null && is_string($value) === false) {
-            throw InvalidApiRequest::invalidField($path, 'must be a string or null');
-        }
-
-        return $value;
+        return $this->mapRequiredPositiveInteger($data, $field, $path, $maximum);
     }
 
     /** @param array<string, mixed> $data */
