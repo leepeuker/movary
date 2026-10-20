@@ -11,6 +11,22 @@ use SplFileInfo;
 #[CoversNothing]
 class FrontendAssetReferenceTest extends TestCase
 {
+    public function testPwaManifestUrlsAreRelativeToApplicationPath() : void
+    {
+        $manifestContents = file_get_contents(__DIR__ . '/../../public/manifest.json');
+        self::assertNotFalse($manifestContents);
+
+        $manifest = json_decode($manifestContents, true, flags: JSON_THROW_ON_ERROR);
+        self::assertIsArray($manifest);
+        self::assertSame('./', $manifest['start_url']);
+
+        self::assertIsArray($manifest['icons']);
+        foreach ($manifest['icons'] as $icon) {
+            self::assertIsArray($icon);
+            self::assertStringStartsNotWith('/', $icon['src']);
+        }
+    }
+
     public function testLocalJavascriptAndStylesheetReferencesUseDirectorySpecificUrlGenerator() : void
     {
         $templateDirectory = __DIR__ . '/../../templates';
