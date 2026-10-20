@@ -201,19 +201,9 @@ jobs:
             done <<<"$moving_tag_suffixes"
           fi
 
-          resolve_digest() {
-            docker buildx imagetools inspect "$1" | awk '$1 == "Digest:" { print $2; exit }'
-          }
-
           for immutable_tag in "${immutable_tags[@]}"; do
-            if existing_digest=$(resolve_digest "$immutable_tag" 2>/dev/null); then
-              if [[ "$existing_digest" != "$CANDIDATE_DIGEST" ]]; then
-                echo "Immutable tag $immutable_tag already points to $existing_digest" >&2
-                exit 1
-              fi
-            else
-              docker buildx imagetools create --tag "$immutable_tag" "$source_reference"
-            fi
+            bash tests/container/promote-immutable-image.sh \
+              "$source_reference" "$immutable_tag" "$CANDIDATE_DIGEST"
           done
 
           for moving_tag in "${moving_tags[@]}"; do
