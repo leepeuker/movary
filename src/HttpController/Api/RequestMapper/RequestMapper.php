@@ -46,10 +46,29 @@ class RequestMapper
                 throw InvalidApiRequest::invalidField('items[' . $index . ']', 'must be an object');
             }
 
-            $result[] = get_object_vars($item);
+            /** @var array<string, mixed> $mappedItem */
+            $mappedItem = $this->convertJsonObjectsToArrays($item);
+            $result[] = $mappedItem;
         }
 
         return $result;
+    }
+
+    private function convertJsonObjectsToArrays(mixed $value) : mixed
+    {
+        if ($value instanceof \stdClass) {
+            $value = get_object_vars($value);
+        }
+
+        if (is_array($value) === false) {
+            return $value;
+        }
+
+        foreach ($value as $key => $nestedValue) {
+            $value[$key] = $this->convertJsonObjectsToArrays($nestedValue);
+        }
+
+        return $value;
     }
 
     /** @param array<string, mixed> $data */

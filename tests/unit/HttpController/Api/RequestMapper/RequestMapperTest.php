@@ -27,8 +27,16 @@ class RequestMapperTest extends TestCase
     public function testMapsJsonObjectList() : void
     {
         self::assertSame(
-            [['movaryId' => 42]],
-            $this->subject->mapJsonObjectList($this->createRequest('[{"movaryId":42}]')),
+            [[
+                'movaryId' => 42,
+                'watchDates' => [[
+                    'watchedAt' => '2026-10-20',
+                    'metadata' => ['source' => 'api'],
+                ]],
+            ]],
+            $this->subject->mapJsonObjectList($this->createRequest(
+                '[{"movaryId":42,"watchDates":[{"watchedAt":"2026-10-20","metadata":{"source":"api"}}]}]',
+            )),
         );
     }
 
