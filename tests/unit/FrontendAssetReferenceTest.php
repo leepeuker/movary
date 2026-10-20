@@ -11,7 +11,7 @@ use SplFileInfo;
 #[CoversNothing]
 class FrontendAssetReferenceTest extends TestCase
 {
-    public function testLocalJavascriptAndStylesheetReferencesUseAssetUrlGenerator() : void
+    public function testLocalJavascriptAndStylesheetReferencesUseDirectorySpecificUrlGenerator() : void
     {
         $templateDirectory = __DIR__ . '/../../templates';
         $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($templateDirectory));
@@ -24,19 +24,22 @@ class FrontendAssetReferenceTest extends TestCase
             $contents = file_get_contents($file->getPathname());
             self::assertNotFalse($contents);
 
-            preg_match_all('/<(?:script|link)\b[^>]*(?:src|href)="([^"]+)"/', $contents, $matches);
-            foreach ($matches[1] as $assetReference) {
-                if (str_contains($assetReference, 'js/') === false
-                    && str_contains($assetReference, 'css/') === false
-                    && str_contains($assetReference, 'vendor/') === false
+            preg_match_all('/<(script|link)\b[^>]*(?:src|href)="([^"]+)"/', $contents, $matches);
+            foreach ($matches[2] as $index => $assetReference) {
+                if (str_contains($assetReference, 'applicationUrl')
+                    || preg_match('/^(?:https?:)?\/\//', $assetReference) === 1
                 ) {
                     continue;
                 }
 
-                self::assertStringContainsString(
-                    'asset_url(',
-                    $assetReference,
-                    sprintf('Unversioned frontend asset in %s', $file->getPathname()),
+                $expectedFunctions = $matches[1][$index] === 'script'
+                    ? ['js_url(', 'vendor_url(']
+                    : ['css_url(', 'vendor_url('];
+
+                self::assertTrue(
+                    str_contains($assetReference, $expectedFunctions[0])
+                        || str_contains($assetReference, $expectedFunctions[1]),
+                    sprintf('Frontend asset uses the wrong URL generator in %s', $file->getPathname()),
                 );
             }
         }

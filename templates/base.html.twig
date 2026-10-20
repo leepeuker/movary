@@ -15,15 +15,15 @@
     <meta property="og:image" content="{% block ogImage %}{{ applicationUrl }}/images/movary-logo-512x512.png{% endblock %}" />
     <meta property="og:description" content="Self hosted web app to track and rate your watched movies" />
 
-    <link href="{{ asset_url('vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ vendor_url('bootstrap/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="manifest" href="{{ applicationUrl }}/manifest.json">
 
-    <script src="{{ asset_url('js/movie-list-view-preference.js') }}"></script>
+    <script src="{{ js_url('movie-list-view-preference.js') }}"></script>
 
     <meta name="theme-color" content="white">
-    <link rel="stylesheet" href="{{ asset_url('vendor/bootstrap-icons/bootstrap-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset_url('vendor/datepicker/datepicker.min.css') }}">
-    <link rel="stylesheet" href="{{ asset_url('css/global.css') }}">
+    <link rel="stylesheet" href="{{ vendor_url('bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ vendor_url('datepicker/datepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ css_url('global.css') }}">
 {% block stylesheets %}{% endblock %}
 </head>
 <body>
@@ -40,12 +40,12 @@
 <script>
     window.APPLICATION_URL = "{{ applicationUrl }}";
     window.MOVIE_TITLE_DISPLAY = {{ movieTitleDisplay|json_encode|raw }};
-    window.SERVICE_WORKER_URL = "{{ asset_url('serviceWorker.js') }}";
+    window.SERVICE_WORKER_URL = "{{ applicationUrl }}/serviceWorker.js";
     window.PASSWORD_MIN_LENGTH = {{ passwordMinimumLength }};
 </script>
-<script src="{{ asset_url('vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset_url('vendor/datepicker/datepicker-full.min.js') }}"></script>
-<script src="{{ asset_url('js/app.js') }}"></script>
+<script src="{{ vendor_url('bootstrap/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ vendor_url('datepicker/datepicker-full.min.js') }}"></script>
+<script src="{{ js_url('app.js') }}"></script>
 
 {% block scripts %}{% endblock %}
 </body>

@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block stylesheets %}
-    <link href="{{ asset_url('css/settings.css') }}" rel="stylesheet">
+    <link href="{{ css_url('settings.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ asset_url('vendor/qrcode/qrcode.min.js') }}"></script>
-    <script src="{{ asset_url('js/settings-account-security.js') }}"></script>
+    <script src="{{ vendor_url('qrcode/qrcode.min.js') }}"></script>
+    <script src="{{ js_url('settings-account-security.js') }}"></script>
 {% endblock %}
 
 {% block body %}

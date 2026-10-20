@@ -528,7 +528,9 @@ class Factory
             self::createDirectoryAppRoot() . 'public',
             $applicationUrl,
         );
-        $twig->addFunction(new TwigFunction('asset_url', [$assetUrlGenerator, 'generate']));
+        $twig->addFunction(new TwigFunction('js_url', [$assetUrlGenerator, 'generateJavascript']));
+        $twig->addFunction(new TwigFunction('css_url', [$assetUrlGenerator, 'generateStylesheet']));
+        $twig->addFunction(new TwigFunction('vendor_url', [$assetUrlGenerator, 'generateVendor']));
 
         // slugify filter for "nice looking" URLs
         //  turns names/movie titles into slugs for use in, e.g., "/…/14-freakier-friday/"
