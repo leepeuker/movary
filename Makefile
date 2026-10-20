@@ -153,4 +153,4 @@ app_mastodon_post_watchlist:
 
 # Shortcuts
 php: exec_app_bash
-test: composer_test
+test: composer_test api_test

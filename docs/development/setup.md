@@ -30,6 +30,14 @@ Use the following cli commands to manage your local environment:
 
 ### API tests
 
+Run all standard checks and test suites, including the API tests, with:
+
+```bash
+make test
+```
+
+This runs the Composer checks and unit tests first, then runs the API tests in their disposable application container.
+
 Run the real-HTTP API test suite with:
 
 ```bash
