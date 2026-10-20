@@ -37,6 +37,16 @@ jobs:
           composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac
           audit --locked --no-dev --no-interaction
 
+  validate_openapi:
+    name: Validate OpenAPI specification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate OpenAPI specification
+        run: make openapi_validate OPENAPI_OUTPUT_FORMAT=github-actions
+
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
