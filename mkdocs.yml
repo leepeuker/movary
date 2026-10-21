@@ -73,6 +73,7 @@ nav:
       - Directory structure: development/file-structure.md
       - How does the backend work?: development/structure.md
       - Job processing internals: development/job-processing.md
+      - Webhook validation proposal: development/webhook-validation.md
       - Database migrations: development/database-migrations.md
       - Container vulnerability scanning: development/container-vulnerability-scanning.md
   - FAQ: 'faq.md'
