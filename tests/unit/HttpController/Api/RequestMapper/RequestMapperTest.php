@@ -109,6 +109,40 @@ class RequestMapperTest extends TestCase
         );
     }
 
+    public function testMapsOptionalObjectList() : void
+    {
+        self::assertSame(
+            [['watchedAt' => null]],
+            $this->subject->mapOptionalObjectList(
+                ['watchDates' => [['watchedAt' => null]]],
+                'watchDates',
+                'items[0].watchDates',
+            ),
+        );
+    }
+
+    public function testRejectsNonObjectListItem() : void
+    {
+        $this->expectExceptionObject(
+            InvalidApiRequest::invalidField('items[0].watchDates[0]', 'must be an object'),
+        );
+
+        $this->subject->mapOptionalObjectList(
+            ['watchDates' => ['2026-10-20']],
+            'watchDates',
+            'items[0].watchDates',
+        );
+    }
+
+    public function testMapsNullableDate() : void
+    {
+        self::assertNull($this->subject->mapNullableDate(null, 'items[0].watchedAt'));
+        self::assertSame(
+            '2026-10-20',
+            (string)$this->subject->mapNullableDate('2026-10-20', 'items[0].watchedAt'),
+        );
+    }
+
     private function createRequest(string $body) : Request
     {
         $request = $this->createStub(Request::class);
