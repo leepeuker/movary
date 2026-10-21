@@ -11,6 +11,9 @@ The Emby integration automatically records completed movie plays in Movary throu
 
 Movary records only movie playback-stop events that Emby reports as played to completion. The movie must have a TMDB identifier so Movary can match or create it.
 
+Movary validates the JSON in Emby's `data` form field before processing and rejects malformed
+payloads or JSON fields larger than 256 KiB.
+
 The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.
 
 Keep the webhook URL private because it is connected to your account. Regenerating or deleting it immediately invalidates the previous URL, which must then be replaced or removed in Emby.

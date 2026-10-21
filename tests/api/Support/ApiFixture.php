@@ -2,6 +2,7 @@
 
 namespace Tests\Api\Movary\Support;
 
+use InvalidArgumentException;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
@@ -95,5 +96,19 @@ class ApiFixture
         $userApi = $this->container->get(UserApi::class);
 
         return $userApi->regenerateRadarrFeedId($userId);
+    }
+
+    public function createWebhookId(int $userId, string $provider) : string
+    {
+        /** @var UserApi $userApi */
+        $userApi = $this->container->get(UserApi::class);
+
+        return match ($provider) {
+            'emby' => $userApi->regenerateEmbyWebhookId($userId),
+            'jellyfin' => $userApi->regenerateJellyfinWebhookId($userId),
+            'kodi' => $userApi->regenerateKodiWebhookId($userId),
+            'plex' => $userApi->regeneratePlexWebhookId($userId),
+            default => throw new InvalidArgumentException('Unsupported webhook provider: ' . $provider),
+        };
     }
 }

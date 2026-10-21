@@ -1282,12 +1282,46 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "payload"
+                ],
+                "properties": {
+                  "payload": {
+                    "type": "string",
+                    "maxLength": 262144,
+                    "description": "JSON-encoded Plex webhook event"
+                  }
+                }
+              },
+              "encoding": {
+                "payload": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
           },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
           "404": {
             "$ref": "#/components/responses/404"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
           },
           "500": {
             "$ref": "#/components/responses/500"
@@ -1313,12 +1347,56 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "NotificationType",
+                  "ItemType"
+                ],
+                "properties": {
+                  "NotificationType": {
+                    "type": "string",
+                    "example": "PlaybackStop"
+                  },
+                  "ItemType": {
+                    "type": "string",
+                    "example": "Movie"
+                  },
+                  "PlayedToCompletion": {
+                    "type": "boolean"
+                  },
+                  "UtcTimestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "Provider_tmdb": {
+                    "type": "string",
+                    "pattern": "^[1-9]\\d*$"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
           },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
           "404": {
             "$ref": "#/components/responses/404"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
           },
           "500": {
             "$ref": "#/components/responses/500"
@@ -1344,12 +1422,38 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "string",
+                    "maxLength": 262144,
+                    "description": "JSON-encoded Emby webhook event"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
           },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
           "404": {
             "$ref": "#/components/responses/404"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
           },
           "500": {
             "$ref": "#/components/responses/500"
@@ -1375,12 +1479,54 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "uniqueIds": {
+                    "type": "object",
+                    "properties": {
+                      "tmdbId": {
+                        "oneOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "^[1-9]\\d*$"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
           },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
           "404": {
             "$ref": "#/components/responses/404"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
           },
           "500": {
             "$ref": "#/components/responses/500"
@@ -1739,6 +1885,26 @@
       },
       "404": {
         "description": "The resource was not found"
+      },
+      "413": {
+        "description": "The webhook JSON payload exceeds 262144 bytes",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/responses/400/content/application~1json/schema"
+            }
+          }
+        }
+      },
+      "415": {
+        "description": "The webhook request uses an unsupported media type",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/responses/400/content/application~1json/schema"
+            }
+          }
+        }
       },
       "500": {
         "description": "An unexpected server error occurred",

@@ -15,6 +15,10 @@ To configure scrobbling:
 
 Plex sends a `media.scrobble` event when it considers a movie watched and a `media.rate` event when its rating changes. Movary ignores other media types and events. A movie must have a TMDB identifier in Plex so Movary can match or create it.
 
+Movary accepts Plex's multipart webhook format and validates its JSON `payload` field before
+processing. Malformed payloads are rejected, and the JSON field may not exceed 256 KiB. Multipart
+attachments sent by Plex are not included in that JSON limit.
+
 The webhook URL is connected to your Movary account. Keep it private. Regenerating or deleting it immediately invalidates the previous URL, which must then be removed or replaced in Plex.
 
 The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.
