@@ -45,6 +45,10 @@ Movary, then complete the [getting started guide](https://docs.movary.org/gettin
 
 For installations without Docker, see the [manual installation guide](https://docs.movary.org/install/manual/).
 
+## One-click deploy
+
+[![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploylobe.svg)](https://repocloud.io/details/Movary/)
+
 ## Features
 
 - Movie watch history: Collect and manage your watch history and ratings
