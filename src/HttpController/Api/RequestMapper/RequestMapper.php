@@ -99,6 +99,70 @@ class RequestMapper
     }
 
     /** @param array<string, mixed> $data */
+    public function mapOptionalNullableDate(array $data, string $field, string $path) : ?Date
+    {
+        if (array_key_exists($field, $data) === false) {
+            return null;
+        }
+
+        return $this->mapNullableDate($data[$field], $path);
+    }
+
+    public function mapNullableDate(mixed $value, string $path) : ?Date
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_string($value) === false) {
+            throw InvalidApiRequest::invalidField($path, 'must be a date in YYYY-MM-DD format or null');
+        }
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+        if ($date === false || $date->format('Y-m-d') !== $value) {
+            throw InvalidApiRequest::invalidField($path, 'must be a date in YYYY-MM-DD format or null');
+        }
+
+        return Date::createFromString($value);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return list<mixed>
+     */
+    public function mapOptionalList(array $data, string $field, string $path) : array
+    {
+        if (array_key_exists($field, $data) === false || $data[$field] === null) {
+            return [];
+        }
+
+        $value = $data[$field];
+        if (is_array($value) === false || array_is_list($value) === false) {
+            throw InvalidApiRequest::invalidField($path, 'must be an array');
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return list<array<string, mixed>>
+     */
+    public function mapOptionalObjectList(array $data, string $field, string $path) : array
+    {
+        $result = [];
+        foreach ($this->mapOptionalList($data, $field, $path) as $index => $item) {
+            if (is_array($item) === false || ($item !== [] && array_is_list($item) === true)) {
+                throw InvalidApiRequest::invalidField($path . '[' . $index . ']', 'must be an object');
+            }
+
+            /** @var array<string, mixed> $item */
+            $result[] = $item;
+        }
+
+        return $result;
+    }
+
+    /** @param array<string, mixed> $data */
     public function mapRequiredPositiveInteger(
         array $data,
         string $field,

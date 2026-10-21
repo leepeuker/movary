@@ -209,6 +209,196 @@ class PlayedTest extends ApiTestCase
             ->assertStatus(404);
     }
 
+    public function testRejectsMalformedJson() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+
+        $this->api
+            ->requestRaw(
+                'POST',
+                $this->createPath($fixture['user']->getName()),
+                '{',
+                [...$this->createAuthorizationHeader($fixture['token']), 'Content-Type' => 'application/json'],
+            )
+            ->assertStatus(400)
+            ->assertHeaderSame('Content-Type', 'application/json')
+            ->assertJsonSame([
+                'error' => 'InvalidJson',
+                'message' => 'Request body must contain a valid JSON array.',
+            ]);
+    }
+
+    public function testRejectsInvalidNestedWatchDate() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [['movaryId' => $movie->getId(), 'watchDates' => ['not-an-object']]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchDates[0]" must be an object.',
+            ]);
+    }
+
+    public function testAcceptsAdditionDefaultsForNullableWatchDate() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [[
+                    'movaryId' => $movie->getId(),
+                    'watchDates' => [['watchedAt' => null, 'plays' => null]],
+                ]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(204);
+
+        $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), null);
+        self::assertNotNull($entry);
+        self::assertSame(1, $entry->getPlays());
+        self::assertNull($entry->getComment());
+    }
+
+    public function testAcceptsUpdateWithoutOptionalComment() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($fixture['user']->getName());
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->api->post($path, [[
+            'movaryId' => $movie->getId(),
+            'watchDates' => [[
+                'watchedAt' => self::WATCHED_AT,
+                'comment' => 'Keep me',
+            ]],
+        ]], $headers)->assertStatus(204);
+
+        $this->api->put($path, [[
+            'movaryId' => $movie->getId(),
+            'watchDates' => [[
+                'watchedAt' => self::WATCHED_AT,
+                'plays' => 2,
+            ]],
+        ]], $headers)->assertStatus(204);
+
+        $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT);
+        self::assertNotNull($entry);
+        self::assertSame(2, $entry->getPlays());
+        self::assertSame('Keep me', $entry->getComment());
+    }
+
+    public function testRejectsUpdateWithoutPlays() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->put(
+                $this->createPath($fixture['user']->getName()),
+                [[
+                    'movaryId' => $movie->getId(),
+                    'watchDates' => [['watchedAt' => self::WATCHED_AT]],
+                ]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchDates[0].plays" must be a positive integer.',
+            ]);
+    }
+
+    public function testRejectsInvalidDeletionDate() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->delete(
+                $this->createPath($fixture['user']->getName()),
+                [['movaryId' => $movie->getId(), 'watchDates' => ['not-a-date']]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchDates[0]" must be a date in YYYY-MM-DD format or null.',
+            ]);
+    }
+
+    public function testRejectsUnknownMovieWithoutPartiallyApplyingRequest() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [
+                    [
+                        'movaryId' => $movie->getId(),
+                        'watchDates' => [['watchedAt' => self::WATCHED_AT]],
+                    ],
+                    [
+                        'movaryId' => 2_147_483_647,
+                        'watchDates' => [['watchedAt' => self::WATCHED_AT]],
+                    ],
+                ],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'MovieNotFound',
+                'message' => 'Movie with id 2147483647 does not exist.',
+            ]);
+
+        self::assertNull($this->fixture->findHistoryEntry(
+            $movie->getId(),
+            $fixture['user']->getId(),
+            self::WATCHED_AT,
+        ));
+    }
+
+    public function testRejectsOversizedNestedValueWithoutPartiallyApplyingRequest() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [[
+                    'movaryId' => $movie->getId(),
+                    'watchDates' => [
+                        ['watchedAt' => self::WATCHED_AT],
+                        ['watchedAt' => '2024-05-07', 'plays' => 32768],
+                    ],
+                ]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchDates[1].plays" must be at most 32767.',
+            ]);
+
+        self::assertNull($this->fixture->findHistoryEntry(
+            $movie->getId(),
+            $fixture['user']->getId(),
+            self::WATCHED_AT,
+        ));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function writeMethodProvider() : iterable
     {

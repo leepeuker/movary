@@ -8,7 +8,6 @@ use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\PlayedResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
-use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -26,19 +25,16 @@ class PlayedController
     public function addToPlayed(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $playedAdditions = Json::decode($request->getBody());
+        $playedAdditions = $this->playedRequestMapper->mapAdditions($request);
 
         foreach ($playedAdditions as $playAddition) {
-            $movieId = (int)$playAddition['movaryId'];
-            $watchDates = $playAddition['watchDates'] ?? [];
-
-            foreach ($watchDates as $watchDate) {
+            foreach ($playAddition['watchDates'] as $watchDate) {
                 $this->movieApi->addPlaysForMovieOnDate(
-                    $movieId,
+                    $playAddition['movieId'],
                     $userId,
-                    $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
-                    $watchDate['plays'] ?? 1,
-                    comment: $watchDate['comment'] ?? null,
+                    $watchDate['watchedAt'],
+                    $watchDate['plays'],
+                    comment: $watchDate['comment'],
                 );
             }
         }
@@ -49,26 +45,23 @@ class PlayedController
     public function deleteFromPlayed(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $playedDeletions = Json::decode($request->getBody());
+        $playedDeletions = $this->playedRequestMapper->mapDeletions($request);
 
         foreach ($playedDeletions as $playedDeletion) {
-            $movieId = (int)$playedDeletion['movaryId'];
-            $watchDates = $playedDeletion['watchDates'] ?? [];
-
-            if (count($watchDates) === 0) {
+            if (count($playedDeletion['watchDates']) === 0) {
                 $this->movieApi->deleteHistoryById(
-                    $movieId,
+                    $playedDeletion['movieId'],
                     $userId,
                 );
 
                 continue;
             }
 
-            foreach ($watchDates as $date) {
+            foreach ($playedDeletion['watchDates'] as $date) {
                 $this->movieApi->deleteHistoryByIdAndDate(
-                    $movieId,
+                    $playedDeletion['movieId'],
                     $userId,
-                    empty($date) === true ? null : Date::createFromString($date),
+                    $date,
                 );
             }
         }
@@ -126,17 +119,14 @@ class PlayedController
     public function updatePlayed(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $playedUpdates = Json::decode($request->getBody());
+        $playedUpdates = $this->playedRequestMapper->mapUpdates($request);
 
         foreach ($playedUpdates as $playedUpdate) {
-            $movieId = (int)$playedUpdate['movaryId'];
-            $watchDates = $playedUpdate['watchDates'] ?? [];
-
-            foreach ($watchDates as $watchDate) {
+            foreach ($playedUpdate['watchDates'] as $watchDate) {
                 $this->movieApi->replaceHistoryForMovieByDate(
-                    $movieId,
+                    $playedUpdate['movieId'],
                     $userId,
-                    $watchDate['watchedAt'] !== null ? Date::createFromString($watchDate['watchedAt']) : null,
+                    $watchDate['watchedAt'],
                     $watchDate['plays'],
                     comment: $watchDate['comment'],
                 );

@@ -772,12 +772,16 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -808,6 +812,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -846,12 +853,16 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -860,6 +871,9 @@
                       "type": "array",
                       "items": {
                         "type": "object",
+                        "required": [
+                          "plays"
+                        ],
                         "properties": {
                           "watchedAt": {
                             "$ref": "#/components/schemas/calendarDateNullable"
@@ -868,7 +882,7 @@
                             "$ref": "#/components/schemas/plays"
                           },
                           "comment": {
-                            "$ref": "#/components/schemas/comment"
+                            "$ref": "#/components/schemas/commentOptional"
                           }
                         }
                       }
@@ -882,6 +896,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -920,12 +937,16 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -945,6 +966,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
