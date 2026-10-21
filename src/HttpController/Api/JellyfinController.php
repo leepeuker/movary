@@ -3,18 +3,17 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\RequestMapper\JellyfinWebhookRequestMapper;
 use Movary\Service\Jellyfin\JellyfinScrobbler;
-use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Psr\Log\LoggerInterface;
 
 class JellyfinController
 {
     public function __construct(
         private readonly UserApi $userApi,
         private readonly JellyfinScrobbler $jellyfinScrobbler,
-        private readonly LoggerInterface $logger,
+        private readonly JellyfinWebhookRequestMapper $requestMapper,
     ) {
     }
 
@@ -27,11 +26,7 @@ class JellyfinController
             return Response::createNotFound();
         }
 
-        $requestPayload = $request->getBody();
-
-        $this->logger->debug('Jellyfin: Webhook triggered with payload: ' . $requestPayload);
-
-        $this->jellyfinScrobbler->processJellyfinWebhook($userId, Json::decode($requestPayload));
+        $this->jellyfinScrobbler->processJellyfinWebhook($userId, $this->requestMapper->mapRequest($request));
 
         return Response::createOk();
     }

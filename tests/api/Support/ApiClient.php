@@ -33,6 +33,23 @@ class ApiClient
         return $this->request('POST', $path, $headers, $body);
     }
 
+    /** @param array<string, string> $fields */
+    public function postForm(string $path, array $fields) : ApiResponse
+    {
+        return new ApiResponse($this->client->post(ltrim($path, '/'), ['form_params' => $fields]));
+    }
+
+    /** @param array<string, string> $fields */
+    public function postMultipart(string $path, array $fields) : ApiResponse
+    {
+        $multipart = [];
+        foreach ($fields as $name => $contents) {
+            $multipart[] = ['name' => $name, 'contents' => $contents];
+        }
+
+        return new ApiResponse($this->client->post(ltrim($path, '/'), ['multipart' => $multipart]));
+    }
+
     /**
      * @param array<array-key, mixed> $body
      * @param array<string, string> $headers

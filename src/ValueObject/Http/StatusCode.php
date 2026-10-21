@@ -50,6 +50,11 @@ class StatusCode
         return new self(404, 'Not Found');
     }
 
+    public static function createPayloadTooLarge() : self
+    {
+        return new self(413, 'Payload Too Large');
+    }
+
     public static function createOk() : self
     {
         return new self(200, 'OK');

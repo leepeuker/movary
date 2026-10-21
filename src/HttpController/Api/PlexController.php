@@ -3,18 +3,17 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\RequestMapper\PlexWebhookRequestMapper;
 use Movary\Service\Plex\PlexScrobbler;
-use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Psr\Log\LoggerInterface;
 
 class PlexController
 {
     public function __construct(
         private readonly UserApi $userApi,
         private readonly PlexScrobbler $plexScrobbler,
-        private readonly LoggerInterface $logger,
+        private readonly PlexWebhookRequestMapper $requestMapper,
     ) {
     }
 
@@ -27,14 +26,7 @@ class PlexController
             return Response::createNotFound();
         }
 
-        $requestPayload = $request->getPostParameters()['payload'] ?? null;
-        if ($requestPayload === null) {
-            return Response::createOk();
-        }
-
-        $this->logger->debug('Plex: Webhook triggered with payload: ' . $requestPayload);
-
-        $this->plexScrobbler->processPlexWebhook($userId, Json::decode((string)$requestPayload));
+        $this->plexScrobbler->processPlexWebhook($userId, $this->requestMapper->mapRequest($request));
 
         return Response::createOk();
     }

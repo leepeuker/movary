@@ -12,7 +12,7 @@ class ErrorResponseMapper
     public function mapInvalidRequest(InvalidApiRequest $exception) : Response
     {
         return $this->createResponse(
-            StatusCode::createBadRequest(),
+            $exception->getStatusCode(),
             $exception->getErrorType(),
             $exception->getMessage(),
         );

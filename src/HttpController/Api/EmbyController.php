@@ -3,18 +3,17 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\User\UserApi;
+use Movary\HttpController\Api\RequestMapper\EmbyWebhookRequestMapper;
 use Movary\Service\Emby\EmbyScrobbler;
-use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
-use Psr\Log\LoggerInterface;
 
 class EmbyController
 {
     public function __construct(
         private readonly UserApi $userApi,
         private readonly EmbyScrobbler $embyScrobbler,
-        private readonly LoggerInterface $logger,
+        private readonly EmbyWebhookRequestMapper $requestMapper,
     ) {
     }
 
@@ -27,11 +26,7 @@ class EmbyController
             return Response::createNotFound();
         }
 
-        $requestPayload = $request->getPostParameters()['data'];
-
-        $this->logger->debug('Emby: Webhook triggered with payload: ' . $requestPayload);
-
-        $this->embyScrobbler->processEmbyWebhook($userId, Json::decode($requestPayload));
+        $this->embyScrobbler->processEmbyWebhook($userId, $this->requestMapper->mapRequest($request));
 
         return Response::createOk();
     }

@@ -48,4 +48,28 @@ class ErrorResponseMapperTest extends TestCase
             array_map('strval', $response->getHeaders()),
         );
     }
+
+    public function testMapsPayloadTooLarge() : void
+    {
+        $response = $this->subject->mapInvalidRequest(InvalidApiRequest::payloadTooLarge(262144));
+
+        self::assertSame(413, $response->getStatusCode()->getCode());
+        self::assertSame(
+            '{"error":"PayloadTooLarge","message":"Webhook JSON payload must not exceed 262144 bytes."}',
+            $response->getBody(),
+        );
+    }
+
+    public function testMapsUnsupportedMediaType() : void
+    {
+        $response = $this->subject->mapInvalidRequest(
+            InvalidApiRequest::unsupportedWebhookMediaType('application/json'),
+        );
+
+        self::assertSame(415, $response->getStatusCode()->getCode());
+        self::assertSame(
+            '{"error":"UnsupportedMediaType","message":"Webhook Content-Type must be application\/json."}',
+            $response->getBody(),
+        );
+    }
 }
