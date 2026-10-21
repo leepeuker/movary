@@ -4,27 +4,19 @@
 
 use Movary\HttpController\Web\ErrorController;
 use Movary\HttpController\Api\Exception\InvalidApiRequest;
-use Movary\Util\Json;
-use Movary\ValueObject\Http\Header;
+use Movary\HttpController\Api\ResponseMapper\ErrorResponseMapper;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Psr\Log\LoggerInterface;
 
 $container = require(__DIR__ . '/../bootstrap.php');
 $httpRequest = $container->get(Request::class);
+$uri = rawurldecode($httpRequest->getPath());
 
 try {
     $dispatcher = FastRoute\simpleDispatcher(
         require(__DIR__ . '/../settings/routes.php'),
     );
-
-    $uri = $_SERVER['REQUEST_URI'];
-
-    // Strip query string (?foo=bar) and decode URI
-    if (false !== $pos = strpos($uri, '?')) {
-        $uri = substr($uri, 0, $pos);
-    }
-    $uri = rawurldecode($uri);
 
     $routeInfo = $dispatcher->dispatch($_SERVER['REQUEST_METHOD'], $uri);
 
@@ -60,17 +52,13 @@ try {
     }
 
 } catch (InvalidApiRequest $exception) {
-    $response = Response::createBadRequest(
-        Json::encode([
-            'error' => $exception->getErrorType(),
-            'message' => $exception->getMessage(),
-        ]),
-        [Header::createContentTypeJson()],
-    );
+    $response = $container->get(ErrorResponseMapper::class)->mapInvalidRequest($exception);
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
-    if (str_starts_with($uri, '/api') === false) {
+    if (str_starts_with($uri, '/api') === true) {
+        $response = $container->get(ErrorResponseMapper::class)->mapInternalServerError();
+    } else {
         $response = $container->get(ErrorController::class)->renderInternalServerError();
     }
 }

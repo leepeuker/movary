@@ -170,6 +170,23 @@ class HistoryTest extends ApiTestCase
             ->assertStatus(404);
     }
 
+    public function testUnexpectedExceptionReturnsGenericJsonError() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+
+        $this->api
+            ->get(
+                $this->createPath($fixture['user']->getName()) . '?sortOrder=unsupported',
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(500)
+            ->assertHeaderSame('Content-Type', 'application/json')
+            ->assertJsonSame([
+                'error' => 'InternalServerError',
+                'message' => 'The request could not be processed.',
+            ]);
+    }
+
     public function testRejectsMalformedJson() : void
     {
         $fixture = $this->fixture->createUserWithToken();
