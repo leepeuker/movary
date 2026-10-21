@@ -56,6 +56,25 @@ class RequestMapper
         return $result;
     }
 
+    /** @return array<string, mixed> */
+    public function mapJsonObject(Request $request) : array
+    {
+        try {
+            $decoded = json_decode($request->getBody(), false, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            throw InvalidApiRequest::invalidJsonObject();
+        }
+
+        if ($decoded instanceof \stdClass === false) {
+            throw InvalidApiRequest::invalidJsonObject();
+        }
+
+        /** @var array<string, mixed> $result */
+        $result = $this->convertJsonObjectsToArrays($decoded);
+
+        return $result;
+    }
+
     private function convertJsonObjectsToArrays(mixed $value) : mixed
     {
         if ($value instanceof \stdClass) {

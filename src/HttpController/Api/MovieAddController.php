@@ -3,6 +3,7 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
+use Movary\HttpController\Api\RequestMapper\MovieAddRequestMapper;
 use Movary\Service\Tmdb\SyncMovie;
 use Movary\Util\Json;
 use Movary\ValueObject\Http\Header;
@@ -13,25 +14,16 @@ class MovieAddController
 {
     public function __construct(
         private readonly SyncMovie $tmdbSyncMovie,
+        private readonly MovieAddRequestMapper $requestMapper,
     ) {
     }
 
     public function addMovie(Request $request) : Response
     {
-        $requestBody = Json::decode($request->getBody());
-
-        if (isset($requestBody['tmdbId']) === false) {
-            return Response::createBadRequest(
-                Json::encode([
-                    'error' => 'MissingProviderId',
-                    'message' => 'No external provider id submitted',
-                ]),
-                [Header::createContentTypeJson()],
-            );
-        }
+        $requestData = $this->requestMapper->mapRequest($request);
 
         try {
-            $movie = $this->tmdbSyncMovie->syncMovie($requestBody['tmdbId']);
+            $movie = $this->tmdbSyncMovie->syncMovie($requestData->getTmdbId());
         } catch (TmdbResourceNotFound) {
             return Response::createBadRequest(
                 Json::encode([
