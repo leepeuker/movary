@@ -2,6 +2,9 @@
 
 Movary's API accepts personal API tokens for trusted clients such as scripts, CLI tools, home automation, and self-hosted integrations. A token has the same API permissions as the user who created it.
 
+Client API routes use the `/api/v1` prefix. The previous unversioned `/api` routes remain available
+for compatibility until Movary 1.0.
+
 ## Create a token
 
 Open **Settings → Account → API tokens**, select **Add token**, and enter a descriptive name. Tokens can expire after 30, 90, or 365 days, or never expire.
@@ -25,7 +28,7 @@ Bearer authentication is supported:
 ```bash
 curl --fail-with-body \
   --header "Authorization: Bearer $MOVARY_TOKEN" \
-  https://movary.example/api/authentication/token
+  https://movary.example/api/v1/authentication/token
 ```
 
 The custom header remains supported permanently:
@@ -33,7 +36,7 @@ The custom header remains supported permanently:
 ```bash
 curl --fail-with-body \
   --header "X-Movary-Token: $MOVARY_TOKEN" \
-  https://movary.example/api/authentication/token
+  https://movary.example/api/v1/authentication/token
 ```
 
 Do not send both forms in one request. Movary rejects a request containing both a Bearer credential and `X-Movary-Token` with `401 Unauthorized`.

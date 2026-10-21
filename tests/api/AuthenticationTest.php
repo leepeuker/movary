@@ -9,7 +9,7 @@ use Tests\Api\Movary\Support\ApiTestCase;
 #[CoversNothing]
 class AuthenticationTest extends ApiTestCase
 {
-    private const string ENDPOINT = '/api/authentication/token';
+    private const string ENDPOINT = '/api/v1/authentication/token';
 
     public function testRejectsMissingToken() : void
     {

@@ -16,7 +16,7 @@ class JellyfinControllerTest extends TestCase
     public function testReturnsNotFoundBeforeMappingPayloadForUnknownWebhook() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByJellyfinWebhookId')->willReturn(null);
         $requestMapper = $this->createMock(JellyfinWebhookRequestMapper::class);
@@ -35,7 +35,7 @@ class JellyfinControllerTest extends TestCase
     {
         $payload = ['NotificationType' => 'PlaybackStart', 'ItemType' => 'Movie'];
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByJellyfinWebhookId')->willReturn(42);
         $requestMapper = $this->createMock(JellyfinWebhookRequestMapper::class);

@@ -16,7 +16,7 @@ class PlexControllerTest extends TestCase
     public function testReturnsNotFoundBeforeMappingPayloadForUnknownWebhook() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByPlexWebhookId')->willReturn(null);
         $requestMapper = $this->createMock(PlexWebhookRequestMapper::class);
@@ -35,7 +35,7 @@ class PlexControllerTest extends TestCase
     {
         $payload = ['event' => 'library.new'];
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByPlexWebhookId')->willReturn(42);
         $requestMapper = $this->createMock(PlexWebhookRequestMapper::class);

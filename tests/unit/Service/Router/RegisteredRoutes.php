@@ -8,10 +8,10 @@ use FastRoute\RouteParser\Std;
 
 class RegisteredRoutes
 {
-    /** @var null|list<array{method: string, path: string, middleware: array<string>}> */
+    /** @var null|list<array{method: string, path: string, handler: mixed, middleware: array<string>}> */
     private static ?array $routes = null;
 
-    /** @return list<array{method: string, path: string, middleware: array<string>}> */
+    /** @return list<array{method: string, path: string, handler: mixed, middleware: array<string>}> */
     public static function collect() : array
     {
         if (self::$routes !== null) {
@@ -19,7 +19,7 @@ class RegisteredRoutes
         }
 
         $collector = new class extends RouteCollector {
-            /** @var list<array{method: string, path: string, middleware: array<string>}> */
+            /** @var list<array{method: string, path: string, handler: mixed, middleware: array<string>}> */
             public array $routes = [];
 
             public function __construct()
@@ -44,6 +44,7 @@ class RegisteredRoutes
                     $this->routes[] = [
                         'method' => $method,
                         'path' => $this->currentGroupPrefix . $route,
+                        'handler' => $handler['handler'],
                         'middleware' => $middleware,
                     ];
                 }

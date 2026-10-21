@@ -238,6 +238,6 @@ class WatchlistTest extends ApiTestCase
 
     private function createPath(string $username) : string
     {
-        return '/api/users/' . $username . '/watchlist/movies';
+        return '/api/v1/users/' . $username . '/watchlist/movies';
     }
 }

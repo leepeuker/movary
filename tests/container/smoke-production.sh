@@ -75,7 +75,7 @@ if [[ $(docker exec "$container_name" curl --silent --fail http://127.0.0.1:8080
 fi
 
 docker exec "$container_name" curl --silent --fail --output /dev/null http://127.0.0.1:8080/
-docker exec "$container_name" curl --silent --fail --output /dev/null http://127.0.0.1:8080/api/openapi
+docker exec "$container_name" curl --silent --fail --output /dev/null http://127.0.0.1:8080/api/v1/openapi
 
 container_logs=$(docker logs "$container_name" 2>&1)
 if [[ $container_logs != *'SUCCESS: Automatic database migration succeeded'* ]]; then

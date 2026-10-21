@@ -10,7 +10,12 @@ return function (FastRoute\RouteCollector $routeCollector) {
     $routerService = new RouterService();
 
     $routeCollector->addGroup('', fn($routeCollector) => addWebRoutes($routerService, $routeCollector));
+    $routeCollector->addGroup('/api/v1', fn($routeCollector) => addApiRoutes($routerService, $routeCollector));
+    // Deprecated: remove the unversioned API aliases in Movary 1.0.
     $routeCollector->addGroup('/api', fn($routeCollector) => addApiRoutes($routerService, $routeCollector));
+    addIntegrationRoutes($routerService, $routeCollector, '/webhooks', '/feeds');
+    // Deprecated: remove the integration aliases under /api in Movary 1.0.
+    addIntegrationRoutes($routerService, $routeCollector, '/api/webhook', '/api/feed');
 };
 
 function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $routeCollector) : void
@@ -52,7 +57,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/images/placeholder/{imageNameBase64Encoded:.+}', [Web\PlaceholderImageController::class, 'renderPlaceholderImage']);
 
     #####################
-    # Webhook listeners # !!! Deprecated use new api routes
+    # Webhook listeners # Deprecated: remove in Movary 1.0; use /webhooks routes.
     #####################
     $routes->add('POST', '/plex/{id:.+}', [Web\PlexController::class, 'handlePlexWebhook'], csrfProtectionEnabled: false);
     $routes->add('POST', '/jellyfin/{id:.+}', [Web\JellyfinController::class, 'handleJellyfinWebhook'], csrfProtectionEnabled: false);
@@ -359,12 +364,22 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
 
-    $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
-    $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
-    $routes->add('POST', '/webhook/emby/{id:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
-    $routes->add('POST', '/webhook/kodi/{id:.+}', [Api\KodiController::class, 'handleKodiWebhook']);
+    $routerService->addRoutesToRouteCollector($routeCollector, $routes);
+}
 
-    $routes->add('GET', '/feed/radarr/{id:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
+function addIntegrationRoutes(
+    RouterService $routerService,
+    FastRoute\RouteCollector $routeCollector,
+    string $webhookPrefix,
+    string $feedPrefix,
+) : void {
+    $routes = RouteList::create();
+
+    $routes->add('POST', $webhookPrefix . '/plex/{token:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
+    $routes->add('POST', $webhookPrefix . '/jellyfin/{token:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
+    $routes->add('POST', $webhookPrefix . '/emby/{token:.+}', [Api\EmbyController::class, 'handleEmbyWebhook']);
+    $routes->add('POST', $webhookPrefix . '/kodi/{token:.+}', [Api\KodiController::class, 'handleKodiWebhook']);
+    $routes->add('GET', $feedPrefix . '/radarr/{token:.+}', [Api\RadarrController::class, 'renderRadarrFeed']);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

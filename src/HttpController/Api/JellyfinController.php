@@ -19,7 +19,7 @@ class JellyfinController
 
     public function handleJellyfinWebhook(Request $request) : Response
     {
-        $webhookId = $request->getRouteParameters()['id'];
+        $webhookId = $request->getRouteParameters()['token'];
 
         $userId = $this->userApi->findUserIdByJellyfinWebhookId($webhookId);
         if ($userId === null) {
