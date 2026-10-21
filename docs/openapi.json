@@ -1072,10 +1072,14 @@
         "summary": "Add movie via external provider id",
         "description": "Adds a new movie via external data provider",
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "tmdbId"
+                ],
                 "properties": {
                   "tmdbId": {
                     "$ref": "#/components/schemas/id"

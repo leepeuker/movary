@@ -55,6 +55,21 @@ class RequestMapperTest extends TestCase
         $this->subject->mapJsonObjectList($this->createRequest('{"movaryId":42}'));
     }
 
+    public function testMapsJsonObject() : void
+    {
+        self::assertSame(
+            ['tmdbId' => 42],
+            $this->subject->mapJsonObject($this->createRequest('{"tmdbId":42}')),
+        );
+    }
+
+    public function testRejectsJsonListWhenObjectIsRequired() : void
+    {
+        $this->expectExceptionObject(InvalidApiRequest::invalidJsonObject());
+
+        $this->subject->mapJsonObject($this->createRequest('[{"tmdbId":42}]'));
+    }
+
     public function testMapsExistingMovieId() : void
     {
         $movieApi = $this->createMock(MovieApi::class);
