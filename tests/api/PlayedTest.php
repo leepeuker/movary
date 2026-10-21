@@ -209,6 +209,54 @@ class PlayedTest extends ApiTestCase
             ->assertStatus(404);
     }
 
+    /** @param array{error: string, message: string} $expectedError */
+    #[DataProvider('invalidQueryProvider')]
+    public function testRejectsInvalidQueryParameters(string $query, array $expectedError) : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+
+        $this->api
+            ->get(
+                $this->createPath($fixture['user']->getName()) . '?' . $query,
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertHeaderSame('Content-Type', 'application/json')
+            ->assertJsonSame($expectedError);
+    }
+
+    public static function invalidQueryProvider() : array
+    {
+        return [
+            'zero page' => [
+                'page=0',
+                ['error' => 'InvalidRequest', 'message' => 'Field "page" must be a positive integer.'],
+            ],
+            'excessive limit' => [
+                'limit=101',
+                ['error' => 'InvalidRequest', 'message' => 'Field "limit" must be at most 100.'],
+            ],
+            'unsupported sort field' => [
+                'sortBy=unsupported',
+                [
+                    'error' => 'InvalidRequest',
+                    'message' => 'Field "sortBy" must be one of: imdbRating, rating, releaseDate, runtime, title, tmdbRating, watchDate.',
+                ],
+            ],
+            'invalid release year' => [
+                'releaseYear=1900',
+                [
+                    'error' => 'InvalidRequest',
+                    'message' => 'Field "releaseYear" must be a year between 1901 and 2155.',
+                ],
+            ],
+            'array search term' => [
+                'search%5B%5D=Alien',
+                ['error' => 'InvalidRequest', 'message' => 'Field "search" must be a string.'],
+            ],
+        ];
+    }
+
     public function testRejectsMalformedJson() : void
     {
         $fixture = $this->fixture->createUserWithToken();

@@ -9,6 +9,7 @@ use Movary\HttpController\Api\Exception\InvalidApiRequest;
 use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(RequestMapper::class)]
@@ -143,10 +144,121 @@ class RequestMapperTest extends TestCase
         );
     }
 
+    public function testMapsQueryDefaultsAndBoundaries() : void
+    {
+        self::assertSame(1, $this->subject->mapPage($this->createQueryRequest([])));
+        self::assertSame(24, $this->subject->mapLimit($this->createQueryRequest([])));
+        self::assertSame(1, $this->subject->mapPage($this->createQueryRequest(['page' => '1'])));
+        self::assertSame(100, $this->subject->mapLimit($this->createQueryRequest(['limit' => '100'])));
+    }
+
+    /** @param mixed $value */
+    #[DataProvider('invalidPositiveQueryIntegerProvider')]
+    public function testRejectsInvalidPositiveQueryInteger(string $field, mixed $value, string $requirement) : void
+    {
+        $this->expectExceptionObject(InvalidApiRequest::invalidField($field, $requirement));
+
+        if ($field === 'page') {
+            $this->subject->mapPage($this->createQueryRequest([$field => $value]));
+        } else {
+            $this->subject->mapLimit($this->createQueryRequest([$field => $value]));
+        }
+    }
+
+    public static function invalidPositiveQueryIntegerProvider() : array
+    {
+        return [
+            'non-numeric page' => ['page', 'first', 'must be a positive integer'],
+            'zero page' => ['page', '0', 'must be a positive integer'],
+            'negative page' => ['page', '-1', 'must be a positive integer'],
+            'array page' => ['page', ['1'], 'must be a positive integer'],
+            'integer overflow' => ['page', '999999999999999999999999', 'must be a positive integer'],
+            'limit above maximum' => ['limit', '101', 'must be at most 100'],
+        ];
+    }
+
+    public function testMapsAndValidatesSearchTerm() : void
+    {
+        self::assertNull($this->subject->mapSearchTerm($this->createQueryRequest([])));
+        self::assertSame('Alien', $this->subject->mapSearchTerm($this->createQueryRequest(['search' => 'Alien'])));
+
+        $this->expectExceptionObject(InvalidApiRequest::invalidField('search', 'must be a string'));
+        $this->subject->mapSearchTerm($this->createQueryRequest(['search' => ['Alien']]));
+    }
+
+    public function testRejectsMissingRequiredSearchTerm() : void
+    {
+        $this->expectExceptionObject(
+            InvalidApiRequest::invalidField('search', 'is required and must be a string'),
+        );
+
+        $this->subject->mapRequiredSearchTerm($this->createQueryRequest([]));
+    }
+
+    public function testMapsAndValidatesSortValues() : void
+    {
+        $request = $this->createQueryRequest([]);
+        self::assertSame('title', $this->subject->mapSortBy($request, ['title', 'rating'], 'title'));
+        self::assertSame('desc', (string)$this->subject->mapSortOrder($request));
+        self::assertSame(
+            'rating',
+            $this->subject->mapSortBy(
+                $this->createQueryRequest(['sortBy' => 'rating']),
+                ['title', 'rating'],
+                'title',
+            ),
+        );
+
+        $this->expectExceptionObject(
+            InvalidApiRequest::invalidField('sortBy', 'must be one of: title, rating'),
+        );
+        $this->subject->mapSortBy(
+            $this->createQueryRequest(['sortBy' => 'unsupported']),
+            ['title', 'rating'],
+            'title',
+        );
+    }
+
+    public function testRejectsInvalidSortOrder() : void
+    {
+        $this->expectExceptionObject(
+            InvalidApiRequest::invalidField('sortOrder', 'must be one of: asc, desc'),
+        );
+
+        $this->subject->mapSortOrder($this->createQueryRequest(['sortOrder' => 'unsupported']));
+    }
+
+    public function testMapsAndValidatesReleaseYear() : void
+    {
+        self::assertNull($this->subject->mapReleaseYear($this->createQueryRequest([])));
+        self::assertSame(
+            1901,
+            $this->subject->mapReleaseYear($this->createQueryRequest(['releaseYear' => '1901']))?->asInt(),
+        );
+        self::assertSame(
+            2155,
+            $this->subject->mapReleaseYear($this->createQueryRequest(['releaseYear' => '2155']))?->asInt(),
+        );
+
+        $this->expectExceptionObject(
+            InvalidApiRequest::invalidField('releaseYear', 'must be a year between 1901 and 2155'),
+        );
+        $this->subject->mapReleaseYear($this->createQueryRequest(['releaseYear' => '2156']));
+    }
+
     private function createRequest(string $body) : Request
     {
         $request = $this->createStub(Request::class);
         $request->method('getBody')->willReturn($body);
+
+        return $request;
+    }
+
+    /** @param array<string, mixed> $query */
+    private function createQueryRequest(array $query) : Request
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getGetParameters')->willReturn($query);
 
         return $request;
     }

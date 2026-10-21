@@ -13,10 +13,8 @@ class SearchRequestMapper
 
     public function mapRequest(Request $request) : SearchRequestDto
     {
-        $getParameters = $request->getGetParameters();
-
         return SearchRequestDto::create(
-            $getParameters['search'],
+            $this->requestMapper->mapRequiredSearchTerm($request),
             $this->requestMapper->mapPage($request),
             $this->requestMapper->mapReleaseYear($request),
         );
