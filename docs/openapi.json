@@ -11,6 +11,7 @@
         "tags": [
           "History"
         ],
+        "operationId": "getUserHistory",
         "summary": "Get played movies with watch dates of user",
         "description": "Get all played movies with watch dates set. Sorted by most recently watch dates on default.",
         "parameters": [
@@ -125,6 +126,7 @@
         "tags": [
           "History"
         ],
+        "operationId": "addToUserHistory",
         "summary": "Add movie play with watch date set to user",
         "description": "Create or update the provided watch dates for the specified movies. A date for plays is required.",
         "parameters": [
@@ -202,6 +204,7 @@
         "tags": [
           "History"
         ],
+        "operationId": "updateUserHistory",
         "summary": "Replace movie play with watch date set for user",
         "description": "Create or replace the provided watch dates for the specified movies. A date for plays is required.",
         "parameters": [
@@ -280,6 +283,7 @@
         "tags": [
           "History"
         ],
+        "operationId": "deleteFromUserHistory",
         "summary": "Delete movie watch dates from user history",
         "description": "Delete the specified movie watch dates. A watch date is required for every movie.",
         "parameters": [
@@ -350,6 +354,7 @@
         "tags": [
           "Watchlist"
         ],
+        "operationId": "getUserWatchlist",
         "summary": "Get movies in watchlist of user",
         "description": "Get all movies on the user watchlist. Sorted by most recently added on default.",
         "parameters": [
@@ -490,6 +495,7 @@
         "tags": [
           "Watchlist"
         ],
+        "operationId": "addToUserWatchlist",
         "summary": "Add movie to watchlist of user",
         "parameters": [
           {
@@ -553,6 +559,7 @@
         "tags": [
           "Watchlist"
         ],
+        "operationId": "deleteFromUserWatchlist",
         "summary": "Delete movie from watchlist of user",
         "parameters": [
           {
@@ -618,6 +625,7 @@
         "tags": [
           "Played"
         ],
+        "operationId": "getUserPlayedMovies",
         "summary": "Get played movies of user",
         "description": "Get all played movies and their watch dates.",
         "parameters": [
@@ -772,6 +780,7 @@
         "tags": [
           "Played"
         ],
+        "operationId": "addToUserPlayedMovies",
         "summary": "Add movie plays to user",
         "description": "Create or update the provided watch dates for the specified movies.",
         "parameters": [
@@ -853,6 +862,7 @@
         "tags": [
           "Played"
         ],
+        "operationId": "updateUserPlayedMovies",
         "summary": "Replace movie plays for user",
         "description": "Create or replace the provided watch dates for the specified movies.",
         "parameters": [
@@ -937,6 +947,7 @@
         "tags": [
           "Played"
         ],
+        "operationId": "deleteFromUserPlayedMovies",
         "summary": "Delete movie plays from user",
         "description": "Delete all watch dates of specified movies if no specific watch dates are provided.",
         "parameters": [
@@ -1009,6 +1020,7 @@
         "tags": [
           "Movies"
         ],
+        "operationId": "addMovie",
         "summary": "Add movie via external provider id",
         "description": "Adds a new movie via external data provider",
         "requestBody": {
@@ -1066,6 +1078,7 @@
         "tags": [
           "Movies"
         ],
+        "operationId": "searchMovies",
         "summary": "Search for movies remotely",
         "description": "Search remotely on tmdb for the movie with the specified search filters. Movies already existing locally will have a Movary id set.",
         "parameters": [
@@ -1195,6 +1208,7 @@
         "tags": [
           "Webhooks"
         ],
+        "operationId": "handlePlexWebhook",
         "description": "Endpoint to scrobble your Plex watches to Movary.",
         "parameters": [
           {
@@ -1222,6 +1236,7 @@
         "tags": [
           "Webhooks"
         ],
+        "operationId": "handleJellyfinWebhook",
         "description": "Endpoint to scrobble your Jellyfin watches to Movary.",
         "parameters": [
           {
@@ -1249,6 +1264,7 @@
         "tags": [
           "Webhooks"
         ],
+        "operationId": "handleEmbyWebhook",
         "description": "Endpoint to scrobble your Emby watches to Movary.",
         "parameters": [
           {
@@ -1276,6 +1292,7 @@
         "tags": [
           "Webhooks"
         ],
+        "operationId": "handleKodiWebhook",
         "description": "Endpoint to scrobble your Kodi watches to Movary.",
         "parameters": [
           {
@@ -1298,11 +1315,75 @@
         }
       }
     },
+    "/feed/radarr/{id}": {
+      "get": {
+        "tags": [
+          "Radarr"
+        ],
+        "operationId": "getRadarrFeed",
+        "summary": "Get a user's Radarr watchlist feed",
+        "description": "Returns the user's Movary watchlist in the format consumed by a Radarr import list. The feed URL grants access without a Movary login and must be treated as a credential.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The secret feed identifier generated in the user's Radarr settings.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current watchlist feed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "title",
+                      "tmdb_id",
+                      "imdb_id",
+                      "added_at"
+                    ],
+                    "properties": {
+                      "title": {
+                        "$ref": "#/components/schemas/title"
+                      },
+                      "tmdb_id": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "imdb_id": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "added_at": {
+                        "$ref": "#/components/schemas/timestamp"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          }
+        },
+        "security": []
+      }
+    },
     "/authentication/token": {
       "get": {
         "tags": [
           "Authentication"
         ],
+        "operationId": "getAuthenticationTokenData",
         "summary": "Get authentication data",
         "description": "Get information about the user authenticated by the supplied personal API token.",
         "responses": {
