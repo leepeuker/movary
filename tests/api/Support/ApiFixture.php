@@ -81,4 +81,19 @@ class ApiFixture
 
         return $movieWatchlistApi->hasMovieInWatchlist($userId, $movieId);
     }
+
+    public function addMovieToWatchlist(int $movieId, int $userId) : void
+    {
+        /** @var MovieWatchlistApi $movieWatchlistApi */
+        $movieWatchlistApi = $this->container->get(MovieWatchlistApi::class);
+        $movieWatchlistApi->addMovieToWatchlist($userId, $movieId, postToMastodon: false);
+    }
+
+    public function createRadarrFeedId(int $userId) : string
+    {
+        /** @var UserApi $userApi */
+        $userApi = $this->container->get(UserApi::class);
+
+        return $userApi->regenerateRadarrFeedId($userId);
+    }
 }
