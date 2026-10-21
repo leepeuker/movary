@@ -1270,6 +1270,7 @@
           "Webhooks"
         ],
         "operationId": "handlePlexWebhook",
+        "summary": "Receive Plex webhook events",
         "description": "Endpoint to scrobble your Plex watches to Movary.",
         "parameters": [
           {
@@ -1335,6 +1336,7 @@
           "Webhooks"
         ],
         "operationId": "handleJellyfinWebhook",
+        "summary": "Receive Jellyfin webhook events",
         "description": "Endpoint to scrobble your Jellyfin watches to Movary.",
         "parameters": [
           {
@@ -1410,6 +1412,7 @@
           "Webhooks"
         ],
         "operationId": "handleEmbyWebhook",
+        "summary": "Receive Emby webhook events",
         "description": "Endpoint to scrobble your Emby watches to Movary.",
         "parameters": [
           {
@@ -1467,6 +1470,7 @@
           "Webhooks"
         ],
         "operationId": "handleKodiWebhook",
+        "summary": "Receive Kodi webhook events",
         "description": "Endpoint to scrobble your Kodi watches to Movary.",
         "parameters": [
           {
