@@ -1,19 +1,19 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary;
+namespace Tests\Http\Movary\Api;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Api\Movary\Support\ApiTestCase;
+use Tests\Http\Movary\HttpTestCase;
 
 #[CoversNothing]
-class MovieAddTest extends ApiTestCase
+class MovieAddTest extends HttpTestCase
 {
     private const string ENDPOINT = '/api/v1/movies/add';
 
     public function testRejectsUnauthenticatedRequest() : void
     {
-        $this->api
+        $this->http
             ->requestRaw('POST', self::ENDPOINT, '{"tmdbId":42}', ['Content-Type' => 'application/json'])
             ->assertStatus(401)
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
@@ -25,7 +25,7 @@ class MovieAddTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->requestRaw(
                 'POST',
                 self::ENDPOINT,

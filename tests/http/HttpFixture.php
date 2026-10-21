@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary\Support;
+namespace Tests\Http\Movary;
 
 use InvalidArgumentException;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
@@ -13,7 +13,7 @@ use Movary\Domain\User\UserEntity;
 use Movary\ValueObject\Date;
 use Psr\Container\ContainerInterface;
 
-class ApiFixture
+class HttpFixture
 {
     public function __construct(private readonly ContainerInterface $container)
     {
@@ -23,13 +23,13 @@ class ApiFixture
     public function createUserWithToken(?int $privacyLevel = null) : array
     {
         $suffix = bin2hex(random_bytes(8));
-        $name = 'ApiTest' . $suffix;
+        $name = 'HttpTest' . $suffix;
 
         /** @var UserApi $userApi */
         $userApi = $this->container->get(UserApi::class);
         $userApi->createUser(
-            'api-test-' . $suffix . '@example.com',
-            'api-test-password',
+            'http-test-' . $suffix . '@example.com',
+            'http-test-password',
             $name,
             false,
             true,
@@ -43,7 +43,7 @@ class ApiFixture
 
         /** @var PersonalApiTokenService $tokenService */
         $tokenService = $this->container->get(PersonalApiTokenService::class);
-        $tokenData = $tokenService->createToken($user->getId(), 'API test', null);
+        $tokenData = $tokenService->createToken($user->getId(), 'HTTP test', null);
 
         return ['user' => $user, 'token' => $tokenData['token']];
     }
@@ -55,7 +55,7 @@ class ApiFixture
         $suffix = bin2hex(random_bytes(8));
 
         return $movieApi->create(
-            'API Test Movie ' . $suffix,
+            'HTTP Test Movie ' . $suffix,
             random_int(1, 2_000_000_000),
         );
     }

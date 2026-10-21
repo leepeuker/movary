@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary;
+namespace Tests\Http\Movary\Api;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
-use Tests\Api\Movary\Support\ApiTestCase;
+use Tests\Http\Movary\HttpTestCase;
 
 #[CoversNothing]
-class OpenApiTest extends ApiTestCase
+class OpenApiTest extends HttpTestCase
 {
     public function testReturnsRuntimeOpenApiDocumentWithoutAuthentication() : void
     {
-        $schema = $this->api
+        $schema = $this->http
             ->get('/api/v1/openapi')
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')

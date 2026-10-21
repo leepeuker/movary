@@ -28,25 +28,28 @@ Use the following cli commands to manage your local environment:
 - `make app_database_migrate` execute the database migrations
 - `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
 
-### API tests
+### HTTP endpoint tests
 
-Run all standard checks and test suites, including the API tests, with:
+Run all standard checks and test suites, including the HTTP endpoint tests, with:
 
 ```bash
 make test
 ```
 
-This runs the Composer checks and unit tests first, then runs the API tests in their disposable application container.
+This runs the Composer checks and unit tests first, then runs the real-HTTP tests in their disposable application container.
 
-Run the real-HTTP API test suite with:
+Run the real-HTTP test suite with:
 
 ```bash
-make api_test
+make http_test
 ```
 
 This builds and starts one disposable development image containing both the application and the PHPUnit runner. The container uses a temporary SQLite database, publishes no host ports, has no external network access, and is removed after the test run. It does not use or modify the developer's running Movary containers or database.
 
-The tests create fixtures through Movary's domain services and send API requests through Nginx and PHP-FPM. Add API tests under `tests/api/`; keep fast isolated tests under `tests/unit/`.
+The tests create fixtures through Movary's domain services and send requests through Nginx and
+PHP-FPM. Put versioned client tests in `tests/http/Api/`, webhook tests in
+`tests/http/Webhooks/`, and feed tests in `tests/http/Feeds/`. Shared HTTP test harness classes
+live directly in `tests/http/`. Keep fast isolated tests under `tests/unit/`.
 
 ### Frontend dependencies
 
