@@ -39,6 +39,11 @@ class StatusCodeTest extends TestCase
         self::assertSame('HTTP/1.1 200 OK', (string)StatusCode::createOk());
     }
 
+    public function testCreatePayloadTooLarge() : void
+    {
+        self::assertSame('HTTP/1.1 413 Payload Too Large', (string)StatusCode::createPayloadTooLarge());
+    }
+
     public function testCreateSeeOther() : void
     {
         self::assertSame('HTTP/1.1 303 See Other', (string)StatusCode::createSeeOther());
