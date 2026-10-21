@@ -36,6 +36,10 @@ class RouteSecurityTest extends TestCase
                 'POST /emby/{id:.+}',
                 'POST /jellyfin/{id:.+}',
                 'POST /plex/{id:.+}',
+                'POST /webhooks/emby/{token:.+}',
+                'POST /webhooks/jellyfin/{token:.+}',
+                'POST /webhooks/kodi/{token:.+}',
+                'POST /webhooks/plex/{token:.+}',
             ],
             $exemptRoutes,
         );
@@ -126,10 +130,10 @@ class RouteSecurityTest extends TestCase
         sort($explicitBoundaries);
         self::assertSame(
             [
-                'POST /api/webhook/emby/{id:.+}',
-                'POST /api/webhook/jellyfin/{id:.+}',
-                'POST /api/webhook/kodi/{id:.+}',
-                'POST /api/webhook/plex/{id:.+}',
+                'POST /api/webhook/emby/{token:.+}',
+                'POST /api/webhook/jellyfin/{token:.+}',
+                'POST /api/webhook/kodi/{token:.+}',
+                'POST /api/webhook/plex/{token:.+}',
             ],
             $explicitBoundaries,
         );
@@ -139,11 +143,11 @@ class RouteSecurityTest extends TestCase
     {
         $methods = [];
         foreach (RegisteredRoutes::collect() as $route) {
-            if ($route['path'] === '/api/authentication/token') {
+            if (in_array($route['path'], ['/api/authentication/token', '/api/v1/authentication/token'], true)) {
                 $methods[] = $route['method'];
             }
         }
 
-        self::assertSame(['GET'], $methods);
+        self::assertSame(['GET', 'GET'], $methods);
     }
 }

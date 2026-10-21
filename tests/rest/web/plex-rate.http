@@ -1,4 +1,4 @@
-POST http://127.0.0.1/api/webhook/plex/16914287-329d-4f3b-ba57-4a092f13058d
+POST http://127.0.0.1/webhooks/plex/16914287-329d-4f3b-ba57-4a092f13058d
 Accept: */*
 Cache-Control: no-cache
 Content-Type: multipart/form-data; boundary=MovaryWebhookBoundary

@@ -1,4 +1,4 @@
-GET http://127.0.0.1/api/users/{{username}}/history/movies?search=Matrix&limit=10
+GET http://127.0.0.1/api/v1/users/{{username}}/history/movies?search=Matrix&limit=10
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -6,7 +6,7 @@ X-Movary-Token: {{xMovaryToken}}
 
 ####
 
-PUT http://127.0.0.1/api/users/{{username}}/history/movies
+PUT http://127.0.0.1/api/v1/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -16,7 +16,7 @@ X-Movary-Token: {{xMovaryToken}}
 
 ####
 
-POST http://127.0.0.1/api/users/{{username}}/history/movies
+POST http://127.0.0.1/api/v1/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -26,7 +26,7 @@ X-Movary-Token: {{xMovaryToken}}
 
 ####
 
-DELETE http://127.0.0.1/api/users/{{username}}/history/movies
+DELETE http://127.0.0.1/api/v1/users/{{username}}/history/movies
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

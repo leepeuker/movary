@@ -457,6 +457,6 @@ class PlayedTest extends ApiTestCase
 
     private function createPath(string $username) : string
     {
-        return '/api/users/' . $username . '/played/movies';
+        return '/api/v1/users/' . $username . '/played/movies';
     }
 }

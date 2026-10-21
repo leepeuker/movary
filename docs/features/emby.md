@@ -14,6 +14,9 @@ Movary records only movie playback-stop events that Emby reports as played to co
 Movary validates the JSON in Emby's `data` form field before processing and rejects malformed
 payloads or JSON fields larger than 256 KiB.
 
+New webhook URLs use `/webhooks/emby/{token}`. Existing `/api/webhook/emby/{token}` URLs remain
+available for compatibility until Movary 1.0.
+
 The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.
 
 Keep the webhook URL private because it is connected to your account. Regenerating or deleting it immediately invalidates the previous URL, which must then be replaced or removed in Emby.

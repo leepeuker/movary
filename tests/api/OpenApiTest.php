@@ -11,14 +11,14 @@ class OpenApiTest extends ApiTestCase
     public function testReturnsRuntimeOpenApiDocumentWithoutAuthentication() : void
     {
         $schema = $this->api
-            ->get('/api/openapi')
+            ->get('/api/v1/openapi')
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')
             ->json();
 
         self::assertSame('3.0.2', $schema['openapi']);
         self::assertNotSame('', $schema['info']['version']);
-        self::assertSame('/api', $schema['servers'][0]['url']);
-        self::assertArrayHasKey('/users/{username}/history/movies', $schema['paths']);
+        self::assertSame('/', $schema['servers'][0]['url']);
+        self::assertArrayHasKey('/api/v1/users/{username}/history/movies', $schema['paths']);
     }
 }

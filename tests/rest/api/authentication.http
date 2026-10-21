@@ -1,4 +1,4 @@
-GET http://127.0.0.1/api/authentication/token
+GET http://127.0.0.1/api/v1/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -6,7 +6,7 @@ Authorization: Bearer {{xMovaryToken}}
 
 ###
 
-GET http://127.0.0.1/api/authentication/token
+GET http://127.0.0.1/api/v1/authentication/token
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

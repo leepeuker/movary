@@ -1,4 +1,4 @@
-POST http://127.0.0.1/api/webhook/jellyfin/8f119459-7373-4bf2-8a1c-998db16c24f7
+POST http://127.0.0.1/webhooks/jellyfin/8f119459-7373-4bf2-8a1c-998db16c24f7
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

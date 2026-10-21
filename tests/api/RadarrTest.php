@@ -11,7 +11,7 @@ class RadarrTest extends ApiTestCase
     public function testRejectsUnknownFeedId() : void
     {
         $this->api
-            ->get('/api/feed/radarr/00000000-0000-4000-8000-000000000000')
+            ->get('/feeds/radarr/00000000-0000-4000-8000-000000000000')
             ->assertStatus(404)
             ->assertBodySame('');
     }
@@ -24,7 +24,7 @@ class RadarrTest extends ApiTestCase
         $feedId = $this->fixture->createRadarrFeedId($fixture['user']->getId());
 
         $response = $this->api
-            ->get('/api/feed/radarr/' . $feedId)
+            ->get('/feeds/radarr/' . $feedId)
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')
             ->json();

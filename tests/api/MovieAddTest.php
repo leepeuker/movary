@@ -9,7 +9,7 @@ use Tests\Api\Movary\Support\ApiTestCase;
 #[CoversNothing]
 class MovieAddTest extends ApiTestCase
 {
-    private const string ENDPOINT = '/api/movies/add';
+    private const string ENDPOINT = '/api/v1/movies/add';
 
     public function testRejectsUnauthenticatedRequest() : void
     {

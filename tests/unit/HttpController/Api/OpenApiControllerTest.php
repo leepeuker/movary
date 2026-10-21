@@ -21,12 +21,12 @@ class OpenApiControllerTest extends TestCase
         $settings = $this->createStub(ServerSettings::class);
         $settings->method('getApplicationVersion')->willReturn('1.2.3');
         $url = $this->createStub(ApplicationUrlService::class);
-        $url->method('createApplicationUrl')->willReturn('https://movary.example/api');
+        $url->method('createApplicationUrl')->willReturn('https://movary.example');
 
         $response = (new OpenApiController($file, $settings, $url, '/docs/'))->getSchema();
 
         self::assertSame(
-            '{"openapi":"3.0.2","info":{"version":"1.2.3"},"servers":[{"url":"https:\/\/movary.example\/api"}]}',
+            '{"openapi":"3.0.2","info":{"version":"1.2.3"},"servers":[{"url":"https:\/\/movary.example"}]}',
             $response->getBody(),
         );
     }

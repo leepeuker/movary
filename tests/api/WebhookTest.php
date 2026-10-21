@@ -14,7 +14,7 @@ class WebhookTest extends ApiTestCase
     public function testRejectsUnknownWebhookId(string $provider) : void
     {
         $this->api
-            ->requestRaw('POST', '/api/webhook/' . $provider . '/unknown', '')
+            ->requestRaw('POST', '/webhooks/' . $provider . '/unknown', '')
             ->assertStatus(404)
             ->assertBodySame('');
     }
@@ -24,7 +24,7 @@ class WebhookTest extends ApiTestCase
         $webhookId = $this->createWebhookId('plex');
 
         $this->api
-            ->postMultipart('/api/webhook/plex/' . $webhookId, ['payload' => '{'])
+            ->postMultipart('/webhooks/plex/' . $webhookId, ['payload' => '{'])
             ->assertStatus(400)
             ->assertJsonSame([
                 'error' => 'InvalidRequest',
@@ -39,7 +39,7 @@ class WebhookTest extends ApiTestCase
         $this->api
             ->requestRaw(
                 'POST',
-                '/api/webhook/jellyfin/' . $webhookId,
+                '/webhooks/jellyfin/' . $webhookId,
                 '{',
                 ['Content-Type' => 'application/json'],
             )
@@ -51,7 +51,7 @@ class WebhookTest extends ApiTestCase
         $webhookId = $this->createWebhookId('kodi');
 
         $this->api
-            ->requestRaw('POST', '/api/webhook/kodi/' . $webhookId, '{}', ['Content-Type' => 'text/plain'])
+            ->requestRaw('POST', '/webhooks/kodi/' . $webhookId, '{}', ['Content-Type' => 'text/plain'])
             ->assertStatus(415);
     }
 
@@ -60,7 +60,7 @@ class WebhookTest extends ApiTestCase
         $webhookId = $this->createWebhookId('emby');
 
         $this->api
-            ->postForm('/api/webhook/emby/' . $webhookId, ['data' => '{'])
+            ->postForm('/webhooks/emby/' . $webhookId, ['data' => '{'])
             ->assertStatus(400);
     }
 
@@ -69,7 +69,7 @@ class WebhookTest extends ApiTestCase
         $webhookId = $this->createWebhookId('emby');
 
         $this->api
-            ->postForm('/api/webhook/emby/' . $webhookId, ['data' => str_repeat(' ', 262145)])
+            ->postForm('/webhooks/emby/' . $webhookId, ['data' => str_repeat(' ', 262145)])
             ->assertStatus(413);
     }
 
@@ -100,28 +100,28 @@ class WebhookTest extends ApiTestCase
             'Plex unsupported event' => [
                 'plex',
                 static fn(self $test, string $id) => $test->api->postMultipart(
-                    '/api/webhook/plex/' . $id,
+                    '/webhooks/plex/' . $id,
                     ['payload' => '{"event":"library.new"}'],
                 ),
             ],
             'Jellyfin unsupported event' => [
                 'jellyfin',
                 static fn(self $test, string $id) => $test->api->post(
-                    '/api/webhook/jellyfin/' . $id,
+                    '/webhooks/jellyfin/' . $id,
                     ['NotificationType' => 'PlaybackStart', 'ItemType' => 'Movie'],
                 ),
             ],
             'Emby unsupported event' => [
                 'emby',
                 static fn(self $test, string $id) => $test->api->postForm(
-                    '/api/webhook/emby/' . $id,
+                    '/webhooks/emby/' . $id,
                     ['data' => '{"Event":"playback.start","Item":{"Type":"Movie"}}'],
                 ),
             ],
             'Kodi event ignored by disabled setting' => [
                 'kodi',
                 static fn(self $test, string $id) => $test->api->post(
-                    '/api/webhook/kodi/' . $id,
+                    '/webhooks/kodi/' . $id,
                     ['title' => 'Movie', 'uniqueIds' => []],
                 ),
             ],
