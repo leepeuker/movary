@@ -64,4 +64,13 @@ class ApiClient
 
         return new ApiResponse($this->client->request($method, ltrim($path, '/'), $options));
     }
+
+    /** @param array<string, string> $headers */
+    public function requestRaw(string $method, string $path, string $body, array $headers = []) : ApiResponse
+    {
+        return new ApiResponse($this->client->request($method, ltrim($path, '/'), [
+            'body' => $body,
+            'headers' => $headers,
+        ]));
+    }
 }

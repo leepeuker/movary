@@ -84,7 +84,7 @@
                             "$ref": "#/components/schemas/movie"
                           },
                           "watchedAt": {
-                            "$ref": "#/components/schemas/date"
+                            "$ref": "#/components/schemas/calendarDate"
                           }
                         }
                       }
@@ -139,18 +139,23 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId",
+                    "watchedAt"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
                     "watchedAt": {
-                      "$ref": "#/components/schemas/date"
+                      "$ref": "#/components/schemas/calendarDate"
                     },
                     "plays": {
                       "$ref": "#/components/schemas/playsOptional"
@@ -170,6 +175,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -208,27 +216,33 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId",
+                    "watchedAt",
+                    "plays"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
                     "watchedAt": {
-                      "$ref": "#/components/schemas/date"
+                      "$ref": "#/components/schemas/calendarDate"
                     },
                     "plays": {
                       "$ref": "#/components/schemas/plays"
                     },
                     "comment": {
-                      "$ref": "#/components/schemas/comment"
+                      "$ref": "#/components/schemas/commentOptional"
                     },
                     "position": {
-                      "$ref": "#/components/schemas/position"
+                      "$ref": "#/components/schemas/positionNullable"
                     }
                   }
                 }
@@ -239,6 +253,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -264,7 +281,7 @@
           "History"
         ],
         "summary": "Delete movie watch dates from user history",
-        "description": "Delete all watch dates of specified movies if no specific watch dates are provided. A date for plays is required.",
+        "description": "Delete the specified movie watch dates. A watch date is required for every movie.",
         "parameters": [
           {
             "name": "username",
@@ -277,18 +294,23 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId",
+                    "watchedAt"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
                     },
                     "watchedAt": {
-                      "$ref": "#/components/schemas/date"
+                      "$ref": "#/components/schemas/calendarDate"
                     }
                   }
                 }
@@ -299,6 +321,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -424,7 +449,7 @@
                             "$ref": "#/components/schemas/movie"
                           },
                           "addedAt": {
-                            "$ref": "#/components/schemas/date"
+                            "$ref": "#/components/schemas/timestamp"
                           }
                         }
                       }
@@ -683,7 +708,7 @@
                               "type": "object",
                               "properties": {
                                 "date": {
-                                  "$ref": "#/components/schemas/dateNullable"
+                                  "$ref": "#/components/schemas/calendarDateNullable"
                                 },
                                 "plays": {
                                   "$ref": "#/components/schemas/plays"
@@ -763,7 +788,7 @@
                         "type": "object",
                         "properties": {
                           "watchedAt": {
-                            "$ref": "#/components/schemas/dateNullable"
+                            "$ref": "#/components/schemas/calendarDateNullable"
                           },
                           "plays": {
                             "$ref": "#/components/schemas/playsOptional"
@@ -837,7 +862,7 @@
                         "type": "object",
                         "properties": {
                           "watchedAt": {
-                            "$ref": "#/components/schemas/dateNullable"
+                            "$ref": "#/components/schemas/calendarDateNullable"
                           },
                           "plays": {
                             "$ref": "#/components/schemas/plays"
@@ -908,7 +933,7 @@
                     "watchDates": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/dateNullable"
+                        "$ref": "#/components/schemas/calendarDateNullable"
                       }
                     }
                   }
@@ -1057,7 +1082,7 @@
                             "example": "千と千尋の神隠し"
                           },
                           "releaseDate": {
-                            "$ref": "#/components/schemas/releaseDateNullable"
+                            "$ref": "#/components/schemas/calendarDateNullable"
                           },
                           "overview": {
                             "$ref": "#/components/schemas/overview"
@@ -1301,7 +1326,7 @@
             "example": "千と千尋の神隠し"
           },
           "releaseDate": {
-            "$ref": "#/components/schemas/releaseDateNullable"
+            "$ref": "#/components/schemas/calendarDateNullable"
           },
           "tagline": {
             "type": "string",
@@ -1378,15 +1403,16 @@
             }
           },
           "updatedAt": {
-            "$ref": "#/components/schemas/dateNullable"
+            "$ref": "#/components/schemas/timestampNullable"
           },
           "createdAt": {
-            "$ref": "#/components/schemas/date"
+            "$ref": "#/components/schemas/timestamp"
           }
         }
       },
       "id": {
         "type": "integer",
+        "minimum": 1,
         "example": 42
       },
       "idNullable": {
@@ -1396,21 +1422,21 @@
       },
       "plays": {
         "type": "integer",
+        "minimum": 1,
+        "maximum": 32767,
         "example": 1
       },
       "playsOptional": {
         "type": "integer",
+        "minimum": 1,
+        "maximum": 32767,
         "example": 1,
+        "nullable": true,
         "default": 1
       },
       "title": {
         "type": "string",
         "example": "Matrix"
-      },
-      "releaseDateNullable": {
-        "type": "string",
-        "example": "2004-12-07",
-        "nullable": true
       },
       "overview": {
         "type": "string",
@@ -1429,24 +1455,48 @@
         "default": null
       },
       "position": {
-        "type": "number",
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 32767,
         "example": 1,
         "nullable": false
       },
+      "positionNullable": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 32767,
+        "example": 1,
+        "nullable": true
+      },
       "positionOptional": {
-        "type": "number",
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 32767,
         "example": 1,
         "nullable": true,
         "default": 1
       },
-      "date": {
+      "calendarDate": {
         "type": "string",
+        "format": "date",
         "example": "2023-07-02"
       },
-      "dateNullable": {
+      "calendarDateNullable": {
         "type": "string",
+        "format": "date",
         "nullable": true,
         "example": "2023-07-02"
+      },
+      "timestamp": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+        "example": "2023-07-02 12:34:56"
+      },
+      "timestampNullable": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$",
+        "nullable": true,
+        "example": "2023-07-02 12:34:56"
       }
     },
     "responses": {

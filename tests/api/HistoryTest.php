@@ -170,6 +170,186 @@ class HistoryTest extends ApiTestCase
             ->assertStatus(404);
     }
 
+    public function testRejectsMalformedJson() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+
+        $this->api
+            ->requestRaw(
+                'POST',
+                $this->createPath($fixture['user']->getName()),
+                '{',
+                [...$this->createAuthorizationHeader($fixture['token']), 'Content-Type' => 'application/json'],
+            )
+            ->assertStatus(400)
+            ->assertHeaderSame('Content-Type', 'application/json')
+            ->assertJsonSame([
+                'error' => 'InvalidJson',
+                'message' => 'Request body must contain a valid JSON array.',
+            ]);
+    }
+
+    public function testRejectsInvalidAdditionFields() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [['movaryId' => $movie->getId(), 'watchedAt' => 'not-a-date']],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchedAt" must be a date in YYYY-MM-DD format.',
+            ]);
+    }
+
+    public function testRejectsInvalidUpdateFields() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->put(
+                $this->createPath($fixture['user']->getName()),
+                [[
+                    'movaryId' => $movie->getId(),
+                    'watchedAt' => self::WATCHED_AT,
+                    'position' => 1,
+                ]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].plays" must be a positive integer.',
+            ]);
+    }
+
+    public function testAcceptsNullOptionalPositionOnAddition() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [[
+                    'movaryId' => $movie->getId(),
+                    'watchedAt' => self::WATCHED_AT,
+                    'position' => null,
+                ]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(204);
+
+        $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT);
+        self::assertNotNull($entry);
+        self::assertSame(1, $entry->getPosition());
+    }
+
+    public function testAcceptsUpdateWithoutOptionalFields() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($fixture['user']->getName());
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->api->post($path, [[
+            'movaryId' => $movie->getId(),
+            'watchedAt' => self::WATCHED_AT,
+            'position' => 2,
+            'comment' => 'Keep me',
+        ]], $headers)->assertStatus(204);
+
+        $this->api->put($path, [[
+            'movaryId' => $movie->getId(),
+            'watchedAt' => self::WATCHED_AT,
+            'plays' => 2,
+        ]], $headers)->assertStatus(204);
+
+        $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT);
+        self::assertNotNull($entry);
+        self::assertSame(2, $entry->getPlays());
+        self::assertSame(2, $entry->getPosition());
+        self::assertSame('Keep me', $entry->getComment());
+    }
+
+    public function testRejectsInvalidDeletionFields() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->delete(
+                $this->createPath($fixture['user']->getName()),
+                [['movaryId' => $movie->getId()]],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].watchedAt" must be a date in YYYY-MM-DD format.',
+            ]);
+    }
+
+    public function testRejectsUnknownMovieWithoutPartiallyApplyingRequest() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [
+                    ['movaryId' => $movie->getId(), 'watchedAt' => self::WATCHED_AT],
+                    ['movaryId' => 2_147_483_647, 'watchedAt' => self::WATCHED_AT],
+                ],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'MovieNotFound',
+                'message' => 'Movie with id 2147483647 does not exist.',
+            ]);
+
+        self::assertNull($this->fixture->findHistoryEntry(
+            $movie->getId(),
+            $fixture['user']->getId(),
+            self::WATCHED_AT,
+        ));
+    }
+
+    public function testRejectsOversizedValueWithoutPartiallyApplyingRequest() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [
+                    ['movaryId' => $movie->getId(), 'watchedAt' => self::WATCHED_AT],
+                    ['movaryId' => $movie->getId(), 'watchedAt' => '2024-05-07', 'plays' => 32768],
+                ],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[1].plays" must be at most 32767.',
+            ]);
+
+        self::assertNull($this->fixture->findHistoryEntry(
+            $movie->getId(),
+            $fixture['user']->getId(),
+            self::WATCHED_AT,
+        ));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function writeMethodProvider() : iterable
     {

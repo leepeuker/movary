@@ -9,7 +9,6 @@ use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\HistoryResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
-use Movary\ValueObject\Date;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 
@@ -28,16 +27,16 @@ class HistoryController
     public function addToHistory(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $historyAdditions = Json::decode($request->getBody());
+        $historyAdditions = $this->historyRequestMapper->mapAdditions($request);
 
         foreach ($historyAdditions as $historyAddition) {
             $this->movieApi->addPlaysForMovieOnDate(
-                (int)$historyAddition['movaryId'],
+                $historyAddition['movieId'],
                 $userId,
-                Date::createFromString($historyAddition['watchedAt']),
-                $historyAddition['plays'] ?? 1,
-                $historyAddition['position'] ?? 1,
-                $historyAddition['comment'] ?? null,
+                $historyAddition['watchedAt'],
+                $historyAddition['plays'],
+                $historyAddition['position'],
+                $historyAddition['comment'],
             );
         }
 
@@ -47,13 +46,13 @@ class HistoryController
     public function deleteFromHistory(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $historyAdditions = Json::decode($request->getBody());
+        $historyAdditions = $this->historyRequestMapper->mapDeletions($request);
 
         foreach ($historyAdditions as $historyAddition) {
             $this->movieApi->deleteHistoryByIdAndDate(
-                (int)$historyAddition['movaryId'],
+                $historyAddition['movieId'],
                 $userId,
-                Date::createFromString($historyAddition['watchedAt']),
+                $historyAddition['watchedAt'],
             );
         }
 
@@ -95,13 +94,13 @@ class HistoryController
     public function updateHistory(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $historyAdditions = Json::decode($request->getBody());
+        $historyAdditions = $this->historyRequestMapper->mapUpdates($request);
 
         foreach ($historyAdditions as $historyAddition) {
             $this->movieApi->replaceHistoryForMovieByDate(
-                (int)$historyAddition['movaryId'],
+                $historyAddition['movieId'],
                 $userId,
-                Date::createFromString($historyAddition['watchedAt']),
+                $historyAddition['watchedAt'],
                 $historyAddition['plays'],
                 $historyAddition['position'],
                 $historyAddition['comment'],
