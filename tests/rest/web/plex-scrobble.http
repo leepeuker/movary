@@ -1,9 +1,12 @@
 POST http://127.0.0.1/api/webhook/plex/14f14d6b-695f-41b9-a856-5ba401bcc040
 Accept: */*
 Cache-Control: no-cache
-Content-Type: application/x-www-form-urlencoded
+Content-Type: multipart/form-data; boundary=MovaryWebhookBoundary
 
-payload=
+--MovaryWebhookBoundary
+Content-Disposition: form-data; name="payload"
+Content-Type: application/json
+
   {
     "event": "media.scrobble",
     "user": true,
@@ -564,3 +567,4 @@ payload=
       ]
     }
   }
+--MovaryWebhookBoundary--

@@ -8,7 +8,6 @@ use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Service\Tmdb\SyncMovie;
-use Movary\Util\Json;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\PersonalRating;
 use Psr\Log\LoggerInterface;
@@ -46,7 +45,10 @@ class PlexScrobbler
         }
 
         if ($tmdbId === null) {
-            $this->logger->error('Could not extract tmdb id from webhook: ' . Json::encode($webHook));
+            $this->logger->warning('Plex: Movie ignored because it was missing tmdb id', [
+                'event' => $webHook['event'],
+                'movieName' => $webHook['Metadata']['title'] ?? null,
+            ]);
 
             return;
         }
@@ -70,7 +72,7 @@ class PlexScrobbler
         }
 
         if (isset($webHook['rating']) === false) {
-            throw new RuntimeException('Could not get rating from: ' . Json::encode($webHook));
+            throw new RuntimeException('Could not get rating from Plex webhook');
         }
 
         $rating = PersonalRating::create((int)$webHook['rating']);
