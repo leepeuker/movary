@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary\Support;
+namespace Tests\Http\Movary;
 
 use GuzzleHttp\Client;
 
-class ApiClient
+class HttpClient
 {
     private readonly Client $client;
 
@@ -19,7 +19,7 @@ class ApiClient
     }
 
     /** @param array<string, string> $headers */
-    public function get(string $path, array $headers = []) : ApiResponse
+    public function get(string $path, array $headers = []) : HttpResponse
     {
         return $this->request('GET', $path, $headers);
     }
@@ -28,33 +28,33 @@ class ApiClient
      * @param array<array-key, mixed> $body
      * @param array<string, string> $headers
      */
-    public function post(string $path, array $body, array $headers = []) : ApiResponse
+    public function post(string $path, array $body, array $headers = []) : HttpResponse
     {
         return $this->request('POST', $path, $headers, $body);
     }
 
     /** @param array<string, string> $fields */
-    public function postForm(string $path, array $fields) : ApiResponse
+    public function postForm(string $path, array $fields) : HttpResponse
     {
-        return new ApiResponse($this->client->post(ltrim($path, '/'), ['form_params' => $fields]));
+        return new HttpResponse($this->client->post(ltrim($path, '/'), ['form_params' => $fields]));
     }
 
     /** @param array<string, string> $fields */
-    public function postMultipart(string $path, array $fields) : ApiResponse
+    public function postMultipart(string $path, array $fields) : HttpResponse
     {
         $multipart = [];
         foreach ($fields as $name => $contents) {
             $multipart[] = ['name' => $name, 'contents' => $contents];
         }
 
-        return new ApiResponse($this->client->post(ltrim($path, '/'), ['multipart' => $multipart]));
+        return new HttpResponse($this->client->post(ltrim($path, '/'), ['multipart' => $multipart]));
     }
 
     /**
      * @param array<array-key, mixed> $body
      * @param array<string, string> $headers
      */
-    public function put(string $path, array $body, array $headers = []) : ApiResponse
+    public function put(string $path, array $body, array $headers = []) : HttpResponse
     {
         return $this->request('PUT', $path, $headers, $body);
     }
@@ -63,7 +63,7 @@ class ApiClient
      * @param array<array-key, mixed> $body
      * @param array<string, string> $headers
      */
-    public function delete(string $path, array $body, array $headers = []) : ApiResponse
+    public function delete(string $path, array $body, array $headers = []) : HttpResponse
     {
         return $this->request('DELETE', $path, $headers, $body);
     }
@@ -72,20 +72,20 @@ class ApiClient
      * @param array<string, string> $headers
      * @param null|array<array-key, mixed> $body
      */
-    public function request(string $method, string $path, array $headers = [], ?array $body = null) : ApiResponse
+    public function request(string $method, string $path, array $headers = [], ?array $body = null) : HttpResponse
     {
         $options = ['headers' => $headers];
         if ($body !== null) {
             $options['json'] = $body;
         }
 
-        return new ApiResponse($this->client->request($method, ltrim($path, '/'), $options));
+        return new HttpResponse($this->client->request($method, ltrim($path, '/'), $options));
     }
 
     /** @param array<string, string> $headers */
-    public function requestRaw(string $method, string $path, string $body, array $headers = []) : ApiResponse
+    public function requestRaw(string $method, string $path, string $body, array $headers = []) : HttpResponse
     {
-        return new ApiResponse($this->client->request($method, ltrim($path, '/'), [
+        return new HttpResponse($this->client->request($method, ltrim($path, '/'), [
             'body' => $body,
             'headers' => $headers,
         ]));

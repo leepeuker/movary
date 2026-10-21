@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary;
+namespace Tests\Http\Movary\Feeds;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
-use Tests\Api\Movary\Support\ApiTestCase;
+use Tests\Http\Movary\HttpTestCase;
 
 #[CoversNothing]
-class RadarrTest extends ApiTestCase
+class RadarrTest extends HttpTestCase
 {
     public function testRejectsUnknownFeedId() : void
     {
-        $this->api
+        $this->http
             ->get('/feeds/radarr/00000000-0000-4000-8000-000000000000')
             ->assertStatus(404)
             ->assertBodySame('');
@@ -23,7 +23,7 @@ class RadarrTest extends ApiTestCase
         $this->fixture->addMovieToWatchlist($movie->getId(), $fixture['user']->getId());
         $feedId = $this->fixture->createRadarrFeedId($fixture['user']->getId());
 
-        $response = $this->api
+        $response = $this->http
             ->get('/feeds/radarr/' . $feedId)
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')

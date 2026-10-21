@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary;
+namespace Tests\Http\Movary\Api;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Api\Movary\Support\ApiTestCase;
+use Tests\Http\Movary\HttpTestCase;
 
 #[CoversNothing]
-class HistoryTest extends ApiTestCase
+class HistoryTest extends HttpTestCase
 {
     private const string WATCHED_AT = '2024-05-06';
 
@@ -18,7 +18,7 @@ class HistoryTest extends ApiTestCase
         $path = $this->createPath($fixture['user']->getName());
         $headers = $this->createAuthorizationHeader($fixture['token']);
 
-        $this->api
+        $this->http
             ->post($path, [[
                 'movaryId' => $movie->getId(),
                 'watchedAt' => self::WATCHED_AT,
@@ -39,7 +39,7 @@ class HistoryTest extends ApiTestCase
         self::assertSame(1, $createdEntry->getPosition());
         self::assertSame('Created through the API', $createdEntry->getComment());
 
-        $historyResponse = $this->api
+        $historyResponse = $this->http
             ->get($path, $headers)
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')
@@ -53,7 +53,7 @@ class HistoryTest extends ApiTestCase
         self::assertSame($movie->getId(), $historyResponse['history'][0]['movie']['ids']['movary']);
         self::assertSame($movie->getTmdbId(), $historyResponse['history'][0]['movie']['ids']['tmdb']);
 
-        $this->api
+        $this->http
             ->put($path, [[
                 'movaryId' => $movie->getId(),
                 'watchedAt' => self::WATCHED_AT,
@@ -74,7 +74,7 @@ class HistoryTest extends ApiTestCase
         self::assertSame(2, $updatedEntry->getPosition());
         self::assertSame('Updated through the API', $updatedEntry->getComment());
 
-        $this->api
+        $this->http
             ->delete($path, [[
                 'movaryId' => $movie->getId(),
                 'watchedAt' => self::WATCHED_AT,
@@ -87,7 +87,7 @@ class HistoryTest extends ApiTestCase
             $fixture['user']->getId(),
             self::WATCHED_AT,
         ));
-        self::assertSame([], $this->api->get($path, $headers)->assertStatus(200)->json()['history']);
+        self::assertSame([], $this->http->get($path, $headers)->assertStatus(200)->json()['history']);
     }
 
     #[DataProvider('writeMethodProvider')]
@@ -95,7 +95,7 @@ class HistoryTest extends ApiTestCase
     {
         $user = $this->fixture->createUserWithToken()['user'];
 
-        $this->api
+        $this->http
             ->request($method, $this->createPath($user->getName()), body: [])
             ->assertStatus(401)
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
@@ -105,7 +105,7 @@ class HistoryTest extends ApiTestCase
     {
         $user = $this->fixture->createUserWithToken()['user'];
 
-        $this->api
+        $this->http
             ->get($this->createPath($user->getName()))
             ->assertStatus(401)
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
@@ -115,7 +115,7 @@ class HistoryTest extends ApiTestCase
     {
         $user = $this->fixture->createUserWithToken()['user'];
 
-        $this->api
+        $this->http
             ->get($this->createPath($user->getName()), $this->createAuthorizationHeader('invalid-token'))
             ->assertStatus(401)
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
@@ -126,7 +126,7 @@ class HistoryTest extends ApiTestCase
         $target = $this->fixture->createUserWithToken(0);
         $authenticatedUser = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->get(
                 $this->createPath($target['user']->getName()),
                 $this->createAuthorizationHeader($authenticatedUser['token']),
@@ -140,7 +140,7 @@ class HistoryTest extends ApiTestCase
         $authenticatedUser = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->post(
                 $this->createPath($target['user']->getName()),
                 [[
@@ -162,7 +162,7 @@ class HistoryTest extends ApiTestCase
     {
         $authenticatedUser = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->get(
                 $this->createPath('UnknownApiUser'),
                 $this->createAuthorizationHeader($authenticatedUser['token']),
@@ -174,7 +174,7 @@ class HistoryTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->get(
                 $this->createPath($fixture['user']->getName()) . '?sortOrder=unsupported',
                 $this->createAuthorizationHeader($fixture['token']),
@@ -191,7 +191,7 @@ class HistoryTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->requestRaw(
                 'POST',
                 $this->createPath($fixture['user']->getName()),
@@ -211,7 +211,7 @@ class HistoryTest extends ApiTestCase
         $fixture = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->post(
                 $this->createPath($fixture['user']->getName()),
                 [['movaryId' => $movie->getId(), 'watchedAt' => 'not-a-date']],
@@ -229,7 +229,7 @@ class HistoryTest extends ApiTestCase
         $fixture = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->put(
                 $this->createPath($fixture['user']->getName()),
                 [[
@@ -251,7 +251,7 @@ class HistoryTest extends ApiTestCase
         $fixture = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->post(
                 $this->createPath($fixture['user']->getName()),
                 [[
@@ -275,14 +275,14 @@ class HistoryTest extends ApiTestCase
         $path = $this->createPath($fixture['user']->getName());
         $headers = $this->createAuthorizationHeader($fixture['token']);
 
-        $this->api->post($path, [[
+        $this->http->post($path, [[
             'movaryId' => $movie->getId(),
             'watchedAt' => self::WATCHED_AT,
             'position' => 2,
             'comment' => 'Keep me',
         ]], $headers)->assertStatus(204);
 
-        $this->api->put($path, [[
+        $this->http->put($path, [[
             'movaryId' => $movie->getId(),
             'watchedAt' => self::WATCHED_AT,
             'plays' => 2,
@@ -300,7 +300,7 @@ class HistoryTest extends ApiTestCase
         $fixture = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->delete(
                 $this->createPath($fixture['user']->getName()),
                 [['movaryId' => $movie->getId()]],
@@ -318,7 +318,7 @@ class HistoryTest extends ApiTestCase
         $fixture = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->post(
                 $this->createPath($fixture['user']->getName()),
                 [
@@ -345,7 +345,7 @@ class HistoryTest extends ApiTestCase
         $fixture = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->post(
                 $this->createPath($fixture['user']->getName()),
                 [

@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary;
+namespace Tests\Http\Movary\Api;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Api\Movary\Support\ApiTestCase;
+use Tests\Http\Movary\HttpTestCase;
 
 #[CoversNothing]
-class WatchlistTest extends ApiTestCase
+class WatchlistTest extends HttpTestCase
 {
     public function testOwnerCanCreateReadAndDeleteWatchlistEntry() : void
     {
@@ -16,14 +16,14 @@ class WatchlistTest extends ApiTestCase
         $path = $this->createPath($fixture['user']->getName());
         $headers = $this->createAuthorizationHeader($fixture['token']);
 
-        $this->api
+        $this->http
             ->post($path, [['movaryId' => $movie->getId()]], $headers)
             ->assertStatus(204)
             ->assertBodySame('');
 
         self::assertTrue($this->fixture->hasMovieInWatchlist($movie->getId(), $fixture['user']->getId()));
 
-        $watchlistResponse = $this->api
+        $watchlistResponse = $this->http
             ->get($path, $headers)
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')
@@ -40,13 +40,13 @@ class WatchlistTest extends ApiTestCase
             $watchlistResponse['watchlist'][0]['addedAt'],
         );
 
-        $this->api
+        $this->http
             ->delete($path, [['movaryId' => $movie->getId()]], $headers)
             ->assertStatus(204)
             ->assertBodySame('');
 
         self::assertFalse($this->fixture->hasMovieInWatchlist($movie->getId(), $fixture['user']->getId()));
-        self::assertSame([], $this->api->get($path, $headers)->assertStatus(200)->json()['watchlist']);
+        self::assertSame([], $this->http->get($path, $headers)->assertStatus(200)->json()['watchlist']);
     }
 
     #[DataProvider('writeMethodProvider')]
@@ -54,7 +54,7 @@ class WatchlistTest extends ApiTestCase
     {
         $user = $this->fixture->createUserWithToken()['user'];
 
-        $this->api
+        $this->http
             ->request($method, $this->createPath($user->getName()), body: [])
             ->assertStatus(401)
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
@@ -64,7 +64,7 @@ class WatchlistTest extends ApiTestCase
     {
         $user = $this->fixture->createUserWithToken()['user'];
 
-        $this->api
+        $this->http
             ->get($this->createPath($user->getName()))
             ->assertStatus(401)
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
@@ -74,7 +74,7 @@ class WatchlistTest extends ApiTestCase
     {
         $user = $this->fixture->createUserWithToken()['user'];
 
-        $this->api
+        $this->http
             ->get($this->createPath($user->getName()), $this->createAuthorizationHeader('invalid-token'))
             ->assertStatus(401)
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
@@ -85,7 +85,7 @@ class WatchlistTest extends ApiTestCase
         $target = $this->fixture->createUserWithToken(0);
         $authenticatedUser = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->get(
                 $this->createPath($target['user']->getName()),
                 $this->createAuthorizationHeader($authenticatedUser['token']),
@@ -99,7 +99,7 @@ class WatchlistTest extends ApiTestCase
         $authenticatedUser = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->post(
                 $this->createPath($target['user']->getName()),
                 [['movaryId' => $movie->getId()]],
@@ -114,7 +114,7 @@ class WatchlistTest extends ApiTestCase
     {
         $authenticatedUser = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->get(
                 $this->createPath('UnknownApiUser'),
                 $this->createAuthorizationHeader($authenticatedUser['token']),
@@ -126,7 +126,7 @@ class WatchlistTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->delete(
                 $this->createPath($fixture['user']->getName()),
                 [['movaryId' => 2_147_483_647]],
@@ -143,7 +143,7 @@ class WatchlistTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->requestRaw(
                 $method,
                 $this->createPath($fixture['user']->getName()),
@@ -163,7 +163,7 @@ class WatchlistTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->requestRaw(
                 $method,
                 $this->createPath($fixture['user']->getName()),
@@ -182,7 +182,7 @@ class WatchlistTest extends ApiTestCase
         $fixture = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
-        $this->api
+        $this->http
             ->post(
                 $this->createPath($fixture['user']->getName()),
                 [
@@ -207,11 +207,11 @@ class WatchlistTest extends ApiTestCase
         $path = $this->createPath($fixture['user']->getName());
         $headers = $this->createAuthorizationHeader($fixture['token']);
 
-        $this->api
+        $this->http
             ->post($path, [['movaryId' => $movie->getId()]], $headers)
             ->assertStatus(204);
 
-        $this->api
+        $this->http
             ->delete(
                 $path,
                 [
