@@ -1,6 +1,6 @@
 FROM composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac AS composer
 
-FROM alpine:3.23@sha256:85fe1e81d6758c208f3e1eed4338a1997e19d4be002d4dd32d3100c9a8c010a0 AS base
+FROM php:8.5.12-fpm-alpine3.24@sha256:4c9541a4506014672d074652a1cc9754d3c5f97cad6c6027bae35be0e4a4dea9 AS base
 
 LABEL Description="Movary is a self hosted web app to track and rate your watched movies"
 LABEL Maintainer="Lee Peuker"
@@ -8,28 +8,20 @@ LABEL Maintainer="Lee Peuker"
 ARG USER_ID=3000
 ARG GROUP_ID=3000
 
-ENV PHP_INI_DIR=/etc/php85
-
 RUN apk upgrade --no-cache \
     && apk add --no-cache \
     bash \
     curl \
+    libzip \
     nginx \
-    php85 \
-    php85-ctype \
-    php85-curl \
-    php85-fpm \
-    php85-mbstring \
-    php85-openssl \
-    php85-pdo \
-    php85-pdo_mysql \
-    php85-pdo_sqlite \
-    php85-sqlite3 \
-    php85-zip \
-    supervisor
+    supervisor \
+    && apk add --no-cache --virtual .php-extension-build-dependencies \
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql zip \
+    && apk del .php-extension-build-dependencies
 
-# Create standard binary name without duplicating the PHP executable
-RUN ln -s /usr/bin/php85 /usr/bin/php
+# Keep the PHP path used by the entrypoint and Supervisor configuration.
+RUN ln -s /usr/local/bin/php /usr/bin/php
 
 # Create entrypoint script (for automatic database migrations)
 COPY ./build/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -42,7 +34,7 @@ RUN chmod +x /usr/local/bin/stop_supervisor_on_process_failure.sh
 # Create runtime configuration
 COPY ./build/config/conf.d /etc/nginx/conf.d
 COPY ./build/config/nginx.conf /etc/nginx/nginx.conf
-COPY ./build/config/fpm-pool.conf $PHP_INI_DIR/php-fpm.d/www.conf
+COPY ./build/config/fpm-pool.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./build/config/php.ini $PHP_INI_DIR/conf.d/custom.ini
 COPY ./build/config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
@@ -68,12 +60,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping || exit 1
 
 FROM base AS production-dependencies
-
-USER root
-
-RUN apk add --no-cache php85-phar
-
-USER application
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY --chown=application:application ./composer.json ./composer.lock /app/
@@ -111,12 +97,11 @@ FROM base AS development
 USER root
 
 RUN apk add --no-cache \
-    php85-dom \
-    php85-phar \
-    php85-simplexml \
-    php85-tokenizer \
-    php85-xmlwriter \
-    php85-pecl-xdebug
+    --virtual .xdebug-build-dependencies \
+    $PHPIZE_DEPS \
+    linux-headers \
+    && pecl install xdebug-3.5.3 \
+    && apk del .xdebug-build-dependencies
 
 ARG XDEBUG_INI="$PHP_INI_DIR/conf.d/xdebug.ini"
 RUN echo 'zend_extension=xdebug.so' > "$XDEBUG_INI" \
