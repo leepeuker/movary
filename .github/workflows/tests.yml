@@ -63,6 +63,20 @@ jobs:
       - name: Validate OpenAPI specification
         run: make openapi_validate OPENAPI_OUTPUT_FORMAT=github-actions
 
+  validate_docs:
+    name: Validate documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build documentation
+        run: >-
+          docker run --rm
+          --mount type=bind,src=${{ github.workspace }},dst=/docs,readonly
+          squidfunk/mkdocs-material:9.7.7@sha256:51b87149d227691486b5f08993d28c65ca7e4990010664b697265b8e6fcd5287
+          build --strict --site-dir /tmp/site
+
   run_tests:
     name: Run tests
     runs-on: ubuntu-latest
