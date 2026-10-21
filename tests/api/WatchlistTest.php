@@ -138,6 +138,97 @@ class WatchlistTest extends ApiTestCase
         self::assertFalse($this->fixture->hasMovieInWatchlist(2_147_483_647, $fixture['user']->getId()));
     }
 
+    #[DataProvider('writeMethodProvider')]
+    public function testRejectsMalformedJson(string $method) : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+
+        $this->api
+            ->requestRaw(
+                $method,
+                $this->createPath($fixture['user']->getName()),
+                '{',
+                [...$this->createAuthorizationHeader($fixture['token']), 'Content-Type' => 'application/json'],
+            )
+            ->assertStatus(400)
+            ->assertHeaderSame('Content-Type', 'application/json')
+            ->assertJsonSame([
+                'error' => 'InvalidJson',
+                'message' => 'Request body must contain a valid JSON array.',
+            ]);
+    }
+
+    #[DataProvider('writeMethodProvider')]
+    public function testRejectsMissingMovieId(string $method) : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+
+        $this->api
+            ->requestRaw(
+                $method,
+                $this->createPath($fixture['user']->getName()),
+                '[{}]',
+                [...$this->createAuthorizationHeader($fixture['token']), 'Content-Type' => 'application/json'],
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[0].movaryId" must be a positive integer.',
+            ]);
+    }
+
+    public function testRejectsUnknownMovieWithoutPartiallyApplyingRequest() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->api
+            ->post(
+                $this->createPath($fixture['user']->getName()),
+                [
+                    ['movaryId' => $movie->getId()],
+                    ['movaryId' => 2_147_483_647],
+                ],
+                $this->createAuthorizationHeader($fixture['token']),
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'MovieNotFound',
+                'message' => 'Movie with id 2147483647 does not exist.',
+            ]);
+
+        self::assertFalse($this->fixture->hasMovieInWatchlist($movie->getId(), $fixture['user']->getId()));
+    }
+
+    public function testRejectsInvalidRemovalWithoutPartiallyApplyingRequest() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($fixture['user']->getName());
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->api
+            ->post($path, [['movaryId' => $movie->getId()]], $headers)
+            ->assertStatus(204);
+
+        $this->api
+            ->delete(
+                $path,
+                [
+                    ['movaryId' => $movie->getId()],
+                    ['movaryId' => 0],
+                ],
+                $headers,
+            )
+            ->assertStatus(400)
+            ->assertJsonSame([
+                'error' => 'InvalidRequest',
+                'message' => 'Field "items[1].movaryId" must be a positive integer.',
+            ]);
+
+        self::assertTrue($this->fixture->hasMovieInWatchlist($movie->getId(), $fixture['user']->getId()));
+    }
+
     /** @return iterable<string, array{string}> */
     public static function writeMethodProvider() : iterable
     {

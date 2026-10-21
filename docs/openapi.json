@@ -503,12 +503,16 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -522,6 +526,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -559,12 +566,16 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application\/json": {
               "schema": {
                 "type": "array",
                 "items": {
                   "type": "object",
+                  "required": [
+                    "movaryId"
+                  ],
                   "properties": {
                     "movaryId": {
                       "$ref": "#/components/schemas/id"
@@ -578,6 +589,9 @@
         "responses": {
           "204": {
             "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"

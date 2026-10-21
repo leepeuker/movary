@@ -29,4 +29,30 @@ class WatchlistRequestMapper
             $this->requestMapper->mapReleaseYear($request),
         );
     }
+
+    /** @return list<int> */
+    public function mapAdditions(Request $request) : array
+    {
+        $result = [];
+        foreach ($this->requestMapper->mapJsonObjectList($request) as $index => $addition) {
+            $result[] = $this->requestMapper->mapExistingMovieId($addition, 'items[' . $index . ']');
+        }
+
+        return $result;
+    }
+
+    /** @return list<int> */
+    public function mapDeletions(Request $request) : array
+    {
+        $result = [];
+        foreach ($this->requestMapper->mapJsonObjectList($request) as $index => $deletion) {
+            $result[] = $this->requestMapper->mapRequiredPositiveInteger(
+                $deletion,
+                'movaryId',
+                'items[' . $index . '].movaryId',
+            );
+        }
+
+        return $result;
+    }
 }

@@ -25,11 +25,9 @@ class WatchlistController
     public function addToWatchlist(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $watchlistAdditions = Json::decode($request->getBody());
+        $movieIds = $this->watchlistRequestMapper->mapAdditions($request);
 
-        foreach ($watchlistAdditions as $watchlistAddition) {
-            $movieId = (int)$watchlistAddition['movaryId'];
-
+        foreach ($movieIds as $movieId) {
             $this->movieWatchlistApi->addMovieToWatchlist($userId, $movieId);
         }
 
@@ -39,11 +37,9 @@ class WatchlistController
     public function deleteFromWatchlist(Request $request) : Response
     {
         $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $watchlistRemovals = Json::decode($request->getBody());
+        $movieIds = $this->watchlistRequestMapper->mapDeletions($request);
 
-        foreach ($watchlistRemovals as $watchlistRemoval) {
-            $movieId = (int)$watchlistRemoval['movaryId'];
-
+        foreach ($movieIds as $movieId) {
             $this->movieWatchlistApi->removeMovieFromWatchlist($userId, $movieId);
         }
 
