@@ -5,6 +5,7 @@ namespace Tests\Api\Movary\Support;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
@@ -71,5 +72,13 @@ class ApiFixture
             $userId,
             $watchedAt === null ? null : Date::createFromString($watchedAt),
         );
+    }
+
+    public function hasMovieInWatchlist(int $movieId, int $userId) : bool
+    {
+        /** @var MovieWatchlistApi $movieWatchlistApi */
+        $movieWatchlistApi = $this->container->get(MovieWatchlistApi::class);
+
+        return $movieWatchlistApi->hasMovieInWatchlist($userId, $movieId);
     }
 }
