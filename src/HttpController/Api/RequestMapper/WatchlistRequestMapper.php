@@ -11,20 +11,26 @@ class WatchlistRequestMapper
 
     private const string DEFAULT_SORT_ORDER = 'desc';
 
+    private const array SORT_BY_VALUES = [
+        'addedAt',
+        'rating',
+        'releaseDate',
+        'runtime',
+        'title',
+    ];
+
     public function __construct(private readonly RequestMapper $requestMapper)
     {
     }
 
     public function mapRequest(Request $request) : WatchlistRequestDto
     {
-        $sortBy = $request->getGetParameters()['sortBy'] ?? self::DEFAULT_SORT_BY;
-
         return WatchlistRequestDto::create(
             $this->requestMapper->mapUsernameFromRoute($request)->getId(),
             $this->requestMapper->mapSearchTerm($request),
             $this->requestMapper->mapPage($request),
             $this->requestMapper->mapLimit($request),
-            $sortBy,
+            $this->requestMapper->mapSortBy($request, self::SORT_BY_VALUES, self::DEFAULT_SORT_BY),
             $this->requestMapper->mapSortOrder($request, self::DEFAULT_SORT_ORDER),
             $this->requestMapper->mapReleaseYear($request),
         );

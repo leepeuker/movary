@@ -19,6 +19,8 @@ class RequestMapper
 
     private const int DEFAULT_LIMIT = 24;
 
+    private const int MAX_LIMIT = 100;
+
     private const string DEFAULT_SORT_ORDER = 'desc';
 
     public function __construct(
@@ -227,38 +229,69 @@ class RequestMapper
 
     public function mapLimit(Request $request) : int
     {
-        $getParameters = $request->getGetParameters();
-
-        $limit = $getParameters['limit'] ?? self::DEFAULT_LIMIT;
-
-        return (int)$limit;
+        return $this->mapPositiveQueryInteger($request, 'limit', self::DEFAULT_LIMIT, self::MAX_LIMIT);
     }
 
     public function mapPage(Request $request) : int
     {
-        $getParameters = $request->getGetParameters();
-
-        $page = $getParameters['page'] ?? self::DEFAULT_PAGE;
-
-        return (int)$page;
+        return $this->mapPositiveQueryInteger($request, 'page', self::DEFAULT_PAGE);
     }
 
     public function mapReleaseYear(Request $request) : ?Year
     {
         $getParameters = $request->getGetParameters();
 
-        if (isset($getParameters['releaseYear']) === false) {
+        if (array_key_exists('releaseYear', $getParameters) === false) {
             return null;
         }
 
-        return Year::createFromString($getParameters['releaseYear']);
+        $releaseYear = $getParameters['releaseYear'];
+        if (is_string($releaseYear) === false || preg_match('/^\d{4}$/D', $releaseYear) !== 1) {
+            throw InvalidApiRequest::invalidField('releaseYear', 'must be a year between 1901 and 2155');
+        }
+
+        try {
+            return Year::createFromString($releaseYear);
+        } catch (RuntimeException) {
+            throw InvalidApiRequest::invalidField('releaseYear', 'must be a year between 1901 and 2155');
+        }
     }
 
     public function mapSearchTerm(Request $request) : ?string
     {
         $getParameters = $request->getGetParameters();
 
-        return $getParameters['search'] ?? null;
+        if (array_key_exists('search', $getParameters) === false) {
+            return null;
+        }
+
+        $searchTerm = $getParameters['search'];
+        if (is_string($searchTerm) === false) {
+            throw InvalidApiRequest::invalidField('search', 'must be a string');
+        }
+
+        return $searchTerm;
+    }
+
+    public function mapRequiredSearchTerm(Request $request) : string
+    {
+        $searchTerm = $this->mapSearchTerm($request);
+        if ($searchTerm === null) {
+            throw InvalidApiRequest::invalidField('search', 'is required and must be a string');
+        }
+
+        return $searchTerm;
+    }
+
+    /** @param list<string> $allowedValues */
+    public function mapSortBy(Request $request, array $allowedValues, string $defaultSortBy) : string
+    {
+        $sortBy = $request->getGetParameters()['sortBy'] ?? $defaultSortBy;
+        if (is_string($sortBy) === false || in_array($sortBy, $allowedValues, true) === false) {
+            throw InvalidApiRequest::invalidField('sortBy', 'must be one of: ' . implode(', ', $allowedValues));
+        }
+
+        return $sortBy;
     }
 
     public function mapSortOrder(Request $request, ?string $defaultSortOrder = null) : SortOrder
@@ -271,8 +304,34 @@ class RequestMapper
             'asc' => SortOrder::createAsc(),
             'desc' => SortOrder::createDesc(),
 
-            default => throw new RuntimeException('Not supported sort order: ' . $getParameters['sortOrder'])
+            default => throw InvalidApiRequest::invalidField('sortOrder', 'must be one of: asc, desc'),
         };
+    }
+
+    private function mapPositiveQueryInteger(
+        Request $request,
+        string $field,
+        int $default,
+        ?int $maximum = null,
+    ) : int {
+        $getParameters = $request->getGetParameters();
+        if (array_key_exists($field, $getParameters) === false) {
+            return $default;
+        }
+
+        $value = $getParameters[$field];
+        $validatedValue = is_string($value) === true && preg_match('/^[1-9]\d*$/D', $value) === 1
+            ? filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
+            : $value;
+        if (is_int($validatedValue) === false || $validatedValue < 1) {
+            throw InvalidApiRequest::invalidField($field, 'must be a positive integer');
+        }
+
+        if ($maximum !== null && $validatedValue > $maximum) {
+            throw InvalidApiRequest::invalidField($field, 'must be at most ' . $maximum);
+        }
+
+        return $validatedValue;
     }
 
     public function mapUsernameFromRoute(Request $request) : UserEntity

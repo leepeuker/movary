@@ -40,6 +40,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
               "default": 1
             }
           },
@@ -50,6 +51,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
               "default": 24
             }
           },
@@ -60,7 +63,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "default": "asc",
+              "default": "desc",
               "enum": [
                 "asc",
                 "desc"
@@ -395,6 +398,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
               "default": 1
             }
           },
@@ -405,6 +409,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
               "default": 24
             }
           },
@@ -445,7 +451,9 @@
             "description": "Release year",
             "required": false,
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1901,
+              "maximum": 2155
             }
           }
         ],
@@ -675,6 +683,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
               "default": 1
             }
           },
@@ -685,6 +694,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
               "default": 24
             }
           },
@@ -697,11 +708,13 @@
               "type": "string",
               "default": "title",
               "enum": [
-                "addedAt",
+                "imdbRating",
                 "rating",
                 "releaseDate",
                 "runtime",
-                "title"
+                "title",
+                "tmdbRating",
+                "watchDate"
               ]
             }
           },
@@ -725,7 +738,9 @@
             "description": "Release year",
             "required": false,
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1901,
+              "maximum": 2155
             }
           }
         ],
@@ -1134,6 +1149,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
               "default": 1
             }
           },
@@ -1144,6 +1160,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1901,
+              "maximum": 2155,
               "example": 2012
             }
           }

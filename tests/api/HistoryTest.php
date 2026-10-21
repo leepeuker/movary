@@ -170,7 +170,7 @@ class HistoryTest extends ApiTestCase
             ->assertStatus(404);
     }
 
-    public function testUnexpectedExceptionReturnsGenericJsonError() : void
+    public function testRejectsInvalidSortOrder() : void
     {
         $fixture = $this->fixture->createUserWithToken();
 
@@ -179,11 +179,11 @@ class HistoryTest extends ApiTestCase
                 $this->createPath($fixture['user']->getName()) . '?sortOrder=unsupported',
                 $this->createAuthorizationHeader($fixture['token']),
             )
-            ->assertStatus(500)
+            ->assertStatus(400)
             ->assertHeaderSame('Content-Type', 'application/json')
             ->assertJsonSame([
-                'error' => 'InternalServerError',
-                'message' => 'The request could not be processed.',
+                'error' => 'InvalidRequest',
+                'message' => 'Field "sortOrder" must be one of: asc, desc.',
             ]);
     }
 
