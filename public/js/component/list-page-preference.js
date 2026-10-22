@@ -113,6 +113,7 @@ function removeListPagePreference() {
     url.searchParams.delete('sb');
     url.searchParams.delete('so');
     url.searchParams.delete('p');
+    url.searchParams.delete('pp');
     listPagePreferenceModal.querySelectorAll('[data-list-page-filter]').forEach((filter) => {
         url.searchParams.delete(filter.name);
     });
