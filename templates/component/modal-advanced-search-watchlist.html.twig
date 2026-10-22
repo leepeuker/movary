@@ -1,4 +1,4 @@
-<div class="modal fade" id="searchOptionsMovieModal" tabindex="-1" aria-labelledby="searchOptionsMovieModal" aria-hidden="true" data-bs-keyboard="false">
+<div class="modal fade" id="searchOptionsMovieModal" tabindex="-1" aria-labelledby="searchOptionsMovieModal" aria-hidden="true" data-bs-keyboard="false" data-list-page-preference="watchlist" data-list-page-default-sort-by="addedAt" data-list-page-default-sort-order="desc">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -31,7 +31,7 @@
 
                     <div class="input-group mb-3">
                         <span class="input-group-text">Genre</span>
-                        <select class="form-control" name="ge" id="searchGenreSelect">
+                        <select class="form-control" name="ge" id="searchGenreSelect" data-list-page-filter>
                             <option value="" {{ genre is null ? 'selected' }}></option>
                             {% for uniqueGenre in uniqueGenres %}
                                 <option value="{{ uniqueGenre }}" {{ uniqueGenre == genre ? 'selected' }}>{{ uniqueGenre }}</option>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Language</span>
-                        <select class="form-control" name="la" id="searchLanguageSelect">
+                        <select class="form-control" name="la" id="searchLanguageSelect" data-list-page-filter>
                             <option value="" {{ language is null ? 'selected' }}></option>
                             {% for uniqueLanguage in uniqueLanguages %}
                                 <option value="{{ uniqueLanguage.code }}" {{ uniqueLanguage.code == language ? 'selected' }}>{{ uniqueLanguage.name }}</option>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Release year</span>
-                        <select class="form-control" name="ry" id="searchReleaseYearSelect">
+                        <select class="form-control" name="ry" id="searchReleaseYearSelect" data-list-page-filter>
                             <option value="" {{ releaseYear is null ? 'selected' }}></option>
                             {% for uniqueReleaseYear in uniqueReleaseYears %}
                                 <option value="{{ uniqueReleaseYear }}" {{ releaseYear == uniqueReleaseYear ? 'selected' }}>{{ uniqueReleaseYear }}</option>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Production country</span>
-                        <select class="form-control" name="pc" id="searchProductionCountrySelect">
+                        <select class="form-control" name="pc" id="searchProductionCountrySelect" data-list-page-filter>
                             <option value="" {{ productionCountryCode is null ? 'selected' }}></option>
                             {% for uniqueProductionCountry in uniqueProductionCountries %}
                                 <option value="{{ uniqueProductionCountry.iso_3166_1 }}" {{ productionCountryCode == uniqueProductionCountry.iso_3166_1 ? 'selected' }}>{{ uniqueProductionCountry.english_name }}</option>
@@ -81,9 +81,12 @@
 
             </div>
             <div class="modal-footer justify-content-between">
-{#                <button class="btn btn-outline-light float-start" id="appReleaseModalButtonViewGithub" target="_blank">Save</button>#}
-                <button class="btn btn-warning float-start" onclick="resetSearchOptions()">Reset</button>
-                <button class="btn btn-primary" onclick="search()">Search</button>
+                <button class="btn btn-warning" onclick="resetSearchOptions()">Reset</button>
+                <div class="d-flex gap-2 align-items-center justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="removeListPagePreferenceButton">Clear defaults</button>
+                    <button type="button" class="btn btn-sm btn-secondary d-none" id="saveListPagePreferenceButton">Set defaults</button>
+                    <button class="btn btn-primary" onclick="search()">Search</button>
+                </div>
             </div>
         </div>
     </div>

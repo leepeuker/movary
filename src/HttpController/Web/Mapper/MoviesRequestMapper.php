@@ -4,6 +4,7 @@ namespace Movary\HttpController\Web\Mapper;
 
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Web\Dto\MoviesRequestDto;
+use Movary\Service\ListPagePreference;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\SortOrder;
 use Movary\ValueObject\Year;
@@ -11,17 +12,17 @@ use RuntimeException;
 
 class MoviesRequestMapper
 {
-    private const null DEFAULT_PRODUCTION_COUNTRY_CODE = null;
+    private const array FILTER_VALUES = ['ge', 'la', 'ry', 'pc', 'ur', 'minur', 'maxur', 'loc'];
 
-    private const null DEFAULT_HAS_USER_RATING = null;
-
-    private const null DEFAULT_USER_RATING_MIN = null;
-
-    private const null DEFAULT_USER_RATING_MAX = null;
-
-    private const null DEFAULT_GENRE = null;
-
-    private const null DEFAULT_RELEASE_YEAR = null;
+    private const array SORT_BY_VALUES = [
+        'title',
+        'releaseDate',
+        'watchDate',
+        'rating',
+        'imdbRating',
+        'tmdbRating',
+        'runtime',
+    ];
 
     private const int DEFAULT_LIMIT = 24;
 
@@ -29,6 +30,7 @@ class MoviesRequestMapper
 
     public function __construct(
         private readonly UserApi $userApi,
+        private readonly ListPagePreference $listPagePreference,
     ) {
     }
 
@@ -38,21 +40,31 @@ class MoviesRequestMapper
         $userId = $this->userApi->fetchUserByName((string)$request->getRouteParameters()['username'])->getId();
 
         $getParameters = $request->getGetParameters();
+        $savedPreference = $this->listPagePreference->find(
+            $request,
+            ListPagePreference::PAGE_MOVIES,
+            self::SORT_BY_VALUES,
+            self::FILTER_VALUES,
+        );
+        $savedFilters = $savedPreference['filters'] ?? [];
+        $filterParameters = [...$savedFilters, ...$getParameters];
 
         $searchTerm = $getParameters['s'] ?? null;
         $page = $getParameters['p'] ?? 1;
         $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
-        $sortBy = $getParameters['sb'] ?? self::DEFAULT_SORT_BY;
-        $sortOrder = $this->mapSortOrder($getParameters);
-        $releaseYear = $getParameters['ry'] ?? self::DEFAULT_RELEASE_YEAR;
-        $releaseYear = empty($releaseYear) === false ? Year::createFromString($releaseYear) : null;
-        $language = $getParameters['la'] ?? null;
-        $genre = $getParameters['ge'] ?? self::DEFAULT_GENRE;
-        $productionCountryCode = $getParameters['pc'] ?? self::DEFAULT_PRODUCTION_COUNTRY_CODE;
-        $userRating = isset($getParameters['ur']) === true ? (bool)$getParameters['ur'] : self::DEFAULT_HAS_USER_RATING;
-        $userRatingMin = isset($getParameters['minur']) === true ? (int)$getParameters['minur'] : self::DEFAULT_USER_RATING_MIN;
-        $userRatingMax = isset($getParameters['maxur']) === true ? (int)$getParameters['maxur'] : self::DEFAULT_USER_RATING_MAX;
-        $locationId = isset($getParameters['loc']) === true ? (int)$getParameters['loc'] : null;
+        $sortBy = $getParameters['sb'] ?? $savedPreference['sortBy'] ?? self::DEFAULT_SORT_BY;
+        $sortOrder = $this->mapSortOrder(
+            $getParameters,
+            $savedPreference['sortOrder'] ?? SortOrder::createAsc(),
+        );
+        $releaseYear = $this->mapReleaseYear($filterParameters);
+        $language = $this->mapOptionalString($filterParameters, 'la');
+        $genre = $this->mapOptionalString($filterParameters, 'ge');
+        $productionCountryCode = $this->mapOptionalString($filterParameters, 'pc');
+        $userRating = $this->mapOptionalBool($filterParameters, 'ur');
+        $userRatingMin = $this->mapOptionalInt($filterParameters, 'minur');
+        $userRatingMax = $this->mapOptionalInt($filterParameters, 'maxur');
+        $locationId = $this->mapOptionalInt($filterParameters, 'loc');
 
         return MoviesRequestDto::createFromParameters(
             $userId,
@@ -72,10 +84,10 @@ class MoviesRequestMapper
         );
     }
 
-    private function mapSortOrder(array $getParameters) : SortOrder
+    private function mapSortOrder(array $getParameters, SortOrder $default) : SortOrder
     {
         if (isset($getParameters['so']) === false) {
-            return SortOrder::createAsc();
+            return $default;
         }
 
         return match ($getParameters['so']) {
@@ -84,5 +96,33 @@ class MoviesRequestMapper
 
             default => throw new RuntimeException('Not supported sort order: ' . $getParameters['so'])
         };
+    }
+
+    private function mapOptionalBool(array $parameters, string $name) : ?bool
+    {
+        $value = $parameters[$name] ?? null;
+
+        return $value === null || $value === '' ? null : (bool)$value;
+    }
+
+    private function mapOptionalInt(array $parameters, string $name) : ?int
+    {
+        $value = $parameters[$name] ?? null;
+
+        return $value === null || $value === '' ? null : (int)$value;
+    }
+
+    private function mapOptionalString(array $parameters, string $name) : ?string
+    {
+        $value = $parameters[$name] ?? null;
+
+        return is_string($value) === true && $value !== '' ? $value : null;
+    }
+
+    private function mapReleaseYear(array $parameters) : ?Year
+    {
+        $releaseYear = $this->mapOptionalString($parameters, 'ry');
+
+        return $releaseYear === null ? null : Year::createFromString($releaseYear);
     }
 }

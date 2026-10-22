@@ -37,30 +37,18 @@ function search() {
     getParameters += '&so=' + sortOrder
     getParameters += '&pp=' + searchPerPage
 
-    if (searchGenre != '') {
-        getParameters += '&ge=' + searchGenre
-    }
-    if (searchLanguage != '') {
-        getParameters += '&la=' + searchLanguage
-    }
-    if (searchReleaseYear != '') {
-        getParameters += '&ry=' + searchReleaseYear
-    }
-    if (searchProductionCountry != '') {
-        getParameters += '&pc=' + searchProductionCountry
-    }
+    getParameters += '&ge=' + searchGenre
+    getParameters += '&la=' + searchLanguage
+    getParameters += '&ry=' + searchReleaseYear
+    getParameters += '&pc=' + searchProductionCountry
     if (searchTerm != '') {
         getParameters += '&s=' + searchTerm
     }
-    if (searchLocation != '') {
-        getParameters += '&loc=' + searchLocation
-    }
-    if (searchUserRating != '') {
-        getParameters += '&ur=' + searchUserRating
-        if (searchUserRating === '1') {
-            getParameters += '&minur=' + searchMinUserRating
-            getParameters += '&maxur=' + searchMaxUserRating
-        }
+    getParameters += '&loc=' + searchLocation
+    getParameters += '&ur=' + searchUserRating
+    if (searchUserRating === '1') {
+        getParameters += '&minur=' + searchMinUserRating
+        getParameters += '&maxur=' + searchMaxUserRating
     }
 
     const urlWithoutGetParameters = window.location.href.split('?')[0];
@@ -80,6 +68,8 @@ function resetSearchOptions() {
     searchProductionCountrySelect.value = ''
     searchPerPageSelect.value = '24'
     searchLocationSelect.value = ''
+
+    updateListPagePreferenceButtons()
 }
 
 

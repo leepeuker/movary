@@ -24,9 +24,7 @@ function search() {
     getParameters += '&pp=' + searchPerPage
     getParameters += '&s=' + searchTerm
 
-    if (searchGender != '') {
-        getParameters += '&ge=' + searchGender
-    }
+    getParameters += '&ge=' + searchGender
 
     const urlWithoutGetParameters = window.location.href.split('?')[0];
 
@@ -38,4 +36,6 @@ function resetSearchOptions() {
     searchSortOrderSelect.value = 'desc'
     searchGenderSelect.value = ''
     searchPerPageSelect.value = '24'
+
+    updateListPagePreferenceButtons()
 }

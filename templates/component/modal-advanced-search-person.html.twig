@@ -1,4 +1,4 @@
-<div class="modal fade" id="searchOptionsPersonModal" tabindex="-1" aria-labelledby="searchOptionsPersonModal" aria-hidden="true" data-bs-keyboard="false">
+<div class="modal fade" id="searchOptionsPersonModal" tabindex="-1" aria-labelledby="searchOptionsPersonModal" aria-hidden="true" data-bs-keyboard="false" data-list-page-preference="{{ listPagePreference }}" data-list-page-default-sort-by="uniqueAppearances" data-list-page-default-sort-order="desc">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -29,7 +29,7 @@
 
                     <div class="input-group mb-3">
                         <span class="input-group-text">Gender</span>
-                        <select class="form-control" name="ge" id="searchGenderSelect">
+                        <select class="form-control" name="ge" id="searchGenderSelect" data-list-page-filter>
                             <option value="" {{ filterGender is null ? 'selected' }}></option>
                             {% for uniqueGender in uniqueGenders %}
                                 <option value="{{ uniqueGender.id }}" {{ uniqueGender.id == filterGender ? 'selected' }}>{{ uniqueGender.name }}</option>
@@ -52,8 +52,12 @@
 
             </div>
             <div class="modal-footer justify-content-between">
-                <button class="btn btn-warning float-start" onclick="resetSearchOptions()">Reset</button>
-                <button class="btn btn-primary" onclick="search()">Search</button>
+                <button class="btn btn-warning" onclick="resetSearchOptions()">Reset</button>
+                <div class="d-flex gap-2 align-items-center justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="removeListPagePreferenceButton">Clear defaults</button>
+                    <button type="button" class="btn btn-sm btn-secondary d-none" id="saveListPagePreferenceButton">Set defaults</button>
+                    <button class="btn btn-primary" onclick="search()">Search</button>
+                </div>
             </div>
         </div>
     </div>

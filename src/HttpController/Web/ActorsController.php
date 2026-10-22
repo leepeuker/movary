@@ -7,6 +7,7 @@ use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\PersonsRequestMapper;
 use Movary\Service\PaginationElementsCalculator;
+use Movary\Service\ListPagePreference;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -26,7 +27,7 @@ class ActorsController
 
     public function renderPage(Request $request) : Response
     {
-        $requestData = $this->requestMapper->mapRenderPageRequest($request);
+        $requestData = $this->requestMapper->mapRenderPageRequest($request, ListPagePreference::PAGE_ACTORS);
 
         $currentUserId = $this->authenticationService->authenticateWebSession()?->getUserId();
 
@@ -62,7 +63,8 @@ class ActorsController
                 'sortBy' => $requestData->getSortBy(),
                 'sortOrder' => (string)$requestData->getSortOrder(),
                 'filterGender' => (string)$requestData->getGender(),
-                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueActorGenders($requestData->getUserId())
+                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueActorGenders($requestData->getUserId()),
+                'listPagePreference' => ListPagePreference::PAGE_ACTORS,
             ]),
         );
     }

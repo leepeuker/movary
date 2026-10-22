@@ -6,6 +6,7 @@ use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
 use Movary\HttpController\Web\Mapper\PersonsRequestMapper;
+use Movary\Service\ListPagePreference;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
@@ -26,7 +27,7 @@ class DirectorsController
 
     public function renderPage(Request $request) : Response
     {
-        $requestData = $this->requestMapper->mapRenderPageRequest($request);
+        $requestData = $this->requestMapper->mapRenderPageRequest($request, ListPagePreference::PAGE_DIRECTORS);
 
         $currentUserId = $this->authenticationService->authenticateWebSession()?->getUserId();
 
@@ -62,7 +63,8 @@ class DirectorsController
                 'sortBy' => $requestData->getSortBy(),
                 'sortOrder' => (string)$requestData->getSortOrder(),
                 'filterGender' => (string)$requestData->getGender(),
-                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueDirectorsGenders($requestData->getUserId())
+                'uniqueGenders' => $this->movieHistoryApi->fetchUniqueDirectorsGenders($requestData->getUserId()),
+                'listPagePreference' => ListPagePreference::PAGE_DIRECTORS,
             ]),
         );
     }
