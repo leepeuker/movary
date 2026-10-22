@@ -1,5 +1,134 @@
 let originalRating
 
+const POSTER_BATCH_SIZE = 12
+let availablePosters = null
+let renderedPosterCount = 0
+
+document.addEventListener('DOMContentLoaded', () => {
+    const changePosterModal = document.getElementById('changePosterModal')
+    if (changePosterModal === null) {
+        return
+    }
+
+    changePosterModal.addEventListener('show.bs.modal', loadPosterChoices)
+    document.getElementById('showMorePostersButton').addEventListener('click', renderNextPosterBatch)
+    document.getElementById('useSelectedPosterButton').addEventListener('click', useSelectedPoster)
+    document.getElementById('restoreDefaultPosterButton').addEventListener('click', restoreDefaultPoster)
+})
+
+async function loadPosterChoices() {
+    if (availablePosters !== null) {
+        return
+    }
+
+    const loading = document.getElementById('posterSelectionLoading')
+    const error = document.getElementById('posterSelectionError')
+    loading.classList.remove('d-none')
+    error.classList.add('d-none')
+
+    try {
+        const response = await fetch(APPLICATION_URL + '/movies/' + getMovieId() + '/posters')
+        if (response.ok === false) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        availablePosters = data.posters
+        document.getElementById('restoreDefaultPosterButton').classList.toggle('d-none', data.hasOverride !== true)
+        loading.classList.add('d-none')
+
+        if (availablePosters.length === 0) {
+            document.getElementById('posterSelectionEmpty').classList.remove('d-none')
+            return
+        }
+
+        renderNextPosterBatch()
+    } catch (requestError) {
+        loading.classList.add('d-none')
+        error.classList.remove('d-none')
+    }
+}
+
+function renderNextPosterBatch() {
+    const grid = document.getElementById('posterSelectionGrid')
+    const postersToRender = availablePosters.slice(renderedPosterCount, renderedPosterCount + POSTER_BATCH_SIZE)
+
+    postersToRender.forEach((poster, offset) => {
+        const index = renderedPosterCount + offset
+        const column = document.createElement('div')
+        column.className = 'col'
+
+        const input = document.createElement('input')
+        input.type = 'radio'
+        input.className = 'btn-check'
+        input.name = 'moviePoster'
+        input.id = 'moviePoster' + index
+        input.value = poster.path
+        input.addEventListener('change', () => {
+            document.getElementById('useSelectedPosterButton').disabled = false
+        })
+
+        const label = document.createElement('label')
+        label.className = 'btn btn-outline-primary p-1 w-100'
+        label.htmlFor = input.id
+
+        const image = document.createElement('img')
+        image.className = 'img-fluid rounded'
+        image.src = poster.previewUrl
+        image.alt = 'TMDB poster option ' + (index + 1)
+        image.loading = 'lazy'
+
+        label.appendChild(image)
+        column.appendChild(input)
+        column.appendChild(label)
+        grid.appendChild(column)
+    })
+
+    renderedPosterCount += postersToRender.length
+    document.getElementById('showMorePostersButton').classList.toggle(
+        'd-none',
+        renderedPosterCount >= availablePosters.length,
+    )
+}
+
+async function useSelectedPoster() {
+    const selectedPoster = document.querySelector('input[name="moviePoster"]:checked')
+    if (selectedPoster === null) {
+        return
+    }
+
+    await updateMoviePoster('PUT', JSON.stringify({posterPath: selectedPoster.value}))
+}
+
+async function restoreDefaultPoster() {
+    await updateMoviePoster('DELETE')
+}
+
+async function updateMoviePoster(method, body = null) {
+    const saveButton = document.getElementById('useSelectedPosterButton')
+    const restoreButton = document.getElementById('restoreDefaultPosterButton')
+    saveButton.disabled = true
+    restoreButton.disabled = true
+
+    try {
+        const response = await fetchWithCsrf(APPLICATION_URL + '/movies/' + getMovieId() + '/poster', {
+            method: method,
+            headers: {'Content-Type': 'application/json'},
+            body: body,
+        })
+        if (response.ok === false) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        window.location.reload()
+    } catch (requestError) {
+        document.getElementById('posterSelectionError').textContent = 'Could not update the movie poster.'
+        document.getElementById('posterSelectionError').classList.remove('d-none')
+        saveButton.disabled = document.querySelector('input[name="moviePoster"]:checked') === null
+        restoreButton.disabled = false
+    }
+}
+
 async function deleteWatchDate() {
     const confirmed = await showConfirmationModal({
         title: 'Delete watch date',
