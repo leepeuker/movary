@@ -160,6 +160,7 @@ function setTheme(theme, force = false) {
 function updateHtmlThemeColors(mainColor, secondaryColor) {
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
     const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
+    const reviewButton = document.getElementById('reviewButton');
     const watchlistButton = document.getElementById('watchlistButton');
     const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
@@ -167,6 +168,8 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
         toggleWatchDatesButton.classList.remove('btn-' + mainColor)
         logSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+        reviewButton.classList.add('btn-outline-' + secondaryColor)
+        reviewButton.classList.remove('btn-outline-' + mainColor)
         watchlistButton.classList.add('btn-outline-' + secondaryColor)
         watchlistButton.classList.remove('btn-outline-' + mainColor)
         moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)

@@ -51,30 +51,21 @@
             </span>
         </div>
 
-        {% if selectedUserReview is not null or currentUserName == routeUsername %}
+        {% if selectedUserReview is not null %}
             <section class="mb-3" aria-labelledby="selectedUserReviewHeading">
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <h6 class="mb-0" id="selectedUserReviewHeading">{{ currentUserName == routeUsername ? 'My review' : routeUsername ~ "'s review" }}</h6>
-                    {% if currentUserName == routeUsername %}
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editReviewModal">
-                            {{ selectedUserReview is null ? 'Write review' : 'Edit review' }}
-                        </button>
-                    {% endif %}
-                </div>
-                {% if selectedUserReview is not null %}
-                    {% if selectedUserReview.containsSpoilers %}
-                        <details>
-                            <summary class="text-warning">Contains spoilers — show review</summary>
-                            <p class="mt-2 mb-0" style="white-space: pre-wrap">{{ selectedUserReview.review }}</p>
-                        </details>
-                    {% else %}
-                        <p class="mb-0" style="white-space: pre-wrap">{{ selectedUserReview.review }}</p>
-                    {% endif %}
-                    <small class="text-muted">
-                        {{ selectedUserReview.updatedAt is null ? 'Reviewed' : 'Updated' }}
-                        {{ (selectedUserReview.updatedAt ?? selectedUserReview.createdAt)|date(dateFormatPhp) }}
-                    </small>
+                <h6 class="mb-1" id="selectedUserReviewHeading">{{ currentUserName == routeUsername ? 'My review' : routeUsername ~ "'s review" }}</h6>
+                {% if selectedUserReview.containsSpoilers %}
+                    <details>
+                        <summary class="text-warning">Contains spoilers — show review</summary>
+                        <p class="mt-2 mb-0" style="white-space: pre-wrap">{{ selectedUserReview.review }}</p>
+                    </details>
+                {% else %}
+                    <p class="mb-0" style="white-space: pre-wrap">{{ selectedUserReview.review }}</p>
                 {% endif %}
+                <small class="text-muted">
+                    {{ selectedUserReview.updatedAt is null ? 'Reviewed' : 'Updated' }}
+                    {{ (selectedUserReview.updatedAt ?? selectedUserReview.createdAt)|date(dateFormatPhp) }}
+                </small>
             </section>
         {% endif %}
 
@@ -212,6 +203,15 @@
                             class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="logSpecificMovieButton"
                             onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|movie_title(movie.originalTitle)|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
+                    </button>
+                </div>
+                <div class="row mb-2">
+                    <button type="button"
+                            class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
+                            id="reviewButton"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editReviewModal">
+                        {{ selectedUserReview is null ? 'Add review' : 'Edit review' }}
                     </button>
                 </div>
                 <div class="row mb-2">
