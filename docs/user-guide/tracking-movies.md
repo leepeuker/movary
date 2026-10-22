@@ -1,9 +1,10 @@
 # Movie tracking
 
-Movary keeps three related kinds of personal movie data:
+Movary keeps four related kinds of personal movie data:
 
 - **History** records when you watched a movie. A movie can have multiple watch dates and plays.
 - **Ratings** store one personal score from 1 to 10 for each movie.
+- **Reviews** store one written opinion for each movie, with an optional spoiler warning.
 - **Watchlist** stores movies you plan to watch.
 
 These are managed separately. For example, you can rate a movie without adding another play, or keep an unwatched movie on your watchlist.
@@ -16,7 +17,7 @@ Before selecting **Add play**, you can:
 
 - change the watch date;
 - assign a rating from 1 to 10;
-- add a comment;
+- add a viewing note;
 - select a [location](locations.md), when locations are enabled;
 - choose whether to post the activity to Mastodon, when that integration is enabled.
 
@@ -39,7 +40,7 @@ Scrobbled plays appear in **History** alongside plays added manually. Some integ
 
 Open the navigation menu and select **History**. You can search the history and switch between poster and table views. Select a movie to open its detail page.
 
-On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date, comment, or location. **Advanced mode** also lets you change the number of plays recorded for that date and their ordering position.
+On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date, viewing note, or location. **Advanced mode** also lets you change the number of plays recorded for that date and their ordering position.
 
 Select **Delete** in the edit dialog to permanently remove that history entry. This does not remove the movie's personal rating or add it back to the watchlist.
 
@@ -51,6 +52,14 @@ To change a rating later, open the movie page, select the edit icon beside the r
 
 Personal ratings are distinct from the public TMDB and IMDb ratings that may also appear on movie pages.
 
+## Write and read reviews
+
+A review is your current written opinion of a movie. It is separate from viewing notes, history, and ratings, so you can review a movie without recording a play or assigning a rating.
+
+Open the movie in your own user context and select **Write review**. Reviews are plain text and can contain up to 10,000 characters. Select **Contains spoilers** when appropriate; Movary then hides the text until a reader chooses to reveal it. You can edit or delete your review from the same movie page.
+
+The selected user's review appears beside their personal rating. Other visible reviews appear below the plot with the author's current rating when available. Review visibility follows each author's [account privacy setting](privacy-and-sharing.md).
+
 ## Manage the watchlist
 
 To save a search result without recording a play, select **Add to watchlist** in the **Add movie** dialog. From an existing movie page, select **Add to Watchlist** or **Remove from Watchlist**.
@@ -61,4 +70,4 @@ Movary can automatically remove a movie from your watchlist when you record a pl
 
 ## Import, export, or delete data in bulk
 
-For CSV import and export, deleting all history or ratings, or deleting your account, see [Personal data](personal-data.md). Imports from services such as Letterboxd, Trakt, and Netflix are documented under **Integrations**.
+For CSV import and export, deleting all history, ratings, or reviews, or deleting your account, see [Personal data](personal-data.md). Imports from services such as Letterboxd, Trakt, and Netflix are documented under **Integrations**.

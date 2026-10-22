@@ -22,6 +22,7 @@ The privacy check applies to pages below `/users/<username>/`, including:
 - History and watchlist pages.
 - Movie, actor, and director lists.
 - Movie and person detail pages shown in your user context.
+- Reviews written on movie pages. A private review remains visible to its author.
 
 It also applies when the API reads a user's history, watchlist, or played movies. API operations that change data still require a personal token belonging to that user.
 
