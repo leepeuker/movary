@@ -5,6 +5,7 @@ namespace Movary\Api\Tmdb;
 use Movary\Api\Tmdb\Cache\TmdbIsoLanguageCache;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbPerson;
+use Movary\Api\Tmdb\Dto\TmdbPoster;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderCollection;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderList;
 use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
@@ -15,6 +16,7 @@ class TmdbApi
     public function __construct(
         private readonly TmdbClient $client,
         private readonly TmdbIsoLanguageCache $iso6931,
+        private readonly TmdbUrlGenerator $urlGenerator,
     ) {
     }
 
@@ -30,6 +32,30 @@ class TmdbApi
         $data = $this->client->get('/person/' . $personId);
 
         return TmdbPerson::createFromArray($data);
+    }
+
+    /** @return list<TmdbPoster> */
+    public function fetchEnglishMoviePosters(int $movieId) : array
+    {
+        $data = $this->client->get(
+            '/movie/' . $movieId . '/images',
+            ['language' => 'en-US', 'include_image_language' => 'en'],
+        );
+
+        $posters = [];
+        foreach ($data['posters'] ?? [] as $poster) {
+            $path = $poster['file_path'] ?? null;
+            if (is_string($path) === false || $path === '') {
+                continue;
+            }
+
+            $posters[] = new TmdbPoster(
+                $path,
+                (string)$this->urlGenerator->generateImageUrl($path, 'w154'),
+            );
+        }
+
+        return $posters;
     }
 
     public function getLanguageByCode(string $languageCode) : string

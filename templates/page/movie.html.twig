@@ -214,6 +214,9 @@
             {{ include('component/modal-edit-rating.html.twig') }}
             {{ include('component/modal-edit-watch-date.html.twig') }}
             {{ include('component/modal-more-options.html.twig') }}
+            {% if currentUserIsAdmin == true %}
+                {{ include('component/modal-change-movie-poster.html.twig') }}
+            {% endif %}
         {% endif %}
 
         {# --- Tagline --- #}

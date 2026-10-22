@@ -41,7 +41,7 @@ class ImageUrlService
     {
         foreach ($dbResults as $index => $dbResult) {
             $dbResults[$index]['poster_path'] = $this->generateImageSrcUrlFromParameters(
-                $dbResult['tmdb_poster_path'] ?? null,
+                $dbResult['tmdb_poster_path_override'] ?? $dbResult['tmdb_poster_path'] ?? null,
                 $dbResult['poster_path'] ?? null,
                 $dbResult['name'] ?? $dbResult['title'] ?? self::PLACEHOLDER_IMAGE_NAME_FALLBACK,
             );

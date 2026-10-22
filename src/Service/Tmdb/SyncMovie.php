@@ -82,7 +82,9 @@ class SyncMovie
                     originalTitle: $tmdbMovie->getOriginalTitle(),
                 );
 
-                if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()) {
+                if ($originalTmdbPosterPath !== $movie->getTmdbPosterPath()
+                    && $movie->getTmdbPosterPathOverride() === null
+                ) {
                     $this->jobScheduler->storeMovieIdForTmdbImageCacheJob($movie->getId());
                 }
             }

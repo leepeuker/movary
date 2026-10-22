@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\Service\Router;
 
+use Movary\HttpController\Api\Middleware\IsAdmin;
 use Movary\HttpController\Api\Middleware\IsAuthenticated;
 use Movary\HttpController\Api\Middleware\IsAuthorizedToWriteUserData;
 use Movary\HttpController\Web\Middleware\UserIsAdmin;
@@ -95,6 +96,45 @@ class RouteSecurityTest extends TestCase
             self::assertSame('GET', $route['method']);
             self::assertContains(UserIsAuthenticated::class, $route['middleware']);
             self::assertContains(UserIsAdmin::class, $route['middleware']);
+        }
+    }
+
+    public function testMoviePosterRoutesRequireAdministratorAuthentication() : void
+    {
+        $routes = array_filter(
+            RegisteredRoutes::collect(),
+            static fn(array $route) : bool => in_array($route['path'], [
+                '/movies/{id:[0-9]+}/posters',
+                '/movies/{id:[0-9]+}/poster',
+            ], true),
+        );
+
+        self::assertCount(3, $routes);
+        foreach ($routes as $route) {
+            self::assertContains(UserIsAuthenticated::class, $route['middleware']);
+            self::assertContains(UserIsAdmin::class, $route['middleware']);
+            if (in_array($route['method'], self::UNSAFE_METHODS, true)) {
+                self::assertContains(ValidateCsrfToken::class, $route['middleware']);
+            }
+        }
+    }
+
+    public function testMoviePosterApiRoutesRequireAdministratorAuthentication() : void
+    {
+        $routes = array_filter(
+            RegisteredRoutes::collect(),
+            static fn(array $route) : bool => in_array($route['path'], [
+                '/api/movies/{movaryId:[0-9]+}/posters',
+                '/api/movies/{movaryId:[0-9]+}/poster',
+                '/api/v1/movies/{movaryId:[0-9]+}/posters',
+                '/api/v1/movies/{movaryId:[0-9]+}/poster',
+            ], true),
+        );
+
+        self::assertCount(6, $routes);
+        foreach ($routes as $route) {
+            self::assertContains(IsAuthenticated::class, $route['middleware']);
+            self::assertContains(IsAdmin::class, $route['middleware']);
         }
     }
 

@@ -1245,6 +1245,24 @@ class MovieRepository
         );
     }
 
+    public function clearTmdbPosterPathOverride(int $movieId) : void
+    {
+        $this->dbConnection->update(
+            'movie',
+            ['tmdb_poster_path_override' => null, 'poster_path' => null],
+            ['id' => $movieId],
+        );
+    }
+
+    public function setTmdbPosterPathOverride(int $movieId, string $posterPath) : void
+    {
+        $this->dbConnection->update(
+            'movie',
+            ['tmdb_poster_path_override' => $posterPath, 'poster_path' => null],
+            ['id' => $movieId],
+        );
+    }
+
     public function updateDetails(
         int $id,
         ?string $tagline,

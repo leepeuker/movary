@@ -294,6 +294,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/movies/{id:[0-9]+}/watch-providers', [Web\Movie\MovieWatchProviderController::class, 'getWatchProviders']);
     $routes->add('POST', '/movies/{id:[0-9]+}/add-watchlist', [Web\Movie\MovieWatchlistController::class, 'addToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/movies/{id:[0-9]+}/remove-watchlist', [Web\Movie\MovieWatchlistController::class, 'removeFromWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/movies/{id:[0-9]+}/posters', [Web\Movie\MoviePosterController::class, 'fetchPosters'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('PUT', '/movies/{id:[0-9]+}/poster', [Web\Movie\MoviePosterController::class, 'selectPoster'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('DELETE', '/movies/{id:[0-9]+}/poster', [Web\Movie\MoviePosterController::class, 'restoreDefault'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
 
     ##########
     # Person #
@@ -363,6 +375,18 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('GET', '/movies/{movaryId:[0-9]+}/posters', [Api\MoviePosterController::class, 'fetchPosters'], [
+        Api\Middleware\IsAuthenticated::class,
+        Api\Middleware\IsAdmin::class,
+    ]);
+    $routes->add('PUT', '/movies/{movaryId:[0-9]+}/poster', [Api\MoviePosterController::class, 'selectPoster'], [
+        Api\Middleware\IsAuthenticated::class,
+        Api\Middleware\IsAdmin::class,
+    ]);
+    $routes->add('DELETE', '/movies/{movaryId:[0-9]+}/poster', [Api\MoviePosterController::class, 'restoreDefault'], [
+        Api\Middleware\IsAuthenticated::class,
+        Api\Middleware\IsAdmin::class,
+    ]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes);
 }

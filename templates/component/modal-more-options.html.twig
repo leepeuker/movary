@@ -17,6 +17,15 @@
                     </button>
                     <button type="button" class="btn btn-primary" id="refreshTmdbDataButton" onclick="refreshTmdbData()">Refresh TMDB data</button>
                     <button type="button" class="btn btn-primary" id="refreshImdbRatingButton" onclick="refreshImdbRating()">Refresh IMDb rating</button>
+                    {% if currentUserIsAdmin == true %}
+                        <button type="button"
+                                class="btn btn-primary"
+                                id="changePosterModalButton"
+                                data-bs-target="#changePosterModal"
+                                data-bs-toggle="modal">
+                            Change poster
+                        </button>
+                    {% endif %}
                 </div>
             </div>
 

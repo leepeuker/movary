@@ -166,4 +166,21 @@ class ImageUrlGeneratorTest extends TestCase
             $this->subject->replacePosterPathWithImageSrcUrl($dbResults),
         );
     }
+
+    public function testReplacePosterPathUsesMovieOverrideAfterCacheInvalidation() : void
+    {
+        $this->tmdbUrlGeneratorMock
+            ->expects(self::once())
+            ->method('generateImageUrl')
+            ->with('/override.jpg')
+            ->willReturn(Url::createFromString('https://example.com/override.jpg'));
+
+        $result = $this->subject->replacePosterPathWithImageSrcUrl([[
+            'poster_path' => null,
+            'tmdb_poster_path' => '/default.jpg',
+            'tmdb_poster_path_override' => '/override.jpg',
+        ]]);
+
+        self::assertSame('https://example.com/override.jpg', $result[0]['poster_path']);
+    }
 }

@@ -23,6 +23,7 @@ class MovieEntity
         private readonly ?float $tmdbVoteAverage,
         private readonly ?int $tmdbVoteCount,
         private readonly ?string $tmdbPosterPath,
+        private readonly ?string $tmdbPosterPathOverride,
         private readonly ?float $imdbRatingAverage,
         private readonly ?int $imdbRatingVoteCount,
         private readonly ?DateTime $updatedAtTmdb,
@@ -30,6 +31,7 @@ class MovieEntity
     ) {
     }
 
+    // phpcs:ignore Generic.Metrics.CyclomaticComplexity
     public static function createFromArray(array $data) : self
     {
         return new self(
@@ -48,6 +50,7 @@ class MovieEntity
             $data['tmdb_vote_average'] === null ? null : (float)$data['tmdb_vote_average'],
             $data['tmdb_vote_count'] === null ? null : (int)$data['tmdb_vote_count'],
             $data['tmdb_poster_path'],
+            $data['tmdb_poster_path_override'] ?? null,
             $data['imdb_rating_average'] === null ? null : (float)$data['imdb_rating_average'],
             $data['imdb_rating_vote_count'] === null ? null : (int)$data['imdb_rating_vote_count'],
             $data['updated_at_tmdb'] === null ? null : DateTime::createFromString($data['updated_at_tmdb']),
@@ -123,6 +126,16 @@ class MovieEntity
     public function getTmdbPosterPath() : ?string
     {
         return $this->tmdbPosterPath;
+    }
+
+    public function getTmdbPosterPathEffective() : ?string
+    {
+        return $this->tmdbPosterPathOverride ?? $this->tmdbPosterPath;
+    }
+
+    public function getTmdbPosterPathOverride() : ?string
+    {
+        return $this->tmdbPosterPathOverride;
     }
 
     public function getTmdbVoteAverage() : ?float

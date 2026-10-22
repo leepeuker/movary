@@ -1063,6 +1063,204 @@
         ]
       }
     },
+    "\/api\/v1\/movies\/{movaryId}\/posters": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "getMoviePosters",
+        "summary": "Get available posters for a movie",
+        "description": "Gets the English-language TMDB posters available for a movie. Requires an administrator's personal API token.",
+        "parameters": [
+          {
+            "name": "movaryId",
+            "in": "path",
+            "description": "Movary movie id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "posters",
+                    "hasOverride"
+                  ],
+                  "properties": {
+                    "posters": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "path",
+                          "previewUrl"
+                        ],
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "example": "\/gb7C4oRzYWXWCuZMR1cwtHa53Pz.jpg"
+                          },
+                          "previewUrl": {
+                            "type": "string",
+                            "format": "uri",
+                            "example": "https:\/\/image.tmdb.org\/t\/p\/w342\/gb7C4oRzYWXWCuZMR1cwtHa53Pz.jpg"
+                          }
+                        }
+                      }
+                    },
+                    "hasOverride": {
+                      "type": "boolean",
+                      "description": "True when an administrator selected a poster instead of using TMDB's default.",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      }
+    },
+    "\/api\/v1\/movies\/{movaryId}\/poster": {
+      "put": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "selectMoviePoster",
+        "summary": "Select a poster for a movie",
+        "description": "Selects one of the movie's available TMDB posters as its global poster. Requires an administrator's personal API token.",
+        "parameters": [
+          {
+            "name": "movaryId",
+            "in": "path",
+            "description": "Movary movie id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application\/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "posterPath"
+                ],
+                "properties": {
+                  "posterPath": {
+                    "type": "string",
+                    "minLength": 1,
+                    "example": "\/gb7C4oRzYWXWCuZMR1cwtHa53Pz.jpg"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "restoreDefaultMoviePoster",
+        "summary": "Restore the default poster for a movie",
+        "description": "Removes the global poster selection so the movie uses TMDB's current default poster. Requires an administrator's personal API token.",
+        "parameters": [
+          {
+            "name": "movaryId",
+            "in": "path",
+            "description": "Movary movie id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      }
+    },
     "\/api\/v1\/movies\/add": {
       "post": {
         "tags": [

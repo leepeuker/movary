@@ -13,3 +13,53 @@
     border: black solid;
     border-width: 0.1rem;
 }
+
+.movie-poster-option {
+    border: 2px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    padding: 0.25rem;
+    position: relative;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    width: fit-content;
+}
+
+.movie-poster-option::after {
+    align-items: center;
+    background: var(--bs-primary);
+    border: 2px solid var(--bs-body-bg);
+    border-radius: 50%;
+    color: white;
+    content: '✓';
+    display: flex;
+    font-size: 0.8rem;
+    font-weight: bold;
+    height: 1.5rem;
+    justify-content: center;
+    opacity: 0;
+    position: absolute;
+    right: 0.45rem;
+    top: 0.45rem;
+    transition: opacity 0.15s ease-in-out;
+    width: 1.5rem;
+}
+
+.movie-poster-option img {
+    display: block;
+}
+
+.btn-check:checked + .movie-poster-option {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.15rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.btn-check:checked + .movie-poster-option::after {
+    opacity: 1;
+}
+
+.btn-check:focus-visible + .movie-poster-option {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.35);
+}

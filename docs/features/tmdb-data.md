@@ -4,6 +4,8 @@ Movary uses [TMDB](https://www.themoviedb.org/) as its primary source for movie 
 
 Set the key under **Settings → Server → General** or with the `TMDB_API_KEY` environment variable. Environment variables take precedence over values saved through the web interface. See [Configuration](../configuration.md) for the complete settings reference.
 
+Administrators can choose a global movie poster from the English posters available on TMDB. Open the movie's **More** menu, select **Change poster**, and choose a poster. The selection is kept during later TMDB metadata synchronization. Use **Restore default** in the same dialog to return to TMDB's current default poster.
+
 ## Synchronize movie and person metadata
 
 Open **Settings → Server → Job Queue**, select **Create Job**, and choose either **TMDB movie metadata sync** or **TMDB person metadata sync**.

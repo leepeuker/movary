@@ -432,7 +432,7 @@ class MovieApi
         $imdbId = $entity->getImdbId();
 
         $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
-            $entity->getTmdbPosterPath(),
+            $entity->getTmdbPosterPathEffective(),
             $entity->getPosterPath(),
             $entity->getTitle(),
         );
