@@ -1,4 +1,4 @@
-POST http://127.0.0.1/api/webhook/emby/cec10240-c6b7-4baf-914d-5975f85e5131
+POST http://127.0.0.1/webhooks/emby/cec10240-c6b7-4baf-914d-5975f85e5131
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/x-www-form-urlencoded

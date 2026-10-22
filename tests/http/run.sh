@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-image_reference=${1:-movary-api-test}
-timeout_seconds=${API_TEST_TIMEOUT_SECONDS:-120}
+image_reference=${1:-movary-http-test}
+timeout_seconds=${HTTP_TEST_TIMEOUT_SECONDS:-120}
 database_directory=$(mktemp -d)
-container_name="movary-api-test-$$-$RANDOM"
+container_name="movary-http-test-$$-$RANDOM"
 application_secret='0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
 
 cleanup() {
@@ -21,7 +21,7 @@ cleanup() {
 trap cleanup EXIT
 
 if [[ ! $timeout_seconds =~ ^[1-9][0-9]*$ ]]; then
-    echo "API_TEST_TIMEOUT_SECONDS must be a positive integer: $timeout_seconds" >&2
+    echo "HTTP_TEST_TIMEOUT_SECONDS must be a positive integer: $timeout_seconds" >&2
     exit 1
 fi
 
@@ -32,9 +32,9 @@ docker run --detach \
     --network none \
     --env "APPLICATION_SECRET=$application_secret" \
     --env DATABASE_MODE=sqlite \
-    --env DATABASE_SQLITE=../api-test-data/movary.sqlite \
+    --env DATABASE_SQLITE=../http-test-data/movary.sqlite \
     --env TMDB_API_KEY=not-used \
-    --volume "$database_directory:/api-test-data" \
+    --volume "$database_directory:/http-test-data" \
     "$image_reference" >/dev/null
 
 deadline=$((SECONDS + timeout_seconds))
@@ -43,7 +43,7 @@ application_ready=false
 while ((SECONDS < deadline)); do
     container_status=$(docker inspect --format '{{.State.Status}}' "$container_name")
     if [[ $container_status != running ]]; then
-        echo "API test container stopped before the application was ready (status: $container_status)" >&2
+        echo "HTTP test container stopped before the application was ready (status: $container_status)" >&2
         exit 1
     fi
 
@@ -61,6 +61,6 @@ if [[ $application_ready != true ]]; then
 fi
 
 docker exec \
-    --env API_BASE_URL=http://127.0.0.1:8080 \
+    --env HTTP_BASE_URL=http://127.0.0.1:8080 \
     "$container_name" \
-    composer test-api
+    composer test-http

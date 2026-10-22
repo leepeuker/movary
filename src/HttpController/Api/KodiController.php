@@ -19,7 +19,7 @@ class KodiController
 
     public function handleKodiWebhook(Request $request) : Response
     {
-        $webhookId = $request->getRouteParameters()['id'];
+        $webhookId = $request->getRouteParameters()['token'];
 
         $userId = $this->userApi->findUserIdByKodiWebhookId($webhookId);
         if ($userId === null) {

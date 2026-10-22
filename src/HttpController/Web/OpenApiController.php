@@ -19,7 +19,7 @@ class OpenApiController
     public function renderPage() : Response
     {
         $applicationUrl = $this->applicationUrlService->createApplicationUrl(
-            RelativeUrl::create('/api/openapi'),
+            RelativeUrl::create('/api/v1/openapi'),
         );
 
         return Response::create(

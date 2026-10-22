@@ -19,6 +19,9 @@ Movary records only `PlaybackStop` notifications for movies that Jellyfin report
 The Generic Destination must send JSON with the `application/json` content type. Movary rejects
 malformed payloads and JSON request bodies larger than 256 KiB.
 
+New webhook URLs use `/webhooks/jellyfin/{token}`. Existing `/api/webhook/jellyfin/{token}` URLs
+remain available for compatibility until Movary 1.0.
+
 Keep the webhook URL private. Regenerating or deleting it invalidates the previous URL, which must then be replaced or removed in Jellyfin. The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs.
 
 ## Authenticate a Jellyfin account

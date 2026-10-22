@@ -12,6 +12,9 @@ use Psr\Log\LoggerInterface;
 $container = require(__DIR__ . '/../bootstrap.php');
 $httpRequest = $container->get(Request::class);
 $uri = rawurldecode($httpRequest->getPath());
+$usesApiResponse = str_starts_with($uri, '/api')
+    || str_starts_with($uri, '/webhooks/')
+    || str_starts_with($uri, '/feeds/');
 
 try {
     $dispatcher = FastRoute\simpleDispatcher(
@@ -47,7 +50,7 @@ try {
             throw new LogicException('Unhandled dispatcher status :' . $routeInfo[0]);
     }
 
-    if ($response->getStatusCode()->getCode() === 404 && str_starts_with($uri, '/api') === false) {
+    if ($response->getStatusCode()->getCode() === 404 && $usesApiResponse === false) {
         $response = $container->get(ErrorController::class)->renderNotFound($httpRequest);
     }
 
@@ -56,7 +59,7 @@ try {
 } catch (Throwable $t) {
     $container->get(LoggerInterface::class)->emergency($t->getMessage(), ['exception' => $t]);
 
-    if (str_starts_with($uri, '/api') === true) {
+    if ($usesApiResponse === true) {
         $response = $container->get(ErrorResponseMapper::class)->mapInternalServerError();
     } else {
         $response = $container->get(ErrorController::class)->renderInternalServerError();

@@ -11,13 +11,13 @@ class ApiOpenApiParityTest extends TestCase
     private const array HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head'];
 
     private const array EXCLUDED_ROUTES = [
-        'GET /api/openapi' => 'This route serves the OpenAPI contract itself.',
+        'GET /api/v1/openapi' => 'This route serves the OpenAPI contract itself.',
     ];
 
     public function testEveryApiRouteIsDocumented() : void
     {
         $undocumentedRoutes = array_values(array_diff(
-            $this->collectRegisteredApiOperations(),
+            $this->collectRegisteredOperations(),
             array_keys($this->collectDocumentedOperations()),
         ));
 
@@ -28,7 +28,7 @@ class ApiOpenApiParityTest extends TestCase
     {
         $unimplementedOperations = array_values(array_diff(
             array_keys($this->collectDocumentedOperations()),
-            $this->collectRegisteredApiOperations(),
+            $this->collectRegisteredOperations(),
         ));
 
         self::assertSame(
@@ -71,11 +71,14 @@ class ApiOpenApiParityTest extends TestCase
     }
 
     /** @return list<string> */
-    private function collectRegisteredApiOperations() : array
+    private function collectRegisteredOperations() : array
     {
         $operations = [];
         foreach (RegisteredRoutes::collect() as $route) {
-            if (str_starts_with($route['path'], '/api/') === false) {
+            $isCanonicalRoute = str_starts_with($route['path'], '/api/v1/')
+                || str_starts_with($route['path'], '/webhooks/')
+                || str_starts_with($route['path'], '/feeds/');
+            if ($isCanonicalRoute === false) {
                 continue;
             }
 
@@ -84,7 +87,7 @@ class ApiOpenApiParityTest extends TestCase
                 continue;
             }
 
-            $operations[] = $route['method'] . ' ' . $this->normalizePath(substr($route['path'], 4));
+            $operations[] = $route['method'] . ' ' . $this->normalizePath($route['path']);
         }
 
         sort($operations);

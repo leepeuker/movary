@@ -16,6 +16,9 @@ The add-on reports a movie when playback finishes, or when playback is stopped a
 The add-on sends JSON with the `application/json` content type. Movary rejects malformed payloads
 and JSON request bodies larger than 256 KiB.
 
+New webhook URLs use `/webhooks/kodi/{token}`. Existing `/api/webhook/kodi/{token}` URLs remain
+available for compatibility until Movary 1.0.
+
 The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.
 
 Keep the webhook URL private because it is connected to your account. Regenerating or deleting it immediately invalidates the previous URL, which must then be replaced in Kodi.

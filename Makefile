@@ -1,13 +1,13 @@
 .PHONY:build
-.PHONY: api_test frontend_install frontend_sync frontend_check openapi_validate
+.PHONY: http_test frontend_install frontend_sync frontend_check openapi_validate
 
 -include .env
 
 FRONTEND_COMPOSE = docker compose -f docker-compose.frontend.yml
 OPENAPI_VALIDATOR_IMAGE = redocly/cli:2.64.1@sha256:b9b4585a3bda40f77b58f5fa4535ad5ce7b7d1e4d6f8ed98ebc2c7694dbf3f5b
 OPENAPI_OUTPUT_FORMAT ?= stylish
-API_TEST_IMAGE ?= movary-api-test
-API_TEST_TIMEOUT_SECONDS ?= 120
+HTTP_TEST_IMAGE ?= movary-http-test
+HTTP_TEST_TIMEOUT_SECONDS ?= 120
 
 # Container management
 ######################
@@ -68,11 +68,11 @@ composer_update:
 composer_test:
 	make exec_app_cmd CMD="composer test"
 
-# API tests
-###########
-api_test:
-	docker build --target development --tag "$(API_TEST_IMAGE)" --file ./build/Dockerfile .
-	API_TEST_TIMEOUT_SECONDS="$(API_TEST_TIMEOUT_SECONDS)" ./tests/api/run.sh "$(API_TEST_IMAGE)"
+# HTTP tests
+############
+http_test:
+	docker build --target development --tag "$(HTTP_TEST_IMAGE)" --file ./build/Dockerfile .
+	HTTP_TEST_TIMEOUT_SECONDS="$(HTTP_TEST_TIMEOUT_SECONDS)" ./tests/http/run.sh "$(HTTP_TEST_IMAGE)"
 
 # Frontend dependencies
 #######################
@@ -153,4 +153,4 @@ app_mastodon_post_watchlist:
 
 # Shortcuts
 php: exec_app_bash
-test: composer_test api_test
+test: composer_test http_test

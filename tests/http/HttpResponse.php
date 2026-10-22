@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary\Support;
+namespace Tests\Http\Movary;
 
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 
-class ApiResponse
+class HttpResponse
 {
     public function __construct(private readonly ResponseInterface $response)
     {

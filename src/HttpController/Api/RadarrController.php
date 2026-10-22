@@ -18,7 +18,7 @@ class RadarrController
 
     public function renderRadarrFeed(Request $request) : Response
     {
-        $feedId = $request->getRouteParameters()['id'];
+        $feedId = $request->getRouteParameters()['token'];
 
         $userId = $this->userApi->findUserIdByRadarrFeedId($feedId);
 

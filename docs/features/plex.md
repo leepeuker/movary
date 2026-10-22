@@ -19,6 +19,9 @@ Movary accepts Plex's multipart webhook format and validates its JSON `payload` 
 processing. Malformed payloads are rejected, and the JSON field may not exceed 256 KiB. Multipart
 attachments sent by Plex are not included in that JSON limit.
 
+New webhook URLs use `/webhooks/plex/{token}`. Existing `/api/webhook/plex/{token}` URLs remain
+available for compatibility until Movary 1.0.
+
 The webhook URL is connected to your Movary account. Keep it private. Regenerating or deleting it immediately invalidates the previous URL, which must then be removed or replaced in Plex.
 
 The public `APPLICATION_URL` must be configured before Movary can generate webhook URLs. Contact the Movary administrator if the controls are disabled.

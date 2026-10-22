@@ -16,7 +16,7 @@ class EmbyControllerTest extends TestCase
     public function testReturnsNotFoundBeforeMappingPayloadForUnknownWebhook() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByEmbyWebhookId')->willReturn(null);
         $requestMapper = $this->createMock(EmbyWebhookRequestMapper::class);
@@ -35,7 +35,7 @@ class EmbyControllerTest extends TestCase
     {
         $payload = ['Event' => 'playback.start', 'Item' => ['Type' => 'Movie']];
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByEmbyWebhookId')->willReturn(42);
         $requestMapper = $this->createMock(EmbyWebhookRequestMapper::class);

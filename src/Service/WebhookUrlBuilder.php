@@ -38,7 +38,7 @@ class WebhookUrlBuilder
         }
 
         return $this->applicationUrlService->createApplicationUrl(
-            RelativeUrl::create('/api/webhook/' . $webhookType . '/' . $webhookId),
+            RelativeUrl::create('/webhooks/' . $webhookType . '/' . $webhookId),
         );
     }
 }

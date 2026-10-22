@@ -19,7 +19,7 @@ class PlexController
 
     public function handlePlexWebhook(Request $request) : Response
     {
-        $webhookId = $request->getRouteParameters()['id'];
+        $webhookId = $request->getRouteParameters()['token'];
 
         $userId = $this->userApi->findUserIdByPlexWebhookId($webhookId);
         if ($userId === null) {

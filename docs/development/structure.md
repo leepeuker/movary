@@ -8,8 +8,9 @@ To add a new route, go to the file `settings/routes.php` and add this new line:
 $routes->add('<HTTP_METHOD>', '/your/url/path', [Web\Some\Controller::class, 'Method']);
 ```
 
-Replace <HTTPMethod> with either `GET`, `POST`, `PUT` or `DELETE` and put this line of code in either the `addWebRoutes` function or the `addApiRoutes` function. It should be
-in `addWebRoutes` if it's a route that the user will be visiting on the website and in the `addApiRoutes` if it's not.
+Replace `<HTTP_METHOD>` with either `GET`, `POST`, `PUT` or `DELETE`. Add website routes to
+`addWebRoutes`, versioned client API routes to `addApiRoutes`, and inbound webhook or feed routes to
+`addIntegrationRoutes`.
 
 Movary uses [FastRoute](https://github.com/nikic/FastRoute) to manage most of the routing stuff (only the middleware is added by us) and for more info, visit their git repo.
 

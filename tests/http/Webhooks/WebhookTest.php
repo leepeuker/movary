@@ -1,20 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary;
+namespace Tests\Http\Movary\Webhooks;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Api\Movary\Support\ApiResponse;
-use Tests\Api\Movary\Support\ApiTestCase;
+use Tests\Http\Movary\HttpResponse;
+use Tests\Http\Movary\HttpTestCase;
 
 #[CoversNothing]
-class WebhookTest extends ApiTestCase
+class WebhookTest extends HttpTestCase
 {
     #[DataProvider('providerProvider')]
     public function testRejectsUnknownWebhookId(string $provider) : void
     {
-        $this->api
-            ->requestRaw('POST', '/api/webhook/' . $provider . '/unknown', '')
+        $this->http
+            ->requestRaw('POST', '/webhooks/' . $provider . '/unknown', '')
             ->assertStatus(404)
             ->assertBodySame('');
     }
@@ -23,8 +23,8 @@ class WebhookTest extends ApiTestCase
     {
         $webhookId = $this->createWebhookId('plex');
 
-        $this->api
-            ->postMultipart('/api/webhook/plex/' . $webhookId, ['payload' => '{'])
+        $this->http
+            ->postMultipart('/webhooks/plex/' . $webhookId, ['payload' => '{'])
             ->assertStatus(400)
             ->assertJsonSame([
                 'error' => 'InvalidRequest',
@@ -36,10 +36,10 @@ class WebhookTest extends ApiTestCase
     {
         $webhookId = $this->createWebhookId('jellyfin');
 
-        $this->api
+        $this->http
             ->requestRaw(
                 'POST',
-                '/api/webhook/jellyfin/' . $webhookId,
+                '/webhooks/jellyfin/' . $webhookId,
                 '{',
                 ['Content-Type' => 'application/json'],
             )
@@ -50,8 +50,8 @@ class WebhookTest extends ApiTestCase
     {
         $webhookId = $this->createWebhookId('kodi');
 
-        $this->api
-            ->requestRaw('POST', '/api/webhook/kodi/' . $webhookId, '{}', ['Content-Type' => 'text/plain'])
+        $this->http
+            ->requestRaw('POST', '/webhooks/kodi/' . $webhookId, '{}', ['Content-Type' => 'text/plain'])
             ->assertStatus(415);
     }
 
@@ -59,8 +59,8 @@ class WebhookTest extends ApiTestCase
     {
         $webhookId = $this->createWebhookId('emby');
 
-        $this->api
-            ->postForm('/api/webhook/emby/' . $webhookId, ['data' => '{'])
+        $this->http
+            ->postForm('/webhooks/emby/' . $webhookId, ['data' => '{'])
             ->assertStatus(400);
     }
 
@@ -68,12 +68,12 @@ class WebhookTest extends ApiTestCase
     {
         $webhookId = $this->createWebhookId('emby');
 
-        $this->api
-            ->postForm('/api/webhook/emby/' . $webhookId, ['data' => str_repeat(' ', 262145)])
+        $this->http
+            ->postForm('/webhooks/emby/' . $webhookId, ['data' => str_repeat(' ', 262145)])
             ->assertStatus(413);
     }
 
-    /** @param callable(self, string): ApiResponse $send */
+    /** @param callable(self, string): HttpResponse $send */
     #[DataProvider('validUnsupportedEventProvider')]
     public function testAcceptsValidEvent(string $provider, callable $send) : void
     {
@@ -93,35 +93,35 @@ class WebhookTest extends ApiTestCase
         ];
     }
 
-    /** @return array<string, array{string, callable(self, string): ApiResponse}> */
+    /** @return array<string, array{string, callable(self, string): HttpResponse}> */
     public static function validUnsupportedEventProvider() : array
     {
         return [
             'Plex unsupported event' => [
                 'plex',
-                static fn(self $test, string $id) => $test->api->postMultipart(
-                    '/api/webhook/plex/' . $id,
+                static fn(self $test, string $id) => $test->http->postMultipart(
+                    '/webhooks/plex/' . $id,
                     ['payload' => '{"event":"library.new"}'],
                 ),
             ],
             'Jellyfin unsupported event' => [
                 'jellyfin',
-                static fn(self $test, string $id) => $test->api->post(
-                    '/api/webhook/jellyfin/' . $id,
+                static fn(self $test, string $id) => $test->http->post(
+                    '/webhooks/jellyfin/' . $id,
                     ['NotificationType' => 'PlaybackStart', 'ItemType' => 'Movie'],
                 ),
             ],
             'Emby unsupported event' => [
                 'emby',
-                static fn(self $test, string $id) => $test->api->postForm(
-                    '/api/webhook/emby/' . $id,
+                static fn(self $test, string $id) => $test->http->postForm(
+                    '/webhooks/emby/' . $id,
                     ['data' => '{"Event":"playback.start","Item":{"Type":"Movie"}}'],
                 ),
             ],
             'Kodi event ignored by disabled setting' => [
                 'kodi',
-                static fn(self $test, string $id) => $test->api->post(
-                    '/api/webhook/kodi/' . $id,
+                static fn(self $test, string $id) => $test->http->post(
+                    '/webhooks/kodi/' . $id,
                     ['title' => 'Movie', 'uniqueIds' => []],
                 ),
             ],

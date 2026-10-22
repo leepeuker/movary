@@ -17,6 +17,9 @@ Radarr imports changes on its own list-update schedule, so a watchlist addition 
 
 The feed URL grants access to the titles and identifiers in your Movary watchlist without a Movary login. Treat it as a credential and do not publish it.
 
+New feed URLs use `/feeds/radarr/{token}`. Existing `/api/feed/radarr/{token}` URLs remain available
+for compatibility until Movary 1.0.
+
 - **Regenerate url** immediately invalidates the previous URL. Replace it in Radarr afterward.
 - **Delete url** disables the feed until a new one is generated.
 

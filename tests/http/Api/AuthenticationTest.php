@@ -1,25 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Api\Movary;
+namespace Tests\Http\Movary\Api;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
-use Tests\Api\Movary\Support\ApiResponse;
-use Tests\Api\Movary\Support\ApiTestCase;
+use Tests\Http\Movary\HttpResponse;
+use Tests\Http\Movary\HttpTestCase;
 
 #[CoversNothing]
-class AuthenticationTest extends ApiTestCase
+class AuthenticationTest extends HttpTestCase
 {
-    private const string ENDPOINT = '/api/authentication/token';
+    private const string ENDPOINT = '/api/v1/authentication/token';
 
     public function testRejectsMissingToken() : void
     {
-        $this->assertUnauthorizedResponse($this->api->get(self::ENDPOINT));
+        $this->assertUnauthorizedResponse($this->http->get(self::ENDPOINT));
     }
 
     public function testRejectsInvalidBearerToken() : void
     {
         $this->assertUnauthorizedResponse(
-            $this->api->get(self::ENDPOINT, ['Authorization' => 'Bearer invalid-token']),
+            $this->http->get(self::ENDPOINT, ['Authorization' => 'Bearer invalid-token']),
         );
     }
 
@@ -27,7 +27,7 @@ class AuthenticationTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->get(self::ENDPOINT, ['Authorization' => 'Bearer ' . $fixture['token']])
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')
@@ -45,7 +45,7 @@ class AuthenticationTest extends ApiTestCase
     {
         $fixture = $this->fixture->createUserWithToken();
 
-        $this->api
+        $this->http
             ->get(self::ENDPOINT, ['X-Movary-Token' => $fixture['token']])
             ->assertStatus(200)
             ->assertHeaderSame('Content-Type', 'application/json')
@@ -58,7 +58,7 @@ class AuthenticationTest extends ApiTestCase
             ]);
     }
 
-    private function assertUnauthorizedResponse(ApiResponse $response) : void
+    private function assertUnauthorizedResponse(HttpResponse $response) : void
     {
         $response
             ->assertStatus(401)

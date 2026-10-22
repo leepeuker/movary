@@ -16,7 +16,7 @@ class KodiControllerTest extends TestCase
     public function testReturnsNotFoundBeforeMappingPayloadForUnknownWebhook() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByKodiWebhookId')->willReturn(null);
         $requestMapper = $this->createMock(KodiWebhookRequestMapper::class);
@@ -35,7 +35,7 @@ class KodiControllerTest extends TestCase
     {
         $payload = ['title' => 'Movie', 'uniqueIds' => ['tmdbId' => '42']];
         $request = $this->createStub(Request::class);
-        $request->method('getRouteParameters')->willReturn(['id' => 'secret']);
+        $request->method('getRouteParameters')->willReturn(['token' => 'secret']);
         $userApi = $this->createStub(UserApi::class);
         $userApi->method('findUserIdByKodiWebhookId')->willReturn(42);
         $requestMapper = $this->createMock(KodiWebhookRequestMapper::class);

@@ -19,7 +19,7 @@ class EmbyController
 
     public function handleEmbyWebhook(Request $request) : Response
     {
-        $webhookId = $request->getRouteParameters()['id'];
+        $webhookId = $request->getRouteParameters()['token'];
 
         $userId = $this->userApi->findUserIdByEmbyWebhookId($webhookId);
         if ($userId === null) {

@@ -15,7 +15,7 @@ class RadarrFeedUrlGenerator
     public function generateUrl(string $feedId) : string
     {
         return $this->applicationUrlService->createApplicationUrl(
-            RelativeUrl::create('/api/feed/radarr/' . $feedId),
+            RelativeUrl::create('/feeds/radarr/' . $feedId),
         );
     }
 }
