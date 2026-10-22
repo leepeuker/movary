@@ -29,18 +29,10 @@ function search() {
     getParameters += '&so=' + sortOrder
     getParameters += '&pp=' + searchPerPage
 
-    if (searchGenre != '') {
-        getParameters += '&ge=' + searchGenre
-    }
-    if (searchLanguage != '') {
-        getParameters += '&la=' + searchLanguage
-    }
-    if (searchReleaseYear != '') {
-        getParameters += '&ry=' + searchReleaseYear
-    }
-    if (searchProductionCountry != '') {
-        getParameters += '&pc=' + searchProductionCountry
-    }
+    getParameters += '&ge=' + searchGenre
+    getParameters += '&la=' + searchLanguage
+    getParameters += '&ry=' + searchReleaseYear
+    getParameters += '&pc=' + searchProductionCountry
     if (searchTerm != '') {
         getParameters += '&s=' + searchTerm
     }
@@ -58,4 +50,6 @@ function resetSearchOptions() {
     searchReleaseYearSelect.value = ''
     searchProductionCountrySelect.value = ''
     searchPerPageSelect.value = '24'
+
+    updateListPagePreferenceButtons()
 }
