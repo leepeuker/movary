@@ -3,6 +3,7 @@
 namespace Movary\Domain\Movie\Review;
 
 use InvalidArgumentException;
+use Movary\ValueObject\DateTime;
 
 class MovieReviewApi
 {
@@ -23,9 +24,61 @@ class MovieReviewApi
         $this->repository->delete($movieId, $userId);
     }
 
+    public function deleteAllForUser(int $userId) : void
+    {
+        $this->repository->deleteAllForUser($userId);
+    }
+
+    public function fetchAllForUser(int $userId) : array
+    {
+        return $this->repository->fetchAllForUser($userId);
+    }
+
+    public function fetchVisibleForMovie(int $movieId, ?int $viewerUserId) : array
+    {
+        return $this->repository->fetchVisibleForMovie($movieId, $viewerUserId);
+    }
+
     public function find(int $movieId, int $userId) : ?MovieReviewEntity
     {
         return $this->repository->find($movieId, $userId);
+    }
+
+    public function import(
+        int $movieId,
+        int $userId,
+        string $review,
+        bool $containsSpoilers,
+        DateTime $createdAt,
+        ?DateTime $updatedAt,
+    ) : void {
+        $this->validateReview($review);
+
+        if ($this->repository->find($movieId, $userId) === null) {
+            $this->repository->create(
+                $movieId,
+                $userId,
+                $review,
+                $containsSpoilers,
+                $createdAt,
+                $updatedAt,
+            );
+
+            return;
+        }
+
+        $this->repository->update($movieId, $userId, $review, $containsSpoilers, $updatedAt);
+    }
+
+    public function save(int $movieId, int $userId, string $review, bool $containsSpoilers) : void
+    {
+        if ($this->repository->find($movieId, $userId) === null) {
+            $this->create($movieId, $userId, $review, $containsSpoilers);
+
+            return;
+        }
+
+        $this->update($movieId, $userId, $review, $containsSpoilers);
     }
 
     public function update(int $movieId, int $userId, string $review, bool $containsSpoilers) : void

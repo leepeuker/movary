@@ -63,6 +63,37 @@ class MovieReviewApiTest extends TestCase
         (new MovieReviewApi($repository))->update(12, 34, $review, false);
     }
 
+    public function testSaveCreatesMissingReview() : void
+    {
+        /** @var MovieReviewRepository&MockObject $repository */
+        $repository = $this->createMock(MovieReviewRepository::class);
+        $repository->expects(self::once())->method('find')->with(12, 34)->willReturn(null);
+        $repository->expects(self::once())->method('create')->with(12, 34, 'A review.', true);
+        $repository->expects(self::never())->method('update');
+
+        (new MovieReviewApi($repository))->save(12, 34, 'A review.', true);
+    }
+
+    public function testSaveUpdatesExistingReview() : void
+    {
+        $review = MovieReviewEntity::createFromArray([
+            'movie_id' => 12,
+            'user_id' => 34,
+            'review' => 'Old review.',
+            'contains_spoilers' => 0,
+            'created_at' => '2026-10-20 12:00:00',
+            'updated_at' => null,
+        ]);
+
+        /** @var MovieReviewRepository&MockObject $repository */
+        $repository = $this->createMock(MovieReviewRepository::class);
+        $repository->expects(self::once())->method('find')->with(12, 34)->willReturn($review);
+        $repository->expects(self::never())->method('create');
+        $repository->expects(self::once())->method('update')->with(12, 34, 'Updated review.', false);
+
+        (new MovieReviewApi($repository))->save(12, 34, 'Updated review.', false);
+    }
+
     public function testDeleteDelegatesToRepository() : void
     {
         /** @var MovieReviewRepository&MockObject $repository */
