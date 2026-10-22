@@ -30,7 +30,7 @@ class MoviePosterControllerTest extends TestCase
 
     public function testFetchPostersReturnsNotFoundForUnknownMovie() : void
     {
-        $this->movieApi->method('findById')->with(12)->willReturn(null);
+        $this->movieApi->expects(self::once())->method('findById')->with(12)->willReturn(null);
 
         self::assertSame(404, $this->subject->fetchPosters($this->createRequest())->getStatusCode()->getCode());
     }
@@ -39,7 +39,7 @@ class MoviePosterControllerTest extends TestCase
     {
         $movie = $this->createMovie('/override.jpg');
         $this->movieApi->method('findById')->willReturn($movie);
-        $this->posterService->method('fetchAvailablePosters')->with($movie)->willReturn([
+        $this->posterService->expects(self::once())->method('fetchAvailablePosters')->with($movie)->willReturn([
             new TmdbPoster('/poster.jpg', 'https://example.com/poster.jpg'),
         ]);
 

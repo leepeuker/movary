@@ -370,6 +370,18 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
 
     $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('GET', '/movies/{movaryId:[0-9]+}/posters', [Api\MoviePosterController::class, 'fetchPosters'], [
+        Api\Middleware\IsAuthenticated::class,
+        Api\Middleware\IsAdmin::class,
+    ]);
+    $routes->add('PUT', '/movies/{movaryId:[0-9]+}/poster', [Api\MoviePosterController::class, 'selectPoster'], [
+        Api\Middleware\IsAuthenticated::class,
+        Api\Middleware\IsAdmin::class,
+    ]);
+    $routes->add('DELETE', '/movies/{movaryId:[0-9]+}/poster', [Api\MoviePosterController::class, 'restoreDefault'], [
+        Api\Middleware\IsAuthenticated::class,
+        Api\Middleware\IsAdmin::class,
+    ]);
 
     $routes->add('POST', '/webhook/plex/{id:.+}', [Api\PlexController::class, 'handlePlexWebhook']);
     $routes->add('POST', '/webhook/jellyfin/{id:.+}', [Api\JellyfinController::class, 'handleJellyfinWebhook']);
