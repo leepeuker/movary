@@ -99,20 +99,21 @@ class TmdbImageCache
     private function cacheImageDataByTableName(array $data, ResourceType $resourceType, bool $forceRefresh = false) : bool
     {
         $cachedImagePublicPath = null;
+        $tmdbPosterPath = $data['tmdb_poster_path_override'] ?? $data['tmdb_poster_path'];
 
-        if ($data['tmdb_poster_path'] === null) {
+        if ($tmdbPosterPath === null) {
             return false;
         }
 
         try {
             $cachedImagePublicPath = $this->imageCacheService->cacheImage(
-                $this->tmdbUrlGenerator->generateImageUrl($data['tmdb_poster_path']),
+                $this->tmdbUrlGenerator->generateImageUrl($tmdbPosterPath),
                 $data['id'],
                 $resourceType,
                 $data['poster_path'] === null ? true : $forceRefresh,
             );
         } catch (Exception $e) {
-            $this->logger->warning('Could not cache ' . $resourceType . ' image: ' . $data['tmdb_poster_path'], ['exception' => $e]);
+            $this->logger->warning('Could not cache ' . $resourceType . ' image: ' . $tmdbPosterPath, ['exception' => $e]);
         }
 
         if ($cachedImagePublicPath === null) {
@@ -131,7 +132,8 @@ class TmdbImageCache
     {
         $cachedImages = 0;
 
-        $query = "SELECT id, poster_path, tmdb_poster_path FROM $resourceType";
+        $overrideColumn = $resourceType->isMovie() ? ', tmdb_poster_path_override' : '';
+        $query = "SELECT id, poster_path, tmdb_poster_path$overrideColumn FROM $resourceType";
         if (count($filerIds) > 0) {
             $placeholders = str_repeat('?, ', count($filerIds));
             $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';
