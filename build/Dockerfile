@@ -1,6 +1,6 @@
 FROM composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac AS composer
 
-FROM php:8.5.12-fpm-alpine3.24@sha256:4c9541a4506014672d074652a1cc9754d3c5f97cad6c6027bae35be0e4a4dea9 AS base
+FROM php:8.6.0RC3-fpm-alpine3.24@sha256:481010776c273096841ff202f56e6c98ffbdf7ca41483d389b6a3dfa5b236ebe AS base
 
 LABEL Description="Movary is a self hosted web app to track and rate your watched movies"
 LABEL Maintainer="Lee Peuker"
