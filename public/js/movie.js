@@ -101,6 +101,18 @@ async function useSelectedPoster() {
 }
 
 async function restoreDefaultPoster() {
+    const confirmed = await showConfirmationModal({
+        title: 'Restore default poster',
+        message: 'Are you sure you want to restore the default poster?',
+        confirmLabel: 'Restore default',
+        confirmClass: 'btn-danger',
+        restoreSourceModalOnConfirm: true,
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
     await updateMoviePoster('DELETE')
 }
 
