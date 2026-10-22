@@ -106,7 +106,6 @@ async function restoreDefaultPoster() {
         message: 'Are you sure you want to restore the default poster?',
         confirmLabel: 'Restore default',
         confirmClass: 'btn-danger',
-        restoreSourceModalOnConfirm: true,
     })
 
     if (confirmed === false) {
@@ -134,6 +133,11 @@ async function updateMoviePoster(method, body = null) {
 
         window.location.reload()
     } catch (requestError) {
+        const posterModal = document.getElementById('changePosterModal')
+        if (posterModal.classList.contains('show') === false) {
+            bootstrap.Modal.getOrCreateInstance(posterModal).show()
+        }
+
         document.getElementById('posterSelectionError').textContent = 'Could not update the movie poster.'
         document.getElementById('posterSelectionError').classList.remove('d-none')
         saveButton.disabled = document.querySelector('input[name="moviePoster"]:checked') === null
