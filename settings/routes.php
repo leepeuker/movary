@@ -289,6 +289,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/movies/{id:[0-9]+}/watch-providers', [Web\Movie\MovieWatchProviderController::class, 'getWatchProviders']);
     $routes->add('POST', '/movies/{id:[0-9]+}/add-watchlist', [Web\Movie\MovieWatchlistController::class, 'addToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/movies/{id:[0-9]+}/remove-watchlist', [Web\Movie\MovieWatchlistController::class, 'removeFromWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/movies/{id:[0-9]+}/posters', [Web\Movie\MoviePosterController::class, 'fetchPosters'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('PUT', '/movies/{id:[0-9]+}/poster', [Web\Movie\MoviePosterController::class, 'selectPoster'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('DELETE', '/movies/{id:[0-9]+}/poster', [Web\Movie\MoviePosterController::class, 'restoreDefault'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
 
     ##########
     # Person #

@@ -87,6 +87,11 @@ class StatusCode
         return new self(415, 'Unsupported Media Type');
     }
 
+    public static function createUnprocessableEntity() : self
+    {
+        return new self(422, 'Unprocessable Entity');
+    }
+
     public function __toString() : string
     {
         return sprintf('HTTP/1.1 %d %s', $this->code, $this->string);

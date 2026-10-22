@@ -94,6 +94,26 @@ class RouteSecurityTest extends TestCase
         }
     }
 
+    public function testMoviePosterRoutesRequireAdministratorAuthentication() : void
+    {
+        $routes = array_filter(
+            RegisteredRoutes::collect(),
+            static fn(array $route) : bool => in_array($route['path'], [
+                '/movies/{id:[0-9]+}/posters',
+                '/movies/{id:[0-9]+}/poster',
+            ], true),
+        );
+
+        self::assertCount(3, $routes);
+        foreach ($routes as $route) {
+            self::assertContains(UserIsAuthenticated::class, $route['middleware']);
+            self::assertContains(UserIsAdmin::class, $route['middleware']);
+            if (in_array($route['method'], self::UNSAFE_METHODS, true)) {
+                self::assertContains(ValidateCsrfToken::class, $route['middleware']);
+            }
+        }
+    }
+
     public function testJobScheduleFormUpdateUsesPost() : void
     {
         $methods = [];
