@@ -23,6 +23,7 @@ class ListPagePreferenceTest extends TestCase
                     'sortBy' => 'rating',
                     'sortOrder' => 'desc',
                     'filters' => ['ge' => 'Drama', 'la' => 'en'],
+                    'perPage' => '48',
                 ],
             ])));
 
@@ -37,6 +38,7 @@ class ListPagePreferenceTest extends TestCase
         self::assertSame('rating', $preference['sortBy']);
         self::assertSame('desc', (string)$preference['sortOrder']);
         self::assertSame(['ge' => 'Drama', 'la' => 'en'], $preference['filters']);
+        self::assertSame(48, $preference['perPage']);
     }
 
     public function testIgnoresUnsupportedAndInvalidFilters() : void
@@ -47,6 +49,7 @@ class ListPagePreferenceTest extends TestCase
                 'sortBy' => 'title',
                 'sortOrder' => 'asc',
                 'filters' => ['ge' => 'Drama', 'unsupported' => 'value', 'la' => [], 'pc' => ''],
+                'perPage' => '100',
             ],
         ]));
 
@@ -59,6 +62,7 @@ class ListPagePreferenceTest extends TestCase
 
         self::assertNotNull($preference);
         self::assertSame(['ge' => 'Drama'], $preference['filters']);
+        self::assertNull($preference['perPage']);
     }
 
     public static function provideInvalidCookie() : array

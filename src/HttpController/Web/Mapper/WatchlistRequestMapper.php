@@ -51,7 +51,7 @@ class WatchlistRequestMapper
 
         $searchTerm = $getParameters['s'] ?? null;
         $page = $getParameters['p'] ?? self::DEFAULT_PAGE;
-        $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
+        $limit = $getParameters['pp'] ?? $savedPreference['perPage'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sb'] ?? $savedPreference['sortBy'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $this->mapSortOrder(
             $getParameters,

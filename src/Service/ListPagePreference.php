@@ -20,10 +20,12 @@ class ListPagePreference
 
     private const int COOKIE_VERSION = 1;
 
+    private const array PER_PAGE_VALUES = ['24', '48', '72', '96'];
+
     /**
      * @param list<string> $allowedSortBy
      * @param list<string> $allowedFilters
-     * @return array{sortBy: string, sortOrder: SortOrder, filters: array<string, string>}|null
+     * @return array{sortBy: string, sortOrder: SortOrder, filters: array<string, string>, perPage: ?int}|null
      */
     public function find(
         Request $request,
@@ -56,6 +58,7 @@ class ListPagePreference
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder === 'asc' ? SortOrder::createAsc() : SortOrder::createDesc(),
             'filters' => $this->mapFilters($preference['filters'] ?? null, $allowedFilters),
+            'perPage' => $this->mapPerPage($preference['perPage'] ?? null),
         ];
     }
 
@@ -97,5 +100,14 @@ class ListPagePreference
         }
 
         return $filters;
+    }
+
+    private function mapPerPage(mixed $perPage) : ?int
+    {
+        if (is_string($perPage) === false || in_array($perPage, self::PER_PAGE_VALUES, true) === false) {
+            return null;
+        }
+
+        return (int)$perPage;
     }
 }

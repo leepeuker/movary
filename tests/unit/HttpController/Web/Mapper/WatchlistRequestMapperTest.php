@@ -24,6 +24,7 @@ class WatchlistRequestMapperTest extends TestCase
 
         self::assertSame('addedAt', $result->getSortBy());
         self::assertSame('desc', (string)$result->getSortOrder());
+        self::assertSame(24, $result->getLimit());
     }
 
     public function testSavedPreferenceOverridesApplicationDefault() : void
@@ -33,7 +34,7 @@ class WatchlistRequestMapperTest extends TestCase
         $request->method('getGetParameters')->willReturn([]);
         $request->method('getCookie')->willReturn(
             '{"version":1,"pages":{"watchlist":{"sortBy":"title","sortOrder":"asc",'
-            . '"filters":{"ge":"Drama","la":"en","pc":"DE"}}}}',
+            . '"filters":{"ge":"Drama","la":"en","pc":"DE"},"perPage":"96"}}}',
         );
 
         $result = $this->createSubject()->mapRenderPageRequest($request);
@@ -43,6 +44,7 @@ class WatchlistRequestMapperTest extends TestCase
         self::assertSame('Drama', $result->getGenre());
         self::assertSame('en', $result->getLanguage());
         self::assertSame('DE', $result->getProductionCountryCode());
+        self::assertSame(96, $result->getLimit());
     }
 
     private function createSubject() : WatchlistRequestMapper

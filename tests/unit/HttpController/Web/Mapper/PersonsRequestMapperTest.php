@@ -24,6 +24,7 @@ class PersonsRequestMapperTest extends TestCase
 
         self::assertSame('uniqueAppearances', $result->getSortBy());
         self::assertSame('desc', (string)$result->getSortOrder());
+        self::assertSame(24, $result->getLimit());
     }
 
     public function testUsesSeparatePreferencesForActorsAndDirectors() : void
@@ -33,8 +34,9 @@ class PersonsRequestMapperTest extends TestCase
         $request->method('getGetParameters')->willReturn([]);
         $request->method('getCookie')->willReturn(
             '{"version":1,"pages":{'
-            . '"actors":{"sortBy":"name","sortOrder":"asc","filters":{"ge":"2"}},'
-            . '"directors":{"sortBy":"totalAppearances","sortOrder":"desc","filters":{"ge":"1"}}'
+            . '"actors":{"sortBy":"name","sortOrder":"asc","filters":{"ge":"2"},"perPage":"48"},'
+            . '"directors":{"sortBy":"totalAppearances","sortOrder":"desc","filters":{"ge":"1"},'
+            . '"perPage":"72"}'
             . '}}',
         );
 
@@ -45,9 +47,11 @@ class PersonsRequestMapperTest extends TestCase
         self::assertSame('name', $actors->getSortBy());
         self::assertSame('asc', (string)$actors->getSortOrder());
         self::assertSame(2, $actors->getGender()?->asInt());
+        self::assertSame(48, $actors->getLimit());
         self::assertSame('totalAppearances', $directors->getSortBy());
         self::assertSame('desc', (string)$directors->getSortOrder());
         self::assertSame(1, $directors->getGender()?->asInt());
+        self::assertSame(72, $directors->getLimit());
     }
 
     private function createSubject() : PersonsRequestMapper

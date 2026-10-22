@@ -14,7 +14,7 @@ On **All Movies**, search by title or open **Advanced search** to:
 - filter by genre, language, release year, production country, rating status or range, and watch location; and
 - choose how many results appear on each page.
 
-Select **Set defaults** to remember the selected sorting and filters for All Movies in the current browser. **Clear defaults** restores Movary's built-in sorting and unfiltered view on future visits, while **Reset** restores all current search controls to their built-in values. Use the view button to switch between poster and table layouts; the table shows additional details and supports sorting through its column headings. Movary remembers the selected layout in the current browser.
+Select **Set defaults** to remember the selected sorting, filters, and results per page for All Movies in the current browser. **Clear defaults** restores Movary's built-in sorting, unfiltered view, and page size on future visits, while **Reset** restores all current search controls to their built-in values. Use the view button to switch between poster and table layouts; the table shows additional details and supports sorting through its column headings. Movary remembers the selected layout in the current browser.
 
 Select a movie to view its metadata and the selected user's rating, watch dates, and watchlist status. On your own pages, you can also add a play, change the rating, or update the watchlist.
 
@@ -30,7 +30,7 @@ The advanced search options let you filter by gender, choose the page size, and 
 
 In the table layout, select a supported column heading to change the sorting directly.
 
-Select **Set defaults** in advanced search to remember sorting and filters separately for Top Actors and Top Directors in the current browser. The Watchlist page provides the same option for its sorting and filters.
+Select **Set defaults** in advanced search to remember sorting, filters, and results per page separately for Top Actors and Top Directors in the current browser. The Watchlist page provides the same option.
 
 Select a person to open their detail page. It shows available biographical information and external TMDB or IMDb links. The **Acting** and **Director** tabs show watched movies associated with that person and, when available, matching movies from the watchlist.
 

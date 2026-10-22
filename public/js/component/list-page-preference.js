@@ -72,6 +72,7 @@ function getEffectiveListPagePreference() {
         sortBy: listPagePreferenceModal.dataset.listPageDefaultSortBy,
         sortOrder: listPagePreferenceModal.dataset.listPageDefaultSortOrder,
         filters: {},
+        perPage: listPagePreferenceModal.dataset.listPageDefaultPerPage,
     };
 }
 
@@ -84,7 +85,8 @@ function updateListPagePreferenceButtons() {
     const effectivePreference = getEffectiveListPagePreference();
     const matchesEffectivePreference = effectivePreference.sortBy === searchSortBySelect.value
         && effectivePreference.sortOrder === searchSortOrderSelect.value
-        && JSON.stringify(effectivePreference.filters ?? {}) === JSON.stringify(getCurrentListPageFilters());
+        && JSON.stringify(effectivePreference.filters ?? {}) === JSON.stringify(getCurrentListPageFilters())
+        && effectivePreference.perPage === searchPerPageSelect.value;
 
     saveListPagePreferenceButton.classList.toggle('d-none', matchesEffectivePreference);
     removeListPagePreferenceButton.classList.toggle('d-none', savedPreference == null);
@@ -96,6 +98,7 @@ function saveListPagePreference() {
         sortBy: searchSortBySelect.value,
         sortOrder: searchSortOrderSelect.value,
         filters: getCurrentListPageFilters(),
+        perPage: searchPerPageSelect.value,
     };
     writeListPagePreferences(preferences);
     search();

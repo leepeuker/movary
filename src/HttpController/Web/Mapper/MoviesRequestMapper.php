@@ -51,7 +51,7 @@ class MoviesRequestMapper
 
         $searchTerm = $getParameters['s'] ?? null;
         $page = $getParameters['p'] ?? 1;
-        $limit = $getParameters['pp'] ?? self::DEFAULT_LIMIT;
+        $limit = $getParameters['pp'] ?? $savedPreference['perPage'] ?? self::DEFAULT_LIMIT;
         $sortBy = $getParameters['sb'] ?? $savedPreference['sortBy'] ?? self::DEFAULT_SORT_BY;
         $sortOrder = $this->mapSortOrder(
             $getParameters,

@@ -19,6 +19,7 @@ class MoviesRequestMapperTest extends TestCase
 
         self::assertSame('title', $result->getSortBy());
         self::assertSame('asc', (string)$result->getSortOrder());
+        self::assertSame(24, $result->getLimit());
     }
 
     public function testSavedPreferenceOverridesApplicationDefault() : void
@@ -26,7 +27,8 @@ class MoviesRequestMapperTest extends TestCase
         $request = $this->createRequest(
             [],
             '{"version":1,"pages":{"movies":{"sortBy":"rating","sortOrder":"desc",'
-            . '"filters":{"ge":"Drama","la":"en","ur":"1","minur":"7","maxur":"9","loc":"4"}}}}',
+            . '"filters":{"ge":"Drama","la":"en","ur":"1","minur":"7","maxur":"9","loc":"4"},'
+            . '"perPage":"48"}}}',
         );
 
         $result = $this->createSubject()->mapRenderPageRequest($request);
@@ -39,20 +41,22 @@ class MoviesRequestMapperTest extends TestCase
         self::assertSame(7, $result->getUserRatingMin());
         self::assertSame(9, $result->getUserRatingMax());
         self::assertSame(4, $result->getLocationId());
+        self::assertSame(48, $result->getLimit());
     }
 
     public function testQuerySortingOverridesSavedSorting() : void
     {
         $request = $this->createRequest(
-            ['sb' => 'releaseDate', 'so' => 'asc'],
+            ['sb' => 'releaseDate', 'so' => 'asc', 'pp' => '72'],
             '{"version":1,"pages":{"movies":{"sortBy":"rating","sortOrder":"desc",'
-            . '"filters":{"ge":"Drama"}}}}',
+            . '"filters":{"ge":"Drama"},"perPage":"48"}}}',
         );
 
         $result = $this->createSubject()->mapRenderPageRequest($request);
 
         self::assertSame('releaseDate', $result->getSortBy());
         self::assertSame('asc', (string)$result->getSortOrder());
+        self::assertSame(72, $result->getLimit());
     }
 
     public function testExplicitEmptyFilterOverridesSavedFilter() : void
