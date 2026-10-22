@@ -62,6 +62,7 @@ class SettingsController
         private readonly TwoFactorAuthenticationApi $twoFactorAuthenticationService,
         private readonly UserApi $userApi,
         private readonly Movie\MovieApi $movieApi,
+        private readonly Movie\Review\MovieReviewApi $movieReviewApi,
         private readonly GithubApi $githubApi,
         private readonly PlexApi $plexApi,
         private readonly FlashMessageService $flashMessageService,
@@ -146,6 +147,15 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
+    public function deleteReviews() : Response
+    {
+        $this->movieReviewApi->deleteAllForUser(
+            $this->authenticationService->requireWebSession()->getUserId(),
+        );
+
+        return Response::create(StatusCode::createNoContent());
+    }
+
     public function generateLetterboxdExportData() : Response
     {
         $userId = $this->authenticationService->requireWebSession()->getUserId();
@@ -208,6 +218,7 @@ class SettingsController
         $importHistoryError = match (true) {
             $this->flashMessageService->consume(FlashMessage::IMPORT_HISTORY_FAILED) => 'history',
             $this->flashMessageService->consume(FlashMessage::IMPORT_RATINGS_FAILED) => 'ratings',
+            $this->flashMessageService->consume(FlashMessage::IMPORT_REVIEWS_FAILED) => 'reviews',
             $this->flashMessageService->consume(FlashMessage::IMPORT_WATCHLIST_FAILED) => 'watchlist',
             default => null,
         };
@@ -223,6 +234,9 @@ class SettingsController
                 ),
                 'importRatingsSuccessful' => $this->flashMessageService->consume(
                     FlashMessage::IMPORT_RATINGS_SUCCESSFUL,
+                ),
+                'importReviewsSuccessful' => $this->flashMessageService->consume(
+                    FlashMessage::IMPORT_REVIEWS_SUCCESSFUL,
                 ),
                 'importWatchlistSuccessful' => $this->flashMessageService->consume(
                     FlashMessage::IMPORT_WATCHLIST_SUCCESSFUL,

@@ -18,10 +18,11 @@
             <div style="padding-top: 1rem">
                 <h5>Export & Import</h5>
 
-                <p class="text-muted">Export or import your movary history, ratings or watchlist.</p>
+                <p class="text-muted">Export or import your Movary history, ratings, reviews, or watchlist.</p>
 
                 <a class="btn btn-primary" target="_blank" href="{{ applicationUrl }}/settings/account/export/csv/history">Export: history.csv</a>
                 <a class="btn btn-primary" target="_blank" href="{{ applicationUrl }}/settings/account/export/csv/ratings">Export: ratings.csv</a>
+                <a class="btn btn-primary" target="_blank" href="{{ applicationUrl }}/settings/account/export/csv/reviews">Export: reviews.csv</a>
                 <a class="btn btn-primary" target="_blank" href="{{ applicationUrl }}/settings/account/export/csv/watchlist">Export: watchlist.csv</a>
 
                 <form action="{{ applicationUrl }}/settings/account/import/csv/history" method="post" enctype="multipart/form-data" style="margin-top: 1.2rem">
@@ -67,6 +68,27 @@
                     </div>
                 {% endif %}
 
+                <form action="{{ applicationUrl }}/settings/account/import/csv/reviews" method="post" enctype="multipart/form-data" style="margin-top: 1rem">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                    <div class="input-group">
+                        <input type="file" class="form-control" name="reviews" required {% if coreAccountChangesDisabled == true %}disabled{% endif %}>
+                        <button class="btn btn-primary" type="submit" {% if coreAccountChangesDisabled == true %}disabled{% endif %}>Import reviews.csv</button>
+                    </div>
+                </form>
+                {% if importReviewsSuccessful == true %}
+                    <div class="alert alert-success alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Reviews were successfully imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                {% if importHistoryError == 'reviews' %}
+                    <div class="alert alert-danger alert-dismissible" role="alert" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem">
+                        Reviews could not be imported.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
                 <form action="{{ applicationUrl }}/settings/account/import/csv/watchlist" method="post" enctype="multipart/form-data" style="padding-bottom: 0.2rem;margin-top: 1rem">
                     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                     <div class="input-group">
@@ -98,6 +120,7 @@
                 <div style="margin-bottom: 1rem">
                     <button type="button" class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" id="deleteHistoryButton">Delete history</button>
                     <button type="button" class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" id="deleteRatingsButton">Delete ratings</button>
+                    <button type="button" class="btn btn-warning {% if coreAccountChangesDisabled == true %}disabled{% endif %}" id="deleteReviewsButton">Delete reviews</button>
 
                     <div id="alertDeletionsDiv" style="margin-left: 5%;margin-right: 5%;margin-bottom: 0.7rem!important;margin-top: 1rem"></div>
                 </div>

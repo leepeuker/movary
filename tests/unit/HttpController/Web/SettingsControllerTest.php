@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\HttpController\Web;
 
+use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\User\Exception\PasswordTooShort;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
@@ -51,6 +52,8 @@ class SettingsControllerTest extends TestCase
 
     private JobScheduleApi|MockObject $jobScheduleApiMock;
 
+    private MovieReviewApi|MockObject $movieReviewApiMock;
+
     private DashboardFactory|MockObject $dashboardFactoryMock;
 
     private PersonalApiTokenService|MockObject $personalApiTokenServiceMock;
@@ -75,6 +78,7 @@ class SettingsControllerTest extends TestCase
         $this->currentWebUserMock = $this->createMock(CurrentWebUser::class);
         $this->flashMessageServiceMock = $this->createMock(FlashMessageService::class);
         $this->jobScheduleApiMock = $this->createMock(JobScheduleApi::class);
+        $this->movieReviewApiMock = $this->createMock(MovieReviewApi::class);
         $this->applicationUrlServiceMock = $this->createMock(ApplicationUrlService::class);
         $this->dashboardFactoryMock = $this->createMock(DashboardFactory::class);
         $this->personalApiTokenServiceMock = $this->createMock(PersonalApiTokenService::class);
@@ -85,6 +89,7 @@ class SettingsControllerTest extends TestCase
             'userApi' => $this->userApiMock,
             'flashMessageService' => $this->flashMessageServiceMock,
             'jobScheduleApi' => $this->jobScheduleApiMock,
+            'movieReviewApi' => $this->movieReviewApiMock,
             'applicationUrlService' => $this->applicationUrlServiceMock,
             'dashboardFactory' => $this->dashboardFactoryMock,
             'personalApiTokenService' => $this->personalApiTokenServiceMock,
@@ -100,6 +105,15 @@ class SettingsControllerTest extends TestCase
         $this->userMock->method('hasCoreAccountChangesDisabled')->willReturn(false);
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->currentWebUserMock->method('requireUser')->willReturn($this->userMock);
+    }
+
+    public function testDeleteReviewsDeletesOnlyCurrentUsersReviews() : void
+    {
+        $this->movieReviewApiMock->expects(self::once())->method('deleteAllForUser')->with(42);
+
+        $response = $this->subject->deleteReviews();
+
+        self::assertSame(204, $response->getStatusCode()->getCode());
     }
 
     public function testRenderServerJobSchedulesPageRendersSchedules() : void
@@ -609,6 +623,7 @@ class SettingsControllerTest extends TestCase
     {
         yield 'history' => [FlashMessage::IMPORT_HISTORY_SUCCESSFUL, 'importHistorySuccessful'];
         yield 'ratings' => [FlashMessage::IMPORT_RATINGS_SUCCESSFUL, 'importRatingsSuccessful'];
+        yield 'reviews' => [FlashMessage::IMPORT_REVIEWS_SUCCESSFUL, 'importReviewsSuccessful'];
         yield 'watchlist' => [FlashMessage::IMPORT_WATCHLIST_SUCCESSFUL, 'importWatchlistSuccessful'];
     }
 
@@ -617,6 +632,7 @@ class SettingsControllerTest extends TestCase
     {
         yield 'history' => [FlashMessage::IMPORT_HISTORY_FAILED, 'history'];
         yield 'ratings' => [FlashMessage::IMPORT_RATINGS_FAILED, 'ratings'];
+        yield 'reviews' => [FlashMessage::IMPORT_REVIEWS_FAILED, 'reviews'];
         yield 'watchlist' => [FlashMessage::IMPORT_WATCHLIST_FAILED, 'watchlist'];
     }
 

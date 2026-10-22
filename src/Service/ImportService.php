@@ -5,6 +5,7 @@ namespace Movary\Service;
 use League\Csv\Reader;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\JobQueue\JobQueueScheduler;
 use Movary\ValueObject\Date;
@@ -18,6 +19,7 @@ class ImportService
         private readonly MovieApi $movieApi,
         private readonly MovieWatchlistApi $watchlistApi,
         private readonly JobQueueScheduler $jobQueueScheduler,
+        private readonly MovieReviewApi $reviewApi,
     ) {
     }
 
@@ -42,7 +44,7 @@ class ImportService
 
     public function importHistory(int $userId, string $importCsvPath) : void
     {
-        $csv = Reader::createFromPath($importCsvPath, 'r');
+        $csv = Reader::from($importCsvPath, 'r');
         $csv->setHeaderOffset(0);
 
         foreach ($csv->getRecords() as $record) {
@@ -70,7 +72,7 @@ class ImportService
 
     public function importRatings(int $userId, string $importCsvPath) : void
     {
-        $csv = Reader::createFromPath($importCsvPath, 'r');
+        $csv = Reader::from($importCsvPath, 'r');
         $csv->setHeaderOffset(0);
 
         foreach ($csv->getRecords() as $record) {
@@ -87,9 +89,51 @@ class ImportService
         }
     }
 
+    public function importReviews(int $userId, string $importCsvPath) : void
+    {
+        $csv = Reader::from($importCsvPath, 'r');
+        $csv->setHeaderOffset(0);
+
+        foreach ($csv->getRecords() as $record) {
+            $requiredColumns = [
+                'title',
+                'tmdbId',
+                'imdbId',
+                'review',
+                'containsSpoilers',
+                'createdAt',
+                'updatedAt',
+            ];
+            if (array_diff($requiredColumns, array_keys($record)) !== []) {
+                throw new RuntimeException('Import csv is missing data');
+            }
+
+            $containsSpoilers = filter_var(
+                $record['containsSpoilers'],
+                FILTER_VALIDATE_BOOLEAN,
+                FILTER_NULL_ON_FAILURE,
+            );
+            if ($containsSpoilers === null) {
+                throw new RuntimeException('Import csv contains an invalid spoiler value');
+            }
+
+            $imdbId = $record['imdbId'] === '' ? null : (string)$record['imdbId'];
+            $movie = $this->findOrCreateMovie((int)$record['tmdbId'], (string)$record['title'], $imdbId);
+
+            $this->reviewApi->import(
+                $movie->getId(),
+                $userId,
+                (string)$record['review'],
+                $containsSpoilers,
+                DateTime::createFromString((string)$record['createdAt']),
+                $record['updatedAt'] === '' ? null : DateTime::createFromString((string)$record['updatedAt']),
+            );
+        }
+    }
+
     public function importWatchlist(int $userId, string $importCsvPath) : void
     {
-        $csv = Reader::createFromPath($importCsvPath, 'r');
+        $csv = Reader::from($importCsvPath, 'r');
         $csv->setHeaderOffset(0);
 
         foreach ($csv->getRecords() as $record) {

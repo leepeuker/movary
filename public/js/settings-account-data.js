@@ -57,6 +57,32 @@ document.getElementById('deleteRatingsButton').addEventListener('click', async (
     }
 });
 
+document.getElementById('deleteReviewsButton').addEventListener('click', async () => {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete reviews',
+        message: 'Are you sure you want to permanently delete your movie reviews? This action is not reversible!',
+        confirmLabel: 'Delete reviews',
+        confirmClass: 'btn-danger',
+    })
+
+    if (confirmed === false) {
+        return
+    }
+
+    const response = await deleteUserReviews();
+
+    switch (response.status) {
+        case 204:
+            addAlert('alertDeletionsDiv', 'Reviews deletion successful', 'success');
+            break;
+        case 400:
+            addAlert('alertDeletionsDiv', await response.text(), 'danger');
+            break;
+        default:
+            addAlert('alertDeletionsDiv', 'Unexpected server error', 'danger');
+    }
+});
+
 document.getElementById('deleteAccountButton').addEventListener('click', async () => {
     const confirmed = await showConfirmationModal({
         title: 'Delete account',
@@ -101,6 +127,12 @@ function deleteUserHistory() {
 
 function deleteUserRatings() {
     return fetchWithCsrf(APPLICATION_URL + '/settings/account/delete-ratings', {
+        method: 'DELETE',
+    })
+}
+
+function deleteUserReviews() {
+    return fetchWithCsrf(APPLICATION_URL + '/settings/account/delete-reviews', {
         method: 'DELETE',
     })
 }

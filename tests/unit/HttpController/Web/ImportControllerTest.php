@@ -118,6 +118,11 @@ class ImportControllerTest extends TestCase
             'importRatings',
             FlashMessage::IMPORT_RATINGS_SUCCESSFUL,
         ];
+        yield 'reviews' => [
+            'reviews',
+            'importReviews',
+            FlashMessage::IMPORT_REVIEWS_SUCCESSFUL,
+        ];
         yield 'watchlist' => [
             'watchlist',
             'importWatchlist',
@@ -137,6 +142,11 @@ class ImportControllerTest extends TestCase
             'ratings',
             'importRatings',
             FlashMessage::IMPORT_RATINGS_FAILED,
+        ];
+        yield 'reviews' => [
+            'reviews',
+            'importReviews',
+            FlashMessage::IMPORT_REVIEWS_FAILED,
         ];
         yield 'watchlist' => [
             'watchlist',
