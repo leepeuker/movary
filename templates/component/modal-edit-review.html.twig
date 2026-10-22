@@ -1,0 +1,28 @@
+<div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editReviewModalTitle">{{ selectedUserReview is null ? 'Write review' : 'Edit review' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label" for="movieReviewInput">Review</label>
+                <textarea class="form-control" id="movieReviewInput" rows="8" maxlength="10000" required>{{ selectedUserReview is null ? '' : selectedUserReview.review }}</textarea>
+                <div class="form-text">Plain text, up to 10,000 characters.</div>
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="movieReviewContainsSpoilers"{% if selectedUserReview is not null and selectedUserReview.containsSpoilers %} checked{% endif %}>
+                    <label class="form-check-label" for="movieReviewContainsSpoilers">Contains spoilers</label>
+                </div>
+                <div id="movieReviewAlert" class="mt-3"></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                {% if selectedUserReview is not null %}
+                    <button type="button" class="btn btn-danger" onclick="deleteMovieReview()">Delete review</button>
+                {% else %}
+                    <span></span>
+                {% endif %}
+                <button type="button" class="btn btn-primary" onclick="saveMovieReview()">Save review</button>
+            </div>
+        </div>
+    </div>
+</div>

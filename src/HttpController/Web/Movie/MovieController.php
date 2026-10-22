@@ -4,6 +4,7 @@ namespace Movary\HttpController\Web\Movie;
 
 use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
@@ -29,6 +30,7 @@ class MovieController
         private readonly CountryApi $countryApi,
         private readonly CurrentWebUser $currentWebUser,
         private readonly UserApi $userApi,
+        private readonly MovieReviewApi $movieReviewApi,
     ) {
     }
 
@@ -82,11 +84,26 @@ class MovieController
 
         $movie['personalRating'] = $this->movieApi->findUserRating($movieId, $userId)?->asInt();
 
+        $visibleReviews = $this->movieReviewApi->fetchVisibleForMovie($movieId, $currentUser?->getId());
+        $otherReviews = array_values(array_filter(
+            $visibleReviews,
+            static fn(array $review) : bool => $review['userId'] !== $userId,
+        ));
+
+        $users = $this->mergeVisibleReviewers(
+            $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor(
+                $movieId,
+            ),
+            $visibleReviews,
+        );
+
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/movie.html.twig', [
-                'users' => $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor($movieId),
+                'users' => $users,
                 'movie' => $movie,
+                'selectedUserReview' => $this->movieReviewApi->find($movieId, $userId),
+                'otherReviews' => $otherReviews,
                 'movieProductionCountries' => $this->movieApi->findProductionCountriesByMovieId($movieId),
                 'movieGenres' => $this->movieApi->findGenresByMovieId($movieId),
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),
@@ -101,5 +118,21 @@ class MovieController
                 'displayImdbRating' => $currentUser?->getDisplayImdbRating() ?? true,
             ]),
         );
+    }
+
+    private function mergeVisibleReviewers(array $users, array $visibleReviews) : array
+    {
+        $usernames = array_column($users, 'name');
+        foreach ($visibleReviews as $visibleReview) {
+            if (in_array($visibleReview['username'], $usernames, true) === true) {
+                continue;
+            }
+
+            $users[] = ['name' => $visibleReview['username']];
+            $usernames[] = $visibleReview['username'];
+        }
+        usort($users, static fn(array $left, array $right) : int => $left['name'] <=> $right['name']);
+
+        return $users;
     }
 }

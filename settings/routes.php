@@ -342,6 +342,14 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Movie\MovieRatingController::class,
         'updateRating'
     ], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/review', [
+        Web\Movie\MovieReviewController::class,
+        'save'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/review', [
+        Web\Movie\MovieReviewController::class,
+        'delete'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class]);

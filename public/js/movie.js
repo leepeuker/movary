@@ -587,6 +587,55 @@ function isTruncated(el) {
     return el.scrollWidth > el.clientWidth
 }
 
+async function saveMovieReview() {
+    const review = document.getElementById('movieReviewInput').value
+    const body = new URLSearchParams({review: review})
+    if (document.getElementById('movieReviewContainsSpoilers').checked === true) {
+        body.set('containsSpoilers', '1')
+    }
+
+    const response = await fetchWithCsrf(
+        APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/review',
+        {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: body.toString(),
+        },
+    )
+
+    if (response.status === 204) {
+        window.location.reload()
+        return
+    }
+
+    const message = response.status === 400 ? await response.text() : 'Could not save review.'
+    addAlert('movieReviewAlert', message, 'danger')
+}
+
+async function deleteMovieReview() {
+    const confirmed = await showConfirmationModal({
+        title: 'Delete review',
+        message: 'Are you sure you want to permanently delete this review?',
+        confirmLabel: 'Delete review',
+        confirmClass: 'btn-danger',
+    })
+    if (confirmed === false) {
+        return
+    }
+
+    const response = await fetchWithCsrf(
+        APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/review',
+        {method: 'DELETE'},
+    )
+
+    if (response.status === 204) {
+        window.location.reload()
+        return
+    }
+
+    addAlert('movieReviewAlert', 'Could not delete review.', 'danger')
+}
+
 const tooltipTriggerListCast = document.querySelectorAll('[data-bs-toggle="tooltip"].castMemberName, [data-bs-toggle="tooltip"].castCharacterName')
 const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
     if (isTruncated(tooltipTriggerEl) === false) {
