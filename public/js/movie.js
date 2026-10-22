@@ -69,7 +69,7 @@ function renderNextPosterBatch() {
         })
 
         const label = document.createElement('label')
-        label.className = 'btn btn-outline-primary p-1 w-100'
+        label.className = 'movie-poster-option'
         label.htmlFor = input.id
 
         const image = document.createElement('img')
