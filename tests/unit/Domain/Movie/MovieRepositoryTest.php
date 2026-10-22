@@ -428,4 +428,32 @@ class MovieRepositoryTest extends TestCase
 
         self::assertSame('千と千尋の神隠し', $movie->getOriginalTitle());
     }
+
+    public function testSetTmdbPosterPathOverrideAlsoClearsCachedPoster() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'movie',
+                ['tmdb_poster_path_override' => '/selected.jpg', 'poster_path' => null],
+                ['id' => 12],
+            );
+
+        $this->subject->setTmdbPosterPathOverride(12, '/selected.jpg');
+    }
+
+    public function testClearTmdbPosterPathOverrideAlsoClearsCachedPoster() : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'movie',
+                ['tmdb_poster_path_override' => null, 'poster_path' => null],
+                ['id' => 12],
+            );
+
+        $this->subject->clearTmdbPosterPathOverride(12);
+    }
 }
