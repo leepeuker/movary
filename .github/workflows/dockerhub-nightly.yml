@@ -69,6 +69,7 @@ jobs:
           context: .
           file: build/Dockerfile
           target: production
+          no-cache-filters: base
           push: true
           platforms: linux/amd64,linux/arm64
           provenance: mode=max
