@@ -1261,6 +1261,151 @@
         ]
       }
     },
+    "\/api\/v1\/users\/{username}\/movies\/{movaryId}\/review": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "operationId": "getUserMovieReview",
+        "summary": "Get the user's review of a movie",
+        "description": "Get the authenticated user's private review for the specified movie.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/username"
+          },
+          {
+            "$ref": "#/components/parameters/movaryId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/movieReview"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Reviews"
+        ],
+        "operationId": "saveUserMovieReview",
+        "summary": "Create or update the user's review of a movie",
+        "description": "Create or replace the authenticated user's review for the specified movie.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/username"
+          },
+          {
+            "$ref": "#/components/parameters/movaryId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/movieReviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Reviews"
+        ],
+        "operationId": "deleteUserMovieReview",
+        "summary": "Delete the user's review of a movie",
+        "description": "Delete the authenticated user's review for the specified movie. The operation succeeds when the movie exists but has no review.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/username"
+          },
+          {
+            "$ref": "#/components/parameters/movaryId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      }
+    },
     "\/api\/v1\/movies\/add": {
       "post": {
         "tags": [
@@ -1859,7 +2004,69 @@
     }
   },
   "components": {
+    "parameters": {
+      "username": {
+        "name": "username",
+        "in": "path",
+        "description": "Name of user",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "movaryId": {
+        "name": "movaryId",
+        "in": "path",
+        "description": "Movary movie id",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/id"
+        }
+      }
+    },
     "schemas": {
+      "movieReviewInput": {
+        "type": "object",
+        "required": [
+          "review"
+        ],
+        "properties": {
+          "review": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000,
+            "pattern": "\\S",
+            "example": "A thoughtful review of the movie."
+          },
+          "containsSpoilers": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "movieReview": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/movieReviewInput"
+          },
+          {
+            "type": "object",
+            "required": [
+              "containsSpoilers",
+              "createdAt",
+              "updatedAt"
+            ],
+            "properties": {
+              "createdAt": {
+                "$ref": "#/components/schemas/timestamp"
+              },
+              "updatedAt": {
+                "$ref": "#/components/schemas/timestampNullable"
+              }
+            }
+          }
+        ]
+      },
       "movie": {
         "type": "object",
         "properties": {

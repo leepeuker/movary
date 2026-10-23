@@ -20,5 +20,6 @@ class OpenApiTest extends HttpTestCase
         self::assertNotSame('', $schema['info']['version']);
         self::assertSame('/', $schema['servers'][0]['url']);
         self::assertArrayHasKey('/api/v1/users/{username}/history/movies', $schema['paths']);
+        self::assertArrayHasKey('/api/v1/users/{username}/movies/{movaryId}/review', $schema['paths']);
     }
 }
