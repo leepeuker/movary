@@ -17,7 +17,7 @@ Before selecting **Add play**, you can:
 
 - change the watch date;
 - assign a rating from 1 to 10;
-- add a viewing note;
+- add a comment;
 - select a [location](locations.md), when locations are enabled;
 - choose whether to post the activity to Mastodon, when that integration is enabled.
 
@@ -40,7 +40,7 @@ Scrobbled plays appear in **History** alongside plays added manually. Some integ
 
 Open the navigation menu and select **History**. You can search the history and switch between poster and table views. Select a movie to open its detail page.
 
-On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date, viewing note, or location. **Advanced mode** also lets you change the number of plays recorded for that date and their ordering position.
+On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date, comment, or location. **Advanced mode** also lets you change the number of plays recorded for that date and their ordering position.
 
 Select **Delete** in the edit dialog to permanently remove that history entry. This does not remove the movie's personal rating or add it back to the watchlist.
 
@@ -54,7 +54,7 @@ Personal ratings are distinct from the public TMDB and IMDb ratings that may als
 
 ## Write reviews
 
-A review is your current written opinion of a movie. It is separate from viewing notes, history, and ratings, so you can review a movie without recording a play or assigning a rating.
+A review is your current written opinion of a movie. It is separate from comments, history, and ratings, so you can review a movie without recording a play or assigning a rating.
 
 Open the movie in your own user context and select **Add review**. Reviews are plain text and can contain up to 10,000 characters. Select **Contains spoilers** when appropriate. You can edit or delete your review from the same movie page.
 
