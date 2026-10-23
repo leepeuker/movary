@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\User\Service\CurrentWebUser;
+use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use Movary\ValueObject\Http\Response;
 use Movary\ValueObject\Http\StatusCode;
@@ -17,6 +18,18 @@ class MovieReviewController
         private readonly MovieApi $movieApi,
         private readonly CurrentWebUser $currentWebUser,
     ) {
+    }
+
+    public function fetchByTmdbId(Request $request) : Response
+    {
+        $currentUser = $this->currentWebUser->requireUser();
+        $movie = $this->movieApi->findByTmdbId((int)$request->getGetParameters()['tmdbId']);
+        $review = $movie === null ? null : $this->reviewApi->find($movie->getId(), $currentUser->getId());
+
+        return Response::createJson(Json::encode([
+            'review' => $review?->getReview(),
+            'containsSpoilers' => $review?->containsSpoilers() ?? false,
+        ]));
     }
 
     public function delete(Request $request) : Response

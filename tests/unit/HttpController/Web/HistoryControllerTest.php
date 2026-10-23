@@ -5,6 +5,8 @@ namespace Tests\Unit\Movary\HttpController\Web;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\MovieEntity;
+use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
@@ -36,6 +38,8 @@ class HistoryControllerTest extends TestCase
 
     private MovieApi&MockObject $movieApiMock;
 
+    private MovieReviewApi&MockObject $movieReviewApiMock;
+
     private HistoryController $subject;
 
     private UserApi&MockObject $userApiMock;
@@ -45,6 +49,7 @@ class HistoryControllerTest extends TestCase
         $this->authenticationMock = $this->createMock(Authentication::class);
         $this->movieHistoryEditorMock = $this->createMock(MovieHistoryEditor::class);
         $this->movieApiMock = $this->createMock(MovieApi::class);
+        $this->movieReviewApiMock = $this->createMock(MovieReviewApi::class);
         $this->userApiMock = $this->createMock(UserApi::class);
 
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(12, CredentialType::WEB_SESSION));
@@ -60,6 +65,7 @@ class HistoryControllerTest extends TestCase
             $this->createMock(MovieHistoryApi::class),
             $this->movieHistoryEditorMock,
             $this->movieApiMock,
+            $this->movieReviewApiMock,
             $this->userApiMock,
             $this->createMock(SyncMovie::class),
             $this->authenticationMock,
@@ -104,6 +110,30 @@ class HistoryControllerTest extends TestCase
         ]));
 
         self::assertEquals(StatusCode::createNoContent(), $response->getStatusCode());
+    }
+
+    public function testLogMovieSavesChangedReview() : void
+    {
+        $movie = $this->createStub(MovieEntity::class);
+        $movie->method('getId')->willReturn(56);
+        $this->movieApiMock->expects(self::once())->method('findByTmdbId')->with(78)->willReturn($movie);
+        $this->movieReviewApiMock
+            ->expects(self::once())
+            ->method('save')
+            ->with(56, 12, 'A review.', true);
+
+        $response = $this->subject->logMovie($this->createRequest([
+            'tmdbId' => 78,
+            'watchDate' => '',
+            'dateFormat' => 'Y-m-d',
+            'personalRating' => 0,
+            'comment' => '',
+            'locationId' => '',
+            'review' => 'A review.',
+            'reviewContainsSpoilers' => true,
+        ]));
+
+        self::assertEquals(StatusCode::createOk(), $response->getStatusCode());
     }
 
     private function createRequest(array $body) : Request&MockObject

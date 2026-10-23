@@ -5,9 +5,11 @@ namespace Tests\Unit\Movary\HttpController\Web\Movie;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\Movie\Review\MovieReviewApi;
+use Movary\Domain\Movie\Review\MovieReviewEntity;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Web\Movie\MovieReviewController;
+use Movary\Util\Json;
 use Movary\ValueObject\Http\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -45,6 +47,42 @@ class MovieReviewControllerTest extends TestCase
         $response = $this->subject->save($this->createRequest('bob', 12, ['review' => 'A review.']));
 
         self::assertSame(403, $response->getStatusCode()->getCode());
+    }
+
+    public function testFetchByTmdbIdReturnsCurrentUsersReview() : void
+    {
+        $movie = $this->createStub(MovieEntity::class);
+        $movie->method('getId')->willReturn(12);
+        $review = $this->createStub(MovieReviewEntity::class);
+        $review->method('getReview')->willReturn('A review.');
+        $review->method('containsSpoilers')->willReturn(true);
+        $this->movieApi->expects(self::once())->method('findByTmdbId')->with(45)->willReturn($movie);
+        $this->reviewApi->expects(self::once())->method('find')->with(12, 34)->willReturn($review);
+
+        $response = $this->subject->fetchByTmdbId($this->createTmdbRequest(45));
+        $responseBody = $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode()->getCode());
+        self::assertIsString($responseBody);
+        self::assertSame(
+            ['review' => 'A review.', 'containsSpoilers' => true],
+            Json::decode($responseBody),
+        );
+    }
+
+    public function testFetchByTmdbIdReturnsEmptyReviewForUnknownMovie() : void
+    {
+        $this->movieApi->expects(self::once())->method('findByTmdbId')->with(45)->willReturn(null);
+        $this->reviewApi->expects(self::never())->method('find');
+
+        $response = $this->subject->fetchByTmdbId($this->createTmdbRequest(45));
+        $responseBody = $response->getBody();
+
+        self::assertIsString($responseBody);
+        self::assertSame(
+            ['review' => null, 'containsSpoilers' => false],
+            Json::decode($responseBody),
+        );
     }
 
     public function testSaveReturnsNotFoundForMissingMovie() : void
@@ -111,6 +149,14 @@ class MovieReviewControllerTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->method('getRouteParameters')->willReturn(['username' => $username, 'id' => (string)$movieId]);
         $request->method('getPostParameters')->willReturn($postParameters);
+
+        return $request;
+    }
+
+    private function createTmdbRequest(int $tmdbId) : Request&MockObject
+    {
+        $request = $this->createMock(Request::class);
+        $request->method('getGetParameters')->willReturn(['tmdbId' => (string)$tmdbId]);
 
         return $request;
     }

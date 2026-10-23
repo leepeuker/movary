@@ -193,18 +193,24 @@ function toggleWatchDateAdvancedMode() {
 
 function disableWatchDateAdvancedMode() {
     const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
-    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
 
-    advancedWatchDateModeButton.innerHTML = 'Advanced mode'
     advancedWatchDateDetails.classList.add('d-none')
+    updateWatchDateAdvancedModeButton('Advanced mode', false)
 }
 
 function enableWatchDateAdvancedMode() {
     const advancedWatchDateDetails = document.getElementById('advancedWatchDateDetails');
-    const advancedWatchDateModeButton = document.getElementById('advancedWatchDateModeButton');
 
     advancedWatchDateDetails.classList.remove('d-none')
-    advancedWatchDateModeButton.innerHTML = 'Simple mode'
+    updateWatchDateAdvancedModeButton('Simple mode', true)
+}
+
+function updateWatchDateAdvancedModeButton(label, active) {
+    const button = document.getElementById('advancedWatchDateModeButton')
+    button.setAttribute('data-bs-title', label)
+    button.setAttribute('aria-label', label)
+    button.classList.toggle('active', active)
+    bootstrap.Tooltip.getOrCreateInstance(button).setContent({'.tooltip-inner': label})
 }
 
 function getMovieId() {
@@ -275,6 +281,7 @@ async function loadWatchDateModal(watchDateListElement) {
 
     await loadLocationOptions()
     document.getElementById('editWatchDateModalLocationInput').value = watchDateListElement.dataset.location;
+    updateLocationSelectPlaceholderStyle(document.getElementById('editWatchDateModalLocationInput'))
 
     modal.show()
 }
@@ -297,6 +304,8 @@ async function loadLocationOptions() {
 
     const optionElement = document.createElement('option');
     optionElement.value = '';
+    optionElement.textContent = 'Location';
+    optionElement.classList.add('text-body-secondary');
     optionElement.selected = true;
     fragment.appendChild(optionElement);
 
@@ -660,5 +669,5 @@ const tooltipCastList = [...tooltipTriggerListCast].map(tooltipTriggerEl => {
     new bootstrap.Tooltip(tooltipTriggerEl, {'placement': placement})
 })
 
-const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1, [data-bs-toggle="tooltip"].directorName, [data-bs-toggle="tooltip"]#bookmarkIcon')
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]#editWatchDateModalPlays, [data-bs-toggle="tooltip"]#editWatchDateModalPlaysInput1, [data-bs-toggle="tooltip"].editWatchDateInputIcon, [data-bs-toggle="tooltip"].directorName, [data-bs-toggle="tooltip"]#bookmarkIcon')
 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))

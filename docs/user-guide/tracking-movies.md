@@ -17,9 +17,11 @@ Before selecting **Add play**, you can:
 
 - change the watch date;
 - assign a rating from 1 to 10;
-- add a comment;
+- write or update the movie review;
 - select a [location](locations.md), when locations are enabled;
 - choose whether to post the activity to Mastodon, when that integration is enabled.
+
+**Advanced mode** lets you add a comment that belongs only to this play.
 
 The new play appears in **History**. Adding the same movie again with the same watch date increases the play count for that date instead of creating a separate entry.
 
@@ -40,7 +42,7 @@ Scrobbled plays appear in **History** alongside plays added manually. Some integ
 
 Open the navigation menu and select **History**. You can search the history and switch between poster and table views. Select a movie to open its detail page.
 
-On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date, comment, or location. **Advanced mode** also lets you change the number of plays recorded for that date and their ordering position.
+On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date or location. **Advanced mode** also lets you change the comment for that play, the number of plays recorded for that date, and their ordering position.
 
 Select **Delete** in the edit dialog to permanently remove that history entry. This does not remove the movie's personal rating or add it back to the watchlist.
 
