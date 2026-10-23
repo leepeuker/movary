@@ -22,8 +22,9 @@ The privacy check applies to pages below `/users/<username>/`, including:
 - History and watchlist pages.
 - Movie, actor, and director lists.
 - Movie and person detail pages shown in your user context.
+- Your movie reviews.
 
-It also applies when the API reads a user's history, watchlist, or played movies. API operations that change data still require a personal token belonging to that user.
+It also applies when the API reads a user's history, watchlist, played movies, or movie reviews. API operations that change data still require a personal token belonging to that user.
 
 Privacy changes who can view the data; it does not delete or transfer ownership of anything. Use [Personal data](personal-data.md) when you want to export or permanently delete your information.
 

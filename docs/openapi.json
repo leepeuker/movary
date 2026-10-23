@@ -1268,7 +1268,7 @@
         ],
         "operationId": "getUserMovieReview",
         "summary": "Get the user's review of a movie",
-        "description": "Get the authenticated user's private review for the specified movie.",
+        "description": "Get the specified user's review when their privacy setting permits access.",
         "parameters": [
           {
             "$ref": "#/components/parameters/username"

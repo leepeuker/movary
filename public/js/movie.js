@@ -602,6 +602,43 @@ function refreshWhereToWatchModal() {
 }
 //endregion whereToWatchModal
 
+function showMovieReview() {
+    document.getElementById('movieReviewSpoilerWarning').classList.add('d-none')
+    document.getElementById('movieReviewText').classList.remove('d-none')
+}
+
+function editMovieReview() {
+    document.getElementById('reviewModalTitle').textContent = 'Edit review'
+    document.getElementById('movieReviewView').classList.add('d-none')
+    document.getElementById('movieReviewEdit').classList.remove('d-none')
+}
+
+function cancelMovieReviewEdit() {
+    const reviewInput = document.getElementById('movieReviewInput')
+    const containsSpoilersInput = document.getElementById('movieReviewContainsSpoilers')
+
+    reviewInput.value = reviewInput.dataset.originalReview
+    containsSpoilersInput.checked = containsSpoilersInput.dataset.originalValue === '1'
+    removeAlert('movieReviewAlert')
+
+    document.getElementById('reviewModalTitle').textContent = 'Review'
+    document.getElementById('movieReviewEdit').classList.add('d-none')
+    document.getElementById('movieReviewView').classList.remove('d-none')
+}
+
+const movieReviewModal = document.getElementById('reviewModal')
+movieReviewModal?.addEventListener('hidden.bs.modal', () => {
+    const spoilerWarning = document.getElementById('movieReviewSpoilerWarning')
+    if (spoilerWarning !== null) {
+        spoilerWarning.classList.remove('d-none')
+        document.getElementById('movieReviewText').classList.add('d-none')
+    }
+
+    if (document.getElementById('movieReviewEdit') !== null && document.getElementById('movieReviewView') !== null) {
+        cancelMovieReviewEdit()
+    }
+})
+
 function isTruncated(el) {
     return el.scrollWidth > el.clientWidth
 }

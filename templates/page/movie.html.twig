@@ -187,15 +187,25 @@
                             onclick="showLogPlayModalWithSpecificMovie({{ movie.tmdbId }}, {{ movie.title|movie_title(movie.originalTitle)|json_encode() }}, {{ movie.releaseDate|date("Y") }})">Add play
                     </button>
                 </div>
+            </div>
+        {% endif %}
+
+        {% if currentUserName == routeUsername or selectedUserReview is not null %}
+            <div class="container">
                 <div class="row mb-2">
                     <button type="button"
                             class="col-lg-5 col-xl-4 col-xxl-3 btn {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
                             id="reviewButton"
                             data-bs-toggle="modal"
-                            data-bs-target="#editReviewModal">
-                        {{ selectedUserReview is null ? 'Add review' : 'Edit review' }}
+                            data-bs-target="#reviewModal">
+                        {{ selectedUserReview is null ? 'Add review' : 'Review' }}
                     </button>
                 </div>
+            </div>
+        {% endif %}
+
+        {% if currentUserName == routeUsername %}
+            <div class="container">
                 <div class="row mb-2">
                     <button
                         type="button"
@@ -221,12 +231,15 @@
 
             {{ include('component/modal-where-to-watch.html.twig') }}
             {{ include('component/modal-edit-rating.html.twig') }}
-            {{ include('component/modal-edit-review.html.twig') }}
             {{ include('component/modal-edit-watch-date.html.twig') }}
             {{ include('component/modal-more-options.html.twig') }}
             {% if currentUserIsAdmin == true %}
                 {{ include('component/modal-change-movie-poster.html.twig') }}
             {% endif %}
+        {% endif %}
+
+        {% if currentUserName == routeUsername or selectedUserReview is not null %}
+            {{ include('component/modal-review.html.twig') }}
         {% endif %}
 
         {# --- Tagline --- #}

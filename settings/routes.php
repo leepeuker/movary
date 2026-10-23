@@ -384,7 +384,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('PUT', $routeUserPlayed, [Api\PlayedController::class, 'updatePlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
     $routeUserMovieReview = '/users/{username:[a-zA-Z0-9]+}/movies/{movaryId:[0-9]+}/review';
-    $routes->add('GET', $routeUserMovieReview, [Api\MovieReviewController::class, 'getReview'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('GET', $routeUserMovieReview, [Api\MovieReviewController::class, 'getReview'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('PUT', $routeUserMovieReview, [Api\MovieReviewController::class, 'saveReview'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('DELETE', $routeUserMovieReview, [Api\MovieReviewController::class, 'deleteReview'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 

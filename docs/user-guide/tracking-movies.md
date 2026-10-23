@@ -58,7 +58,9 @@ Personal ratings are distinct from the public TMDB and IMDb ratings that may als
 
 A review is your current written opinion of a movie. It is separate from comments, history, and ratings, so you can review a movie without recording a play or assigning a rating.
 
-Open the movie in your own user context and select **Add review**. Reviews are plain text and can contain up to 10,000 characters. Select **Contains spoilers** when appropriate. You can edit or delete your review from the same movie page.
+Open the movie in your own user context and select **Add review**. Reviews are plain text and can contain up to 10,000 characters. Select **Contains spoilers** when appropriate.
+
+When a review exists, anyone permitted by the review owner's [privacy setting](privacy-and-sharing.md) can select **Review** on the movie page to read it. Reviews marked as spoilers remain hidden until the viewer chooses to reveal them. When viewing your own review, select **Edit** to change or delete it.
 
 ## Manage the watchlist
 
