@@ -2,9 +2,11 @@
 
 namespace Movary\HttpController\Web;
 
+use InvalidArgumentException;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
@@ -30,6 +32,7 @@ class HistoryController
         private readonly MovieHistoryApi $movieHistoryApi,
         private readonly MovieHistoryEditor $movieHistoryEditor,
         private readonly MovieApi $movieApi,
+        private readonly MovieReviewApi $movieReviewApi,
         private readonly UserApi $userApi,
         private readonly SyncMovie $tmdbMovieSyncService,
         private readonly Authentication $authenticationService,
@@ -127,6 +130,19 @@ class HistoryController
 
         if ($movie === null) {
             $movie = $this->tmdbMovieSyncService->syncMovie($tmdbId);
+        }
+
+        if (isset($requestData['review']) === true && is_string($requestData['review']) === true) {
+            try {
+                $this->movieReviewApi->save(
+                    $movie->getId(),
+                    $userId,
+                    $requestData['review'],
+                    (bool)($requestData['reviewContainsSpoilers'] ?? false),
+                );
+            } catch (InvalidArgumentException $exception) {
+                return Response::createBadRequest($exception->getMessage());
+            }
         }
 
         $this->movieApi->updateUserRating($movie->getId(), $userId, $personalRating);

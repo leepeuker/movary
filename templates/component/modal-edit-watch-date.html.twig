@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="watchDateModalTitle">Edit Watch Date</h5>
+                <h5 class="modal-title" id="watchDateModalTitle">Edit Play</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="padding-bottom: 0">
@@ -10,10 +10,10 @@
                 <input type="hidden" value="" name="tmdbId" id="originalWatchDate" required>
                 <input type="hidden" value="" name="tmdbId" id="originalWatchDatePlays" required>
                 <div class="input-group" id="watchDateGroup">
-                    <i class="bi bi-calendar-date input-group-text"></i>
+                    <i class="bi bi-calendar-date input-group-text editWatchDateInputIcon" data-bs-toggle="tooltip" data-bs-title="Watch date" aria-label="Watch date"></i>
                     <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" id="editWatchDateModalInput" required
                            onfocusout="validateWatchDate(this.value)">
-                    <button class="btn btn-primary rounded-end" onclick="document.getElementById('editWatchDateModalInput').value = null"><i class="bi bi-x-lg"></i></button>
+                    <button class="btn btn-outline-secondary rounded-end editWatchDateInputIcon" onclick="document.getElementById('editWatchDateModalInput').value = null" data-bs-toggle="tooltip" data-bs-title="Clear watch date" aria-label="Clear watch date"><i class="bi bi-x-lg text-body"></i></button>
                     <div class="invalid-feedback" id="watchDateValidationRequiredErrorMessage" style="padding-bottom: 0;margin-bottom: 0">
                         Watch date is required!
                     </div>
@@ -21,14 +21,10 @@
                         Watch date format is invalid!
                     </div>
                 </div>
-                <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
-                    <i class="input-group-text"><i class="bi bi-chat-square-text"></i></i>
-                    <textarea class="form-control" rows="1" aria-label="Comment" id="editWatchDateModalCommentInput"></textarea>
-                </div>
                 <div class="input-group {% if currentUserLocationsEnabled == false %}d-none{% endif %}" style="margin-top: 1rem;margin-bottom: 1rem">
-                    <i class="input-group-text"><i class="bi bi-pin-map-fill"></i></i>
+                    <i class="input-group-text editWatchDateInputIcon" data-bs-toggle="tooltip" data-bs-title="Location" aria-label="Location"><i class="bi bi-pin-map-fill"></i></i>
                     <select class="form-select"  id="editWatchDateModalLocationInput" aria-describedby="location"></select>
-                    <a class="btn btn-outline-secondary rounded-end" href="{{ applicationUrl }}/settings/account/locations"><i class="bi bi-gear"></i></a>
+                    <a class="btn btn-outline-secondary rounded-end editWatchDateInputIcon" href="{{ applicationUrl }}/settings/account/locations" data-bs-toggle="tooltip" data-bs-title="Manage locations" aria-label="Manage locations"><i class="bi bi-gear text-body"></i></a>
                 </div>
                 <div class="mb-3 {% if currentUserMastodonEnabled == false %}d-none{% endif %}" style="margin-top: 0.5rem;">
                     <input
@@ -40,6 +36,10 @@
                     <label for="editWatchDateModalPostToMastodonInput" class="form-check-label">Post to Mastodon</label>
                 </div>
                 <div id="advancedWatchDateDetails" class="d-none">
+                    <div class="input-group" style="margin-top: 1rem">
+                        <span class="input-group-text">Comment</span>
+                        <textarea class="form-control" rows="1" aria-label="Comment" id="editWatchDateModalCommentInput"></textarea>
+                    </div>
                     <div class="input-group" style="margin-top: 1rem">
                         <i class="input-group-text">Plays</i>
                         <input type="number" class="form-control" aria-label="Plays" id="editWatchDateModalPlaysInput" min="1" required>
@@ -58,7 +58,7 @@
                 <div id="alertMovieModalDiv"></div>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="submit" class="btn btn-outline-primary float-start" onclick="toggleWatchDateAdvancedMode()" id="advancedWatchDateModeButton">Advanced mode</button>
+                <button type="button" class="btn btn-outline-primary float-start editWatchDateInputIcon" onclick="toggleWatchDateAdvancedMode()" id="advancedWatchDateModeButton" data-bs-toggle="tooltip" data-bs-title="Advanced mode" aria-label="Advanced mode"><i class="bi bi-sliders"></i></button>
                 <div class="float-end">
                     <button type="submit" class="btn btn-danger" onclick="deleteWatchDate()">Delete</button>
                     <button type="submit" class="btn btn-primary" onclick="editWatchDate()">Update</button>

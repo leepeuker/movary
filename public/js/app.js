@@ -102,6 +102,10 @@ document.addEventListener('DOMContentLoaded', function () {
             title: 'Watch date',
         })
 
+        document.querySelectorAll('#logPlayModal [data-bs-toggle="tooltip"]').forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
         document.getElementById('logPlayModal').addEventListener('show.bs.modal', function () {
             document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
             document.getElementById("openedFromMoviePage").setAttribute("value", "")
@@ -111,12 +115,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         loadLogPlayModalLocationOptions()
 
+        document.getElementById('logPlayModalLocationInput').addEventListener('change', function () {
+            updateLocationSelectPlaceholderStyle(this)
+        })
+
         document.getElementById('logPlayModal').addEventListener('hidden.bs.modal', function () {
             setLogPlayModalSearchSpinner(false)
             logPlayModalSearchInput.value = ''
             resetLogModalLogInputs()
             resetLogModalSearchResults()
             backToLogModalSearchResults()
+        })
+    }
+
+    const editPlayLocationInput = document.getElementById('editWatchDateModalLocationInput')
+    if (editPlayLocationInput !== null) {
+        editPlayLocationInput.addEventListener('change', function () {
+            updateLocationSelectPlaceholderStyle(this)
         })
     }
 });
@@ -160,6 +175,7 @@ function setTheme(theme, force = false) {
 function updateHtmlThemeColors(mainColor, secondaryColor) {
     const toggleWatchDatesButton = document.getElementById('toggleWatchDatesButton');
     const logSpecificMovieButton = document.getElementById('logSpecificMovieButton');
+    const reviewButton = document.getElementById('reviewButton');
     const watchlistButton = document.getElementById('watchlistButton');
     const moreSpecificMovieButton = document.getElementById('moreSpecificMovieButton');
     if (logSpecificMovieButton != null && moreSpecificMovieButton != null && toggleWatchDatesButton != null) {
@@ -167,6 +183,8 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
         toggleWatchDatesButton.classList.remove('btn-' + mainColor)
         logSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
         logSpecificMovieButton.classList.remove('btn-outline-' + mainColor)
+        reviewButton.classList.add('btn-outline-' + secondaryColor)
+        reviewButton.classList.remove('btn-outline-' + mainColor)
         watchlistButton.classList.add('btn-outline-' + secondaryColor)
         watchlistButton.classList.remove('btn-outline-' + mainColor)
         moreSpecificMovieButton.classList.add('btn-outline-' + secondaryColor)
@@ -197,6 +215,10 @@ function updateHtmlThemeColors(mainColor, secondaryColor) {
         elementWithThemeTextClass.classList.add('text-' + secondaryColor)
         elementWithThemeTextClass.classList.remove('text-' + mainColor)
     });
+}
+
+function updateLocationSelectPlaceholderStyle(selectElement) {
+    selectElement.classList.toggle('text-body-secondary', selectElement.value === '')
 }
 
 async function searchTmdbWithLogModalSearchInput() {
@@ -411,6 +433,9 @@ function backToLogModalSearchResults() {
     removeAlert('logPlayModalAlert')
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
+    setLogPlayModalReview({review: null, containsSpoilers: false})
+    disableLogPlayAdvancedMode()
+    document.getElementById('advancedLogPlayModeButton').classList.add('d-none')
     setRatingStars('logPlayModal', 0)
 }
 
@@ -439,8 +464,12 @@ async function selectLogModalTmdbItemForLogging(event) {
         "href", "https://www.themoviedb.org/movie/" + item.dataset.tmdbId
     )
 
-    const rating = await fetchRating(item.dataset.tmdbId)
+    const [rating, review] = await Promise.all([
+        fetchRating(item.dataset.tmdbId),
+        fetchReview(item.dataset.tmdbId),
+    ])
     setRatingStars('logPlayModal', rating)
+    setLogPlayModalReview(review)
 
     document.getElementById('logPlayModalWatchDateDiv').classList.remove('d-none')
     document.getElementById('logPlayModalFooterTMDBLink').classList.remove('d-none')
@@ -449,6 +478,7 @@ async function selectLogModalTmdbItemForLogging(event) {
     document.getElementById('logPlayModalSearchDiv').classList.add('d-none')
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
+    document.getElementById('advancedLogPlayModeButton').classList.remove('d-none')
 }
 
 function updateLogPlayModalButtonState() {
@@ -472,7 +502,39 @@ function resetLogModalLogInputs() {
     document.getElementById('logPlayModalTmdbIdInput').value = ''
     document.getElementById('logPlayModalWatchDateInput').value = getCurrentDate()
     document.getElementById('logPlayModalCommentInput').value = ''
+    setLogPlayModalReview({review: null, containsSpoilers: false})
+    disableLogPlayAdvancedMode()
     removeAlert('logPlayModalAlert')
+}
+
+function toggleLogPlayAdvancedMode() {
+    if (document.getElementById('advancedLogPlayDetails').classList.contains('d-none')) {
+        document.getElementById('advancedLogPlayDetails').classList.remove('d-none')
+        updateLogPlayAdvancedModeButton('Simple mode', true)
+        return
+    }
+
+    disableLogPlayAdvancedMode()
+}
+
+function disableLogPlayAdvancedMode() {
+    document.getElementById('advancedLogPlayDetails').classList.add('d-none')
+    updateLogPlayAdvancedModeButton('Advanced mode', false)
+}
+
+function updateLogPlayAdvancedModeButton(label, active) {
+    const button = document.getElementById('advancedLogPlayModeButton')
+    button.setAttribute('data-bs-title', label)
+    button.setAttribute('aria-label', label)
+    button.classList.toggle('active', active)
+    bootstrap.Tooltip.getOrCreateInstance(button).setContent({'.tooltip-inner': label})
+}
+
+function setLogPlayModalReview(reviewData) {
+    const review = reviewData.review ?? ''
+    document.getElementById('logPlayModalReviewInput').value = review
+    document.getElementById('logPlayModalOriginalReview').value = review
+    document.getElementById('logPlayModalReviewContainsSpoilers').value = reviewData.containsSpoilers === true ? '1' : '0'
 }
 
 function addToWatchlist(context) {
@@ -500,7 +562,7 @@ function addToWatchlist(context) {
     })
 }
 
-function logMovie(context) {
+async function logMovie(context) {
     const rating = getRatingFromStars(context)
     const tmdbId = document.getElementById(context + 'TmdbIdInput').value
     const watchDate = document.getElementById(context + 'WatchDateInput').value
@@ -508,6 +570,8 @@ function logMovie(context) {
     const locationId = document.getElementById(context + 'LocationInput').value
     const postToMastodon = document.getElementById('postToMastodon').checked
     const dateFormatPhp = document.getElementById('dateFormatPhp').value
+    const review = document.getElementById('logPlayModalReviewInput').value
+    const originalReview = document.getElementById('logPlayModalOriginalReview').value
 
     removeAlert('logPlayModalAlert')
 
@@ -515,35 +579,50 @@ function logMovie(context) {
         return
     }
 
-    fetchWithCsrf(APPLICATION_URL + '/log-movie', {
-        method: 'post', headers: {
+    if (review !== originalReview && review.trim() === '') {
+        addAlert('logPlayModalAlert', 'A movie review must not be empty.', 'danger')
+        return
+    }
+
+    const requestData = {
+        'tmdbId': tmdbId,
+        'watchDate': watchDate,
+        'comment': comment,
+        'dateFormat': dateFormatPhp,
+        'personalRating': rating,
+        'locationId': locationId,
+        'postToMastodon': postToMastodon,
+    }
+    if (review !== originalReview) {
+        requestData.review = review
+        requestData.reviewContainsSpoilers = document.getElementById('logPlayModalReviewContainsSpoilers').value === '1'
+    }
+
+    let response
+    try {
+        response = await fetchWithCsrf(APPLICATION_URL + '/log-movie', {
+            method: 'post', headers: {
             'Content-type': 'application/json',
-        }, body: JSON.stringify({
-            'tmdbId': tmdbId,
-            'watchDate': watchDate,
-            'comment': comment,
-            'dateFormat': dateFormatPhp,
-            'personalRating': rating,
-            'locationId': locationId,
-            'postToMastodon': postToMastodon,
+            }, body: JSON.stringify(requestData)
         })
-    }).then(function (response) {
-        if (response.status === 200) {
-            // do not redirect to /history/ page if play logged from /movies/<id> page
-            if (document.getElementById("openedFromMoviePage").getAttribute("value") == "1") {
-                window.location.reload()
-            }else {
-                window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/history"
-            }
-
-            return
-        }
-
-        addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
-    }).catch(function (error) {
+    } catch (error) {
         console.log(error)
         addAlert('logPlayModalAlert', 'Could not add play. Please try again.', 'danger')
-    })
+        return
+    }
+
+    if (response.status !== 200) {
+        const message = response.status === 400 ? await response.text() : 'Could not add play. Please try again.'
+        addAlert('logPlayModalAlert', message, 'danger')
+        return
+    }
+
+    // do not redirect to /history/ page if play logged from /movies/<id> page
+    if (document.getElementById("openedFromMoviePage").getAttribute("value") == "1") {
+        window.location.reload()
+    }else {
+        window.location = APPLICATION_URL + "/users/" + document.getElementById('currentUserName').value + "/history"
+    }
 }
 
 async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear) {
@@ -551,8 +630,12 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
         keyboard: false
     });
 
-    const rating = await fetchRating(tmdbId)
+    const [rating, review] = await Promise.all([
+        fetchRating(tmdbId),
+        fetchReview(tmdbId),
+    ])
     setRatingStars('logPlayModal', rating)
+    setLogPlayModalReview(review)
 
     document.getElementById('logPlayModalTmdbIdInput').value = tmdbId
     document.getElementById('logPlayModalTitle').textContent = movieTitle + ' (' + releaseYear + ')'
@@ -564,6 +647,7 @@ async function showLogPlayModalWithSpecificMovie(tmdbId, movieTitle, releaseYear
     document.getElementById('logPlayModalFooterTMDBLink').classList.add('d-none')
     document.getElementById('logPlayModalFooterBackButton').classList.add('d-none')
     document.getElementById('logPlayModalFooterWatchlistButton').classList.add('d-none')
+    document.getElementById('advancedLogPlayModeButton').classList.remove('d-none')
 
     myModal.show()
 
@@ -674,6 +758,16 @@ async function fetchRating(tmdbId) {
     const data = await response.json()
 
     return data.personalRating
+}
+
+async function fetchReview(tmdbId) {
+    const response = await fetch(APPLICATION_URL + '/fetchMovieReviewByTmdbId?tmdbId=' + tmdbId)
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return await response.json()
 }
 
 function setRatingStars(context, newRating) {
@@ -876,6 +970,8 @@ async function loadLogPlayModalLocationOptions() {
 
     const optionElement = document.createElement('option');
     optionElement.value = '';
+    optionElement.textContent = 'Location';
+    optionElement.classList.add('text-body-secondary');
     optionElement.selected = true;
     fragment.appendChild(optionElement);
 
@@ -888,4 +984,5 @@ async function loadLogPlayModalLocationOptions() {
     });
 
     selectElement.appendChild(fragment)
+    updateLocationSelectPlaceholderStyle(selectElement)
 }

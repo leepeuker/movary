@@ -37,6 +37,7 @@ class ImportController
             match ($exportType) {
                 'history' => $this->importHistory($userId, $fileParameters),
                 'ratings' => $this->importRatings($userId, $fileParameters),
+                'reviews' => $this->importReviews($userId, $fileParameters),
                 'watchlist' => $this->importWatchlist($userId, $fileParameters),
                 default => throw new RuntimeException('Export type not handled: ' . $exportType)
             };
@@ -80,6 +81,17 @@ class ImportController
         $this->flashMessageService->add(FlashMessage::IMPORT_RATINGS_SUCCESSFUL);
     }
 
+    private function importReviews(int $userId, array $fileParameter) : void
+    {
+        if (empty($fileParameter['reviews']['tmp_name']) === true) {
+            throw new RuntimeException('Import csv file missing');
+        }
+
+        $this->importService->importReviews($userId, $fileParameter['reviews']['tmp_name']);
+
+        $this->flashMessageService->add(FlashMessage::IMPORT_REVIEWS_SUCCESSFUL);
+    }
+
     private function importWatchlist(int $userId, array $fileParameter) : void
     {
         if (empty($fileParameter['watchlist']['tmp_name']) === true) {
@@ -96,6 +108,7 @@ class ImportController
         return match ($exportType) {
             'history' => FlashMessage::IMPORT_HISTORY_FAILED,
             'ratings' => FlashMessage::IMPORT_RATINGS_FAILED,
+            'reviews' => FlashMessage::IMPORT_REVIEWS_FAILED,
             'watchlist' => FlashMessage::IMPORT_WATCHLIST_FAILED,
             default => null,
         };

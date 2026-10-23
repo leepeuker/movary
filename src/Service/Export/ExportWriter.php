@@ -38,6 +38,31 @@ class ExportWriter
     }
 
     /** @param resource $fileHandle */
+    public function writeReviewToCsv($fileHandle, array $review) : void
+    {
+        $lengthOfWrittenString = fputcsv(
+            $fileHandle,
+            [
+                $review['title'],
+                $this->convertReleaseDate($review['release_date']),
+                $review['tmdb_id'],
+                $review['imdb_id'],
+                $review['review'],
+                (int)$review['contains_spoilers'],
+                $review['created_at'],
+                $review['updated_at'],
+            ],
+            ',',
+            '"',
+            '',
+        );
+
+        if ($lengthOfWrittenString === false) {
+            throw new RuntimeException('Could not write review to export csv');
+        }
+    }
+
+    /** @param resource $fileHandle */
     public function writeWatchDateToCsv($fileHandle, array $movieWatchDate) : void
     {
         $releaseDate = $this->convertReleaseDate($movieWatchDate['release_date']);

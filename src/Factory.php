@@ -19,6 +19,7 @@ use Movary\Api\Trakt\TraktApi;
 use Movary\Api\Trakt\TraktClient;
 use Movary\Command\CreatePublicStorageLink;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\CurrentWebUser;
@@ -257,6 +258,7 @@ class Factory
         return new ExportService(
             $container->get(MovieApi::class),
             $container->get(MovieWatchlistApi::class),
+            $container->get(MovieReviewApi::class),
             $container->get(ExportWriter::class),
             self::createDirectoryStorage(),
         );

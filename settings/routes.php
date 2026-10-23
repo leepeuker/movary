@@ -182,6 +182,7 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/settings/account/export/csv/{exportType:.+}', [Web\ExportController::class, 'getCsvExport'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/import/csv/{exportType:.+}', [Web\ImportController::class, 'handleCsvImport'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/account/delete-ratings', [Web\SettingsController::class, 'deleteRatings'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/settings/account/delete-reviews', [Web\SettingsController::class, 'deleteReviews'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/account/delete-history', [Web\SettingsController::class, 'deleteHistory'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('DELETE', '/settings/account/delete-account', [Web\SettingsController::class, 'deleteAccount'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/settings/account/update-dashboard-rows', [Web\SettingsController::class, 'updateDashboardRows'], [Web\Middleware\UserIsAuthenticated::class]);
@@ -342,9 +343,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
         Web\Movie\MovieRatingController::class,
         'updateRating'
     ], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('POST', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/review', [
+        Web\Movie\MovieReviewController::class,
+        'save'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('DELETE', '/users/{username:[a-zA-Z0-9]+}/movies/{id:\d+}/review', [
+        Web\Movie\MovieReviewController::class,
+        'delete'
+    ], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/log-movie', [Web\HistoryController::class, 'logMovie'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/add-movie-to-watchlist', [Web\WatchlistController::class, 'addMovieToWatchlist'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('GET', '/fetchMovieRatingByTmdbdId', [Web\Movie\MovieRatingController::class, 'fetchMovieRatingByTmdbdId'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/fetchMovieReviewByTmdbId', [Web\Movie\MovieReviewController::class, 'fetchByTmdbId'], [Web\Middleware\UserIsAuthenticated::class]);
 
     $routerService->addRoutesToRouteCollector($routeCollector, $routes, true);
 }

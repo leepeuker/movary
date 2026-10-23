@@ -30,6 +30,10 @@ enum FlashMessage : string
 
     case IMPORT_RATINGS_SUCCESSFUL = 'import-ratings-successful';
 
+    case IMPORT_REVIEWS_FAILED = 'import-reviews-failed';
+
+    case IMPORT_REVIEWS_SUCCESSFUL = 'import-reviews-successful';
+
     case IMPORT_WATCHLIST_FAILED = 'import-watchlist-failed';
 
     case IMPORT_WATCHLIST_SUCCESSFUL = 'import-watchlist-successful';
@@ -72,6 +76,8 @@ enum FlashMessage : string
             self::IMPORT_HISTORY_SUCCESSFUL,
             self::IMPORT_RATINGS_FAILED,
             self::IMPORT_RATINGS_SUCCESSFUL,
+            self::IMPORT_REVIEWS_FAILED,
+            self::IMPORT_REVIEWS_SUCCESSFUL,
             self::IMPORT_WATCHLIST_FAILED,
             self::IMPORT_WATCHLIST_SUCCESSFUL => FlashMessageDestination::ACCOUNT_DATA,
             self::LETTERBOXD_DIARY_FILE_INVALID,

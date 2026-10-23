@@ -4,19 +4,20 @@ Open **Settings → Account → Personal data** to export, import, or permanentl
 
 ## Export CSV files
 
-Movary provides three downloads:
+Movary provides four downloads:
 
 | Export | Columns |
 |:-------|:--------|
 | History | `title`, `year`, `tmdbId`, `imdbId`, `watchedAt`, `comment`, `location` |
 | Ratings | `title`, `year`, `tmdbId`, `imdbId`, `userRating` |
+| Reviews | `title`, `year`, `tmdbId`, `imdbId`, `review`, `containsSpoilers`, `createdAt`, `updatedAt` |
 | Watchlist | `title`, `year`, `tmdbId`, `imdbId`, `addedAt` |
 
 Each export contains only data for your account. Store exported files securely if your watch activity is private.
 
 ## Import CSV files
 
-The same page accepts history, ratings, and watchlist CSV files. Movary's own exports provide the expected column names and are the safest starting point for an import.
+The same page accepts history, ratings, reviews, and watchlist CSV files. Movary's own exports provide the expected column names and are the safest starting point for an import.
 
 Imports process rows into the data already present in your account; they do not first clear or replace all existing data. In particular, importing history can add watch entries. Export your current data before a large import so you retain a separate copy.
 
@@ -24,12 +25,13 @@ Movies not already known to the installation are created from the identifiers an
 
 For imports from another service, use its integration page and guide when available, such as [Letterboxd](../features/letterboxd.md), [Netflix](../features/netflix.md), or [Trakt](../features/trakt.md).
 
-## Delete history or ratings
+## Delete history, ratings, or reviews
 
 The deletion actions are permanent:
 
-- **Delete history** removes all watch entries from your account. It does not delete your ratings or watchlist.
-- **Delete ratings** removes all movie ratings from your account. It does not delete your history or watchlist.
+- **Delete history** removes all watch entries from your account. It does not delete your ratings, reviews, or watchlist.
+- **Delete ratings** removes all movie ratings from your account. It does not delete your history, reviews, or watchlist.
+- **Delete reviews** removes all movie reviews from your account. It does not delete your history, ratings, or watchlist.
 
 Movary asks for confirmation before either action. Export the corresponding CSV first if you may need the data again.
 

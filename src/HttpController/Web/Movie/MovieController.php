@@ -4,6 +4,7 @@ namespace Movary\HttpController\Web\Movie;
 
 use Movary\Domain\Country\CountryApi;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\CurrentWebUser;
 use Movary\Domain\User\Service\UserPageAuthorizationChecker;
@@ -29,6 +30,7 @@ class MovieController
         private readonly CountryApi $countryApi,
         private readonly CurrentWebUser $currentWebUser,
         private readonly UserApi $userApi,
+        private readonly MovieReviewApi $movieReviewApi,
     ) {
     }
 
@@ -85,8 +87,11 @@ class MovieController
         return Response::create(
             StatusCode::createOk(),
             $this->twig->render('page/movie.html.twig', [
-                'users' => $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor($movieId),
+                'users' => $this->userPageAuthorizationChecker->fetchAllHavingWatchedMovieVisibleUsernamesForCurrentVisitor(
+                    $movieId,
+                ),
                 'movie' => $movie,
+                'selectedUserReview' => $this->movieReviewApi->find($movieId, $userId),
                 'movieProductionCountries' => $this->movieApi->findProductionCountriesByMovieId($movieId),
                 'movieGenres' => $this->movieApi->findGenresByMovieId($movieId),
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),
