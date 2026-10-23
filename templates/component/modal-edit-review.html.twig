@@ -5,7 +5,7 @@
                 <h5 class="modal-title" id="editReviewModalTitle">{{ selectedUserReview is null ? 'Write review' : 'Edit review' }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body pb-0">
                 <label class="form-label" for="movieReviewInput">Review</label>
                 <textarea class="form-control" id="movieReviewInput" rows="8" maxlength="10000" required>{{ selectedUserReview is null ? '' : selectedUserReview.review }}</textarea>
                 <div class="form-text">Plain text, up to 10,000 characters.</div>
