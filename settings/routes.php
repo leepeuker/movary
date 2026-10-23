@@ -383,6 +383,11 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('DELETE', $routeUserPlayed, [Api\PlayedController::class, 'deleteFromPlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('PUT', $routeUserPlayed, [Api\PlayedController::class, 'updatePlayed'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
+    $routeUserMovieReview = '/users/{username:[a-zA-Z0-9]+}/movies/{movaryId:[0-9]+}/review';
+    $routes->add('GET', $routeUserMovieReview, [Api\MovieReviewController::class, 'getReview'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('PUT', $routeUserMovieReview, [Api\MovieReviewController::class, 'saveReview'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', $routeUserMovieReview, [Api\MovieReviewController::class, 'deleteReview'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+
     $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/{movaryId:[0-9]+}/posters', [Api\MoviePosterController::class, 'fetchPosters'], [

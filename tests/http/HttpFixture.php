@@ -6,6 +6,8 @@ use InvalidArgumentException;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
+use Movary\Domain\Movie\Review\MovieReviewApi;
+use Movary\Domain\Movie\Review\MovieReviewEntity;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\User\Service\PersonalApiTokenService;
 use Movary\Domain\User\UserApi;
@@ -73,6 +75,14 @@ class HttpFixture
             $userId,
             $watchedAt === null ? null : Date::createFromString($watchedAt),
         );
+    }
+
+    public function findMovieReview(int $movieId, int $userId) : ?MovieReviewEntity
+    {
+        /** @var MovieReviewApi $movieReviewApi */
+        $movieReviewApi = $this->container->get(MovieReviewApi::class);
+
+        return $movieReviewApi->find($movieId, $userId);
     }
 
     public function hasMovieInWatchlist(int $movieId, int $userId) : bool
