@@ -20,13 +20,11 @@
                         {% endif %}
                         <p id="movieReviewText" class="mb-0 text-break{{ selectedUserReview.containsSpoilers ? ' d-none' : '' }}" style="white-space: pre-wrap;">{{ selectedUserReview.review }}</p>
                     </div>
-                    <div class="modal-footer">
-                        {% if isReviewOwner %}
+                    {% if isReviewOwner %}
+                        <div class="modal-footer">
                             <button type="button" class="btn btn-primary" onclick="editMovieReview()">Edit</button>
-                        {% else %}
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endif %}
                 </div>
             {% endif %}
 

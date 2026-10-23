@@ -27,6 +27,7 @@ class MovieReviewModalTest extends TestCase
         self::assertStringContainsString('A thoughtful review.', $html);
         self::assertStringNotContainsString('onclick="editMovieReview()"', $html);
         self::assertStringNotContainsString('id="movieReviewEdit"', $html);
+        self::assertStringNotContainsString('>Close</button>', $html);
     }
 
     public function testOwnerSeesReviewWithEditModeAvailable() : void
