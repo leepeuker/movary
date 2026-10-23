@@ -34,11 +34,6 @@ class MovieReviewApi
         return $this->repository->fetchAllForUser($userId);
     }
 
-    public function fetchVisibleForMovie(int $movieId, ?int $viewerUserId) : array
-    {
-        return $this->repository->fetchVisibleForMovie($movieId, $viewerUserId);
-    }
-
     public function find(int $movieId, int $userId) : ?MovieReviewEntity
     {
         return $this->repository->find($movieId, $userId);
@@ -67,7 +62,14 @@ class MovieReviewApi
             return;
         }
 
-        $this->repository->update($movieId, $userId, $review, $containsSpoilers, $updatedAt);
+        $this->repository->updateFromImport(
+            $movieId,
+            $userId,
+            $review,
+            $containsSpoilers,
+            $createdAt,
+            $updatedAt,
+        );
     }
 
     public function save(int $movieId, int $userId, string $review, bool $containsSpoilers) : void

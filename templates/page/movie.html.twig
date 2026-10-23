@@ -51,24 +51,6 @@
             </span>
         </div>
 
-        {% if selectedUserReview is not null %}
-            <section class="mb-3" aria-labelledby="selectedUserReviewHeading">
-                <h6 class="mb-1" id="selectedUserReviewHeading">{{ currentUserName == routeUsername ? 'My review' : routeUsername ~ "'s review" }}</h6>
-                {% if selectedUserReview.containsSpoilers %}
-                    <details>
-                        <summary class="text-warning">Contains spoilers — show review</summary>
-                        <p class="mt-2 mb-0" style="white-space: pre-wrap">{{ selectedUserReview.review }}</p>
-                    </details>
-                {% else %}
-                    <p class="mb-0" style="white-space: pre-wrap">{{ selectedUserReview.review }}</p>
-                {% endif %}
-                <small class="text-muted">
-                    {{ selectedUserReview.updatedAt is null ? 'Reviewed' : 'Updated' }}
-                    {{ (selectedUserReview.updatedAt ?? selectedUserReview.createdAt)|date(dateFormatPhp) }}
-                </small>
-            </section>
-        {% endif %}
-
         <div style="display: flex;">
             <div style="text-align: center">
                 <img src="{{ movie.posterPath }}" class="rounded-2" style="width: 13rem;align-self: start;">
@@ -267,36 +249,6 @@
                 {{ movie.overview }}
             </p>
         </div>
-
-        {% if otherReviews|length > 0 %}
-            <section class="mt-4" aria-labelledby="otherReviewsHeading">
-                <h5 id="otherReviewsHeading">Reviews from other users</h5>
-                {% for review in otherReviews %}
-                    <article class="card mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{{ applicationUrl }}/users/{{ review.username }}/movies/{{ movie.id }}-{{ movie.title|slugify }}" class="fw-semibold">{{ review.username }}</a>
-                                {% if review.personalRating is not null %}
-                                    <span class="badge bg-warning text-dark">{{ review.personalRating }}/10</span>
-                                {% endif %}
-                            </div>
-                            {% if review.containsSpoilers %}
-                                <details>
-                                    <summary class="text-warning">Contains spoilers — show review</summary>
-                                    <p class="mt-2 mb-0" style="white-space: pre-wrap">{{ review.review }}</p>
-                                </details>
-                            {% else %}
-                                <p class="mb-0" style="white-space: pre-wrap">{{ review.review }}</p>
-                            {% endif %}
-                            <small class="text-muted">
-                                {{ review.updatedAt is null ? 'Reviewed' : 'Updated' }}
-                                {{ (review.updatedAt ?? review.createdAt)|date(dateFormatPhp) }}
-                            </small>
-                        </div>
-                    </article>
-                {% endfor %}
-            </section>
-        {% endif %}
 
         {# --- Acting --- #}
 

@@ -52,13 +52,11 @@ To change a rating later, open the movie page, select the edit icon beside the r
 
 Personal ratings are distinct from the public TMDB and IMDb ratings that may also appear on movie pages.
 
-## Write and read reviews
+## Write reviews
 
 A review is your current written opinion of a movie. It is separate from viewing notes, history, and ratings, so you can review a movie without recording a play or assigning a rating.
 
-Open the movie in your own user context and select **Write review**. Reviews are plain text and can contain up to 10,000 characters. Select **Contains spoilers** when appropriate; Movary then hides the text until a reader chooses to reveal it. You can edit or delete your review from the same movie page.
-
-The selected user's review appears beside their personal rating. Other visible reviews appear below the plot with the author's current rating when available. Review visibility follows each author's [account privacy setting](privacy-and-sharing.md).
+Open the movie in your own user context and select **Add review**. Reviews are plain text and can contain up to 10,000 characters. Select **Contains spoilers** when appropriate. You can edit or delete your review from the same movie page.
 
 ## Manage the watchlist
 
