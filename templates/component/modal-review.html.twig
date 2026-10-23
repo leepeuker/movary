@@ -1,0 +1,62 @@
+{% set isReviewOwner = currentUserName == routeUsername %}
+{% set hasReview = selectedUserReview is not null %}
+
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalTitle">{{ hasReview ? 'Review' : 'Write review' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            {% if hasReview %}
+                <div id="movieReviewView">
+                    <div class="modal-body">
+                        {% if selectedUserReview.containsSpoilers %}
+                            <div id="movieReviewSpoilerWarning" class="alert alert-warning mb-0" role="alert">
+                                <p>This review contains spoilers.</p>
+                                <button type="button" class="btn btn-warning" onclick="showMovieReview()">Show review</button>
+                            </div>
+                        {% endif %}
+                        <p id="movieReviewText" class="mb-0 text-break{{ selectedUserReview.containsSpoilers ? ' d-none' : '' }}" style="white-space: pre-wrap;">{{ selectedUserReview.review }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        {% if isReviewOwner %}
+                            <button type="button" class="btn btn-primary" onclick="editMovieReview()">Edit</button>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if isReviewOwner %}
+                <div id="movieReviewEdit" class="{{ hasReview ? 'd-none' : '' }}">
+                    <div class="modal-body pb-0">
+                        <label class="form-label" for="movieReviewInput">Review</label>
+                        <textarea class="form-control" id="movieReviewInput" rows="8" maxlength="10000" required data-original-review="{{ hasReview ? selectedUserReview.review : '' }}">{{ hasReview ? selectedUserReview.review : '' }}</textarea>
+                        <div class="form-text">Plain text, up to 10,000 characters.</div>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="movieReviewContainsSpoilers" data-original-value="{{ hasReview and selectedUserReview.containsSpoilers ? '1' : '0' }}"{% if hasReview and selectedUserReview.containsSpoilers %} checked{% endif %}>
+                            <label class="form-check-label" for="movieReviewContainsSpoilers">Contains spoilers</label>
+                        </div>
+                        <div id="movieReviewAlert" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        {% if hasReview %}
+                            <button type="button" class="btn btn-danger" onclick="deleteMovieReview()">Delete review</button>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+                        <div>
+                            {% if hasReview %}
+                                <button type="button" class="btn btn-secondary" onclick="cancelMovieReviewEdit()">Cancel</button>
+                            {% endif %}
+                            <button type="button" class="btn btn-primary" onclick="saveMovieReview()">Save review</button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

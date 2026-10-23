@@ -70,10 +70,72 @@ class MovieReviewTest extends HttpTestCase
             ->assertHeaderSame('WWW-Authenticate', 'Bearer');
     }
 
-    #[DataProvider('methodProvider')]
-    public function testCannotAccessAnotherUsersReview(string $method) : void
+    public function testCannotReadPrivateReviewOfAnotherUser() : void
     {
-        $target = $this->fixture->createUserWithToken();
+        $target = $this->fixture->createUserWithToken(0);
+        $authenticatedUser = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($target['user']->getName(), $movie->getId());
+
+        $this->http
+            ->put($path, ['review' => 'Private review'], $this->createAuthorizationHeader($target['token']))
+            ->assertStatus(204);
+
+        $this->http
+            ->get($path, $this->createAuthorizationHeader($authenticatedUser['token']))
+            ->assertStatus(403);
+    }
+
+    public function testPublicReviewStillRequiresApiAuthentication() : void
+    {
+        $target = $this->fixture->createUserWithToken(2);
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($target['user']->getName(), $movie->getId());
+
+        $this->http
+            ->put($path, ['review' => 'Public review'], $this->createAuthorizationHeader($target['token']))
+            ->assertStatus(204);
+
+        $this->http
+            ->get($path)
+            ->assertStatus(401)
+            ->assertHeaderSame('WWW-Authenticate', 'Bearer');
+    }
+
+    #[DataProvider('readablePrivacyLevelProvider')]
+    public function testCanReadAnotherUsersSharedReview(int $privacyLevel) : void
+    {
+        $target = $this->fixture->createUserWithToken($privacyLevel);
+        $authenticatedUser = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($target['user']->getName(), $movie->getId());
+
+        $this->http
+            ->put(
+                $path,
+                ['review' => 'Shared review', 'containsSpoilers' => true],
+                $this->createAuthorizationHeader($target['token']),
+            )
+            ->assertStatus(204);
+
+        $this->http
+            ->get($path, $this->createAuthorizationHeader($authenticatedUser['token']))
+            ->assertStatus(200)
+            ->assertHeaderSame('Cache-Control', 'no-store')
+            ->assertJsonSame([
+                'review' => 'Shared review',
+                'containsSpoilers' => true,
+                'createdAt' => (string)$this->fixture
+                    ->findMovieReview($movie->getId(), $target['user']->getId())
+                    ?->getCreatedAt(),
+                'updatedAt' => null,
+            ]);
+    }
+
+    #[DataProvider('writeMethodProvider')]
+    public function testCannotWriteAnotherUsersReview(string $method) : void
+    {
+        $target = $this->fixture->createUserWithToken(2);
         $authenticatedUser = $this->fixture->createUserWithToken();
         $movie = $this->fixture->createMovie();
 
@@ -209,6 +271,20 @@ class MovieReviewTest extends HttpTestCase
     public static function methodProvider() : iterable
     {
         yield 'get' => ['GET'];
+        yield 'put' => ['PUT'];
+        yield 'delete' => ['DELETE'];
+    }
+
+    /** @return iterable<string, array{int}> */
+    public static function readablePrivacyLevelProvider() : iterable
+    {
+        yield 'visible to users' => [1];
+        yield 'visible to everyone' => [2];
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function writeMethodProvider() : iterable
+    {
         yield 'put' => ['PUT'];
         yield 'delete' => ['DELETE'];
     }
