@@ -157,22 +157,28 @@ async function deleteWatchDate() {
         return
     }
 
-    $.ajax({
-        url: APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
-        type: 'DELETE',
-        headers: {'X-CSRF-Token': getCsrfToken()},
-        data: JSON.stringify({
-            'date': document.getElementById('originalWatchDate').value,
-            'dateFormat': document.getElementById('dateFormatPhp').value
-        }),
-        success: function (data, textStatus, xhr) {
-            window.location.reload()
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            addAlert('alertMovieModalDiv', 'Could not delete watch date.', 'danger')
-            bootstrap.Modal.getOrCreateInstance('#editWatchDateModal').show()
+    try {
+        const response = await fetchWithCsrf(
+            APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
+            {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    'date': document.getElementById('originalWatchDate').value,
+                    'dateFormat': document.getElementById('dateFormatPhp').value
+                }),
+            },
+        )
+
+        if (response.ok === false) {
+            throw new Error(`HTTP error! status: ${response.status}`)
         }
-    })
+
+        window.location.reload()
+    } catch (requestError) {
+        addAlert('alertMovieModalDiv', 'Could not delete watch date.', 'danger')
+        bootstrap.Modal.getOrCreateInstance('#editWatchDateModal').show()
+    }
 }
 
 function toggleWatchDateAdvancedMode() {
@@ -305,7 +311,7 @@ async function loadLocationOptions() {
     selectElement.appendChild(fragment)
 }
 
-function editWatchDate() {
+async function editWatchDate() {
     const originalWatchDate = document.getElementById('originalWatchDate').value;
 
     const newWatchDate = document.getElementById('editWatchDateModalInput').value;
@@ -315,29 +321,33 @@ function editWatchDate() {
     const locationId = document.getElementById('editWatchDateModalLocationInput').value;
     const postToMastodon = document.getElementById('editWatchDateModalPostToMastodonInput').checked;
 
-    const apiUrl = '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history'
+    try {
+        const response = await fetchWithCsrf(
+            APPLICATION_URL + '/users/' + getRouteUsername() + '/movies/' + getMovieId() + '/history',
+            {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    'newWatchDate': newWatchDate,
+                    'originalWatchDate': originalWatchDate,
+                    'plays': newWatchDatePlays,
+                    'comment': comment,
+                    'position': newPositionPlays,
+                    'dateFormat': document.getElementById('dateFormatPhp').value,
+                    'locationId': locationId,
+                    'postToMastodon': postToMastodon
+                }),
+            },
+        )
 
-    $.ajax({
-        url: apiUrl,
-        type: 'POST',
-        headers: {'X-CSRF-Token': getCsrfToken()},
-        data: JSON.stringify({
-            'newWatchDate': newWatchDate,
-            'originalWatchDate': originalWatchDate,
-            'plays': newWatchDatePlays,
-            'comment': comment,
-            'position': newPositionPlays,
-            'dateFormat': document.getElementById('dateFormatPhp').value,
-            'locationId': locationId,
-            'postToMastodon': postToMastodon
-        }),
-        success: function (data, textStatus, xhr) {
-            window.location.reload()
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            addAlert('alertMovieModalDiv', 'Could not update watch date', 'danger')
+        if (response.ok === false) {
+            throw new Error(`HTTP error! status: ${response.status}`)
         }
-    })
+
+        window.location.reload()
+    } catch (requestError) {
+        addAlert('alertMovieModalDiv', 'Could not update watch date', 'danger')
+    }
 }
 
 function loadRatingModal() {
