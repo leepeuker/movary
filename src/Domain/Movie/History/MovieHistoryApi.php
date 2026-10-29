@@ -642,9 +642,10 @@ class MovieHistoryApi
         ?string $comment = null,
         ?int $locationId = null,
         ?bool $postToMastodon = null,
+        bool $commentProvided = false,
     ) : bool {
         $createdIds = $this->dbConnection->transactional(
-            fn() : array => $this->reconcileDateGroup($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId),
+            fn() : array => $this->reconcileDateGroup($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId, $commentProvided),
         );
 
         $user = $this->userApi->fetchUser($userId);
@@ -684,6 +685,7 @@ class MovieHistoryApi
         ?int $position,
         ?string $comment,
         ?int $locationId,
+        bool $commentProvided,
     ) : array {
         $rows = $this->repository->fetchPlaysByMovieAndDate($movieId, $userId, $watchedAt);
         $existingCount = count($rows);
@@ -726,8 +728,8 @@ class MovieHistoryApi
                 $userId,
                 $watchedAt,
                 $this->positionForExistingPlay($position, $row, $index),
-                $index === 0 ? $comment : $row['comment'],
-                $index === 0 ? $locationId : $row['location_id'],
+                $index === 0 && ($commentProvided || $comment !== null) ? $comment : $row['comment'],
+                $index === 0 && $locationId !== null ? $locationId : $row['location_id'],
             );
         }
 

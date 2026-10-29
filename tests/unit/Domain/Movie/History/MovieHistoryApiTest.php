@@ -182,6 +182,24 @@ class MovieHistoryApiTest extends TestCase
         self::assertSame([41 => 2, 42 => 3], $positions);
     }
 
+    public function testReducingPlaysPreservesMetadataOnTheRetainedPlay() : void
+    {
+        $this->repositoryMock->expects(self::exactly(2))->method('fetchPlaysByMovieAndDate')
+            ->willReturnOnConsecutiveCalls(
+                [
+                    ['id' => 41, 'comment' => null, 'location_id' => null, 'position' => 1],
+                    ['id' => 42, 'comment' => 'Keep me', 'location_id' => 7, 'position' => 2],
+                ],
+                [['id' => 42, 'comment' => 'Keep me', 'location_id' => 7, 'position' => 2]],
+            );
+        $this->repositoryMock->expects(self::once())->method('hasMastodonJobReference')->with(41, 22)->willReturn(false);
+        $this->repositoryMock->expects(self::once())->method('deletePlayById')->with(41, 22);
+        $this->repositoryMock->expects(self::once())->method('updatePlayById')
+            ->with(42, 22, null, 2, 'Keep me', 7);
+
+        self::assertFalse($this->subject->update(11, 22, null, 1, null));
+    }
+
     public function testFetchPersonalRatingDistributionIncludesRatingsWithoutEntries() : void
     {
         $this->repositoryMock->expects(self::never())->method('fetchHighestPositionForWatchDate');

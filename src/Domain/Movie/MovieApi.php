@@ -520,17 +520,16 @@ class MovieApi
         ?bool $postToMastodon = null,
         bool $commentProvided = false,
     ) : void {
-        $existingHistoryEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
-
         $createdPlays = $this->historyApi->update(
             $movieId,
             $userId,
             $watchedAt,
             $playsPerDate,
             $position,
-            $commentProvided ? $comment : ($comment ?? $existingHistoryEntry?->getComment()),
-            $locationId ?? $existingHistoryEntry?->getLocationId(),
+            $comment,
+            $locationId,
             $postToMastodon,
+            $commentProvided,
         );
 
         if ($createdPlays === true) {

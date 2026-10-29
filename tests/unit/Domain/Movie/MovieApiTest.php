@@ -55,6 +55,17 @@ class MovieApiTest extends TestCase
         $this->createSubject($historyApi, $watchlistApi)->replaceHistoryForMovieByDate(1, 2, null, 1);
     }
 
+    public function testReplacementPassesOmittedMetadataThroughToTheSurvivingPlay() : void
+    {
+        $historyApi = $this->createMock(MovieHistoryApi::class);
+        $historyApi->expects(self::once())->method('update')
+            ->with(1, 2, null, 1, null, null, null, null, false)
+            ->willReturn(false);
+        $watchlistApi = $this->createStub(MovieWatchlistApi::class);
+
+        $this->createSubject($historyApi, $watchlistApi)->replaceHistoryForMovieByDate(1, 2, null, 1);
+    }
+
     private function createSubject(MovieHistoryApi $historyApi, MovieWatchlistApi $watchlistApi) : MovieApi
     {
         $movieRepository = $this->createStub(MovieRepository::class);
