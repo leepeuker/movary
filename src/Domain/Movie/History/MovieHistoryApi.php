@@ -294,6 +294,25 @@ class MovieHistoryApi
         return $this->movieRepository->fetchHistoryCount($userId, $searchTerm);
     }
 
+    public function fetchPlayHistoryCount(int $userId, ?string $searchTerm = null) : int
+    {
+        return $this->movieRepository->fetchPlayHistoryCount($userId, $searchTerm);
+    }
+
+    public function fetchPlayHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null, ?SortOrder $sortOrder = null) : array
+    {
+        $entries = $this->movieRepository->fetchPlayHistoryPaginated($userId, $limit, $page, $sortOrder ?? SortOrder::createDesc(), $searchTerm);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($entries);
+    }
+
+    public function findPlayForApi(int $playId, int $userId) : ?array
+    {
+        $play = $this->movieRepository->findPlayForApi($playId, $userId);
+
+        return $play === null ? null : $this->urlGenerator->replacePosterPathWithImageSrcUrl([$play])[0];
+    }
+
     public function fetchLegacyHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         return $this->movieRepository->fetchLegacyHistoryCount($userId, $searchTerm);

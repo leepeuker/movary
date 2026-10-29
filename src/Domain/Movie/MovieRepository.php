@@ -441,6 +441,59 @@ class MovieRepository
         )[0];
     }
 
+    public function fetchPlayHistoryCount(int $userId, ?string $searchTerm = null) : int
+    {
+        $where = $searchTerm === null ? '' : 'AND (m.title LIKE ? OR m.original_title LIKE ?)';
+        $parameters = [$userId];
+        if ($searchTerm !== null) {
+            $parameters[] = "%$searchTerm%";
+            $parameters[] = "%$searchTerm%";
+        }
+
+        return (int)$this->dbConnection->fetchOne(
+            "SELECT COUNT(*) FROM movie_user_watch_dates mh JOIN movie m ON m.id = mh.movie_id WHERE mh.user_id = ? $where",
+            $parameters,
+        );
+    }
+
+    public function fetchPlayHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
+    {
+        $where = $searchTerm === null ? '' : 'AND (m.title LIKE ? OR m.original_title LIKE ?)';
+        $parameters = [$userId, $userId];
+        if ($searchTerm !== null) {
+            $parameters[] = "%$searchTerm%";
+            $parameters[] = "%$searchTerm%";
+        }
+        $offset = ($limit * $page) - $limit;
+
+        return $this->dbConnection->fetchAllAssociative(
+            "SELECT m.*, mh.id AS playId, mh.watched_at, mh.position, mh.comment,
+                mh.location_id AS locationId, mur.rating AS userRating
+            FROM movie_user_watch_dates mh
+            JOIN movie m ON m.id = mh.movie_id
+            LEFT JOIN movie_user_rating mur ON mur.movie_id = m.id AND mur.user_id = ?
+            WHERE mh.user_id = ? $where
+            ORDER BY mh.watched_at $sortOrder, mh.position $sortOrder, mh.id $sortOrder
+            LIMIT $offset, $limit",
+            $parameters,
+        );
+    }
+
+    public function findPlayForApi(int $playId, int $userId) : ?array
+    {
+        $play = $this->dbConnection->fetchAssociative(
+            'SELECT m.*, mh.id AS playId, mh.watched_at, mh.position, mh.comment,
+                mh.location_id AS locationId, mur.rating AS userRating
+            FROM movie_user_watch_dates mh
+            JOIN movie m ON m.id = mh.movie_id
+            LEFT JOIN movie_user_rating mur ON mur.movie_id = m.id AND mur.user_id = ?
+            WHERE mh.id = ? AND mh.user_id = ?',
+            [$userId, $playId, $userId],
+        );
+
+        return $play === false ? null : $play;
+    }
+
     public function fetchLegacyHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         $where = '';

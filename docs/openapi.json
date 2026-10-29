@@ -6,6 +6,296 @@
   },
   "servers": [],
   "paths": {
+    "\/api\/v1\/users\/{username}\/history\/plays": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "getUserPlays",
+        "summary": "Get individual plays of user",
+        "description": "Returns one item per play, including plays with unknown dates. Sorted by watch date, position, and play ID.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "plays",
+                    "currentPage",
+                    "maxPage"
+                  ],
+                  "properties": {
+                    "plays": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#\/components\/schemas\/play"
+                      }
+                    },
+                    "currentPage": {
+                      "type": "integer"
+                    },
+                    "maxPage": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      }
+    },
+    "\/api\/v1\/users\/{username}\/history\/plays\/{playId}": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "getUserPlay",
+        "summary": "Get one individual play",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "playId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "$ref": "#\/components\/schemas\/play"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "updateUserPlay",
+        "summary": "Replace one individual play",
+        "description": "All fields are required. The location must belong to the user. This operation does not change other plays on the same date.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "playId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application\/json": {
+              "schema": {
+                "$ref": "#\/components\/schemas\/playUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "deleteUserPlay",
+        "summary": "Delete one individual play",
+        "description": "Deletes only the play identified by playId.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "playId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      }
+    },
     "\/api\/v1\/users\/{username}\/history\/movies": {
       "get": {
         "tags": [
@@ -2025,6 +2315,76 @@
       }
     },
     "schemas": {
+      "play": {
+        "type": "object",
+        "required": [
+          "id",
+          "movie",
+          "watchedAt",
+          "position",
+          "comment",
+          "locationId"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Stable local play ID"
+          },
+          "movie": {
+            "$ref": "#\/components\/schemas\/movie"
+          },
+          "watchedAt": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 32767
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "locationId": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true
+          }
+        }
+      },
+      "playUpdate": {
+        "type": "object",
+        "required": [
+          "watchedAt",
+          "position",
+          "comment",
+          "locationId"
+        ],
+        "properties": {
+          "watchedAt": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 32767
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "locationId": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true
+          }
+        }
+      },
       "movieReviewInput": {
         "type": "object",
         "required": [
