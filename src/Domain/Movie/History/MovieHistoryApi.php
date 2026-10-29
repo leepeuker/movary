@@ -38,7 +38,7 @@ class MovieHistoryApi
         ?bool $postToMastodon = null,
     ) : array {
         if ($position === null) {
-            $position = (int)$this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt) + 1;
+            $position = (int)$this->findHighestPositionForWatchDate($userId, $watchedAt) + 1;
         }
 
         $playIds = $this->dbConnection->transactional(function () use ($movieId, $userId, $watchedAt, $plays, $comment, $position, $locationId) : array {
@@ -49,7 +49,7 @@ class MovieHistoryApi
                     $userId,
                     $watchedAt,
                     $index === 0 ? $comment : null,
-                    $position,
+                    min($position + $index, 32767),
                     $index === 0 ? $locationId : null,
                 );
             }
@@ -623,9 +623,9 @@ class MovieHistoryApi
         return $this->movieRepository->fetchWatchDatesOrderedByWatchedAtDesc($userId);
     }
 
-    public function findHighestPositionForWatchDate(int $movieIdToIgnore, int $userId, ?Date $watchedAt) : ?int
+    public function findHighestPositionForWatchDate(int $userId, ?Date $watchedAt) : ?int
     {
-        return $this->repository->fetchHighestPositionForWatchDate($movieIdToIgnore, $userId, $watchedAt);
+        return $this->repository->fetchHighestPositionForWatchDate($userId, $watchedAt);
     }
 
     public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, ?Date $watchedAt) : ?MovieHistoryEntity
@@ -638,7 +638,7 @@ class MovieHistoryApi
         int $userId,
         ?Date $watchedAt,
         int $plays,
-        int $position,
+        ?int $position,
         ?string $comment = null,
         ?int $locationId = null,
         ?bool $postToMastodon = null,
@@ -681,7 +681,7 @@ class MovieHistoryApi
         int $userId,
         ?Date $watchedAt,
         int $plays,
-        int $position,
+        ?int $position,
         ?string $comment,
         ?int $locationId,
     ) : array {
@@ -707,13 +707,15 @@ class MovieHistoryApi
         }
 
         $createdIds = [];
+        $existingCount = count($rows);
+        $nextPosition = $position ?? ((int)$this->findHighestPositionForWatchDate($userId, $watchedAt) + 1);
         for ($index = count($rows); $index < $plays; $index++) {
             $createdIds[] = $this->repository->createPlay(
                 $movieId,
                 $userId,
                 $watchedAt,
                 $index === 0 ? $comment : null,
-                $position,
+                $this->positionForCreatedPlay($position, $nextPosition, $index, $existingCount),
                 $index === 0 ? $locationId : null,
             );
         }
@@ -723,12 +725,22 @@ class MovieHistoryApi
                 (int)$row['id'],
                 $userId,
                 $watchedAt,
-                $position,
+                $this->positionForExistingPlay($position, $row, $index),
                 $index === 0 ? $comment : $row['comment'],
                 $index === 0 ? $locationId : $row['location_id'],
             );
         }
 
         return $createdIds;
+    }
+
+    private function positionForCreatedPlay(?int $requestedPosition, int $nextPosition, int $index, int $existingCount) : int
+    {
+        return min($nextPosition + ($requestedPosition === null ? $index - $existingCount : $index), 32767);
+    }
+
+    private function positionForExistingPlay(?int $requestedPosition, array $row, int $index) : int
+    {
+        return $requestedPosition === null ? (int)$row['position'] : min($requestedPosition + $index, 32767);
     }
 }

@@ -13,6 +13,7 @@ use Movary\JobQueue\JobQueueApi;
 use Movary\Service\ImageUrlService;
 use Movary\ValueObject\Date;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -70,7 +71,7 @@ class MovieHistoryApiTest extends TestCase
 
         self::assertSame([
             [11, 22, $watchedAt, 'Comment', 3, 4],
-            [11, 22, $watchedAt, null, 3, null],
+            [11, 22, $watchedAt, null, 4, null],
         ], $created);
     }
 
@@ -81,7 +82,7 @@ class MovieHistoryApiTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('fetchHighestPositionForWatchDate')
-            ->with(11, 22, $watchedAt)
+            ->with(22, $watchedAt)
             ->willReturn(3);
         $this->repositoryMock
             ->expects(self::once())
@@ -99,7 +100,7 @@ class MovieHistoryApiTest extends TestCase
         $this->repositoryMock
             ->expects(self::once())
             ->method('fetchHighestPositionForWatchDate')
-            ->with(11, 22, $watchedAt)
+            ->with(22, $watchedAt)
             ->willReturn(null);
         $this->repositoryMock
             ->expects(self::once())
@@ -108,6 +109,36 @@ class MovieHistoryApiTest extends TestCase
             ->willReturn(1);
 
         $this->subject->create(11, 22, $watchedAt, 1);
+    }
+
+    #[DataProvider('consecutivePositions')]
+    public function testCreateAssignsConsecutivePositionsAcrossTheDate(?int $highest, array $expected) : void
+    {
+        $watchedAt = Date::createFromString('2026-10-03');
+        $positions = [];
+        $this->repositoryMock->expects(self::once())->method('fetchHighestPositionForWatchDate')->with(22, $watchedAt)->willReturn($highest);
+        $this->repositoryMock->expects(self::exactly(3))->method('createPlay')
+            ->willReturnCallback(static function (int $movieId, int $userId, ?Date $date, ?string $comment, int $position) use (&$positions, $watchedAt) : int {
+                self::assertSame(11, $movieId);
+                self::assertSame(22, $userId);
+                self::assertSame($watchedAt, $date);
+                self::assertNull($comment);
+                $positions[] = $position;
+
+                return count($positions);
+            });
+
+        $this->subject->create(11, 22, $watchedAt, 3);
+
+        self::assertSame($expected, $positions);
+    }
+
+    public static function consecutivePositions() : array
+    {
+        return [
+            'first plays on date' => [null, [1, 2, 3]],
+            'after another play' => [1, [2, 3, 4]],
+        ];
     }
 
     public function testUpdateReportsWhetherItCreatedPlays() : void
@@ -124,10 +155,31 @@ class MovieHistoryApiTest extends TestCase
             'id' => 42,
             'comment' => null,
             'location_id' => null,
+            'position' => 1,
         ]]);
         $this->repositoryMock->expects(self::never())->method('createPlay');
 
         self::assertFalse($this->subject->update(11, 22, null, 1, 1));
+    }
+
+    public function testUpdateWithoutPositionPreservesExistingPositionsAndAppendsNewPlay() : void
+    {
+        $this->repositoryMock->method('fetchPlaysByMovieAndDate')->willReturn([
+            ['id' => 41, 'comment' => null, 'location_id' => null, 'position' => 2],
+            ['id' => 42, 'comment' => null, 'location_id' => null, 'position' => 3],
+        ]);
+        $this->repositoryMock->expects(self::once())->method('fetchHighestPositionForWatchDate')->with(22, null)->willReturn(3);
+        $this->repositoryMock->expects(self::once())->method('createPlay')->with(11, 22, null, null, 4, null)->willReturn(43);
+        $positions = [];
+        $this->repositoryMock->expects(self::exactly(2))->method('updatePlayById')
+            ->willReturnCallback(static function (int $playId, int $userId, ?Date $date, int $position) use (&$positions) : void {
+                self::assertSame(22, $userId);
+                self::assertNull($date);
+                $positions[$playId] = $position;
+            });
+
+        self::assertTrue($this->subject->update(11, 22, null, 3, null));
+        self::assertSame([41 => 2, 42 => 3], $positions);
     }
 
     public function testFetchPersonalRatingDistributionIncludesRatingsWithoutEntries() : void

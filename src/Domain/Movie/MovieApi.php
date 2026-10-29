@@ -527,7 +527,7 @@ class MovieApi
             $userId,
             $watchedAt,
             $playsPerDate,
-            $position ?? $existingHistoryEntry?->getPosition() ?? 1,
+            $position,
             $commentProvided ? $comment : ($comment ?? $existingHistoryEntry?->getComment()),
             $locationId ?? $existingHistoryEntry?->getLocationId(),
             $postToMastodon,
