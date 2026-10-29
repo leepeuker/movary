@@ -40,7 +40,7 @@ class IndividualPlayHistoryMigrationTest extends TestCase
     }
 
     #[DataProvider('invalidSourceValues')]
-    public function testRejectsInvalidSourceBeforeChangingSchema(?int $plays, ?int $position) : void
+    public function testRejectsInvalidSourceBeforeChangingSchema(int|float|null $plays, int|float|null $position) : void
     {
         $connection = $this->createConnection();
         $this->insertHistory($connection, 10, 2, '2026-01-01', $plays, null, $position, null);
@@ -62,10 +62,12 @@ class IndividualPlayHistoryMigrationTest extends TestCase
             'zero plays' => [0, 1],
             'negative plays' => [-1, 1],
             'oversized plays' => [32768, 1],
+            'fractional plays' => [1.5, 1],
             'null position' => [1, null],
             'zero position' => [1, 0],
             'negative position' => [1, -1],
             'oversized position' => [1, 32768],
+            'fractional position' => [1, 1.5],
         ];
     }
 
@@ -143,9 +145,9 @@ class IndividualPlayHistoryMigrationTest extends TestCase
         int $movieId,
         int $userId,
         ?string $watchedAt,
-        ?int $plays,
+        int|float|null $plays,
         ?string $comment,
-        ?int $position,
+        int|float|null $position,
         ?int $locationId,
     ) : void {
         $connection->insert('movie_user_watch_dates', [

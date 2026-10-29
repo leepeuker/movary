@@ -52,8 +52,13 @@ final class Version20261029000000 extends AbstractMigration
             throw new RuntimeException('History already has play IDs. Inspect migration metadata before retrying.');
         }
 
+        $invalidTypeCondition = $this->platform instanceof SqlitePlatform
+            ? " OR typeof(plays) <> 'integer' OR typeof(position) <> 'integer'"
+            : '';
         $invalid = (int)$this->connection->fetchOne(
-            'SELECT COUNT(*) FROM movie_user_watch_dates WHERE plays IS NULL OR plays < 1 OR plays > 32767 OR position IS NULL OR position < 1 OR position > 32767',
+            'SELECT COUNT(*) FROM movie_user_watch_dates
+             WHERE plays IS NULL OR plays < 1 OR plays > 32767
+                OR position IS NULL OR position < 1 OR position > 32767' . $invalidTypeCondition,
         );
         if ($invalid !== 0) {
             throw new RuntimeException("Cannot expand $invalid history rows with invalid plays or positions.");
