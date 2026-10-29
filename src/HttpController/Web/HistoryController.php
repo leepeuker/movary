@@ -4,7 +4,6 @@ namespace Movary\HttpController\Web;
 
 use InvalidArgumentException;
 use Movary\Domain\Movie\History\MovieHistoryApi;
-use Movary\Domain\Movie\History\MovieHistoryEditor;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\Review\MovieReviewApi;
 use Movary\Domain\User\Service\Authentication;
@@ -30,7 +29,6 @@ class HistoryController
     public function __construct(
         private readonly Environment $twig,
         private readonly MovieHistoryApi $movieHistoryApi,
-        private readonly MovieHistoryEditor $movieHistoryEditor,
         private readonly MovieApi $movieApi,
         private readonly MovieReviewApi $movieReviewApi,
         private readonly UserApi $userApi,
@@ -58,9 +56,7 @@ class HistoryController
 
         $dateFormat = $requestBody['dateFormat'];
         $newWatchDate = empty($requestBody['newWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['newWatchDate'], $dateFormat) : null;
-        $originalWatchDate = empty($requestBody['originalWatchDate']) === false ? Date::createFromStringAndFormat($requestBody['originalWatchDate'], $dateFormat) : null;
-
-        $plays = empty($requestBody['plays']) === true ? 1 : (int)$requestBody['plays'];
+        $playId = empty($requestBody['playId']) === true ? null : (int)$requestBody['playId'];
         $comment = empty($requestBody['comment']) === true ? null : (string)$requestBody['comment'];
         $position = empty($requestBody['position']) === true ? 1 : (int)$requestBody['position'];
         $locationId = empty($requestBody['locationId']) === true ? null : (int)$requestBody['locationId'];
@@ -70,17 +66,16 @@ class HistoryController
             $postToMastodon = (bool)$requestBody['postToMastodon'];
         }
 
-        $this->movieHistoryEditor->update(
-            $movieId,
-            $userId,
-            $originalWatchDate,
-            $newWatchDate,
-            $plays,
-            $position,
-            $comment,
-            $locationId,
-            $postToMastodon,
-        );
+        if ($playId === null) {
+            $this->movieApi->addPlaysForMovieOnDate($movieId, $userId, $newWatchDate, 1, $position, $comment, $locationId, $postToMastodon);
+        } else {
+            $play = $this->movieHistoryApi->findPlayById($playId, $userId);
+            if ($play === null || $play->getMovieId() !== $movieId) {
+                return Response::createNotFound();
+            }
+
+            $this->movieHistoryApi->updatePlayById($playId, $userId, $newWatchDate, $position, $comment, $locationId, $postToMastodon);
+        }
 
         return Response::create(StatusCode::createNoContent());
     }
@@ -98,9 +93,17 @@ class HistoryController
         $requestBody = Json::decode($request->getBody());
 
         $movieId = (int)$request->getRouteParameters()['id'];
-        $date = empty($requestBody['date']) === false ? Date::createFromStringAndFormat($requestBody['date'], $requestBody['dateFormat']) : null;
+        $playId = empty($requestBody['playId']) === true ? null : (int)$requestBody['playId'];
+        if ($playId === null) {
+            return Response::createNotFound();
+        }
 
-        $this->movieApi->deleteHistoryByIdAndDate($movieId, $userId, $date);
+        $play = $this->movieHistoryApi->findPlayById($playId, $userId);
+        if ($play === null || $play->getMovieId() !== $movieId) {
+            return Response::createNotFound();
+        }
+
+        $this->movieHistoryApi->deletePlayById($playId, $userId);
 
         return Response::create(StatusCode::createNoContent());
     }

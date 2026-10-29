@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\Domain\Movie\History;
 
+use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb\TmdbApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\MovieHistoryRepository;
@@ -28,6 +29,8 @@ class MovieHistoryApiTest extends TestCase
     protected function setUp() : void
     {
         $this->repositoryMock = $this->createMock(MovieHistoryRepository::class);
+        $dbConnection = $this->createStub(Connection::class);
+        $dbConnection->method('transactional')->willReturnCallback(static fn(callable $operation) : mixed => $operation());
         $userApiMock = $this->createStub(UserApi::class);
         $userMock = $this->createStub(UserEntity::class);
 
@@ -44,20 +47,31 @@ class MovieHistoryApiTest extends TestCase
             $this->createStub(ImageUrlService::class),
             $this->createStub(JobQueueApi::class),
             $userApiMock,
+            $dbConnection,
         );
     }
 
     public function testCreatePreservesExplicitPosition() : void
     {
         $watchedAt = Date::createFromString('2026-10-03');
+        $created = [];
 
         $this->repositoryMock->expects(self::never())->method('fetchHighestPositionForWatchDate');
         $this->repositoryMock
-            ->expects(self::once())
-            ->method('create')
-            ->with(11, 22, $watchedAt, 2, 'Comment', 3, 4);
+            ->expects(self::exactly(2))
+            ->method('createPlay')
+            ->willReturnCallback(static function (int $movieId, int $userId, ?Date $date, ?string $comment, int $position, ?int $locationId) use (&$created) : int {
+                $created[] = [$movieId, $userId, $date, $comment, $position, $locationId];
+
+                return count($created);
+            });
 
         $this->subject->create(11, 22, $watchedAt, 2, 3, 'Comment', 4);
+
+        self::assertSame([
+            [11, 22, $watchedAt, 'Comment', 3, 4],
+            [11, 22, $watchedAt, null, 3, null],
+        ], $created);
     }
 
     public function testCreateIncrementsHighestPositionWhenPositionIsOmitted() : void
@@ -71,10 +85,11 @@ class MovieHistoryApiTest extends TestCase
             ->willReturn(3);
         $this->repositoryMock
             ->expects(self::once())
-            ->method('create')
-            ->with(11, 22, $watchedAt, 2, null, 4, null);
+            ->method('createPlay')
+            ->with(11, 22, $watchedAt, null, 4, null)
+            ->willReturn(1);
 
-        $this->subject->create(11, 22, $watchedAt, 2);
+        $this->subject->create(11, 22, $watchedAt, 1);
     }
 
     public function testCreateUsesFirstPositionWhenNoPreviousPositionExists() : void
@@ -88,10 +103,11 @@ class MovieHistoryApiTest extends TestCase
             ->willReturn(null);
         $this->repositoryMock
             ->expects(self::once())
-            ->method('create')
-            ->with(11, 22, $watchedAt, 2, null, 1, null);
+            ->method('createPlay')
+            ->with(11, 22, $watchedAt, null, 1, null)
+            ->willReturn(1);
 
-        $this->subject->create(11, 22, $watchedAt, 2);
+        $this->subject->create(11, 22, $watchedAt, 1);
     }
 
     public function testFetchPersonalRatingDistributionIncludesRatingsWithoutEntries() : void
@@ -141,6 +157,7 @@ class MovieHistoryApiTest extends TestCase
             $this->createStub(ImageUrlService::class),
             $this->createStub(JobQueueApi::class),
             $this->createStub(UserApi::class),
+            $this->createStub(Connection::class),
         );
 
         self::assertSame(

@@ -45,10 +45,11 @@ class MastodonPostPlayService
             $watchDate = Date::createFromString($watchDate);
         }
 
-        $this->postPlay($userId, $movieId, $watchDate);
+        $playId = $job->getParameters()['playId'] ?? null;
+        $this->postPlay($userId, $movieId, $watchDate, $playId === null ? null : (int)$playId);
     }
 
-    public function postPlay(int $userId, int $movieId, ?Date $watchDate) : void
+    public function postPlay(int $userId, int $movieId, ?Date $watchDate, ?int $playId = null) : void
     {
         $movie = $this->movieApi->findById($movieId);
         if ($movie === null) {
@@ -70,7 +71,13 @@ class MastodonPostPlayService
             $mastodonMessageRating = $this->formatUserRating($personalRating);
         }
 
-        $watchHistoryComment = $this->movieHistoryApi->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchDate)?->getComment();
+        $historyEntry = $playId === null
+            ? $this->movieHistoryApi->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchDate)
+            : $this->movieHistoryApi->findPlayById($playId, $userId);
+        if ($playId !== null && ($historyEntry === null || $historyEntry->getMovieId() !== $movieId)) {
+            throw new RuntimeException('Play does not exist for the requested user and movie.');
+        }
+        $watchHistoryComment = $historyEntry?->getComment();
         if ($watchHistoryComment != null) {
             $mastodonMessageComment = $this->formatUserComment($watchHistoryComment);
         }

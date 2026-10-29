@@ -189,7 +189,7 @@ query_sqlite release-0.73.1.sqlite \
 query_sqlite release-0.73.1.sqlite \
     "INSERT INTO movie_user_rating (movie_id, user_id, rating, created_at) VALUES (1, 1, 8, '2026-01-01')"
 query_sqlite release-0.73.1.sqlite \
-    "INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, comment, location_id) VALUES (1, 1, '2026-01-01', 'release-watch', 1)"
+    "INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, comment, location_id) VALUES (1, 1, '2026-01-01', 3, 'release-watch', 1)"
 query_sqlite release-0.73.1.sqlite \
     "INSERT INTO watchlist (movie_id, user_id, added_at) VALUES (1, 1, '2026-01-01')"
 query_sqlite release-0.73.1.sqlite \
@@ -200,7 +200,7 @@ query_sqlite release-0.73.1.sqlite \
     "INSERT INTO server_setting (key, value) VALUES ('release-setting', 'preserved')"
 
 run_sqlite_app_command release-0.73.1.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261022120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
     "$(query_sqlite release-0.73.1.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite \
@@ -209,6 +209,9 @@ assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite
 assert_equal '8|release-watch|release-location' "$(query_sqlite release-0.73.1.sqlite \
     "SELECT r.rating || '|' || w.comment || '|' || l.name FROM movie_user_rating r INNER JOIN movie_user_watch_dates w ON w.movie_id = r.movie_id AND w.user_id = r.user_id INNER JOIN location l ON l.id = w.location_id WHERE r.movie_id = 1 AND r.user_id = 1")" \
     'SQLite 0.73.1 fixture did not preserve rating and watch data'
+assert_equal '3|3|1|1' "$(query_sqlite release-0.73.1.sqlite \
+    "SELECT COUNT(*) || '|' || SUM(plays) || '|' || COUNT(comment) || '|' || COUNT(location_id) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1")" \
+    'SQLite did not expand three plays with metadata on only one play'
 assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
     "SELECT COUNT(*) FROM user_api_token a INNER JOIN user_auth_token u ON u.user_id = a.user_id INNER JOIN watchlist w ON w.user_id = a.user_id WHERE a.user_id = 1")" \
     'SQLite 0.73.1 fixture did not preserve tokens and watchlist data'
@@ -223,8 +226,8 @@ query_sqlite_with_foreign_keys release-0.73.1.sqlite 'DELETE FROM location WHERE
 assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
     "SELECT COUNT(*) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1 AND comment = 'release-watch'")" \
     'SQLite deleted watch history together with its location'
-assert_equal 1 "$(query_sqlite release-0.73.1.sqlite \
-    'SELECT location_id IS NULL FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1')" \
+assert_equal 3 "$(query_sqlite release-0.73.1.sqlite \
+    'SELECT COUNT(*) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1 AND location_id IS NULL')" \
     'SQLite did not clear the deleted location from watch history'
 
 query_sqlite null-genre.sqlite \
@@ -314,8 +317,9 @@ fi
 assert_equal 0 "$(query_sqlite missing-history.sqlite "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'doctrine_migration_versions'")" \
     'SQLite initialized Doctrine metadata for an incomplete legacy history'
 
+cp "$audit_directory/null-genre.sqlite" "$audit_directory/null-genre-before-doctrine.sqlite"
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261022120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite legacy database did not record the latest Doctrine migration'
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
@@ -342,6 +346,15 @@ assert_equal 0 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM user WHER
 assert_equal 1 "$(query_sqlite null-genre.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'index' AND name = 'unique_user_pending_email'")" \
     'SQLite did not add the pending email unique index'
+if run_sqlite_app_command null-genre.sqlite database:migration:rollback; then
+    echo 'SQLite allowed an unsafe rollback of individual plays' >&2
+    exit 1
+fi
+assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
+    "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'SQLite changed migration metadata after rejected individual-play rollback'
+# The remaining rollback checks exercise older, independent migrations on this disposable fixture.
+query_sqlite null-genre.sqlite "DELETE FROM doctrine_migration_versions WHERE version LIKE '%Version20261029000000'"
 run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null
 assert_equal 'Movary\DatabaseMigration\Version20261022000000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
@@ -423,13 +436,15 @@ fi
 assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite removed the authentication-token migration after rejected rollback'
+cp "$audit_directory/null-genre-before-doctrine.sqlite" "$audit_directory/null-genre.sqlite"
+chmod 0666 "$audit_directory/null-genre.sqlite"
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
 
 run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
 assert_equal 31 "$(query_sqlite doctrine-fresh.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
     'Fresh SQLite Doctrine database has an unexpected table count'
-assert_equal 'Movary\DatabaseMigration\Version20261022120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
     "$(query_sqlite doctrine-fresh.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'Fresh SQLite database did not execute the latest Doctrine migration'
 
@@ -476,14 +491,14 @@ mysql_query movary_release "INSERT INTO user (id, email, name, password, jellyfi
 mysql_query movary_release "INSERT INTO movie (id, title, tmdb_id, created_at) VALUES (1, 'release-movie', 1001, '2026-01-01')"
 mysql_query movary_release "INSERT INTO location (id, user_id, name, created_at) VALUES (1, 1, 'release-location', '2026-01-01')"
 mysql_query movary_release "INSERT INTO movie_user_rating (movie_id, user_id, rating, created_at) VALUES (1, 1, 8, '2026-01-01')"
-mysql_query movary_release "INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, comment, location_id) VALUES (1, 1, '2026-01-01', 'release-watch', 1)"
+mysql_query movary_release "INSERT INTO movie_user_watch_dates (movie_id, user_id, watched_at, plays, comment, location_id) VALUES (1, 1, '2026-01-01', 3, 'release-watch', 1)"
 mysql_query movary_release "INSERT INTO watchlist (movie_id, user_id, added_at) VALUES (1, 1, '2026-01-01')"
 mysql_query movary_release "INSERT INTO user_api_token (user_id, token, created_at) VALUES (1, '12345678-1234-1234-1234-123456789012', '2026-01-01')"
 mysql_query movary_release "INSERT INTO user_auth_token (id, user_id, token, device_name, user_agent, expiration_date, created_at) VALUES (1, 1, '12345678901234567890123456789012', 'release-device', 'release-agent', '2027-01-01', '2026-01-01')"
 mysql_query movary_release "INSERT INTO server_setting (\`key\`, value) VALUES ('release-setting', 'preserved')"
 
 run_mysql_app_command movary_release database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261022120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
     "$(mysql_query movary_release 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
@@ -492,6 +507,9 @@ assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
 assert_equal '8|release-watch|release-location' "$(mysql_query movary_release \
     "SELECT CONCAT_WS('|', r.rating, w.comment, l.name) FROM movie_user_rating r INNER JOIN movie_user_watch_dates w ON w.movie_id = r.movie_id AND w.user_id = r.user_id INNER JOIN location l ON l.id = w.location_id WHERE r.movie_id = 1 AND r.user_id = 1")" \
     'MySQL 0.73.1 fixture did not preserve rating and watch data'
+assert_equal '3|3|1|1' "$(mysql_query movary_release \
+    "SELECT CONCAT(COUNT(*), '|', SUM(plays), '|', COUNT(comment), '|', COUNT(location_id)) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1")" \
+    'MySQL did not expand three plays with metadata on only one play'
 assert_equal 1 "$(mysql_query movary_release \
     "SELECT COUNT(*) FROM user_api_token a INNER JOIN user_auth_token u ON u.user_id = a.user_id INNER JOIN watchlist w ON w.user_id = a.user_id WHERE a.user_id = 1")" \
     'MySQL 0.73.1 fixture did not preserve tokens and watchlist data'
@@ -506,8 +524,8 @@ mysql_query movary_release 'DELETE FROM location WHERE id = 1'
 assert_equal 1 "$(mysql_query movary_release \
     "SELECT COUNT(*) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1 AND comment = 'release-watch'")" \
     'MySQL deleted watch history together with its location'
-assert_equal 1 "$(mysql_query movary_release \
-    'SELECT location_id IS NULL FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1')" \
+assert_equal 3 "$(mysql_query movary_release \
+    'SELECT COUNT(*) FROM movie_user_watch_dates WHERE movie_id = 1 AND user_id = 1 AND location_id IS NULL')" \
     'MySQL did not clear the deleted location from watch history'
 
 run_mysql_migrations movary
@@ -551,7 +569,7 @@ assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movi
     'MySQL watched cache does not isolate identical Trakt IDs by user'
 
 run_mysql_app_command movary database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261022120000' \
+assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL legacy database did not record the latest Doctrine migration'
 run_mysql_app_command movary database:migration:migrate
@@ -578,6 +596,16 @@ assert_equal 0 "$(mysql_query movary 'SELECT COUNT(*) FROM user WHERE pending_em
 assert_equal 1 "$(mysql_query movary \
     "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND INDEX_NAME = 'unique_user_pending_email'")" \
     'MySQL did not add the pending email unique index'
+if run_mysql_app_command movary database:migration:rollback; then
+    echo 'MySQL allowed an unsafe rollback of individual plays' >&2
+    exit 1
+fi
+assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
+    "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
+    'MySQL changed migration metadata after rejected individual-play rollback'
+# The remaining rollback checks exercise older, independent migrations on this disposable fixture.
+mysql_query movary "DELETE FROM doctrine_migration_versions WHERE version LIKE '%Version20261029000000'"
+mysql_query movary "ALTER TABLE movie_user_watch_dates DROP FOREIGN KEY play_staging_fk_location, ADD CONSTRAINT fk_movie_user_watch_dates_location_id FOREIGN KEY (location_id) REFERENCES location (id) ON DELETE SET NULL"
 run_mysql_app_command movary database:migration:rollback >/dev/null
 assert_equal 'Movary\DatabaseMigration\Version20261022000000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
@@ -659,6 +687,10 @@ fi
 assert_equal 'Movary\DatabaseMigration\Version20261003000000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL removed the authentication-token migration after rejected rollback'
+docker exec "$mysql_container" mysql --user=root --password=movary-root \
+    --execute="DROP DATABASE movary; CREATE DATABASE movary; GRANT ALL PRIVILEGES ON movary.* TO 'movary'@'%';"
+docker exec --interactive "$mysql_container" mysql --user=movary --password=movary movary \
+    <"$audit_directory/mysql-before.sql"
 run_mysql_app_command movary database:migration:migrate
 
 docker exec "$mysql_container" mysql --user=root --password=movary-root \

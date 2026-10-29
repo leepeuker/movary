@@ -147,9 +147,9 @@ async function updateMoviePoster(method, body = null) {
 
 async function deleteWatchDate() {
     const confirmed = await showConfirmationModal({
-        title: 'Delete watch date',
-        message: 'Are you sure you want to delete this watch date?',
-        confirmLabel: 'Delete watch date',
+        title: 'Delete play',
+        message: 'Are you sure you want to delete this play?',
+        confirmLabel: 'Delete play',
         confirmClass: 'btn-danger',
     })
 
@@ -164,8 +164,7 @@ async function deleteWatchDate() {
                 method: 'DELETE',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    'date': document.getElementById('originalWatchDate').value,
-                    'dateFormat': document.getElementById('dateFormatPhp').value
+                    'playId': document.getElementById('editPlayId').value
                 }),
             },
         )
@@ -176,7 +175,7 @@ async function deleteWatchDate() {
 
         window.location.reload()
     } catch (requestError) {
-        addAlert('alertMovieModalDiv', 'Could not delete watch date.', 'danger')
+        addAlert('alertMovieModalDiv', 'Could not delete play.', 'danger')
         bootstrap.Modal.getOrCreateInstance('#editWatchDateModal').show()
     }
 }
@@ -265,12 +264,9 @@ async function loadWatchDateModal(watchDateListElement) {
     })
 
     document.getElementById('editWatchDateModalInput').value = watchDateListElement.dataset.watchDate;
-    document.getElementById('editWatchDateModalPlaysInput').value = watchDateListElement.dataset.plays;
+    document.getElementById('editPlayId').value = watchDateListElement.dataset.playId;
     document.getElementById('editWatchDateModalCommentInput').value = watchDateListElement.dataset.comment;
     document.getElementById('editWatchDateModalPositionInput').value = watchDateListElement.dataset.position;
-
-    document.getElementById('originalWatchDate').value = watchDateListElement.dataset.watchDate;
-    document.getElementById('originalWatchDatePlays').value = watchDateListElement.dataset.plays;
 
     disableWatchDateAdvancedMode()
 
@@ -321,10 +317,7 @@ async function loadLocationOptions() {
 }
 
 async function editWatchDate() {
-    const originalWatchDate = document.getElementById('originalWatchDate').value;
-
     const newWatchDate = document.getElementById('editWatchDateModalInput').value;
-    const newWatchDatePlays = document.getElementById('editWatchDateModalPlaysInput').value;
     const newPositionPlays = document.getElementById('editWatchDateModalPositionInput').value;
     const comment = document.getElementById('editWatchDateModalCommentInput').value;
     const locationId = document.getElementById('editWatchDateModalLocationInput').value;
@@ -338,8 +331,7 @@ async function editWatchDate() {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     'newWatchDate': newWatchDate,
-                    'originalWatchDate': originalWatchDate,
-                    'plays': newWatchDatePlays,
+                    'playId': document.getElementById('editPlayId').value,
                     'comment': comment,
                     'position': newPositionPlays,
                     'dateFormat': document.getElementById('dateFormatPhp').value,

@@ -3,7 +3,9 @@
 namespace Movary\HttpController\Api;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\History\PlayCountConflict;
 use Movary\Domain\Movie\MovieApi;
+use Movary\HttpController\Api\Exception\InvalidApiRequest;
 use Movary\HttpController\Api\RequestMapper\HistoryRequestMapper;
 use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\HistoryResponseMapper;
@@ -63,7 +65,7 @@ class HistoryController
     {
         $requestData = $this->historyRequestMapper->mapRequest($request);
 
-        $historyEntries = $this->movieHistoryApi->fetchHistoryPaginated(
+        $historyEntries = $this->movieHistoryApi->fetchLegacyHistoryPaginated(
             $requestData->getRequestedUserId(),
             $requestData->getLimit(),
             $requestData->getPage(),
@@ -71,7 +73,7 @@ class HistoryController
             $requestData->getSortOrder(),
         );
 
-        $historyCount = $this->movieHistoryApi->fetchHistoryCount(
+        $historyCount = $this->movieHistoryApi->fetchLegacyHistoryCount(
             $requestData->getRequestedUserId(),
             $requestData->getSearchTerm(),
         );
@@ -97,14 +99,19 @@ class HistoryController
         $historyAdditions = $this->historyRequestMapper->mapUpdates($request);
 
         foreach ($historyAdditions as $historyAddition) {
-            $this->movieApi->replaceHistoryForMovieByDate(
-                $historyAddition['movieId'],
-                $userId,
-                $historyAddition['watchedAt'],
-                $historyAddition['plays'],
-                $historyAddition['position'],
-                $historyAddition['comment'],
-            );
+            try {
+                $this->movieApi->replaceHistoryForMovieByDate(
+                    $historyAddition['movieId'],
+                    $userId,
+                    $historyAddition['watchedAt'],
+                    $historyAddition['plays'],
+                    $historyAddition['position'],
+                    $historyAddition['comment'],
+                    commentProvided: $historyAddition['commentProvided'],
+                );
+            } catch (PlayCountConflict) {
+                throw InvalidApiRequest::playCountConflict();
+            }
         }
 
         return Response::createNoContent();

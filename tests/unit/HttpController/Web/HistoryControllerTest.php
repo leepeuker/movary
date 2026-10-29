@@ -3,7 +3,7 @@
 namespace Tests\Unit\Movary\HttpController\Web;
 
 use Movary\Domain\Movie\History\MovieHistoryApi;
-use Movary\Domain\Movie\History\MovieHistoryEditor;
+use Movary\Domain\Movie\History\MovieHistoryEntity;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\Movie\Review\MovieReviewApi;
@@ -34,7 +34,7 @@ class HistoryControllerTest extends TestCase
 {
     private Authentication&MockObject $authenticationMock;
 
-    private MovieHistoryEditor&MockObject $movieHistoryEditorMock;
+    private MovieHistoryApi&MockObject $movieHistoryApiMock;
 
     private MovieApi&MockObject $movieApiMock;
 
@@ -47,7 +47,7 @@ class HistoryControllerTest extends TestCase
     protected function setUp() : void
     {
         $this->authenticationMock = $this->createMock(Authentication::class);
-        $this->movieHistoryEditorMock = $this->createMock(MovieHistoryEditor::class);
+        $this->movieHistoryApiMock = $this->createMock(MovieHistoryApi::class);
         $this->movieApiMock = $this->createMock(MovieApi::class);
         $this->movieReviewApiMock = $this->createMock(MovieReviewApi::class);
         $this->userApiMock = $this->createMock(UserApi::class);
@@ -62,8 +62,7 @@ class HistoryControllerTest extends TestCase
 
         $this->subject = new HistoryController(
             $this->createMock(Environment::class),
-            $this->createMock(MovieHistoryApi::class),
-            $this->movieHistoryEditorMock,
+            $this->movieHistoryApiMock,
             $this->movieApiMock,
             $this->movieReviewApiMock,
             $this->userApiMock,
@@ -90,18 +89,19 @@ class HistoryControllerTest extends TestCase
         ?string $expectedComment,
         ?int $expectedLocationId,
     ) : void {
-        $originalDate = Date::createFromString('2026-09-01');
         $newDate = Date::createFromString('2026-09-02');
+        $play = $this->createStub(MovieHistoryEntity::class);
+        $play->method('getMovieId')->willReturn(34);
+        $this->movieHistoryApiMock->expects(self::once())->method('findPlayById')->with(9, 12)->willReturn($play);
 
-        $this->movieHistoryEditorMock
+        $this->movieHistoryApiMock
             ->expects(self::once())
-            ->method('update')
-            ->with(34, 12, $originalDate, $newDate, 2, 3, $expectedComment, $expectedLocationId, true);
+            ->method('updatePlayById')
+            ->with(9, 12, $newDate, 3, $expectedComment, $expectedLocationId, true);
 
         $response = $this->subject->createHistoryEntry($this->createRequest([
             'newWatchDate' => '2026-09-02',
-            'originalWatchDate' => '2026-09-01',
-            'plays' => 2,
+            'playId' => 9,
             'comment' => $requestComment,
             'position' => 3,
             'dateFormat' => 'Y-m-d',

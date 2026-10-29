@@ -7,8 +7,7 @@
             </div>
             <div class="modal-body" style="padding-bottom: 0">
                 <input type="hidden" value="" name="tmdbId" id="tmdbId" required>
-                <input type="hidden" value="" name="tmdbId" id="originalWatchDate" required>
-                <input type="hidden" value="" name="tmdbId" id="originalWatchDatePlays" required>
+                <input type="hidden" value="" id="editPlayId">
                 <div class="input-group" id="watchDateGroup">
                     <i class="bi bi-calendar-date input-group-text editWatchDateInputIcon" data-bs-toggle="tooltip" data-bs-title="Watch date" aria-label="Watch date"></i>
                     <input type="text" class="datepicker_input form-control" placeholder="Watch date" aria-label="Watch date" id="editWatchDateModalInput" required
@@ -39,13 +38,6 @@
                     <div class="input-group" style="margin-top: 1rem">
                         <span class="input-group-text">Comment</span>
                         <textarea class="form-control" rows="1" aria-label="Comment" id="editWatchDateModalCommentInput"></textarea>
-                    </div>
-                    <div class="input-group" style="margin-top: 1rem">
-                        <i class="input-group-text">Plays</i>
-                        <input type="number" class="form-control" aria-label="Plays" id="editWatchDateModalPlaysInput" min="1" required>
-                        <button class="btn btn-outline-secondary" id="editWatchDateModalPlays" data-bs-toggle="tooltip" data-bs-title="The number of plays for the movie on this date">
-                            <i class="bi bi-question-lg"></i>
-                        </button>
                     </div>
                     <div class="input-group" style="margin-top: 1rem;margin-bottom: 1rem">
                         <i class="input-group-text">Position</i>

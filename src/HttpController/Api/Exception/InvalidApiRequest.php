@@ -54,6 +54,15 @@ class InvalidApiRequest extends RuntimeException
         );
     }
 
+    public static function playCountConflict() : self
+    {
+        return new self(
+            'PlayCountConflict',
+            'Reducing the play count would remove an annotated or referenced play. Edit plays by ID instead.',
+            StatusCode::createConflict(),
+        );
+    }
+
     public static function unsupportedWebhookMediaType(string $expected) : self
     {
         return new self(

@@ -79,7 +79,7 @@ class PlayedRequestMapper
         return $result;
     }
 
-    /** @return list<array{movieId: int, watchDates: list<array{watchedAt: null|Date, plays: int, comment: null|string}>}> */
+    /** @return list<array{movieId: int, watchDates: list<array{watchedAt: null|Date, plays: int, comment: null|string, commentProvided: bool}>}> */
     public function mapUpdates(Request $request) : array
     {
         $result = [];
@@ -129,7 +129,7 @@ class PlayedRequestMapper
 
     /**
      * @param array<string, mixed> $update
-     * @return list<array{watchedAt: null|Date, plays: int, comment: null|string}>
+     * @return list<array{watchedAt: null|Date, plays: int, comment: null|string, commentProvided: bool}>
      */
     private function mapUpdateWatchDates(array $update, string $path) : array
     {
@@ -153,6 +153,7 @@ class PlayedRequestMapper
                     'comment',
                     $watchDatePath . '.comment',
                 ),
+                'commentProvided' => array_key_exists('comment', $watchDate),
             ];
         }
 

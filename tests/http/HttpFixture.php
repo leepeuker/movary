@@ -77,6 +77,18 @@ class HttpFixture
         );
     }
 
+    public function countHistoryPlays(int $movieId, int $userId, ?string $watchedAt) : int
+    {
+        /** @var \Movary\Domain\Movie\History\MovieHistoryRepository $repository */
+        $repository = $this->container->get(\Movary\Domain\Movie\History\MovieHistoryRepository::class);
+
+        return count($repository->fetchPlaysByMovieAndDate(
+            $movieId,
+            $userId,
+            $watchedAt === null ? null : Date::createFromString($watchedAt),
+        ));
+    }
+
     public function findMovieReview(int $movieId, int $userId) : ?MovieReviewEntity
     {
         /** @var MovieReviewApi $movieReviewApi */

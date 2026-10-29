@@ -408,7 +408,15 @@ class MovieRepository
     public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ? ORDER BY watched_at',
+            'SELECT watched_at, COUNT(*) AS plays FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ? GROUP BY watched_at ORDER BY watched_at',
+            [$movieId, $userId],
+        );
+    }
+
+    public function fetchPlaysByMovieId(int $movieId, int $userId) : array
+    {
+        return $this->dbConnection->fetchAllAssociative(
+            'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ? ORDER BY watched_at, position, id',
             [$movieId, $userId],
         );
     }
@@ -433,6 +441,58 @@ class MovieRepository
         )[0];
     }
 
+    public function fetchLegacyHistoryCount(int $userId, ?string $searchTerm = null) : int
+    {
+        $where = '';
+        $parameters = [$userId];
+        if ($searchTerm !== null) {
+            $where = 'AND (m.title LIKE ? OR m.original_title LIKE ?)';
+            $parameters[] = "%$searchTerm%";
+            $parameters[] = "%$searchTerm%";
+        }
+
+        return (int)$this->dbConnection->fetchOne(
+            "SELECT COUNT(*) FROM (
+                SELECT mh.movie_id, mh.watched_at
+                FROM movie_user_watch_dates mh
+                JOIN movie m ON m.id = mh.movie_id
+                WHERE mh.user_id = ? AND mh.watched_at IS NOT NULL $where
+                GROUP BY mh.movie_id, mh.watched_at
+            ) grouped_history",
+            $parameters,
+        );
+    }
+
+    public function fetchLegacyHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
+    {
+        $where = '';
+        $parameters = [$userId];
+        if ($searchTerm !== null) {
+            $where = 'AND (m.title LIKE ? OR m.original_title LIKE ?)';
+            $parameters[] = "%$searchTerm%";
+            $parameters[] = "%$searchTerm%";
+        }
+
+        $offset = ($limit * $page) - $limit;
+
+        return $this->dbConnection->fetchAllAssociative(
+            "SELECT m.*, mh.watched_at, mur.rating AS userRating, mh.location_id AS locationId
+            FROM (
+                SELECT MIN(mh.id) AS id
+                FROM movie_user_watch_dates mh
+                JOIN movie m ON m.id = mh.movie_id
+                WHERE mh.user_id = ? AND mh.watched_at IS NOT NULL $where
+                GROUP BY mh.movie_id, mh.watched_at
+            ) grouped_history
+            JOIN movie_user_watch_dates mh ON mh.id = grouped_history.id
+            JOIN movie m ON m.id = mh.movie_id
+            LEFT JOIN movie_user_rating mur ON mur.movie_id = m.id AND mur.user_id = mh.user_id
+            ORDER BY mh.watched_at $sortOrder, mh.position $sortOrder, mh.id $sortOrder
+            LIMIT $offset, $limit",
+            $parameters,
+        );
+    }
+
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
     {
         $payload = [$userId, $userId];
@@ -453,7 +513,7 @@ class MovieRepository
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
             $whereQuery
-            ORDER BY watched_at $sortOrder, mh.position $sortOrder
+            ORDER BY watched_at $sortOrder, mh.position $sortOrder, mh.id $sortOrder
             LIMIT $offset, $limit
             SQL,
             $payload,
@@ -467,7 +527,7 @@ class MovieRepository
             FROM movie m
             JOIN movie_user_watch_dates mh ON mh.movie_id = m.id AND mh.user_id = ? AND mh.watched_at IS NOT NULL
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
-            ORDER BY watched_at DESC, mh.position DESC
+            ORDER BY watched_at DESC, mh.position DESC, mh.id DESC
             LIMIT 6',
             [$userId, $userId],
         )->fetchAllAssociative();
@@ -482,7 +542,7 @@ class MovieRepository
             LEFT JOIN movie_user_rating mur ON mh.movie_id = mur.movie_id AND mur.user_id = ?
             JOIN location l on l.id = mh.location_id
             WHERE l.is_cinema = 1
-            ORDER BY watched_at DESC, mh.position DESC
+            ORDER BY watched_at DESC, mh.position DESC, mh.id DESC
             LIMIT 6',
             [$userId, $userId],
         )->fetchAllAssociative();
@@ -694,7 +754,7 @@ class MovieRepository
             SELECT DISTINCT tmdb_id
             FROM movie
             WHERE id IN ($placeholders) AND id NOT IN (
-                SELECT DISTINCT id
+            SELECT DISTINCT m.id
                 FROM movie_user_watch_dates
                 JOIN movie m on movie_user_watch_dates.movie_id = m.id
                 WHERE user_id = ? AND movie_id IN ($placeholders)
@@ -1055,7 +1115,7 @@ class MovieRepository
                 LEFT JOIN genre g on mg.genre_id = g.id
                 $joinProductionCountry
                 $whereQuery
-                GROUP BY m.id, title, release_date, watched_at, rating, mh.position
+                GROUP BY m.id, title, release_date, watched_at, rating, mh.position, mh.id
                 ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition $movieTitleSortExpression asc
             ) a
             WHERE rn = 1
@@ -1074,10 +1134,18 @@ class MovieRepository
         $placeholders = trim(str_repeat('?, ', count($movieIds)), ', ');
 
         return $this->dbConnection->fetchAllAssociative(
-            "SELECT watched_at, plays, comment, movie_id
+            "SELECT watched_at, COUNT(*) AS plays,
+                (SELECT comment FROM movie_user_watch_dates first_play
+                 WHERE first_play.movie_id = movie_user_watch_dates.movie_id
+                   AND first_play.user_id = movie_user_watch_dates.user_id
+                   AND (first_play.watched_at = movie_user_watch_dates.watched_at
+                        OR (first_play.watched_at IS NULL AND movie_user_watch_dates.watched_at IS NULL))
+                 ORDER BY first_play.id LIMIT 1) AS comment,
+                movie_id
             FROM movie_user_watch_dates
             WHERE user_id = ? and movie_id in ($placeholders)
-            ORDER BY watched_at DESC, position DESC",
+            GROUP BY movie_id, user_id, watched_at
+            ORDER BY watched_at DESC",
             [
                 $userId,
                 ...$movieIds
@@ -1093,7 +1161,7 @@ class MovieRepository
             JOIN movie m on muwd.movie_id = m.id
             LEFT JOIN location l on muwd.location_id = l.id
             WHERE muwd.user_id = ?
-            ORDER BY watched_at DESC, muwd.position DESC',
+            ORDER BY watched_at DESC, muwd.position DESC, muwd.id DESC',
             [$userId],
         );
     }
@@ -1192,12 +1260,12 @@ class MovieRepository
     {
         if ($watchedAt === null) {
             $result = $this->dbConnection->fetchAssociative(
-                'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL',
+                'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ? AND watched_at IS NULL ORDER BY id LIMIT 1',
                 [$movieId, $userId],
             );
         } else {
             $result = $this->dbConnection->fetchAssociative(
-                'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ?',
+                'SELECT * FROM movie_user_watch_dates WHERE movie_id = ? AND watched_at = ? AND user_id = ? ORDER BY id LIMIT 1',
                 [$movieId, $watchedAt, $userId],
             );
         }

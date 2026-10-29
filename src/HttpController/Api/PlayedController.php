@@ -2,7 +2,9 @@
 
 namespace Movary\HttpController\Api;
 
+use Movary\Domain\Movie\History\PlayCountConflict;
 use Movary\Domain\Movie\MovieApi;
+use Movary\HttpController\Api\Exception\InvalidApiRequest;
 use Movary\HttpController\Api\RequestMapper\PlayedRequestMapper;
 use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\PlayedResponseMapper;
@@ -123,13 +125,18 @@ class PlayedController
 
         foreach ($playedUpdates as $playedUpdate) {
             foreach ($playedUpdate['watchDates'] as $watchDate) {
-                $this->movieApi->replaceHistoryForMovieByDate(
-                    $playedUpdate['movieId'],
-                    $userId,
-                    $watchDate['watchedAt'],
-                    $watchDate['plays'],
-                    comment: $watchDate['comment'],
-                );
+                try {
+                    $this->movieApi->replaceHistoryForMovieByDate(
+                        $playedUpdate['movieId'],
+                        $userId,
+                        $watchDate['watchedAt'],
+                        $watchDate['plays'],
+                        comment: $watchDate['comment'],
+                        commentProvided: $watchDate['commentProvided'],
+                    );
+                } catch (PlayCountConflict) {
+                    throw InvalidApiRequest::playCountConflict();
+                }
             }
         }
 
