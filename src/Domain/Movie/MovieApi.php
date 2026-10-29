@@ -522,9 +522,7 @@ class MovieApi
     ) : void {
         $existingHistoryEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
 
-        $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
-
-        $this->historyApi->update(
+        $createdPlays = $this->historyApi->update(
             $movieId,
             $userId,
             $watchedAt,
@@ -534,6 +532,10 @@ class MovieApi
             $locationId ?? $existingHistoryEntry?->getLocationId(),
             $postToMastodon,
         );
+
+        if ($createdPlays === true) {
+            $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
+        }
     }
 
     public function updateCast(int $movieId, TmdbCast $tmdbCast) : void

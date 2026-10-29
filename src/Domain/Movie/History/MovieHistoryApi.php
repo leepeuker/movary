@@ -642,7 +642,7 @@ class MovieHistoryApi
         ?string $comment = null,
         ?int $locationId = null,
         ?bool $postToMastodon = null,
-    ) : void {
+    ) : bool {
         $createdIds = $this->dbConnection->transactional(
             fn() : array => $this->reconcileDateGroup($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId),
         );
@@ -654,6 +654,8 @@ class MovieHistoryApi
                 $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt, $playId);
             }
         }
+
+        return $createdIds !== [];
     }
 
     public function updateHistoryComment(

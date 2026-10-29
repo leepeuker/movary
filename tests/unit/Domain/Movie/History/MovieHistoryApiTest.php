@@ -110,6 +110,26 @@ class MovieHistoryApiTest extends TestCase
         $this->subject->create(11, 22, $watchedAt, 1);
     }
 
+    public function testUpdateReportsWhetherItCreatedPlays() : void
+    {
+        $this->repositoryMock->method('fetchPlaysByMovieAndDate')->willReturn([]);
+        $this->repositoryMock->expects(self::once())->method('createPlay')->willReturn(42);
+
+        self::assertTrue($this->subject->update(11, 22, null, 1, 1));
+    }
+
+    public function testUpdateWithoutNewPlaysReportsFalse() : void
+    {
+        $this->repositoryMock->method('fetchPlaysByMovieAndDate')->willReturn([[
+            'id' => 42,
+            'comment' => null,
+            'location_id' => null,
+        ]]);
+        $this->repositoryMock->expects(self::never())->method('createPlay');
+
+        self::assertFalse($this->subject->update(11, 22, null, 1, 1));
+    }
+
     public function testFetchPersonalRatingDistributionIncludesRatingsWithoutEntries() : void
     {
         $this->repositoryMock->expects(self::never())->method('fetchHighestPositionForWatchDate');
