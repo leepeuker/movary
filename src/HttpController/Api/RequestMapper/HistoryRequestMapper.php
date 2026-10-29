@@ -75,7 +75,7 @@ class HistoryRequestMapper
         return $result;
     }
 
-    /** @return list<array{movieId: int, watchedAt: Date, plays: int, position: null|int, comment: null|string}> */
+    /** @return list<array{movieId: int, watchedAt: Date, plays: int, position: null|int, comment: null|string, commentProvided: bool}> */
     public function mapUpdates(Request $request) : array
     {
         $result = [];
@@ -97,6 +97,7 @@ class HistoryRequestMapper
                     self::MAX_SMALLINT,
                 ),
                 'comment' => $this->requestMapper->mapOptionalNullableString($update, 'comment', $path . '.comment'),
+                'commentProvided' => array_key_exists('comment', $update),
             ];
         }
 

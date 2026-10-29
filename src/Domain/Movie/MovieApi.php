@@ -61,33 +61,17 @@ class MovieApi
         ?int $locationId = null,
         ?bool $postToMastodon = null,
     ) : void {
-        $historyEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedDate);
-
         $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
 
-        if ($historyEntry === null) {
-            $this->historyApi->create(
-                $movieId,
-                $userId,
-                $watchedDate,
-                $playsToAdd,
-                $position,
-                $comment,
-                $locationId,
-                $postToMastodon,
-            );
-
-            return;
-        }
-
-        $this->historyApi->update(
+        $this->historyApi->create(
             $movieId,
             $userId,
             $watchedDate,
-            $historyEntry->getPlays() + $playsToAdd,
-            $position ?? $historyEntry->getPosition(),
-            $comment ?? $historyEntry->getComment(),
-            $locationId ?? $historyEntry->getLocationId(),
+            $playsToAdd,
+            $position,
+            $comment,
+            $locationId,
+            $postToMastodon,
         );
     }
 
@@ -209,6 +193,11 @@ class MovieApi
     public function fetchHistoryByMovieId(int $movieId, int $userId) : array
     {
         return $this->historyApi->fetchHistoryByMovieId($movieId, $userId);
+    }
+
+    public function fetchPlaysByMovieId(int $movieId, int $userId) : array
+    {
+        return $this->historyApi->fetchPlaysByMovieId($movieId, $userId);
     }
 
     public function fetchHistoryMovieTotalPlays(int $movieId, int $userId) : int
@@ -529,40 +518,23 @@ class MovieApi
         ?string $comment = null,
         ?int $locationId = null,
         ?bool $postToMastodon = null,
+        bool $commentProvided = false,
     ) : void {
-        $existingHistoryEntry = $this->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchedAt);
-
-        if ($existingHistoryEntry === null) {
-            $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
-
-            $this->historyApi->create(
-                $movieId,
-                $userId,
-                $watchedAt,
-                $playsPerDate,
-                $position,
-                $comment,
-                $locationId,
-                $postToMastodon,
-            );
-
-            return;
-        }
-
-        if ($existingHistoryEntry->getPlays() < $playsPerDate) {
-            $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
-        }
-
-        $this->historyApi->update(
+        $createdPlays = $this->historyApi->update(
             $movieId,
             $userId,
             $watchedAt,
             $playsPerDate,
-            $position ?? $existingHistoryEntry->getPosition(),
-            $comment ?? $existingHistoryEntry->getComment(),
-            $locationId ?? $existingHistoryEntry->getLocationId(),
+            $position,
+            $comment,
+            $locationId,
             $postToMastodon,
+            $commentProvided,
         );
+
+        if ($createdPlays === true) {
+            $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
+        }
     }
 
     public function updateCast(int $movieId, TmdbCast $tmdbCast) : void

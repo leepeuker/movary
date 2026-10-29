@@ -12,6 +12,7 @@ use Movary\Service\ApplicationUrlService;
 use Movary\Service\SlugifyService;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\RelativeUrl;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class MastodonPostPlayService
@@ -25,6 +26,7 @@ class MastodonPostPlayService
         private readonly SlugifyService $slugify,
         private readonly ApplicationUrlService $applicationUrlService,
         private readonly MovieHistoryApi $movieHistoryApi,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -45,11 +47,25 @@ class MastodonPostPlayService
             $watchDate = Date::createFromString($watchDate);
         }
 
-        $this->postPlay($userId, $movieId, $watchDate);
+        $playId = $job->getParameters()['playId'] ?? null;
+        $this->postPlay($userId, $movieId, $watchDate, $playId === null ? null : (int)$playId);
     }
 
-    public function postPlay(int $userId, int $movieId, ?Date $watchDate) : void
+    public function postPlay(int $userId, int $movieId, ?Date $watchDate, ?int $playId = null) : void
     {
+        $historyEntry = $playId === null
+            ? $this->movieHistoryApi->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchDate)
+            : $this->movieHistoryApi->findPlayById($playId, $userId);
+        if ($playId !== null && ($historyEntry === null || $historyEntry->getMovieId() !== $movieId)) {
+            $this->logger->info('Mastodon play post skipped: no play found for the requested user and movie.', [
+                'playId' => $playId,
+                'userId' => $userId,
+                'movieId' => $movieId,
+            ]);
+
+            return;
+        }
+
         $movie = $this->movieApi->findById($movieId);
         if ($movie === null) {
             throw new RuntimeException('Movie does not exist with id: ' . $movieId);
@@ -70,7 +86,7 @@ class MastodonPostPlayService
             $mastodonMessageRating = $this->formatUserRating($personalRating);
         }
 
-        $watchHistoryComment = $this->movieHistoryApi->findHistoryEntryForMovieByUserOnDate($movieId, $userId, $watchDate)?->getComment();
+        $watchHistoryComment = $historyEntry?->getComment();
         if ($watchHistoryComment != null) {
             $mastodonMessageComment = $this->formatUserComment($watchHistoryComment);
         }

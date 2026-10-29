@@ -74,11 +74,19 @@ class PlayedControllerTest extends TestCase
             ->expects(self::once())
             ->method('mapUpdates')
             ->with($request)
-            ->willReturn($this->createMappedPlay($watchDate, 'A comment'));
+            ->willReturn([[
+                'movieId' => 34,
+                'watchDates' => [[
+                    'watchedAt' => $watchDate,
+                    'plays' => 2,
+                    'comment' => 'A comment',
+                    'commentProvided' => true,
+                ]],
+            ]]);
         $this->movieApiMock
             ->expects(self::once())
             ->method('replaceHistoryForMovieByDate')
-            ->with(34, 12, $watchDate, 2, null, 'A comment');
+            ->with(34, 12, $watchDate, 2, null, 'A comment', null, null, true);
 
         $response = $this->subject->updatePlayed($request);
 

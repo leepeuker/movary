@@ -2,6 +2,7 @@
 
 namespace Movary\Domain\Movie\History;
 
+use Doctrine\DBAL\Connection;
 use Movary\Api\Tmdb;
 use Movary\Domain\Movie;
 use Movary\Domain\User\UserApi;
@@ -22,6 +23,7 @@ class MovieHistoryApi
         private readonly ImageUrlService $urlGenerator,
         private readonly JobQueueApi $jobQueueApi,
         private readonly UserApi $userApi,
+        private readonly Connection $dbConnection,
     ) {
     }
 
@@ -34,12 +36,26 @@ class MovieHistoryApi
         ?string $comment = null,
         ?int $locationId = null,
         ?bool $postToMastodon = null,
-    ) : void {
+    ) : array {
         if ($position === null) {
-            $position = (int)$this->findHighestPositionForWatchDate($movieId, $userId, $watchedAt) + 1;
+            $position = (int)$this->findHighestPositionForWatchDate($userId, $watchedAt) + 1;
         }
 
-        $this->repository->create($movieId, $userId, $watchedAt, $plays, $comment, $position, $locationId);
+        $playIds = $this->dbConnection->transactional(function () use ($movieId, $userId, $watchedAt, $plays, $comment, $position, $locationId) : array {
+            $created = [];
+            for ($index = 0; $index < $plays; $index++) {
+                $created[] = $this->repository->createPlay(
+                    $movieId,
+                    $userId,
+                    $watchedAt,
+                    $index === 0 ? $comment : null,
+                    min($position + $index, 32767),
+                    $index === 0 ? $locationId : null,
+                );
+            }
+
+            return $created;
+        });
 
         $user = $this->userApi->fetchUser($userId);
         if ($user->hasJellyfinSyncEnabled() === true) {
@@ -47,7 +63,67 @@ class MovieHistoryApi
         }
 
         if ($user->isMastodonEnabled() === true && $postToMastodon === true) {
-            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt);
+            foreach ($playIds as $playId) {
+                $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt, $playId);
+            }
+        }
+
+        return $playIds;
+    }
+
+    public function createPlay(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        ?int $position = null,
+        ?string $comment = null,
+        ?int $locationId = null,
+        ?bool $postToMastodon = null,
+    ) : int {
+        return $this->create($movieId, $userId, $watchedAt, 1, $position, $comment, $locationId, $postToMastodon)[0];
+    }
+
+    public function findPlayById(int $playId, int $userId) : ?MovieHistoryEntity
+    {
+        return $this->repository->findPlayById($playId, $userId);
+    }
+
+    public function updatePlayById(
+        int $playId,
+        int $userId,
+        ?Date $watchedAt,
+        int $position,
+        ?string $comment,
+        ?int $locationId,
+        ?bool $postToMastodon = null,
+    ) : void {
+        $play = $this->repository->findPlayById($playId, $userId);
+        if ($play === null) {
+            return;
+        }
+
+        $this->repository->updatePlayById($playId, $userId, $watchedAt, $position, $comment, $locationId);
+
+        $user = $this->userApi->fetchUser($userId);
+        if ($user->hasJellyfinSyncEnabled() === true) {
+            $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$play->getMovieId()]);
+        }
+        if ($user->isMastodonEnabled() === true && $postToMastodon === true) {
+            $this->jobQueueApi->addMastodonPostPlayJob($userId, $play->getMovieId(), $watchedAt, $playId);
+        }
+    }
+
+    public function deletePlayById(int $playId, int $userId) : void
+    {
+        $play = $this->repository->findPlayById($playId, $userId);
+        if ($play === null) {
+            return;
+        }
+
+        $this->repository->deletePlayById($playId, $userId);
+
+        if ($this->userApi->fetchUser($userId)->hasJellyfinSyncEnabled() === true) {
+            $this->jobQueueApi->addJellyfinExportMoviesJob($userId, [$play->getMovieId()]);
         }
     }
 
@@ -208,9 +284,19 @@ class MovieHistoryApi
         return $this->movieRepository->fetchHistoryByMovieId($movieId, $userId);
     }
 
+    public function fetchPlaysByMovieId(int $movieId, int $userId) : array
+    {
+        return $this->movieRepository->fetchPlaysByMovieId($movieId, $userId);
+    }
+
     public function fetchHistoryCount(int $userId, ?string $searchTerm = null) : int
     {
         return $this->movieRepository->fetchHistoryCount($userId, $searchTerm);
+    }
+
+    public function fetchLegacyHistoryCount(int $userId, ?string $searchTerm = null) : int
+    {
+        return $this->movieRepository->fetchLegacyHistoryCount($userId, $searchTerm);
     }
 
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null, ?SortOrder $sortOrder = null) : array
@@ -218,6 +304,13 @@ class MovieHistoryApi
         $historyEntries = $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $sortOrder ?? SortOrder::createDesc(), $searchTerm);
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($historyEntries);
+    }
+
+    public function fetchLegacyHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null, ?SortOrder $sortOrder = null) : array
+    {
+        $entries = $this->movieRepository->fetchLegacyHistoryPaginated($userId, $limit, $page, $sortOrder ?? SortOrder::createDesc(), $searchTerm);
+
+        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($entries);
     }
 
     public function fetchLastPlays(int $userId) : array
@@ -530,9 +623,9 @@ class MovieHistoryApi
         return $this->movieRepository->fetchWatchDatesOrderedByWatchedAtDesc($userId);
     }
 
-    public function findHighestPositionForWatchDate(int $movieIdToIgnore, int $userId, ?Date $watchedAt) : ?int
+    public function findHighestPositionForWatchDate(int $userId, ?Date $watchedAt) : ?int
     {
-        return $this->repository->fetchHighestPositionForWatchDate($movieIdToIgnore, $userId, $watchedAt);
+        return $this->repository->fetchHighestPositionForWatchDate($userId, $watchedAt);
     }
 
     public function findHistoryEntryForMovieByUserOnDate(int $movieId, int $userId, ?Date $watchedAt) : ?MovieHistoryEntity
@@ -545,18 +638,25 @@ class MovieHistoryApi
         int $userId,
         ?Date $watchedAt,
         int $plays,
-        int $position,
+        ?int $position,
         ?string $comment = null,
         ?int $locationId = null,
         ?bool $postToMastodon = null,
-    ) : void {
-        $this->repository->update($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId);
+        bool $commentProvided = false,
+    ) : bool {
+        $createdIds = $this->dbConnection->transactional(
+            fn() : array => $this->reconcileDateGroup($movieId, $userId, $watchedAt, $plays, $position, $comment, $locationId, $commentProvided),
+        );
 
         $user = $this->userApi->fetchUser($userId);
 
         if ($user->isMastodonEnabled() === true && $postToMastodon === true) {
-            $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt);
+            foreach ($createdIds as $playId) {
+                $this->jobQueueApi->addMastodonPostPlayJob($userId, $movieId, $watchedAt, $playId);
+            }
         }
+
+        return $createdIds !== [];
     }
 
     public function updateHistoryComment(
@@ -575,5 +675,74 @@ class MovieHistoryApi
         ?int $locationId,
     ) : void {
         $this->repository->updateHistoryLocation($movieId, $userId, $watchAt, $locationId);
+    }
+
+    private function reconcileDateGroup(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        int $plays,
+        ?int $position,
+        ?string $comment,
+        ?int $locationId,
+        bool $commentProvided,
+    ) : array {
+        $rows = $this->repository->fetchPlaysByMovieAndDate($movieId, $userId, $watchedAt);
+        $existingCount = count($rows);
+
+        if ($plays < $existingCount) {
+            $removable = array_filter(
+                array_reverse($rows),
+                fn(array $row) : bool => $row['comment'] === null
+                    && $row['location_id'] === null
+                    && $this->repository->hasMastodonJobReference((int)$row['id'], $userId) === false,
+            );
+            if (count($removable) < $existingCount - $plays) {
+                throw new PlayCountConflict('Cannot reduce plays without deleting annotated history.');
+            }
+
+            foreach (array_slice(array_values($removable), 0, $existingCount - $plays) as $row) {
+                $this->repository->deletePlayById((int)$row['id'], $userId);
+            }
+
+            $rows = $this->repository->fetchPlaysByMovieAndDate($movieId, $userId, $watchedAt);
+        }
+
+        $createdIds = [];
+        $existingCount = count($rows);
+        $nextPosition = $position ?? ((int)$this->findHighestPositionForWatchDate($userId, $watchedAt) + 1);
+        for ($index = count($rows); $index < $plays; $index++) {
+            $createdIds[] = $this->repository->createPlay(
+                $movieId,
+                $userId,
+                $watchedAt,
+                $index === 0 ? $comment : null,
+                $this->positionForCreatedPlay($position, $nextPosition, $index, $existingCount),
+                $index === 0 ? $locationId : null,
+            );
+        }
+
+        foreach ($rows as $index => $row) {
+            $this->repository->updatePlayById(
+                (int)$row['id'],
+                $userId,
+                $watchedAt,
+                $this->positionForExistingPlay($position, $row, $index),
+                $index === 0 && ($commentProvided || $comment !== null) ? $comment : $row['comment'],
+                $index === 0 && $locationId !== null ? $locationId : $row['location_id'],
+            );
+        }
+
+        return $createdIds;
+    }
+
+    private function positionForCreatedPlay(?int $requestedPosition, int $nextPosition, int $index, int $existingCount) : int
+    {
+        return min($nextPosition + ($requestedPosition === null ? $index - $existingCount : $index), 32767);
+    }
+
+    private function positionForExistingPlay(?int $requestedPosition, array $row, int $index) : int
+    {
+        return $requestedPosition === null ? (int)$row['position'] : min($requestedPosition + $index, 32767);
     }
 }

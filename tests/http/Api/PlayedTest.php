@@ -11,6 +11,38 @@ class PlayedTest extends HttpTestCase
 {
     private const string WATCHED_AT = '2024-05-06';
 
+    public function testRepeatedSameDayAdditionsRetainGroupedPlayedResponse() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($fixture['user']->getName());
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->http->post($path, [[
+            'movaryId' => $movie->getId(),
+            'watchDates' => [[
+                'watchedAt' => self::WATCHED_AT,
+                'plays' => 2,
+                'comment' => 'First addition',
+            ]],
+        ]], $headers)->assertStatus(204);
+        $this->http->post($path, [[
+            'movaryId' => $movie->getId(),
+            'watchDates' => [[
+                'watchedAt' => self::WATCHED_AT,
+                'plays' => 1,
+            ]],
+        ]], $headers)->assertStatus(204);
+
+        $response = $this->http->get($path, $headers)->assertStatus(200)->json();
+        self::assertCount(1, $response['played']);
+        self::assertSame($movie->getId(), $response['played'][0]['movie']['ids']['movary']);
+        self::assertSame(
+            [['date' => self::WATCHED_AT, 'plays' => 3, 'comment' => 'First addition']],
+            $response['played'][0]['watchDates'],
+        );
+    }
+
     public function testOwnerCanCreateReadUpdateAndDeletePlayedMovie() : void
     {
         $fixture = $this->fixture->createUserWithToken();
@@ -43,7 +75,7 @@ class PlayedTest extends HttpTestCase
             self::WATCHED_AT,
         );
         self::assertNotNull($datedEntry);
-        self::assertSame(2, $datedEntry->getPlays());
+        self::assertSame(2, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
         self::assertSame('Dated play', $datedEntry->getComment());
 
         $undatedEntry = $this->fixture->findHistoryEntry(
@@ -52,7 +84,7 @@ class PlayedTest extends HttpTestCase
             null,
         );
         self::assertNotNull($undatedEntry);
-        self::assertSame(1, $undatedEntry->getPlays());
+        self::assertSame(1, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), null));
         self::assertSame('Undated play', $undatedEntry->getComment());
 
         $playedResponse = $this->http
@@ -94,7 +126,7 @@ class PlayedTest extends HttpTestCase
             self::WATCHED_AT,
         );
         self::assertNotNull($updatedEntry);
-        self::assertSame(4, $updatedEntry->getPlays());
+        self::assertSame(4, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
         self::assertSame('Updated dated play', $updatedEntry->getComment());
 
         $this->http
@@ -312,7 +344,7 @@ class PlayedTest extends HttpTestCase
 
         $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), null);
         self::assertNotNull($entry);
-        self::assertSame(1, $entry->getPlays());
+        self::assertSame(1, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), null));
         self::assertNull($entry->getComment());
     }
 
@@ -341,7 +373,7 @@ class PlayedTest extends HttpTestCase
 
         $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT);
         self::assertNotNull($entry);
-        self::assertSame(2, $entry->getPlays());
+        self::assertSame(2, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
         self::assertSame('Keep me', $entry->getComment());
     }
 

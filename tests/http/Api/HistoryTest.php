@@ -11,6 +11,35 @@ class HistoryTest extends HttpTestCase
 {
     private const string WATCHED_AT = '2024-05-06';
 
+    public function testRepeatedSameDayAdditionsRemainOnePaginatedHistoryEntry() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($fixture['user']->getName());
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->http->post($path, [[
+            'movaryId' => $movie->getId(),
+            'watchedAt' => self::WATCHED_AT,
+            'plays' => 2,
+        ]], $headers)->assertStatus(204);
+        $this->http->post($path, [[
+            'movaryId' => $movie->getId(),
+            'watchedAt' => self::WATCHED_AT,
+        ]], $headers)->assertStatus(204);
+
+        $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT);
+        self::assertNotNull($entry);
+        self::assertSame(3, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
+
+        $response = $this->http->get($path . '?limit=1', $headers)->assertStatus(200)->json();
+        self::assertSame(1, $response['currentPage']);
+        self::assertSame(1, $response['maxPage']);
+        self::assertCount(1, $response['history']);
+        self::assertSame(self::WATCHED_AT, $response['history'][0]['watchedAt']);
+        self::assertSame($movie->getId(), $response['history'][0]['movie']['ids']['movary']);
+    }
+
     public function testOwnerCanCreateReadUpdateAndDeleteHistory() : void
     {
         $fixture = $this->fixture->createUserWithToken();
@@ -35,7 +64,7 @@ class HistoryTest extends HttpTestCase
             self::WATCHED_AT,
         );
         self::assertNotNull($createdEntry);
-        self::assertSame(2, $createdEntry->getPlays());
+        self::assertSame(2, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
         self::assertSame(1, $createdEntry->getPosition());
         self::assertSame('Created through the API', $createdEntry->getComment());
 
@@ -70,7 +99,7 @@ class HistoryTest extends HttpTestCase
             self::WATCHED_AT,
         );
         self::assertNotNull($updatedEntry);
-        self::assertSame(3, $updatedEntry->getPlays());
+        self::assertSame(3, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
         self::assertSame(2, $updatedEntry->getPosition());
         self::assertSame('Updated through the API', $updatedEntry->getComment());
 
@@ -88,6 +117,52 @@ class HistoryTest extends HttpTestCase
             self::WATCHED_AT,
         ));
         self::assertSame([], $this->http->get($path, $headers)->assertStatus(200)->json()['history']);
+    }
+
+    public function testRejectsReductionThatWouldDeleteAnAnnotatedPlay() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($fixture['user']->getName());
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        foreach (['First comment', 'Second comment'] as $comment) {
+            $this->http->post($path, [[
+                'movaryId' => $movie->getId(),
+                'watchedAt' => self::WATCHED_AT,
+                'comment' => $comment,
+            ]], $headers)->assertStatus(204);
+        }
+
+        $this->http->put($path, [[
+            'movaryId' => $movie->getId(),
+            'watchedAt' => self::WATCHED_AT,
+            'plays' => 1,
+        ]], $headers)->assertStatus(409);
+
+        self::assertSame(2, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
+    }
+
+    public function testExplicitNullCommentClearsCanonicalPlayComment() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $path = $this->createPath($fixture['user']->getName());
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->http->post($path, [[
+            'movaryId' => $movie->getId(),
+            'watchedAt' => self::WATCHED_AT,
+            'comment' => 'Remove me',
+        ]], $headers)->assertStatus(204);
+        $this->http->put($path, [[
+            'movaryId' => $movie->getId(),
+            'watchedAt' => self::WATCHED_AT,
+            'plays' => 1,
+            'comment' => null,
+        ]], $headers)->assertStatus(204);
+
+        self::assertNull($this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT)?->getComment());
     }
 
     #[DataProvider('writeMethodProvider')]
@@ -290,7 +365,7 @@ class HistoryTest extends HttpTestCase
 
         $entry = $this->fixture->findHistoryEntry($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT);
         self::assertNotNull($entry);
-        self::assertSame(2, $entry->getPlays());
+        self::assertSame(2, $this->fixture->countHistoryPlays($movie->getId(), $fixture['user']->getId(), self::WATCHED_AT));
         self::assertSame(2, $entry->getPosition());
         self::assertSame('Keep me', $entry->getComment());
     }

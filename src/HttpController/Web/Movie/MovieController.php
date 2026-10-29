@@ -97,7 +97,7 @@ class MovieController
                 'castMembers' => $this->movieApi->findCastByMovieId($movieId),
                 'directors' => $this->movieApi->findDirectorsByMovieId($movieId),
                 'totalPlays' => $this->movieApi->fetchHistoryMovieTotalPlays($movieId, $userId),
-                'watchDates' => $this->movieApi->fetchHistoryByMovieId($movieId, $userId),
+                'watchDates' => $this->movieApi->fetchPlaysByMovieId($movieId, $userId),
                 'isOnWatchlist' => $this->movieWatchlistApi->hasMovieInWatchlist($userId, $movieId),
                 'countries' => $this->countryApi->getIso31661ToNameMap(),
                 'displayCharacterNames' => $currentUser?->getDisplayCharacterNames() ?? true,
