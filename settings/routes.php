@@ -364,7 +364,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes = RouteList::create();
 
     $routes->add('GET', '/openapi', [Api\OpenApiController::class, 'getSchema']);
-    $routes->add('GET', '/authentication/token', [Api\AuthenticationController::class, 'getTokenData']);
+    $routes->add('GET', '/me', [Api\AuthenticationController::class, 'getTokenData']);
 
     $routeUserDashboardRows = '/users/{username:[a-zA-Z0-9]+}/dashboard/rows';
     $routes->add('GET', $routeUserDashboardRows, [Api\DashboardController::class, 'getRows'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
