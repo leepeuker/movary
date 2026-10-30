@@ -16,6 +16,22 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(UserApi::class)]
 class UserApiTest extends TestCase
 {
+    public function testValidatesUsernameBeforeUpdatingPreferences() : void
+    {
+        $repository = $this->createMock(UserRepository::class);
+        $validator = $this->createMock(Validator::class);
+        $validator->expects(self::once())->method('ensureNameFormatIsValid')->with('NewName');
+        $validator->expects(self::once())->method('ensureNameIsUnique')->with('NewName', 7);
+        $repository->expects(self::once())->method('updatePreferences')->with(7, ['username' => 'NewName', 'privacyLevel' => 2]);
+
+        (new UserApi(
+            $repository,
+            $validator,
+            $this->createStub(PasswordPolicy::class),
+            $this->createStub(EmailVerificationPolicy::class),
+        ))->updatePreferences(7, ['username' => 'NewName', 'privacyLevel' => 2]);
+    }
+
     public function testCountUsersReturnsRepositoryResult() : void
     {
         /** @var UserRepository&MockObject $repository */

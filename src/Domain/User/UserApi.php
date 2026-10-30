@@ -2,6 +2,7 @@
 
 namespace Movary\Domain\User;
 
+use InvalidArgumentException;
 use Movary\Api\Jellyfin\Dto\JellyfinAccessToken;
 use Movary\Api\Jellyfin\Dto\JellyfinAuthenticationData;
 use Movary\Api\Jellyfin\Dto\JellyfinUserId;
@@ -562,6 +563,22 @@ class UserApi
     public function updatePlexServerUrl(int $userId, ?Url $plexServerUrl) : void
     {
         $this->repository->updatePlexServerurl($userId, $plexServerUrl);
+    }
+
+    /** @param array<string, bool|int|string|null> $preferences */
+    public function updatePreferences(int $userId, array $preferences) : void
+    {
+        if (array_key_exists('username', $preferences) === true) {
+            $username = $preferences['username'];
+            if (is_string($username) === false) {
+                throw new InvalidArgumentException('Username must be a string');
+            }
+
+            $this->userValidator->ensureNameFormatIsValid($username);
+            $this->userValidator->ensureNameIsUnique($username, $userId);
+        }
+
+        $this->repository->updatePreferences($userId, $preferences);
     }
 
     public function updatePrivacyLevel(int $userId, int $privacyLevel) : void

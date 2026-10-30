@@ -2149,6 +2149,34 @@
         "security": []
       }
     },
+    "/api/v1/me/preferences": {
+      "get": {
+        "tags": ["Users"],
+        "operationId": "getCurrentUserPreferences",
+        "summary": "Get the current user's general preferences",
+        "description": "Returns the general account preferences supported by the update operation.",
+        "responses": {
+          "200": {"description": "General preferences", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/userPreferences"}}}},
+          "401": {"$ref": "#/components/responses/401"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "patch": {
+        "tags": ["Users"],
+        "operationId": "updateCurrentUserPreferences",
+        "summary": "Update the current user's general account preferences",
+        "description": "Only supplied fields change. All fields are validated before a single database update.",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/userPreferencesUpdate"}}}},
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -2234,6 +2262,40 @@
       }
     },
     "schemas": {
+        "userPreferences": {
+          "type": "object",
+          "required": [
+            "username", "privacyLevel", "dateFormatId", "movieTitleDisplay", "country",
+            "watchlistAutomaticRemovalEnabled", "displayCharacterNames", "displayTmdbRatings", "displayImdbRatings"
+          ],
+          "properties": {
+            "username": {"type": "string", "pattern": "^[a-zA-Z0-9]+$"},
+            "privacyLevel": {"type": "integer", "enum": [0, 1, 2]},
+            "dateFormatId": {"type": "integer", "enum": [0, 1, 2, 3]},
+            "movieTitleDisplay": {"type": "string", "enum": ["localized", "original", "both"]},
+            "country": {"type": "string", "minLength": 2, "maxLength": 2, "nullable": true},
+            "watchlistAutomaticRemovalEnabled": {"type": "boolean"},
+            "displayCharacterNames": {"type": "boolean"},
+            "displayTmdbRatings": {"type": "boolean"},
+            "displayImdbRatings": {"type": "boolean"}
+          }
+        },
+        "userPreferencesUpdate": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "username": {"type": "string", "pattern": "^[a-zA-Z0-9]+$"},
+            "privacyLevel": {"type": "integer", "enum": [0, 1, 2]},
+            "dateFormatId": {"type": "integer", "enum": [0, 1, 2, 3]},
+            "movieTitleDisplay": {"type": "string", "enum": ["localized", "original", "both"]},
+            "country": {"type": "string", "minLength": 2, "maxLength": 2, "nullable": true},
+            "watchlistAutomaticRemovalEnabled": {"type": "boolean"},
+            "displayCharacterNames": {"type": "boolean"},
+            "displayTmdbRatings": {"type": "boolean"},
+            "displayImdbRatings": {"type": "boolean"}
+          }
+        },
         "dashboardOverview": {
           "type": "object",
           "required": [

@@ -11,6 +11,18 @@ use RuntimeException;
 
 class UserRepository
 {
+    private const array PREFERENCE_COLUMNS = [
+        'username' => 'name',
+        'privacyLevel' => 'privacy_level',
+        'dateFormatId' => 'date_format_id',
+        'movieTitleDisplay' => 'movie_title_display',
+        'country' => 'country',
+        'watchlistAutomaticRemovalEnabled' => 'watchlist_automatic_removal_enabled',
+        'displayCharacterNames' => 'display_character_names',
+        'displayTmdbRatings' => 'display_tmdb_rating',
+        'displayImdbRatings' => 'display_imdb_rating',
+    ];
+
     public function __construct(private readonly Connection $dbConnection)
     {
     }
@@ -1569,6 +1581,19 @@ class UserRepository
                 'id' => $userId,
             ],
         );
+    }
+
+    /** @param array<string, bool|int|string|null> $preferences */
+    public function updatePreferences(int $userId, array $preferences) : void
+    {
+        $columns = [];
+        foreach ($preferences as $field => $value) {
+            $column = self::PREFERENCE_COLUMNS[$field] ?? throw new RuntimeException('Unsupported preference: ' . $field);
+
+            $columns[$column] = is_bool($value) === true ? (int)$value : $value;
+        }
+
+        $this->dbConnection->update('user', $columns, ['id' => $userId]);
     }
 
     public function updateTemporaryPlexClientCode(int $userId, ?string $plexClientCode) : void

@@ -22,6 +22,37 @@ class UserRepositoryTest extends TestCase
         $this->subject = new UserRepository($this->dbConnectionMock);
     }
 
+    public function testUpdatesPreferencesInOneStatement() : void
+    {
+        $this->dbConnectionMock->expects(self::once())->method('update')->with(
+            'user',
+            [
+                'name' => 'NewName',
+                'privacy_level' => 2,
+                'date_format_id' => 3,
+                'movie_title_display' => 'both',
+                'country' => 'DE',
+                'watchlist_automatic_removal_enabled' => 1,
+                'display_character_names' => 0,
+                'display_tmdb_rating' => 1,
+                'display_imdb_rating' => 0,
+            ],
+            ['id' => 42],
+        );
+
+        $this->subject->updatePreferences(42, [
+            'username' => 'NewName',
+            'privacyLevel' => 2,
+            'dateFormatId' => 3,
+            'movieTitleDisplay' => 'both',
+            'country' => 'DE',
+            'watchlistAutomaticRemovalEnabled' => true,
+            'displayCharacterNames' => false,
+            'displayTmdbRatings' => true,
+            'displayImdbRatings' => false,
+        ]);
+    }
+
     public function testCountUsersReturnsIntegerCount() : void
     {
         $this->dbConnectionMock
