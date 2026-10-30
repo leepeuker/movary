@@ -28,7 +28,7 @@ class ExportService
 
     public function createExportHistoryCsv(int $userId, ?string $fileName = null) : string
     {
-        $movieWatchDates = $this->movieApi->fetchWatchDatesOrderedByWatchedAtDesc($userId);
+        $plays = $this->movieApi->fetchPlaysForExport($userId);
 
         if ($fileName === null) {
             $fileName = $this->generateFilename($userId, 'history');
@@ -38,8 +38,8 @@ class ExportService
 
         fwrite($exportFileHandle, self::CSV_HEADER_HISTORY);
 
-        foreach ($movieWatchDates as $movieWatchDate) {
-            $this->dataMapper->writeWatchDateToCsv($exportFileHandle, $movieWatchDate);
+        foreach ($plays as $play) {
+            $this->dataMapper->writePlayToCsv($exportFileHandle, $play);
         }
 
         fclose($exportFileHandle);

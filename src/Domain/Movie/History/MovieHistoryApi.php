@@ -625,9 +625,9 @@ class MovieHistoryApi
         return $watchDates;
     }
 
-    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
+    public function fetchPlaysForExport(int $userId) : array
     {
-        return $this->movieRepository->fetchWatchDatesOrderedByWatchedAtDesc($userId);
+        return $this->movieRepository->fetchPlaysForExport($userId);
     }
 
     public function findHighestPositionForWatchDate(int $userId, ?Date $watchedAt) : ?int

@@ -35,7 +35,7 @@ class MovieHistoryLocationRepositoryTest extends TestCase
                 self::callback(
                     static fn(string $query) : bool => str_contains($query, 'WHERE `location`.user_id = ?')
                         && str_contains($query, 'ORDER BY `location`.name')
-                        && str_contains($query, 'SUM(plays)')
+                        && str_contains($query, 'COUNT(*)')
                         && str_contains($query, 'LIMIT 20 OFFSET 40'),
                 ),
                 [12],
