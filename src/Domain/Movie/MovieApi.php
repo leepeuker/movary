@@ -158,14 +158,20 @@ class MovieApi
         return $this->repository->fetchAll();
     }
 
-    public function countAll() : int
+    public function countAll(?string $searchTerm, ?Year $releaseYear) : int
     {
-        return $this->repository->countAll();
+        return $this->repository->countAll($searchTerm, $releaseYear);
     }
 
-    public function fetchAllPaginated(int $limit, int $offset) : MovieEntityList
-    {
-        return $this->repository->fetchAllPaginated($limit, $offset);
+    public function fetchAllPaginated(
+        int $limit,
+        int $offset,
+        ?string $searchTerm,
+        string $sortBy,
+        SortOrder $sortOrder,
+        ?Year $releaseYear,
+    ) : MovieEntityList {
+        return $this->repository->fetchAllPaginated($limit, $offset, $searchTerm, $sortBy, $sortOrder, $releaseYear);
     }
 
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(

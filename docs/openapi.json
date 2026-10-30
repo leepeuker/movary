@@ -1119,10 +1119,14 @@
         "tags": ["Movies"],
         "operationId": "getMovies",
         "summary": "List movies stored in Movary",
-        "description": "Lists the server-wide movie catalog in Movary ID order, including movies that may have been added through private user activity. This does not include personal watch data. Pages beyond the last page resolve to the last page.",
+        "description": "Lists the server-wide movie catalog, including movies that may have been added through private user activity. This does not include personal watch data. Pages beyond the last page resolve to the last page. Sorting uses Movary ID as a tie-breaker.",
         "parameters": [
+          {"name": "search", "in": "query", "description": "Search localized or original title", "schema": {"type": "string"}},
           {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 1, "default": 1}},
-          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 24}}
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 24}},
+          {"name": "sortBy", "in": "query", "schema": {"type": "string", "enum": ["id", "title", "releaseDate", "runtime", "tmdbRating", "imdbRating"], "default": "id"}},
+          {"name": "sortOrder", "in": "query", "schema": {"type": "string", "enum": ["asc", "desc"], "default": "asc"}},
+          {"name": "releaseYear", "in": "query", "schema": {"type": "integer", "minimum": 1901, "maximum": 2155}}
         ],
         "responses": {
           "200": {

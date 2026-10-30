@@ -10,6 +10,8 @@ use Movary\Service\ImageUrlService;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\ValueObject\Http\Header;
 use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\SortOrder;
+use Movary\ValueObject\Year;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -22,9 +24,16 @@ class MovieListControllerTest extends TestCase
         $requestMapper = $this->createStub(RequestMapper::class);
         $requestMapper->method('mapLimit')->willReturn(2);
         $requestMapper->method('mapPage')->willReturn(9);
+        $requestMapper->method('mapSearchTerm')->willReturn('Movie');
+        $releaseYear = Year::createFromInt(2024);
+        $requestMapper->method('mapReleaseYear')->willReturn($releaseYear);
+        $requestMapper->method('mapSortBy')->willReturn('releaseDate');
+        $sortOrder = SortOrder::createDesc();
+        $requestMapper->method('mapSortOrder')->willReturn($sortOrder);
         $movieApi = $this->createMock(MovieApi::class);
-        $movieApi->expects(self::once())->method('countAll')->willReturn(3);
-        $movieApi->expects(self::once())->method('fetchAllPaginated')->with(2, 2)->willReturn(
+        $movieApi->expects(self::once())->method('countAll')->with('Movie', $releaseYear)->willReturn(3);
+        $movieApi->expects(self::once())->method('fetchAllPaginated')
+            ->with(2, 2, 'Movie', 'releaseDate', $sortOrder, $releaseYear)->willReturn(
             MovieEntityList::createFromArray([$this->movieData()]),
         );
         $imageUrlService = $this->createMock(ImageUrlService::class);
@@ -55,9 +64,13 @@ class MovieListControllerTest extends TestCase
         $requestMapper = $this->createStub(RequestMapper::class);
         $requestMapper->method('mapLimit')->willReturn(24);
         $requestMapper->method('mapPage')->willReturn(1);
+        $requestMapper->method('mapSortBy')->willReturn('id');
+        $sortOrder = SortOrder::createAsc();
+        $requestMapper->method('mapSortOrder')->willReturn($sortOrder);
         $movieApi = $this->createMock(MovieApi::class);
-        $movieApi->expects(self::once())->method('countAll')->willReturn(0);
-        $movieApi->expects(self::once())->method('fetchAllPaginated')->with(24, 0)->willReturn(MovieEntityList::create());
+        $movieApi->expects(self::once())->method('countAll')->with(null, null)->willReturn(0);
+        $movieApi->expects(self::once())->method('fetchAllPaginated')
+            ->with(24, 0, null, 'id', $sortOrder, null)->willReturn(MovieEntityList::create());
         $imageUrlService = $this->createMock(ImageUrlService::class);
         $imageUrlService->expects(self::never())->method('generateImageSrcUrlFromParameters');
 

@@ -32,17 +32,44 @@ class MovieRepositoryTest extends TestCase
     public function testCountsAllMovies() : void
     {
         $this->dbConnectionMock->expects(self::once())->method('fetchOne')
-            ->with('SELECT COUNT(*) FROM `movie`')->willReturn('42');
+            ->with('SELECT COUNT(*) FROM `movie`', [])->willReturn('42');
 
-        self::assertSame(42, $this->subject->countAll());
+        self::assertSame(42, $this->subject->countAll(null, null));
     }
 
     public function testFetchesBoundedMoviesInIdOrder() : void
     {
         $this->dbConnectionMock->expects(self::once())->method('fetchAllAssociative')
-            ->with('SELECT * FROM `movie` ORDER BY id LIMIT 24 OFFSET 48')->willReturn([]);
+            ->with('SELECT * FROM `movie` ORDER BY id asc LIMIT 24 OFFSET 48', [])->willReturn([]);
 
-        self::assertCount(0, $this->subject->fetchAllPaginated(24, 48));
+        self::assertCount(0, $this->subject->fetchAllPaginated(24, 48, null, 'id', SortOrder::createAsc(), null));
+    }
+
+    public function testCatalogCountAppliesSearchAndReleaseYear() : void
+    {
+        $this->dbConnectionMock->expects(self::once())->method('fetchOne')->with(
+            'SELECT COUNT(*) FROM `movie` WHERE (title LIKE ? OR original_title LIKE ?) AND release_date >= ? AND release_date < ?',
+            ['%Movie%', '%Movie%', '2024-01-01', '2025-01-01'],
+        )->willReturn('2');
+
+        self::assertSame(2, $this->subject->countAll('Movie', \Movary\ValueObject\Year::createFromInt(2024)));
+    }
+
+    public function testCatalogPageAppliesFiltersAndSafeSortColumn() : void
+    {
+        $this->dbConnectionMock->expects(self::once())->method('fetchAllAssociative')->with(
+            'SELECT * FROM `movie` WHERE (title LIKE ? OR original_title LIKE ?) AND release_date >= ? AND release_date < ? ORDER BY tmdb_vote_average desc, id ASC LIMIT 2 OFFSET 2',
+            ['%Movie%', '%Movie%', '2024-01-01', '2025-01-01'],
+        )->willReturn([]);
+
+        self::assertCount(0, $this->subject->fetchAllPaginated(
+            2,
+            2,
+            'Movie',
+            'tmdbRating',
+            SortOrder::createDesc(),
+            \Movary\ValueObject\Year::createFromInt(2024),
+        ));
     }
 
     public static function providedTestFetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAtData() : array

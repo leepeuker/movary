@@ -24,14 +24,29 @@ class MovieListController
     {
         $limit = $this->requestMapper->mapLimit($request);
         $page = $this->requestMapper->mapPage($request);
+        $searchTerm = $this->requestMapper->mapSearchTerm($request);
+        $releaseYear = $this->requestMapper->mapReleaseYear($request);
+        $sortBy = $this->requestMapper->mapSortBy(
+            $request,
+            ['id', 'title', 'releaseDate', 'runtime', 'tmdbRating', 'imdbRating'],
+            'id',
+        );
+        $sortOrder = $this->requestMapper->mapSortOrder($request, 'asc');
         $pagination = $this->paginationElementsCalculator->createPaginationElements(
-            $this->movieApi->countAll(),
+            $this->movieApi->countAll($searchTerm, $releaseYear),
             $limit,
             $page,
         );
 
         $movies = [];
-        foreach ($this->movieApi->fetchAllPaginated($limit, $pagination->getOffset()) as $movie) {
+        foreach ($this->movieApi->fetchAllPaginated(
+            $limit,
+            $pagination->getOffset(),
+            $searchTerm,
+            $sortBy,
+            $sortOrder,
+            $releaseYear,
+        ) as $movie) {
             $movies[] = [
                 'id' => $movie->getId(),
                 'tmdbId' => $movie->getTmdbId(),
