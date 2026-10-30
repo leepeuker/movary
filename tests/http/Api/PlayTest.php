@@ -43,6 +43,7 @@ class PlayTest extends HttpTestCase
         self::assertSame('Second play', $updated['comment']);
         self::assertSame($movie->getId(), $updated['movie']['ids']['movary']);
         $allPlays = $this->http->get($path, $headers)->assertStatus(200)->json()['plays'];
+        self::assertIsArray($allPlays);
         self::assertCount(2, $allPlays);
         self::assertSame($secondId, $allPlays[1]['id']);
         self::assertNull($allPlays[1]['watchedAt']);
