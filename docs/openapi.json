@@ -12,6 +12,7 @@
     {"name": "Plays"},
     {"name": "Watchlist"},
     {"name": "Reviews"},
+    {"name": "Ratings"},
     {"name": "Webhooks"},
     {"name": "Radarr"}
   ],
@@ -1235,6 +1236,90 @@
             "movaryToken": []
           }
         ]
+      }
+    },
+    "\/api\/v1\/users\/{username}\/movies\/{movaryId}\/rating": {
+      "get": {
+        "tags": ["Ratings"],
+        "operationId": "getUserMovieRating",
+        "summary": "Get the user's personal rating of a movie",
+        "description": "Get the specified user's rating when their privacy setting permits access. Returns 404 when the movie has no rating.",
+        "parameters": [
+          {"$ref": "#/components/parameters/username"},
+          {"$ref": "#/components/parameters/movaryId"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["rating"],
+                  "properties": {
+                    "rating": {"type": "integer", "minimum": 1, "maximum": 10}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "put": {
+        "tags": ["Ratings"],
+        "operationId": "saveUserMovieRating",
+        "summary": "Create or update the user's personal rating of a movie",
+        "description": "Set the authenticated user's rating for the specified movie.",
+        "parameters": [
+          {"$ref": "#/components/parameters/username"},
+          {"$ref": "#/components/parameters/movaryId"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["rating"],
+                "properties": {
+                  "rating": {"type": "integer", "minimum": 1, "maximum": 10}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "delete": {
+        "tags": ["Ratings"],
+        "operationId": "deleteUserMovieRating",
+        "summary": "Delete the user's personal rating of a movie",
+        "description": "Clear the authenticated user's rating. The operation succeeds when the movie exists but has no rating.",
+        "parameters": [
+          {"$ref": "#/components/parameters/username"},
+          {"$ref": "#/components/parameters/movaryId"}
+        ],
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
       }
     },
     "\/api\/v1\/users\/{username}\/movies\/{movaryId}\/review": {
