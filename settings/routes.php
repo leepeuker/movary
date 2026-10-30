@@ -374,10 +374,13 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('PUT', $routeUserPlay, [Api\HistoryController::class, 'updatePlay'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('DELETE', $routeUserPlay, [Api\HistoryController::class, 'deletePlay'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
-    $routeUserWatchlist = '/users/{username:[a-zA-Z0-9]+}/watchlist/movies';
+    $routeUserWatchlist = '/users/{username:[a-zA-Z0-9]+}/watchlist';
     $routes->add('GET', $routeUserWatchlist, [Api\WatchlistController::class, 'getWatchlist'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('POST', $routeUserWatchlist, [Api\WatchlistController::class, 'addToWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('DELETE', $routeUserWatchlist, [Api\WatchlistController::class, 'deleteFromWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routeUserWatchlistMovie = $routeUserWatchlist . '/{movaryId:[0-9]+}';
+    $routes->add('PUT', $routeUserWatchlistMovie, [Api\WatchlistController::class, 'addMovieToWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', $routeUserWatchlistMovie, [Api\WatchlistController::class, 'deleteMovieFromWatchlist'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
     $routeUserPlayMovies = $routeUserPlays . '/movies';
     $routes->add('GET', $routeUserPlayMovies, [Api\PlayedController::class, 'getPlayed'], [Api\Middleware\IsAuthorizedToReadUserData::class]);

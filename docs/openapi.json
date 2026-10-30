@@ -5,6 +5,15 @@
     "version": ""
   },
   "servers": [],
+  "tags": [
+    {"name": "Movies"},
+    {"name": "Plays"},
+    {"name": "Watchlist"},
+    {"name": "Reviews"},
+    {"name": "Webhooks"},
+    {"name": "Radarr"},
+    {"name": "Authentication"}
+  ],
   "paths": {
     "\/api\/v1\/users\/{username}\/plays": {
       "get": {
@@ -367,7 +376,7 @@
         ]
       }
     },
-    "\/api\/v1\/users\/{username}\/watchlist\/movies": {
+    "\/api\/v1\/users\/{username}\/watchlist": {
       "get": {
         "tags": [
           "Watchlist"
@@ -522,7 +531,7 @@
           "Watchlist"
         ],
         "operationId": "addToUserWatchlist",
-        "summary": "Add movie to watchlist of user",
+        "summary": "Add movies to watchlist of user",
         "parameters": [
           {
             "name": "username",
@@ -589,7 +598,7 @@
           "Watchlist"
         ],
         "operationId": "deleteFromUserWatchlist",
-        "summary": "Delete movie from watchlist of user",
+        "summary": "Delete movies from watchlist of user",
         "parameters": [
           {
             "name": "username",
@@ -628,6 +637,90 @@
           },
           "400": {
             "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      }
+    },
+    "\/api\/v1\/users\/{username}\/watchlist\/{movaryId}": {
+      "put": {
+        "tags": [
+          "Watchlist"
+        ],
+        "operationId": "addMovieToUserWatchlist",
+        "summary": "Add one movie to the user's watchlist",
+        "description": "Adds the movie if absent. Repeating the request preserves the original addedAt timestamp.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/username"
+          },
+          {
+            "$ref": "#/components/parameters/movaryId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Watchlist"
+        ],
+        "operationId": "deleteMovieFromUserWatchlist",
+        "summary": "Remove one movie from the user's watchlist",
+        "description": "Returns 204 even if the movie is not on the watchlist or does not exist.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/username"
+          },
+          {
+            "$ref": "#/components/parameters/movaryId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/204"
           },
           "401": {
             "$ref": "#/components/responses/401"
