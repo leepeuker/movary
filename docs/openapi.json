@@ -6,6 +6,7 @@
   },
   "servers": [],
   "tags": [
+    {"name": "Dashboard"},
     {"name": "Movies"},
     {"name": "Plays"},
     {"name": "Watchlist"},
@@ -15,6 +16,132 @@
     {"name": "Authentication"}
   ],
   "paths": {
+      "/api/v1/users/{username}/dashboard/rows": {
+        "get": {
+          "tags": [
+            "Dashboard"
+          ],
+          "operationId": "getUserDashboardRows",
+          "summary": "Get dashboard row configuration",
+          "parameters": [
+            {
+              "name": "username",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Configured dashboard rows, including hidden rows",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/dashboardRowsManifest"
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/401"
+            },
+            "403": {
+              "$ref": "#/components/responses/403"
+            },
+            "404": {
+              "$ref": "#/components/responses/404"
+            },
+            "500": {
+              "$ref": "#/components/responses/500"
+            }
+          },
+          "security": [
+            {
+              "bearerToken": []
+            },
+            {
+              "movaryToken": []
+            }
+          ]
+        }
+      },
+      "/api/v1/users/{username}/dashboard/rows/{rowKey}": {
+        "get": {
+          "tags": [
+            "Dashboard"
+          ],
+          "operationId": "getUserDashboardRow",
+          "summary": "Get one visible dashboard row",
+          "description": "Actor, actress, and director rows use the API token owner's hidden-person settings. Hidden rows return 404.",
+          "parameters": [
+            {
+              "name": "username",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "rowKey",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "last-plays",
+                  "last-plays-cinema",
+                  "most-watched-actors",
+                  "most-watched-actresses",
+                  "most-watched-directors",
+                  "most-watched-genres",
+                  "most-watched-languages",
+                  "most-watched-production-companies",
+                  "most-watched-production-countries",
+                  "most-watched-release-years",
+                  "latest-watchlist",
+                  "top-locations",
+                  "personal-rating-distribution"
+                ]
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Dashboard row data",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/dashboardRowResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/401"
+            },
+            "403": {
+              "$ref": "#/components/responses/403"
+            },
+            "404": {
+              "$ref": "#/components/responses/404"
+            },
+            "500": {
+              "$ref": "#/components/responses/500"
+            }
+          },
+          "security": [
+            {
+              "bearerToken": []
+            },
+            {
+              "movaryToken": []
+            }
+          ]
+        }
+      },
     "\/api\/v1\/users\/{username}\/plays": {
       "get": {
         "tags": [
@@ -1874,6 +2001,633 @@
       }
     },
     "schemas": {
+        "dashboardRowManifest": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "position",
+            "visible",
+            "initiallyExpanded",
+            "href"
+          ],
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "position": {
+              "type": "integer"
+            },
+            "visible": {
+              "type": "boolean"
+            },
+            "initiallyExpanded": {
+              "type": "boolean"
+            },
+            "href": {
+              "type": "string"
+            }
+          }
+        },
+        "dashboardRowsManifest": {
+          "type": "object",
+          "required": [
+            "rows"
+          ],
+          "properties": {
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardRowManifest"
+              }
+            }
+          }
+        },
+        "dashboardMovie": {
+          "type": "object",
+          "required": [
+            "id",
+            "title",
+            "originalTitle",
+            "releaseDate",
+            "posterUrl"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "title": {
+              "type": "string"
+            },
+            "originalTitle": {
+              "type": "string",
+              "nullable": true
+            },
+            "releaseDate": {
+              "type": "string",
+              "format": "date",
+              "nullable": true
+            },
+            "posterUrl": {
+              "type": "string"
+            }
+          }
+        },
+        "dashboardMoviePlay": {
+          "type": "object",
+          "required": [
+            "movie",
+            "watchedAt",
+            "personalRating"
+          ],
+          "properties": {
+            "movie": {
+              "$ref": "#/components/schemas/dashboardMovie"
+            },
+            "watchedAt": {
+              "type": "string",
+              "format": "date"
+            },
+            "personalRating": {
+              "type": "integer",
+              "nullable": true
+            }
+          }
+        },
+        "dashboardPerson": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "profileUrl",
+            "uniqueMovieCount"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "profileUrl": {
+              "type": "string"
+            },
+            "uniqueMovieCount": {
+              "type": "integer"
+            }
+          }
+        },
+        "dashboardNamedCount": {
+          "type": "object",
+          "required": [
+            "name",
+            "count"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "count": {
+              "type": "integer"
+            }
+          }
+        },
+        "dashboardLanguage": {
+          "type": "object",
+          "required": [
+            "name",
+            "count",
+            "code"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "count": {
+              "type": "integer"
+            },
+            "code": {
+              "type": "string"
+            }
+          }
+        },
+        "dashboardCompany": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "count"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "count": {
+              "type": "integer"
+            }
+          }
+        },
+        "dashboardCountry": {
+          "type": "object",
+          "required": [
+            "name",
+            "code",
+            "count"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "count": {
+              "type": "integer"
+            }
+          }
+        },
+        "dashboardLocation": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "count"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "count": {
+              "type": "integer"
+            }
+          }
+        },
+        "dashboardRating": {
+          "type": "object",
+          "required": [
+            "rating",
+            "count"
+          ],
+          "properties": {
+            "rating": {
+              "type": "integer"
+            },
+            "count": {
+              "type": "integer"
+            }
+          }
+        },
+        "dashboardWatchlistItem": {
+          "type": "object",
+          "required": [
+            "movie",
+            "addedAt"
+          ],
+          "properties": {
+            "movie": {
+              "$ref": "#/components/schemas/movie"
+            },
+            "addedAt": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$"
+            }
+          }
+        },
+        "dashboardRowLastPlays": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "last-plays"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardMoviePlay"
+              }
+            }
+          }
+        },
+        "dashboardRowLastPlaysCinema": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "last-plays-cinema"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardMoviePlay"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedActors": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-actors"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardPerson"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedActresses": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-actresses"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardPerson"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedDirectors": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-directors"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardPerson"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedGenres": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-genres"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardNamedCount"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedLanguages": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-languages"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardLanguage"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedProductionCompanies": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-production-companies"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardCompany"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedProductionCountries": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-production-countries"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardCountry"
+              }
+            }
+          }
+        },
+        "dashboardRowMostWatchedReleaseYears": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "most-watched-release-years"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardNamedCount"
+              }
+            }
+          }
+        },
+        "dashboardRowLatestWatchlist": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "latest-watchlist"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardWatchlistItem"
+              }
+            }
+          }
+        },
+        "dashboardRowTopLocations": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "top-locations"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardLocation"
+              }
+            }
+          }
+        },
+        "dashboardRowPersonalRatingDistribution": {
+          "type": "object",
+          "required": [
+            "key",
+            "title",
+            "items"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "personal-rating-distribution"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/dashboardRating"
+              }
+            }
+          }
+        },
+        "dashboardRowResponse": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/dashboardRowLastPlays"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowLastPlaysCinema"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedActors"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedActresses"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedDirectors"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedGenres"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedLanguages"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedProductionCompanies"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedProductionCountries"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowMostWatchedReleaseYears"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowLatestWatchlist"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowTopLocations"
+            },
+            {
+              "$ref": "#/components/schemas/dashboardRowPersonalRatingDistribution"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "key",
+            "mapping": {
+              "last-plays": "#/components/schemas/dashboardRowLastPlays",
+              "last-plays-cinema": "#/components/schemas/dashboardRowLastPlaysCinema",
+              "most-watched-actors": "#/components/schemas/dashboardRowMostWatchedActors",
+              "most-watched-actresses": "#/components/schemas/dashboardRowMostWatchedActresses",
+              "most-watched-directors": "#/components/schemas/dashboardRowMostWatchedDirectors",
+              "most-watched-genres": "#/components/schemas/dashboardRowMostWatchedGenres",
+              "most-watched-languages": "#/components/schemas/dashboardRowMostWatchedLanguages",
+              "most-watched-production-companies": "#/components/schemas/dashboardRowMostWatchedProductionCompanies",
+              "most-watched-production-countries": "#/components/schemas/dashboardRowMostWatchedProductionCountries",
+              "most-watched-release-years": "#/components/schemas/dashboardRowMostWatchedReleaseYears",
+              "latest-watchlist": "#/components/schemas/dashboardRowLatestWatchlist",
+              "top-locations": "#/components/schemas/dashboardRowTopLocations",
+              "personal-rating-distribution": "#/components/schemas/dashboardRowPersonalRatingDistribution"
+            }
+          }
+        },
       "playCreate": {
         "type": "object",
         "required": [

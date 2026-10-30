@@ -6,6 +6,7 @@ class DashboardRow
 {
     public function __construct(
         private readonly int $id,
+        private readonly string $key,
         private readonly string $name,
         private readonly bool $isVisible,
         private readonly bool $isExtended,
@@ -14,77 +15,82 @@ class DashboardRow
 
     public static function createLastPlays(bool $isVisible = true, bool $isExtended = true) : self
     {
-        return self::create(0, 'Last Plays', $isVisible, $isExtended);
+        return self::create(0, 'last-plays', 'Last Plays', $isVisible, $isExtended);
     }
 
     public static function createLastPlaysCinema(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(11, 'Last Plays Cinema', $isVisible, $isExtended);
+        return self::create(11, 'last-plays-cinema', 'Last Plays Cinema', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedActors(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(1, 'Most watched Actors', $isVisible, $isExtended);
+        return self::create(1, 'most-watched-actors', 'Most watched Actors', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedActresses(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(2, 'Most watched Actresses', $isVisible, $isExtended);
+        return self::create(2, 'most-watched-actresses', 'Most watched Actresses', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedDirectors(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(3, 'Most watched Directors', $isVisible, $isExtended);
+        return self::create(3, 'most-watched-directors', 'Most watched Directors', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedGenres(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(4, 'Most watched Genres', $isVisible, $isExtended);
+        return self::create(4, 'most-watched-genres', 'Most watched Genres', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedLanguages(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(8, 'Most watched Languages', $isVisible, $isExtended);
+        return self::create(8, 'most-watched-languages', 'Most watched Languages', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedProductionCompanies(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(6, 'Most watched Production Companies', $isVisible, $isExtended);
+        return self::create(6, 'most-watched-production-companies', 'Most watched Production Companies', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedProductionCountries(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(12, 'Most watched Production Countries', $isVisible, $isExtended);
+        return self::create(12, 'most-watched-production-countries', 'Most watched Production Countries', $isVisible, $isExtended);
     }
 
     public static function createMostWatchedReleaseYears(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(7, 'Most watched Release Years', $isVisible, $isExtended);
+        return self::create(7, 'most-watched-release-years', 'Most watched Release Years', $isVisible, $isExtended);
     }
 
     public static function createTopLocations(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(10, 'Top Locations', $isVisible, $isExtended);
+        return self::create(10, 'top-locations', 'Top Locations', $isVisible, $isExtended);
     }
 
     public static function createWatchlist(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(9, 'Latest in Watchlist', $isVisible, $isExtended);
+        return self::create(9, 'latest-watchlist', 'Latest in Watchlist', $isVisible, $isExtended);
     }
 
     public static function createPersonalRatingDistribution(bool $isVisible = true, bool $isExtended = false) : self
     {
-        return self::create(13, 'Rating distribution', $isVisible, $isExtended);
+        return self::create(13, 'personal-rating-distribution', 'Rating distribution', $isVisible, $isExtended);
     }
 
-    private static function create(int $id, string $name, bool $isVisible, bool $isExtended) : self
+    private static function create(int $id, string $key, string $name, bool $isVisible, bool $isExtended) : self
     {
-        return new self($id, $name, $isVisible, $isExtended);
+        return new self($id, $key, $name, $isVisible, $isExtended);
     }
 
     public function getId() : int
     {
         return $this->id;
+    }
+
+    public function getKey() : string
+    {
+        return $this->key;
     }
 
     public function getName() : string

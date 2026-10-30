@@ -33,4 +33,15 @@ class DashboardRowList extends AbstractList
 
         ksort($this->data);
     }
+
+    public function findByKey(string $key) : ?DashboardRow
+    {
+        foreach ($this->data as $row) {
+            if ($row->getKey() === $key) {
+                return $row;
+            }
+        }
+
+        return null;
+    }
 }

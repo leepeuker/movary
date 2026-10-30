@@ -1,0 +1,61 @@
+<?php declare(strict_types=1);
+
+namespace Movary\HttpController\Api;
+
+use Movary\Domain\User\Service\Authentication;
+use Movary\HttpController\Api\Dto\DashboardRowManifestDto;
+use Movary\HttpController\Api\RequestMapper\RequestMapper;
+use Movary\HttpController\Api\ResponseMapper\DashboardRowResponseMapper;
+use Movary\Service\Dashboard\DashboardFactory;
+use Movary\Service\Dashboard\DashboardRowDataProvider;
+use Movary\Util\Json;
+use Movary\ValueObject\Http\Request;
+use Movary\ValueObject\Http\Response;
+
+class DashboardController
+{
+    public function __construct(
+        private readonly RequestMapper $requestMapper,
+        private readonly DashboardFactory $dashboardFactory,
+        private readonly DashboardRowDataProvider $dashboardRowDataProvider,
+        private readonly DashboardRowResponseMapper $responseMapper,
+        private readonly Authentication $authentication,
+    ) {
+    }
+
+    public function getRows(Request $request) : Response
+    {
+        $user = $this->requestMapper->mapUsernameFromRoute($request);
+        $username = (string)$request->getRouteParameters()['username'];
+        $rows = [];
+
+        foreach ($this->dashboardFactory->createDashboardRowsForUser($user) as $row) {
+            $rows[] = new DashboardRowManifestDto(
+                $row->getKey(),
+                $row->getName(),
+                count($rows),
+                $row->isVisible(),
+                $row->isExtended(),
+                '/api/v1/users/' . $username . '/dashboard/rows/' . $row->getKey(),
+            );
+        }
+
+        return Response::createSensitiveJson(Json::encode(['rows' => $rows]));
+    }
+
+    public function getRow(Request $request) : Response
+    {
+        $user = $this->requestMapper->mapUsernameFromRoute($request);
+        $rows = $this->dashboardFactory->createDashboardRowsForUser($user);
+        $row = $rows->findByKey((string)$request->getRouteParameters()['rowKey']);
+
+        if ($row === null || $row->isVisible() === false) {
+            return Response::createNotFound();
+        }
+
+        $viewerUserId = $this->authentication->authenticateApiToken($request)?->getUserId();
+        $data = $this->dashboardRowDataProvider->fetch($row, $user->getId(), $viewerUserId);
+
+        return Response::createSensitiveJson(Json::encode($this->responseMapper->map($row, $data)));
+    }
+}

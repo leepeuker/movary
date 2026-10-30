@@ -26,6 +26,15 @@ class DashboardFactoryTest extends TestCase
         foreach ($dashboardRows as $dashboardRow) {
             self::assertTrue($dashboardRow->isVisible());
         }
+
+        $keys = array_map(static fn($row) => $row->getKey(), iterator_to_array($dashboardRows));
+        self::assertCount(count(array_unique($keys)), $keys);
+        self::assertSame([
+            'last-plays', 'most-watched-actors', 'most-watched-actresses', 'most-watched-directors',
+            'most-watched-genres', 'most-watched-languages', 'most-watched-production-companies',
+            'most-watched-release-years', 'latest-watchlist', 'top-locations', 'last-plays-cinema',
+            'most-watched-production-countries', 'personal-rating-distribution',
+        ], $keys);
     }
 
     public function testCreateDashboardRowsForUserCanHideAllRows() : void
