@@ -366,6 +366,10 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/openapi', [Api\OpenApiController::class, 'getSchema']);
     $routes->add('GET', '/authentication/token', [Api\AuthenticationController::class, 'getTokenData']);
 
+    $routeUserDashboardRows = '/users/{username:[a-zA-Z0-9]+}/dashboard/rows';
+    $routes->add('GET', $routeUserDashboardRows, [Api\DashboardController::class, 'getRows'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('GET', $routeUserDashboardRows . '/{rowKey:[a-z0-9-]+}', [Api\DashboardController::class, 'getRow'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+
     $routeUserPlays = '/users/{username:[a-zA-Z0-9]+}/plays';
     $routes->add('GET', $routeUserPlays, [Api\HistoryController::class, 'getPlays'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routes->add('POST', $routeUserPlays, [Api\HistoryController::class, 'createPlay'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);

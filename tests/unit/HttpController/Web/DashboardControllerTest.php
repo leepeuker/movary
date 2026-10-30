@@ -11,6 +11,7 @@ use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Web\DashboardController;
 use Movary\Service\Dashboard\DashboardFactory;
+use Movary\Service\Dashboard\DashboardRowDataProvider;
 use Movary\Service\Dashboard\Dto\DashboardRow;
 use Movary\Service\Dashboard\Dto\DashboardRowList;
 use Movary\ValueObject\Http\Request;
@@ -33,8 +34,6 @@ class DashboardControllerTest extends TestCase
 
     private MovieApi&MockObject $movieApiMock;
 
-    private MovieWatchlistApi&MockObject $movieWatchlistApiMock;
-
     private DashboardController $subject;
 
     private Environment&MockObject $twigMock;
@@ -48,7 +47,6 @@ class DashboardControllerTest extends TestCase
         $this->twigMock = $this->createMock(Environment::class);
         $this->movieHistoryApiMock = $this->createMock(MovieHistoryApi::class);
         $this->movieApiMock = $this->createMock(MovieApi::class);
-        $this->movieWatchlistApiMock = $this->createMock(MovieWatchlistApi::class);
         $this->userPageAuthorizationCheckerMock = $this->createMock(UserPageAuthorizationChecker::class);
         $this->dashboardFactoryMock = $this->createMock(DashboardFactory::class);
         $this->userApiMock = $this->createMock(UserApi::class);
@@ -58,7 +56,7 @@ class DashboardControllerTest extends TestCase
             $this->twigMock,
             $this->movieHistoryApiMock,
             $this->movieApiMock,
-            $this->movieWatchlistApiMock,
+            new DashboardRowDataProvider($this->movieHistoryApiMock, $this->createMock(MovieWatchlistApi::class)),
             $this->userPageAuthorizationCheckerMock,
             $this->dashboardFactoryMock,
             $this->userApiMock,
