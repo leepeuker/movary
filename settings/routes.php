@@ -420,6 +420,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies', [Api\MovieListController::class, 'getMovies'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/{movaryId:[0-9]+}', [Api\MovieDetailController::class, 'getMovie'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('GET', '/persons', [Api\PersonListController::class, 'getPersons'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('GET', '/persons/{personId:[0-9]+}', [Api\PersonDetailController::class, 'getPerson'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/{movaryId:[0-9]+}/posters', [Api\MoviePosterController::class, 'fetchPosters'], [
         Api\Middleware\IsAuthenticated::class,
         Api\Middleware\IsAdmin::class,
