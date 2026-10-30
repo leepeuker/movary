@@ -27,6 +27,8 @@ The new play appears in **History**. Adding the same movie again with the same w
 
 You can also open an existing movie page and select **Add play** to record another viewing without searching again.
 
+API clients can list movies stored on the server with `GET /api/v1/movies?page=1&limit=24` and fetch shared details with `GET /api/v1/movies/<movaryId>`.
+
 ## Track plays automatically
 
 Movary can automatically add plays from supported media servers and players through webhooks, also called scrobbling:

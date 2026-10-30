@@ -186,6 +186,59 @@ class MovieRepository
         return MovieEntityList::createFromArray($data);
     }
 
+    public function countAll(?string $searchTerm, ?Year $releaseYear) : int
+    {
+        [$where, $parameters] = $this->createCatalogFilter($searchTerm, $releaseYear);
+
+        return (int)$this->dbConnection->fetchOne("SELECT COUNT(*) FROM `movie`$where", $parameters);
+    }
+
+    public function fetchAllPaginated(
+        int $limit,
+        int $offset,
+        ?string $searchTerm,
+        string $sortBy,
+        SortOrder $sortOrder,
+        ?Year $releaseYear,
+    ) : MovieEntityList {
+        [$where, $parameters] = $this->createCatalogFilter($searchTerm, $releaseYear);
+        $sortColumn = match ($sortBy) {
+            'id' => 'id',
+            'title' => 'title',
+            'releaseDate' => 'release_date',
+            'runtime' => 'runtime',
+            'tmdbRating' => 'tmdb_vote_average',
+            'imdbRating' => 'imdb_rating_average',
+            default => throw new RuntimeException('Unsupported movie catalog sort: ' . $sortBy),
+        };
+        $tieBreaker = $sortColumn === 'id' ? '' : ', id ASC';
+        $data = $this->dbConnection->fetchAllAssociative(
+            "SELECT * FROM `movie`$where ORDER BY $sortColumn $sortOrder$tieBreaker LIMIT $limit OFFSET $offset",
+            $parameters,
+        );
+
+        return MovieEntityList::createFromArray($data);
+    }
+
+    /** @return array{string, list<string>} */
+    private function createCatalogFilter(?string $searchTerm, ?Year $releaseYear) : array
+    {
+        $conditions = [];
+        $parameters = [];
+        if ($searchTerm !== null) {
+            $conditions[] = '(title LIKE ? OR original_title LIKE ?)';
+            $parameters[] = '%' . $searchTerm . '%';
+            $parameters[] = '%' . $searchTerm . '%';
+        }
+        if ($releaseYear !== null) {
+            $conditions[] = 'release_date >= ? AND release_date < ?';
+            $parameters[] = (string)$releaseYear . '-01-01';
+            $parameters[] = ($releaseYear->asInt() + 1) . '-01-01';
+        }
+
+        return [$conditions === [] ? '' : ' WHERE ' . implode(' AND ', $conditions), $parameters];
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(
         ?int $limit = null,
         ?array $ids = null,

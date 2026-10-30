@@ -1114,6 +1114,51 @@
         ]
       }
     },
+    "/api/v1/movies": {
+      "get": {
+        "tags": ["Movies"],
+        "operationId": "getMovies",
+        "summary": "List movies stored in Movary",
+        "description": "Lists the server-wide movie catalog, including movies that may have been added through private user activity. This does not include personal watch data. Pages beyond the last page resolve to the last page. Sorting uses Movary ID as a tie-breaker.",
+        "parameters": [
+          {"name": "search", "in": "query", "description": "Search localized or original title", "schema": {"type": "string"}},
+          {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 1, "default": 1}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 24}},
+          {"name": "sortBy", "in": "query", "schema": {"type": "string", "enum": ["id", "title", "releaseDate", "runtime", "tmdbRating", "imdbRating"], "default": "id"}},
+          {"name": "sortOrder", "in": "query", "schema": {"type": "string", "enum": ["asc", "desc"], "default": "asc"}},
+          {"name": "releaseYear", "in": "query", "schema": {"type": "integer", "minimum": 1901, "maximum": 2155}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of movie summaries",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/movieList"}}}
+          },
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/movies/{movaryId}": {
+      "get": {
+        "tags": ["Movies"],
+        "operationId": "getMovieDetails",
+        "summary": "Get details of a movie stored in Movary",
+        "description": "Returns shared movie metadata and external ratings. Personal plays, ratings, reviews, and watchlist state are not included.",
+        "parameters": [{"$ref": "#/components/parameters/movaryId"}],
+        "responses": {
+          "200": {
+            "description": "Movie details",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/movieDetails"}}}
+          },
+          "401": {"$ref": "#/components/responses/401"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
     "\/api\/v1\/movies\/{movaryId}\/posters": {
       "get": {
         "tags": [
@@ -3189,6 +3234,53 @@
             }
           }
         ]
+      },
+      "movieList": {
+        "type": "object",
+        "required": ["movies", "currentPage", "maxPage", "totalCount"],
+        "properties": {
+          "movies": {"type": "array", "items": {"$ref": "#/components/schemas/movieSummary"}},
+          "currentPage": {"type": "integer", "minimum": 1},
+          "maxPage": {"type": "integer", "minimum": 1},
+          "totalCount": {"type": "integer", "minimum": 0}
+        }
+      },
+      "movieSummary": {
+        "type": "object",
+        "required": ["id", "tmdbId", "title", "releaseDate", "posterUrl"],
+        "properties": {
+          "id": {"$ref": "#/components/schemas/id"},
+          "tmdbId": {"$ref": "#/components/schemas/id"},
+          "title": {"$ref": "#/components/schemas/title"},
+          "releaseDate": {"$ref": "#/components/schemas/calendarDateNullable"},
+          "posterUrl": {"type": "string"}
+        }
+      },
+      "movieDetails": {
+        "type": "object",
+        "required": [
+          "id", "tmdbId", "traktId", "imdbId", "title", "originalTitle", "releaseDate",
+          "tagline", "overview", "originalLanguage", "runtime", "posterUrl",
+          "tmdbRatingAverage", "tmdbRatingVoteCount", "imdbRatingAverage", "imdbRatingVoteCount"
+        ],
+        "properties": {
+          "id": {"$ref": "#/components/schemas/id"},
+          "tmdbId": {"$ref": "#/components/schemas/id"},
+          "traktId": {"$ref": "#/components/schemas/idNullable"},
+          "imdbId": {"type": "string", "nullable": true},
+          "title": {"$ref": "#/components/schemas/title"},
+          "originalTitle": {"type": "string", "nullable": true},
+          "releaseDate": {"$ref": "#/components/schemas/calendarDateNullable"},
+          "tagline": {"type": "string", "nullable": true},
+          "overview": {"$ref": "#/components/schemas/overview"},
+          "originalLanguage": {"type": "string", "nullable": true, "description": "ISO 639-1 language code"},
+          "runtime": {"type": "integer", "nullable": true, "description": "Minutes"},
+          "posterUrl": {"type": "string", "description": "Display URL, including the configured poster override or a placeholder"},
+          "tmdbRatingAverage": {"type": "number", "nullable": true},
+          "tmdbRatingVoteCount": {"type": "integer", "nullable": true},
+          "imdbRatingAverage": {"type": "number", "nullable": true},
+          "imdbRatingVoteCount": {"type": "integer", "nullable": true}
+        }
       },
       "movie": {
         "type": "object",
