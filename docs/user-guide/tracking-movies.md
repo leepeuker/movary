@@ -23,7 +23,7 @@ Before selecting **Add play**, you can:
 
 **Advanced mode** lets you add a comment that belongs only to this play.
 
-The new play appears in **History**. Adding the same movie again with the same watch date increases the play count for that date instead of creating a separate entry.
+The new play appears in **History**. Adding the same movie again with the same watch date creates another play and increases the play count for that date.
 
 You can also open an existing movie page and select **Add play** to record another viewing without searching again.
 
@@ -42,9 +42,9 @@ Scrobbled plays appear in **History** alongside plays added manually. Some integ
 
 Open the navigation menu and select **History**. You can search the history and switch between poster and table views. Select a movie to open its detail page.
 
-On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date or location. **Advanced mode** also lets you change the comment for that play, the number of plays recorded for that date, and their ordering position.
+On the movie page, select **View all** under the play count, then select a play to edit it. You can change its watch date or location. **Advanced mode** also lets you change the comment for that play and its ordering position among plays on the same date.
 
-Select **Delete** in the edit dialog to permanently remove that history entry. This does not remove the movie's personal rating or add it back to the watchlist.
+Select **Delete** in the edit dialog to permanently remove that play. This does not remove the movie's personal rating or add it back to the watchlist.
 
 ## Rate a movie
 
