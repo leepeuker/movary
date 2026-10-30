@@ -1,4 +1,4 @@
-GET http://127.0.0.1/api/v1/users/{{username}}/watchlist/movies
+GET http://127.0.0.1/api/v1/users/{{username}}/watchlist
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -6,7 +6,7 @@ X-Movary-Token: {{xMovaryToken}}
 
 ####
 
-GET http://127.0.0.1/api/v1/users/{{username}}/watchlist/movies?limit=1&page=2
+GET http://127.0.0.1/api/v1/users/{{username}}/watchlist?limit=1&page=2
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -14,7 +14,7 @@ X-Movary-Token: {{xMovaryToken}}
 
 ####
 
-POST http://127.0.0.1/api/v1/users/{{username}}/watchlist/movies
+POST http://127.0.0.1/api/v1/users/{{username}}/watchlist
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json
@@ -28,7 +28,7 @@ X-Movary-Token: {{xMovaryToken}}
 
 ####
 
-DELETE http://127.0.0.1/api/v1/users/{{username}}/watchlist/movies
+DELETE http://127.0.0.1/api/v1/users/{{username}}/watchlist
 Accept: */*
 Cache-Control: no-cache
 Content-Type: application/json

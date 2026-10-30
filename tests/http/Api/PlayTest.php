@@ -16,7 +16,7 @@ class PlayTest extends HttpTestCase
         $path = $this->createPath($fixture['user']->getName());
         $headers = $this->createAuthorizationHeader($fixture['token']);
         $location = $this->fixture->createLocation($fixture['user']->getId());
-        $watchlist = '/api/v1/users/' . $fixture['user']->getName() . '/watchlist/movies';
+        $watchlist = '/api/v1/users/' . $fixture['user']->getName() . '/watchlist';
         $this->http->post($watchlist, [['movaryId' => $movie->getId()]], $headers)->assertStatus(204);
 
         $firstResponse = $this->http->post($path, [

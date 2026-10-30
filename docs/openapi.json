@@ -5,6 +5,15 @@
     "version": ""
   },
   "servers": [],
+  "tags": [
+    {"name": "Movies"},
+    {"name": "Plays"},
+    {"name": "Watchlist"},
+    {"name": "Reviews"},
+    {"name": "Webhooks"},
+    {"name": "Radarr"},
+    {"name": "Authentication"}
+  ],
   "paths": {
     "\/api\/v1\/users\/{username}\/plays": {
       "get": {
@@ -367,7 +376,7 @@
         ]
       }
     },
-    "\/api\/v1\/users\/{username}\/watchlist\/movies": {
+    "\/api\/v1\/users\/{username}\/watchlist": {
       "get": {
         "tags": [
           "Watchlist"
@@ -522,7 +531,7 @@
           "Watchlist"
         ],
         "operationId": "addToUserWatchlist",
-        "summary": "Add movie to watchlist of user",
+        "summary": "Add movies to watchlist of user",
         "parameters": [
           {
             "name": "username",
@@ -589,7 +598,7 @@
           "Watchlist"
         ],
         "operationId": "deleteFromUserWatchlist",
-        "summary": "Delete movie from watchlist of user",
+        "summary": "Delete movies from watchlist of user",
         "parameters": [
           {
             "name": "username",

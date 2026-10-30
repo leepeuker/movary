@@ -49,6 +49,17 @@ class WatchlistTest extends HttpTestCase
         self::assertSame([], $this->http->get($path, $headers)->assertStatus(200)->json()['watchlist']);
     }
 
+    public function testOldMoviesRouteIsRemoved() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $path = $this->createPath($fixture['user']->getName()) . '/movies';
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        foreach (['GET', 'POST', 'DELETE'] as $method) {
+            $this->http->request($method, $path, $headers, $method === 'GET' ? null : [])->assertStatus(404);
+        }
+    }
+
     #[DataProvider('writeMethodProvider')]
     public function testRejectsUnauthenticatedWrites(string $method) : void
     {
@@ -238,6 +249,6 @@ class WatchlistTest extends HttpTestCase
 
     private function createPath(string $username) : string
     {
-        return '/api/v1/users/' . $username . '/watchlist/movies';
+        return '/api/v1/users/' . $username . '/watchlist';
     }
 }
