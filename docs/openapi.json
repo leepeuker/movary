@@ -87,6 +87,41 @@
               "movaryToken": []
             }
           ]
+        },
+        "put": {
+          "tags": ["Dashboard"],
+          "operationId": "updateUserDashboardRows",
+          "summary": "Replace dashboard row configuration",
+          "description": "The token must belong to the specified user. Submit every row exactly once with a unique zero-based position.",
+          "parameters": [{"$ref": "#/components/parameters/username"}],
+          "requestBody": {
+            "required": true,
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/dashboardRowsUpdate"}}}
+          },
+          "responses": {
+            "204": {"description": "Dashboard rows updated"},
+            "400": {"$ref": "#/components/responses/400"},
+            "401": {"$ref": "#/components/responses/401"},
+            "403": {"$ref": "#/components/responses/403"},
+            "404": {"$ref": "#/components/responses/404"},
+            "500": {"$ref": "#/components/responses/500"}
+          },
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        },
+        "delete": {
+          "tags": ["Dashboard"],
+          "operationId": "resetUserDashboardRows",
+          "summary": "Restore default dashboard row configuration",
+          "description": "The token must belong to the specified user.",
+          "parameters": [{"$ref": "#/components/parameters/username"}],
+          "responses": {
+            "204": {"description": "Dashboard rows reset"},
+            "401": {"$ref": "#/components/responses/401"},
+            "403": {"$ref": "#/components/responses/403"},
+            "404": {"$ref": "#/components/responses/404"},
+            "500": {"$ref": "#/components/responses/500"}
+          },
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
         }
       },
       "/api/v1/users/{username}/dashboard/rows/{rowKey}": {
@@ -2336,6 +2371,28 @@
           "type": "object",
           "required": ["locationsEnabled"],
           "properties": {"locationsEnabled": {"type": "boolean"}}
+        },
+        "dashboardRowsUpdate": {
+          "type": "object",
+          "required": ["rows"],
+          "properties": {
+            "rows": {
+              "type": "array",
+              "description": "All dashboard rows, exactly once. Use keys and zero-based positions from GET /api/v1/users/{username}/dashboard/rows.",
+              "minItems": 13,
+              "maxItems": 13,
+              "items": {
+                "type": "object",
+                "required": ["key", "position", "visible", "initiallyExpanded"],
+                "properties": {
+                  "key": {"type": "string"},
+                  "position": {"type": "integer", "minimum": 0, "maximum": 12},
+                  "visible": {"type": "boolean"},
+                  "initiallyExpanded": {"type": "boolean"}
+                }
+              }
+            }
+          }
         },
         "dashboardRowManifest": {
           "type": "object",
