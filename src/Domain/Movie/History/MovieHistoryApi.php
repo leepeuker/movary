@@ -313,23 +313,11 @@ class MovieHistoryApi
         return $play === null ? null : $this->urlGenerator->replacePosterPathWithImageSrcUrl([$play])[0];
     }
 
-    public function fetchLegacyHistoryCount(int $userId, ?string $searchTerm = null) : int
-    {
-        return $this->movieRepository->fetchLegacyHistoryCount($userId, $searchTerm);
-    }
-
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null, ?SortOrder $sortOrder = null) : array
     {
         $historyEntries = $this->movieRepository->fetchHistoryPaginated($userId, $limit, $page, $sortOrder ?? SortOrder::createDesc(), $searchTerm);
 
         return $this->urlGenerator->replacePosterPathWithImageSrcUrl($historyEntries);
-    }
-
-    public function fetchLegacyHistoryPaginated(int $userId, int $limit, int $page, ?string $searchTerm = null, ?SortOrder $sortOrder = null) : array
-    {
-        $entries = $this->movieRepository->fetchLegacyHistoryPaginated($userId, $limit, $page, $sortOrder ?? SortOrder::createDesc(), $searchTerm);
-
-        return $this->urlGenerator->replacePosterPathWithImageSrcUrl($entries);
     }
 
     public function fetchLastPlays(int $userId) : array

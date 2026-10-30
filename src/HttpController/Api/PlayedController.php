@@ -2,11 +2,8 @@
 
 namespace Movary\HttpController\Api;
 
-use Movary\Domain\Movie\History\PlayCountConflict;
 use Movary\Domain\Movie\MovieApi;
-use Movary\HttpController\Api\Exception\InvalidApiRequest;
 use Movary\HttpController\Api\RequestMapper\PlayedRequestMapper;
-use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\PlayedResponseMapper;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
@@ -20,55 +17,7 @@ class PlayedController
         private readonly PaginationElementsCalculator $paginationElementsCalculator,
         private readonly PlayedRequestMapper $playedRequestMapper,
         private readonly PlayedResponseMapper $playedResponseMapper,
-        private readonly RequestMapper $requestMapper,
     ) {
-    }
-
-    public function addToPlayed(Request $request) : Response
-    {
-        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $playedAdditions = $this->playedRequestMapper->mapAdditions($request);
-
-        foreach ($playedAdditions as $playAddition) {
-            foreach ($playAddition['watchDates'] as $watchDate) {
-                $this->movieApi->addPlaysForMovieOnDate(
-                    $playAddition['movieId'],
-                    $userId,
-                    $watchDate['watchedAt'],
-                    $watchDate['plays'],
-                    comment: $watchDate['comment'],
-                );
-            }
-        }
-
-        return Response::createNoContent();
-    }
-
-    public function deleteFromPlayed(Request $request) : Response
-    {
-        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $playedDeletions = $this->playedRequestMapper->mapDeletions($request);
-
-        foreach ($playedDeletions as $playedDeletion) {
-            if (count($playedDeletion['watchDates']) === 0) {
-                $this->movieApi->deleteHistoryById(
-                    $playedDeletion['movieId'],
-                    $userId,
-                );
-
-                continue;
-            }
-
-            foreach ($playedDeletion['watchDates'] as $date) {
-                $this->movieApi->deleteHistoryByIdAndDate(
-                    $playedDeletion['movieId'],
-                    $userId,
-                    $date,
-                );
-            }
-        }
-
-        return Response::createNoContent();
     }
 
     public function getPlayed(Request $request) : Response
@@ -116,30 +65,5 @@ class PlayedController
                 'maxPage' => $paginationElements->getMaxPage(),
             ]),
         );
-    }
-
-    public function updatePlayed(Request $request) : Response
-    {
-        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
-        $playedUpdates = $this->playedRequestMapper->mapUpdates($request);
-
-        foreach ($playedUpdates as $playedUpdate) {
-            foreach ($playedUpdate['watchDates'] as $watchDate) {
-                try {
-                    $this->movieApi->replaceHistoryForMovieByDate(
-                        $playedUpdate['movieId'],
-                        $userId,
-                        $watchDate['watchedAt'],
-                        $watchDate['plays'],
-                        comment: $watchDate['comment'],
-                        commentProvided: $watchDate['commentProvided'],
-                    );
-                } catch (PlayCountConflict) {
-                    throw InvalidApiRequest::playCountConflict();
-                }
-            }
-        }
-
-        return Response::createNoContent();
     }
 }

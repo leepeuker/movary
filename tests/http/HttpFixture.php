@@ -4,6 +4,8 @@ namespace Tests\Http\Movary;
 
 use InvalidArgumentException;
 use Movary\Domain\Movie\History\MovieHistoryEntity;
+use Movary\Domain\Movie\History\Location\MovieHistoryLocationApi;
+use Movary\Domain\Movie\History\Location\MovieHistoryLocationEntity;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\Movie\Review\MovieReviewApi;
@@ -60,6 +62,16 @@ class HttpFixture
             'HTTP Test Movie ' . $suffix,
             random_int(1, 2_000_000_000),
         );
+    }
+
+    public function createLocation(int $userId) : MovieHistoryLocationEntity
+    {
+        /** @var MovieHistoryLocationApi $locationApi */
+        $locationApi = $this->container->get(MovieHistoryLocationApi::class);
+        $name = 'HTTP Test Location ' . bin2hex(random_bytes(8));
+        $locationApi->createLocation($userId, $name, false);
+
+        return $locationApi->fetchLocationByName($userId, $name);
     }
 
     public function findHistoryEntry(

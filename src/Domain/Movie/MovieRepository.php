@@ -494,58 +494,6 @@ class MovieRepository
         return $play === false ? null : $play;
     }
 
-    public function fetchLegacyHistoryCount(int $userId, ?string $searchTerm = null) : int
-    {
-        $where = '';
-        $parameters = [$userId];
-        if ($searchTerm !== null) {
-            $where = 'AND (m.title LIKE ? OR m.original_title LIKE ?)';
-            $parameters[] = "%$searchTerm%";
-            $parameters[] = "%$searchTerm%";
-        }
-
-        return (int)$this->dbConnection->fetchOne(
-            "SELECT COUNT(*) FROM (
-                SELECT mh.movie_id, mh.watched_at
-                FROM movie_user_watch_dates mh
-                JOIN movie m ON m.id = mh.movie_id
-                WHERE mh.user_id = ? AND mh.watched_at IS NOT NULL $where
-                GROUP BY mh.movie_id, mh.watched_at
-            ) grouped_history",
-            $parameters,
-        );
-    }
-
-    public function fetchLegacyHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
-    {
-        $where = '';
-        $parameters = [$userId];
-        if ($searchTerm !== null) {
-            $where = 'AND (m.title LIKE ? OR m.original_title LIKE ?)';
-            $parameters[] = "%$searchTerm%";
-            $parameters[] = "%$searchTerm%";
-        }
-
-        $offset = ($limit * $page) - $limit;
-
-        return $this->dbConnection->fetchAllAssociative(
-            "SELECT m.*, mh.watched_at, mur.rating AS userRating, mh.location_id AS locationId
-            FROM (
-                SELECT MIN(mh.id) AS id
-                FROM movie_user_watch_dates mh
-                JOIN movie m ON m.id = mh.movie_id
-                WHERE mh.user_id = ? AND mh.watched_at IS NOT NULL $where
-                GROUP BY mh.movie_id, mh.watched_at
-            ) grouped_history
-            JOIN movie_user_watch_dates mh ON mh.id = grouped_history.id
-            JOIN movie m ON m.id = mh.movie_id
-            LEFT JOIN movie_user_rating mur ON mur.movie_id = m.id AND mur.user_id = mh.user_id
-            ORDER BY mh.watched_at $sortOrder, mh.position $sortOrder, mh.id $sortOrder
-            LIMIT $offset, $limit",
-            $parameters,
-        );
-    }
-
     public function fetchHistoryPaginated(int $userId, int $limit, int $page, SortOrder $sortOrder, ?string $searchTerm) : array
     {
         $payload = [$userId, $userId];

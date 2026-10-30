@@ -3,8 +3,8 @@
 namespace Tests\Unit\Movary\HttpController\Api\RequestMapper;
 
 use Movary\Domain\Movie\MovieApi;
-use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\User\UserApi;
+use Movary\Domain\User\UserEntity;
 use Movary\HttpController\Api\Exception\InvalidApiRequest;
 use Movary\HttpController\Api\RequestMapper\PlayedRequestMapper;
 use Movary\HttpController\Api\RequestMapper\RequestMapper;
@@ -15,74 +15,35 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PlayedRequestMapper::class)]
 class PlayedRequestMapperTest extends TestCase
 {
-    private PlayedRequestMapper $subject;
-
-    protected function setUp() : void
-    {
-        $movieApi = $this->createStub(MovieApi::class);
-        $movieApi->method('findById')->willReturn($this->createStub(MovieEntity::class));
-
-        $this->subject = new PlayedRequestMapper(new RequestMapper(
-            $this->createStub(UserApi::class),
-            $movieApi,
-        ));
-    }
-
-    public function testMapsAdditionDefaultsAndNullableDates() : void
-    {
-        $result = $this->subject->mapAdditions($this->createRequest(
-            '[{"movaryId":42,"watchDates":['
-            . '{"watchedAt":null,"plays":null},'
-            . '{"watchedAt":"2026-10-20","plays":2,"comment":"A comment"}'
-            . ']}]',
-        ));
-
-        self::assertSame(42, $result[0]['movieId']);
-        self::assertNull($result[0]['watchDates'][0]['watchedAt']);
-        self::assertSame(1, $result[0]['watchDates'][0]['plays']);
-        self::assertNull($result[0]['watchDates'][0]['comment']);
-        self::assertSame('2026-10-20', (string)$result[0]['watchDates'][1]['watchedAt']);
-        self::assertSame(2, $result[0]['watchDates'][1]['plays']);
-        self::assertSame('A comment', $result[0]['watchDates'][1]['comment']);
-    }
-
-    public function testMapsNullableDeletionDates() : void
-    {
-        $result = $this->subject->mapDeletions($this->createRequest(
-            '[{"movaryId":42,"watchDates":[null,"2026-10-20"]}]',
-        ));
-
-        self::assertNull($result[0]['watchDates'][0]);
-        self::assertSame('2026-10-20', (string)$result[0]['watchDates'][1]);
-    }
-
-    public function testRejectsUpdateWithoutPlays() : void
-    {
-        $this->expectExceptionObject(
-            InvalidApiRequest::invalidField('items[0].watchDates[0].plays', 'must be a positive integer'),
-        );
-
-        $this->subject->mapUpdates($this->createRequest(
-            '[{"movaryId":42,"watchDates":[{"watchedAt":"2026-10-20"}]}]',
-        ));
-    }
-
-    public function testRejectsNonObjectWatchDate() : void
-    {
-        $this->expectExceptionObject(
-            InvalidApiRequest::invalidField('items[0].watchDates[0]', 'must be an object'),
-        );
-
-        $this->subject->mapAdditions($this->createRequest(
-            '[{"movaryId":42,"watchDates":["2026-10-20"]}]',
-        ));
-    }
-
-    private function createRequest(string $body) : Request
+    public function testMapsMovieReadDefaults() : void
     {
         $request = $this->createStub(Request::class);
-        $request->method('getBody')->willReturn($body);
+        $request->method('getRouteParameters')->willReturn(['username' => 'Owner']);
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getId')->willReturn(12);
+        $userApi = $this->createStub(UserApi::class);
+        $userApi->method('fetchUserByName')->willReturn($user);
+        $subject = new PlayedRequestMapper(new RequestMapper($userApi, $this->createStub(MovieApi::class)));
 
-        return $request;
+        $result = $subject->mapRequest($request);
+
+        self::assertSame(12, $result->getRequestedUserId());
+        self::assertSame(1, $result->getPage());
+        self::assertSame(24, $result->getLimit());
+        self::assertSame('title', $result->getSortBy());
+        self::assertSame('asc', (string)$result->getSortOrder());
+    }
+
+    public function testRejectsUnsupportedMovieSort() : void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getRouteParameters')->willReturn(['username' => 'Owner']);
+        $request->method('getGetParameters')->willReturn(['sortBy' => 'position']);
+        $userApi = $this->createStub(UserApi::class);
+        $userApi->method('fetchUserByName')->willReturn($this->createStub(UserEntity::class));
+        $subject = new PlayedRequestMapper(new RequestMapper($userApi, $this->createStub(MovieApi::class)));
+
+        $this->expectException(InvalidApiRequest::class);
+        $subject->mapRequest($request);
     }
 }

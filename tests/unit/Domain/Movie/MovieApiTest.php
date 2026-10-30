@@ -18,12 +18,26 @@ use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
 use Movary\Domain\Person\PersonApi;
 use Movary\Service\ImageUrlService;
 use Movary\Service\VoteCountFormatter;
+use Movary\ValueObject\Date;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MovieApi::class)]
 class MovieApiTest extends TestCase
 {
+    public function testCreatingOnePlayRemovesMovieFromWatchlistAndReturnsId() : void
+    {
+        $date = Date::createFromString('2026-10-29');
+        $historyApi = $this->createMock(MovieHistoryApi::class);
+        $historyApi->expects(self::once())->method('createPlay')
+            ->with(1, 2, $date, 3, 'Comment', null)
+            ->willReturn(17);
+        $watchlistApi = $this->createMock(MovieWatchlistApi::class);
+        $watchlistApi->expects(self::once())->method('removeMovieFromWatchlistAutomatically')->with(1, 2);
+
+        self::assertSame(17, $this->createSubject($historyApi, $watchlistApi)->createPlay(1, 2, $date, 3, 'Comment'));
+    }
+
     public function testReplacingWithoutNewPlaysKeepsMovieOnWatchlist() : void
     {
         $historyApi = $this->createStub(MovieHistoryApi::class);

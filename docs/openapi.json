@@ -6,10 +6,10 @@
   },
   "servers": [],
   "paths": {
-    "\/api\/v1\/users\/{username}\/history\/plays": {
+    "\/api\/v1\/users\/{username}\/plays": {
       "get": {
         "tags": [
-          "History"
+          "Plays"
         ],
         "operationId": "getUserPlays",
         "summary": "Get individual plays of user",
@@ -117,12 +117,83 @@
             "movaryToken": []
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "Plays"
+        ],
+        "operationId": "createUserPlay",
+        "summary": "Create one play for a user",
+        "description": "Creates exactly one play, including one with an unknown watch date. The movie is removed from the watchlist automatically.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application\/json": {
+              "schema": {
+                "$ref": "#\/components\/schemas\/playCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Play created",
+            "headers": {
+              "Location": {
+                "description": "URL of the new play",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application\/json": {
+                "schema": {
+                  "$ref": "#\/components\/schemas\/play"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#\/components\/responses\/400"
+          },
+          "401": {
+            "$ref": "#\/components\/responses\/401"
+          },
+          "403": {
+            "$ref": "#\/components\/responses\/403"
+          },
+          "404": {
+            "$ref": "#\/components\/responses\/404"
+          },
+          "500": {
+            "$ref": "#\/components\/responses\/500"
+          }
+        },
+        "security": [
+          {
+            "bearerToken": []
+          },
+          {
+            "movaryToken": []
+          }
+        ]
       }
     },
-    "\/api\/v1\/users\/{username}\/history\/plays\/{playId}": {
+    "\/api\/v1\/users\/{username}\/plays\/{playId}": {
       "get": {
         "tags": [
-          "History"
+          "Plays"
         ],
         "operationId": "getUserPlay",
         "summary": "Get one individual play",
@@ -180,7 +251,7 @@
       },
       "put": {
         "tags": [
-          "History"
+          "Plays"
         ],
         "operationId": "updateUserPlay",
         "summary": "Replace one individual play",
@@ -245,7 +316,7 @@
       },
       "delete": {
         "tags": [
-          "History"
+          "Plays"
         ],
         "operationId": "deleteUserPlay",
         "summary": "Delete one individual play",
@@ -284,364 +355,6 @@
           },
           "500": {
             "$ref": "#\/components\/responses\/500"
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          },
-          {
-            "movaryToken": []
-          }
-        ]
-      }
-    },
-    "\/api\/v1\/users\/{username}\/history\/movies": {
-      "get": {
-        "tags": [
-          "History"
-        ],
-        "operationId": "getUserHistory",
-        "summary": "Get played movies with watch dates of user",
-        "description": "Get all played movies with watch dates set. Sorted by most recently watch dates on default.",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "description": "The search term",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Page",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 1
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Limit",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 24
-            }
-          },
-          {
-            "name": "sortOrder",
-            "in": "query",
-            "description": "Sort order",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "default": "desc",
-              "enum": [
-                "asc",
-                "desc"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application\/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "history": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "movie": {
-                            "$ref": "#/components/schemas/movie"
-                          },
-                          "watchedAt": {
-                            "$ref": "#/components/schemas/calendarDate"
-                          }
-                        }
-                      }
-                    },
-                    "currentPage": {
-                      "type": "integer",
-                      "example": 1
-                    },
-                    "maxPage": {
-                      "type": "integer",
-                      "example": 10
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          },
-          {
-            "movaryToken": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "History"
-        ],
-        "operationId": "addToUserHistory",
-        "summary": "Add movie play with watch date set to user",
-        "description": "Create or update the provided watch dates for the specified movies. A date for plays is required.",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application\/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "movaryId",
-                    "watchedAt"
-                  ],
-                  "properties": {
-                    "movaryId": {
-                      "$ref": "#/components/schemas/id"
-                    },
-                    "watchedAt": {
-                      "$ref": "#/components/schemas/calendarDate"
-                    },
-                    "plays": {
-                      "$ref": "#/components/schemas/playsOptional"
-                    },
-                    "comment": {
-                      "$ref": "#/components/schemas/commentOptional"
-                    },
-                    "position": {
-                      "$ref": "#/components/schemas/positionOptional"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          },
-          {
-            "movaryToken": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "History"
-        ],
-        "operationId": "updateUserHistory",
-        "summary": "Replace movie play with watch date set for user",
-        "description": "Create or replace the provided watch dates for the specified movies. A date for plays is required.",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application\/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "movaryId",
-                    "watchedAt",
-                    "plays"
-                  ],
-                  "properties": {
-                    "movaryId": {
-                      "$ref": "#/components/schemas/id"
-                    },
-                    "watchedAt": {
-                      "$ref": "#/components/schemas/calendarDate"
-                    },
-                    "plays": {
-                      "$ref": "#/components/schemas/plays"
-                    },
-                    "comment": {
-                      "$ref": "#/components/schemas/commentOptional"
-                    },
-                    "position": {
-                      "$ref": "#/components/schemas/positionNullable"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          },
-          {
-            "movaryToken": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "History"
-        ],
-        "operationId": "deleteFromUserHistory",
-        "summary": "Delete movie watch dates from user history",
-        "description": "Delete the specified movie watch dates. A watch date is required for every movie.",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application\/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "movaryId",
-                    "watchedAt"
-                  ],
-                  "properties": {
-                    "movaryId": {
-                      "$ref": "#/components/schemas/id"
-                    },
-                    "watchedAt": {
-                      "$ref": "#/components/schemas/calendarDate"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
           }
         },
         "security": [
@@ -939,10 +652,10 @@
         ]
       }
     },
-    "\/api\/v1\/users\/{username}\/played\/movies": {
+    "\/api\/v1\/users\/{username}\/plays\/movies": {
       "get": {
         "tags": [
-          "Played"
+          "Plays"
         ],
         "operationId": "getUserPlayedMovies",
         "summary": "Get played movies of user",
@@ -1082,253 +795,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          },
-          {
-            "movaryToken": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "Played"
-        ],
-        "operationId": "addToUserPlayedMovies",
-        "summary": "Add movie plays to user",
-        "description": "Create or update the provided watch dates for the specified movies.",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application\/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "movaryId"
-                  ],
-                  "properties": {
-                    "movaryId": {
-                      "$ref": "#/components/schemas/id"
-                    },
-                    "watchDates": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "watchedAt": {
-                            "$ref": "#/components/schemas/calendarDateNullable"
-                          },
-                          "plays": {
-                            "$ref": "#/components/schemas/playsOptional"
-                          },
-                          "comment": {
-                            "$ref": "#/components/schemas/commentOptional"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          },
-          {
-            "movaryToken": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "Played"
-        ],
-        "operationId": "updateUserPlayedMovies",
-        "summary": "Replace movie plays for user",
-        "description": "Create or replace the provided watch dates for the specified movies.",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application\/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "movaryId"
-                  ],
-                  "properties": {
-                    "movaryId": {
-                      "$ref": "#/components/schemas/id"
-                    },
-                    "watchDates": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [
-                          "plays"
-                        ],
-                        "properties": {
-                          "watchedAt": {
-                            "$ref": "#/components/schemas/calendarDateNullable"
-                          },
-                          "plays": {
-                            "$ref": "#/components/schemas/plays"
-                          },
-                          "comment": {
-                            "$ref": "#/components/schemas/commentOptional"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "403": {
-            "$ref": "#/components/responses/403"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        },
-        "security": [
-          {
-            "bearerToken": []
-          },
-          {
-            "movaryToken": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Played"
-        ],
-        "operationId": "deleteFromUserPlayedMovies",
-        "summary": "Delete movie plays from user",
-        "description": "Delete all watch dates of specified movies if no specific watch dates are provided.",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "description": "Name of user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application\/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "required": [
-                    "movaryId"
-                  ],
-                  "properties": {
-                    "movaryId": {
-                      "$ref": "#/components/schemas/id"
-                    },
-                    "watchDates": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/calendarDateNullable"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/204"
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
           },
           "401": {
             "$ref": "#/components/responses/401"
@@ -2315,6 +1781,38 @@
       }
     },
     "schemas": {
+      "playCreate": {
+        "type": "object",
+        "required": [
+          "movaryId",
+          "watchedAt"
+        ],
+        "properties": {
+          "movaryId": {
+            "$ref": "#\/components\/schemas\/id"
+          },
+          "watchedAt": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 32767,
+            "nullable": true
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "locationId": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true
+          }
+        }
+      },
       "play": {
         "type": "object",
         "required": [

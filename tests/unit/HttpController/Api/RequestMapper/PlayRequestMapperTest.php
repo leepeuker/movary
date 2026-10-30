@@ -5,6 +5,7 @@ namespace Tests\Unit\Movary\HttpController\Api\RequestMapper;
 use Movary\Domain\Movie\History\Location\MovieHistoryLocationApi;
 use Movary\Domain\Movie\History\Location\MovieHistoryLocationEntity;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\Exception\InvalidApiRequest;
 use Movary\HttpController\Api\RequestMapper\PlayRequestMapper;
@@ -16,6 +17,31 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PlayRequestMapper::class)]
 class PlayRequestMapperTest extends TestCase
 {
+    public function testMapsSinglePlayCreationWithUnknownDate() : void
+    {
+        $subject = $this->createSubject($this->createStub(MovieHistoryLocationApi::class));
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn('{"movaryId":42,"watchedAt":null,"comment":"A play"}');
+
+        self::assertSame([
+            'movieId' => 42,
+            'watchedAt' => null,
+            'position' => null,
+            'comment' => 'A play',
+            'locationId' => null,
+        ], $subject->mapCreation($request, 7));
+    }
+
+    public function testRejectsAggregatePlayCountOnCreation() : void
+    {
+        $subject = $this->createSubject($this->createStub(MovieHistoryLocationApi::class));
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn('{"movaryId":42,"watchedAt":null,"plays":2}');
+
+        $this->expectException(InvalidApiRequest::class);
+        $subject->mapCreation($request, 7);
+    }
+
     public function testMapsCompleteUpdateWithUnknownDate() : void
     {
         $locationApi = $this->createStub(MovieHistoryLocationApi::class);
@@ -51,8 +77,11 @@ class PlayRequestMapperTest extends TestCase
 
     private function createSubject(MovieHistoryLocationApi $locationApi) : PlayRequestMapper
     {
+        $movieApi = $this->createStub(MovieApi::class);
+        $movieApi->method('findById')->willReturn($this->createStub(MovieEntity::class));
+
         return new PlayRequestMapper(
-            new RequestMapper($this->createStub(UserApi::class), $this->createStub(MovieApi::class)),
+            new RequestMapper($this->createStub(UserApi::class), $movieApi),
             $locationApi,
         );
     }
