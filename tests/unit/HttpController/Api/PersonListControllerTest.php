@@ -40,7 +40,7 @@ class PersonListControllerTest extends TestCase
         $person->method('getName')->willReturn('Lee');
         $person->method('getGender')->willReturn($gender);
         $person->method('getBirthDate')->willReturn(Date::createFromString('1980-01-02'));
-        $person->method('getTmdbPosterPath')->willReturn('/poster.jpg');
+        $person->method('getTmdbPosterPathEffective')->willReturn('/poster.jpg');
         $personApi = $this->createMock(PersonApi::class);
         $personApi->expects(self::once())->method('countAll')->with('Lee', $gender, 'actor')->willReturn(3);
         $personApi->expects(self::once())->method('fetchAllPaginated')

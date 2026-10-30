@@ -29,6 +29,7 @@ You can also open an existing movie page and select **Add play** to record anoth
 
 API clients can list movies stored on the server with `GET /api/v1/movies?page=1&limit=24` and fetch shared details with `GET /api/v1/movies/<movaryId>`.
 They can also list people with `GET /api/v1/persons`, filtering by `search`, `gender`, or `role=actor|director`, and fetch shared details with `GET /api/v1/persons/<personId>`.
+Administrators can list available TMDB profile images with `GET /api/v1/persons/<personId>/profiles`, select one with `PUT /api/v1/persons/<personId>/profile` and a `profilePath` JSON field, or restore the default with `DELETE /api/v1/persons/<personId>/profile`.
 
 ## Track plays automatically
 

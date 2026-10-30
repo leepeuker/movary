@@ -176,6 +176,24 @@ class PersonRepository
         return PersonEntity::createFromArray($data);
     }
 
+    public function clearTmdbPosterPathOverride(int $personId) : void
+    {
+        $this->dbConnection->update(
+            'person',
+            ['tmdb_poster_path_override' => null, 'poster_path' => null],
+            ['id' => $personId],
+        );
+    }
+
+    public function setTmdbPosterPathOverride(int $personId, string $posterPath) : void
+    {
+        $this->dbConnection->update(
+            'person',
+            ['tmdb_poster_path_override' => $posterPath, 'poster_path' => null],
+            ['id' => $personId],
+        );
+    }
+
     public function update(
         int $id,
         int $tmdbId,

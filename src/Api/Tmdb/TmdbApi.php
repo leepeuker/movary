@@ -6,6 +6,7 @@ use Movary\Api\Tmdb\Cache\TmdbIsoLanguageCache;
 use Movary\Api\Tmdb\Dto\TmdbMovie;
 use Movary\Api\Tmdb\Dto\TmdbPerson;
 use Movary\Api\Tmdb\Dto\TmdbPoster;
+use Movary\Api\Tmdb\Dto\TmdbProfile;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderCollection;
 use Movary\Api\Tmdb\Dto\TmdbWatchProviderList;
 use Movary\Api\Tmdb\Exception\TmdbResourceNotFound;
@@ -32,6 +33,27 @@ class TmdbApi
         $data = $this->client->get('/person/' . $personId);
 
         return TmdbPerson::createFromArray($data);
+    }
+
+    /** @return list<TmdbProfile> */
+    public function fetchPersonProfiles(int $personId) : array
+    {
+        $data = $this->client->get('/person/' . $personId . '/images');
+
+        $profiles = [];
+        foreach ($data['profiles'] ?? [] as $profile) {
+            $path = $profile['file_path'] ?? null;
+            if (is_string($path) === false || $path === '') {
+                continue;
+            }
+
+            $profiles[] = new TmdbProfile(
+                $path,
+                (string)$this->urlGenerator->generateImageUrl($path, 'w154'),
+            );
+        }
+
+        return $profiles;
     }
 
     /** @return list<TmdbPoster> */

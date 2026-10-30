@@ -67,26 +67,42 @@ class TmdbImageCacheTest extends TestCase
         self::assertSame(1, $subject->cacheAllMovieImages());
     }
 
-    public function testPersonCachingRetainsDefaultPosterQuery() : void
+    public function testPersonCachingUsesProfileOverride() : void
     {
         $result = $this->createMock(Result::class);
-        $result->expects(self::once())->method('iterateAssociative')->willReturn(new ArrayIterator());
-        $statement = $this->createMock(Statement::class);
-        $statement->expects(self::once())->method('executeQuery')->with([])->willReturn($result);
+        $result->expects(self::once())->method('iterateAssociative')->willReturn(new ArrayIterator([[
+            'id' => 12,
+            'poster_path' => null,
+            'tmdb_poster_path' => '/default.jpg',
+            'tmdb_poster_path_override' => '/selected.jpg',
+        ]]));
+        $select = $this->createMock(Statement::class);
+        $select->expects(self::once())->method('executeQuery')->with([])->willReturn($result);
+        $update = $this->createMock(Statement::class);
+        $update->expects(self::once())->method('executeStatement')->with(['/cached.jpg', 12])->willReturn(1);
         $connection = $this->createMock(Connection::class);
         $connection
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('prepare')
-            ->with('SELECT id, poster_path, tmdb_poster_path FROM person')
-            ->willReturn($statement);
+            ->willReturnMap([
+                ['SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM person', $select],
+                ['UPDATE person SET poster_path = ? WHERE id = ?', $update],
+            ]);
+        $urlGenerator = $this->createMock(TmdbUrlGenerator::class);
+        $urlGenerator->expects(self::once())->method('generateImageUrl')->with('/selected.jpg')
+            ->willReturn(Url::createFromString('https://example.com/selected.jpg'));
+        $imageCacheService = $this->createMock(ImageCacheService::class);
+        $imageCacheService->expects(self::once())->method('cacheImage')
+            ->with(Url::createFromString('https://example.com/selected.jpg'), 12, ResourceType::createPerson(), true)
+            ->willReturn('/cached.jpg');
 
         $subject = new TmdbImageCache(
             $connection,
-            $this->createStub(ImageCacheService::class),
-            $this->createStub(TmdbUrlGenerator::class),
+            $imageCacheService,
+            $urlGenerator,
             new NullLogger(),
         );
 
-        self::assertSame(0, $subject->cacheAllPersonImages());
+        self::assertSame(1, $subject->cacheAllPersonImages());
     }
 }
