@@ -17,6 +17,8 @@ The page provides these account settings:
 
 Select **Submit** to save the preferences to your account.
 
+API clients can read general account preferences with `GET /api/v1/me/preferences`. `PATCH` on the same path updates supplied fields, including username and privacy. The request requires your personal API token. See the [OpenAPI specification](../openapi.json) for fields and formats.
+
 ## Light and dark themes
 
 Open the main navigation menu and use **Dark Mode** to switch between the light and dark themes. The selection is stored in the current browser rather than in your Movary account, so another browser or device can use a different theme.
