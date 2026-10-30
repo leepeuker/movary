@@ -49,6 +49,71 @@ class WatchlistTest extends HttpTestCase
         self::assertSame([], $this->http->get($path, $headers)->assertStatus(200)->json()['watchlist']);
     }
 
+    public function testItemRouteAddsAndRemovesMovieIdempotently() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+        $collectionPath = $this->createPath($fixture['user']->getName());
+        $itemPath = $collectionPath . '/' . $movie->getId();
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->http->request('PUT', $itemPath, $headers)->assertStatus(204)->assertBodySame('');
+        $watchlist = $this->http->get($collectionPath, $headers)->assertStatus(200)->json()['watchlist'];
+        self::assertIsArray($watchlist);
+        self::assertCount(1, $watchlist);
+        self::assertSame($movie->getId(), $watchlist[0]['movie']['ids']['movary']);
+        $addedAt = $watchlist[0]['addedAt'];
+
+        $this->http->request('PUT', $itemPath, $headers)->assertStatus(204)->assertBodySame('');
+        $watchlist = $this->http->get($collectionPath, $headers)->assertStatus(200)->json()['watchlist'];
+        self::assertIsArray($watchlist);
+        self::assertCount(1, $watchlist);
+        self::assertSame($addedAt, $watchlist[0]['addedAt']);
+
+        $this->http->request('DELETE', $itemPath, $headers)->assertStatus(204)->assertBodySame('');
+        $this->http->request('DELETE', $itemPath, $headers)->assertStatus(204)->assertBodySame('');
+        self::assertSame([], $this->http->get($collectionPath, $headers)->assertStatus(200)->json()['watchlist']);
+    }
+
+    public function testItemRouteHandlesUnknownMovie() : void
+    {
+        $fixture = $this->fixture->createUserWithToken();
+        $path = $this->createPath($fixture['user']->getName()) . '/2147483647';
+        $headers = $this->createAuthorizationHeader($fixture['token']);
+
+        $this->http->request('PUT', $path, $headers)->assertStatus(404);
+        $this->http->request('DELETE', $path, $headers)->assertStatus(204)->assertBodySame('');
+    }
+
+    #[DataProvider('itemWriteMethodProvider')]
+    public function testItemRouteRejectsUnauthenticatedWrites(string $method) : void
+    {
+        $user = $this->fixture->createUserWithToken()['user'];
+
+        $this->http
+            ->request($method, $this->createPath($user->getName()) . '/1')
+            ->assertStatus(401)
+            ->assertHeaderSame('WWW-Authenticate', 'Bearer');
+    }
+
+    #[DataProvider('itemWriteMethodProvider')]
+    public function testItemRouteRejectsWritesToAnotherUsersWatchlist(string $method) : void
+    {
+        $target = $this->fixture->createUserWithToken();
+        $authenticatedUser = $this->fixture->createUserWithToken();
+        $movie = $this->fixture->createMovie();
+
+        $this->http
+            ->request(
+                $method,
+                $this->createPath($target['user']->getName()) . '/' . $movie->getId(),
+                $this->createAuthorizationHeader($authenticatedUser['token']),
+            )
+            ->assertStatus(403);
+
+        self::assertFalse($this->fixture->hasMovieInWatchlist($movie->getId(), $target['user']->getId()));
+    }
+
     public function testOldMoviesRouteIsRemoved() : void
     {
         $fixture = $this->fixture->createUserWithToken();
@@ -244,6 +309,13 @@ class WatchlistTest extends HttpTestCase
     public static function writeMethodProvider() : iterable
     {
         yield 'post' => ['POST'];
+        yield 'delete' => ['DELETE'];
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function itemWriteMethodProvider() : iterable
+    {
+        yield 'put' => ['PUT'];
         yield 'delete' => ['DELETE'];
     }
 

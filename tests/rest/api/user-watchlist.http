@@ -41,3 +41,13 @@ X-Movary-Token: {{xMovaryToken}}
 ]
 
 ####
+
+PUT http://127.0.0.1/api/v1/users/{{username}}/watchlist/1
+X-Movary-Token: {{xMovaryToken}}
+
+####
+
+DELETE http://127.0.0.1/api/v1/users/{{username}}/watchlist/1
+X-Movary-Token: {{xMovaryToken}}
+
+####
