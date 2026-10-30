@@ -6,14 +6,14 @@
   },
   "servers": [],
   "tags": [
-    {"name": "Dashboard"},
+    {"name": "Users"},
     {"name": "Movies"},
     {"name": "Plays"},
     {"name": "Watchlist"},
     {"name": "Reviews"},
+    {"name": "Dashboard"},
     {"name": "Webhooks"},
-    {"name": "Radarr"},
-    {"name": "Users"}
+    {"name": "Radarr"}
   ],
   "paths": {
       "/api/v1/users/{username}/dashboard/rows": {
