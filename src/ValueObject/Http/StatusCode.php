@@ -20,6 +20,11 @@ class StatusCode
         return new self(409, 'Conflict');
     }
 
+    public static function createCreated() : self
+    {
+        return new self(201, 'Created');
+    }
+
     public static function createForbidden() : self
     {
         return new self(403, 'Forbidden');

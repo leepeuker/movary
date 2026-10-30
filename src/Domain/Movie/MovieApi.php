@@ -75,6 +75,19 @@ class MovieApi
         );
     }
 
+    public function createPlay(
+        int $movieId,
+        int $userId,
+        ?Date $watchedAt,
+        ?int $position = null,
+        ?string $comment = null,
+        ?int $locationId = null,
+    ) : int {
+        $this->watchlistApi->removeMovieFromWatchlistAutomatically($movieId, $userId);
+
+        return $this->historyApi->createPlay($movieId, $userId, $watchedAt, $position, $comment, $locationId);
+    }
+
     public function create(
         string $title,
         int $tmdbId,

@@ -1,37 +1,30 @@
-GET http://127.0.0.1/api/v1/users/{{username}}/history/movies?search=Matrix&limit=10
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
+GET http://127.0.0.1/api/v1/users/{{username}}/plays?search=Matrix&limit=10
+Accept: application/json
 X-Movary-Token: {{xMovaryToken}}
 
 ####
 
-PUT http://127.0.0.1/api/v1/users/{{username}}/history/movies
-Accept: */*
-Cache-Control: no-cache
+POST http://127.0.0.1/api/v1/users/{{username}}/plays
 Content-Type: application/json
 X-Movary-Token: {{xMovaryToken}}
 
-[{"movaryId" : 1, "watchedAt" : "2011-05-06", "plays" :  1, "comment" :  "comment"}]
+{"movaryId":1,"watchedAt":"2011-05-06","comment":"A play"}
 
 ####
 
-POST http://127.0.0.1/api/v1/users/{{username}}/history/movies
-Accept: */*
-Cache-Control: no-cache
+GET http://127.0.0.1/api/v1/users/{{username}}/plays/{{playId}}
+Accept: application/json
+X-Movary-Token: {{xMovaryToken}}
+
+####
+
+PUT http://127.0.0.1/api/v1/users/{{username}}/plays/{{playId}}
 Content-Type: application/json
 X-Movary-Token: {{xMovaryToken}}
 
-[{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
+{"watchedAt":"2011-05-06","position":1,"comment":"Updated play","locationId":null}
 
 ####
 
-DELETE http://127.0.0.1/api/v1/users/{{username}}/history/movies
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
+DELETE http://127.0.0.1/api/v1/users/{{username}}/plays/{{playId}}
 X-Movary-Token: {{xMovaryToken}}
-
-[{"movaryId" : 1, "watchedAt" : "2011-05-06"}]
-
-####
