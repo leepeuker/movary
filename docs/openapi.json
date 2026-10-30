@@ -7,11 +7,11 @@
   "servers": [],
   "tags": [
     {"name": "Users"},
+    {"name": "Dashboard"},
     {"name": "Movies"},
     {"name": "Plays"},
     {"name": "Watchlist"},
     {"name": "Reviews"},
-    {"name": "Dashboard"},
     {"name": "Webhooks"},
     {"name": "Radarr"}
   ],
