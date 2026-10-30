@@ -3,6 +3,7 @@
 namespace Movary\Service;
 
 use League\Csv\Reader;
+use Movary\Domain\Movie\History\Location\MovieHistoryLocationApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\Movie\Review\MovieReviewApi;
@@ -20,6 +21,7 @@ class ImportService
         private readonly MovieWatchlistApi $watchlistApi,
         private readonly JobQueueScheduler $jobQueueScheduler,
         private readonly MovieReviewApi $reviewApi,
+        private readonly MovieHistoryLocationApi $locationApi,
     ) {
     }
 
@@ -58,15 +60,10 @@ class ImportService
 
             $movie = $this->findOrCreateMovie($tmdbId, (string)$record['title'], $imdbId);
 
-            $this->movieApi->addPlaysForMovieOnDate($movie->getId(), $userId, $watchDate);
+            $locationId = empty($record['location']) === false ? $this->locationApi->createOrUpdate($userId, $record['location']) : null;
+            $comment = empty($record['comment']) === false ? $record['comment'] : null;
 
-            if (empty($record['comment']) === false) {
-                $this->movieApi->updateHistoryComment($movie->getId(), $userId, $watchDate, $record['comment']);
-            }
-
-            if (empty($record['location']) === false) {
-                $this->movieApi->updateHistoryLocationByName($movie->getId(), $userId, $watchDate, $record['location']);
-            }
+            $this->movieApi->createPlay($movie->getId(), $userId, $watchDate, null, $comment, $locationId);
         }
     }
 
