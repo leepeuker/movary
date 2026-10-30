@@ -11,6 +11,7 @@
     {"name": "Movies"},
     {"name": "Plays"},
     {"name": "Watchlist"},
+    {"name": "Locations"},
     {"name": "Reviews"},
     {"name": "Ratings"},
     {"name": "Webhooks"},
@@ -1238,6 +1239,126 @@
         ]
       }
     },
+    "/api/v1/users/{username}/locations": {
+      "get": {
+        "tags": ["Locations"],
+        "operationId": "getUserLocations",
+        "summary": "List the authenticated user's locations",
+        "description": "Location names are private to their owner, even when the user's movie data is shared.",
+        "parameters": [{"$ref": "#/components/parameters/username"}],
+        "responses": {
+          "200": {
+            "description": "Locations ordered by name and ID",
+            "content": {"application/json": {"schema": {
+              "type": "object",
+              "required": ["locations"],
+              "properties": {"locations": {"type": "array", "items": {"$ref": "#/components/schemas/location"}}}
+            }}}
+          },
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "post": {
+        "tags": ["Locations"],
+        "operationId": "createUserLocation",
+        "summary": "Create a location for the authenticated user",
+        "parameters": [{"$ref": "#/components/parameters/username"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/locationInput"}}}},
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/users/{username}/locations/settings": {
+      "get": {
+        "tags": ["Locations"],
+        "operationId": "getUserLocationSettings",
+        "summary": "Get the authenticated user's location setting",
+        "parameters": [{"$ref": "#/components/parameters/username"}],
+        "responses": {
+          "200": {"description": "Location feature status", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/locationSettings"}}}},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "put": {
+        "tags": ["Locations"],
+        "operationId": "updateUserLocationSettings",
+        "summary": "Enable or disable locations for the authenticated user",
+        "description": "Disabling locations retains saved locations and play assignments.",
+        "parameters": [{"$ref": "#/components/parameters/username"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/locationSettings"}}}},
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/users/{username}/locations/{locationId}": {
+      "get": {
+        "tags": ["Locations"],
+        "operationId": "getUserLocation",
+        "summary": "Get one of the authenticated user's locations",
+        "parameters": [{"$ref": "#/components/parameters/username"}, {"$ref": "#/components/parameters/locationId"}],
+        "responses": {
+          "200": {"description": "Location", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/location"}}}},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "put": {
+        "tags": ["Locations"],
+        "operationId": "updateUserLocation",
+        "summary": "Update one of the authenticated user's locations",
+        "parameters": [{"$ref": "#/components/parameters/username"}, {"$ref": "#/components/parameters/locationId"}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/locationInput"}}}},
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "delete": {
+        "tags": ["Locations"],
+        "operationId": "deleteUserLocation",
+        "summary": "Delete one of the authenticated user's locations",
+        "description": "Succeeds when the location is already absent. Existing play entries are retained without that location assignment.",
+        "parameters": [{"$ref": "#/components/parameters/username"}, {"$ref": "#/components/parameters/locationId"}],
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
     "\/api\/v1\/users\/{username}\/movies\/{movaryId}\/rating": {
       "get": {
         "tags": ["Ratings"],
@@ -2083,9 +2204,38 @@
         "schema": {
           "$ref": "#/components/schemas/id"
         }
+      },
+      "locationId": {
+        "name": "locationId",
+        "in": "path",
+        "description": "Location id",
+        "required": true,
+        "schema": {"$ref": "#/components/schemas/id"}
       }
     },
     "schemas": {
+        "location": {
+          "type": "object",
+          "required": ["id", "name", "isCinema"],
+          "properties": {
+            "id": {"$ref": "#/components/schemas/id"},
+            "name": {"type": "string"},
+            "isCinema": {"type": "boolean"}
+          }
+        },
+        "locationInput": {
+          "type": "object",
+          "required": ["name", "isCinema"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "isCinema": {"type": "boolean"}
+          }
+        },
+        "locationSettings": {
+          "type": "object",
+          "required": ["locationsEnabled"],
+          "properties": {"locationsEnabled": {"type": "boolean"}}
+        },
         "dashboardRowManifest": {
           "type": "object",
           "required": [

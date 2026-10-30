@@ -17,6 +17,8 @@ The locations table shows whether each location is a cinema and how many plays a
 
 Marking a location as a cinema makes its plays available to the **Last Plays Cinema** dashboard row. Deleting a location preserves the associated watch entries but removes their location assignment.
 
+API clients can list, create, read, update, and delete your locations under `/api/v1/users/<username>/locations`. The `/settings` subpath reads or changes whether locations are enabled. These endpoints require your own personal API token, including for reads. See the [OpenAPI specification](../openapi.json) for request formats.
+
 ## Assign a location to a play
 
 Choose a location from the location field when adding a play. To change the location later, open the movie page, select **View all** under the play count, and select the play you want to edit.
