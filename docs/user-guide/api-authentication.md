@@ -28,7 +28,7 @@ Bearer authentication is supported:
 ```bash
 curl --fail-with-body \
   --header "Authorization: Bearer $MOVARY_TOKEN" \
-  https://movary.example/api/v1/authentication/token
+  https://movary.example/api/v1/me
 ```
 
 The custom header remains supported permanently:
@@ -36,7 +36,7 @@ The custom header remains supported permanently:
 ```bash
 curl --fail-with-body \
   --header "X-Movary-Token: $MOVARY_TOKEN" \
-  https://movary.example/api/v1/authentication/token
+  https://movary.example/api/v1/me
 ```
 
 Do not send both forms in one request. Movary rejects a request containing both a Bearer credential and `X-Movary-Token` with `401 Unauthorized`.

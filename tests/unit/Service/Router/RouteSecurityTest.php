@@ -179,11 +179,11 @@ class RouteSecurityTest extends TestCase
         );
     }
 
-    public function testApiAuthenticationTokenRouteOnlySupportsIdentityCheck() : void
+    public function testApiCurrentUserRouteOnlySupportsIdentityCheck() : void
     {
         $methods = [];
         foreach (RegisteredRoutes::collect() as $route) {
-            if (in_array($route['path'], ['/api/authentication/token', '/api/v1/authentication/token'], true)) {
+            if (in_array($route['path'], ['/api/me', '/api/v1/me'], true)) {
                 $methods[] = $route['method'];
             }
         }

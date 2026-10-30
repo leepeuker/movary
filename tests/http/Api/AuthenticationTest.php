@@ -9,7 +9,12 @@ use Tests\Http\Movary\HttpTestCase;
 #[CoversNothing]
 class AuthenticationTest extends HttpTestCase
 {
-    private const string ENDPOINT = '/api/v1/authentication/token';
+    private const string ENDPOINT = '/api/v1/me';
+
+    public function testOldEndpointIsNotFound() : void
+    {
+        $this->http->get('/api/v1/authentication/token')->assertStatus(404);
+    }
 
     public function testRejectsMissingToken() : void
     {

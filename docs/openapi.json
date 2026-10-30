@@ -13,7 +13,7 @@
     {"name": "Reviews"},
     {"name": "Webhooks"},
     {"name": "Radarr"},
-    {"name": "Authentication"}
+    {"name": "Users"}
   ],
   "paths": {
       "/api/v1/users/{username}/dashboard/rows": {
@@ -1923,13 +1923,13 @@
         "security": []
       }
     },
-    "/api/v1/authentication/token": {
+    "/api/v1/me": {
       "get": {
         "tags": [
-          "Authentication"
+          "Users"
         ],
-        "operationId": "getAuthenticationTokenData",
-        "summary": "Get authentication data",
+        "operationId": "getCurrentUser",
+        "summary": "Get current user",
         "description": "Get information about the user authenticated by the supplied personal API token.",
         "responses": {
           "200": {
