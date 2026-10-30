@@ -2,6 +2,8 @@
 
 namespace Movary\HttpController\Api;
 
+use Movary\Domain\Movie\History\MovieHistoryApi;
+use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
 use Movary\HttpController\Api\Dto\DashboardRowManifestDto;
 use Movary\HttpController\Api\RequestMapper\RequestMapper;
@@ -20,7 +22,23 @@ class DashboardController
         private readonly DashboardRowDataProvider $dashboardRowDataProvider,
         private readonly DashboardRowResponseMapper $responseMapper,
         private readonly Authentication $authentication,
+        private readonly MovieApi $movieApi,
+        private readonly MovieHistoryApi $movieHistoryApi,
     ) {
+    }
+
+    public function getOverview(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+
+        return Response::createSensitiveJson(Json::encode([
+            'totalPlayCount' => $this->movieApi->fetchTotalPlayCount($userId),
+            'uniqueMoviesCount' => $this->movieApi->fetchTotalPlayCountUnique($userId),
+            'totalHoursWatched' => $this->movieHistoryApi->fetchTotalHoursWatched($userId),
+            'averagePlaysPerDay' => $this->movieHistoryApi->fetchAveragePlaysPerDay($userId),
+            'averageRuntime' => $this->movieHistoryApi->fetchAverageRuntime($userId),
+            'averagePersonalRating' => $this->movieHistoryApi->fetchAveragePersonalRating($userId),
+        ]));
     }
 
     public function getRows(Request $request) : Response
