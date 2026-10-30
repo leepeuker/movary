@@ -399,6 +399,17 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('PUT', $routeUserMovieRating, [Api\MovieRatingController::class, 'saveRating'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('DELETE', $routeUserMovieRating, [Api\MovieRatingController::class, 'deleteRating'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
 
+    $routeUserLocations = '/users/{username:[a-zA-Z0-9]+}/locations';
+    $locationOwnerOnly = [Api\Middleware\IsAuthorizedToWriteUserData::class];
+    $routes->add('GET', $routeUserLocations, [Api\LocationController::class, 'getLocations'], $locationOwnerOnly);
+    $routes->add('POST', $routeUserLocations, [Api\LocationController::class, 'createLocation'], $locationOwnerOnly);
+    $routes->add('GET', $routeUserLocations . '/settings', [Api\LocationController::class, 'getSettings'], $locationOwnerOnly);
+    $routes->add('PUT', $routeUserLocations . '/settings', [Api\LocationController::class, 'updateSettings'], $locationOwnerOnly);
+    $routeUserLocation = $routeUserLocations . '/{locationId:[0-9]+}';
+    $routes->add('GET', $routeUserLocation, [Api\LocationController::class, 'getLocation'], $locationOwnerOnly);
+    $routes->add('PUT', $routeUserLocation, [Api\LocationController::class, 'updateLocation'], $locationOwnerOnly);
+    $routes->add('DELETE', $routeUserLocation, [Api\LocationController::class, 'deleteLocation'], $locationOwnerOnly);
+
     $routes->add('POST', '/movies/add', [Api\MovieAddController::class, 'addMovie'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/{movaryId:[0-9]+}/posters', [Api\MoviePosterController::class, 'fetchPosters'], [
