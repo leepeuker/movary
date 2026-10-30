@@ -371,6 +371,8 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard/overview', [Api\DashboardController::class, 'getOverview'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routeUserDashboardRows = '/users/{username:[a-zA-Z0-9]+}/dashboard/rows';
     $routes->add('GET', $routeUserDashboardRows, [Api\DashboardController::class, 'getRows'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
+    $routes->add('PUT', $routeUserDashboardRows, [Api\DashboardController::class, 'updateRows'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
+    $routes->add('DELETE', $routeUserDashboardRows, [Api\DashboardController::class, 'resetRows'], [Api\Middleware\IsAuthorizedToWriteUserData::class]);
     $routes->add('GET', $routeUserDashboardRows . '/{rowKey:[a-z0-9-]+}', [Api\DashboardController::class, 'getRow'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
 
     $routeUserPlays = '/users/{username:[a-zA-Z0-9]+}/plays';

@@ -5,7 +5,9 @@ namespace Movary\HttpController\Api;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\HttpController\Api\Dto\DashboardRowManifestDto;
+use Movary\HttpController\Api\RequestMapper\DashboardRowsRequestMapper;
 use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\DashboardRowResponseMapper;
 use Movary\Service\Dashboard\DashboardFactory;
@@ -24,6 +26,8 @@ class DashboardController
         private readonly Authentication $authentication,
         private readonly MovieApi $movieApi,
         private readonly MovieHistoryApi $movieHistoryApi,
+        private readonly UserApi $userApi,
+        private readonly DashboardRowsRequestMapper $dashboardRowsRequestMapper,
     ) {
     }
 
@@ -75,5 +79,28 @@ class DashboardController
         $data = $this->dashboardRowDataProvider->fetch($row, $user->getId(), $viewerUserId);
 
         return Response::createSensitiveJson(Json::encode($this->responseMapper->map($row, $data)));
+    }
+
+    public function updateRows(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+        $rows = $this->dashboardRowsRequestMapper->mapRows($request);
+
+        $this->userApi->updateVisibleDashboardRows($userId, $rows['visibleRows']);
+        $this->userApi->updateExtendedDashboardRows($userId, $rows['extendedRows']);
+        $this->userApi->updateOrderDashboardRows($userId, $rows['orderRows']);
+
+        return Response::createNoContent();
+    }
+
+    public function resetRows(Request $request) : Response
+    {
+        $userId = $this->requestMapper->mapUsernameFromRoute($request)->getId();
+
+        $this->userApi->updateVisibleDashboardRows($userId, null);
+        $this->userApi->updateExtendedDashboardRows($userId, null);
+        $this->userApi->updateOrderDashboardRows($userId, null);
+
+        return Response::createNoContent();
     }
 }

@@ -5,10 +5,12 @@ namespace Tests\Unit\Movary\HttpController\Api;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\MovieApi;
 use Movary\Domain\User\Service\Authentication;
+use Movary\Domain\User\UserApi;
 use Movary\Domain\User\UserEntity;
 use Movary\Domain\User\ValueObject\AuthenticatedUser;
 use Movary\Domain\User\ValueObject\CredentialType;
 use Movary\HttpController\Api\DashboardController;
+use Movary\HttpController\Api\RequestMapper\DashboardRowsRequestMapper;
 use Movary\HttpController\Api\RequestMapper\RequestMapper;
 use Movary\HttpController\Api\ResponseMapper\DashboardRowResponseMapper;
 use Movary\HttpController\Api\ResponseMapper\WatchlistResponseMapper;
@@ -46,6 +48,8 @@ class DashboardControllerTest extends TestCase
             $this->createStub(Authentication::class),
             $movieApi,
             $historyApi,
+            $this->createStub(UserApi::class),
+            $this->createStub(DashboardRowsRequestMapper::class),
         );
 
         $response = $subject->getOverview($this->request(['username' => 'alice']));
@@ -70,7 +74,7 @@ class DashboardControllerTest extends TestCase
         ));
         $provider = $this->createMock(DashboardRowDataProvider::class);
         $provider->expects(self::never())->method('fetch');
-        $subject = new DashboardController($mapper, $factory, $provider, $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class));
+        $subject = new DashboardController($mapper, $factory, $provider, $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class), $this->createStub(UserApi::class), $this->createStub(DashboardRowsRequestMapper::class));
 
         $response = $subject->getRows($this->request(['username' => 'alice']));
         $responseBody = $response->getBody();
@@ -93,7 +97,7 @@ class DashboardControllerTest extends TestCase
         $factory->method('createDashboardRowsForUser')->willReturn(DashboardRowList::create(DashboardRow::createLastPlays(false)));
         $provider = $this->createMock(DashboardRowDataProvider::class);
         $provider->expects(self::never())->method('fetch');
-        $subject = new DashboardController($mapper, $factory, $provider, $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class));
+        $subject = new DashboardController($mapper, $factory, $provider, $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class), $this->createStub(UserApi::class), $this->createStub(DashboardRowsRequestMapper::class));
 
         $response = $subject->getRow($this->request(['username' => 'alice', 'rowKey' => 'last-plays']));
 
@@ -109,7 +113,7 @@ class DashboardControllerTest extends TestCase
         $factory->method('createDashboardRowsForUser')->willReturn(DashboardRowList::create(DashboardRow::createLastPlays()));
         $provider = $this->createMock(DashboardRowDataProvider::class);
         $provider->expects(self::never())->method('fetch');
-        $subject = new DashboardController($mapper, $factory, $provider, $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class));
+        $subject = new DashboardController($mapper, $factory, $provider, $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class), $this->createStub(UserApi::class), $this->createStub(DashboardRowsRequestMapper::class));
 
         self::assertSame(404, $subject->getRow($this->request(['username' => 'alice', 'rowKey' => 'unknown']))->getStatusCode()->getCode());
     }
@@ -128,12 +132,49 @@ class DashboardControllerTest extends TestCase
         $authentication = $this->createStub(Authentication::class);
         $authentication->method('authenticateApiToken')->willReturn(AuthenticatedUser::create(7, CredentialType::API_TOKEN));
         $responseMapper = new DashboardRowResponseMapper($this->createStub(WatchlistResponseMapper::class));
-        $subject = new DashboardController($mapper, $factory, $provider, $responseMapper, $authentication, $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class));
+        $subject = new DashboardController($mapper, $factory, $provider, $responseMapper, $authentication, $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class), $this->createStub(UserApi::class), $this->createStub(DashboardRowsRequestMapper::class));
 
         $response = $subject->getRow($this->request(['username' => 'alice', 'rowKey' => 'most-watched-genres']));
 
         self::assertSame(200, $response->getStatusCode()->getCode());
         self::assertSame('{"key":"most-watched-genres","title":"Most watched Genres","items":[]}', $response->getBody());
+    }
+
+    public function testUpdateRowsSavesMappedConfigurationForRouteUser() : void
+    {
+        $request = $this->request(['username' => 'alice']);
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getId')->willReturn(42);
+        $mapper = $this->createStub(RequestMapper::class);
+        $mapper->method('mapUsernameFromRoute')->willReturn($user);
+        $rowsMapper = $this->createMock(DashboardRowsRequestMapper::class);
+        $rowsMapper->expects(self::once())->method('mapRows')->with($request)->willReturn([
+            'visibleRows' => '0;1',
+            'extendedRows' => '0',
+            'orderRows' => '1;0',
+        ]);
+        $userApi = $this->createMock(UserApi::class);
+        $userApi->expects(self::once())->method('updateVisibleDashboardRows')->with(42, '0;1');
+        $userApi->expects(self::once())->method('updateExtendedDashboardRows')->with(42, '0');
+        $userApi->expects(self::once())->method('updateOrderDashboardRows')->with(42, '1;0');
+        $subject = new DashboardController($mapper, $this->createStub(DashboardFactory::class), $this->createStub(DashboardRowDataProvider::class), $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class), $userApi, $rowsMapper);
+
+        self::assertSame(204, $subject->updateRows($request)->getStatusCode()->getCode());
+    }
+
+    public function testResetRowsClearsConfigurationForRouteUser() : void
+    {
+        $user = $this->createStub(UserEntity::class);
+        $user->method('getId')->willReturn(42);
+        $mapper = $this->createStub(RequestMapper::class);
+        $mapper->method('mapUsernameFromRoute')->willReturn($user);
+        $userApi = $this->createMock(UserApi::class);
+        $userApi->expects(self::once())->method('updateVisibleDashboardRows')->with(42, null);
+        $userApi->expects(self::once())->method('updateExtendedDashboardRows')->with(42, null);
+        $userApi->expects(self::once())->method('updateOrderDashboardRows')->with(42, null);
+        $subject = new DashboardController($mapper, $this->createStub(DashboardFactory::class), $this->createStub(DashboardRowDataProvider::class), $this->createStub(DashboardRowResponseMapper::class), $this->createStub(Authentication::class), $this->createStub(MovieApi::class), $this->createStub(MovieHistoryApi::class), $userApi, $this->createStub(DashboardRowsRequestMapper::class));
+
+        self::assertSame(204, $subject->resetRows($this->request(['username' => 'alice']))->getStatusCode()->getCode());
     }
 
     private function request(array $parameters) : Request
