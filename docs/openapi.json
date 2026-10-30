@@ -18,6 +18,26 @@
     {"name": "Radarr"}
   ],
   "paths": {
+      "/api/v1/users/{username}/dashboard/overview": {
+        "get": {
+          "tags": ["Dashboard"],
+          "operationId": "getUserDashboardOverview",
+          "summary": "Get dashboard overview statistics",
+          "description": "Get the six overview values shown on the specified user's dashboard when their privacy setting permits access.",
+          "parameters": [{"$ref": "#/components/parameters/username"}],
+          "responses": {
+            "200": {
+              "description": "Dashboard overview statistics",
+              "content": {"application/json": {"schema": {"$ref": "#/components/schemas/dashboardOverview"}}}
+            },
+            "401": {"$ref": "#/components/responses/401"},
+            "403": {"$ref": "#/components/responses/403"},
+            "404": {"$ref": "#/components/responses/404"},
+            "500": {"$ref": "#/components/responses/500"}
+          },
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        }
+      },
       "/api/v1/users/{username}/dashboard/rows": {
         "get": {
           "tags": [
@@ -2214,6 +2234,25 @@
       }
     },
     "schemas": {
+        "dashboardOverview": {
+          "type": "object",
+          "required": [
+            "totalPlayCount",
+            "uniqueMoviesCount",
+            "totalHoursWatched",
+            "averagePlaysPerDay",
+            "averageRuntime",
+            "averagePersonalRating"
+          ],
+          "properties": {
+            "totalPlayCount": {"type": "integer", "minimum": 0},
+            "uniqueMoviesCount": {"type": "integer", "minimum": 0},
+            "totalHoursWatched": {"type": "integer", "minimum": 0},
+            "averagePlaysPerDay": {"type": "number", "minimum": 0},
+            "averageRuntime": {"type": "integer", "minimum": 0},
+            "averagePersonalRating": {"type": "number", "minimum": 0}
+          }
+        },
         "location": {
           "type": "object",
           "required": ["id", "name", "isCinema"],

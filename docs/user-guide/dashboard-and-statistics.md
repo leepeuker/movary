@@ -15,6 +15,8 @@ The overview at the top of the dashboard always shows:
 
 These values update as your history and ratings change. See [Movie tracking](tracking-movies.md) for managing the underlying data.
 
+API clients can get the same six values from `GET /api/v1/users/<username>/dashboard/overview`, subject to the account's privacy setting. See the [OpenAPI specification](../openapi.json) for the response format.
+
 ## Statistic rows
 
 The dashboard can display rows for:
