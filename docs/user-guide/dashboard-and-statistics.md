@@ -43,7 +43,7 @@ Open **Settings → Account → Dashboard** to configure the statistic rows:
 
 Select **Reset** to restore the default row visibility, expansion, and order.
 
-API clients can replace the configuration with `PUT /api/v1/users/<username>/dashboard/rows` or restore the defaults with `DELETE` on the same path. The `PUT` body contains a `rows` array with every row key exactly once. Each row needs a unique zero-based `position` and boolean `visible` and `initiallyExpanded` fields. Fetch the current keys and settings with `GET` on the same path. Write requests require an API token belonging to that user. See the [OpenAPI specification](../openapi.json) for the request format.
+API clients can replace the configuration with `PUT /api/v1/users/<username>/dashboard/rows` or restore the defaults with `DELETE` on the same path. The `PUT` body contains a `rows` array with every row key exactly once. See the [OpenAPI specification](../openapi.json) for the request format.
 
 The overview statistics at the top of the dashboard are not part of the configurable row list.
 
