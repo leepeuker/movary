@@ -1,0 +1,25 @@
+<div class="modal fade" id="changeProfileModal" tabindex="-1" aria-labelledby="changeProfileModalTitle" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="changeProfileModalTitle">Change profile image</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="profileSelectionLoading" class="text-center py-4">
+                    <div class="spinner-border" role="status"><span class="visually-hidden">Loading profile images</span></div>
+                </div>
+                <div id="profileSelectionError" class="alert alert-danger d-none" role="alert">Could not load profile images from TMDB.</div>
+                <div id="profileSelectionEmpty" class="text-center py-4 d-none">No profile images are available for this person.</div>
+                <div id="profileSelectionGrid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3"></div>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-outline-secondary d-none" id="showMoreProfilesButton">Show more</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger d-none" id="restoreDefaultProfileButton">Restore default</button>
+                <button type="button" class="btn btn-primary" id="useSelectedProfileButton" disabled>Use selected image</button>
+            </div>
+        </div>
+    </div>
+</div>

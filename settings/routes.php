@@ -314,6 +314,18 @@ function addWebRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('POST', '/persons/{id:[0-9]+}/refresh-tmdb', [Web\PersonController::class, 'refreshTmdbData'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/persons/{id:[0-9]+}/hide-in-top-lists', [Web\PersonController::class, 'hideInTopLists'], [Web\Middleware\UserIsAuthenticated::class]);
     $routes->add('POST', '/persons/{id:[0-9]+}/show-in-top-lists', [Web\PersonController::class, 'showInTopLists'], [Web\Middleware\UserIsAuthenticated::class]);
+    $routes->add('GET', '/persons/{id:[0-9]+}/profiles', [Web\PersonProfileController::class, 'fetchProfiles'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('PUT', '/persons/{id:[0-9]+}/profile', [Web\PersonProfileController::class, 'selectProfile'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
+    $routes->add('DELETE', '/persons/{id:[0-9]+}/profile', [Web\PersonProfileController::class, 'restoreDefault'], [
+        Web\Middleware\UserIsAuthenticated::class,
+        Web\Middleware\UserIsAdmin::class,
+    ]);
 
     ##############
     # User media #
