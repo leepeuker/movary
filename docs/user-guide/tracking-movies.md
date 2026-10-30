@@ -27,6 +27,8 @@ The new play appears in **History**. Adding the same movie again with the same w
 
 You can also open an existing movie page and select **Add play** to record another viewing without searching again.
 
+API clients can fetch shared details of a movie already stored in Movary with `GET /api/v1/movies/<movaryId>`. This requires a personal API token and returns `404` when the movie is absent. The response contains movie metadata and external ratings; personal plays, ratings, reviews, and watchlist state remain separate. See the [OpenAPI specification](../openapi.json) for the response format.
+
 ## Track plays automatically
 
 Movary can automatically add plays from supported media servers and players through webhooks, also called scrobbling:
