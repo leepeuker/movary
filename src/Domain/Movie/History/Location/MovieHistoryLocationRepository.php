@@ -83,7 +83,7 @@ class MovieHistoryLocationRepository
     ) : MovieHistoryLocationEntityList {
         $data = $this->dbConnection->fetchAllAssociative(
             "SELECT `location`.*,
-                (SELECT COALESCE(SUM(plays), 0)
+                (SELECT COUNT(*)
                  FROM movie_user_watch_dates
                  WHERE location_id = `location`.id) AS plays
             FROM `location`

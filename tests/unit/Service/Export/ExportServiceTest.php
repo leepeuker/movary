@@ -14,6 +14,57 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ExportWriter::class)]
 class ExportServiceTest extends TestCase
 {
+    public function testCreateExportHistoryCsvWritesEachPlayWithItsOwnMetadata() : void
+    {
+        $movieApi = $this->createMock(MovieApi::class);
+        $movieApi
+            ->expects(self::once())
+            ->method('fetchPlaysForExport')
+            ->with(7)
+            ->willReturn([
+                [
+                    'title' => 'Arrival',
+                    'release_date' => '2016-11-10',
+                    'tmdb_id' => 329865,
+                    'imdb_id' => 'tt2543164',
+                    'watched_at' => '2026-10-29',
+                    'comment' => 'First play',
+                    'location_name' => 'Cinema',
+                ],
+                [
+                    'title' => 'Arrival',
+                    'release_date' => '2016-11-10',
+                    'tmdb_id' => 329865,
+                    'imdb_id' => 'tt2543164',
+                    'watched_at' => '2026-10-29',
+                    'comment' => 'Second play',
+                    'location_name' => null,
+                ],
+            ]);
+
+        $exportPath = tempnam(sys_get_temp_dir(), 'movary-history-export-');
+        self::assertIsString($exportPath);
+        $subject = new ExportService(
+            $movieApi,
+            $this->createStub(MovieWatchlistApi::class),
+            $this->createStub(MovieReviewApi::class),
+            new ExportWriter($movieApi),
+            sys_get_temp_dir() . '/',
+        );
+
+        try {
+            self::assertSame($exportPath, $subject->createExportHistoryCsv(7, $exportPath));
+            self::assertSame(
+                "title,year,tmdbId,imdbId,watchedAt,comment,location\n"
+                . "Arrival,2016,329865,tt2543164,2026-10-29,\"First play\",Cinema\n"
+                . "Arrival,2016,329865,tt2543164,2026-10-29,\"Second play\",\n",
+                file_get_contents($exportPath),
+            );
+        } finally {
+            unlink($exportPath);
+        }
+    }
+
     public function testCreateExportReviewsCsvWritesDedicatedReviewShape() : void
     {
         $reviewApi = $this->createMock(MovieReviewApi::class);

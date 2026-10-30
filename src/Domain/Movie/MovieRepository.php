@@ -796,10 +796,10 @@ class MovieRepository
 
     public function fetchTotalPlayCount(int $userId) : int
     {
-        return (int)$this->dbConnection->fetchFirstColumn(
-            'SELECT SUM(plays) FROM movie_user_watch_dates JOIN movie m on movie_id = m.id WHERE user_id = ?',
+        return (int)$this->dbConnection->fetchOne(
+            'SELECT COUNT(*) FROM movie_user_watch_dates WHERE user_id = ?',
             [$userId],
-        )[0];
+        );
     }
 
     public function fetchTotalPlayCountUnique(int $userId) : int
@@ -816,16 +816,10 @@ class MovieRepository
 
     public function fetchTotalPlaysForMovieAndUserId(int $movieId, int $userId) : int
     {
-        $result = $this->dbConnection->fetchOne(
-            'SELECT SUM(plays) FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ?',
+        return (int)$this->dbConnection->fetchOne(
+            'SELECT COUNT(*) FROM movie_user_watch_dates WHERE movie_id = ? AND user_id = ?',
             [$movieId, $userId],
         );
-
-        if (empty($result) === true) {
-            return 0;
-        }
-
-        return (int)$result;
     }
 
     public function fetchUniqueActorGenders(int $userId) : array
@@ -1154,10 +1148,10 @@ class MovieRepository
         );
     }
 
-    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
+    public function fetchPlaysForExport(int $userId) : array
     {
         return $this->dbConnection->fetchAllAssociative(
-            'SELECT m.*, muwd.watched_at, muwd.plays, comment, l.name as location_name
+            'SELECT m.*, muwd.watched_at, muwd.comment, l.name as location_name
             FROM movie_user_watch_dates muwd
             JOIN movie m on muwd.movie_id = m.id
             LEFT JOIN location l on muwd.location_id = l.id

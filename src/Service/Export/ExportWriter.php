@@ -63,25 +63,23 @@ class ExportWriter
     }
 
     /** @param resource $fileHandle */
-    public function writeWatchDateToCsv($fileHandle, array $movieWatchDate) : void
+    public function writePlayToCsv($fileHandle, array $play) : void
     {
-        $releaseDate = $this->convertReleaseDate($movieWatchDate['release_date']);
-        $watchDate = empty($movieWatchDate['watched_at']) === false ? Date::createFromString($movieWatchDate['watched_at']) : null;
+        $releaseDate = $this->convertReleaseDate($play['release_date']);
+        $watchDate = empty($play['watched_at']) === false ? Date::createFromString($play['watched_at']) : null;
 
-        for ($i = 1; $i <= $movieWatchDate['plays']; $i++) {
-            $lengthOfWrittenString = fputcsv($fileHandle, [
-                $movieWatchDate['title'],
-                $releaseDate,
-                $movieWatchDate['tmdb_id'],
-                $movieWatchDate['imdb_id'],
-                $watchDate,
-                $movieWatchDate['comment'],
-                $movieWatchDate['location_name'],
-            ]);
+        $lengthOfWrittenString = fputcsv($fileHandle, [
+            $play['title'],
+            $releaseDate,
+            $play['tmdb_id'],
+            $play['imdb_id'],
+            $watchDate,
+            $play['comment'],
+            $play['location_name'],
+        ], ',', '"', '\\');
 
-            if ($lengthOfWrittenString === false) {
-                throw new RuntimeException('Could not write watch date to export csv');
-            }
+        if ($lengthOfWrittenString === false) {
+            throw new RuntimeException('Could not write play to export csv');
         }
     }
 

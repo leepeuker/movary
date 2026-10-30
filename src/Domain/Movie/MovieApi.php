@@ -387,9 +387,9 @@ class MovieApi
         return $this->historyApi->fetchWatchDatesForMovieIds($userId, $movieIds);
     }
 
-    public function fetchWatchDatesOrderedByWatchedAtDesc(int $userId) : array
+    public function fetchPlaysForExport(int $userId) : array
     {
-        return $this->historyApi->fetchWatchDatesOrderedByWatchedAtDesc($userId);
+        return $this->historyApi->fetchPlaysForExport($userId);
     }
 
     public function fetchWithActor(int $personId, int $userId) : array
