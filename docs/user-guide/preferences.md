@@ -17,7 +17,7 @@ The page provides these account settings:
 
 Select **Submit** to save the preferences to your account.
 
-API clients can read general account preferences with `GET /api/v1/me/preferences`. `PATCH` on the same path updates supplied fields, including username and privacy. The request requires your personal API token. See the [OpenAPI specification](../openapi.json) for fields and formats.
+API clients can read general account preferences with `GET /api/v1/me/preferences`. `PATCH` on the same path updates supplied fields. The request requires your personal API token. See the [OpenAPI specification](../openapi.json) for fields and formats.
 
 ## Light and dark themes
 
