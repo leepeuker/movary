@@ -7,6 +7,7 @@
   "servers": [],
   "tags": [
     {"name": "Users"},
+    {"name": "Me"},
     {"name": "Dashboard"},
     {"name": "Movies"},
     {"name": "Plays"},
@@ -2203,7 +2204,7 @@
     },
     "/api/v1/me/preferences": {
       "get": {
-        "tags": ["Users"],
+        "tags": ["Me"],
         "operationId": "getCurrentUserPreferences",
         "summary": "Get the current user's general preferences",
         "description": "Returns the general account preferences supported by the update operation.",
@@ -2215,7 +2216,7 @@
         "security": [{"bearerToken": []}, {"movaryToken": []}]
       },
       "patch": {
-        "tags": ["Users"],
+        "tags": ["Me"],
         "operationId": "updateCurrentUserPreferences",
         "summary": "Update the current user's general account preferences",
         "description": "Only supplied fields change. All fields are validated before a single database update.",
@@ -2232,7 +2233,7 @@
     "/api/v1/me": {
       "get": {
         "tags": [
-          "Users"
+          "Me"
         ],
         "operationId": "getCurrentUser",
         "summary": "Get current user",
