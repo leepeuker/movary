@@ -367,6 +367,7 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/me', [Api\AuthenticationController::class, 'getTokenData']);
     $routes->add('GET', '/me/preferences', [Api\UserPreferencesController::class, 'getPreferences'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('PATCH', '/me/preferences', [Api\UserPreferencesController::class, 'updatePreferences'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('GET', '/users', [Api\UserListController::class, 'getUsers'], [Api\Middleware\IsAuthenticated::class]);
 
     $routes->add('GET', '/users/{username:[a-zA-Z0-9]+}/dashboard/overview', [Api\DashboardController::class, 'getOverview'], [Api\Middleware\IsAuthorizedToReadUserData::class]);
     $routeUserDashboardRows = '/users/{username:[a-zA-Z0-9]+}/dashboard/rows';

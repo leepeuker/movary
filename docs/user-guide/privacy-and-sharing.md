@@ -26,6 +26,8 @@ The privacy check applies to pages below `/users/<username>/`, including:
 
 It also applies when the API reads a user's history, watchlist, played movies, or movie reviews. API operations that change data still require a personal token belonging to that user.
 
+An API client can list visible usernames with `GET /api/v1/users`. The response includes accounts visible to signed-in users and the token owner's own account, even if it is set to **Not visible**. It does not include other private accounts. See the [OpenAPI specification](../openapi.json) for the response format.
+
 Privacy changes who can view the data; it does not delete or transfer ownership of anything. Use [Personal data](personal-data.md) when you want to export or permanently delete your information.
 
 ## Share a user page
