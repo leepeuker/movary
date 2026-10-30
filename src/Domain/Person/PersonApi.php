@@ -5,6 +5,7 @@ namespace Movary\Domain\Person;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\SortOrder;
 use Traversable;
 
 class PersonApi
@@ -86,6 +87,24 @@ class PersonApi
     public function deleteById(int $id) : void
     {
         $this->repository->deleteById($id);
+    }
+
+    public function countAll(?string $searchTerm, ?Gender $gender, ?string $role) : int
+    {
+        return $this->repository->countAll($searchTerm, $gender, $role);
+    }
+
+    /** @return list<PersonEntity> */
+    public function fetchAllPaginated(
+        int $limit,
+        int $offset,
+        ?string $searchTerm,
+        ?Gender $gender,
+        ?string $role,
+        string $sortBy,
+        SortOrder $sortOrder,
+    ) : array {
+        return $this->repository->fetchAllPaginated($limit, $offset, $searchTerm, $gender, $role, $sortBy, $sortOrder);
     }
 
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(

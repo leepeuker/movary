@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Movary\ValueObject\Date;
 use Movary\ValueObject\DateTime;
 use Movary\ValueObject\Gender;
+use Movary\ValueObject\SortOrder;
 use RuntimeException;
 use Traversable;
 
@@ -67,6 +68,63 @@ class PersonRepository
         $this->dbConnection->delete('movie_cast', ['person_id' => $id]);
         $this->dbConnection->delete('movie_crew', ['person_id' => $id]);
         $this->dbConnection->delete('person', ['id' => $id]);
+    }
+
+    public function countAll(?string $searchTerm, ?Gender $gender, ?string $role) : int
+    {
+        [$where, $parameters] = $this->createCatalogFilter($searchTerm, $gender, $role);
+
+        return (int)$this->dbConnection->fetchOne("SELECT COUNT(*) FROM `person` p$where", $parameters);
+    }
+
+    /** @return list<PersonEntity> */
+    public function fetchAllPaginated(
+        int $limit,
+        int $offset,
+        ?string $searchTerm,
+        ?Gender $gender,
+        ?string $role,
+        string $sortBy,
+        SortOrder $sortOrder,
+    ) : array {
+        [$where, $parameters] = $this->createCatalogFilter($searchTerm, $gender, $role);
+        $sortColumn = match ($sortBy) {
+            'id' => 'p.id',
+            'name' => 'p.name',
+            'birthDate' => 'p.birth_date',
+            default => throw new RuntimeException('Unsupported person catalog sort: ' . $sortBy),
+        };
+        $tieBreaker = $sortColumn === 'p.id' ? '' : ', p.id ASC';
+        $data = $this->dbConnection->fetchAllAssociative(
+            "SELECT p.* FROM `person` p$where ORDER BY $sortColumn $sortOrder$tieBreaker LIMIT $limit OFFSET $offset",
+            $parameters,
+        );
+
+        return array_map(PersonEntity::createFromArray(...), $data);
+    }
+
+    /** @return array{string, list<string|int>} */
+    private function createCatalogFilter(?string $searchTerm, ?Gender $gender, ?string $role) : array
+    {
+        $conditions = [];
+        $parameters = [];
+        if ($searchTerm !== null) {
+            $conditions[] = 'p.name LIKE ?';
+            $parameters[] = '%' . $searchTerm . '%';
+        }
+        if ($gender !== null) {
+            $conditions[] = 'p.gender = ?';
+            $parameters[] = $gender->asInt();
+        }
+        if ($role === 'actor') {
+            $conditions[] = 'EXISTS (SELECT 1 FROM movie_cast mc WHERE mc.person_id = p.id)';
+        } elseif ($role === 'director') {
+            $conditions[] = "EXISTS (SELECT 1 FROM movie_crew mc WHERE mc.person_id = p.id AND mc.job = 'Director')";
+        } elseif ($role !== null) {
+            throw new RuntimeException('Unsupported person catalog role: ' . $role);
+        }
+
+        return [$conditions === [] ? '' : ' WHERE ' . implode(' AND ', $conditions), $parameters];
     }
 
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(

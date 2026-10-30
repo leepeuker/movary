@@ -10,6 +10,7 @@
     {"name": "Users"},
     {"name": "Dashboard"},
     {"name": "Movies"},
+    {"name": "Persons"},
     {"name": "Plays"},
     {"name": "Watchlist"},
     {"name": "Locations"},
@@ -1152,6 +1153,46 @@
             "description": "Movie details",
             "content": {"application/json": {"schema": {"$ref": "#/components/schemas/movieDetails"}}}
           },
+          "401": {"$ref": "#/components/responses/401"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/persons": {
+      "get": {
+        "tags": ["Persons"],
+        "operationId": "getPersons",
+        "summary": "List persons stored in Movary",
+        "description": "Lists the server-wide person catalog, including persons added through private user activity. Role filters match stored movie credits, independent of a user's watch history. Pages beyond the last page resolve to the last page. Sorting uses Movary ID as a tie-breaker.",
+        "parameters": [
+          {"name": "search", "in": "query", "description": "Search person name", "schema": {"type": "string"}},
+          {"name": "gender", "in": "query", "description": "0: unknown, 1: female, 2: male, 3: nonbinary", "schema": {"type": "integer", "enum": [0, 1, 2, 3]}},
+          {"name": "role", "in": "query", "description": "Persons credited in the stored movie catalog", "schema": {"type": "string", "enum": ["actor", "director"]}},
+          {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 1, "default": 1}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 24}},
+          {"name": "sortBy", "in": "query", "schema": {"type": "string", "enum": ["id", "name", "birthDate"], "default": "name"}},
+          {"name": "sortOrder", "in": "query", "schema": {"type": "string", "enum": ["asc", "desc"], "default": "asc"}}
+        ],
+        "responses": {
+          "200": {"description": "Page of person summaries", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/personList"}}}},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/persons/{personId}": {
+      "get": {
+        "tags": ["Persons"],
+        "operationId": "getPersonDetails",
+        "summary": "Get details of a person stored in Movary",
+        "description": "Returns shared person metadata. Personal movie credits and user preferences are not included.",
+        "parameters": [{"name": "personId", "in": "path", "required": true, "description": "Movary person ID", "schema": {"$ref": "#/components/schemas/id"}}],
+        "responses": {
+          "200": {"description": "Person details", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/personDetails"}}}},
           "401": {"$ref": "#/components/responses/401"},
           "404": {"$ref": "#/components/responses/404"},
           "500": {"$ref": "#/components/responses/500"}
@@ -3243,6 +3284,46 @@
           "currentPage": {"type": "integer", "minimum": 1},
           "maxPage": {"type": "integer", "minimum": 1},
           "totalCount": {"type": "integer", "minimum": 0}
+        }
+      },
+      "personList": {
+        "type": "object",
+        "required": ["persons", "currentPage", "maxPage", "totalCount"],
+        "properties": {
+          "persons": {"type": "array", "items": {"$ref": "#/components/schemas/personSummary"}},
+          "currentPage": {"type": "integer", "minimum": 1},
+          "maxPage": {"type": "integer", "minimum": 1},
+          "totalCount": {"type": "integer", "minimum": 0}
+        }
+      },
+      "personSummary": {
+        "type": "object",
+        "required": ["id", "tmdbId", "name", "gender", "knownForDepartment", "birthDate", "posterUrl"],
+        "properties": {
+          "id": {"$ref": "#/components/schemas/id"},
+          "tmdbId": {"$ref": "#/components/schemas/id"},
+          "name": {"type": "string"},
+          "gender": {"type": "integer", "enum": [0, 1, 2, 3]},
+          "knownForDepartment": {"type": "string", "nullable": true},
+          "birthDate": {"$ref": "#/components/schemas/calendarDateNullable"},
+          "posterUrl": {"type": "string"}
+        }
+      },
+      "personDetails": {
+        "type": "object",
+        "required": ["id", "tmdbId", "imdbId", "name", "gender", "knownForDepartment", "biography", "birthDate", "deathDate", "placeOfBirth", "posterUrl"],
+        "properties": {
+          "id": {"$ref": "#/components/schemas/id"},
+          "tmdbId": {"$ref": "#/components/schemas/id"},
+          "imdbId": {"type": "string", "nullable": true},
+          "name": {"type": "string"},
+          "gender": {"type": "integer", "enum": [0, 1, 2, 3]},
+          "knownForDepartment": {"type": "string", "nullable": true},
+          "biography": {"type": "string", "nullable": true},
+          "birthDate": {"$ref": "#/components/schemas/calendarDateNullable"},
+          "deathDate": {"$ref": "#/components/schemas/calendarDateNullable"},
+          "placeOfBirth": {"type": "string", "nullable": true},
+          "posterUrl": {"type": "string", "description": "Display URL, including the configured poster override or a placeholder"}
         }
       },
       "movieSummary": {
