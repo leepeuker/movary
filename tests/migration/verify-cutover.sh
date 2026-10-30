@@ -200,7 +200,7 @@ query_sqlite release-0.73.1.sqlite \
     "INSERT INTO server_setting (key, value) VALUES ('release-setting', 'preserved')"
 
 run_sqlite_app_command release-0.73.1.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261030000000' \
     "$(query_sqlite release-0.73.1.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(query_sqlite release-0.73.1.sqlite \
@@ -319,7 +319,7 @@ assert_equal 0 "$(query_sqlite missing-history.sqlite "SELECT COUNT(*) FROM sqli
 
 cp "$audit_directory/null-genre.sqlite" "$audit_directory/null-genre-before-doctrine.sqlite"
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261030000000' \
     "$(query_sqlite null-genre.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'SQLite legacy database did not record the latest Doctrine migration'
 run_sqlite_app_command null-genre.sqlite database:migration:migrate
@@ -346,6 +346,11 @@ assert_equal 0 "$(query_sqlite null-genre.sqlite 'SELECT COUNT(*) FROM user WHER
 assert_equal 1 "$(query_sqlite null-genre.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'index' AND name = 'unique_user_pending_email'")" \
     'SQLite did not add the pending email unique index'
+assert_equal 1 "$(query_sqlite null-genre.sqlite "SELECT COUNT(*) FROM pragma_table_info('person') WHERE name = 'tmdb_poster_path_override'")" \
+    'SQLite did not add the person profile override column'
+run_sqlite_app_command null-genre.sqlite database:migration:rollback >/dev/null
+assert_equal 0 "$(query_sqlite null-genre.sqlite "SELECT COUNT(*) FROM pragma_table_info('person') WHERE name = 'tmdb_poster_path_override'")" \
+    'SQLite did not roll back the person profile override migration'
 if run_sqlite_app_command null-genre.sqlite database:migration:rollback; then
     echo 'SQLite allowed an unsafe rollback of individual plays' >&2
     exit 1
@@ -444,7 +449,7 @@ run_sqlite_app_command doctrine-fresh.sqlite database:migration:migrate
 assert_equal 31 "$(query_sqlite doctrine-fresh.sqlite \
     "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")" \
     'Fresh SQLite Doctrine database has an unexpected table count'
-assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261030000000' \
     "$(query_sqlite doctrine-fresh.sqlite 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'Fresh SQLite database did not execute the latest Doctrine migration'
 
@@ -498,7 +503,7 @@ mysql_query movary_release "INSERT INTO user_auth_token (id, user_id, token, dev
 mysql_query movary_release "INSERT INTO server_setting (\`key\`, value) VALUES ('release-setting', 'preserved')"
 
 run_mysql_app_command movary_release database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261030000000' \
     "$(mysql_query movary_release 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL 0.73.1 fixture did not reach the latest Doctrine migration'
 assert_equal 'release-user|jellyfin-token' "$(mysql_query movary_release \
@@ -569,7 +574,7 @@ assert_equal 2 "$(mysql_query movary 'SELECT COUNT(*) FROM cache_trakt_user_movi
     'MySQL watched cache does not isolate identical Trakt IDs by user'
 
 run_mysql_app_command movary database:migration:migrate
-assert_equal 'Movary\DatabaseMigration\Version20261029000000' \
+assert_equal 'Movary\DatabaseMigration\Version20261030000000' \
     "$(mysql_query movary 'SELECT MAX(version) FROM doctrine_migration_versions')" \
     'MySQL legacy database did not record the latest Doctrine migration'
 run_mysql_app_command movary database:migration:migrate
@@ -596,6 +601,11 @@ assert_equal 0 "$(mysql_query movary 'SELECT COUNT(*) FROM user WHERE pending_em
 assert_equal 1 "$(mysql_query movary \
     "SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND INDEX_NAME = 'unique_user_pending_email'")" \
     'MySQL did not add the pending email unique index'
+assert_equal 1 "$(mysql_query movary "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'person' AND COLUMN_NAME = 'tmdb_poster_path_override'")" \
+    'MySQL did not add the person profile override column'
+run_mysql_app_command movary database:migration:rollback >/dev/null
+assert_equal 0 "$(mysql_query movary "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'person' AND COLUMN_NAME = 'tmdb_poster_path_override'")" \
+    'MySQL did not roll back the person profile override migration'
 if run_mysql_app_command movary database:migration:rollback; then
     echo 'MySQL allowed an unsafe rollback of individual plays' >&2
     exit 1
