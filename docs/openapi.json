@@ -1114,6 +1114,28 @@
         ]
       }
     },
+    "/api/v1/movies": {
+      "get": {
+        "tags": ["Movies"],
+        "operationId": "getMovies",
+        "summary": "List movies stored in Movary",
+        "description": "Lists the server-wide movie catalog in Movary ID order, including movies that may have been added through private user activity. This does not include personal watch data. Pages beyond the last page resolve to the last page.",
+        "parameters": [
+          {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 1, "default": 1}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 24}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Page of movie summaries",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/movieList"}}}
+          },
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
     "/api/v1/movies/{movaryId}": {
       "get": {
         "tags": ["Movies"],
@@ -3208,6 +3230,27 @@
             }
           }
         ]
+      },
+      "movieList": {
+        "type": "object",
+        "required": ["movies", "currentPage", "maxPage", "totalCount"],
+        "properties": {
+          "movies": {"type": "array", "items": {"$ref": "#/components/schemas/movieSummary"}},
+          "currentPage": {"type": "integer", "minimum": 1},
+          "maxPage": {"type": "integer", "minimum": 1},
+          "totalCount": {"type": "integer", "minimum": 0}
+        }
+      },
+      "movieSummary": {
+        "type": "object",
+        "required": ["id", "tmdbId", "title", "releaseDate", "posterUrl"],
+        "properties": {
+          "id": {"$ref": "#/components/schemas/id"},
+          "tmdbId": {"$ref": "#/components/schemas/id"},
+          "title": {"$ref": "#/components/schemas/title"},
+          "releaseDate": {"$ref": "#/components/schemas/calendarDateNullable"},
+          "posterUrl": {"type": "string"}
+        }
       },
       "movieDetails": {
         "type": "object",

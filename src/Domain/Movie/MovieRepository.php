@@ -186,6 +186,20 @@ class MovieRepository
         return MovieEntityList::createFromArray($data);
     }
 
+    public function countAll() : int
+    {
+        return (int)$this->dbConnection->fetchOne('SELECT COUNT(*) FROM `movie`');
+    }
+
+    public function fetchAllPaginated(int $limit, int $offset) : MovieEntityList
+    {
+        $data = $this->dbConnection->fetchAllAssociative(
+            "SELECT * FROM `movie` ORDER BY id LIMIT $limit OFFSET $offset",
+        );
+
+        return MovieEntityList::createFromArray($data);
+    }
+
     public function fetchAllOrderedByLastUpdatedAtTmdbAsc(
         ?int $limit = null,
         ?array $ids = null,

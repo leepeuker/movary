@@ -29,6 +29,22 @@ class MovieRepositoryTest extends TestCase
         $this->subject = new MovieRepository($this->dbConnectionMock);
     }
 
+    public function testCountsAllMovies() : void
+    {
+        $this->dbConnectionMock->expects(self::once())->method('fetchOne')
+            ->with('SELECT COUNT(*) FROM `movie`')->willReturn('42');
+
+        self::assertSame(42, $this->subject->countAll());
+    }
+
+    public function testFetchesBoundedMoviesInIdOrder() : void
+    {
+        $this->dbConnectionMock->expects(self::once())->method('fetchAllAssociative')
+            ->with('SELECT * FROM `movie` ORDER BY id LIMIT 24 OFFSET 48')->willReturn([]);
+
+        self::assertCount(0, $this->subject->fetchAllPaginated(24, 48));
+    }
+
     public static function providedTestFetchMovieIdsHavingImdbIdOrderedByLastImdbUpdatedAtData() : array
     {
         return [
