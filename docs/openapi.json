@@ -6,8 +6,8 @@
   },
   "servers": [],
   "tags": [
-    {"name": "Users"},
     {"name": "Me"},
+    {"name": "Users"},
     {"name": "Dashboard"},
     {"name": "Movies"},
     {"name": "Plays"},
