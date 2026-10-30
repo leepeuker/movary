@@ -18,6 +18,23 @@
     {"name": "Radarr"}
   ],
   "paths": {
+      "/api/v1/users": {
+        "get": {
+          "tags": ["Users"],
+          "operationId": "getVisibleUsers",
+          "summary": "Get users visible to the API token owner",
+          "description": "Returns usernames of accounts visible to signed-in users, plus the token owner's own account even when it is private. Usernames are sorted alphabetically.",
+          "responses": {
+            "200": {
+              "description": "Visible usernames",
+              "content": {"application/json": {"schema": {"$ref": "#/components/schemas/visibleUsers"}}}
+            },
+            "401": {"$ref": "#/components/responses/401"},
+            "500": {"$ref": "#/components/responses/500"}
+          },
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        }
+      },
       "/api/v1/users/{username}/dashboard/overview": {
         "get": {
           "tags": ["Dashboard"],
@@ -2297,6 +2314,13 @@
       }
     },
     "schemas": {
+        "visibleUsers": {
+          "type": "object",
+          "required": ["users"],
+          "properties": {
+            "users": {"type": "array", "items": {"type": "string"}}
+          }
+        },
         "userPreferences": {
           "type": "object",
           "required": [
