@@ -25,6 +25,8 @@ use Movary\Service\FlashMessage\FlashMessageService;
 use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Dashboard\Dto\DashboardRowList;
 use Movary\Service\Email\EmailSupport;
+use Movary\Service\Email\EmailSettingsConflict;
+use Movary\Service\Email\ServerEmailSettingsService;
 use Movary\Service\PaginationElementsCalculator;
 use Movary\Util\Json;
 use Movary\ValueObject\DateTime;
@@ -105,6 +107,28 @@ class SettingsControllerTest extends TestCase
         $this->userMock->method('hasCoreAccountChangesDisabled')->willReturn(false);
         $this->authenticationMock->method('requireWebSession')->willReturn(AuthenticatedUser::create(42, CredentialType::WEB_SESSION));
         $this->currentWebUserMock->method('requireUser')->willReturn($this->userMock);
+    }
+
+    public function testDisableEmailPreservesTheWebFormsExistingSmtpConfiguration() : void
+    {
+        $service = $this->createMock(ServerEmailSettingsService::class);
+        $service->expects(self::once())->method('update')->with(['emailEnabled' => false]);
+        $subject = $this->createSubject(['serverEmailSettingsService' => $service]);
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn(Json::encode(['emailEnabled' => false, 'smtpHost' => '']));
+
+        self::assertSame(200, $subject->updateServerEmail($request)->getStatusCode()->getCode());
+    }
+
+    public function testWebEmailSettingsReturnVerificationConflict() : void
+    {
+        $service = $this->createMock(ServerEmailSettingsService::class);
+        $service->expects(self::once())->method('update')->willThrowException(new EmailSettingsConflict('Required.'));
+        $subject = $this->createSubject(['serverEmailSettingsService' => $service]);
+        $request = $this->createStub(Request::class);
+        $request->method('getBody')->willReturn(Json::encode(['emailEnabled' => false]));
+
+        self::assertSame(409, $subject->updateServerEmail($request)->getStatusCode()->getCode());
     }
 
     public function testDeleteReviewsDeletesOnlyCurrentUsersReviews() : void

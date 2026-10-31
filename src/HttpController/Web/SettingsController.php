@@ -30,7 +30,9 @@ use Movary\Service\Dashboard\DashboardFactory;
 use Movary\Service\Email\CannotSendEmailException;
 use Movary\Service\Email\EmailService;
 use Movary\Service\Email\EmailSupport;
+use Movary\Service\Email\EmailSettingsConflict;
 use Movary\Service\Email\InvalidSmtpConfigException;
+use Movary\Service\Email\ServerEmailSettingsService;
 use Movary\Service\Email\SmtpConfigFactory;
 use Movary\Service\Email\TestEmailRenderer;
 use Movary\Service\FlashMessage\FlashMessage;
@@ -91,6 +93,7 @@ class SettingsController
         private readonly UserFilterRequestMapper $userFilterRequestMapper,
         private readonly CurrentWebUser $currentWebUser,
         private readonly EmailVerificationPolicy $emailVerificationPolicy,
+        private readonly ServerEmailSettingsService $serverEmailSettingsService,
     ) {
     }
 
@@ -1004,64 +1007,18 @@ class SettingsController
         return Response::create(StatusCode::createNoContent());
     }
 
-    // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
     public function updateServerEmail(Request $request) : Response
     {
-        $requestData = Json::decode($request->getBody());
-        $emailEnabled = $this->resolveEmailEnabled($requestData);
-
-        if ($emailEnabled === false) {
-            $this->serverSettings->setEmailEnabled(false);
-            $this->passwordResetTokenService->deleteAllTokens();
-
-            return Response::createOk();
-        }
-
         try {
-            $this->smtpConfigFactory->create($requestData);
+            $requestData = Json::decode($request->getBody());
+            $this->serverEmailSettingsService->update(
+                $this->resolveEmailEnabled($requestData) === false ? ['emailEnabled' => false] : $requestData,
+            );
         } catch (InvalidSmtpConfigException $e) {
             return Response::createBadRequest($e->getMessage());
+        } catch (EmailSettingsConflict $e) {
+            return Response::create(StatusCode::createConflict(), $e->getMessage());
         }
-
-        $smtpHost = isset($requestData['smtpHost']) === false ? null : $requestData['smtpHost'];
-        $smtpPort = isset($requestData['smtpPort']) === false ? null : $requestData['smtpPort'];
-        $smtpFromAddress = isset($requestData['smtpFromAddress']) === false ? null : $requestData['smtpFromAddress'];
-        $smtpEncryption = isset($requestData['smtpEncryption']) === false ? null : $requestData['smtpEncryption'];
-        $smtpWithAuthentication = isset($requestData['smtpWithAuthentication']) === false ? null : (bool)$requestData['smtpWithAuthentication'];
-        $smtpUser = isset($requestData['smtpUser']) === false ? null : $requestData['smtpUser'];
-        $smtpPassword = isset($requestData['smtpPassword']) === false ? null : $requestData['smtpPassword'];
-
-        if ($smtpHost !== null) {
-            $this->serverSettings->setSmtpHost($smtpHost);
-        }
-        if ($smtpPort !== null) {
-            $this->serverSettings->setSmtpPort((int)$smtpPort);
-        }
-        if ($smtpFromAddress !== null) {
-            $this->serverSettings->setSmtpFromAddress($smtpFromAddress);
-        }
-        if ($smtpEncryption !== null) {
-            $this->serverSettings->setSmtpEncryption($smtpEncryption);
-        }
-        if ($smtpWithAuthentication !== null) {
-            $this->serverSettings->setSmtpFromWithAuthentication($smtpWithAuthentication);
-        }
-
-        $smtpAuthenticationEnabled = $this->serverSettings->getSmtpWithAuthentication() === true;
-        if ($smtpWithAuthentication === false
-            && $this->serverSettings->isSmtpWithAuthenticationSetInEnvironment() === false
-        ) {
-            $this->serverSettings->clearSmtpAuthenticationCredentials();
-        } elseif ($smtpAuthenticationEnabled === true) {
-            if ($smtpUser !== null) {
-                $this->serverSettings->setSmtpUser($smtpUser);
-            }
-            if ($smtpPassword !== null) {
-                $this->serverSettings->setSmtpPassword($smtpPassword);
-            }
-        }
-
-        $this->serverSettings->setEmailEnabled(true);
 
         return Response::createOk();
     }
