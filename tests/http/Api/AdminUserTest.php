@@ -156,6 +156,19 @@ class AdminUserTest extends HttpTestCase
         $this->http->get($path, $headers)->assertJsonSame(['user' => $created]);
     }
 
+    public function testFailedMultiFieldUpdateDoesNotChangeAccount() : void
+    {
+        $admin = $this->fixture->createUserWithToken(isAdmin: true);
+        $headers = $this->createAuthorizationHeader($admin['token']);
+        $created = $this->http->post(self::PATH, $this->createBody(), $headers)->assertStatus(201)->json()['user'];
+        $path = self::PATH . '/' . $created['id'];
+
+        $this->http->request('PATCH', $path, $headers, ['isAdmin' => true, 'password' => 'short'])
+            ->assertStatus(400);
+
+        $this->http->get($path, $headers)->assertJsonSame(['user' => $created]);
+    }
+
     public function testCannotDisableOwnAdminAccountAndMissingUsersReturnNotFound() : void
     {
         $admin = $this->fixture->createUserWithToken(isAdmin: true);

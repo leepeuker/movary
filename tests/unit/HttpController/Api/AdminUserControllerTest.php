@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\HttpController\Api;
 
+use Doctrine\DBAL\Connection;
 use Movary\Domain\User\Service\Authentication;
 use Movary\Domain\User\Service\EmailVerificationRequestService;
 use Movary\Domain\User\UserApi;
@@ -81,6 +82,7 @@ class AdminUserControllerTest extends TestCase
             $this->createStub(EmailVerificationRequestService::class),
             $mapper ?? $this->createStub(AdminUserRequestMapper::class),
             $this->createStub(RequestMapper::class),
+            $this->createStub(Connection::class),
         );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Movary\HttpController\Api;
 
+use Doctrine\DBAL\Connection;
 use Exception;
 use Movary\Domain\User\Exception\EmailNotUnique;
 use Movary\Domain\User\Exception\PasswordInvalidEncoding;
@@ -28,6 +29,7 @@ class AdminUserController
         private readonly EmailVerificationRequestService $emailVerificationRequestService,
         private readonly AdminUserRequestMapper $adminUserRequestMapper,
         private readonly RequestMapper $requestMapper,
+        private readonly Connection $dbConnection,
     ) {
     }
 
@@ -108,7 +110,7 @@ class AdminUserController
         }
 
         try {
-            $this->applyUserUpdates($userId, $data);
+            $this->dbConnection->transactional(fn() => $this->applyUserUpdates($userId, $data));
         } catch (EmailNotUnique | PasswordInvalidEncoding | PasswordTooShort | UsernameInvalidFormat | UsernameNotUnique $exception) {
             $this->throwValidationError($exception);
         }
@@ -139,7 +141,7 @@ class AdminUserController
             if ($verificationRequested === true) {
                 $updatedUser = $this->userApi->fetchUser($userId);
                 if ($this->emailVerificationRequestService->requestForUser($updatedUser) === false) {
-                    throw InvalidApiRequest::invalidField('email', 'change is pending, but the verification email could not be scheduled; the current email remains active');
+                    throw InvalidApiRequest::invalidField('email', 'verification email could not be scheduled; no changes were saved');
                 }
             }
         }
