@@ -432,8 +432,11 @@ function addApiRoutes(RouterService $routerService, FastRoute\RouteCollector $ro
     $routes->add('GET', '/movies/search', [Api\MovieSearchController::class, 'search'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies', [Api\MovieListController::class, 'getMovies'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/movies/{movaryId:[0-9]+}', [Api\MovieDetailController::class, 'getMovie'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/movies/{movaryId:[0-9]+}/refresh-tmdb', [Api\MetadataSyncController::class, 'refreshMovieTmdbData'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/movies/{movaryId:[0-9]+}/refresh-imdb', [Api\MetadataSyncController::class, 'refreshMovieImdbRating'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/persons', [Api\PersonListController::class, 'getPersons'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/persons/{personId:[0-9]+}', [Api\PersonDetailController::class, 'getPerson'], [Api\Middleware\IsAuthenticated::class]);
+    $routes->add('POST', '/persons/{personId:[0-9]+}/refresh-tmdb', [Api\MetadataSyncController::class, 'refreshPersonTmdbData'], [Api\Middleware\IsAuthenticated::class]);
     $routes->add('GET', '/persons/{personId:[0-9]+}/profiles', [Api\PersonProfileController::class, 'fetchProfiles'], [
         Api\Middleware\IsAuthenticated::class,
         Api\Middleware\IsAdmin::class,
