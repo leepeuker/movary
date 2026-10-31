@@ -18,7 +18,7 @@ class AdminUserRequestMapper
         $this->validateFields($data, ['email', 'password', 'name', 'isAdmin', 'isEnabled', 'emailVerified']);
 
         return [
-            'email' => $this->requiredString($data, 'email'),
+            'email' => $this->requiredEmail($data),
             'password' => $this->requiredString($data, 'password'),
             'name' => $this->requiredString($data, 'name'),
             'isAdmin' => $this->requiredBoolean($data, 'isAdmin'),
@@ -37,7 +37,9 @@ class AdminUserRequestMapper
         }
 
         foreach ($data as $field => $value) {
-            if (in_array($field, ['email', 'password', 'name'], true) === true) {
+            if ($field === 'email') {
+                $this->requiredEmail($data);
+            } elseif (in_array($field, ['password', 'name'], true) === true) {
                 $this->requiredString($data, $field);
             } else {
                 $this->requiredBoolean($data, $field);
@@ -69,6 +71,17 @@ class AdminUserRequestMapper
         }
 
         return $value;
+    }
+
+    /** @param array<string, mixed> $data */
+    private function requiredEmail(array $data) : string
+    {
+        $email = $this->requiredString($data, 'email');
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            throw InvalidApiRequest::invalidField('email', 'must be a valid email address');
+        }
+
+        return $email;
     }
 
     /** @param array<string, mixed> $data */

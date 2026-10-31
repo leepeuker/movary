@@ -42,6 +42,24 @@ class AdminUserRequestMapperTest extends TestCase
         ]);
     }
 
+    public function testCreateRejectsInvalidEmail() : void
+    {
+        $this->expectExceptionObject(InvalidApiRequest::invalidField('email', 'must be a valid email address'));
+        $this->mapCreate([
+            'name' => 'alice', 'email' => 'invalid', 'password' => 'long-password', 'isAdmin' => false,
+        ]);
+    }
+
+    public function testUpdateRejectsInvalidEmail() : void
+    {
+        $request = $this->createStub(Request::class);
+        $requestMapper = $this->createStub(RequestMapper::class);
+        $requestMapper->method('mapJsonObject')->willReturn(['email' => 'invalid']);
+
+        $this->expectExceptionObject(InvalidApiRequest::invalidField('email', 'must be a valid email address'));
+        (new AdminUserRequestMapper($requestMapper))->mapUpdate($request);
+    }
+
     public function testUpdateRejectsEmailVerified() : void
     {
         $request = $this->createStub(Request::class);

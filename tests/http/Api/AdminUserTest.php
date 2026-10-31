@@ -152,6 +152,8 @@ class AdminUserTest extends HttpTestCase
         $this->http->post(self::PATH, $body, $headers)->assertStatus(400);
         $this->http->request('PATCH', $path, $headers, ['name' => 'changed', 'isEnabled' => 'false'])
             ->assertStatus(400);
+        $this->http->request('PATCH', $path, $headers, ['isAdmin' => true, 'email' => 'invalid'])
+            ->assertStatus(400);
         $this->http->request('PATCH', $path, $headers, ['emailVerified' => false])->assertStatus(400);
         $this->http->get($path, $headers)->assertJsonSame(['user' => $created]);
     }
@@ -201,6 +203,7 @@ class AdminUserTest extends HttpTestCase
         yield 'verified is not boolean' => [['emailVerified' => 0]];
         yield 'unknown field' => [['unknown' => true]];
         yield 'invalid username' => [['name' => 'invalid-name']];
+        yield 'invalid email' => [['email' => 'invalid']];
     }
 
     /** @return array{name: string, email: string, password: string, isAdmin: bool} */
