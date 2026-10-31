@@ -1160,6 +1160,38 @@
         "security": [{"bearerToken": []}, {"movaryToken": []}]
       }
     },
+    "/api/v1/movies/{movaryId}/refresh-tmdb": {
+      "post": {
+        "tags": ["Movies"],
+        "operationId": "refreshMovieTmdbData",
+        "summary": "Refresh a movie from TMDB",
+        "description": "Synchronously refreshes shared movie metadata from TMDB. Requires a personal API token.",
+        "parameters": [{"$ref": "#/components/parameters/movaryId"}],
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "401": {"$ref": "#/components/responses/401"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/movies/{movaryId}/refresh-imdb": {
+      "post": {
+        "tags": ["Movies"],
+        "operationId": "refreshMovieImdbRating",
+        "summary": "Refresh a movie IMDb rating",
+        "description": "Synchronously refreshes the shared IMDb rating from the ratings file when it has changed. A movie without an IMDb ID is left unchanged. Requires a personal API token.",
+        "parameters": [{"$ref": "#/components/parameters/movaryId"}],
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "401": {"$ref": "#/components/responses/401"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
     "/api/v1/persons": {
       "get": {
         "tags": ["Persons"],
@@ -1193,6 +1225,22 @@
         "parameters": [{"name": "personId", "in": "path", "required": true, "description": "Movary person ID", "schema": {"$ref": "#/components/schemas/id"}}],
         "responses": {
           "200": {"description": "Person details", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/personDetails"}}}},
+          "401": {"$ref": "#/components/responses/401"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/persons/{personId}/refresh-tmdb": {
+      "post": {
+        "tags": ["Persons"],
+        "operationId": "refreshPersonTmdbData",
+        "summary": "Refresh a person from TMDB",
+        "description": "Synchronously refreshes shared person metadata from TMDB. Requires a personal API token.",
+        "parameters": [{"name": "personId", "in": "path", "required": true, "description": "Movary person ID", "schema": {"$ref": "#/components/schemas/id"}}],
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
           "401": {"$ref": "#/components/responses/401"},
           "404": {"$ref": "#/components/responses/404"},
           "500": {"$ref": "#/components/responses/500"}

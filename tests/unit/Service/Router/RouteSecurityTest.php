@@ -138,6 +138,27 @@ class RouteSecurityTest extends TestCase
         }
     }
 
+    public function testMetadataSyncApiRoutesRequireAuthentication() : void
+    {
+        $routes = array_filter(
+            RegisteredRoutes::collect(),
+            static fn(array $route) : bool => in_array($route['path'], [
+                '/api/movies/{movaryId:[0-9]+}/refresh-tmdb',
+                '/api/movies/{movaryId:[0-9]+}/refresh-imdb',
+                '/api/persons/{personId:[0-9]+}/refresh-tmdb',
+                '/api/v1/movies/{movaryId:[0-9]+}/refresh-tmdb',
+                '/api/v1/movies/{movaryId:[0-9]+}/refresh-imdb',
+                '/api/v1/persons/{personId:[0-9]+}/refresh-tmdb',
+            ], true),
+        );
+
+        self::assertCount(6, $routes);
+        foreach ($routes as $route) {
+            self::assertSame('POST', $route['method']);
+            self::assertContains(IsAuthenticated::class, $route['middleware']);
+        }
+    }
+
     public function testJobScheduleFormUpdateUsesPost() : void
     {
         $methods = [];
