@@ -47,7 +47,7 @@ class PersonListController
                 'knownForDepartment' => $person->getKnownForDepartment(),
                 'birthDate' => $person->getBirthDate()?->jsonSerialize(),
                 'posterUrl' => $this->imageUrlService->generateImageSrcUrlFromParameters(
-                    $person->getTmdbPosterPath(),
+                    $person->getTmdbPosterPathEffective(),
                     $person->getPosterPath(),
                     $person->getName(),
                 ),

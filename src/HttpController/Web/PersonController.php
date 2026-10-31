@@ -102,7 +102,7 @@ class PersonController
             : $this->userApi->hasHiddenPerson($authenticatedUser->getUserId(), $personId);
 
         $posterPath = $this->urlGenerator->generateImageSrcUrlFromParameters(
-            $person->getTmdbPosterPath(),
+            $person->getTmdbPosterPathEffective(),
             $person->getPosterPath(),
             $person->getName(),
         );

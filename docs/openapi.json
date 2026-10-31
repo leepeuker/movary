@@ -1200,6 +1200,57 @@
         "security": [{"bearerToken": []}, {"movaryToken": []}]
       }
     },
+    "/api/v1/persons/{personId}/profiles": {
+      "get": {
+        "tags": ["Persons"],
+        "operationId": "getPersonProfiles",
+        "summary": "Get available profile images for a person",
+        "description": "Returns the TMDB profile images for a person stored in Movary. Requires an administrator's personal API token.",
+        "parameters": [{"name": "personId", "in": "path", "required": true, "description": "Movary person ID", "schema": {"$ref": "#/components/schemas/id"}}],
+        "responses": {
+          "200": {"description": "Available profile images and override state", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/personProfiles"}}}},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
+    "/api/v1/persons/{personId}/profile": {
+      "put": {
+        "tags": ["Persons"],
+        "operationId": "selectPersonProfile",
+        "summary": "Select a profile image for a person",
+        "description": "Selects an available TMDB profile image as the person's global image. Requires an administrator's personal API token.",
+        "parameters": [{"name": "personId", "in": "path", "required": true, "description": "Movary person ID", "schema": {"$ref": "#/components/schemas/id"}}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["profilePath"], "properties": {"profilePath": {"type": "string", "minLength": 1}}}}}},
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "400": {"$ref": "#/components/responses/400"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      },
+      "delete": {
+        "tags": ["Persons"],
+        "operationId": "restoreDefaultPersonProfile",
+        "summary": "Restore the default profile image for a person",
+        "description": "Removes the global image selection so the person uses TMDB's current default profile image. Requires an administrator's personal API token.",
+        "parameters": [{"name": "personId", "in": "path", "required": true, "description": "Movary person ID", "schema": {"$ref": "#/components/schemas/id"}}],
+        "responses": {
+          "204": {"$ref": "#/components/responses/204"},
+          "401": {"$ref": "#/components/responses/401"},
+          "403": {"$ref": "#/components/responses/403"},
+          "404": {"$ref": "#/components/responses/404"},
+          "500": {"$ref": "#/components/responses/500"}
+        },
+        "security": [{"bearerToken": []}, {"movaryToken": []}]
+      }
+    },
     "\/api\/v1\/movies\/{movaryId}\/posters": {
       "get": {
         "tags": [
@@ -3324,6 +3375,14 @@
           "deathDate": {"$ref": "#/components/schemas/calendarDateNullable"},
           "placeOfBirth": {"type": "string", "nullable": true},
           "posterUrl": {"type": "string", "description": "Display URL, including the configured poster override or a placeholder"}
+        }
+      },
+      "personProfiles": {
+        "type": "object",
+        "required": ["profiles", "hasOverride"],
+        "properties": {
+          "profiles": {"type": "array", "items": {"type": "object", "required": ["path", "previewUrl"], "properties": {"path": {"type": "string"}, "previewUrl": {"type": "string", "format": "uri"}}}},
+          "hasOverride": {"type": "boolean", "description": "True when an administrator selected a profile image instead of using TMDB's default."}
         }
       },
       "movieSummary": {

@@ -35,7 +35,7 @@ class PersonDetailController
             'deathDate' => $person->getDeathDate()?->jsonSerialize(),
             'placeOfBirth' => $person->getPlaceOfBirth(),
             'posterUrl' => $this->imageUrlService->generateImageSrcUrlFromParameters(
-                $person->getTmdbPosterPath(),
+                $person->getTmdbPosterPathEffective(),
                 $person->getPosterPath(),
                 $person->getName(),
             ),

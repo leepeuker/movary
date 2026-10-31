@@ -22,6 +22,7 @@ class PersonEntity
         private readonly ?Date $deathDate,
         private readonly ?string $placeOfBirth,
         private readonly ?DateTime $updatedAtTmdb,
+        private readonly ?string $tmdbPosterPathOverride,
     ) {
     }
 
@@ -41,6 +42,7 @@ class PersonEntity
             empty($data['death_date']) === true ? null : Date::createFromString($data['death_date']),
             $data['place_of_birth'],
             empty($data['updated_at_tmdb']) === true ? null : DateTime::createFromString($data['updated_at_tmdb']),
+            $data['tmdb_poster_path_override'] ?? null,
         );
     }
 
@@ -102,6 +104,16 @@ class PersonEntity
     public function getTmdbPosterPath() : ?string
     {
         return $this->tmdbPosterPath;
+    }
+
+    public function getTmdbPosterPathEffective() : ?string
+    {
+        return $this->tmdbPosterPathOverride ?? $this->tmdbPosterPath;
+    }
+
+    public function getTmdbPosterPathOverride() : ?string
+    {
+        return $this->tmdbPosterPathOverride;
     }
 
     public function getUpdatedAtTmdb() : ?DateTime

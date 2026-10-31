@@ -132,8 +132,7 @@ class TmdbImageCache
     {
         $cachedImages = 0;
 
-        $overrideColumn = $resourceType->isMovie() ? ', tmdb_poster_path_override' : '';
-        $query = "SELECT id, poster_path, tmdb_poster_path$overrideColumn FROM $resourceType";
+        $query = "SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM $resourceType";
         if (count($filerIds) > 0) {
             $placeholders = str_repeat('?, ', count($filerIds));
             $query .= ' WHERE id IN (' . trim($placeholders, ', ') . ')';

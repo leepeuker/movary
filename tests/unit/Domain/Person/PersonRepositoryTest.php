@@ -15,6 +15,28 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PersonRepository::class)]
 class PersonRepositoryTest extends TestCase
 {
+    public function testSetAndClearProfileOverrideAlsoClearCachedImagePath() : void
+    {
+        $connection = $this->createMock(Connection::class);
+        $updates = [];
+        $connection->expects(self::exactly(2))->method('update')->willReturnCallback(
+            static function (string $table, array $values, array $identifier) use (&$updates) : int {
+                self::assertSame('person', $table);
+                self::assertSame(['id' => 12], $identifier);
+                self::assertArrayHasKey('poster_path', $values);
+                self::assertNull($values['poster_path']);
+                $updates[] = $values['tmdb_poster_path_override'];
+
+                return 1;
+            },
+        );
+
+        $subject = new PersonRepository($connection);
+        $subject->setTmdbPosterPathOverride(12, '/selected.jpg');
+        $subject->clearTmdbPosterPathOverride(12);
+        self::assertSame(['/selected.jpg', null], $updates);
+    }
+
     public function testCatalogCountAndPageUseTheSameDirectorFilters() : void
     {
         $connection = $this->createMock(Connection::class);

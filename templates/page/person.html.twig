@@ -13,6 +13,10 @@
     <script src="{{ js_url('person.js') }}"></script>
 {% endblock %}
 
+{% block stylesheets %}
+    <link href="{{ css_url('person.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
     <style>
         .truncated {
@@ -85,6 +89,9 @@
             </div>
 
             {{ include('component/modal-person-more-options.html.twig') }}
+            {% if currentUserIsAdmin == true %}
+                {{ include('component/modal-change-person-profile.html.twig') }}
+            {% endif %}
         {% endif %}
 
         <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">Biography</h6>

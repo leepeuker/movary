@@ -12,6 +12,25 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TmdbApi::class)]
 class TmdbApiTest extends TestCase
 {
+    public function testFetchPersonProfilesMapsAvailableImages() : void
+    {
+        $client = $this->createMock(TmdbClient::class);
+        $client->expects(self::once())->method('get')->with('/person/42/images')->willReturn([
+            'profiles' => [
+                ['file_path' => '/first.jpg'],
+                ['file_path' => ''],
+                ['file_path' => '/second.jpg'],
+            ],
+        ]);
+        $subject = new TmdbApi($client, $this->createStub(TmdbIsoLanguageCache::class), new TmdbUrlGenerator());
+
+        $profiles = $subject->fetchPersonProfiles(42);
+
+        self::assertCount(2, $profiles);
+        self::assertSame(['path' => '/first.jpg', 'previewUrl' => 'https://image.tmdb.org/t/p/w154/first.jpg'], $profiles[0]->asArray());
+        self::assertSame('/second.jpg', $profiles[1]->getPath());
+    }
+
     public function testFetchEnglishMoviePostersUsesFixedLanguageAndMapsMinimalData() : void
     {
         $client = $this->createMock(TmdbClient::class);

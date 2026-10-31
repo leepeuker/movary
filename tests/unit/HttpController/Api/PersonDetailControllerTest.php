@@ -27,7 +27,7 @@ class PersonDetailControllerTest extends TestCase
         $person->method('getBiography')->willReturn('Biography');
         $person->method('getBirthDate')->willReturn(Date::createFromString('1980-01-02'));
         $person->method('getPlaceOfBirth')->willReturn('Berlin');
-        $person->method('getTmdbPosterPath')->willReturn('/poster.jpg');
+        $person->method('getTmdbPosterPathEffective')->willReturn('/poster.jpg');
         $personApi = $this->createMock(PersonApi::class);
         $personApi->expects(self::once())->method('findById')->with(12)->willReturn($person);
         $imageUrlService = $this->createMock(ImageUrlService::class);
