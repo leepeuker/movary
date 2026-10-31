@@ -24,7 +24,7 @@ class HttpFixture
     }
 
     /** @return array{user: UserEntity, token: string} */
-    public function createUserWithToken(?int $privacyLevel = null) : array
+    public function createUserWithToken(?int $privacyLevel = null, bool $isAdmin = false) : array
     {
         $suffix = bin2hex(random_bytes(8));
         $name = 'HttpTest' . $suffix;
@@ -35,7 +35,7 @@ class HttpFixture
             'http-test-' . $suffix . '@example.com',
             'http-test-password',
             $name,
-            false,
+            $isAdmin,
             true,
             true,
         );
@@ -50,6 +50,14 @@ class HttpFixture
         $tokenData = $tokenService->createToken($user->getId(), 'HTTP test', null);
 
         return ['user' => $user, 'token' => $tokenData['token']];
+    }
+
+    public function isValidUserPassword(int $userId, string $password) : bool
+    {
+        /** @var UserApi $userApi */
+        $userApi = $this->container->get(UserApi::class);
+
+        return $userApi->isValidPassword($userId, $password);
     }
 
     public function createMovie() : MovieEntity

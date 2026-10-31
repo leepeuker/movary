@@ -8,6 +8,7 @@
   "tags": [
     {"name": "Me"},
     {"name": "Users"},
+    {"name": "Admin users"},
     {"name": "Dashboard"},
     {"name": "Movies"},
     {"name": "Persons"},
@@ -20,6 +21,51 @@
     {"name": "Radarr"}
   ],
   "paths": {
+      "/api/v1/admin/users": {
+        "get": {
+          "tags": ["Admin users"], "operationId": "getAdminUsers", "summary": "List all user accounts",
+          "parameters": [
+            {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 1, "default": 1}},
+            {"name": "limit", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 24}},
+            {"name": "role", "in": "query", "schema": {"type": "string", "enum": ["admin", "user"]}}
+          ],
+          "responses": {
+            "200": {"description": "Paginated account list", "content": {"application/json": {"schema": {"type": "object", "required": ["users", "page", "limit", "total"], "properties": {"users": {"type": "array", "items": {"$ref": "#/components/schemas/adminUserListEntry"}}, "page": {"type": "integer"}, "limit": {"type": "integer"}, "total": {"type": "integer"}}}}}},
+            "400": {"$ref": "#/components/responses/400"}, "401": {"$ref": "#/components/responses/401"}, "403": {"$ref": "#/components/responses/403"}
+          },
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        },
+        "post": {
+          "tags": ["Admin users"], "operationId": "createAdminUser", "summary": "Create a user account",
+          "description": "isEnabled and emailVerified default to true when omitted.",
+          "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/adminUserCreate"}}}},
+          "responses": {
+            "201": {"description": "Account created", "content": {"application/json": {"schema": {"type": "object", "required": ["user"], "properties": {"user": {"$ref": "#/components/schemas/adminUser"}}}}}},
+            "400": {"$ref": "#/components/responses/400"}, "401": {"$ref": "#/components/responses/401"}, "403": {"$ref": "#/components/responses/403"}
+          },
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        }
+      },
+      "/api/v1/admin/users/{userId}": {
+        "parameters": [{"name": "userId", "in": "path", "required": true, "schema": {"type": "integer", "minimum": 1}}],
+        "get": {
+          "tags": ["Admin users"], "operationId": "getAdminUser", "summary": "Get a user account",
+          "responses": {"200": {"description": "Account", "content": {"application/json": {"schema": {"type": "object", "required": ["user"], "properties": {"user": {"$ref": "#/components/schemas/adminUser"}}}}}}, "401": {"$ref": "#/components/responses/401"}, "403": {"$ref": "#/components/responses/403"}, "404": {"$ref": "#/components/responses/404"}},
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        },
+        "patch": {
+          "tags": ["Admin users"], "operationId": "updateAdminUser", "summary": "Update supplied user account fields",
+          "description": "An administrator cannot disable their own account. Email changes follow the configured verification policy. A password change ends the user's web sessions but leaves personal API tokens active.",
+          "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/adminUserUpdate"}}}},
+          "responses": {"204": {"description": "Account updated"}, "400": {"$ref": "#/components/responses/400"}, "401": {"$ref": "#/components/responses/401"}, "403": {"$ref": "#/components/responses/403"}, "404": {"$ref": "#/components/responses/404"}},
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        },
+        "delete": {
+          "tags": ["Admin users"], "operationId": "deleteAdminUser", "summary": "Delete a user account",
+          "responses": {"204": {"description": "Account deleted"}, "401": {"$ref": "#/components/responses/401"}, "403": {"$ref": "#/components/responses/403"}, "404": {"$ref": "#/components/responses/404"}},
+          "security": [{"bearerToken": []}, {"movaryToken": []}]
+        }
+      },
       "/api/v1/users": {
         "get": {
           "tags": ["Users"],
@@ -2452,6 +2498,21 @@
       }
     },
     "schemas": {
+        "adminUserListEntry": {
+          "type": "object", "required": ["id", "name", "email", "pendingEmail", "isAdmin", "isEnabled"],
+          "properties": {"id": {"type": "integer"}, "name": {"type": "string"}, "email": {"type": "string", "format": "email"}, "pendingEmail": {"type": "string", "format": "email", "nullable": true}, "isAdmin": {"type": "boolean"}, "isEnabled": {"type": "boolean"}}
+        },
+        "adminUser": {
+          "allOf": [{"$ref": "#/components/schemas/adminUserListEntry"}, {"type": "object", "required": ["emailVerified"], "properties": {"emailVerified": {"type": "boolean"}}}]
+        },
+        "adminUserCreate": {
+          "type": "object", "required": ["name", "email", "password", "isAdmin"], "additionalProperties": false,
+          "properties": {"name": {"type": "string", "pattern": "^[a-zA-Z0-9]+$"}, "email": {"type": "string", "format": "email"}, "password": {"type": "string"}, "isAdmin": {"type": "boolean"}, "isEnabled": {"type": "boolean", "default": true}, "emailVerified": {"type": "boolean", "default": true}}
+        },
+        "adminUserUpdate": {
+          "type": "object", "minProperties": 1, "additionalProperties": false,
+          "properties": {"name": {"type": "string", "pattern": "^[a-zA-Z0-9]+$"}, "email": {"type": "string", "format": "email"}, "password": {"type": "string"}, "isAdmin": {"type": "boolean"}, "isEnabled": {"type": "boolean"}}
+        },
         "visibleUsers": {
           "type": "object",
           "required": ["users"],

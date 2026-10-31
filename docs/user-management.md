@@ -2,6 +2,8 @@
 
 Administrators manage user accounts under **Settings → Server → Users**. Administrators with server command-line access can also create accounts through the CLI. Public registration can optionally allow users to create their own accounts.
 
+Administrators can also manage accounts with a personal API token under `/api/v1/admin/users`. See the [OpenAPI specification](openapi.json) for request and response formats.
+
 Users can update their own email, password, username, and two-factor authentication under **Settings → Account**. See [Account and security](user-guide/account-and-security.md) for these self-service actions.
 
 ## Roles and account states
