@@ -18,9 +18,129 @@
     {"name": "Ratings"},
     {"name": "Webhooks"},
     {"name": "Radarr"},
-    {"name": "Admin users"}
+    {"name": "Admin users"},
+    {"name": "Admin server"}
   ],
   "paths": {
+      "/api/v1/admin/server/email": {
+        "get": {
+          "tags": [
+            "Admin server"
+          ],
+          "operationId": "getServerEmailSettings",
+          "summary": "Get server email settings without credentials",
+          "description": "Administrator token required. Returns effective settings and credential presence flags; never returns the SMTP username or password. Uses Cache-Control: no-store.",
+          "responses": {
+            "200": {
+              "description": "Effective email settings",
+              "headers": {
+                "Cache-Control": {
+                  "schema": {
+                    "type": "string",
+                    "enum": [
+                      "no-store"
+                    ]
+                  }
+                }
+              },
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/serverEmailSettings"
+                  }
+                }
+              }
+            },
+            "401": {
+              "$ref": "#/components/responses/401"
+            },
+            "403": {
+              "$ref": "#/components/responses/403"
+            }
+          },
+          "security": [
+            {
+              "bearerToken": []
+            },
+            {
+              "movaryToken": []
+            }
+          ]
+        },
+        "patch": {
+          "tags": [
+            "Admin server"
+          ],
+          "operationId": "updateServerEmailSettings",
+          "summary": "Update supplied server email settings",
+          "description": "Administrator token required. Omitted fields, including credentials, retain their current values. Rejects any supplied environment-controlled field with 409 before saving. Validates the resulting SMTP configuration before writing when email is enabled or SMTP fields are supplied. Set smtpEncryption to an empty string for no encryption. Disabling SMTP authentication clears database credentials not controlled by the environment; credential fields are only saved when authentication is enabled. Disabling email preserves SMTP settings and invalidates pending password reset tokens; it is rejected while EMAIL_VERIFICATION_REQUIRED=1.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serverEmailSettingsUpdate"
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "Email settings updated"
+            },
+            "400": {
+              "$ref": "#/components/responses/400"
+            },
+            "401": {
+              "$ref": "#/components/responses/401"
+            },
+            "403": {
+              "$ref": "#/components/responses/403"
+            },
+            "409": {
+              "description": "An affected field is controlled by an environment variable, or disabling email conflicts with required email verification."
+            }
+          },
+          "security": [
+            {
+              "bearerToken": []
+            },
+            {
+              "movaryToken": []
+            }
+          ]
+        },
+        "delete": {
+          "tags": [
+            "Admin server"
+          ],
+          "operationId": "deleteServerEmailSettings",
+          "summary": "Disable email and remove stored SMTP configuration",
+          "description": "Administrator token required. Removes all database-stored SMTP settings, disables email, and invalidates pending password reset tokens. Returns 409 without changes if any email or SMTP field is controlled by an environment variable, or EMAIL_VERIFICATION_REQUIRED=1. Repeated deletion returns 204.",
+          "responses": {
+            "204": {
+              "description": "Email disabled and stored SMTP configuration removed"
+            },
+            "401": {
+              "$ref": "#/components/responses/401"
+            },
+            "403": {
+              "$ref": "#/components/responses/403"
+            },
+            "409": {
+              "description": "An affected field is controlled by an environment variable, or disabling email conflicts with required email verification."
+            }
+          },
+          "security": [
+            {
+              "bearerToken": []
+            },
+            {
+              "movaryToken": []
+            }
+          ]
+        }
+      },
       "/api/v1/admin/users": {
         "get": {
           "tags": ["Admin users"], "operationId": "getAdminUsers", "summary": "List all user accounts",
@@ -2546,6 +2666,116 @@
       }
     },
     "schemas": {
+      "serverEmailSettings": {
+        "type": "object",
+        "required": [
+          "emailEnabled",
+          "smtpHost",
+          "smtpPort",
+          "smtpFromAddress",
+          "smtpEncryption",
+          "smtpWithAuthentication",
+          "smtpUserConfigured",
+          "smtpPasswordConfigured",
+          "environmentControlledFields"
+        ],
+        "properties": {
+          "emailEnabled": {
+            "type": "boolean"
+          },
+          "smtpHost": {
+            "type": "string",
+            "nullable": true
+          },
+          "smtpPort": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "nullable": true
+          },
+          "smtpFromAddress": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "smtpEncryption": {
+            "type": "string",
+            "enum": [
+              null,
+              "ssl",
+              "tls"
+            ],
+            "nullable": true
+          },
+          "smtpWithAuthentication": {
+            "type": "boolean"
+          },
+          "smtpUserConfigured": {
+            "type": "boolean"
+          },
+          "smtpPasswordConfigured": {
+            "type": "boolean"
+          },
+          "environmentControlledFields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "emailEnabled",
+                "smtpHost",
+                "smtpPort",
+                "smtpFromAddress",
+                "smtpEncryption",
+                "smtpWithAuthentication",
+                "smtpUser",
+                "smtpPassword"
+              ]
+            }
+          }
+        }
+      },
+      "serverEmailSettingsUpdate": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": false,
+        "properties": {
+          "emailEnabled": {
+            "type": "boolean"
+          },
+          "smtpHost": {
+            "type": "string"
+          },
+          "smtpPort": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "smtpFromAddress": {
+            "type": "string",
+            "format": "email"
+          },
+          "smtpEncryption": {
+            "type": "string",
+            "enum": [
+              "",
+              "ssl",
+              "tls"
+            ]
+          },
+          "smtpWithAuthentication": {
+            "type": "boolean"
+          },
+          "smtpUser": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "smtpPassword": {
+            "type": "string",
+            "writeOnly": true
+          }
+        }
+      },
+
         "adminUserListEntry": {
           "type": "object", "required": ["id", "name", "email", "pendingEmail", "isAdmin", "isEnabled"],
           "properties": {"id": {"type": "integer"}, "name": {"type": "string"}, "email": {"type": "string", "format": "email"}, "pendingEmail": {"type": "string", "format": "email", "nullable": true}, "isAdmin": {"type": "boolean"}, "isEnabled": {"type": "boolean"}}

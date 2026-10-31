@@ -311,6 +311,17 @@ class ServerSettings
         $this->updateValue(self::SMTP_WITH_AUTH, $smtpFromWithAuthentication);
     }
 
+    public function clearSmtpConfiguration() : void
+    {
+        $this->deleteValue(self::SMTP_HOST);
+        $this->deleteValue(self::SMTP_PORT);
+        $this->deleteValue(self::SMTP_FROM_ADDRESS);
+        $this->deleteValue(self::SMTP_ENCRYPTION);
+        $this->deleteValue(self::SMTP_WITH_AUTH);
+        $this->deleteValue(self::SMTP_USER);
+        $this->deleteValue(self::SMTP_PASSWORD);
+    }
+
     public function clearSmtpAuthenticationCredentials() : void
     {
         if ($this->isSmtpUserSetInEnvironment() === false) {

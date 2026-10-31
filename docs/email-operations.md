@@ -21,6 +21,12 @@ Use **Test** to send a test message to a chosen recipient. The test is sent imme
 
 After saving the configuration, make sure `jobs:process` runs regularly. Docker installations include job processing in the standard setup. Manual installations must configure Supervisor or cron as described in [Manual installation](install/manual.md#job-processing).
 
+## Configure SMTP through the API
+
+Administrators can use a personal API token with `/api/v1/admin/server/email`.
+
+For request and response schemas, see the [OpenAPI specification](openapi.json).
+
 ## Email verification
 
 Set `EMAIL_VERIFICATION_REQUIRED=1` to require verified email addresses. This setting is valid only when email support, SMTP, and `APPLICATION_URL` are configured.
