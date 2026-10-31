@@ -8,7 +8,6 @@
   "tags": [
     {"name": "Me"},
     {"name": "Users"},
-    {"name": "Admin users"},
     {"name": "Dashboard"},
     {"name": "Movies"},
     {"name": "Persons"},
@@ -18,7 +17,8 @@
     {"name": "Reviews"},
     {"name": "Ratings"},
     {"name": "Webhooks"},
-    {"name": "Radarr"}
+    {"name": "Radarr"},
+    {"name": "Admin users"}
   ],
   "paths": {
       "/api/v1/admin/users": {
