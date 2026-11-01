@@ -92,16 +92,38 @@ class PersonPageTest extends TestCase
         self::assertStringNotContainsString('<dt>Gender</dt>', $html);
         self::assertStringNotContainsString('years old', $html);
         self::assertStringNotContainsString('id="biographyToggle"', $html);
+        self::assertStringNotContainsString('id="moreSpecificMovieButton"', $html);
     }
 
-    public function testSignedInUserSeesOptionsBesideExternalLinks() : void
+    public function testSignedInUserSeesOptionsBesidePersonName() : void
     {
         $html = $this->renderPage(null, [], [], [], [], true);
 
         self::assertSame(1, substr_count($html, 'id="moreSpecificMovieButton"'));
-        self::assertMatchesRegularExpression('/class="person-links".*id="moreSpecificMovieButton".*bi-three-dots.*<div class="person-info"/s', $html);
+        self::assertMatchesRegularExpression('/<header class="person-heading">\s*<h1[^>]*>Example person<\/h1>\s*<button[^>]*id="moreSpecificMovieButton"[^>]*>\s*<i class="bi bi-three-dots-vertical" aria-hidden="true"><\/i>\s*<\/button>\s*<\/header>/s', $html);
+        self::assertStringContainsString('aria-label="Person options"', $html);
+        self::assertStringContainsString('title="Person options"', $html);
+        self::assertStringContainsString('data-bs-target="#moreModal"', $html);
         self::assertStringNotContainsString('data-person-options-placement', $html);
         self::assertStringContainsString('id="moreModal"', $html);
+    }
+
+    public function testBiographyPreservesEmptyLinesAndEscapesMarkup() : void
+    {
+        $html = $this->renderPage(null, [], [], [], [], biography: "First line.\r\n\r\n \t\nSecond line.\r\r<script>alert(1)</script>");
+
+        self::assertStringContainsString("First line.<br />\r\n<br />\r\n \t<br />\nSecond line.<br />\r<br />\r&lt;script&gt;alert(1)&lt;/script&gt;</p>", $html);
+        self::assertStringNotContainsString('<script>alert(1)</script>', $html);
+        self::assertStringContainsString('id="biographyToggle"', $html);
+    }
+
+    public function testWhitespaceOnlyBiographyHasEmptyState() : void
+    {
+        $html = $this->renderPage(null, [], [], [], [], biography: "\r\n \t\n\r");
+
+        self::assertStringContainsString('No biography available.', $html);
+        self::assertStringNotContainsString('id="biographyParagraph"', $html);
+        self::assertStringNotContainsString('id="biographyToggle"', $html);
     }
 
     private function movie() : array
@@ -123,6 +145,7 @@ class PersonPageTest extends TestCase
         array $watchedDirecting,
         array $watchlistDirecting,
         bool $signedIn = false,
+        ?string $biography = null,
     ) : string {
         return $this->twig->render('page/person.html.twig', [
             'applicationUrl' => '',
@@ -139,7 +162,7 @@ class PersonPageTest extends TestCase
                 'birthDate' => null,
                 'deathDate' => null,
                 'placeOfBirth' => null,
-                'biography' => null,
+                'biography' => $biography,
                 'imdbUrl' => null,
                 'tmdbUrl' => 'https://www.themoviedb.org/person/1',
             ],

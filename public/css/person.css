@@ -1,7 +1,7 @@
 .person-profile {
     display: grid;
     gap: 1rem;
-    grid-template-columns: minmax(0, 42%) minmax(0, 1fr);
+    grid-template-columns: minmax(11rem, 42%) minmax(0, 1fr);
     grid-template-areas:
         "heading heading"
         "portrait facts"
@@ -28,6 +28,15 @@
 .person-heading {
     grid-area: heading;
     min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.person-heading h1 {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .person-links {
@@ -35,12 +44,34 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 1rem 0.5rem;
 }
 
-.person-links .btn {
-    padding: 0.15rem 0.4rem;
-    font-size: 0.75rem;
+.person-external-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+}
+
+.person-logo-tmdb,
+.person-logo-imdb {
+    height: 1.5rem;
+    width: auto;
+}
+
+.person-options-button {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 2rem;
+    min-height: 2rem;
+    justify-content: center;
+}
+
+.person-options-button .bi {
+    display: flex;
+    line-height: 1;
 }
 
 #biographyToggle {
@@ -107,9 +138,15 @@
     mask-image: linear-gradient(to bottom, #000 75%, transparent);
 }
 
-@media (min-width: 480px) {
+@media (min-width: 480px) and (max-width: 767.98px) {
     .person-profile {
-        grid-template-columns: clamp(8rem, 28vw, 15rem) minmax(0, 1fr);
+        grid-template-columns: minmax(11rem, 40%) minmax(0, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .person-profile {
+        grid-template-columns: clamp(11rem, 28vw, 15rem) minmax(0, 1fr);
         grid-template-areas:
             "heading heading"
             "sidebar content";
@@ -138,6 +175,10 @@
 
     .person-links {
         justify-content: flex-start;
+    }
+
+    .person-info {
+        margin-top: -0.25rem;
     }
 
     .person-facts {

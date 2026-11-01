@@ -152,9 +152,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let expanded = false
     const updateBiography = () => {
+        biography.style.removeProperty('max-height')
         biography.classList.add('is-collapsed')
         const overflows = biography.scrollHeight > biography.clientHeight + 1
         biography.classList.toggle('is-collapsed', overflows && expanded === false)
+        if (overflows && expanded === false) {
+            const top = biography.getBoundingClientRect().top
+            const cutoff = top + biography.clientHeight
+            const textNodes = document.createTreeWalker(biography, NodeFilter.SHOW_TEXT)
+            const range = document.createRange()
+            let lastTextBottom = top
+            while (textNodes.nextNode()) {
+                const node = textNodes.currentNode
+                const start = node.textContent.search(/\S/)
+                if (start === -1) {
+                    continue
+                }
+                range.setStart(node, start)
+                range.setEnd(node, node.textContent.trimEnd().length)
+                for (const rect of range.getClientRects()) {
+                    if (rect.width > 0 && rect.bottom <= cutoff + 1) {
+                        lastTextBottom = Math.max(lastTextBottom, rect.bottom)
+                    }
+                }
+            }
+            if (lastTextBottom > top) {
+                const lineHeight = parseFloat(getComputedStyle(biography).lineHeight)
+                const height = Math.ceil((lastTextBottom - top) / lineHeight) * lineHeight
+                biography.style.maxHeight = Math.min(biography.clientHeight, height) + 'px'
+            }
+        }
         toggle.classList.toggle('d-none', overflows === false)
         toggle.setAttribute('aria-expanded', String(expanded || overflows === false))
         toggle.textContent = expanded ? 'Show less' : 'Read more'

@@ -50,20 +50,24 @@
         <div class="person-profile">
             <header class="person-heading">
                 <h1 id="personName" class="h2 mb-0">{{ person.name }}</h1>
+                {% if currentUserName is not null %}
+                    <button type="button" id="moreSpecificMovieButton" class="btn btn-sm btn-outline-secondary person-options-button"
+                            data-bs-toggle="modal" data-bs-target="#moreModal"
+                            aria-label="Person options" title="Person options">
+                        <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                    </button>
+                {% endif %}
             </header>
             <aside class="person-sidebar" aria-label="Personal information">
                 <img src="{{ person.posterPath }}" class="person-portrait rounded-2" alt="{{ person.name }}">
                 <div class="person-links">
-                    <a href="{{ person.tmdbUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">TMDB <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                    <a href="{{ person.tmdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link">
+                        <img src="{{ applicationUrl }}/images/tmdb-logo.svg" class="person-logo-tmdb" alt="TMDB">
+                    </a>
                     {% if person.imdbUrl is not null %}
-                        <a href="{{ person.imdbUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">IMDb <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
-                    {% endif %}
-                    {% if currentUserName is not null %}
-                        <button type="button" id="moreSpecificMovieButton" class="btn btn-sm btn-outline-secondary"
-                                data-bs-toggle="modal" data-bs-target="#moreModal"
-                                aria-label="Person options" title="Person options">
-                            <i class="bi bi-three-dots" aria-hidden="true"></i>
-                        </button>
+                        <a href="{{ person.imdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link">
+                            <img src="{{ applicationUrl }}/images/imdb-logo.svg" class="person-logo-imdb" alt="IMDb">
+                        </a>
                     {% endif %}
                 </div>
                 <div class="person-info">
@@ -104,8 +108,9 @@
             <div class="person-content">
                 <section class="person-biography" aria-labelledby="biographyHeading">
                     <h2 id="biographyHeading" class="h6 fw-bold">Biography</h2>
-                    {% if person.biography is not empty %}
-                        <p id="biographyParagraph" class="person-biography-text">{{ person.biography|nl2br }}</p>
+                    {% set biography = person.biography|default('') %}
+                    {% if biography|trim is not empty %}
+                        <p id="biographyParagraph" class="person-biography-text">{{ biography|nl2br }}</p>
                         <button type="button" id="biographyToggle" class="btn btn-sm btn-outline-secondary mt-2 d-none" aria-controls="biographyParagraph" aria-expanded="false">Read more</button>
                     {% else %}
                         <p class="text-body-secondary mb-0">No biography available.</p>

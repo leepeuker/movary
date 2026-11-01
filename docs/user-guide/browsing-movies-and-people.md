@@ -32,8 +32,9 @@ In the table layout, select a supported column heading to change the sorting dir
 
 Select **Set defaults** in advanced search to remember sorting, filters, and results per page separately for Top Actors and Top Directors in the current browser. The Watchlist page provides the same option.
 
-Select a person to open their detail page. It shows available biographical information and external TMDB or IMDb links. On desktop and tablet screens, personal details appear below the portrait beside the biography and **Watched** section. On narrow phone screens, these sections stack, with the portrait centered above the name and external links. Use **Read more** to expand longer biographies. The **Watched** section combines acting and directing credits, with each watched movie listed once in alphabetical order and a total count. It shows the selected user's watched movies rather than a complete filmography.
-Signed-in users can open person options using the **⋯** button beside the external links.
+Select a person to see their biography, personal details, and TMDB or IMDb links. Use **Read more** to expand the biography. **Watched** lists the selected user's watched movies featuring the person as an actor or director, without duplicates.
+
+Signed-in users can open **Person options** using the **⋮** button beside the person's name.
 
 Administrators can use **Person options → Change profile image** on a person page to select an available TMDB image or restore the default.
 
