@@ -150,7 +150,7 @@
                         <p class="text-body-secondary mb-0">No biography available.</p>
                     {% endif %}
                 </section>
-                <section class="person-movies person-movie-section" aria-labelledby="personMoviesHeading">
+                <section class="person-movies person-movie-section{% if watchedMovies is not empty and watchlistMovies is empty %} person-movies-before-empty-watchlist{% endif %}" aria-labelledby="personMoviesHeading">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <h2 id="personMoviesHeading" class="h6 fw-bold mb-0">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
                         {% if watchedMovies is not empty %}

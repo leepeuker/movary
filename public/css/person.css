@@ -131,6 +131,10 @@
     overflow-x: auto;
 }
 
+.person-movies-before-empty-watchlist:not([data-movie-view="table"]) .person-movie-grid {
+    padding-bottom: 0.5rem;
+}
+
 .person-movie-grid img {
     aspect-ratio: 2 / 3;
     object-fit: cover;
