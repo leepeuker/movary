@@ -28,6 +28,14 @@ class PersonEntityTest extends TestCase
         ];
 
         self::assertSame('/default.jpg', PersonEntity::createFromArray($data)->getTmdbPosterPathEffective());
+        self::assertSame([
+            'facebook_id' => null,
+            'instagram_id' => null,
+            'tiktok_id' => null,
+            'twitter_id' => null,
+            'youtube_id' => null,
+            'wikidata_id' => null,
+        ], PersonEntity::createFromArray($data)->getExternalIds());
         self::assertSame('/selected.jpg', PersonEntity::createFromArray([
             ...$data,
             'tmdb_poster_path_override' => '/selected.jpg',

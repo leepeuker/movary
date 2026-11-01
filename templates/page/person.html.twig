@@ -95,14 +95,19 @@
             <aside class="person-sidebar" aria-label="Personal information">
                 <img src="{{ person.posterPath }}" class="person-portrait rounded-2" alt="{{ person.name }}">
                 <div class="person-links">
-                    <a href="{{ person.tmdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link">
+                    <a href="{{ person.tmdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link" aria-label="TMDB" data-bs-toggle="tooltip" data-bs-title="TMDB">
                         <img src="{{ applicationUrl }}/images/tmdb-logo.svg" class="person-logo-tmdb" alt="TMDB">
                     </a>
                     {% if person.imdbUrl is not null %}
-                        <a href="{{ person.imdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link">
+                        <a href="{{ person.imdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link" aria-label="IMDb" data-bs-toggle="tooltip" data-bs-title="IMDb">
                             <img src="{{ applicationUrl }}/images/imdb-logo.svg" class="person-logo-imdb" alt="IMDb">
                         </a>
                     {% endif %}
+                    {% for link in person.externalLinks %}
+                        <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="person-external-link" aria-label="{{ link.name }}" data-bs-toggle="tooltip" data-bs-title="{{ link.name }}">
+                            <img src="{{ applicationUrl }}/images/person-{{ link.icon }}" class="person-logo-social person-logo-{{ link.icon|split('.')|first }}" alt="">
+                        </a>
+                    {% endfor %}
                 </div>
                 <div class="person-info">
                     <dl class="person-facts">

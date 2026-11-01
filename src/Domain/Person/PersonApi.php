@@ -27,6 +27,7 @@ class PersonApi
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
         ?string $imdbId = null,
+        array $externalIds = [],
     ) : PersonEntity {
         return $this->repository->create(
             $tmdbId,
@@ -40,6 +41,7 @@ class PersonApi
             $placeOfBirth,
             $updatedAtTmdb,
             $imdbId,
+            $externalIds,
         );
     }
 
@@ -139,6 +141,7 @@ class PersonApi
         ?string $placeOfBirth,
         ?DateTime $updatedAtTmdb,
         ?string $imdbId,
+        array $externalIds,
     ) : PersonEntity {
         return $this->repository->update(
             $id,
@@ -153,6 +156,7 @@ class PersonApi
             $placeOfBirth,
             $updatedAtTmdb,
             $imdbId,
+            $externalIds,
         );
     }
 

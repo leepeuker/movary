@@ -12,6 +12,30 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TmdbApi::class)]
 class TmdbApiTest extends TestCase
 {
+    public function testFetchPersonDetailsAppendsExternalIds() : void
+    {
+        $client = $this->createMock(TmdbClient::class);
+        $client->expects(self::once())->method('get')
+            ->with('/person/42', ['append_to_response' => 'external_ids'])
+            ->willReturn([
+                'id' => 42,
+                'imdb_id' => null,
+                'name' => 'Example',
+                'biography' => '',
+                'birthday' => null,
+                'deathday' => null,
+                'gender' => 0,
+                'popularity' => 1.0,
+                'known_for_department' => null,
+                'profile_path' => null,
+                'place_of_birth' => null,
+                'external_ids' => ['instagram_id' => 'example'],
+            ]);
+        $subject = new TmdbApi($client, $this->createStub(TmdbIsoLanguageCache::class), new TmdbUrlGenerator());
+
+        self::assertSame('example', $subject->fetchPersonDetails(42)->getExternalIds()['instagram_id']);
+    }
+
     public function testFetchPersonProfilesMapsAvailableImages() : void
     {
         $client = $this->createMock(TmdbClient::class);
