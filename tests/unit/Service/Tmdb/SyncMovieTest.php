@@ -101,7 +101,31 @@ class SyncMovieTest extends TestCase
         self::assertSame('/override.jpg', $result->getTmdbPosterPathEffective());
     }
 
-    private function createMovie(string $defaultPoster, string $overridePoster) : MovieEntity
+    public function testChangedBackdropSchedulesCachingEvenWithPosterOverride() : void
+    {
+        $beforeSync = $this->createMovie('/poster.jpg', '/override.jpg', '/old.jpg');
+        $afterSync = $this->createMovie('/poster.jpg', '/override.jpg', '/new.jpg');
+        $tmdbMovie = $this->createStub(TmdbMovie::class);
+        $tmdbMovie->method('getBackdropPath')->willReturn('/new.jpg');
+        $tmdbApi = $this->createStub(TmdbApi::class);
+        $tmdbApi->method('fetchMovieDetails')->willReturn($tmdbMovie);
+        $movieApi = $this->createMock(MovieApi::class);
+        $movieApi->expects(self::once())->method('findByTmdbId')->with(34)->willReturn($beforeSync);
+        $movieApi->expects(self::once())->method('updateDetails')->willReturn($afterSync);
+        $genreConverter = $this->createStub(GenreConverter::class);
+        $genreConverter->method('getMovaryGenresFromTmdbMovie')->willReturn(GenreEntityList::create());
+        $companyConverter = $this->createStub(SyncProductionCompany::class);
+        $companyConverter->method('syncMovaryProductionCompaniesFromTmdbMovie')->willReturn(CompanyEntityList::create());
+        $scheduler = $this->getMockBuilder(JobQueueScheduler::class)
+            ->setConstructorArgs([$this->createStub(JobQueueApi::class), false])
+            ->onlyMethods(['storeMovieIdForTmdbImageCacheJob'])->getMock();
+        $scheduler->expects(self::once())->method('storeMovieIdForTmdbImageCacheJob')->with(12);
+        $subject = new SyncMovie($tmdbApi, $movieApi, $genreConverter, $companyConverter, $this->createStub(Connection::class), $scheduler, new NullLogger());
+
+        self::assertSame($afterSync, $subject->syncMovie(34));
+    }
+
+    private function createMovie(string $defaultPoster, string $overridePoster, ?string $backdrop = null) : MovieEntity
     {
         return MovieEntity::createFromArray([
             'id' => 12,
@@ -119,6 +143,7 @@ class SyncMovieTest extends TestCase
             'tmdb_vote_average' => 7.0,
             'tmdb_vote_count' => 10,
             'tmdb_poster_path' => $defaultPoster,
+            'tmdb_backdrop_path' => $backdrop,
             'tmdb_poster_path_override' => $overridePoster,
             'imdb_rating_average' => null,
             'imdb_rating_vote_count' => null,

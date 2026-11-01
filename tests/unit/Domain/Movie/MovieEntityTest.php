@@ -25,6 +25,17 @@ class MovieEntityTest extends TestCase
         self::assertNull($movie->getTmdbPosterPathOverride());
     }
 
+    public function testBackdropPathIsReadWithoutChangingPoster() : void
+    {
+        $data = $this->createMovieData('/poster.jpg', null);
+        $data['tmdb_backdrop_path'] = '/backdrop.jpg';
+        $movie = MovieEntity::createFromArray($data);
+
+        self::assertSame('/backdrop.jpg', $movie->getTmdbBackdropPath());
+        self::assertSame('/poster.jpg', $movie->getTmdbPosterPathEffective());
+        self::assertNull(MovieEntity::createFromArray($this->createMovieData(null, null))->getTmdbBackdropPath());
+    }
+
     private function createMovieData(?string $defaultPoster, ?string $overridePoster) : array
     {
         return [

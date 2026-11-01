@@ -479,6 +479,7 @@ class MovieApi
             'originalTitle' => $entity->getOriginalTitle(),
             'releaseDate' => $entity->getReleaseDate(),
             'posterPath' => $posterPath,
+            'backdropPath' => $this->urlGenerator->generateMovieBackdropUrl($entity->getId(), $entity->getTmdbBackdropPath()),
             'tagline' => $entity->getTagline(),
             'overview' => $entity->getOverview(),
             'runtime' => $renderedRuntime,

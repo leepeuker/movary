@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use RuntimeException;
 
 #[CoversClass(TmdbImageCache::class)]
 #[AllowMockObjectsWithoutExpectations]
@@ -40,7 +41,7 @@ class TmdbImageCacheTest extends TestCase
             ->expects(self::exactly(2))
             ->method('prepare')
             ->willReturnMap([
-                ['SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override FROM movie', $select],
+                ['SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override, tmdb_backdrop_path FROM movie', $select],
                 ['UPDATE movie SET poster_path = ? WHERE id = ?', $update],
             ]);
 
@@ -63,6 +64,59 @@ class TmdbImageCacheTest extends TestCase
             ->willReturn('/cached.jpg');
 
         $subject = new TmdbImageCache($connection, $imageCacheService, $urlGenerator, new NullLogger());
+
+        self::assertSame(1, $subject->cacheAllMovieImages());
+    }
+
+    public function testMovieWithoutPosterStillCachesItsBackdrop() : void
+    {
+        $result = $this->createStub(Result::class);
+        $result->method('iterateAssociative')->willReturn(new ArrayIterator([[
+            'id' => 12, 'poster_path' => null, 'tmdb_poster_path' => null, 'tmdb_backdrop_path' => '/backdrop.jpg',
+        ]]));
+        $select = $this->createStub(Statement::class);
+        $select->method('executeQuery')->willReturn($result);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())->method('prepare')
+            ->with('SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override, tmdb_backdrop_path FROM movie')->willReturn($select);
+        $imageCacheService = $this->createMock(ImageCacheService::class);
+        $imageCacheService->expects(self::once())->method('cacheImage')
+            ->with(Url::createFromString('https://image.tmdb.org/t/p/w1280/backdrop.jpg'), 12, ResourceType::createMovie(), false, true)
+            ->willReturn('/cache/backdrop.jpg');
+        $subject = new TmdbImageCache($connection, $imageCacheService, new TmdbUrlGenerator(), new NullLogger());
+
+        self::assertSame(1, $subject->cacheAllMovieImages());
+    }
+
+    public function testBackdropFailureDoesNotPreventPosterCaching() : void
+    {
+        $result = $this->createStub(Result::class);
+        $result->method('iterateAssociative')->willReturn(new ArrayIterator([[
+            'id' => 12, 'poster_path' => null, 'tmdb_poster_path' => '/poster.jpg', 'tmdb_backdrop_path' => '/backdrop.jpg',
+        ]]));
+        $select = $this->createStub(Statement::class);
+        $select->method('executeQuery')->willReturn($result);
+        $update = $this->createMock(Statement::class);
+        $update->expects(self::once())->method('executeStatement')->with(['/cache/poster.jpg', 12])->willReturn(1);
+        $connection = $this->createStub(Connection::class);
+        $connection->method('prepare')->willReturnMap([
+            ['SELECT id, poster_path, tmdb_poster_path, tmdb_poster_path_override, tmdb_backdrop_path FROM movie', $select],
+            ['UPDATE movie SET poster_path = ? WHERE id = ?', $update],
+        ]);
+        $imageCacheService = $this->createMock(ImageCacheService::class);
+        $imageCacheService->expects(self::exactly(2))->method('cacheImage')
+            ->willReturnCallback(static function (Url $url, int $id, ResourceType $type, bool $force, bool $backdrop = false) : string {
+                self::assertSame(12, $id);
+                self::assertTrue($type->isMovie());
+                self::assertSame($backdrop === false, $force);
+                self::assertStringContainsString($backdrop === true ? 'backdrop.jpg' : 'poster.jpg', (string)$url);
+                if ($backdrop === true) {
+                    throw new RuntimeException('Backdrop unavailable');
+                }
+
+                return '/cache/poster.jpg';
+            });
+        $subject = new TmdbImageCache($connection, $imageCacheService, new TmdbUrlGenerator(), new NullLogger());
 
         self::assertSame(1, $subject->cacheAllMovieImages());
     }
