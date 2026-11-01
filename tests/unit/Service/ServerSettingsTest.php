@@ -4,6 +4,7 @@ namespace Tests\Unit\Movary\Service;
 
 use Doctrine\DBAL\Connection;
 use Movary\Service\ServerSettings;
+use Movary\Util\File;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Exception\ConfigNotSetException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -19,13 +20,45 @@ class ServerSettingsTest extends TestCase
 
     private Connection|MockObject $dbConnectionMock;
 
+    private File|MockObject $fileUtilMock;
+
     private ServerSettings $subject;
 
     protected function setUp() : void
     {
         $this->configMock = $this->createMock(Config::class);
         $this->dbConnectionMock = $this->createMock(Connection::class);
-        $this->subject = new ServerSettings($this->configMock, $this->dbConnectionMock);
+        $this->fileUtilMock = $this->createMock(File::class);
+        $this->subject = new ServerSettings($this->configMock, $this->dbConnectionMock, $this->fileUtilMock);
+    }
+
+    public function testApplicationVersionUsesBuildFileInsteadOfConfigurationOrDatabase() : void
+    {
+        $this->configMock->expects(self::never())->method('getAsString');
+        $this->dbConnectionMock->expects(self::never())->method('fetchFirstColumn');
+        $versionFile = dirname(__DIR__, 3) . '/VERSION';
+        $this->fileUtilMock->expects(self::once())->method('fileExists')->with($versionFile)->willReturn(true);
+        $this->fileUtilMock->expects(self::once())->method('readFile')->with($versionFile)->willReturn("0.83.0\n");
+
+        self::assertSame('0.83.0', $this->subject->getApplicationVersion());
+    }
+
+    public function testApplicationVersionIsUnknownWithoutBuildFile() : void
+    {
+        $this->configMock->expects(self::never())->method('getAsString');
+        $this->dbConnectionMock->expects(self::never())->method('fetchFirstColumn');
+        $this->fileUtilMock->expects(self::once())->method('fileExists')->willReturn(false);
+        $this->fileUtilMock->expects(self::never())->method('readFile');
+
+        self::assertSame('unknown', $this->subject->getApplicationVersion());
+    }
+
+    public function testApplicationVersionIsUnknownWithEmptyBuildFile() : void
+    {
+        $this->fileUtilMock->method('fileExists')->willReturn(true);
+        $this->fileUtilMock->method('readFile')->willReturn(" \n");
+
+        self::assertSame('unknown', $this->subject->getApplicationVersion());
     }
 
     public function testEmailSupportIsDisabledByDefault() : void

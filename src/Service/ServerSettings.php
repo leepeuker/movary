@@ -3,6 +3,7 @@
 namespace Movary\Service;
 
 use Doctrine\DBAL\Connection;
+use Movary\Util\File;
 use Movary\ValueObject\Config;
 use Movary\ValueObject\Exception\ConfigNotSetException;
 
@@ -23,8 +24,6 @@ class ServerSettings
     private const string APPLICATION_NAME = 'APPLICATION_NAME';
 
     private const string APPLICATION_URL = 'APPLICATION_URL';
-
-    private const string APPLICATION_VERSION = 'APPLICATION_VERSION';
 
     private const string EMAIL_ENABLED = 'EMAIL_ENABLED';
 
@@ -53,6 +52,7 @@ class ServerSettings
     public function __construct(
         private readonly Config $config,
         private readonly Connection $dbConnection,
+        private readonly File $fileUtil,
     ) {
     }
 
@@ -73,7 +73,14 @@ class ServerSettings
 
     public function getApplicationVersion() : string
     {
-        return $this->getByKey(self::APPLICATION_VERSION) ?? 'unknown';
+        $versionFile = dirname(__DIR__, 2) . '/VERSION';
+        if ($this->fileUtil->fileExists($versionFile) === false) {
+            return 'unknown';
+        }
+
+        $version = trim($this->fileUtil->readFile($versionFile));
+
+        return $version === '' ? 'unknown' : $version;
     }
 
     public function isEmailEnabled() : bool

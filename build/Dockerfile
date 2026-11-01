@@ -78,8 +78,11 @@ RUN composer dump-autoload --no-dev --classmap-authoritative
 
 FROM base AS production
 
-ARG APPLICATION_VERSION
-ENV APPLICATION_VERSION=${APPLICATION_VERSION}
+ARG APPLICATION_VERSION=unknown
+ARG APPLICATION_REVISION=unknown
+
+RUN printf '%s\n' "$APPLICATION_VERSION" > /app/VERSION \
+    && printf '%s\n' "$APPLICATION_REVISION" > /app/REVISION
 
 COPY --chown=application:application ./bootstrap.php /app/bootstrap.php
 COPY --chown=application:application ./bin /app/bin
