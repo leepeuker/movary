@@ -49,6 +49,12 @@ else
   echo "INFO: Automatic database migration is disabled";
 fi
 
+/usr/bin/php /app/bin/console.php user:bootstrap-admin
+if [ $? -ne 0 ]; then
+  echo "ALERT: Initial administrator bootstrap failed, exiting..."
+  exit 1
+fi
+
 echo "INFO: Generating symbolic link for storage"
 /usr/bin/php /app/bin/console.php storage:link
 

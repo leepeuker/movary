@@ -14,6 +14,8 @@ php bin/console.php user:create admin@example.com 'replace-with-secure-password'
 
 The final `1` grants the Admin role. Passwords must contain at least 15 characters. CLI-created users are enabled and email-verified by default; use `--isEnabled=0` or `--emailVerified=0` to override either state.
 
+Docker installations can also create the first administrator from environment settings before the web server starts. See [Initial administrator](user-management.md#initial-administrator) for the required settings and one-time behavior.
+
 Run `php bin/console.php` without a command to list all available CLI commands.
 
 ## Review the settings

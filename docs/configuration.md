@@ -30,6 +30,9 @@ The `Web UI` column is set to yes if an environment variable can alternatively b
 | `LOGIN_ATTEMPT_WINDOW_IN_SECONDS`           |     `900`     | Positive period during which failed login attempts are counted (seconds)       |        |
 | `DEFAULT_LOGIN_EMAIL`                       |       -       | Email address to always autofill on login page                                 |        |
 | `DEFAULT_LOGIN_PASSWORD`                    |       -       | Password to always autofill on login page                                      |        |
+| `INITIAL_ADMIN_EMAIL`                       |       -       | Email for one-time initial administrator setup                                 |        |
+| `INITIAL_ADMIN_USERNAME`                    |       -       | Username for one-time initial administrator setup                              |        |
+| `INITIAL_ADMIN_PASSWORD`                    |       -       | Password for one-time initial administrator setup; also supports `_FILE`       |        |
 | `TOTP_ISSUER`                               |   `Movary`    | The issuer used when setting up two factor authentication                      |        |
 
 Generate `APPLICATION_SECRET` with `openssl rand -hex 32`. Movary uses it as the root secret for purpose-specific cryptographic keys. Keep the value stable across restarts and identical across all Movary instances.
@@ -39,6 +42,8 @@ When TLS terminates at a reverse proxy, set `APPLICATION_URL` to the public `htt
 See [TMDB data](features/tmdb-data.md) for API-key setup, metadata synchronization, and image caching.
 
 See [User management](user-management.md#public-registration) for the public registration workflow and the interaction between account approval and email verification.
+
+The three `INITIAL_ADMIN_*` settings must be provided together on an empty database. Docker startup creates the account after migrations and before serving requests. Once any user exists, these settings have no effect. The password must contain at least 15 characters.
 
 ### Database
 
