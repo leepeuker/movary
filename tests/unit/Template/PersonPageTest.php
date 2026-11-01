@@ -113,7 +113,7 @@ class PersonPageTest extends TestCase
         $html = $this->renderPage(null, [], [], [], [], true);
 
         self::assertSame(1, substr_count($html, 'id="moreSpecificMovieButton"'));
-        self::assertMatchesRegularExpression('/<header class="person-heading">\s*<h1[^>]*>Example person<\/h1>\s*<button[^>]*id="moreSpecificMovieButton"[^>]*>\s*<i class="bi bi-three-dots-vertical" aria-hidden="true"><\/i>\s*<\/button>\s*<\/header>/s', $html);
+        self::assertMatchesRegularExpression('/<header class="person-heading">\s*<h1[^>]*>Example person<\/h1>\s*<button[^>]*id="moreSpecificMovieButton"[^>]*>\s*<i class="bi bi-gear" aria-hidden="true"><\/i>\s*<\/button>\s*<\/header>/s', $html);
         self::assertStringContainsString('aria-label="Person options"', $html);
         self::assertStringContainsString('btn-outline-light person-options-button', $html);
         self::assertStringContainsString('title="Person options"', $html);
