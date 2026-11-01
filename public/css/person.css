@@ -60,7 +60,15 @@
     width: auto;
 }
 
+.person-options-button,
+.person-options-button .bi,
+.person-external-link,
+#biographyToggle {
+    cursor: pointer;
+}
+
 .person-options-button {
+    border-color: #9d9d9d;
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;

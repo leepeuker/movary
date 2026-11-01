@@ -51,7 +51,7 @@
             <header class="person-heading">
                 <h1 id="personName" class="h2 mb-0">{{ person.name }}</h1>
                 {% if currentUserName is not null %}
-                    <button type="button" id="moreSpecificMovieButton" class="btn btn-sm btn-outline-secondary person-options-button"
+                    <button type="button" id="moreSpecificMovieButton" class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button"
                             data-bs-toggle="modal" data-bs-target="#moreModal"
                             aria-label="Person options" title="Person options">
                         <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>

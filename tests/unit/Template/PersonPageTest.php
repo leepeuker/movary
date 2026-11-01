@@ -102,6 +102,7 @@ class PersonPageTest extends TestCase
         self::assertSame(1, substr_count($html, 'id="moreSpecificMovieButton"'));
         self::assertMatchesRegularExpression('/<header class="person-heading">\s*<h1[^>]*>Example person<\/h1>\s*<button[^>]*id="moreSpecificMovieButton"[^>]*>\s*<i class="bi bi-three-dots-vertical" aria-hidden="true"><\/i>\s*<\/button>\s*<\/header>/s', $html);
         self::assertStringContainsString('aria-label="Person options"', $html);
+        self::assertStringContainsString('btn-outline-light person-options-button', $html);
         self::assertStringContainsString('title="Person options"', $html);
         self::assertStringContainsString('data-bs-target="#moreModal"', $html);
         self::assertStringNotContainsString('data-person-options-placement', $html);
@@ -149,6 +150,7 @@ class PersonPageTest extends TestCase
     ) : string {
         return $this->twig->render('page/person.html.twig', [
             'applicationUrl' => '',
+            'theme' => 'dark',
             'routeUsername' => 'viewer',
             'currentUserName' => $signedIn ? 'viewer' : null,
             'currentUserIsAdmin' => false,
