@@ -205,6 +205,14 @@ class MovieApi
         return $movie;
     }
 
+    public function fetchFromWatchlistWithPerson(int $personId, int $userId) : array
+    {
+        return $this->sortUniqueMovies(array_merge(
+            $this->fetchFromWatchlistWithActor($personId, $userId),
+            $this->fetchFromWatchlistWithDirector($personId, $userId),
+        ));
+    }
+
     public function fetchFromWatchlistWithActor(int $personId, int $userId) : array
     {
         $movies = $this->repository->fetchFromWatchlistWithActor($personId, $userId);
@@ -406,6 +414,14 @@ class MovieApi
     public function fetchPlaysForExport(int $userId) : array
     {
         return $this->historyApi->fetchPlaysForExport($userId);
+    }
+
+    public function fetchWatchedWithPerson(int $personId, int $userId) : array
+    {
+        return $this->sortUniqueMovies(array_merge(
+            $this->fetchWithActor($personId, $userId),
+            $this->fetchWithDirector($personId, $userId),
+        ));
     }
 
     public function fetchWithActor(int $personId, int $userId) : array
@@ -727,5 +743,13 @@ class MovieApi
         }
 
         $this->repository->updateUserRating($movieId, $userId, $rating);
+    }
+
+    private function sortUniqueMovies(array $movies) : array
+    {
+        $movies = array_column($movies, null, 'id');
+        usort($movies, static fn(array $a, array $b) : int => mb_strtolower($a['title']) <=> mb_strtolower($b['title']));
+
+        return $movies;
     }
 }

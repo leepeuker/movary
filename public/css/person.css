@@ -1,3 +1,264 @@
+.person-profile {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(11rem, 42%) minmax(0, 1fr);
+    grid-template-areas:
+        "heading heading"
+        "portrait facts"
+        "links facts"
+        "biography biography"
+        "movies movies"
+        "watchlist watchlist";
+    margin-bottom: 1rem;
+}
+
+.person-sidebar,
+.person-content {
+    display: contents;
+}
+
+.person-portrait {
+    grid-area: portrait;
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+.person-heading {
+    grid-area: heading;
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.person-heading h1 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.person-links {
+    grid-area: links;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem 0.5rem;
+}
+
+.person-external-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+}
+
+.person-logo-tmdb,
+.person-logo-imdb {
+    height: 1.5rem;
+    width: auto;
+}
+
+.person-options-button,
+.person-options-button .bi,
+.person-external-link,
+#biographyToggle {
+    cursor: pointer;
+}
+
+.person-options-button {
+    border-color: #9d9d9d;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 2rem;
+    min-height: 2rem;
+    justify-content: center;
+}
+
+.person-options-button .bi {
+    display: flex;
+    line-height: 1;
+}
+
+#biographyToggle {
+    min-height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#biographyToggle::after {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+    transform: translateY(-0.1rem) rotate(45deg);
+}
+
+#biographyToggle[aria-expanded="true"]::after {
+    transform: translateY(0.1rem) rotate(225deg);
+}
+
+.person-info {
+    grid-area: facts;
+    min-width: 0;
+}
+
+.person-movies {
+    grid-area: movies;
+    min-width: 0;
+}
+
+.person-watchlist {
+    grid-area: watchlist;
+    min-width: 0;
+}
+
+.person-movie-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: clamp(7rem, 18vw, 10rem);
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.person-movie-grid img {
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+.person-movie-scroll {
+    --bs-btn-color: var(--bs-body-color);
+    --bs-btn-bg: rgba(var(--bs-body-bg-rgb), 0.95);
+    --bs-btn-border-color: var(--bs-border-color);
+    --bs-btn-hover-color: var(--bs-body-color);
+    --bs-btn-hover-bg: var(--bs-secondary-bg);
+    --bs-btn-hover-border-color: var(--bs-secondary-color);
+    --bs-btn-active-color: var(--bs-body-color);
+    --bs-btn-active-bg: var(--bs-tertiary-bg);
+    --bs-btn-active-border-color: var(--bs-secondary-color);
+    --bs-btn-focus-shadow-rgb: var(--bs-body-color-rgb);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.25);
+}
+
+.person-movie-scroll-previous {
+    left: 0.5rem;
+}
+
+.person-movie-scroll-next {
+    right: 0.5rem;
+}
+
+.person-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 0.4rem 1rem;
+    margin: 0;
+}
+
+.person-facts dt {
+    font-weight: 600;
+}
+
+.person-facts dd {
+    margin: 0.1rem 0 0;
+    overflow-wrap: anywhere;
+}
+
+.person-biography {
+    grid-area: biography;
+    min-width: 0;
+}
+
+.person-biography-text {
+    line-height: 1.6;
+    margin-bottom: 0;
+    overflow-wrap: anywhere;
+}
+
+.person-biography-text.is-collapsed {
+    max-height: 6.4em;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent);
+    mask-image: linear-gradient(to bottom, #000 75%, transparent);
+}
+
+@media (min-width: 480px) and (max-width: 767.98px) {
+    .person-profile {
+        grid-template-columns: minmax(11rem, 40%) minmax(0, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .person-profile {
+        grid-template-columns: clamp(11rem, 28vw, 15rem) minmax(0, 1fr);
+        grid-template-areas:
+            "heading heading"
+            "sidebar content";
+        align-items: start;
+        column-gap: 1rem;
+        row-gap: 0.65rem;
+    }
+
+    .person-sidebar {
+        grid-area: sidebar;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 0;
+    }
+
+    .person-content {
+        grid-area: content;
+        display: block;
+        min-width: 0;
+    }
+
+    .person-portrait {
+        width: 100%;
+    }
+
+    .person-links {
+        justify-content: flex-start;
+    }
+
+    .person-info {
+        margin-top: -0.25rem;
+    }
+
+    .person-facts {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .person-biography {
+        margin-bottom: 1.25rem;
+    }
+
+    .person-watchlist {
+        margin-top: 1rem;
+    }
+
+    .person-biography-text.is-collapsed {
+        max-height: 9.6em;
+    }
+}
+
 .person-profile-option {
     border: 2px solid var(--bs-border-color);
     border-radius: var(--bs-border-radius);

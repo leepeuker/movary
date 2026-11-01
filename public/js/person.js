@@ -143,29 +143,83 @@ async function updatePersonProfile(method, body = null) {
     }
 }
 
-function toggleBiography() {
-    let expandContainer = document.getElementById('expandContainer');
-    if (document.getElementsByClassName('truncated').length > 0) {
-        document.getElementById('biographyParagraph').classList.remove('truncated');
-        expandContainer.getElementsByTagName('i')[0].classList.remove('bi-chevron-down');
-        expandContainer.getElementsByTagName('i')[0].classList.add('bi-chevron-up');
-        expandContainer.children[1].innerHTML = 'Show less&#8230;';
-    } else {
-        document.getElementById('biographyParagraph').classList.add('truncated');
-        expandContainer.getElementsByTagName('i')[0].classList.add('bi-chevron-down');
-        expandContainer.getElementsByTagName('i')[0].classList.remove('bi-chevron-up');
-        expandContainer.children[1].innerHTML = 'Show more&#8230;';
-    }
-}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.person-movie-carousel').forEach(carousel => {
+        const grid = carousel.querySelector('.person-movie-grid')
+        const buttons = carousel.querySelectorAll('.person-movie-scroll')
+        const updateButtons = () => {
+            buttons.forEach(button => {
+                const hidden = button.dataset.direction === '-1'
+                    ? grid.scrollLeft <= 1
+                    : grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 1
+                if (hidden && document.activeElement === button) {
+                    grid.focus({preventScroll: true})
+                }
+                button.classList.toggle('d-none', hidden)
+            })
+        }
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                grid.scrollBy({left: Number(button.dataset.direction) * grid.clientWidth * 0.8})
+            })
+        })
+        grid.addEventListener('scroll', updateButtons, {passive: true})
+        window.addEventListener('resize', updateButtons)
+        updateButtons()
+    })
+})
 
-document.addEventListener("DOMContentLoaded", () => {
-    let biographyHeight = document.getElementById('biographyParagraph').offsetHeight;
-    let windowHeight = window.outerHeight;
-    if (((biographyHeight / windowHeight) * 100) > 20) {
-        document.getElementById('biographyParagraph').classList.add('truncated');
-        document.getElementById('expandContainer').classList.remove('d-none');
+document.addEventListener('DOMContentLoaded', () => {
+    const biography = document.getElementById('biographyParagraph')
+    const toggle = document.getElementById('biographyToggle')
+    if (biography === null || toggle === null) {
+        return
     }
-});
+
+    let expanded = false
+    const updateBiography = () => {
+        biography.style.removeProperty('max-height')
+        biography.classList.add('is-collapsed')
+        const overflows = biography.scrollHeight > biography.clientHeight + 1
+        biography.classList.toggle('is-collapsed', overflows && expanded === false)
+        if (overflows && expanded === false) {
+            const top = biography.getBoundingClientRect().top
+            const cutoff = top + biography.clientHeight
+            const textNodes = document.createTreeWalker(biography, NodeFilter.SHOW_TEXT)
+            const range = document.createRange()
+            let lastTextBottom = top
+            while (textNodes.nextNode()) {
+                const node = textNodes.currentNode
+                const start = node.textContent.search(/\S/)
+                if (start === -1) {
+                    continue
+                }
+                range.setStart(node, start)
+                range.setEnd(node, node.textContent.trimEnd().length)
+                for (const rect of range.getClientRects()) {
+                    if (rect.width > 0 && rect.bottom <= cutoff + 1) {
+                        lastTextBottom = Math.max(lastTextBottom, rect.bottom)
+                    }
+                }
+            }
+            if (lastTextBottom > top) {
+                const lineHeight = parseFloat(getComputedStyle(biography).lineHeight)
+                const height = Math.ceil((lastTextBottom - top) / lineHeight) * lineHeight
+                biography.style.maxHeight = Math.min(biography.clientHeight, height) + 'px'
+            }
+        }
+        toggle.classList.toggle('d-none', overflows === false)
+        toggle.setAttribute('aria-expanded', String(expanded || overflows === false))
+        toggle.textContent = expanded ? 'Show less' : 'Read more'
+    }
+
+    toggle.addEventListener('click', () => {
+        expanded = expanded === false
+        updateBiography()
+    })
+    window.addEventListener('resize', updateBiography)
+    updateBiography()
+})
 
 function refreshTmdbData() {
     disableMoreModalButtons(true)

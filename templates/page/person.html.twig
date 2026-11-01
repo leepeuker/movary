@@ -17,203 +17,133 @@
     <link href="{{ css_url('person.css') }}" rel="stylesheet">
 {% endblock %}
 
+{% macro movieGrid(movies, applicationUrl, routeUsername, label) %}
+    <div class="person-movie-carousel position-relative">
+        <div class="person-movie-grid" tabindex="0" role="group" aria-label="{{ label }}">
+            {% for movie in movies %}
+                <div class="position-relative">
+                    <a class="poster-link card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}-{{ movie.title|slugify }}">
+                        <div class="position-relative">
+                            <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title|movie_title(movie.original_title) }} Poster" loading="lazy">
+                        </div>
+                        {% if movie.userRating is not null %}
+                            <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">{{ movie.userRating }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn rounded-circle person-movie-scroll person-movie-scroll-previous d-none"
+                data-direction="-1" aria-label="Scroll {{ label|lower }} left">
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn rounded-circle person-movie-scroll person-movie-scroll-next d-none"
+                data-direction="1" aria-label="Scroll {{ label|lower }} right">
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+    </div>
+{% endmacro %}
+
 {% block body %}
-    <style>
-        .truncated {
-            -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-            mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-            max-height: 4rem;
-            overflow-y: hidden;
-        }
-    </style>
-    <main role="main" class="container">
+    <main role="main" class="container person-page">
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
 
         <input type="hidden" id="personId" value="{{ person.id }}">
 
-        <h2 style="display: flex;">{{ person.name }}</h2>
-
-        <div style="display: flex;">
-            <div style="text-align: center">
-                <img src="{{ person.posterPath }}" class="rounded-2" style="width: 13rem;align-self: start;">
+        <div class="person-profile">
+            <header class="person-heading">
+                <h1 id="personName" class="h2 mb-0">{{ person.name }}</h1>
+                {% if currentUserName is not null %}
+                    <button type="button" id="moreSpecificMovieButton" class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button"
+                            data-bs-toggle="modal" data-bs-target="#moreModal"
+                            aria-label="Person options" title="Person options">
+                        <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                    </button>
+                {% endif %}
+            </header>
+            <aside class="person-sidebar" aria-label="Personal information">
+                <img src="{{ person.posterPath }}" class="person-portrait rounded-2" alt="{{ person.name }}">
+                <div class="person-links">
+                    <a href="{{ person.tmdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link">
+                        <img src="{{ applicationUrl }}/images/tmdb-logo.svg" class="person-logo-tmdb" alt="TMDB">
+                    </a>
+                    {% if person.imdbUrl is not null %}
+                        <a href="{{ person.imdbUrl }}" target="_blank" rel="noopener noreferrer" class="person-external-link">
+                            <img src="{{ applicationUrl }}/images/imdb-logo.svg" class="person-logo-imdb" alt="IMDb">
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="person-info">
+                    <dl class="person-facts">
+                        {% if person.knownForDepartment is not empty %}
+                            <div>
+                                <dt>Known for</dt>
+                                <dd>{{ person.knownForDepartment }}</dd>
+                            </div>
+                        {% endif %}
+                        {% if person.birthDate is not null %}
+                            <div>
+                                <dt>Born</dt>
+                                <dd>{{ person.birthDate }}{% if person.deathDate is null and person.age is not null %} ({{ person.age }}){% endif %}</dd>
+                            </div>
+                        {% endif %}
+                        {% if person.deathDate is not null %}
+                            <div>
+                                <dt>Died</dt>
+                                <dd>{{ person.deathDate }}{% if person.age is not null %} (aged {{ person.age }}){% endif %}</dd>
+                            </div>
+                        {% endif %}
+                        {% if person.placeOfBirth is not empty %}
+                            <div>
+                                <dt>Place of birth</dt>
+                                <dd>{{ person.placeOfBirth }}</dd>
+                            </div>
+                        {% endif %}
+                        {% if person.gender != '0' %}
+                            <div>
+                                <dt>Gender</dt>
+                                <dd>{{ person.gender == '1' ? 'Female' }}{{ person.gender == '2' ? 'Male' }}{{ person.gender == '3' ? 'Non-Binary' }}</dd>
+                            </div>
+                        {% endif %}
+                    </dl>
+                </div>
+            </aside>
+            <div class="person-content">
+                <section class="person-biography" aria-labelledby="biographyHeading">
+                    <h2 id="biographyHeading" class="h6 fw-bold">Biography</h2>
+                    {% set biography = person.biography|default('') %}
+                    {% if biography|trim is not empty %}
+                        <p id="biographyParagraph" class="person-biography-text">{{ biography|nl2br }}</p>
+                        <button type="button" id="biographyToggle" class="btn btn-sm btn-outline-secondary mt-2 d-none" aria-controls="biographyParagraph" aria-expanded="false">Read more</button>
+                    {% else %}
+                        <p class="text-body-secondary mb-0">No biography available.</p>
+                    {% endif %}
+                </section>
+                <section class="person-movies" aria-labelledby="personMoviesHeading">
+                    <h2 id="personMoviesHeading" class="h6 fw-bold mb-2">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
+                    {% if watchedMovies is not empty %}
+                        {{ _self.movieGrid(watchedMovies, applicationUrl, routeUsername, 'Watched movies') }}
+                    {% else %}
+                        <p class="text-body-secondary mb-0">No watched movies for this person yet.</p>
+                    {% endif %}
+                </section>
+                <section class="person-watchlist" aria-labelledby="personWatchlistHeading">
+                    <h2 id="personWatchlistHeading" class="h6 fw-bold mb-2">On Watchlist <span class="text-body-secondary">({{ watchlistMovies|length }})</span></h2>
+                    {% if watchlistMovies is not empty %}
+                        {{ _self.movieGrid(watchlistMovies, applicationUrl, routeUsername, 'Watchlist movies') }}
+                    {% else %}
+                        <p class="text-body-secondary mb-0">No watchlist movies for this person yet.</p>
+                    {% endif %}
+                </section>
             </div>
-
-            <div style="padding-left: 1rem">
-                <h6 style="margin-bottom: 0.1rem">Known for</h6>
-                <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.knownForDepartment }}</p>
-
-                <h6 style="margin-bottom: 0.1rem">Gender</h6>
-                <p class="fw-light"
-                   style="margin-bottom: 0.4rem">{{ person.gender == '0' ? '-' }}{{ person.gender == '1' ? 'Female' }}{{ person.gender == '2' ? 'Male' }}{{ person.gender == '3' ? 'Non-Binary' }}</p>
-
-                {% if person.birthDate is not null %}
-                    <h6 style="margin-bottom: 0.1rem">Birth date</h6>
-                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.birthDate }} {% if person.deathDate is null %}({{ person.age }}){% endif %}</p>
-                {% endif %}
-
-                {% if person.deathDate is not null %}
-                    <h6 style="margin-bottom: 0.1rem">Day of Death</h6>
-                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.deathDate }} ({{ person.age }})</p>
-                {% endif %}
-
-                {% if person.placeOfBirth is not null %}
-                    <h6 style="margin-bottom: 0.1rem">Place of Birth</h6>
-                    <p class="fw-light" style="margin-bottom: 0.4rem">{{ person.placeOfBirth }}</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="carousel" style="display: flex;margin-top: 0.9rem;margin-bottom: 0.9rem">
-            {% if person.imdbUrl is not null %}
-                <a style="display: flex; align-items: center;cursor:pointer;margin-right: 0.6rem" href="{{ person.imdbUrl }}" target="_blank">
-                    <img src="{{ applicationUrl }}/images/imdb-logo.svg" style="width: 3rem" alt="imdb logo">
-                </a>
-            {% endif %}
-            <a style="display: flex; align-items: center;cursor:pointer;" href="{{ person.tmdbUrl }}" target="_blank">
-                <img src="{{ applicationUrl }}/images/tmdb-logo.svg" style="width: 2rem" alt="tmdb logo">
-            </a>
         </div>
 
         {% if currentUserName is not null %}
-            <div class="container" style="margin-bottom: .8rem">
-                <div class="row">
-                    <button type="button"
-                            id="moreSpecificMovieButton"
-                            class="col-lg-5 col-xl-4 col-xxl-3 btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }}"
-                            data-bs-toggle="modal"
-                            data-bs-target="#moreModal">
-                        More
-                    </button>
-                </div>
-            </div>
-
             {{ include('component/modal-person-more-options.html.twig') }}
             {% if currentUserIsAdmin == true %}
                 {{ include('component/modal-change-person-profile.html.twig') }}
             {% endif %}
         {% endif %}
-
-        <h6 style="margin-bottom: 0.1rem; margin-top: 1rem; font-weight: bold;">Biography</h6>
-        {% if person.biography is not null %}
-            <p id="biographyParagraph" style="margin-bottom: 1rem">{{ person.biography|nl2br }}</p>
-            <div class="text-primary d-none" style="cursor: pointer; top: 0;" id="expandContainer">
-                <span style="padding: 0;float: right;" onclick="toggleBiography()"><i class="bi bi-chevron-down"></i></span>
-                <span style="float: right; margin-right: 0.5em;" onclick="toggleBiography()">Read more&#8230;</span>
-                <br>
-            </div>
-        {% else %}
-            <p id="biographyParagraph">No biography available.</p>
-        {% endif %}
-
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsActor is empty %}disabled{% elseif person.knownForDepartment == 'Acting' or moviesAsDirector is empty %}active{% endif %}"
-                        id="home-tab"
-                        data-bs-toggle="tab" data-bs-target="#acting"
-                        type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
-                    Acting {% if moviesAsActor is not empty %}({{ moviesAsActor|length }}){% endif %}
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link {% if moviesAsDirector is empty %}disabled{% elseif person.knownForDepartment == 'Directing' or moviesAsActor is empty %}active{% endif %}"
-                        id="profile-tab"
-                        data-bs-toggle="tab" data-bs-target="#director" type="button"
-                        role="tab" aria-controls="profile-tab-pane" aria-selected="false">
-                    Director {% if moviesAsDirector is not empty %}({{ moviesAsDirector|length }}){% endif %}
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content mb-3" id="myTabContent">
-            <div class="tab-pane fade show {% if person.knownForDepartment == 'Acting' or (moviesAsDirector is empty and moviesAsActor is not empty) %}active{% endif %}"
-                 id="acting" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                {% if moviesAsActor is not empty %}
-                    <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
-                        {% for movieAsActor in moviesAsActor %}
-                            <div class="col position-relative">
-                                <a class="poster-link card h-100 position-relative"
-                                     href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}-{{ movieAsActor.title|slugify }}">
-                                    <div class="position-relative">
-                                        <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title|movie_title(movieAsActor.original_title) }} Poster">
-                                    </div>
-
-                                    {% if movieAsActor.userRating is not null %}
-                                        <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
-                                            {{ movieAsActor.userRating }}
-                                        </span>
-                                    {% endif %}
-                                </a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                {% if moviesFromWatchlistAsActor is not empty %}
-                    <h6>From your watch list</h6>
-                    <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
-                        {% for movieAsActor in moviesFromWatchlistAsActor %}
-                            <div class="col position-relative">
-                                <a class="poster-link card h-100 position-relative"
-                                     href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsActor.id }}">
-                                    <div class="position-relative">
-                                        <img src="{{ movieAsActor.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsActor.title|movie_title(movieAsActor.original_title) }} Poster">
-                                    </div>
-
-                                    {% if movieAsActor.userRating is not null %}
-                                        <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
-                                            {{ movieAsActor.userRating }}
-                                        </span>
-                                    {% endif %}
-                                </a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="tab-pane fade show {% if person.knownForDepartment == 'Directing' or (moviesAsActor is empty and moviesAsDirector is not empty) %}active{% endif %}"
-                 id="director" role="tabpanel" aria-labelledby="profile-tab"
-                 tabindex="0">
-                <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
-                    {% for movieAsDirector in moviesAsDirector %}
-                        <div class="col position-relative">
-                            <a class="poster-link card h-100 position-relative"
-                                 href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
-                                <div class="position-relative">
-                                    <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title|movie_title(movieAsDirector.original_title) }} Poster">
-
-                                </div>
-                                {% if movieAsDirector.userRating is not null %}
-                                    <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
-                                        {{ movieAsDirector.userRating }}
-                                    </span>
-                                {% endif %}
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
-
-                {% if moviesFromWatchlistAsDirector is not empty %}
-                  <h6>From your watch list</h6>
-                  <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center mt-3">
-                      {% for movieAsDirector in moviesFromWatchlistAsDirector %}
-                          <div class="col position-relative">
-                              <a class="poster-link card h-100 position-relative"
-                                   href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movieAsDirector.id }}">
-                                  <div class="position-relative">
-                                      <img src="{{ movieAsDirector.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movieAsDirector.title|movie_title(movieAsDirector.original_title) }} Poster">
-
-                                  </div>
-                                  {% if movieAsDirector.userRating is not null %}
-                                      <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">
-                                          {{ movieAsDirector.userRating }}
-                                      </span>
-                                  {% endif %}
-                              </a>
-                          </div>
-                      {% endfor %}
-                      </div>
-                  {% endif %}
-            </div>
-        </div>
     </main>
 {% endblock %}

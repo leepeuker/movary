@@ -126,10 +126,8 @@ class PersonController
                     'imdbUrl' => $imdbUrl,
                     'isHiddenInTopLists' => $isHiddenInTopLists,
                 ],
-                'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
-                'moviesFromWatchlistAsActor' => $this->movieApi->fetchFromWatchlistWithActor($personId, $userId),
-                'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
-                'moviesFromWatchlistAsDirector' => $this->movieApi->fetchFromWatchlistWithDirector($personId, $userId),
+                'watchedMovies' => $this->movieApi->fetchWatchedWithPerson($personId, $userId),
+                'watchlistMovies' => $this->movieApi->fetchFromWatchlistWithPerson($personId, $userId),
                 'canonicalExtra' => '-' . $this->slugify->slugify($person->getName()),
             ]),
         );
