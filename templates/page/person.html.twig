@@ -17,20 +17,30 @@
     <link href="{{ css_url('person.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% macro movieGrid(movies, applicationUrl, routeUsername) %}
-    <div class="poster-grid row row-cols-3 row-cols-md-3 row-cols-lg-5 row-cols-xxl-6 text-center">
-        {% for movie in movies %}
-            <div class="col position-relative">
-                <a class="poster-link card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}-{{ movie.title|slugify }}">
-                    <div class="position-relative">
-                        <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title|movie_title(movie.original_title) }} Poster" loading="lazy">
-                    </div>
-                    {% if movie.userRating is not null %}
-                        <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">{{ movie.userRating }}</span>
-                    {% endif %}
-                </a>
-            </div>
-        {% endfor %}
+{% macro movieGrid(movies, applicationUrl, routeUsername, label) %}
+    <div class="person-movie-carousel position-relative">
+        <div class="person-movie-grid" tabindex="0" role="group" aria-label="{{ label }}">
+            {% for movie in movies %}
+                <div class="position-relative">
+                    <a class="poster-link card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}-{{ movie.title|slugify }}">
+                        <div class="position-relative">
+                            <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title|movie_title(movie.original_title) }} Poster" loading="lazy">
+                        </div>
+                        {% if movie.userRating is not null %}
+                            <span class="poster-rating position-absolute badge rounded-pill bg-warning text-dark">{{ movie.userRating }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="btn rounded-circle person-movie-scroll person-movie-scroll-previous d-none"
+                data-direction="-1" aria-label="Scroll {{ label|lower }} left">
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn rounded-circle person-movie-scroll person-movie-scroll-next d-none"
+                data-direction="1" aria-label="Scroll {{ label|lower }} right">
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
     </div>
 {% endmacro %}
 
@@ -113,9 +123,17 @@
                 <section class="person-movies" aria-labelledby="personMoviesHeading">
                     <h2 id="personMoviesHeading" class="h6 fw-bold mb-2">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
                     {% if watchedMovies is not empty %}
-                        {{ _self.movieGrid(watchedMovies, applicationUrl, routeUsername) }}
+                        {{ _self.movieGrid(watchedMovies, applicationUrl, routeUsername, 'Watched movies') }}
                     {% else %}
                         <p class="text-body-secondary mb-0">No watched movies for this person yet.</p>
+                    {% endif %}
+                </section>
+                <section class="person-watchlist" aria-labelledby="personWatchlistHeading">
+                    <h2 id="personWatchlistHeading" class="h6 fw-bold mb-2">On Watchlist <span class="text-body-secondary">({{ watchlistMovies|length }})</span></h2>
+                    {% if watchlistMovies is not empty %}
+                        {{ _self.movieGrid(watchlistMovies, applicationUrl, routeUsername, 'Watchlist movies') }}
+                    {% else %}
+                        <p class="text-body-secondary mb-0">No watchlist movies for this person yet.</p>
                     {% endif %}
                 </section>
             </div>

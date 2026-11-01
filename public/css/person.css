@@ -7,7 +7,8 @@
         "portrait facts"
         "links facts"
         "biography biography"
-        "movies movies";
+        "movies movies"
+        "watchlist watchlist";
     margin-bottom: 1rem;
 }
 
@@ -112,6 +113,58 @@
     min-width: 0;
 }
 
+.person-watchlist {
+    grid-area: watchlist;
+    min-width: 0;
+}
+
+.person-movie-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: clamp(7rem, 18vw, 10rem);
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.person-movie-grid img {
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+.person-movie-scroll {
+    --bs-btn-color: var(--bs-body-color);
+    --bs-btn-bg: rgba(var(--bs-body-bg-rgb), 0.95);
+    --bs-btn-border-color: var(--bs-border-color);
+    --bs-btn-hover-color: var(--bs-body-color);
+    --bs-btn-hover-bg: var(--bs-secondary-bg);
+    --bs-btn-hover-border-color: var(--bs-secondary-color);
+    --bs-btn-active-color: var(--bs-body-color);
+    --bs-btn-active-bg: var(--bs-tertiary-bg);
+    --bs-btn-active-border-color: var(--bs-secondary-color);
+    --bs-btn-focus-shadow-rgb: var(--bs-body-color-rgb);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0.1rem 0.4rem rgba(0, 0, 0, 0.25);
+}
+
+.person-movie-scroll-previous {
+    left: 0.5rem;
+}
+
+.person-movie-scroll-next {
+    right: 0.5rem;
+}
+
 .person-facts {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
@@ -195,6 +248,10 @@
 
     .person-biography {
         margin-bottom: 1.25rem;
+    }
+
+    .person-watchlist {
+        margin-top: 1rem;
     }
 
     .person-biography-text.is-collapsed {

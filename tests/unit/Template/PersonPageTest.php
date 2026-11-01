@@ -40,24 +40,24 @@ class PersonPageTest extends TestCase
         ));
     }
 
-    public function testWatchlistOnlyActingCreditsAreNotShown() : void
+    public function testWatchlistOnlyActingCreditsAreShownSeparately() : void
     {
         $html = $this->renderPage('Writing', [], [$this->movie()], [], []);
 
         self::assertStringContainsString('No watched movies for this person yet.', $html);
         self::assertStringContainsString('Watched <span class="text-body-secondary">(0)</span>', $html);
-        self::assertStringNotContainsString('Watchlist', $html);
-        self::assertStringNotContainsString('Example movie', $html);
+        self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
+        self::assertSame(1, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
         self::assertStringNotContainsString('role="tablist"', $html);
     }
 
-    public function testWatchlistOnlyDirectingCreditsAreNotShown() : void
+    public function testWatchlistOnlyDirectingCreditsAreShownSeparately() : void
     {
         $html = $this->renderPage('Acting', [], [], [], [$this->movie()]);
 
         self::assertStringContainsString('Watched <span class="text-body-secondary">(0)</span>', $html);
-        self::assertStringNotContainsString('Watchlist', $html);
-        self::assertStringNotContainsString('Example movie', $html);
+        self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
+        self::assertSame(1, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
         self::assertStringNotContainsString('role="tablist"', $html);
     }
 
@@ -66,8 +66,12 @@ class PersonPageTest extends TestCase
         $html = $this->renderPage('Writing', [$this->movie()], [$this->movie()], [$this->movie()], [$this->movie()]);
 
         self::assertStringContainsString('Watched <span class="text-body-secondary">(1)</span>', $html);
-        self::assertStringNotContainsString('Watchlist', $html);
-        self::assertSame(1, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
+        self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
+        self::assertSame(2, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
+        self::assertStringContainsString('tabindex="0" role="group" aria-label="Watched movies"', $html);
+        self::assertStringContainsString('tabindex="0" role="group" aria-label="Watchlist movies"', $html);
+        self::assertStringContainsString('aria-label="Scroll watched movies right"', $html);
+        self::assertStringContainsString('aria-label="Scroll watchlist movies right"', $html);
         self::assertStringNotContainsString('role="tablist"', $html);
     }
 
@@ -78,8 +82,8 @@ class PersonPageTest extends TestCase
         $html = $this->renderPage('Directing', [$actorMovie], [$actorMovie], [$directorMovie], [$directorMovie]);
 
         self::assertStringContainsString('Watched <span class="text-body-secondary">(2)</span>', $html);
-        self::assertStringNotContainsString('Watchlist', $html);
-        self::assertMatchesRegularExpression('/14-alpha.*13-zebra/s', $html);
+        self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(2)</span>', $html);
+        self::assertMatchesRegularExpression('/Watched.*14-alpha.*13-zebra.*On Watchlist.*14-alpha.*13-zebra/s', $html);
         self::assertStringNotContainsString('role="tablist"', $html);
     }
 
@@ -89,6 +93,7 @@ class PersonPageTest extends TestCase
 
         self::assertStringContainsString('No biography available.', $html);
         self::assertStringContainsString('No watched movies for this person yet.', $html);
+        self::assertStringContainsString('No watchlist movies for this person yet.', $html);
         self::assertStringNotContainsString('role="tablist"', $html);
         self::assertStringNotContainsString('<dt>Gender</dt>', $html);
         self::assertStringNotContainsString('years old', $html);
@@ -151,10 +156,12 @@ class PersonPageTest extends TestCase
     ) : string {
         $movieApi = $this->getMockBuilder(MovieApi::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['fetchWithActor', 'fetchWithDirector'])
+            ->onlyMethods(['fetchWithActor', 'fetchWithDirector', 'fetchFromWatchlistWithActor', 'fetchFromWatchlistWithDirector'])
             ->getMock();
         $movieApi->expects(self::once())->method('fetchWithActor')->with(1, 2)->willReturn($watchedActing);
         $movieApi->expects(self::once())->method('fetchWithDirector')->with(1, 2)->willReturn($watchedDirecting);
+        $movieApi->expects(self::once())->method('fetchFromWatchlistWithActor')->with(1, 2)->willReturn($watchlistActing);
+        $movieApi->expects(self::once())->method('fetchFromWatchlistWithDirector')->with(1, 2)->willReturn($watchlistDirecting);
 
         return $this->twig->render('page/person.html.twig', [
             'applicationUrl' => '',
@@ -177,8 +184,7 @@ class PersonPageTest extends TestCase
                 'tmdbUrl' => 'https://www.themoviedb.org/person/1',
             ],
             'watchedMovies' => $movieApi->fetchWatchedWithPerson(1, 2),
-            'moviesFromWatchlistAsActor' => $watchlistActing,
-            'moviesFromWatchlistAsDirector' => $watchlistDirecting,
+            'watchlistMovies' => $movieApi->fetchFromWatchlistWithPerson(1, 2),
         ]);
     }
 }

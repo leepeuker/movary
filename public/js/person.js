@@ -144,6 +144,32 @@ async function updatePersonProfile(method, body = null) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.person-movie-carousel').forEach(carousel => {
+        const grid = carousel.querySelector('.person-movie-grid')
+        const buttons = carousel.querySelectorAll('.person-movie-scroll')
+        const updateButtons = () => {
+            buttons.forEach(button => {
+                const hidden = button.dataset.direction === '-1'
+                    ? grid.scrollLeft <= 1
+                    : grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 1
+                if (hidden && document.activeElement === button) {
+                    grid.focus({preventScroll: true})
+                }
+                button.classList.toggle('d-none', hidden)
+            })
+        }
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                grid.scrollBy({left: Number(button.dataset.direction) * grid.clientWidth * 0.8})
+            })
+        })
+        grid.addEventListener('scroll', updateButtons, {passive: true})
+        window.addEventListener('resize', updateButtons)
+        updateButtons()
+    })
+})
+
+document.addEventListener('DOMContentLoaded', () => {
     const biography = document.getElementById('biographyParagraph')
     const toggle = document.getElementById('biographyToggle')
     if (biography === null || toggle === null) {

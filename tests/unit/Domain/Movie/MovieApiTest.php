@@ -20,6 +20,7 @@ use Movary\Service\ImageUrlService;
 use Movary\Service\VoteCountFormatter;
 use Movary\ValueObject\Date;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MovieApi::class)]
@@ -80,7 +81,13 @@ class MovieApiTest extends TestCase
         $this->createSubject($historyApi, $watchlistApi)->replaceHistoryForMovieByDate(1, 2, null, 1);
     }
 
-    public function testWatchedPersonMoviesAreUniqueByIdAndSortedCaseInsensitively() : void
+    /**
+     * @param non-empty-string $method
+     * @param non-empty-string $actorQuery
+     * @param non-empty-string $directorQuery
+     */
+    #[DataProvider('personMovieLists')]
+    public function testPersonMoviesAreUniqueByIdAndSortedCaseInsensitively(string $method, string $actorQuery, string $directorQuery) : void
     {
         $zebra = ['id' => 1, 'title' => 'zebra', 'userRating' => 8];
         $eclair = ['id' => 2, 'title' => 'Éclair', 'userRating' => null];
@@ -88,8 +95,8 @@ class MovieApiTest extends TestCase
         $anotherAlpha = ['id' => 4, 'title' => 'Alpha', 'userRating' => 6];
         $ecole = ['id' => 5, 'title' => 'école', 'userRating' => null];
         $repository = $this->createMock(MovieRepository::class);
-        $repository->expects(self::once())->method('fetchWithActor')->with(12, 34)->willReturn([$zebra, $eclair, $alpha]);
-        $repository->expects(self::once())->method('fetchWithDirector')->with(12, 34)->willReturn([$ecole, $anotherAlpha, $zebra]);
+        $repository->expects(self::once())->method($actorQuery)->with(12, 34)->willReturn([$zebra, $eclair, $alpha]);
+        $repository->expects(self::once())->method($directorQuery)->with(12, 34)->willReturn([$ecole, $anotherAlpha, $zebra]);
         $urlGenerator = $this->createMock(ImageUrlService::class);
         $urlGenerator->expects(self::exactly(2))->method('replacePosterPathWithImageSrcUrl')
             ->willReturnCallback(static fn(array $movies) : array => array_map(
@@ -104,19 +111,33 @@ class MovieApiTest extends TestCase
             array_replace($zebra, ['poster_path' => '/posters/1.jpg']),
             array_replace($eclair, ['poster_path' => '/posters/2.jpg']),
             array_replace($ecole, ['poster_path' => '/posters/5.jpg']),
-        ], $subject->fetchWatchedWithPerson(12, 34));
+        ], $subject->$method(12, 34));
     }
 
-    public function testWatchedPersonMoviesCanBeEmpty() : void
+    /**
+     * @param non-empty-string $method
+     * @param non-empty-string $actorQuery
+     * @param non-empty-string $directorQuery
+     */
+    #[DataProvider('personMovieLists')]
+    public function testPersonMoviesCanBeEmpty(string $method, string $actorQuery, string $directorQuery) : void
     {
         $repository = $this->createMock(MovieRepository::class);
-        $repository->expects(self::once())->method('fetchWithActor')->with(12, 34)->willReturn([]);
-        $repository->expects(self::once())->method('fetchWithDirector')->with(12, 34)->willReturn([]);
+        $repository->expects(self::once())->method($actorQuery)->with(12, 34)->willReturn([]);
+        $repository->expects(self::once())->method($directorQuery)->with(12, 34)->willReturn([]);
         $urlGenerator = $this->createStub(ImageUrlService::class);
         $urlGenerator->method('replacePosterPathWithImageSrcUrl')->willReturnArgument(0);
         $subject = $this->createSubject($this->createStub(MovieHistoryApi::class), $this->createStub(MovieWatchlistApi::class), $repository, $urlGenerator);
 
-        self::assertSame([], $subject->fetchWatchedWithPerson(12, 34));
+        self::assertSame([], $subject->$method(12, 34));
+    }
+
+    public static function personMovieLists() : array
+    {
+        return [
+            'watched' => ['fetchWatchedWithPerson', 'fetchWithActor', 'fetchWithDirector'],
+            'watchlist' => ['fetchFromWatchlistWithPerson', 'fetchFromWatchlistWithActor', 'fetchFromWatchlistWithDirector'],
+        ];
     }
 
     private function createSubject(

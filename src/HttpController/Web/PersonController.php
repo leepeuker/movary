@@ -127,6 +127,7 @@ class PersonController
                     'isHiddenInTopLists' => $isHiddenInTopLists,
                 ],
                 'watchedMovies' => $this->movieApi->fetchWatchedWithPerson($personId, $userId),
+                'watchlistMovies' => $this->movieApi->fetchFromWatchlistWithPerson($personId, $userId),
                 'canonicalExtra' => '-' . $this->slugify->slugify($person->getName()),
             ]),
         );
