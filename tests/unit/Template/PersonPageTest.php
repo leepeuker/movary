@@ -126,6 +126,28 @@ class PersonPageTest extends TestCase
         self::assertStringContainsString('id="moreModal"', $html);
     }
 
+    public function testAvailableExternalLinksAreRendered() : void
+    {
+        $html = $this->renderPage(null, [], [], [], [], externalLinks: [
+            ['name' => 'Instagram', 'url' => 'https://www.instagram.com/example', 'icon' => 'instagram.svg'],
+            ['name' => 'X', 'url' => 'https://x.com/example', 'icon' => 'x.png'],
+        ]);
+
+        self::assertStringContainsString('href="https://www.instagram.com/example"', $html);
+        self::assertStringContainsString('aria-label="Instagram"', $html);
+        self::assertStringContainsString('data-bs-title="Instagram"', $html);
+        self::assertStringContainsString('data-bs-title="TMDB"', $html);
+        self::assertStringContainsString('src="/images/person-instagram.svg"', $html);
+        self::assertStringContainsString('data-bs-title="X"', $html);
+        self::assertStringContainsString('src="/images/person-x.png"', $html);
+        self::assertStringNotContainsString('aria-label="Facebook"', $html);
+    }
+
+    public function testMissingExternalLinksAreOmitted() : void
+    {
+        self::assertStringNotContainsString('aria-label="Instagram"', $this->renderPage(null, [], [], [], []));
+    }
+
     public function testBiographyPreservesEmptyLinesAndEscapesMarkup() : void
     {
         $html = $this->renderPage(null, [], [], [], [], biography: "First line.\r\n\r\n \t\nSecond line.\r\r<script>alert(1)</script>");
@@ -164,6 +186,7 @@ class PersonPageTest extends TestCase
         array $watchlistDirecting,
         bool $signedIn = false,
         ?string $biography = null,
+        array $externalLinks = [],
     ) : string {
         $movieApi = $this->getMockBuilder(MovieApi::class)
             ->disableOriginalConstructor()
@@ -193,6 +216,7 @@ class PersonPageTest extends TestCase
                 'biography' => $biography,
                 'imdbUrl' => null,
                 'tmdbUrl' => 'https://www.themoviedb.org/person/1',
+                'externalLinks' => $externalLinks,
             ],
             'watchedMovies' => $movieApi->fetchWatchedWithPerson(1, 2),
             'watchlistMovies' => $movieApi->fetchFromWatchlistWithPerson(1, 2),

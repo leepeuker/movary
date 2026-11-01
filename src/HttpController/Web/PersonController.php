@@ -20,6 +20,15 @@ use Twig\Environment;
 
 class PersonController
 {
+    private const array EXTERNAL_LINKS = [
+        'facebook_id' => ['Facebook', 'https://www.facebook.com/', 'facebook.svg'],
+        'instagram_id' => ['Instagram', 'https://www.instagram.com/', 'instagram.svg'],
+        'tiktok_id' => ['TikTok', 'https://www.tiktok.com/@', 'tiktok.svg'],
+        'twitter_id' => ['X', 'https://x.com/', 'x.png'],
+        'youtube_id' => ['YouTube', 'https://www.youtube.com/channel/', 'youtube.svg'],
+        'wikidata_id' => ['Wikidata', 'https://www.wikidata.org/wiki/', 'wikidata.svg'],
+    ];
+
     public function __construct(
         private readonly Person\PersonApi $personApi,
         private readonly MovieApi $movieApi,
@@ -96,6 +105,16 @@ class PersonController
             $imdbUrl = $this->imdbUrlGenerator->generatePersonUrl($imdbId);
         }
 
+        $externalLinks = [];
+        foreach ($person->getExternalIds() as $source => $id) {
+            if ($id === null) {
+                continue;
+            }
+
+            [$name, $baseUrl, $icon] = self::EXTERNAL_LINKS[$source];
+            $externalLinks[] = ['name' => $name, 'url' => $baseUrl . rawurlencode($id), 'icon' => $icon];
+        }
+
         $authenticatedUser = $this->authenticationService->authenticateWebSession();
         $isHiddenInTopLists = $authenticatedUser === null
             ? false
@@ -124,6 +143,7 @@ class PersonController
                     'placeOfBirth' => $person->getPlaceOfBirth(),
                     'tmdbUrl' => $this->tmdbUrlGenerator->generatePersonUrl($person->getTmdbId()),
                     'imdbUrl' => $imdbUrl,
+                    'externalLinks' => $externalLinks,
                     'isHiddenInTopLists' => $isHiddenInTopLists,
                 ],
                 'watchedMovies' => $this->movieApi->fetchWatchedWithPerson($personId, $userId),

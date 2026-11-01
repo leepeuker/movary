@@ -51,6 +51,7 @@ class SyncPerson
                 $tmdbPerson->getPlaceOfBirth(),
                 updatedAtTmdb: DateTime::create(),
                 imdbId: $tmdbPerson->getImdbId(),
+                externalIds: $tmdbPerson->getExternalIds(),
             );
 
             $this->logger->debug('TMDB: Created person', ['personId' => $person->getId(), 'tmdbId' => $person->getTmdbId()]);
@@ -77,6 +78,7 @@ class SyncPerson
             $tmdbPerson->getPlaceOfBirth(),
             DateTime::create(),
             $tmdbPerson->getImdbId(),
+            $tmdbPerson->getExternalIds(),
         );
 
         $this->logger->debug(

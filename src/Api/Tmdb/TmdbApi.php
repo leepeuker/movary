@@ -30,7 +30,7 @@ class TmdbApi
 
     public function fetchPersonDetails(int $personId) : TmdbPerson
     {
-        $data = $this->client->get('/person/' . $personId);
+        $data = $this->client->get('/person/' . $personId, ['append_to_response' => 'external_ids']);
 
         return TmdbPerson::createFromArray($data);
     }

@@ -3,6 +3,10 @@ let availableProfiles = null
 let renderedProfileCount = 0
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.person-links [data-bs-toggle="tooltip"]').forEach(link => {
+        new bootstrap.Tooltip(link)
+    })
+
     const changeProfileModal = document.getElementById('changeProfileModal')
     if (changeProfileModal === null) {
         return

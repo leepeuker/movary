@@ -61,6 +61,25 @@
     width: auto;
 }
 
+.person-logo-social {
+    height: 1.5rem;
+    width: 1.5rem;
+    object-fit: contain;
+    border-radius: 0.25rem;
+}
+
+.person-logo-wikidata {
+    width: 1.8rem;
+}
+
+.person-logo-x {
+    object-fit: cover;
+}
+
+[data-bs-theme="dark"] .person-logo-x {
+    filter: invert(1);
+}
+
 .person-options-button,
 .person-options-button .bi,
 .person-external-link,

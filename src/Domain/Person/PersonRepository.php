@@ -28,6 +28,7 @@ class PersonRepository
         ?string $placeOfBirth = null,
         ?DateTime $updatedAtTmdb = null,
         ?string $imdbId = null,
+        array $externalIds = [],
     ) : PersonEntity {
         $this->dbConnection->insert(
             'person',
@@ -44,7 +45,7 @@ class PersonRepository
                 'place_of_birth' => $placeOfBirth,
                 'updated_at_tmdb' => $updatedAtTmdb === null ? null : (string)$updatedAtTmdb,
                 'created_at' => (string)DateTime::create(),
-            ],
+            ] + $externalIds,
         );
 
         return $this->fetchById((int)$this->dbConnection->lastInsertId());
@@ -207,6 +208,7 @@ class PersonRepository
         ?string $placeOfBirth,
         ?DateTime $updatedAtTmdb,
         ?string $imdbId,
+        array $externalIds,
     ) : PersonEntity {
         $payload = [
             'name' => $name,
@@ -220,7 +222,7 @@ class PersonRepository
             'death_date' => $deathDate === null ? null : (string)$deathDate,
             'place_of_birth' => $placeOfBirth,
             'updated_at' => (string)DateTime::create(),
-        ];
+        ] + $externalIds;
 
         if ($updatedAtTmdb !== null) {
             $payload['updated_at_tmdb'] = (string)$updatedAtTmdb;

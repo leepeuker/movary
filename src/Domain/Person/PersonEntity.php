@@ -8,6 +8,15 @@ use Movary\ValueObject\Gender;
 
 class PersonEntity
 {
+    private const array EXTERNAL_ID_DEFAULTS = [
+        'facebook_id' => null,
+        'instagram_id' => null,
+        'tiktok_id' => null,
+        'twitter_id' => null,
+        'youtube_id' => null,
+        'wikidata_id' => null,
+    ];
+
     private function __construct(
         private readonly int $id,
         private readonly string $name,
@@ -23,6 +32,7 @@ class PersonEntity
         private readonly ?string $placeOfBirth,
         private readonly ?DateTime $updatedAtTmdb,
         private readonly ?string $tmdbPosterPathOverride,
+        private readonly array $externalIds,
     ) {
     }
 
@@ -43,7 +53,13 @@ class PersonEntity
             $data['place_of_birth'],
             empty($data['updated_at_tmdb']) === true ? null : DateTime::createFromString($data['updated_at_tmdb']),
             $data['tmdb_poster_path_override'] ?? null,
+            array_replace(self::EXTERNAL_ID_DEFAULTS, array_intersect_key($data, self::EXTERNAL_ID_DEFAULTS)),
         );
+    }
+
+    public function getExternalIds() : array
+    {
+        return $this->externalIds;
     }
 
     public function getBiography() : ?string
