@@ -132,6 +132,14 @@
     object-fit: cover;
 }
 
+html[data-movie-list-view="table"] .person-page .person-movie-carousel {
+    display: none !important;
+}
+
+html[data-movie-list-view="table"] .person-page .person-movie-table {
+    display: block !important;
+}
+
 @media (min-width: 992px) {
     .person-movie-grid {
         grid-auto-columns: calc((100% - 3rem) / 5);

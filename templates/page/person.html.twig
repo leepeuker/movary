@@ -11,6 +11,9 @@
 {% block scripts -%}
     <script src="{{ js_url('component/user-select.js') }}"></script>
     <script src="{{ js_url('person.js') }}"></script>
+    {% if watchedMovies is not empty or watchlistMovies is not empty %}
+        <script src="{{ js_url('movie-list-view.js') }}"></script>
+    {% endif %}
 {% endblock %}
 
 {% block stylesheets %}
@@ -41,6 +44,36 @@
                 data-direction="1" aria-label="Scroll {{ label|lower }} right">
             <i class="bi bi-chevron-right" aria-hidden="true"></i>
         </button>
+    </div>
+{% endmacro %}
+
+{% macro movieTable(movies, applicationUrl, routeUsername) %}
+    <div class="person-movie-table table-responsive d-none">
+        <table class="table table-hover align-middle text-start">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell" scope="col">Poster</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Release</th>
+                    <th class="d-none d-md-table-cell" scope="col">User rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies %}
+                    {% set movieUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies/' ~ movie.id ~ '-' ~ movie.title|slugify %}
+                    <tr>
+                        <td class="d-none d-sm-table-cell">
+                            <a href="{{ movieUrl }}">
+                                <img src="{{ movie.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ movie.title|movie_title(movie.original_title) }}" loading="lazy">
+                            </a>
+                        </td>
+                        <td><a href="{{ movieUrl }}">{{ movie.title|movie_title(movie.original_title) }}</a></td>
+                        <td>{{ movie.release_date is null ? '—' : movie.release_date|date('Y') }}</td>
+                        <td class="d-none d-md-table-cell">{{ movie.userRating is null ? '—' : movie.userRating }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endmacro %}
 
@@ -121,9 +154,18 @@
                     {% endif %}
                 </section>
                 <section class="person-movies" aria-labelledby="personMoviesHeading">
-                    <h2 id="personMoviesHeading" class="h6 fw-bold mb-2">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h2 id="personMoviesHeading" class="h6 fw-bold mb-0">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
+                        {% if watchedMovies is not empty or watchlistMovies is not empty %}
+                            <button id="movieViewToggleButton" class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button" type="button" aria-label="Show table view" title="Show table view" data-storage-key="movieListView">
+                                <i id="movieTableViewIcon" class="bi bi-table" aria-hidden="true"></i>
+                                <i id="moviePosterViewIcon" class="bi bi-grid-fill d-none" aria-hidden="true"></i>
+                            </button>
+                        {% endif %}
+                    </div>
                     {% if watchedMovies is not empty %}
                         {{ _self.movieGrid(watchedMovies, applicationUrl, routeUsername, 'Watched movies') }}
+                        {{ _self.movieTable(watchedMovies, applicationUrl, routeUsername) }}
                     {% else %}
                         <p class="text-body-secondary mb-0">No watched movies for this person yet.</p>
                     {% endif %}
@@ -132,6 +174,7 @@
                     <h2 id="personWatchlistHeading" class="h6 fw-bold mb-2">On Watchlist <span class="text-body-secondary">({{ watchlistMovies|length }})</span></h2>
                     {% if watchlistMovies is not empty %}
                         {{ _self.movieGrid(watchlistMovies, applicationUrl, routeUsername, 'Watchlist movies') }}
+                        {{ _self.movieTable(watchlistMovies, applicationUrl, routeUsername) }}
                     {% else %}
                         <p class="text-body-secondary mb-0">No watchlist movies for this person yet.</p>
                     {% endif %}

@@ -47,7 +47,7 @@ class PersonPageTest extends TestCase
         self::assertStringContainsString('No watched movies for this person yet.', $html);
         self::assertStringContainsString('Watched <span class="text-body-secondary">(0)</span>', $html);
         self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
-        self::assertSame(1, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
+        self::assertSame(3, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
         self::assertStringNotContainsString('role="tablist"', $html);
     }
 
@@ -57,7 +57,7 @@ class PersonPageTest extends TestCase
 
         self::assertStringContainsString('Watched <span class="text-body-secondary">(0)</span>', $html);
         self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
-        self::assertSame(1, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
+        self::assertSame(3, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
         self::assertStringNotContainsString('role="tablist"', $html);
     }
 
@@ -67,7 +67,13 @@ class PersonPageTest extends TestCase
 
         self::assertStringContainsString('Watched <span class="text-body-secondary">(1)</span>', $html);
         self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
-        self::assertSame(2, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
+        self::assertSame(6, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
+        self::assertSame(1, substr_count($html, 'id="movieViewToggleButton"'));
+        self::assertStringContainsString('id="movieViewToggleButton" class="btn btn-sm btn-outline-light person-options-button"', $html);
+        self::assertStringContainsString('data-storage-key="movieListView"', $html);
+        self::assertSame(2, substr_count($html, 'class="person-movie-table table-responsive d-none"'));
+        self::assertSame(2, substr_count($html, '<td>2024</td>'));
+        self::assertSame(2, substr_count($html, '<td class="d-none d-md-table-cell">8</td>'));
         self::assertStringContainsString('tabindex="0" role="group" aria-label="Watched movies"', $html);
         self::assertStringContainsString('tabindex="0" role="group" aria-label="Watchlist movies"', $html);
         self::assertStringContainsString('aria-label="Scroll watched movies right"', $html);
@@ -98,6 +104,7 @@ class PersonPageTest extends TestCase
         self::assertStringNotContainsString('<dt>Gender</dt>', $html);
         self::assertStringNotContainsString('years old', $html);
         self::assertStringNotContainsString('id="biographyToggle"', $html);
+        self::assertStringNotContainsString('id="movieViewToggleButton"', $html);
         self::assertStringNotContainsString('id="moreSpecificMovieButton"', $html);
     }
 

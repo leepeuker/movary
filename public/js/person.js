@@ -165,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         grid.addEventListener('scroll', updateButtons, {passive: true})
         window.addEventListener('resize', updateButtons)
+        document.getElementById('movieViewToggleButton')?.addEventListener('click', updateButtons)
         updateButtons()
     })
 })
