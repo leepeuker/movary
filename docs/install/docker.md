@@ -28,6 +28,21 @@ MySQL additionally requires `DATABASE_MYSQL_HOST`, `DATABASE_MYSQL_NAME`, `DATAB
 
 The Docker image automatically runs missing database migrations when the container starts. Back up your database and storage before updating Movary.
 
+## Initial administrator
+
+To provision the first administrator without using the setup page, set `INITIAL_ADMIN_EMAIL`, `INITIAL_ADMIN_USERNAME`, and `INITIAL_ADMIN_PASSWORD_FILE` in the container environment. The file must contain a password of at least 15 characters. `INITIAL_ADMIN_PASSWORD` can be used instead of the file setting. Startup creates the administrator after migrations and before the web server starts. It skips provisioning when any user already exists and never updates an existing password. With no bootstrap settings, the setup page remains available; incomplete or invalid settings cause startup to fail on an empty database.
+
+For example, mount a password secret at `/run/secrets/admin_password` and set:
+
+```yaml
+environment:
+  INITIAL_ADMIN_EMAIL: "admin@example.com"
+  INITIAL_ADMIN_USERNAME: "admin"
+  INITIAL_ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+```
+
+Remove the bootstrap settings after the first successful deployment when practical.
+
 ## Image tags
 
 - `latest`: latest stable version and recommended for most users

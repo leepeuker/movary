@@ -64,6 +64,11 @@ class Config
         }
     }
 
+    public function isProvided(string $key) : bool
+    {
+        return isset($this->config[$key]) === true || isset($this->config[$key . '_FILE']) === true;
+    }
+
     /** @throws ConfigNotSetException */
     private function get(string $key) : mixed
     {

@@ -71,6 +71,13 @@ class ConfigTest extends TestCase
         self::assertSame('fallback', $this->subject->getAsString('string_test_not_existing', 'fallback'));
     }
 
+    public function testIsProvidedIncludesFileBasedSettings() : void
+    {
+        self::assertTrue($this->subject->isProvided('string_test'));
+        self::assertTrue($this->subject->isProvided('string_test_secret'));
+        self::assertFalse($this->subject->isProvided('missing'));
+    }
+
     public function testGetAsStringReturnsSecretAsFirstFallback() : void
     {
         $this->fileUtilMock

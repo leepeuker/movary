@@ -31,6 +31,8 @@ php bin/console.php user:create admin@example.com 'replace-with-secure-password'
 
 The password must contain at least 15 characters. CLI-created accounts are enabled and email-verified by default.
 
+For unattended setup, set `INITIAL_ADMIN_EMAIL`, `INITIAL_ADMIN_USERNAME`, and `INITIAL_ADMIN_PASSWORD` before starting the Docker container. You can use `INITIAL_ADMIN_PASSWORD_FILE` instead of the direct password setting. After database migrations, startup creates the enabled, email-verified administrator only when no users exist. Existing users are never modified on restart. If the settings are incomplete or invalid on an empty database, startup fails with an error; if none are set, the web setup page remains available. Remove the bootstrap credentials from the environment after setup when practical.
+
 ## Creating users as an administrator
 
 Open **Settings → Server → Users** and select **Create user**. Administrators choose whether the new account has the Admin role. Accounts created through this form are enabled and email-verified immediately; the public registration defaults do not apply.
@@ -80,6 +82,7 @@ Run `php bin/console.php <command> --help` for complete arguments and options.
 |:--------|:--------|
 | `user:list` | List user IDs and email addresses. |
 | `user:create` | Create a user and choose its role and initial states. |
+| `user:bootstrap-admin` | Create the first administrator from `INITIAL_ADMIN_*` settings if no users exist. |
 | `user:update` | Update user account data or role. |
 | `user:delete` | Delete a user. |
 | `user:email:request-verification` | Queue another verification email. |
