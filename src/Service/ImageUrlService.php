@@ -37,6 +37,23 @@ class ImageUrlService
         return $this->urlService->createApplicationUrl(RelativeUrl::create('/images/placeholder/' . base64_encode($fallbackName)));
     }
 
+    public function generateMovieBackdropUrl(int $movieId, ?string $tmdbBackdropPath) : ?string
+    {
+        if (empty($tmdbBackdropPath) === true) {
+            return null;
+        }
+
+        $imageUrl = $this->tmdbUrlGenerator->generateImageUrl($tmdbBackdropPath, 'w1280');
+        if ($this->enableImageCaching === true) {
+            $cachedPath = $this->imageCacheService->generateMovieBackdropPath($movieId, $imageUrl);
+            if ($this->imageCacheService->posterPathExists($cachedPath) === true) {
+                return $this->urlService->createApplicationUrl(RelativeUrl::create($cachedPath));
+            }
+        }
+
+        return (string)$imageUrl;
+    }
+
     public function replacePosterPathWithImageSrcUrl(array $dbResults) : array
     {
         foreach ($dbResults as $index => $dbResult) {

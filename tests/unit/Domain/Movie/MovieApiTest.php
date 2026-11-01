@@ -12,6 +12,7 @@ use Movary\Domain\Movie\History\Location\MovieHistoryLocationApi;
 use Movary\Domain\Movie\History\MovieHistoryApi;
 use Movary\Domain\Movie\History\PlayCountConflict;
 use Movary\Domain\Movie\MovieApi;
+use Movary\Domain\Movie\MovieEntity;
 use Movary\Domain\Movie\MovieRepository;
 use Movary\Domain\Movie\ProductionCompany\ProductionCompanyApi;
 use Movary\Domain\Movie\Watchlist\MovieWatchlistApi;
@@ -138,6 +139,26 @@ class MovieApiTest extends TestCase
             'watched' => ['fetchWatchedWithPerson', 'fetchWithActor', 'fetchWithDirector'],
             'watchlist' => ['fetchFromWatchlistWithPerson', 'fetchFromWatchlistWithActor', 'fetchFromWatchlistWithDirector'],
         ];
+    }
+
+    public function testFormattedMovieIncludesBackdropUrl() : void
+    {
+        $movie = $this->createStub(MovieEntity::class);
+        $movie->method('getId')->willReturn(12);
+        $movie->method('getRuntime')->willReturn(90);
+        $movie->method('getTmdbBackdropPath')->willReturn('/backdrop.jpg');
+        $repository = $this->createMock(MovieRepository::class);
+        $repository->expects(self::once())->method('findById')->with(12)->willReturn($movie);
+        $urlGenerator = $this->createMock(ImageUrlService::class);
+        $urlGenerator->expects(self::once())->method('generateImageSrcUrlFromParameters')->willReturn('/poster.jpg');
+        $urlGenerator->expects(self::once())->method('generateMovieBackdropUrl')->with(12, '/backdrop.jpg')->willReturn('/cached-backdrop.jpg');
+        $subject = $this->createSubject($this->createStub(MovieHistoryApi::class), $this->createStub(MovieWatchlistApi::class), $repository, $urlGenerator);
+
+        $formatted = $subject->findByIdFormatted(12);
+
+        self::assertNotNull($formatted);
+        self::assertSame('/cached-backdrop.jpg', $formatted['backdropPath']);
+        self::assertSame('/poster.jpg', $formatted['posterPath']);
     }
 
     private function createSubject(

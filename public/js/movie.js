@@ -5,6 +5,35 @@ let availablePosters = null
 let renderedPosterCount = 0
 
 document.addEventListener('DOMContentLoaded', () => {
+    const backdrop = document.querySelector('.movie-backdrop img')
+    if (backdrop !== null) {
+        const hideBackdrop = () => {
+            backdrop.parentElement.hidden = true
+            document.querySelector('.movie-profile').classList.remove('movie-profile-with-backdrop')
+        }
+        backdrop.addEventListener('error', hideBackdrop)
+        if (backdrop.complete && backdrop.naturalWidth === 0) hideBackdrop()
+    }
+
+    document.querySelectorAll('.movie-credit-carousel').forEach(carousel => {
+        const grid = carousel.querySelector('.movie-credit-grid')
+        const previous = carousel.querySelector('.movie-credit-scroll-previous')
+        const next = carousel.querySelector('.movie-credit-scroll-next')
+        const update = () => {
+            previous.classList.toggle('d-none', grid.scrollLeft <= 1)
+            next.classList.toggle('d-none', grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 1)
+        }
+        carousel.querySelectorAll('.movie-credit-scroll').forEach(button => {
+            button.addEventListener('click', () => grid.scrollBy({
+                left: Number(button.dataset.direction) * grid.clientWidth * 0.8,
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+            }))
+        })
+        grid.addEventListener('scroll', update, {passive: true})
+        window.addEventListener('resize', update)
+        update()
+    })
+
     const changePosterModal = document.getElementById('changePosterModal')
     if (changePosterModal === null) {
         return
@@ -245,6 +274,8 @@ function toggleWatchDates() {
     const watchDatesListDiv = document.getElementById('watchDatesListDiv');
     const toggleWatchDatesButtonDiv = document.getElementById('toggleWatchDatesButtonDiv');
 
+    toggleWatchDatesButton.setAttribute('aria-expanded', String(!toggleWatchDatesButton.classList.contains('active')))
+
     if (toggleWatchDatesButton.classList.contains('active') === true) {
         toggleWatchDatesButton.classList.remove('active')
         watchDatesListDiv.style.display = 'none';
@@ -363,7 +394,7 @@ function loadRatingModal() {
 }
 
 async function toggleWatchlist(isOnWatchlist) {
-    if (isOnWatchlist == null) {
+    if (isOnWatchlist == null || isOnWatchlist === false) {
         try {
             await addToWatchlistRequest()
             location.reload()

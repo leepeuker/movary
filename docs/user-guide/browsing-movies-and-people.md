@@ -16,7 +16,7 @@ On **All Movies**, search by title or open **Advanced search** to:
 
 Select **Set defaults** to remember the selected sorting, filters, and results per page for All Movies in the current browser. **Clear defaults** restores Movary's built-in sorting, unfiltered view, and page size on future visits, while **Reset** restores all current search controls to their built-in values. Use the view button to switch between poster and table layouts; the table shows additional details and supports sorting through its column headings. Movary remembers the selected layout in the current browser.
 
-Select a movie to view its metadata and the selected user's rating, watch dates, and watchlist status. On your own pages, you can also add a play, change the rating, or update the watchlist.
+Select a movie to view its metadata and the selected user's rating, watch dates, and watchlist status. The movie page shows a backdrop when one is available, with the poster, external ratings and links, and release details alongside the plot and credits. Scroll the cast and director rows horizontally or use their arrow buttons. On your own pages, use **Add play**, the rating edit button, or the watchlist button to update your tracking. **View history** expands watch dates, and **Add review** or **Review** opens the review dialog. The **⋮** button beside the title opens **Movie options**.
 
 ## Browse actors and directors
 
