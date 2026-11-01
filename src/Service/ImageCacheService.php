@@ -30,9 +30,9 @@ class ImageCacheService
     /**
      * @return string|null Public path of image if file path was not already used
      */
-    public function cacheImage(Url $imageUrl, int $resourceId, ResourceType $resourceType, bool $forceRefresh) : ?string
+    public function cacheImage(Url $imageUrl, int $resourceId, ResourceType $resourceType, bool $forceRefresh, bool $backdrop = false) : ?string
     {
-        $imageFile = $this->generateStorageFilePath($resourceId, $resourceType, $imageUrl);
+        $imageFile = $this->generateStorageFilePath($resourceId, $resourceType, $imageUrl, $backdrop);
 
         if ($forceRefresh === false && $this->fileUtil->fileExists($imageFile) === true) {
             return null;
@@ -86,10 +86,18 @@ class ImageCacheService
             }
             $resourceId = pathinfo($file->getPathname(), PATHINFO_FILENAME);
 
-            $result = $this->dbConnection->executeQuery("SELECT id FROM $resourceType WHERE id = ?", [$resourceId]);
+            $columns = $resourceType->isMovie() === true ? 'id, tmdb_backdrop_path' : 'id';
+            $result = $this->dbConnection->executeQuery("SELECT $columns FROM $resourceType WHERE id = ?", [(int)$resourceId]);
+            $resource = $result->fetchAssociative();
 
-            if (count($result->fetchAll()) > 0) {
-                continue;
+            if ($resource !== false) {
+                if (str_contains($resourceId, '-backdrop-') === false) {
+                    continue;
+                }
+                $backdropPath = $resource['tmdb_backdrop_path'] ?? null;
+                if ($backdropPath !== null && $resourceId === $resource['id'] . '-backdrop-' . md5(basename($backdropPath))) {
+                    continue;
+                }
             }
 
             $this->fileUtil->deleteFile($file->getPathname());
@@ -98,6 +106,11 @@ class ImageCacheService
         }
 
         return $deletionCounter;
+    }
+
+    public function generateMovieBackdropPath(int $movieId, Url $imageUrl) : string
+    {
+        return str_replace($this->publicDirectory, '/', $this->generateStorageFilePath($movieId, ResourceType::createMovie(), $imageUrl, true));
     }
 
     public function posterPathExists(string $posterPath) : bool
@@ -119,7 +132,7 @@ class ImageCacheService
         return $this->publicDirectory . trim($this->imageBasePath, '/') . '/' . $pathId . '/';
     }
 
-    private function generateStorageFilePath(int $resourceId, ResourceType $resourceType, Url $imageUrl) : string
+    private function generateStorageFilePath(int $resourceId, ResourceType $resourceType, Url $imageUrl, bool $backdrop = false) : string
     {
         $imageUrlPath = $imageUrl->getPath();
 
@@ -129,6 +142,7 @@ class ImageCacheService
 
         $imageFileExtension = pathinfo($imageUrlPath, PATHINFO_EXTENSION);
 
-        return $this->generateStorageDirectory($resourceType) . $resourceId . '.' . $imageFileExtension;
+        // Include the source image so a changed backdrop cannot reuse a stale cached file.
+        return $this->generateStorageDirectory($resourceType) . $resourceId . ($backdrop === true ? '-backdrop-' . md5(basename($imageUrlPath)) : '') . '.' . $imageFileExtension;
     }
 }
