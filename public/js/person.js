@@ -144,6 +144,38 @@ async function updatePersonProfile(method, body = null) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.person-movie-section').forEach(section => {
+        const button = section.querySelector('.person-movie-view-toggle')
+        if (button === null) {
+            return
+        }
+
+        const setView = view => {
+            const tableViewSelected = view === 'table'
+            section.dataset.movieView = tableViewSelected ? 'table' : 'posters'
+            button.querySelector('.bi-table').classList.toggle('d-none', tableViewSelected)
+            button.querySelector('.bi-grid-fill').classList.toggle('d-none', tableViewSelected === false)
+            const label = `Show ${tableViewSelected ? 'poster' : 'table'} view for ${button.dataset.viewLabel}`
+            button.setAttribute('aria-label', label)
+            button.setAttribute('title', label)
+
+            try {
+                localStorage.setItem(button.dataset.storageKey, section.dataset.movieView)
+            } catch {
+            }
+        }
+
+        let initialView = document.documentElement.dataset.movieListView
+        try {
+            initialView = localStorage.getItem(button.dataset.storageKey) || initialView
+        } catch {
+        }
+        setView(initialView)
+        button.addEventListener('click', () => {
+            setView(section.dataset.movieView === 'table' ? 'posters' : 'table')
+        })
+    })
+
     document.querySelectorAll('.person-movie-carousel').forEach(carousel => {
         const grid = carousel.querySelector('.person-movie-grid')
         const buttons = carousel.querySelectorAll('.person-movie-scroll')
@@ -165,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         grid.addEventListener('scroll', updateButtons, {passive: true})
         window.addEventListener('resize', updateButtons)
-        document.getElementById('movieViewToggleButton')?.addEventListener('click', updateButtons)
+        carousel.closest('.person-movie-section').querySelector('.person-movie-view-toggle').addEventListener('click', updateButtons)
         updateButtons()
     })
 })

@@ -48,6 +48,8 @@ class PersonPageTest extends TestCase
         self::assertStringContainsString('Watched <span class="text-body-secondary">(0)</span>', $html);
         self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
         self::assertSame(3, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
+        self::assertStringContainsString('data-storage-key="personWatchlistView"', $html);
+        self::assertStringNotContainsString('data-storage-key="personWatchedView"', $html);
         self::assertStringNotContainsString('role="tablist"', $html);
     }
 
@@ -68,9 +70,11 @@ class PersonPageTest extends TestCase
         self::assertStringContainsString('Watched <span class="text-body-secondary">(1)</span>', $html);
         self::assertStringContainsString('On Watchlist <span class="text-body-secondary">(1)</span>', $html);
         self::assertSame(6, substr_count($html, 'href="/users/viewer/movies/12-example-movie"'));
-        self::assertSame(1, substr_count($html, 'id="movieViewToggleButton"'));
-        self::assertStringContainsString('id="movieViewToggleButton" class="btn btn-sm btn-outline-light person-options-button"', $html);
-        self::assertStringContainsString('data-storage-key="movieListView"', $html);
+        self::assertSame(2, substr_count($html, 'person-movie-view-toggle"'));
+        self::assertStringContainsString('data-storage-key="personWatchedView"', $html);
+        self::assertStringContainsString('data-storage-key="personWatchlistView"', $html);
+        self::assertStringContainsString('aria-label="Show table view for watched movies"', $html);
+        self::assertStringContainsString('aria-label="Show table view for watchlist movies"', $html);
         self::assertSame(2, substr_count($html, 'class="person-movie-table table-responsive d-none"'));
         self::assertSame(2, substr_count($html, '<td>2024</td>'));
         self::assertSame(2, substr_count($html, '<td class="d-none d-md-table-cell">8</td>'));
@@ -104,7 +108,7 @@ class PersonPageTest extends TestCase
         self::assertStringNotContainsString('<dt>Gender</dt>', $html);
         self::assertStringNotContainsString('years old', $html);
         self::assertStringNotContainsString('id="biographyToggle"', $html);
-        self::assertStringNotContainsString('id="movieViewToggleButton"', $html);
+        self::assertStringNotContainsString('person-movie-view-toggle', $html);
         self::assertStringNotContainsString('id="moreSpecificMovieButton"', $html);
     }
 
