@@ -129,7 +129,6 @@
     grid-auto-columns: calc((100% - 1.5rem) / 3);
     gap: 0.75rem;
     overflow-x: auto;
-    padding-bottom: 0.5rem;
 }
 
 .person-movie-grid img {
