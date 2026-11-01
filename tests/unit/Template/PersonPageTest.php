@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Movary\Template;
 
+use Movary\Domain\Movie\MovieApi;
 use Movary\Service\MovieTitleFormatter;
 use Movary\Service\SlugifyService;
 use Movary\ValueObject\MovieTitleDisplay;
@@ -148,6 +149,13 @@ class PersonPageTest extends TestCase
         bool $signedIn = false,
         ?string $biography = null,
     ) : string {
+        $movieApi = $this->getMockBuilder(MovieApi::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['fetchWithActor', 'fetchWithDirector'])
+            ->getMock();
+        $movieApi->expects(self::once())->method('fetchWithActor')->with(1, 2)->willReturn($watchedActing);
+        $movieApi->expects(self::once())->method('fetchWithDirector')->with(1, 2)->willReturn($watchedDirecting);
+
         return $this->twig->render('page/person.html.twig', [
             'applicationUrl' => '',
             'theme' => 'dark',
@@ -168,9 +176,8 @@ class PersonPageTest extends TestCase
                 'imdbUrl' => null,
                 'tmdbUrl' => 'https://www.themoviedb.org/person/1',
             ],
-            'moviesAsActor' => $watchedActing,
+            'watchedMovies' => $movieApi->fetchWatchedWithPerson(1, 2),
             'moviesFromWatchlistAsActor' => $watchlistActing,
-            'moviesAsDirector' => $watchedDirecting,
             'moviesFromWatchlistAsDirector' => $watchlistDirecting,
         ]);
     }

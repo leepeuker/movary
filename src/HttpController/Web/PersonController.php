@@ -126,8 +126,7 @@ class PersonController
                     'imdbUrl' => $imdbUrl,
                     'isHiddenInTopLists' => $isHiddenInTopLists,
                 ],
-                'moviesAsActor' => $this->movieApi->fetchWithActor($personId, $userId),
-                'moviesAsDirector' => $this->movieApi->fetchWithDirector($personId, $userId),
+                'watchedMovies' => $this->movieApi->fetchWatchedWithPerson($personId, $userId),
                 'canonicalExtra' => '-' . $this->slugify->slugify($person->getName()),
             ]),
         );

@@ -408,6 +408,18 @@ class MovieApi
         return $this->historyApi->fetchPlaysForExport($userId);
     }
 
+    public function fetchWatchedWithPerson(int $personId, int $userId) : array
+    {
+        $movies = array_column(array_merge(
+            $this->fetchWithActor($personId, $userId),
+            $this->fetchWithDirector($personId, $userId),
+        ), null, 'id');
+
+        usort($movies, static fn(array $a, array $b) : int => mb_strtolower($a['title']) <=> mb_strtolower($b['title']));
+
+        return $movies;
+    }
+
     public function fetchWithActor(int $personId, int $userId) : array
     {
         $movies = $this->repository->fetchWithActor($personId, $userId);

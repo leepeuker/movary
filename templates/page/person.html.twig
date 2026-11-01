@@ -35,12 +35,6 @@
 {% endmacro %}
 
 {% block body %}
-    {% set watchedMovies = {} %}
-    {% for movie in moviesAsActor|merge(moviesAsDirector) %}
-        {% set watchedMovies = watchedMovies|merge({('movie-' ~ movie.id): movie}) %}
-    {% endfor %}
-    {% set watchedMovies = watchedMovies|sort((a, b) => a.title|lower <=> b.title|lower) %}
-
     <main role="main" class="container person-page">
         {{ include('component/navbar.html.twig') }}
         {{ include('component/user-select.html.twig') }}
@@ -74,7 +68,7 @@
                     <dl class="person-facts">
                         {% if person.knownForDepartment is not empty %}
                             <div>
-                                <dt>Department</dt>
+                                <dt>Known for</dt>
                                 <dd>{{ person.knownForDepartment }}</dd>
                             </div>
                         {% endif %}
