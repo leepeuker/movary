@@ -219,6 +219,13 @@
     mask-image: linear-gradient(to bottom, #000 75%, transparent);
 }
 
+@media (max-width: 767.98px) {
+    .person-movies,
+    .person-watchlist {
+        margin-top: -0.25rem;
+    }
+}
+
 @media (min-width: 480px) and (max-width: 767.98px) {
     .person-profile {
         grid-template-columns: minmax(11rem, 40%) minmax(0, 1fr);
@@ -267,11 +274,11 @@
     }
 
     .person-biography {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1rem;
     }
 
     .person-watchlist {
-        margin-top: 1rem;
+        margin-top: 0.75rem;
     }
 
     .person-biography-text.is-collapsed {
