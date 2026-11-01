@@ -9,18 +9,6 @@ There are two main ways how to set your server configuration:
 
     Environment variables have the highest priority and overwrite everything else as long as they are set.
 
-## Application version
-
-The version shown in Settings → App → About and the OpenAPI schema is read from the
-`VERSION` file in the application root (`/app/VERSION` in Docker). Official images
-generate this file at build time from the release tag, or `nightly` for nightly builds.
-The matching Git commit is recorded separately in `/app/REVISION` and in the image's
-`org.opencontainers.image.revision` metadata.
-
-Runtime `APPLICATION_VERSION` and `APPLICATION_VERSION_FILE` settings and database values
-do not override the build version. Mounting `/app/storage` does not affect these files.
-Source installations without a `VERSION` file display `unknown`.
-
 ## Environment variables
 
 The `Web UI` column is set to yes if an environment variable can alternatively be set via the web UI.
