@@ -99,7 +99,7 @@ class PersonPageTest extends TestCase
         $html = $this->renderPage(null, [], [], [], [], true);
 
         self::assertSame(1, substr_count($html, 'id="moreSpecificMovieButton"'));
-        self::assertMatchesRegularExpression('/class="person-links".*id="moreSpecificMovieButton".*bi-three-dots.*<section class="person-info"/s', $html);
+        self::assertMatchesRegularExpression('/class="person-links".*id="moreSpecificMovieButton".*bi-three-dots.*<div class="person-info"/s', $html);
         self::assertStringNotContainsString('data-person-options-placement', $html);
         self::assertStringContainsString('id="moreModal"', $html);
     }
