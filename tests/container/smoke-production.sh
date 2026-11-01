@@ -35,6 +35,7 @@ elif ! docker image inspect "$image_reference" >/dev/null 2>&1; then
 fi
 docker run --detach --name "$container_name" --platform "$platform" \
     --env "APPLICATION_SECRET=$application_secret" \
+    --env APPLICATION_VERSION=stale-runtime-version \
     --env DATABASE_MODE=sqlite \
     --env DATABASE_SQLITE=../smoke/movary.sqlite \
     --volume "$database_directory:/smoke" \
@@ -77,6 +78,15 @@ fi
 docker exec "$container_name" curl --silent --fail --output /dev/null http://127.0.0.1:8080/
 docker exec "$container_name" curl --silent --fail --output /dev/null http://127.0.0.1:8080/api/v1/openapi
 
+docker exec "$container_name" php -r '
+    $schema = json_decode(file_get_contents("http://127.0.0.1:8080/api/v1/openapi"), true, 512, JSON_THROW_ON_ERROR);
+    $version = trim(file_get_contents("/app/VERSION"));
+    if ($version === "" || $schema["info"]["version"] !== $version || $version === "stale-runtime-version") {
+        fwrite(STDERR, "API version does not match build metadata\n");
+        exit(1);
+    }
+'
+
 container_logs=$(docker logs "$container_name" 2>&1)
 if [[ $container_logs != *'SUCCESS: Automatic database migration succeeded'* ]]; then
     echo 'The entrypoint did not report a successful automatic database migration' >&2
@@ -97,7 +107,7 @@ fi
 
 docker exec "$container_name" sh -c 'touch /app/storage/.write-test && rm /app/storage/.write-test'
 
-expected_entries=$'bin\nbootstrap.php\ndb\ndocs\npublic\nsettings\nsrc\nstorage\ntemplates\nvendor'
+expected_entries=$'REVISION\nVERSION\nbin\nbootstrap.php\ndb\ndocs\npublic\nsettings\nsrc\nstorage\ntemplates\nvendor'
 actual_entries=$(docker exec "$container_name" sh -c \
     'for path in /app/*; do basename "$path"; done' | sort)
 

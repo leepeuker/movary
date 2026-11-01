@@ -28,6 +28,14 @@ Use the following cli commands to manage your local environment:
 - `make app_database_migrate` execute the database migrations
 - `make app_jobs_process` process the next job from the queue (see database table `job_queue`)
 
+### Build version metadata
+
+Production builds accept `APPLICATION_VERSION` and `APPLICATION_REVISION` build arguments
+and write them to `/app/VERSION` and `/app/REVISION`. Both default to `unknown` when omitted.
+Release and nightly workflows supply the version and commit from the same source used for
+the OCI image metadata. These files are build artifacts outside persistent storage;
+the application version cannot be overridden through runtime configuration.
+
 ### HTTP endpoint tests
 
 Run all standard checks and test suites, including the HTTP endpoint tests, with:

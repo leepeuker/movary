@@ -161,7 +161,7 @@ class ServerEmailSettingsServiceTest extends TestCase
     private function service(array $environment = [], ?PasswordResetTokenService $tokens = null) : array
     {
         $config = new Config($this->createStub(File::class), $environment);
-        $settings = new ServerSettings($config, $this->connection);
+        $settings = new ServerSettings($config, $this->connection, new File());
 
         return [new ServerEmailSettingsService(
             $settings,

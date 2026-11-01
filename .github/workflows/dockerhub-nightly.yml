@@ -78,6 +78,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             APPLICATION_VERSION=nightly
+            APPLICATION_REVISION=${{ github.event.workflow_run.head_sha }}
           cache-from: type=gha,scope=production
           cache-to: type=gha,mode=max,scope=production
 
