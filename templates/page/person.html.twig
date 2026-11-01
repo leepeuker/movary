@@ -44,6 +44,36 @@
     </div>
 {% endmacro %}
 
+{% macro movieTable(movies, applicationUrl, routeUsername) %}
+    <div class="person-movie-table table-responsive d-none">
+        <table class="table table-hover align-middle text-start">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell" scope="col">Poster</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Release</th>
+                    <th class="d-none d-md-table-cell" scope="col">User rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies %}
+                    {% set movieUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies/' ~ movie.id ~ '-' ~ movie.title|slugify %}
+                    <tr>
+                        <td class="d-none d-sm-table-cell">
+                            <a href="{{ movieUrl }}">
+                                <img src="{{ movie.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ movie.title|movie_title(movie.original_title) }}" loading="lazy">
+                            </a>
+                        </td>
+                        <td><a href="{{ movieUrl }}">{{ movie.title|movie_title(movie.original_title) }}</a></td>
+                        <td>{{ movie.release_date is null ? '—' : movie.release_date|date('Y') }}</td>
+                        <td class="d-none d-md-table-cell">{{ movie.userRating is null ? '—' : movie.userRating }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}
+
 {% block body %}
     <main role="main" class="container person-page">
         {{ include('component/navbar.html.twig') }}
@@ -58,7 +88,7 @@
                     <button type="button" id="moreSpecificMovieButton" class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button"
                             data-bs-toggle="modal" data-bs-target="#moreModal"
                             aria-label="Person options" title="Person options">
-                        <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                        <i class="bi bi-gear" aria-hidden="true"></i>
                     </button>
                 {% endif %}
             </header>
@@ -120,18 +150,36 @@
                         <p class="text-body-secondary mb-0">No biography available.</p>
                     {% endif %}
                 </section>
-                <section class="person-movies" aria-labelledby="personMoviesHeading">
-                    <h2 id="personMoviesHeading" class="h6 fw-bold mb-2">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
+                <section class="person-movies person-movie-section{% if watchedMovies is not empty and watchlistMovies is empty %} person-movies-before-empty-watchlist{% endif %}" aria-labelledby="personMoviesHeading">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h2 id="personMoviesHeading" class="h6 fw-bold mb-0">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
+                        {% if watchedMovies is not empty %}
+                            <button class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button person-movie-view-toggle" type="button" aria-label="Show table view for watched movies" title="Show table view for watched movies" data-storage-key="personWatchedView" data-view-label="watched movies">
+                                <i class="bi bi-table" aria-hidden="true"></i>
+                                <i class="bi bi-grid-fill d-none" aria-hidden="true"></i>
+                            </button>
+                        {% endif %}
+                    </div>
                     {% if watchedMovies is not empty %}
                         {{ _self.movieGrid(watchedMovies, applicationUrl, routeUsername, 'Watched movies') }}
+                        {{ _self.movieTable(watchedMovies, applicationUrl, routeUsername) }}
                     {% else %}
                         <p class="text-body-secondary mb-0">No watched movies for this person yet.</p>
                     {% endif %}
                 </section>
-                <section class="person-watchlist" aria-labelledby="personWatchlistHeading">
-                    <h2 id="personWatchlistHeading" class="h6 fw-bold mb-2">On Watchlist <span class="text-body-secondary">({{ watchlistMovies|length }})</span></h2>
+                <section class="person-watchlist person-movie-section" aria-labelledby="personWatchlistHeading">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h2 id="personWatchlistHeading" class="h6 fw-bold mb-0">On Watchlist <span class="text-body-secondary">({{ watchlistMovies|length }})</span></h2>
+                        {% if watchlistMovies is not empty %}
+                            <button class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button person-movie-view-toggle" type="button" aria-label="Show table view for watchlist movies" title="Show table view for watchlist movies" data-storage-key="personWatchlistView" data-view-label="watchlist movies">
+                                <i class="bi bi-table" aria-hidden="true"></i>
+                                <i class="bi bi-grid-fill d-none" aria-hidden="true"></i>
+                            </button>
+                        {% endif %}
+                    </div>
                     {% if watchlistMovies is not empty %}
                         {{ _self.movieGrid(watchlistMovies, applicationUrl, routeUsername, 'Watchlist movies') }}
+                        {{ _self.movieTable(watchlistMovies, applicationUrl, routeUsername) }}
                     {% else %}
                         <p class="text-body-secondary mb-0">No watchlist movies for this person yet.</p>
                     {% endif %}

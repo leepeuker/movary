@@ -78,6 +78,11 @@
     justify-content: center;
 }
 
+#moreSpecificMovieButton {
+    transform: scale(1.2);
+    transform-origin: top right;
+}
+
 .person-options-button .bi {
     display: flex;
     line-height: 1;
@@ -121,15 +126,38 @@
 .person-movie-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: clamp(7rem, 18vw, 10rem);
-    gap: 1rem;
+    grid-auto-columns: calc((100% - 1.5rem) / 3);
+    gap: 0.75rem;
     overflow-x: auto;
+}
+
+.person-movies-before-empty-watchlist:not([data-movie-view="table"]) .person-movie-grid {
     padding-bottom: 0.5rem;
 }
 
 .person-movie-grid img {
     aspect-ratio: 2 / 3;
     object-fit: cover;
+}
+
+.person-movie-section[data-movie-view="table"] .person-movie-carousel {
+    display: none !important;
+}
+
+.person-movie-section[data-movie-view="table"] .person-movie-table {
+    display: block !important;
+}
+
+@media (min-width: 992px) {
+    .person-movie-grid {
+        grid-auto-columns: calc((100% - 3rem) / 5);
+    }
+}
+
+@media (min-width: 1400px) {
+    .person-movie-grid {
+        grid-auto-columns: calc((100% - 3.75rem) / 6);
+    }
 }
 
 .person-movie-scroll {
@@ -247,11 +275,11 @@
     }
 
     .person-biography {
-        margin-bottom: 1.25rem;
+        margin-bottom: 0.5rem;
     }
 
     .person-watchlist {
-        margin-top: 1rem;
+        margin-top: 0.5rem;
     }
 
     .person-biography-text.is-collapsed {
