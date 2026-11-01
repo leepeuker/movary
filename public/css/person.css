@@ -121,8 +121,8 @@
 .person-movie-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: clamp(7rem, 18vw, 10rem);
-    gap: 1rem;
+    grid-auto-columns: calc((100% - 1.5rem) / 3);
+    gap: 0.75rem;
     overflow-x: auto;
     padding-bottom: 0.5rem;
 }
@@ -130,6 +130,18 @@
 .person-movie-grid img {
     aspect-ratio: 2 / 3;
     object-fit: cover;
+}
+
+@media (min-width: 992px) {
+    .person-movie-grid {
+        grid-auto-columns: calc((100% - 3rem) / 5);
+    }
+}
+
+@media (min-width: 1400px) {
+    .person-movie-grid {
+        grid-auto-columns: calc((100% - 3.75rem) / 6);
+    }
 }
 
 .person-movie-scroll {
