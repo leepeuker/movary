@@ -180,6 +180,65 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     })
 
+    document.querySelectorAll('.person-movie-section').forEach(section => {
+        const sortBy = section.querySelector('.person-movie-sort-by')
+        const sortOrder = section.querySelector('.person-movie-sort-order')
+        if (sortBy === null) {
+            return
+        }
+
+        const headers = section.querySelectorAll('button[data-sort-by]')
+        const fields = {title: 'title', releaseDate: 'releaseDate', watchDate: 'watchDate', rating: 'rating'}
+        const applySort = () => {
+            const field = fields[sortBy.value]
+            const direction = sortOrder.value === 'asc' ? 1 : -1
+            const compare = (a, b) => {
+                const first = a.dataset[field]
+                const second = b.dataset[field]
+                if (first === '' || second === '') {
+                    if (first !== second) {
+                        return first === '' ? 1 : -1
+                    }
+                } else {
+                    const result = field === 'rating'
+                        ? Number(first) - Number(second)
+                        : first.toLowerCase().localeCompare(second.toLowerCase())
+                    if (result !== 0) {
+                        return result * direction
+                    }
+                }
+
+                return a.dataset.title.toLowerCase().localeCompare(b.dataset.title.toLowerCase())
+                    || Number(a.dataset.movieId) - Number(b.dataset.movieId)
+            }
+
+            section.querySelectorAll('.person-movie-grid, tbody').forEach(container => {
+                const movies = Array.from(container.children).sort(compare)
+                movies.forEach(movie => container.appendChild(movie))
+            })
+            headers.forEach(button => {
+                const active = button.dataset.sortBy === sortBy.value
+                button.closest('th').setAttribute('aria-sort', active ? (direction === 1 ? 'ascending' : 'descending') : 'none')
+                button.querySelector('.person-sort-indicator').textContent = active ? (direction === 1 ? ' ↑' : ' ↓') : ''
+                const nextOrder = active && direction === 1 ? 'descending' : 'ascending'
+                button.setAttribute('aria-label', `Sort by ${button.childNodes[0].textContent.trim()}, ${nextOrder}`)
+            })
+            section.querySelector('.person-movie-grid').scrollLeft = 0
+            section.dispatchEvent(new Event('person-movies-sorted'))
+        }
+
+        sortBy.addEventListener('change', applySort)
+        sortOrder.addEventListener('change', applySort)
+        headers.forEach(button => {
+            button.addEventListener('click', () => {
+                sortOrder.value = button.dataset.sortBy === sortBy.value && sortOrder.value === 'asc' ? 'desc' : 'asc'
+                sortBy.value = button.dataset.sortBy
+                applySort()
+            })
+        })
+        applySort()
+    })
+
     document.querySelectorAll('.person-movie-carousel').forEach(carousel => {
         const grid = carousel.querySelector('.person-movie-grid')
         const buttons = carousel.querySelectorAll('.person-movie-scroll')
@@ -200,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         })
         grid.addEventListener('scroll', updateButtons, {passive: true})
+        carousel.closest('.person-movie-section').addEventListener('person-movies-sorted', updateButtons)
         window.addEventListener('resize', updateButtons)
         carousel.closest('.person-movie-section').querySelector('.person-movie-view-toggle').addEventListener('click', updateButtons)
         updateButtons()

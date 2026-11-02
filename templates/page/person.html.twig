@@ -21,7 +21,7 @@
     <div class="person-movie-carousel position-relative">
         <div class="person-movie-grid" tabindex="0" role="group" aria-label="{{ label }}">
             {% for movie in movies %}
-                <div class="position-relative">
+                <div class="position-relative" {{ _self.movieSortData(movie) }}>
                     <a class="poster-link card h-100 position-relative" href="{{ applicationUrl }}/users/{{ routeUsername }}/movies/{{ movie.id }}-{{ movie.title|slugify }}">
                         <div class="position-relative">
                             <img src="{{ movie.poster_path }}" class="card-img-top card-img-bottom" alt="{{ movie.title|movie_title(movie.original_title) }} Poster" loading="lazy">
@@ -44,21 +44,22 @@
     </div>
 {% endmacro %}
 
-{% macro movieTable(movies, applicationUrl, routeUsername) %}
+{% macro movieTable(movies, applicationUrl, routeUsername, dateFormatPhp) %}
     <div class="person-movie-table table-responsive d-none">
         <table class="table table-hover align-middle text-start">
             <thead>
                 <tr>
                     <th class="d-none d-sm-table-cell" scope="col">Poster</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Release</th>
-                    <th class="d-none d-md-table-cell" scope="col">User rating</th>
+                    <th scope="col">{{ _self.sortHeading('title', 'Title') }}</th>
+                    <th scope="col">{{ _self.sortHeading('releaseDate', 'Release') }}</th>
+                    <th class="d-none d-md-table-cell" scope="col">{{ _self.sortHeading('rating', 'User rating') }}</th>
+                    <th scope="col">{{ _self.sortHeading('watchDate', 'Last watched') }}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for movie in movies %}
                     {% set movieUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies/' ~ movie.id ~ '-' ~ movie.title|slugify %}
-                    <tr>
+                    <tr {{ _self.movieSortData(movie) }}>
                         <td class="d-none d-sm-table-cell">
                             <a href="{{ movieUrl }}">
                                 <img src="{{ movie.poster_path }}" class="rounded-1" width="46" alt="Poster for {{ movie.title|movie_title(movie.original_title) }}" loading="lazy">
@@ -67,10 +68,46 @@
                         <td><a href="{{ movieUrl }}">{{ movie.title|movie_title(movie.original_title) }}</a></td>
                         <td>{{ movie.release_date is null ? '—' : movie.release_date|date('Y') }}</td>
                         <td class="d-none d-md-table-cell">{{ movie.userRating is null ? '—' : movie.userRating }}</td>
+                        <td>{{ movie.lastWatchedAt|default(null) is null ? '—' : movie.lastWatchedAt|date(dateFormatPhp) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+{% endmacro %}
+
+{% macro movieSortData(movie) %}
+    data-movie-id="{{ movie.id }}" data-title="{{ movie.title }}" data-release-date="{{ movie.release_date }}" data-watch-date="{{ movie.lastWatchedAt|default('') }}" data-rating="{{ movie.userRating }}"
+{% endmacro %}
+
+{% macro sortHeading(key, label) %}
+    <button class="btn btn-link p-0 text-reset text-decoration-none fw-semibold" type="button" data-sort-by="{{ key }}">{{ label }}<span class="person-sort-indicator fs-5" aria-hidden="true"></span></button>
+{% endmacro %}
+
+{% macro sortControls(label, theme) %}
+    <div class="dropdown">
+        <button class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button" type="button"
+                data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Sort {{ label }}" title="Sort {{ label }}">
+            <i class="bi bi-sort-down" aria-hidden="true"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end p-3 person-movie-sort-menu">
+            <label class="input-group mb-3">
+                <span class="input-group-text">Sort by</span>
+                <select class="form-control person-movie-sort-by" aria-label="Sort {{ label }} by">
+                    <option value="title">Title</option>
+                    <option value="releaseDate" selected>Release date</option>
+                    <option value="watchDate">Last watched</option>
+                    <option value="rating">User rating</option>
+                </select>
+            </label>
+            <label class="input-group">
+                <span class="input-group-text">Sort order</span>
+                <select class="form-control person-movie-sort-order" aria-label="Sort order for {{ label }}">
+                    <option value="asc">Ascending</option>
+                    <option value="desc" selected>Descending</option>
+                </select>
+            </label>
+        </div>
     </div>
 {% endmacro %}
 
@@ -159,15 +196,18 @@
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <h2 id="personMoviesHeading" class="h6 fw-bold mb-0">Watched <span class="text-body-secondary">({{ watchedMovies|length }})</span></h2>
                         {% if watchedMovies is not empty %}
-                            <button class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button person-movie-view-toggle" type="button" aria-label="Show table view for watched movies" title="Show table view for watched movies" data-storage-key="personWatchedView" data-view-label="watched movies">
-                                <i class="bi bi-table" aria-hidden="true"></i>
-                                <i class="bi bi-grid-fill d-none" aria-hidden="true"></i>
-                            </button>
+                            <div class="d-flex gap-2">
+                                {{ _self.sortControls('watched movies', theme) }}
+                                <button class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button person-movie-view-toggle" type="button" aria-label="Show table view for watched movies" title="Show table view for watched movies" data-storage-key="personWatchedView" data-view-label="watched movies">
+                                    <i class="bi bi-table" aria-hidden="true"></i>
+                                    <i class="bi bi-grid-fill d-none" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         {% endif %}
                     </div>
                     {% if watchedMovies is not empty %}
                         {{ _self.movieGrid(watchedMovies, applicationUrl, routeUsername, 'Watched movies') }}
-                        {{ _self.movieTable(watchedMovies, applicationUrl, routeUsername) }}
+                        {{ _self.movieTable(watchedMovies, applicationUrl, routeUsername, dateFormatPhp|default('Y-m-d')) }}
                     {% else %}
                         <p class="text-body-secondary mb-0">No watched movies for this person yet.</p>
                     {% endif %}
@@ -176,15 +216,18 @@
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <h2 id="personWatchlistHeading" class="h6 fw-bold mb-0">On Watchlist <span class="text-body-secondary">({{ watchlistMovies|length }})</span></h2>
                         {% if watchlistMovies is not empty %}
-                            <button class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button person-movie-view-toggle" type="button" aria-label="Show table view for watchlist movies" title="Show table view for watchlist movies" data-storage-key="personWatchlistView" data-view-label="watchlist movies">
-                                <i class="bi bi-table" aria-hidden="true"></i>
-                                <i class="bi bi-grid-fill d-none" aria-hidden="true"></i>
-                            </button>
+                            <div class="d-flex gap-2">
+                                {{ _self.sortControls('watchlist movies', theme) }}
+                                <button class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} person-options-button person-movie-view-toggle" type="button" aria-label="Show table view for watchlist movies" title="Show table view for watchlist movies" data-storage-key="personWatchlistView" data-view-label="watchlist movies">
+                                    <i class="bi bi-table" aria-hidden="true"></i>
+                                    <i class="bi bi-grid-fill d-none" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         {% endif %}
                     </div>
                     {% if watchlistMovies is not empty %}
                         {{ _self.movieGrid(watchlistMovies, applicationUrl, routeUsername, 'Watchlist movies') }}
-                        {{ _self.movieTable(watchlistMovies, applicationUrl, routeUsername) }}
+                        {{ _self.movieTable(watchlistMovies, applicationUrl, routeUsername, dateFormatPhp|default('Y-m-d')) }}
                     {% else %}
                         <p class="text-body-secondary mb-0">No watchlist movies for this person yet.</p>
                     {% endif %}

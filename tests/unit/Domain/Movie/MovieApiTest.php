@@ -132,6 +132,28 @@ class MovieApiTest extends TestCase
         self::assertSame([], $subject->$method(12, 34));
     }
 
+    /**
+     * @param non-empty-string $method
+     * @param non-empty-string $actorQuery
+     * @param non-empty-string $directorQuery
+     */
+    #[DataProvider('personMovieLists')]
+    public function testPersonMoviesDefaultToReleaseDateDescending(string $method, string $actorQuery, string $directorQuery) : void
+    {
+        $older = ['id' => 1, 'title' => 'Zebra', 'release_date' => '2024-01-01', 'lastWatchedAt' => '2026-01-01'];
+        $latest = ['id' => 2, 'title' => 'Omega', 'release_date' => '2026-01-01', 'lastWatchedAt' => '2024-01-01'];
+        $unknown = ['id' => 3, 'title' => 'Beta', 'release_date' => null, 'lastWatchedAt' => null];
+        $sameDate = ['id' => 4, 'title' => 'Delta', 'release_date' => '2024-01-01', 'lastWatchedAt' => '2024-01-01'];
+        $repository = $this->createMock(MovieRepository::class);
+        $repository->expects(self::once())->method($actorQuery)->with(12, 34)->willReturn([$older, $unknown, $latest]);
+        $repository->expects(self::once())->method($directorQuery)->with(12, 34)->willReturn([$latest, $sameDate]);
+        $urlGenerator = $this->createStub(ImageUrlService::class);
+        $urlGenerator->method('replacePosterPathWithImageSrcUrl')->willReturnArgument(0);
+        $subject = $this->createSubject($this->createStub(MovieHistoryApi::class), $this->createStub(MovieWatchlistApi::class), $repository, $urlGenerator);
+
+        self::assertSame([$latest, $sameDate, $older, $unknown], $subject->$method(12, 34));
+    }
+
     public static function personMovieLists() : array
     {
         return [
