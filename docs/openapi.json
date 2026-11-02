@@ -1167,7 +1167,7 @@
           {
             "name": "sortBy",
             "in": "query",
-            "description": "Sort by",
+            "description": "Sort by. For watchDate, ascending uses each movie's earliest play and descending uses its latest play. Same-day plays are ordered by their position.",
             "required": false,
             "schema": {
               "type": "string",

@@ -1092,7 +1092,7 @@ class MovieRepository
         $movieTitleSortExpression = $this->getMovieTitleSortExpression($movieTitleDisplay);
 
         $sortBySanitized = match ($sortBy) {
-            'rating' => 'rating',
+            'rating' => 'userRating',
             'imdbRating' => 'imdb_rating_average',
             'tmdbRating' => 'tmdb_vote_average',
             'releaseDate' => 'release_date',
@@ -1109,7 +1109,7 @@ class MovieRepository
 
         $sortByWatchDatePosition = '';
         if ($sortBySanitized === 'watched_at') {
-            $sortByWatchDatePosition = "mh.position $sortOrder, ";
+            $sortByWatchDatePosition = "position $sortOrder, ";
         }
 
         $whereQuery = 'WHERE (m.title LIKE ? OR m.original_title LIKE ?) ';
@@ -1153,9 +1153,9 @@ class MovieRepository
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
             SELECT * FROM (
-                SELECT m.*, mur.rating as userRating,
+                SELECT m.*, mur.rating as userRating, mh.watched_at, mh.position,
                     MAX(mh.watched_at) OVER(PARTITION BY m.id) as lastWatchedAt,
-                    ROW_NUMBER() OVER(PARTITION BY m.id) rn
+                    ROW_NUMBER() OVER(PARTITION BY m.id ORDER BY mh.watched_at $sortOrder, mh.position $sortOrder, mh.id $sortOrder) rn
                 FROM movie m
                 JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
                 LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mur.user_id = ?
@@ -1164,9 +1164,9 @@ class MovieRepository
                 $joinProductionCountry
                 $whereQuery
                 GROUP BY m.id, title, release_date, watched_at, rating, mh.position, mh.id
-                ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition $movieTitleSortExpression asc
-            ) a
+            ) m
             WHERE rn = 1
+            ORDER BY $sortBySanitized $sortOrder,$sortByWatchDatePosition $movieTitleSortExpression asc, m.id asc
             LIMIT $offset, $limit
             SQL,
             $payload,

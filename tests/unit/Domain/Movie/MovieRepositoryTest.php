@@ -296,16 +296,17 @@ class MovieRepositoryTest extends TestCase
         );
     }
 
-    public static function provideExternalRatingSortData() : array
+    public static function provideWatchedMovieRatingSortData() : array
     {
         return [
+            'User rating descending' => ['rating', SortOrder::createDesc(), 'userRating desc'],
             'IMDb rating ascending' => ['imdbRating', SortOrder::createAsc(), 'imdb_rating_average asc'],
             'TMDB rating descending' => ['tmdbRating', SortOrder::createDesc(), 'tmdb_vote_average desc'],
         ];
     }
 
-    #[DataProvider('provideExternalRatingSortData')]
-    public function testFetchUniqueWatchedMoviesPaginatedCanSortByExternalRating(
+    #[DataProvider('provideWatchedMovieRatingSortData')]
+    public function testFetchUniqueWatchedMoviesPaginatedCanSortByRating(
         string $sortBy,
         SortOrder $sortOrder,
         string $expectedOrderBy,
@@ -314,7 +315,7 @@ class MovieRepositoryTest extends TestCase
             ->expects(self::once())
             ->method('fetchAllAssociative')
             ->with(
-                self::callback(static fn(string $query) : bool => str_contains($query, "ORDER BY $expectedOrderBy,")),
+                self::callback(static fn(string $query) : bool => str_contains($query, "WHERE rn = 1\nORDER BY $expectedOrderBy,")),
                 [42, 42, '%%', '%%'],
             )
             ->willReturn([]);
@@ -327,6 +328,59 @@ class MovieRepositoryTest extends TestCase
                 page: 1,
                 searchTerm: null,
                 sortBy: $sortBy,
+                sortOrder: $sortOrder,
+                releaseYear: null,
+                language: null,
+                genre: null,
+                hasUserRating: null,
+                userRatingMin: null,
+                userRatingMax: null,
+                locationId: null,
+                productionCountryCode: null,
+                movieTitleDisplay: MovieTitleDisplay::createLocalized(),
+            ),
+        );
+    }
+
+    public static function provideWatchDateSortOrders() : array
+    {
+        return [
+            'earliest play first' => [SortOrder::createAsc()],
+            'latest play first' => [SortOrder::createDesc()],
+        ];
+    }
+
+    #[DataProvider('provideWatchDateSortOrders')]
+    public function testFetchUniqueWatchedMoviesPaginatedSortsSelectedPlaysBeforePagination(SortOrder $sortOrder) : void
+    {
+        $this->dbConnectionMock
+            ->expects(self::once())
+            ->method('fetchAllAssociative')
+            ->with(
+                self::callback(
+                    static fn(string $query) : bool => str_contains(
+                        $query,
+                        "ROW_NUMBER() OVER(PARTITION BY m.id ORDER BY mh.watched_at $sortOrder, mh.position $sortOrder, mh.id $sortOrder) rn",
+                    ) && str_contains(
+                        $query,
+                        "SELECT m.*, mur.rating as userRating, mh.watched_at, mh.position,",
+                    ) && str_contains(
+                        $query,
+                        "WHERE rn = 1\nORDER BY watched_at $sortOrder,position $sortOrder,  LOWER(COALESCE(NULLIF(m.title, ''), m.original_title)) asc, m.id asc\nLIMIT 2, 2",
+                    ),
+                ),
+                [42, 42, '%%', '%%'],
+            )
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->subject->fetchUniqueWatchedMoviesPaginated(
+                userId: 42,
+                limit: 2,
+                page: 2,
+                searchTerm: null,
+                sortBy: 'watchDate',
                 sortOrder: $sortOrder,
                 releaseYear: null,
                 language: null,
