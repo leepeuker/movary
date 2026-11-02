@@ -89,12 +89,13 @@
             {% set perPageQuery = (perPage is null) ? '' : "pp=#{perPage}&" %}
             {% set releaseYearQuery = (releaseYear is null) ? '' : "ry=#{releaseYear}&" %}
             {% set genreQuery = (genre is null) ? '' : "ge=#{genre}&" %}
+            {% set locationQuery = (locationId is null) ? '' : "loc=#{locationId}&" %}
             {% set languageQuery = (language is null) ? '' : "la=#{language}&" %}
             {% set hasUserRatingQuery = (hasUserRating is null) ? '' : hasUserRating == '0' ? "ur=0&" : "ur=1&" %}
             {% set minUserRatingQuery = (hasUserRating is null or minUserRating is null) ? '' : "minur=#{minUserRating}&" %}
             {% set maxUserRatingQuery = (hasUserRating is null or maxUserRating is null) ? '' : "maxur=#{maxUserRating}&" %}
             {% set productionCountryCode = (productionCountryCode is null) ? '' : "pc=#{productionCountryCode}&" %}
-            {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ languageQuery ~ hasUserRatingQuery ~ minUserRatingQuery ~ maxUserRatingQuery ~ productionCountryCode %}
+            {% set baseUrl = applicationUrl ~ '/users/' ~ routeUsername ~ '/movies?' ~ searchTermQuery ~ sortByQuery ~ sortOrderQuery ~ perPageQuery ~ releaseYearQuery ~ genreQuery ~ locationQuery ~ languageQuery ~ hasUserRatingQuery ~ minUserRatingQuery ~ maxUserRatingQuery ~ productionCountryCode %}
 
             <ul class="pagination justify-content-center mt-3">
                 {% if paginationElements.previous is null %}
