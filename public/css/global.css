@@ -50,8 +50,14 @@ html[data-movie-list-view="table"] #movieTableView {
 }
 
 .poster-rating {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   top: 6px;
   right: 6px;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   font-size: 0.8rem;

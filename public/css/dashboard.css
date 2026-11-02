@@ -12,7 +12,16 @@
 }
 
 .dashboard-poster-row {
-    padding: 1rem 0.4rem 0;
+    padding: 0.75rem 0.4rem 0;
+}
+
+.dashboard-poster-row .poster-grid {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+}
+
+.dashboard-poster-row .poster-footer {
+    padding: 0.1rem 0.2rem;
 }
 
 .dashboard-person-card-header {
@@ -32,6 +41,7 @@
     margin: 0.75rem 0;
     padding: 0.4rem;
     background: rgba(var(--bs-secondary-bg-rgb), 0.4);
+    border: 1px solid var(--bs-border-color);
     border-radius: var(--bs-border-radius-sm);
     color: var(--bs-secondary-color);
     font-size: 0.875rem;
