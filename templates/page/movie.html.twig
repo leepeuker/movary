@@ -76,7 +76,7 @@
                 {% if currentUserName == routeUsername %}
                     <button type="button" id="moreSpecificMovieButton" class="btn btn-sm {{ theme == 'dark' ? 'btn-outline-light' : 'btn-outline-dark' }} movie-options-button"
                             data-bs-toggle="modal" data-bs-target="#moreModal" aria-label="Movie options" title="Movie options">
-                        <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                        <i class="bi bi-gear" aria-hidden="true"></i>
                     </button>
                 {% endif %}
             </header>
@@ -88,7 +88,7 @@
                             <a id="bookmarkIcon" class="bi bi-bookmark-fill" href="{{ applicationUrl }}/users/{{ routeUsername }}/watchlist" aria-label="On Watchlist" data-bs-toggle="tooltip" data-bs-title="On Watchlist"></a>
                         {% endif %}
                         <div class="movie-external-rating">
-                            <a href="{{ movie.tmdbUrl }}" target="_blank" rel="noopener noreferrer">
+                            <a href="{{ movie.tmdbUrl }}" target="_blank" rel="noopener noreferrer" aria-label="TMDB" data-bs-toggle="tooltip" data-bs-title="TMDB">
                                 <img src="{{ applicationUrl }}/images/tmdb-logo.svg" class="movie-logo" alt="TMDB">
                             </a>
                             {% if displayTmdbRating and movie.tmdbRatingAverage is not empty and movie.tmdbRatingAverage != 0.0 %}
@@ -98,7 +98,7 @@
                         </div>
                         {% if movie.imdbId is not null %}
                             <div class="movie-external-rating">
-                                <a href="{{ movie.imdbUrl }}" target="_blank" rel="noopener noreferrer">
+                                <a href="{{ movie.imdbUrl }}" target="_blank" rel="noopener noreferrer" aria-label="IMDb" data-bs-toggle="tooltip" data-bs-title="IMDb">
                                     <img src="{{ applicationUrl }}/images/imdb-logo.svg" class="movie-logo" alt="IMDb">
                                 </a>
                                 {% if displayImdbRating and movie.imdbRatingAverage is not empty %}
@@ -107,7 +107,7 @@
                                 {% endif %}
                             </div>
                         {% endif %}
-                        <a href="https://letterboxd.com/tmdb/{{ movie.tmdbId }}" target="_blank" rel="noopener noreferrer">
+                        <a href="https://letterboxd.com/tmdb/{{ movie.tmdbId }}" target="_blank" rel="noopener noreferrer" aria-label="Letterboxd" data-bs-toggle="tooltip" data-bs-title="Letterboxd">
                             <img src="{{ applicationUrl }}/images/letterboxd-logo.png" class="movie-logo" alt="Letterboxd">
                         </a>
                     </div>

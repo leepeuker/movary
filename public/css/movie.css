@@ -21,11 +21,12 @@
 
 .movie-profile {
     display: grid;
-    grid-template-columns: minmax(6rem, 28%) minmax(0, 1fr);
+    grid-template-columns: minmax(11rem, 42%) minmax(0, 1fr);
     grid-template-areas:
-        "poster heading"
-        "content content"
-        "information information";
+        "heading heading"
+        "poster facts"
+        "links facts"
+        "content content";
     gap: 1rem;
     margin-bottom: 1rem;
     position: relative;
@@ -35,7 +36,8 @@
     margin-top: -1.5rem;
 }
 
-.movie-sidebar {
+.movie-sidebar,
+.movie-information {
     display: contents;
 }
 
@@ -51,9 +53,8 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: 1rem;
     min-width: 0;
-    padding-top: 0.25rem;
 }
 
 .movie-heading h1,
@@ -63,8 +64,8 @@
     overflow-wrap: anywhere;
 }
 
-.movie-heading h1 {
-    font-size: clamp(1.25rem, 3vw, 2rem);
+.movie-heading > div {
+    min-width: 0;
 }
 
 .movie-options-button {
@@ -82,9 +83,9 @@
     line-height: 1;
 }
 
-.movie-information {
-    grid-area: information;
-    min-width: 0;
+#moreSpecificMovieButton {
+    transform: scale(1.2);
+    transform-origin: top right;
 }
 
 .movie-content {
@@ -100,6 +101,12 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
+}
+
+.movie-links {
+    grid-area: links;
+    gap: 1rem 0.5rem;
+    margin-bottom: 0;
 }
 
 .movie-secondary-actions {
@@ -133,13 +140,17 @@
 }
 
 .movie-logo {
-    height: 1.25rem;
+    height: 1.5rem;
     width: auto;
 }
 
 .movie-facts {
+    grid-area: facts;
+    min-width: 0;
     display: grid;
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    align-content: start;
+    gap: 0.4rem 1rem;
     margin: 0;
 }
 
@@ -157,7 +168,7 @@
 
 .movie-tagline,
 .movie-section {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.5rem;
 }
 
 .movie-overview {
@@ -168,8 +179,8 @@
 .movie-credit-grid {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: clamp(6.5rem, 17vw, 8rem);
-    gap: 1rem;
+    grid-auto-columns: calc((100% - 1.5rem) / 3);
+    gap: 0.75rem;
     overflow-x: auto;
     padding-bottom: 0.5rem;
 }
@@ -202,8 +213,14 @@
     --bs-btn-hover-color: var(--bs-body-color);
     --bs-btn-hover-bg: var(--bs-secondary-bg);
     --bs-btn-hover-border-color: var(--bs-secondary-color);
+    --bs-btn-active-color: var(--bs-body-color);
+    --bs-btn-active-bg: var(--bs-tertiary-bg);
+    --bs-btn-active-border-color: var(--bs-secondary-color);
+    --bs-btn-focus-shadow-rgb: var(--bs-body-color-rgb);
     position: absolute;
-    top: 40%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
     width: 2rem;
     height: 2rem;
     padding: 0;
@@ -227,15 +244,21 @@
     cursor: pointer;
 }
 
+@media (min-width: 480px) and (max-width: 767.98px) {
+    .movie-profile {
+        grid-template-columns: minmax(11rem, 40%) minmax(0, 1fr);
+    }
+}
+
 @media (min-width: 768px) {
     .movie-profile {
-        grid-template-columns: clamp(13rem, 24vw, 15rem) minmax(0, 1fr);
+        grid-template-columns: clamp(11rem, 28vw, 15rem) minmax(0, 1fr);
         grid-template-areas:
-            "sidebar heading"
+            "heading heading"
             "sidebar content";
-        grid-template-rows: auto 1fr;
-        column-gap: 1.5rem;
-        row-gap: 0.75rem;
+        align-items: start;
+        column-gap: 1rem;
+        row-gap: 0.65rem;
     }
 
     .movie-profile-with-backdrop {
@@ -248,6 +271,29 @@
         flex-direction: column;
         gap: 1rem;
         min-width: 0;
+    }
+
+    .movie-information {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .movie-facts {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (min-width: 992px) {
+    .movie-credit-grid {
+        grid-auto-columns: calc((100% - 3rem) / 5);
+    }
+}
+
+@media (min-width: 1400px) {
+    .movie-credit-grid {
+        grid-auto-columns: calc((100% - 3.75rem) / 6);
     }
 }
 
