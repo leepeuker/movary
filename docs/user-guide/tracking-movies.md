@@ -13,6 +13,10 @@ These are managed separately. For example, you can rate a movie without adding a
 
 Select **Add movie** in the navigation bar, search by title or enter a TMDB movie URL, and select the correct result.
 
+You can also press `+` to open **Add movie** when you are not typing in a form field or editable area and no dialog is open. The search field receives focus automatically when the search dialog opens, so you can start typing immediately.
+
+After searching, use **Tab** and **Shift+Tab** to move through the results, then press **Enter** or **Space** to select a movie. Focus moves to the watch date after selection. **Back** returns focus to the search field.
+
 Before selecting **Add play**, you can:
 
 - change the watch date;
