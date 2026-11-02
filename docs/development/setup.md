@@ -51,16 +51,6 @@ PHP-FPM. Put versioned client tests in `tests/http/Api/`, webhook tests in
 `tests/http/Webhooks/`, and feed tests in `tests/http/Feeds/`. Shared HTTP test harness classes
 live directly in `tests/http/`. Keep fast isolated tests under `tests/unit/`.
 
-### Database integration tests
-
-Unit tests mock database dependencies and run without a database. Tests for email
-settings persistence and transaction rollback live under `tests/integration/` and
-use in-memory SQLite databases. Run them separately in the development container:
-
-```bash
-docker compose exec app vendor/bin/phpunit -c settings/phpunit.xml --testsuite integration
-```
-
 ### Frontend dependencies
 
 Third-party CSS, JavaScript, fonts, source maps, and licenses are managed with npm. npm always runs in the dedicated frontend Docker container, so Node.js and npm do not need to be installed on the host.
