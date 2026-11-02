@@ -113,6 +113,27 @@ document.addEventListener('DOMContentLoaded', function () {
             currentModalVersion++
         })
 
+        document.getElementById('logPlayModal').addEventListener('shown.bs.modal', function () {
+            if (logPlayModalSearchInput.getClientRects().length > 0) {
+                logPlayModalSearchInput.focus()
+            }
+        })
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== '/' || event.defaultPrevented || event.repeat || event.isComposing ||
+                event.ctrlKey || event.metaKey || event.altKey) {
+                return
+            }
+
+            if (event.target.closest('input, textarea, select') !== null || event.target.isContentEditable ||
+                document.querySelector('.modal.show, .modal-backdrop') !== null) {
+                return
+            }
+
+            event.preventDefault()
+            document.querySelector('[data-bs-target="#logPlayModal"]').click()
+        })
+
         loadLogPlayModalLocationOptions()
 
         document.getElementById('logPlayModalLocationInput').addEventListener('change', function () {
