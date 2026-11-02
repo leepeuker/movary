@@ -1057,7 +1057,7 @@ class MovieRepository
             SELECT COUNT(DISTINCT m.id)
             FROM movie m
             JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-            LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?
+            LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mur.user_id = ?
             LEFT JOIN movie_genre mg on m.id = mg.movie_id
             LEFT JOIN genre g on mg.genre_id = g.id
             $joinProductionCountry
@@ -1158,7 +1158,7 @@ class MovieRepository
                     ROW_NUMBER() OVER(PARTITION BY m.id) rn
                 FROM movie m
                 JOIN movie_user_watch_dates mh on mh.movie_id = m.id and mh.user_id = ?
-                LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mh.user_id = ?
+                LEFT JOIN movie_user_rating mur on mh.movie_id = mur.movie_id and mur.user_id = ?
                 LEFT JOIN movie_genre mg on m.id = mg.movie_id
                 LEFT JOIN genre g on mg.genre_id = g.id
                 $joinProductionCountry
