@@ -371,8 +371,12 @@ function loadLogModalSearchResults(data) {
 
     data.forEach((item, index) => {
         const displayTitle = formatMovieTitle(item.title, item.originalTitle)
-        let listElement = document.createElement('li');
-        listElement.className = 'list-group-item list-group-item-action'
+        const listItem = document.createElement('li')
+        listItem.className = 'list-group-item p-0'
+        const listElement = document.createElement('button')
+        listElement.type = 'button'
+        listElement.className = 'list-group-item list-group-item-action border-0 text-start'
+        listElement.style.borderRadius = 'inherit'
         listElement.style.cursor = 'pointer'
         listElement.style.display = 'flex'
         listElement.style.alignItems = 'center'
@@ -393,7 +397,7 @@ function loadLogModalSearchResults(data) {
         poster.style.marginRight = '.5rem'
         poster.style.width = '3rem'
 
-        const description = document.createElement('p')
+        const description = document.createElement('span')
         description.style.margin = '0'
 
         const title = document.createElement('b')
@@ -426,7 +430,8 @@ function loadLogModalSearchResults(data) {
 
         listElement.addEventListener('click', selectLogModalTmdbItemForLogging);
 
-        searchResultList.append(listElement);
+        listItem.append(listElement)
+        searchResultList.append(listItem);
         listElement.querySelectorAll("i.bi[data-bs-toggle='tooltip']").forEach(tooltipTriggerEl => {
             new bootstrap.Tooltip(tooltipTriggerEl)
         });
@@ -458,6 +463,10 @@ function backToLogModalSearchResults() {
     disableLogPlayAdvancedMode()
     document.getElementById('advancedLogPlayModeButton').classList.add('d-none')
     setRatingStars('logPlayModal', 0)
+
+    if (document.getElementById('logPlayModal').classList.contains('show')) {
+        document.getElementById('logPlayModalSearchInput').focus()
+    }
 }
 
 async function selectLogModalTmdbItemForLogging(event) {
@@ -500,6 +509,7 @@ async function selectLogModalTmdbItemForLogging(event) {
     document.getElementById('logPlayModalSearchResultList').classList.add('d-none')
     document.getElementById('logPlayModalFooter').classList.remove('d-none')
     document.getElementById('advancedLogPlayModeButton').classList.remove('d-none')
+    document.getElementById('logPlayModalWatchDateInput').focus()
 }
 
 function updateLogPlayModalButtonState() {
