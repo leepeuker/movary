@@ -16,8 +16,8 @@
 }
 
 .dashboard-poster-row .poster-grid {
-    --bs-gutter-x: 0.5rem;
-    --bs-gutter-y: 0.5rem;
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
 }
 
 .dashboard-poster-row .poster-footer {
