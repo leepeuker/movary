@@ -166,6 +166,31 @@ class PersonPageTest extends TestCase
         self::assertStringNotContainsString('id="biographyToggle"', $html);
     }
 
+    public function testBothSectionsOfferSortingAndClickableHeaders() : void
+    {
+        $movie = array_replace($this->movie(), ['lastWatchedAt' => '2026-11-01']);
+        $html = $this->renderPage(null, [$movie], [$movie], [], []);
+
+        self::assertStringContainsString('aria-label="Sort watched movies"', $html);
+        self::assertStringContainsString('aria-label="Sort watchlist movies"', $html);
+        self::assertSame(2, substr_count($html, '<option value="releaseDate" selected>Release date</option>'));
+        self::assertSame(2, substr_count($html, '<option value="desc" selected>Descending</option>'));
+        foreach (['title', 'releaseDate', 'watchDate', 'rating'] as $sortBy) {
+            self::assertSame(2, substr_count($html, 'data-sort-by="' . $sortBy . '"'));
+        }
+        self::assertSame(4, substr_count($html, 'data-watch-date="2026-11-01"'));
+        self::assertSame(2, substr_count($html, '<td>2026-11-01</td>'));
+    }
+
+    public function testLastWatchedUsesPreferredDateFormat() : void
+    {
+        $movie = array_replace($this->movie(), ['lastWatchedAt' => '2026-11-01']);
+        $html = $this->renderPage(null, [$movie], [], [], [], dateFormat: 'd.m.Y');
+
+        self::assertStringContainsString('<td>01.11.2026</td>', $html);
+        self::assertStringContainsString('data-watch-date="2026-11-01"', $html);
+    }
+
     private function movie() : array
     {
         return [
@@ -187,6 +212,7 @@ class PersonPageTest extends TestCase
         bool $signedIn = false,
         ?string $biography = null,
         array $externalLinks = [],
+        string $dateFormat = 'Y-m-d',
     ) : string {
         $movieApi = $this->getMockBuilder(MovieApi::class)
             ->disableOriginalConstructor()
@@ -200,6 +226,7 @@ class PersonPageTest extends TestCase
         return $this->twig->render('page/person.html.twig', [
             'applicationUrl' => '',
             'theme' => 'dark',
+            'dateFormatPhp' => $dateFormat,
             'routeUsername' => 'viewer',
             'currentUserName' => $signedIn ? 'viewer' : null,
             'currentUserIsAdmin' => false,

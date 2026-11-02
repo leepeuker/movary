@@ -355,3 +355,7 @@
 .btn-check:focus-visible + .person-profile-option {
     box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.35);
 }
+
+.person-movie-sort-menu {
+    min-width: 18rem;
+}

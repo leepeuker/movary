@@ -428,7 +428,8 @@ class MovieRepository
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
+            SELECT DISTINCT m.*, mur.rating as userRating,
+                (SELECT MAX(history.watched_at) FROM movie_user_watch_dates history WHERE history.movie_id = m.id AND history.user_id = ?) AS lastWatchedAt
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
@@ -437,7 +438,7 @@ class MovieRepository
             WHERE p.id = ? AND m.id IN (wl.movie_id) AND wl.user_id = ?
             ORDER BY LOWER(m.title)
             SQL,
-            [$userId, $personId, $userId],
+            [$userId, $userId, $personId, $userId],
         );
     }
 
@@ -445,7 +446,8 @@ class MovieRepository
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
+            SELECT DISTINCT m.*, mur.rating as userRating,
+                (SELECT MAX(history.watched_at) FROM movie_user_watch_dates history WHERE history.movie_id = m.id AND history.user_id = ?) AS lastWatchedAt
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
@@ -454,7 +456,7 @@ class MovieRepository
             WHERE p.id = ? AND m.id IN (wl.movie_id)
             ORDER BY LOWER(m.title)
             SQL,
-            [$userId, $userId, $personId],
+            [$userId, $userId, $userId, $personId],
         );
     }
 
@@ -1218,7 +1220,8 @@ class MovieRepository
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
+            SELECT DISTINCT m.*, mur.rating as userRating,
+                (SELECT MAX(history.watched_at) FROM movie_user_watch_dates history WHERE history.movie_id = m.id AND history.user_id = ?) AS lastWatchedAt
             FROM movie m
             JOIN movie_cast mc ON m.id = mc.movie_id
             JOIN person p ON mc.person_id = p.id
@@ -1227,7 +1230,7 @@ class MovieRepository
             WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh) AND muwd.user_id = ?
             ORDER BY LOWER(m.title)
             SQL,
-            [$userId, $personId, $userId],
+            [$userId, $userId, $personId, $userId],
         );
     }
 
@@ -1235,7 +1238,8 @@ class MovieRepository
     {
         return $this->dbConnection->fetchAllAssociative(
             <<<SQL
-            SELECT DISTINCT m.*, mur.rating as userRating
+            SELECT DISTINCT m.*, mur.rating as userRating,
+                (SELECT MAX(history.watched_at) FROM movie_user_watch_dates history WHERE history.movie_id = m.id AND history.user_id = ?) AS lastWatchedAt
             FROM movie m
             JOIN movie_crew mc ON m.id = mc.movie_id AND job = "Director"
             JOIN person p ON mc.person_id = p.id
@@ -1244,7 +1248,7 @@ class MovieRepository
             WHERE p.id = ? AND m.id IN (SELECT DISTINCT movie_id FROM movie_user_watch_dates mh)
             ORDER BY LOWER(m.title)
             SQL,
-            [$userId, $userId, $personId],
+            [$userId, $userId, $userId, $personId],
         );
     }
 

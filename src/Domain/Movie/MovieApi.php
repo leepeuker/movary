@@ -748,7 +748,11 @@ class MovieApi
     private function sortUniqueMovies(array $movies) : array
     {
         $movies = array_column($movies, null, 'id');
-        usort($movies, static fn(array $a, array $b) : int => mb_strtolower($a['title']) <=> mb_strtolower($b['title']));
+        usort($movies, static fn(array $a, array $b) : int =>
+            ((($a['release_date'] ?? null) === null) <=> (($b['release_date'] ?? null) === null))
+            ?: (($b['release_date'] ?? '') <=> ($a['release_date'] ?? ''))
+            ?: (mb_strtolower($a['title']) <=> mb_strtolower($b['title']))
+            ?: ($a['id'] <=> $b['id']));
 
         return $movies;
     }
