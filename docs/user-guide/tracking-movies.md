@@ -13,7 +13,7 @@ These are managed separately. For example, you can rate a movie without adding a
 
 Select **Add movie** in the navigation bar, search by title or enter a TMDB movie URL, and select the correct result.
 
-You can also press `/` to open **Add movie** when you are not typing in a form field or editable area and no dialog is open. The search field receives focus automatically when the search dialog opens, so you can start typing immediately.
+You can also press `+` to open **Add movie** when you are not typing in a form field or editable area and no dialog is open. The search field receives focus automatically when the search dialog opens, so you can start typing immediately.
 
 Before selecting **Add play**, you can:
 

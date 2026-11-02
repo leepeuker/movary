@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
         document.addEventListener('keydown', function (event) {
-            if (event.key !== '/' || event.defaultPrevented || event.repeat || event.isComposing ||
+            if (event.key !== '+' || event.defaultPrevented || event.repeat || event.isComposing ||
                 event.ctrlKey || event.metaKey || event.altKey) {
                 return
             }
