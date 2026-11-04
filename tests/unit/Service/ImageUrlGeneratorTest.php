@@ -18,13 +18,13 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 class ImageUrlGeneratorTest extends TestCase
 {
-    private ImageCacheService|MockObject $imageCacheServiceMock;
+    private ImageCacheService&MockObject $imageCacheServiceMock;
 
-    private ApplicationUrlService|MockObject $applicationUrlServiceMock;
+    private ApplicationUrlService&MockObject $applicationUrlServiceMock;
 
     private ImageUrlService $subject;
 
-    private MockObject|TmdbUrlGenerator $tmdbUrlGeneratorMock;
+    private MockObject&TmdbUrlGenerator $tmdbUrlGeneratorMock;
 
     public static function provideTestGenerateImageSrcUrlFromParametersData() : array
     {
@@ -119,6 +119,48 @@ class ImageUrlGeneratorTest extends TestCase
             $expectedResult,
             $this->subject->generateImageSrcUrlFromParameters($tmdbPosterPath, $posterPath),
         );
+    }
+
+    public function testMissingBackdropHasNoPlaceholder() : void
+    {
+        $this->tmdbUrlGeneratorMock->expects(self::never())->method('generateImageUrl');
+        $this->imageCacheServiceMock->expects(self::never())->method('generateMovieBackdropPath');
+
+        self::assertNull($this->subject->generateMovieBackdropUrl(12, null));
+        self::assertNull($this->subject->generateMovieBackdropUrl(12, ''));
+    }
+
+    public function testBackdropUsesAvailableCache() : void
+    {
+        $url = Url::createFromString('https://image.tmdb.org/t/p/w1280/backdrop.jpg');
+        $this->tmdbUrlGeneratorMock->expects(self::once())->method('generateImageUrl')->with('/backdrop.jpg', 'w1280')->willReturn($url);
+        $this->imageCacheServiceMock->expects(self::once())->method('generateMovieBackdropPath')->with(12, $url)->willReturn('/cache/12-backdrop.jpg');
+        $this->imageCacheServiceMock->expects(self::once())->method('posterPathExists')->with('/cache/12-backdrop.jpg')->willReturn(true);
+        $this->applicationUrlServiceMock->expects(self::once())->method('createApplicationUrl')
+            ->with(RelativeUrl::create('/cache/12-backdrop.jpg'))->willReturn('/movary/cache/12-backdrop.jpg');
+
+        self::assertSame('/movary/cache/12-backdrop.jpg', $this->subject->generateMovieBackdropUrl(12, '/backdrop.jpg'));
+    }
+
+    public function testBackdropFallsBackToTmdbWhenNotCached() : void
+    {
+        $url = Url::createFromString('https://image.tmdb.org/t/p/w1280/backdrop.jpg');
+        $this->tmdbUrlGeneratorMock->expects(self::once())->method('generateImageUrl')->with('/backdrop.jpg', 'w1280')->willReturn($url);
+        $this->imageCacheServiceMock->method('generateMovieBackdropPath')->willReturn('/cache/12-backdrop.jpg');
+        $this->imageCacheServiceMock->expects(self::once())->method('posterPathExists')->willReturn(false);
+        $this->applicationUrlServiceMock->expects(self::never())->method('createApplicationUrl');
+
+        self::assertSame((string)$url, $this->subject->generateMovieBackdropUrl(12, '/backdrop.jpg'));
+    }
+
+    public function testBackdropUsesTmdbWhenCachingIsDisabled() : void
+    {
+        $url = Url::createFromString('https://image.tmdb.org/t/p/w1280/backdrop.jpg');
+        $this->tmdbUrlGeneratorMock->expects(self::once())->method('generateImageUrl')->with('/backdrop.jpg', 'w1280')->willReturn($url);
+        $this->imageCacheServiceMock->expects(self::never())->method('generateMovieBackdropPath');
+        $subject = new ImageUrlService($this->tmdbUrlGeneratorMock, $this->imageCacheServiceMock, $this->applicationUrlServiceMock, false);
+
+        self::assertSame((string)$url, $subject->generateMovieBackdropUrl(12, '/backdrop.jpg'));
     }
 
     public function testReplacePosterPathWithImageSrcUrl() : void
