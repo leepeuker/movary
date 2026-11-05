@@ -10,7 +10,7 @@
     "bootstrap-icons": "1.13.2",
     "marked": "18.1.1",
     "qrcodejs": "1.0.0",
-    "swagger-ui-dist": "5.34.0",
+    "swagger-ui-dist": "5.34.1",
     "vanillajs-datepicker": "1.3.4"
   }
 }
