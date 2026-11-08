@@ -1,37 +1,36 @@
-name: Deploy openapi.json to https://api.movary.org
+name: Deploy OpenAPI to Cloudflare Pages
 
 on:
   release:
     types: [published]
-    paths:
-      - docs/openapi.json
   workflow_dispatch:
 
+permissions:
+  contents: read
+  deployments: write
+
 jobs:
-
-
-  build:
-    name: Build
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: copy files
-        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1.0.0
         with:
-          host: ${{ secrets.DOCS_SSH_HOST }}
-          username: ${{ secrets.DOCS_SSH_USER }}
-          port: ${{ secrets.DOCS_SSH_PORT }}
-          key: ${{ secrets.DOCS_SSH_KEY }}
-          source: "docs/openapi.json"
-          target: ${{ secrets.API_DEPLOYMENT_DIRECTORY }}
-          strip_components: 1
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: update openapi application version
-        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
+          fetch-depth: 0
+      - name: Build API reference
+        run: |
+          version="${{ github.event.release.tag_name }}"
+          if [ -z "$version" ]; then
+            version="$(git describe --tags --abbrev=0)"
+          fi
+          mkdir -p site/swagger-ui
+          jq --arg version "$version" '.info.version = $version' docs/openapi.json > site/openapi.json
+          cp .github/pages/openapi-index.html site/index.html
+          cp public/vendor/swagger-ui/swagger-ui.css public/vendor/swagger-ui/swagger-ui-bundle.js site/swagger-ui/
+          test -s site/openapi.json
+      - name: Publish API reference
+        uses: cloudflare/wrangler-action@v4.1.3
         with:
-          host: ${{ secrets.DOCS_SSH_HOST }}
-          username: ${{ secrets.DOCS_SSH_USER }}
-          port: ${{ secrets.DOCS_SSH_PORT }}
-          key: ${{ secrets.DOCS_SSH_KEY }}
-          script: >
-            sed -i 's/"version": ""/"version": "${{ github.ref_name }}"/g' ${{ secrets.API_DEPLOYMENT_DIRECTORY }}/openapi.json
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=movary-api --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
